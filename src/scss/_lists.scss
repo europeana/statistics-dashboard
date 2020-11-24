@@ -1,0 +1,17 @@
+ol,
+ul {
+  list-style: none;
+}
+
+dl {
+  margin: 0 0 $space;
+  overflow: hidden;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-left: 0;
+}

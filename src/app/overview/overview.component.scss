@@ -1,9 +1,4 @@
-//@import '../../assets/sass/pandora/settings/metis-variables';
-
-$eu-jade: #009900;
-$bp-small: 15em;
-$bp-med: 60em;
-$bp-xl: 90em;
+@import '../../scss/_variables';
 
 @import "~@swimlane/ngx-datatable/index.css";
 @import "~@swimlane/ngx-datatable/themes/bootstrap.css";
@@ -166,9 +161,13 @@ label {
   display: flex;
 }
 
+.column,
 .filters {
   display: flex;
   flex-direction: column;
+}
+
+.filters {
 
   > li:not(:last-child) {
     margin-bottom: 1em;

@@ -1,4 +1,9 @@
 @charset "UTF-8";
 @import 'scss/reset';
+@import 'scss/mixins';
 @import 'scss/dropdown';
-//@import 'assets/sass/scss/iconography/svg-icons-metis';
+@import 'scss/forms';
+@import 'scss/lists';
+@import 'scss/links';
+@import 'scss/headings_simple';
+@import 'scss/main';

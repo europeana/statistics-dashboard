@@ -67,7 +67,8 @@
       </ul>
 
       <ul class="filters">
-        <li>
+        <li class="column">
+          <h3 [title]="getFormattedDateParam()">Dataset</h3>
           <input
             formControlName="datasetName"
             (keyup.enter)="refresh()"
@@ -75,7 +76,8 @@
             class="datasetName"
           />
         </li>
-        <li>
+        <li class="column">
+          <h3 [title]="getFormattedDateParam()">Date From</h3>
           <input
             formControlName="dateFrom"
             #dateFrom
@@ -85,7 +87,8 @@
             (change)="dateChange(true)"
           />
         </li>
-        <li>
+        <li class="column">
+          <h3 [title]="getFormattedDateParam()">Date To</h3>
           <input
             formControlName="dateTo"
             #dateTo
