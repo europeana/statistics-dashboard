@@ -1,0 +1,340 @@
+<form [formGroup]="form" class="dashboard-wrapper">
+  <ng-template #cbFieldset let-group="group" let-options="options">
+    <li class="dropdown">
+      <a
+        (click)="toggleFilterMenu(group)"
+        class="filter-opener"
+        [ngClass]="{
+          disabled: menuStates[group].disabled,
+          open: menuStates[group].visible
+        }"
+        >{{ group }}
+        <!--{{ group | renameApiFacet }}-->
+      </a>
+      <div *ngIf="menuStates[group].visible" class="dropdown-wrapper">
+        <div class="dropdown-content">
+          <fieldset
+            [formGroupName]="group"
+            class="checkboxes"
+            [ngClass]="group"
+          >
+            <ng-container *ngFor="let option of options">
+              <label>
+                <input
+                  type="checkbox"
+                  [value]="option"
+                  (change)="refresh()"
+                  [formControlName]="fixName(option)"
+                  [attr.disabled]="!selectOptionEnabled(option) ? true : null"
+                />
+                {{ option }}
+              </label>
+            </ng-container>
+          </fieldset>
+        </div>
+      </div>
+
+      <ng-container *ngIf="!menuStates[group].visible">
+        <ng-container *ngIf="getSetValues(group) as setVals">
+          <ng-container *ngIf="setVals.length > 0">
+            <ul class="applied-filter-summary">
+              <li *ngFor="let val of setVals">{{ val }}</li>
+            </ul>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </li>
+  </ng-template>
+
+  <div class="metis-dashboard">
+    <div class="metis-dashboard-left">
+      <h3 [title]="getFormattedFilterParam()">Filters</h3>
+
+      <ul class="filters" (clickOutside)="closeFilters()">
+        <ng-container *ngIf="allFacetData">
+          <ng-container *ngFor="let filter of facetConf">
+            <ng-content
+              *ngTemplateOutlet="
+                cbFieldset;
+                context: {
+                  options: getSelectOptions(filter, allFacetData),
+                  group: filter
+                }
+              "
+            ></ng-content>
+          </ng-container>
+        </ng-container>
+      </ul>
+
+      <ul class="filters">
+        <li>
+          <input
+            formControlName="datasetName"
+            (keyup.enter)="refresh()"
+            placeholder="Dataset Name"
+            class="datasetName"
+          />
+        </li>
+        <li>
+          <input
+            formControlName="dateFrom"
+            #dateFrom
+            [attr.max]="today"
+            type="date"
+            placeholder="{{ 'YYYY-MM-DD' }}"
+            (change)="dateChange(true)"
+          />
+        </li>
+        <li>
+          <input
+            formControlName="dateTo"
+            #dateTo
+            [attr.max]="today"
+            type="date"
+            placeholder="{{ 'YYYY-MM-DD' }}"
+            (change)="dateChange(false)"
+          />
+        </li>
+      </ul>
+    </div>
+
+    <div class="metis-dashboard-right">
+      <h3 [title]="getFormattedContentTierParam() + getFormattedFacetParam()">
+        Facets
+        <span class="svg-icon-spin" [ngClass]="{ showing: isLoading }"></span>
+      </h3>
+
+      <div class="facet-params">
+        <div class="switch-wrapper">
+          <span> CT Zero </span>
+          <label class="switch">
+            <input
+              type="checkbox"
+              formControlName="contentTierZero"
+              (change)="refreshCTZ()"
+            />
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <label *ngFor="let facet of facetConf; let i = index">
+          <input
+            type="radio"
+            value="{{ facet }}"
+            formControlName="facetParameter"
+            (change)="switchFacet(facet)"
+          />
+          {{ facet }}
+          <!-- {{ facet | renameApiFacet }} -->
+        </label>
+      </div>
+
+      <ngx-datatable
+        *ngIf="showTab && tableData"
+        #dataTable
+        id="dataTable"
+        [rows]="tableData.tableRows"
+        class="material expandable datatable fullscreen"
+        [columnMode]="ColumnMode.flex"
+        [headerHeight]="50"
+        [footerHeight]="60"
+        [rowHeight]="50"
+        [scrollbarV]="true"
+        [limit]="tableDataRowsVisible"
+      >
+        <!-- Mobile row detail -->
+        <ngx-datatable-row-detail [rowHeight]="50">
+          <ng-template
+            let-row="row"
+            let-expanded="expanded"
+            ngx-datatable-row-detail-template
+          >
+            <div class="mobile-row">
+              <span
+                *ngFor="let col of tableData.columns | slice: 1"
+                class="mobile-row-detail"
+              >
+                {{ row[col] }}</span
+              >
+            </div>
+          </ng-template>
+        </ngx-datatable-row-detail>
+
+        <!-- Mobile controls -->
+        <ngx-datatable-column
+          [width]="50"
+          [resizeable]="false"
+          [sortable]="false"
+          [draggable]="false"
+          [canAutoResize]="false"
+        >
+          <ng-template
+            let-row="row"
+            let-expanded="expanded"
+            ngx-datatable-cell-template
+          >
+            <a
+              href="#"
+              [class.datatable-icon-right]="!expanded"
+              [class.datatable-icon-down]="expanded"
+              title="Expand / Collapse Row"
+              (click)="toggleExpandRow(row)"
+              class="desktop-hidden"
+            >
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Col 0 -->
+        <ngx-datatable-column
+          name="{{ tableData.columns[0] | titlecase }}"
+          [flexGrow]="3"
+          [minWidth]="200"
+        >
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <a target="_blank" [href]="getUrlRow(value)">
+              {{ value }}
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Col >= 1 -->
+        <ngx-datatable-column
+          *ngFor="let col of tableData.columns | slice: 1; index as i"
+          name="{{ col | titlecase }}"
+          [flexGrow]="1"
+        >
+          <ng-template
+            let-column="column"
+            let-sort="sortFn"
+            ngx-datatable-header-template
+          >
+            <span class="mobile-hidden">{{ column.name }}</span>
+          </ng-template>
+          <ng-template let-value="value" ngx-datatable-cell-template>
+            <span class="mobile-hidden">{{ value }}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-footer *ngIf="true">
+          <ng-template
+            ngx-datatable-footer-template
+            let-rowCount="rowCount"
+            let-pageSize="pageSize"
+            let-selectedCount="selectedCount"
+            let-curPage="curPage"
+            let-offset="offset"
+          >
+            <div class="table-footer">
+              <div class="table-footer-total">
+                <strong>Total</strong>: {{ totalResults }}
+              </div>
+              <a [href]="getUrl(true)" target="_blank">View in portal</a>
+            </div>
+
+            <datatable-pager
+              [pagerLeftArrowIcon]="'datatable-icon-left'"
+              [pagerRightArrowIcon]="'datatable-icon-right'"
+              [pagerPreviousIcon]="'datatable-icon-prev'"
+              [pagerNextIcon]="'datatable-icon-skip'"
+              [page]="curPage"
+              [size]="pageSize"
+              [count]="rowCount"
+              [hidden]="!(rowCount / pageSize > 1)"
+              (change)="dataTable.onFooterPage($event)"
+            >
+            </datatable-pager>
+          </ng-template>
+        </ngx-datatable-footer>
+      </ngx-datatable>
+
+      <ul
+        *ngIf="allFacetData"
+        class="options-wrapper"
+        (clickOutside)="closeDisplayOptions()"
+      >
+        <li class="dropdown">
+          <a
+            (click)="toggleChartOptions()"
+            [ngClass]="{ open: chartOptionsOpen }"
+            ><h3>Charts</h3></a
+          >
+          <div *ngIf="chartOptionsOpen" class="dropdown-wrapper">
+            <div class="dropdown-content">
+              <div class="chart-settings">
+                <label *ngFor="let chartType of chartTypes; let i = index">
+                  <input
+                    type="radio"
+                    value="{{ chartType }}"
+                    (change)="switchChartType()"
+                    formControlName="chartType"
+                  />
+                  {{ chartType }}
+                </label>
+                <label
+                  ><input
+                    type="checkbox"
+                    formControlName="showPercent"
+                    (change)="extractChartData()"
+                  />%</label
+                >
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li>
+          <a #downloadAnchor></a>
+        </li>
+
+        <li class="dropdown">
+          <a
+            (click)="toggleDownloadOptions()"
+            [ngClass]="{ open: downloadOptionsOpen }"
+            ><h3>Downloads</h3></a
+          >
+          <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
+            <ul class="dropdown-content">
+              <li *ngFor="let exportType of exportTypes">
+                <a (click)="export(exportType)">{{ exportType }}</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+
+      <div *ngIf="chartData" class="chart-wrapper" id="pieChart" #pieChart>
+        <ngx-charts-pie-chart
+          *ngIf="showPie"
+          [scheme]="colorScheme"
+          [results]="chartData"
+          [gradient]="true"
+          [legend]="false"
+          [labels]="true"
+          [doughnut]="false"
+        >
+        </ngx-charts-pie-chart>
+
+        <ngx-charts-bar-vertical
+          *ngIf="showBar"
+          [scheme]="colorScheme"
+          [results]="chartData"
+          [gradient]="true"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="false"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+        ></ngx-charts-bar-vertical>
+
+        <ngx-charts-gauge
+          *ngIf="showGauge"
+          [scheme]="colorScheme"
+          [results]="chartData"
+          [legend]="false"
+          [legendPosition]="'below'"
+        ></ngx-charts-gauge>
+      </div>
+      <img style="display: none" #canvas />
+    </div>
+  </div>
+</form>
