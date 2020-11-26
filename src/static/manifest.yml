@@ -1,0 +1,7 @@
+---
+applications:
+- name: statistics-dashboard
+  memory: 2048M
+  instances: 1
+  host: statistics-dashboard-test
+  buildpack: https://github.com/cloudfoundry/staticfile-buildpack.git
