@@ -1,4 +1,6 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { OverviewComponent } from './overview.component';
 
@@ -8,6 +10,9 @@ describe('OverviewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule, ReactiveFormsModule
+      ],
       declarations: [OverviewComponent],
     }).compileComponents();
   }));

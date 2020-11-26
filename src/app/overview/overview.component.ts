@@ -34,7 +34,7 @@ import {
   NameValue,
   RawFacet,
   ExportType
-} from '../_models/models';
+} from '../_models';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
