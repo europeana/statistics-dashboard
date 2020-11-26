@@ -24,49 +24,17 @@ import {
 } from '@swimlane/ngx-datatable';
 import { DataPollingComponent } from '../data-polling';
 
-export type HeaderNameType = 'name' | 'count' | 'percent';
-
-export interface MenuState {
-  visible: boolean;
-  disabled?: boolean;
-}
-
-export interface FacetField {
-  count: number;
-  label: HeaderNameType;
-}
-
-export interface TableRow {
-  name: HeaderNameType;
-  count: string;
-  percent: string;
-}
-
-export interface FmtTableData {
-  columns: Array<string>;
-  tableRows: Array<TableRow>;
-}
-
-export interface Facet {
-  name: string;
-  fields: Array<FacetField>;
-}
-
-export interface NameValue {
-  name: string;
-  value: number;
-}
-
-export interface RawFacet {
-  facets: Array<Facet>;
-  totalResults: number;
-}
-
-export enum ExportType {
-  CSV = 'CSV',
-  PDF = 'PDF',
-}
-
+import {
+  HeaderNameType,
+  MenuState,
+  FacetField,
+  TableRow,
+  FmtTableData,
+  Facet,
+  NameValue,
+  RawFacet,
+  ExportType
+} from '../_models/models';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
@@ -142,7 +110,7 @@ export class OverviewComponent
   isLoading = true;
 
   selFacetIndex = 0;
-  disableZeros = true;
+//  disableZeros = true;
 
   allFacetData: Array<Facet>;
   chartData: Array<NameValue>;
@@ -520,13 +488,9 @@ export class OverviewComponent
     this.pollRefresh.next(true);
   }
 
-  refreshCTZ(): void {
-    this.disableZeros = !this.form.value['contentTierZero'];
-    this.refresh();
-  }
-
-  selectOptionEnabled(val: string): boolean {
-    return !(this.disableZeros && val === '0');
+  selectOptionEnabled(group: string, val: string): boolean {
+    const ctZero = this.form.value['contentTierZero'];
+    return !(group === 'contentTier' && val === '0' && ctZero);
   }
 
   toggleExpandRow(row: DatatableRowDetailDirective): false {
