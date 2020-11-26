@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   europeanaSearchAPI: 'todo......',
   intervalStatus: 2500,
   intervalStatusMax: 60000 * 9.5,
