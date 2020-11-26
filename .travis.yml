@@ -8,6 +8,9 @@ cache:
   - ~/.npm
   - ~/.cache
 
+services:
+  - xvfb
+
 addons:
   apt:
     packages:
@@ -16,6 +19,6 @@ addons:
 before_install:
   - export TZ=Europe/Amsterdam
   - export CHROME_BIN=chromium-browser
-  
+
 #before_script:
 #- cp src/environments/apisettings-test.ts src/environments/apisettings.ts
