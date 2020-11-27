@@ -201,7 +201,7 @@ export class DataPollingComponent
     );
 
     this.allPollingInfo.push({
-      interval: interval,
+      interval,
       refresher: pollRefresh,
       trigger: loadTrigger,
       pollContext: 0,

@@ -4,21 +4,19 @@ import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 import { FmtTableData, TableRow } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class ExportPDFService {
   download(tableData: FmtTableData, imgUrlData: string): void {
-    let html = {
+    const html = {
       content: [
         { text: 'Tables', style: 'header' },
         {
           image: imgUrlData,
-          width: 300,
-          //              alignment: 'justify'
-          //,style: 'centerAlign'
+          width: 300
         },
         {
           table: {
@@ -37,7 +35,7 @@ export class ExportPDFService {
             margin: [0, 30],
           },
           layout: {
-            fillColor: function (rowIndex: number) {
+            fillColor(rowIndex: number) {
               return rowIndex % 2 === 0 ? '#CCCCCC' : null;
             },
           },
@@ -45,7 +43,7 @@ export class ExportPDFService {
       ],
       styles: {
         centerAlign: {
-          //alignment: 'center'
+          // alignment: 'center'
         },
         header: {
           // background: 'red',
@@ -59,7 +57,7 @@ export class ExportPDFService {
         },
       },
       defaultStyle: {
-        //alignment: 'justify'
+        // alignment: 'justify'
       },
     };
     pdfMake.createPdf(html).download();
@@ -69,7 +67,6 @@ export class ExportPDFService {
     return new Promise((resolve) => {
       html2canvas(source.nativeElement).then(
         (canvasHTML: HTMLCanvasElement) => {
-          //this.canvas.nativeElement.src = canvas.toDataURL('image/png');
           canvas.nativeElement.src = canvasHTML.toDataURL('image/png');
           resolve(canvas.nativeElement.src);
         }

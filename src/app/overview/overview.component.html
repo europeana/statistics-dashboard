@@ -8,8 +8,7 @@
           disabled: menuStates[group].disabled,
           open: menuStates[group].visible
         }"
-        >{{ group }}
-        <!--{{ group | renameApiFacet }}-->
+        >{{ group | renameApiFacet }}
       </a>
       <div *ngIf="menuStates[group].visible" class="dropdown-wrapper">
         <div class="dropdown-content">
@@ -128,8 +127,7 @@
             formControlName="facetParameter"
             (change)="switchFacet(facet)"
           />
-          {{ facet }}
-          <!-- {{ facet | renameApiFacet }} -->
+          {{ facet | renameApiFacet }}
         </label>
       </div>
 

@@ -180,7 +180,6 @@ export class OverviewComponent
       () => {
         this.isLoading = true;
         return this.api.loadAPIData(this.getUrl());
-        //return this.http.get<RawFacet>(this.getUrl());
       },
       (rawResult: RawFacet) => {
         this.isLoading = false;
@@ -302,7 +301,7 @@ export class OverviewComponent
     );
     res = (filterContentTierParam.length > 0
       ? filterContentTierParam
-      : this.form.value['contentTierZero']
+      : this.form.value.contentTierZero
       ? this.contentTiersOptions
       : this.contentTiersOptions.slice(1)
     ).join(' OR ');
@@ -323,15 +322,15 @@ export class OverviewComponent
   /** getFormatteddatasetNameParam
    */
   getFormatteddatasetNameParam(): string {
-    const val = this.form.value['datasetName'];
+    const val = this.form.value.datasetName;
     return val ? `&facet=edm_datasetName&qf=edm_datasetName:${val}` : '';
   }
 
   /** getFormattedDateParam
    */
   getFormattedDateParam(): string {
-    const valFrom = this.form.value['dateFrom'];
-    const valTo = this.form.value['dateTo'];
+    const valFrom = this.form.value.dateFrom;
+    const valTo = this.form.value.dateTo;
     if (valFrom && valTo) {
       const range = `${new Date(valFrom).toISOString()}+TO+${new Date(
         valTo
@@ -404,7 +403,7 @@ export class OverviewComponent
   }
 
   selectOptionEnabled(group: string, val: string): boolean {
-    const ctZero = this.form.value['contentTierZero'];
+    const ctZero = this.form.value.contentTierZero;
     return !(group === 'contentTier' && val === '0' && ctZero);
   }
 
