@@ -104,7 +104,7 @@
 
     <div class="metis-dashboard-right">
       <h3 [title]="getFormattedContentTierParam() + getFormattedFacetParam()">
-        Facets
+        By {{ form.value.facetParameter | renameApiFacet }}
         <span class="svg-icon-spin" [ngClass]="{ showing: isLoading }"></span>
       </h3>
 

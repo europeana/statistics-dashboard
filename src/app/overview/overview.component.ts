@@ -325,7 +325,6 @@ export class OverviewComponent
    */
   getFormattedDatasetNameParam(): string {
     const val = this.form.value.datasetName;
-    //return val ? `&facet=edm_datasetName&qf=edm_datasetName:${val}` : '';
     return val ? `edm_datasetName:${val}` : '';
   }
 
