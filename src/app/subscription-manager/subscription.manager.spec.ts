@@ -5,15 +5,15 @@ describe('SubscriptionManager', () => {
   let clss: SubscriptionManager;
 
   /** getUnsubscribable utility
-  */
+   */
   const getUnsubscribable = (undef?: boolean): Subscription => {
     return (undef
       ? undefined
       : ({
-          unsubscribe: jasmine.createSpy('unsubscribe')
+          unsubscribe: jasmine.createSpy('unsubscribe'),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any)) as Subscription;
-  }
+  };
 
   beforeEach(() => {
     clss = new SubscriptionManager();

@@ -1,4 +1,4 @@
-@import '../../scss/_variables';
+@import "../../scss/_variables";
 
 @import "~@swimlane/ngx-datatable/index.css";
 @import "~@swimlane/ngx-datatable/themes/bootstrap.css";
@@ -168,7 +168,6 @@ label {
 }
 
 .filters {
-
   > li:not(:last-child) {
     margin-bottom: 1em;
   }
