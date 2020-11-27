@@ -25,21 +25,21 @@ export class ExportPDFService {
                 return {
                   text: s,
                   style: 'tableHeader',
-                  alignment: 'center',
+                  alignment: 'center'
                 };
               }),
               ...tableData.tableRows.map((tr: TableRow) => {
                 return [tr.name, tr.count, tr.percent];
-              }),
+              })
             ],
-            margin: [0, 30],
+            margin: [0, 30]
           },
           layout: {
             fillColor(rowIndex: number) {
               return rowIndex % 2 === 0 ? '#CCCCCC' : null;
-            },
-          },
-        },
+            }
+          }
+        }
       ],
       styles: {
         centerAlign: {
@@ -48,17 +48,17 @@ export class ExportPDFService {
         header: {
           // background: 'red',
           fontSize: 18,
-          bold: true,
+          bold: true
         },
         tableHeader: {
           bold: true,
           fontSize: 12,
-          color: 'black',
-        },
+          color: 'black'
+        }
       },
       defaultStyle: {
         // alignment: 'justify'
-      },
+      }
     };
     pdfMake.createPdf(html).download();
   }

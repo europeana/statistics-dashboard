@@ -1,4 +1,4 @@
-/** RenameFacetPipe
+/** RenameApiFacetPipe
 /*
 /* a translation utility for html files
 /* supplies human-readable labels for facet names
@@ -12,13 +12,13 @@ const facetNames: { [key: string]: string } = {
   TYPE: 'Type',
   RIGHTS: 'Rights',
   DATA_PROVIDER: 'Data Provider',
-  PROVIDER: 'Provider',
+  PROVIDER: 'Provider'
 };
 
 @Pipe({
-  name: 'renameApiFacet',
+  name: 'renameApiFacet'
 })
-export class RenameFacetPipe implements PipeTransform {
+export class RenameApiFacetPipe implements PipeTransform {
   transform(value: string): string {
     return facetNames[value] || value;
   }

@@ -3,7 +3,7 @@ import {
   Component,
   ElementRef,
   ViewChild,
-  ViewEncapsulation,
+  ViewEncapsulation
 } from '@angular/core';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -12,7 +12,7 @@ import { Subject } from 'rxjs';
 import {
   ColumnMode,
   DatatableComponent,
-  DatatableRowDetailDirective,
+  DatatableRowDetailDirective
 } from '@swimlane/ngx-datatable';
 
 import {
@@ -24,7 +24,7 @@ import {
   Facet,
   NameValue,
   RawFacet,
-  ExportType,
+  ExportType
 } from '../_models';
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
@@ -34,7 +34,7 @@ import { DataPollingComponent } from '../data-polling';
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent
   extends DataPollingComponent
@@ -60,11 +60,11 @@ export class OverviewComponent
     'TYPE',
     'RIGHTS',
     'DATA_PROVIDER',
-    'PROVIDER',
+    'PROVIDER'
   ];
 
   menuStates: { [key: string]: MenuState } = {
-    filterContentTier: { visible: false },
+    filterContentTier: { visible: false }
   };
 
   contentTiersOptions = Array(5)
@@ -85,8 +85,8 @@ export class OverviewComponent
       '#37B98B',
       '#4BC0F0',
       '#1676AA',
-      '#7F3978',
-    ],
+      '#7F3978'
+    ]
   };
 
   ColumnMode = ColumnMode;
@@ -208,7 +208,7 @@ export class OverviewComponent
           this.chartData = [];
           this.tableData = {
             columns: this.columnNames,
-            tableRows: [],
+            tableRows: []
           };
           this.dataTable.limit = this.tableDataRowsVisible;
           this.dataTable.recalculate();
@@ -222,7 +222,7 @@ export class OverviewComponent
     if (!this.menuStates[name]) {
       this.menuStates[name] = {
         visible: false,
-        disabled: this.form.value.facetParameter === name,
+        disabled: this.form.value.facetParameter === name
       };
     }
     options.forEach((option: string) => {
@@ -244,7 +244,7 @@ export class OverviewComponent
       chartType: [this.chartTypes[0]],
       datasetName: [''],
       dateFrom: [''],
-      dateTo: [''],
+      dateTo: ['']
     });
 
     this.facetConf.map((s: string) => {
@@ -430,7 +430,7 @@ export class OverviewComponent
         : f.count;
       return {
         name: f.label,
-        value: val,
+        value: val
       };
     });
   }
@@ -499,9 +499,9 @@ export class OverviewComponent
         return {
           name: f.label,
           count: `${f.count}`,
-          percent: `${((f.count / total) * 100).toFixed(2)}%`,
+          percent: `${((f.count / total) * 100).toFixed(2)}%`
         } as TableRow;
-      }),
+      })
     };
   }
 }

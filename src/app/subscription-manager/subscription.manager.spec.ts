@@ -10,7 +10,7 @@ describe('SubscriptionManager', () => {
     return (undef
       ? undefined
       : ({
-          unsubscribe: jasmine.createSpy('unsubscribe'),
+          unsubscribe: jasmine.createSpy('unsubscribe')
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any)) as Subscription;
   };

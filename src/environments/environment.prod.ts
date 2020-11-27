@@ -5,6 +5,6 @@ export const environment = {
   intervalStatusMax: 60000 * 9.5,
   test: {
     username: 'username',
-    password: 'password',
-  },
+    password: 'password'
+  }
 };

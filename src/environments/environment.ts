@@ -1,6 +1,6 @@
 /** environment
-/* settings that can be used throughout the entire application
-*/
+/*  settings that can be used throughout the entire application
+ **/
 
 export const environment = {
   production: false,
@@ -9,6 +9,6 @@ export const environment = {
   intervalStatusMax: 60000 * 9.5,
   test: {
     username: 'username',
-    password: 'password',
-  },
+    password: 'password'
+  }
 };

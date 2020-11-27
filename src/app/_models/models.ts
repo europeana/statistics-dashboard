@@ -38,5 +38,5 @@ export interface RawFacet {
 
 export enum ExportType {
   CSV = 'CSV',
-  PDF = 'PDF',
+  PDF = 'PDF'
 }

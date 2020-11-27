@@ -2,6 +2,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 
+import { createMockPipe } from '../_mocked';
 import { Facet, HeaderNameType } from '../_models';
 import { OverviewComponent } from './overview.component';
 
@@ -18,9 +19,9 @@ describe('OverviewComponent', () => {
         fields: [
           {
             count: i,
-            label: 'count' as HeaderNameType,
-          },
-        ],
+            label: 'count' as HeaderNameType
+          }
+        ]
       };
       return item;
     });
@@ -29,7 +30,7 @@ describe('OverviewComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, ReactiveFormsModule],
-      declarations: [OverviewComponent],
+      declarations: [OverviewComponent, createMockPipe('renameApiFacet')]
     }).compileComponents();
   }));
 

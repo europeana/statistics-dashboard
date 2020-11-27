@@ -11,12 +11,12 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-import { RenameFacetPipe } from './_translate';
+import { RenameApiFacetPipe } from './_translate';
 
 import { OverviewComponent } from './overview/overview.component';
 
 @NgModule({
-  declarations: [AppComponent, OverviewComponent, RenameFacetPipe],
+  declarations: [AppComponent, OverviewComponent, RenameApiFacetPipe],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
@@ -26,9 +26,9 @@ import { OverviewComponent } from './overview/overview.component';
     ReactiveFormsModule,
     ClickOutsideModule,
     NgxChartsModule,
-    NgxDatatableModule,
+    NgxDatatableModule
   ],
   providers: [],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}
