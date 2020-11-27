@@ -48,13 +48,13 @@
 */
 @mixin svg-bg-with-fallback($file_name) {
   background-repeat: no-repeat;
-  background-image: inline-image('#{$file_name}.svg', image/svg\+ xml);
+  background-image: inline-image("#{$file_name}.svg", image/svg\+ xml);
 
   html.no-svg & {
-    background-image: image-url('#{$file_name}.png');
+    background-image: image-url("#{$file_name}.png");
   }
 }
 
-@import 'mixins/transform';
-@import 'mixins/placeholder';
-@import 'mixins/flexbox';
+@import "mixins/transform";
+@import "mixins/placeholder";
+@import "mixins/flexbox";

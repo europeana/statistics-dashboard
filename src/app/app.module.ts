@@ -4,18 +4,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { ClickOutsideModule } from 'ng-click-outside';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ClickOutsideModule } from 'ng-click-outside';
 
-import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { RenameApiFacetPipe } from './_translate';
 
 import { OverviewComponent } from './overview/overview.component';
 
 @NgModule({
-  declarations: [AppComponent, OverviewComponent],
+  declarations: [AppComponent, OverviewComponent, RenameApiFacetPipe],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
@@ -25,9 +26,9 @@ import { OverviewComponent } from './overview/overview.component';
     ReactiveFormsModule,
     ClickOutsideModule,
     NgxChartsModule,
-    NgxDatatableModule,
+    NgxDatatableModule
   ],
   providers: [],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}

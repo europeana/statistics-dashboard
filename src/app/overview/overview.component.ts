@@ -3,26 +3,17 @@ import {
   Component,
   ElementRef,
   ViewChild,
-  ViewEncapsulation,
+  ViewEncapsulation
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-
-import html2canvas from 'html2canvas';
-import * as pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
-
 import { Subject } from 'rxjs';
 
 import {
   ColumnMode,
   DatatableComponent,
-  DatatableRowDetailDirective,
+  DatatableRowDetailDirective
 } from '@swimlane/ngx-datatable';
-import { DataPollingComponent } from '../data-polling';
 
 import {
   HeaderNameType,
@@ -35,11 +26,15 @@ import {
   RawFacet,
   ExportType
 } from '../_models';
+
+import { APIService, ExportCSVService, ExportPDFService } from '../_services';
+import { DataPollingComponent } from '../data-polling';
+
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent
   extends DataPollingComponent
@@ -65,11 +60,11 @@ export class OverviewComponent
     'TYPE',
     'RIGHTS',
     'DATA_PROVIDER',
-    'PROVIDER',
+    'PROVIDER'
   ];
 
   menuStates: { [key: string]: MenuState } = {
-    filterContentTier: { visible: false },
+    filterContentTier: { visible: false }
   };
 
   contentTiersOptions = Array(5)
@@ -90,8 +85,8 @@ export class OverviewComponent
       '#37B98B',
       '#4BC0F0',
       '#1676AA',
-      '#7F3978',
-    ],
+      '#7F3978'
+    ]
   };
 
   ColumnMode = ColumnMode;
@@ -108,120 +103,37 @@ export class OverviewComponent
   showGauge = false;
   showTab = true;
   isLoading = true;
-
   selFacetIndex = 0;
-//  disableZeros = true;
-
   allFacetData: Array<Facet>;
   chartData: Array<NameValue>;
   tableData: FmtTableData;
   tableDataRowsVisible = 5;
 
-  constructor(private readonly http: HttpClient, private fb: FormBuilder) {
+  constructor(
+    private api: APIService,
+    private csv: ExportCSVService,
+    private pdf: ExportPDFService,
+    private fb: FormBuilder
+  ) {
     super();
     this.buildForm();
-  }
-
-  getChartAsImageUrl(): Promise<string> {
-    return new Promise((resolve) => {
-      html2canvas(this.pieChart.nativeElement).then(
-        (canvas: HTMLCanvasElement) => {
-          this.canvas.nativeElement.src = canvas.toDataURL('image/png');
-          resolve(canvas.toDataURL('image/png'));
-        }
-      );
-    });
-  }
-
-  async download(data: string): Promise<void> {
-    const url = window.URL.createObjectURL(
-      new Blob([data], { type: 'text/csv;charset=utf-8' })
-    );
-    const link = this.downloadAnchor.nativeElement;
-
-    link.href = url;
-    link.download = 'data.csv';
-    link.click();
-
-    const fn = (): void => {
-      window.URL.revokeObjectURL(url);
-    };
-    fn();
   }
 
   export(type: ExportType): false {
     this.downloadOptionsOpen = false;
 
     if (type === ExportType.CSV) {
-      const items = this.tableData.tableRows;
-      const replacer = (_: string, value: string): string => {
-        return value === null ? '' : value;
-      };
-
-      const header = this.columnNames;
-      const csv = items.map((row: TableRow) => {
-        const vals: Array<string> = header.map((fieldName: HeaderNameType) => {
-          return JSON.stringify(row[fieldName], replacer);
-        });
-        return vals.join(',');
-      });
-      csv.unshift(header.join(','));
-      this.download(csv.join('\r\n'));
+      const res = this.csv.csvFromTableRows(
+        this.columnNames,
+        this.tableData.tableRows
+      );
+      this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
-      this.getChartAsImageUrl().then((imgUrl: string) => {
-        let html = {
-          content: [
-            { text: 'Tables', style: 'header' },
-            {
-              image: imgUrl,
-              width: 300,
-              //              alignment: 'justify'
-              //,style: 'centerAlign'
-            },
-            {
-              table: {
-                body: [
-                  this.tableData.columns.map((s: string) => {
-                    return {
-                      text: s,
-                      style: 'tableHeader',
-                      alignment: 'center',
-                    };
-                  }),
-                  ...this.tableData.tableRows.map((tr: TableRow) => {
-                    return [tr.name, tr.count, tr.percent];
-                  }),
-                ],
-                margin: [0, 30],
-              },
-              layout: {
-                fillColor: function (rowIndex: number) {
-                  return rowIndex % 2 === 0 ? '#CCCCCC' : null;
-                },
-              },
-            },
-          ],
-          styles: {
-            centerAlign: {
-              //alignment: 'center'
-            },
-            header: {
-              // background: 'red',
-              fontSize: 18,
-              bold: true,
-            },
-            tableHeader: {
-              bold: true,
-              fontSize: 12,
-              color: 'black',
-            },
-          },
-          defaultStyle: {
-            //alignment: 'justify'
-          },
-        };
-        pdfMake.createPdf(html).download();
-      });
+      this.pdf
+        .getChartAsImageUrl(this.canvas, this.pieChart)
+        .then((imgUrl: string) => {
+          this.pdf.download(this.tableData, imgUrl);
+        });
     }
     return false;
   }
@@ -267,7 +179,7 @@ export class OverviewComponent
       60 * 100000,
       () => {
         this.isLoading = true;
-        return this.http.get<RawFacet>(this.getUrl());
+        return this.api.loadAPIData(this.getUrl());
       },
       (rawResult: RawFacet) => {
         this.isLoading = false;
@@ -296,7 +208,7 @@ export class OverviewComponent
           this.chartData = [];
           this.tableData = {
             columns: this.columnNames,
-            tableRows: [],
+            tableRows: []
           };
           this.dataTable.limit = this.tableDataRowsVisible;
           this.dataTable.recalculate();
@@ -310,7 +222,7 @@ export class OverviewComponent
     if (!this.menuStates[name]) {
       this.menuStates[name] = {
         visible: false,
-        disabled: this.form.value.facetParameter === name,
+        disabled: this.form.value.facetParameter === name
       };
     }
     options.forEach((option: string) => {
@@ -332,7 +244,7 @@ export class OverviewComponent
       chartType: [this.chartTypes[0]],
       datasetName: [''],
       dateFrom: [''],
-      dateTo: [''],
+      dateTo: ['']
     });
 
     this.facetConf.map((s: string) => {
@@ -384,10 +296,12 @@ export class OverviewComponent
   */
   getFormattedContentTierParam(): string {
     let res = '';
-    const filterContentTierParam = this.getSetValues('filterContentTier');
+    const filterContentTierParam = this.getSetCheckboxValues(
+      'filterContentTier'
+    );
     res = (filterContentTierParam.length > 0
       ? filterContentTierParam
-      : this.form.value['contentTierZero']
+      : this.form.value.contentTierZero
       ? this.contentTiersOptions
       : this.contentTiersOptions.slice(1)
     ).join(' OR ');
@@ -408,15 +322,15 @@ export class OverviewComponent
   /** getFormatteddatasetNameParam
    */
   getFormatteddatasetNameParam(): string {
-    const val = this.form.value['datasetName'];
+    const val = this.form.value.datasetName;
     return val ? `&facet=edm_datasetName&qf=edm_datasetName:${val}` : '';
   }
 
   /** getFormattedDateParam
    */
   getFormattedDateParam(): string {
-    const valFrom = this.form.value['dateFrom'];
-    const valTo = this.form.value['dateTo'];
+    const valFrom = this.form.value.dateFrom;
+    const valTo = this.form.value.dateTo;
     if (valFrom && valTo) {
       const range = `${new Date(valFrom).toISOString()}+TO+${new Date(
         valTo
@@ -437,7 +351,7 @@ export class OverviewComponent
         return this.form.controls[filterName].enabled;
       })
       .map((filterName: string) => {
-        return this.getSetValues(filterName)
+        return this.getSetCheckboxValues(filterName)
           .map((value: string) => {
             const unfixed = this.unfixName(value);
             return `&qf=${filterName}:"${encodeURIComponent(unfixed)}"`;
@@ -447,7 +361,7 @@ export class OverviewComponent
       .join('');
   }
 
-  getSetValues(filterName: string): Array<string> {
+  getSetCheckboxValues(filterName: string): Array<string> {
     const checkVals = this.form.value[filterName];
     return checkVals
       ? Object.keys(checkVals).filter((key: string) => {
@@ -489,7 +403,7 @@ export class OverviewComponent
   }
 
   selectOptionEnabled(group: string, val: string): boolean {
-    const ctZero = this.form.value['contentTierZero'];
+    const ctZero = this.form.value.contentTierZero;
     return !(group === 'contentTier' && val === '0' && ctZero);
   }
 
@@ -516,7 +430,7 @@ export class OverviewComponent
         : f.count;
       return {
         name: f.label,
-        value: val,
+        value: val
       };
     });
   }
@@ -585,9 +499,9 @@ export class OverviewComponent
         return {
           name: f.label,
           count: `${f.count}`,
-          percent: `${((f.count / total) * 100).toFixed(2)}%`,
+          percent: `${((f.count / total) * 100).toFixed(2)}%`
         } as TableRow;
-      }),
+      })
     };
   }
 }

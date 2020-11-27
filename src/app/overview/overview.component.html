@@ -8,8 +8,7 @@
           disabled: menuStates[group].disabled,
           open: menuStates[group].visible
         }"
-        >{{ group }}
-        <!--{{ group | renameApiFacet }}-->
+        >{{ group | renameApiFacet }}
       </a>
       <div *ngIf="menuStates[group].visible" class="dropdown-wrapper">
         <div class="dropdown-content">
@@ -25,7 +24,9 @@
                   [value]="option"
                   (change)="refresh()"
                   [formControlName]="fixName(option)"
-                  [attr.disabled]="!selectOptionEnabled(group, option) ? true : null"
+                  [attr.disabled]="
+                    !selectOptionEnabled(group, option) ? true : null
+                  "
                 />
                 {{ option }}
               </label>
@@ -35,7 +36,7 @@
       </div>
 
       <ng-container *ngIf="!menuStates[group].visible">
-        <ng-container *ngIf="getSetValues(group) as setVals">
+        <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
           <ng-container *ngIf="setVals.length > 0">
             <ul class="applied-filter-summary">
               <li *ngFor="let val of setVals">{{ val }}</li>
@@ -126,8 +127,7 @@
             formControlName="facetParameter"
             (change)="switchFacet(facet)"
           />
-          {{ facet }}
-          <!-- {{ facet | renameApiFacet }} -->
+          {{ facet | renameApiFacet }}
         </label>
       </div>
 

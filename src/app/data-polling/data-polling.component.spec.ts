@@ -4,7 +4,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick,
+  tick
 } from '@angular/core/testing';
 import { Observable, of, throwError } from 'rxjs';
 import { RouterModule } from '@angular/router';
@@ -29,7 +29,7 @@ describe('DataPollingComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterModule.forRoot([])],
-      declarations: [DataPollingComponent],
+      declarations: [DataPollingComponent]
     }).compileComponents();
   }));
 
