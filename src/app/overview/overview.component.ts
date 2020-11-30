@@ -141,21 +141,23 @@ export class OverviewComponent extends DataPollingComponent {
   /* returns the url (portal or api) according to the form state
   */
   getUrl(portal = false): string {
-    let apiOnly = '';
     let server;
     const ct = this.getFormattedContentTierParam();
     const filterParam = this.getFormattedFilterParam();
-    const datasetNameParam = this.getFormatteddatasetNameParam();
+    const datasetNameParam = this.getFormattedDatasetNameParam();
     const dateParam = this.getFormattedDateParam();
+    const auth = 'wskey=api2demo&rows=0';
+    const apiOnly = '&profile=facets' + this.getFormattedFacetParam();
 
     if (portal) {
       server = 'https://www.europeana.eu/en/search';
     } else {
       server = 'https://api.europeana.eu/record/v2/search.json';
-      apiOnly =
-        '&wskey=api2demo&profile=facets&rows=0' + this.getFormattedFacetParam();
     }
-    return `${server}?query=*${ct}${apiOnly}${filterParam}${datasetNameParam}${dateParam}`;
+    return (
+      `${server}?${auth}${ct}${apiOnly}${filterParam}${dateParam}` +
+      (datasetNameParam.length > 0 ? `&query=${datasetNameParam}` : '&query=*')
+    );
   }
 
   /** getUrlRow
@@ -314,11 +316,11 @@ export class OverviewComponent extends DataPollingComponent {
       .join('');
   }
 
-  /** getFormatteddatasetNameParam
+  /** getFormattedDatasetNameParam
    */
-  getFormatteddatasetNameParam(): string {
+  getFormattedDatasetNameParam(): string {
     const val = this.form.value.datasetName;
-    return val ? `&facet=edm_datasetName&qf=edm_datasetName:${val}` : '';
+    return val ? `edm_datasetName:${val}` : '';
   }
 
   /** getFormattedDateParam
