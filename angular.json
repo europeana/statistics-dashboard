@@ -84,7 +84,8 @@
             "karmaConfig": "karma.conf.js",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "codeCoverageExclude": ["src/app/_mocked/*.ts"]
           }
         },
         "lint": {

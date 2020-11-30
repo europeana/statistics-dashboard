@@ -1,4 +1,3 @@
-import { ElementRef } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
 import { HeaderNameType } from '../_models';
 import { ExportCSVService } from './';

@@ -7,7 +7,7 @@ export interface MenuState {
 
 export interface FacetField {
   count: number;
-  label: HeaderNameType;
+  label: string;
 }
 
 export interface TableRow {

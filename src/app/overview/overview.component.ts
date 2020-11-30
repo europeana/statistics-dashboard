@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   ViewChild,
@@ -36,9 +35,7 @@ import { DataPollingComponent } from '../data-polling';
   styleUrls: ['./overview.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class OverviewComponent
-  extends DataPollingComponent
-  implements AfterViewInit {
+export class OverviewComponent extends DataPollingComponent {
   @ViewChild('dataTable') dataTable: DatatableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('pieChart') pieChart: ElementRef;
@@ -117,6 +114,7 @@ export class OverviewComponent
   ) {
     super();
     this.buildForm();
+    this.beginPolling();
   }
 
   export(type: ExportType): false {
@@ -170,11 +168,10 @@ export class OverviewComponent
     }:"${encodeURIComponent(qfVal)}"`;
   }
 
-  /** ngOnInit
+  /** beginPolling
   /* - set up data polling for facet data
-  /* - TODO: independently of canned queries
   */
-  ngAfterViewInit(): void {
+  beginPolling(): void {
     this.pollRefresh = this.createNewDataPoller(
       60 * 100000,
       () => {
@@ -210,8 +207,6 @@ export class OverviewComponent
             columns: this.columnNames,
             tableRows: []
           };
-          this.dataTable.limit = this.tableDataRowsVisible;
-          this.dataTable.recalculate();
         }
       }
     ).getPollingSubject();
