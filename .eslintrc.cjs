@@ -11,9 +11,15 @@ module.exports = {
     sourceType: 'module',
     tsconfigRootDir: __dirname
   },
-  plugins: ['@typescript-eslint', '@typescript-eslint/tslint'],
+  plugins: ['@typescript-eslint', '@typescript-eslint/tslint', 'rxjs'],
   extends: ['plugin:@typescript-eslint/eslint-recommended'],
   rules: {
+    'rxjs/no-async-subscribe': 'error',
+    'rxjs/no-ignored-observable': 'error',
+    'rxjs/no-ignored-subscription': 'error',
+    'rxjs/no-nested-subscribe': 'error',
+    'rxjs/no-unbound-methods': 'error',
+    'rxjs/throw-error': 'error',
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/ban-ts-comment': 'error',
     '@typescript-eslint/ban-types': 'off',

@@ -21,9 +21,10 @@ describe('APIService', () => {
 
   it('should load the API data', () => {
     const testUrl = 'http://europeana-api-data';
-    service.loadAPIData(testUrl).subscribe((res: RawFacet) => {
+    const sub = service.loadAPIData(testUrl).subscribe((res: RawFacet) => {
       expect(res).toBeTruthy();
     });
+    sub.unsubscribe();
     http.expectOne(testUrl);
     http.verify();
   });
