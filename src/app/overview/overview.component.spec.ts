@@ -3,8 +3,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
-  DatatableRowDetailDirective,
-  DatatableComponent
+  DatatableComponent,
+  DatatableRowDetailDirective
 } from '@swimlane/ngx-datatable';
 
 import {
@@ -14,7 +14,7 @@ import {
   MockExportCSVService,
   MockExportPDFService
 } from '../_mocked';
-import { ExportType, Facet, HeaderNameType } from '../_models';
+import { ExportType } from '../_models';
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
 
 import { OverviewComponent } from './overview.component';
@@ -27,7 +27,7 @@ describe('OverviewComponent', () => {
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
 
-  const configureTestBed = (errorMode = false) => {
+  const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, ReactiveFormsModule],
       declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
@@ -42,7 +42,7 @@ describe('OverviewComponent', () => {
     }).compileComponents();
   };
 
-  const b4Each = () => {
+  const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
@@ -76,7 +76,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the select options', () => {
-      component.facetConf.forEach((facet: string, i: number) => {
+      component.facetConf.forEach((facet: string) => {
         expect(
           component.getSelectOptions(facet, component.allFacetData).length
         ).toBeGreaterThan(0);
@@ -122,7 +122,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the formatted content tier param', () => {
-      const fmt = (s: string) => {
+      const fmt = (s: string): string => {
         return `&qf=contentTier:(${encodeURIComponent(s)})`;
       };
 
@@ -238,7 +238,9 @@ describe('OverviewComponent', () => {
         rowDetail: {
           toggleExpandRow: spy
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any) as DatatableComponent;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       component.toggleExpandRow(({} as any) as DatatableRowDetailDirective);
       expect(spy).toHaveBeenCalled();
     });
@@ -290,14 +292,13 @@ describe('OverviewComponent', () => {
     });
 
     it('should close the filters', () => {
-      const setAllTrue = () => {
+      const setAllTrue = (): void => {
         Object.keys(component.menuStates).forEach((s: string) => {
           component.menuStates[s].visible = true;
-          //expect(component.menuStates[s].visible).toBeTruthy();
         });
       };
 
-      const checkAllValue = (tf: boolean) => {
+      const checkAllValue = (tf: boolean): void => {
         let allVal = true;
         Object.keys(component.menuStates).forEach((s: string) => {
           if (component.menuStates[s].visible != tf) {

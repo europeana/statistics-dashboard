@@ -1,17 +1,28 @@
-/*
-  This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s language server to improve development experience.
-  It is not intended to be used to perform a compilation.
-
-  To learn more about this file see: https://angular.io/config/solution-tsconfig.
-*/
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "preserveWhitespaces": false
+  },
+  "compileOnSave": false,
+  "compilerOptions": {
+    "declaration": false,
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["es2017", "dom"],
+    "module": "es2020",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "target": "es6",
+    "typeRoots": ["node_modules/@types"]
+  },
+  "exclude": ["cypress/**/*"]
 }

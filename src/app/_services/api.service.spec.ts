@@ -24,7 +24,7 @@ describe('APIService', () => {
     service.loadAPIData(testUrl).subscribe((res: RawFacet) => {
       expect(res).toBeTruthy();
     });
-    const req = http.expectOne(testUrl);
+    http.expectOne(testUrl);
     http.verify();
   });
 });

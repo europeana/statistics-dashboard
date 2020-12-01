@@ -15,15 +15,15 @@ import {
 } from '@swimlane/ngx-datatable';
 
 import {
+  ExportType,
+  Facet,
+  FacetField,
+  FmtTableData,
   HeaderNameType,
   MenuState,
-  FacetField,
-  TableRow,
-  FmtTableData,
-  Facet,
   NameValue,
   RawFacet,
-  ExportType
+  TableRow
 } from '../_models';
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';

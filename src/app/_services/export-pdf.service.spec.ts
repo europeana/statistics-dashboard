@@ -1,6 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
-import { HeaderNameType, TableRow } from '../_models';
+import { TableRow } from '../_models';
 import { ExportPDFService } from './';
 
 describe('ExportPDFService', () => {

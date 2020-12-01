@@ -5,5 +5,7 @@ export class MockExportCSVService {
   csvFromTableRows(_: Array<HeaderNameType>, __: Array<TableRow>): string {
     return 'XXX';
   }
-  download(_: string, __: ElementRef): void {}
+  download(_: string, __: ElementRef): void {
+    console.log('mock download');
+  }
 }
