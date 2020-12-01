@@ -3,20 +3,24 @@ import html2canvas from 'html2canvas';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 import { FmtTableData, TableRow } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class ExportPDFService {
-  download(tableData: FmtTableData, imgUrlData: string): void {
-    const html = {
+  getFillColour(rowIndex: number): string | null {
+    return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+  }
+
+  getHTML(tableData: FmtTableData, imgUrlData: string): any {
+    return {
       content: [
         { text: 'Tables', style: 'header' },
         {
           image: imgUrlData,
-          width: 300
+          width: 300,
+          alignment: 'center'
         },
         {
           table: {
@@ -35,18 +39,12 @@ export class ExportPDFService {
             margin: [0, 30]
           },
           layout: {
-            fillColor(rowIndex: number) {
-              return rowIndex % 2 === 0 ? '#CCCCCC' : null;
-            }
+            fillColor: this.getFillColour
           }
         }
       ],
       styles: {
-        centerAlign: {
-          // alignment: 'center'
-        },
         header: {
-          // background: 'red',
           fontSize: 18,
           bold: true
         },
@@ -55,12 +53,12 @@ export class ExportPDFService {
           fontSize: 12,
           color: 'black'
         }
-      },
-      defaultStyle: {
-        // alignment: 'justify'
       }
     };
-    pdfMake.createPdf(html).download();
+  }
+
+  download(tableData: FmtTableData, imgUrlData: string): void {
+    pdfMake.createPdf(this.getHTML(tableData, imgUrlData)).download();
   }
 
   getChartAsImageUrl(canvas: ElementRef, source: ElementRef): Promise<string> {
