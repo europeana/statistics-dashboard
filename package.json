@@ -7,7 +7,6 @@
     "build": "ng build",
     "test": "ng test",
     "test:dev": "ng test  --code-coverage",
-    "XXXlint": "ng lint",
     "lint": "eslint --ext .js,.ts src/app --fix",
     "e2e": "ng e2e",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{js,json}'",
