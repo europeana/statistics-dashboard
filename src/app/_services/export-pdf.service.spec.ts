@@ -1,6 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';
-import { HeaderNameType, TableRow } from '../_models';
+import { TableRow } from '../_models';
 import { ExportPDFService } from './';
 
 describe('ExportPDFService', () => {
@@ -24,6 +24,11 @@ describe('ExportPDFService', () => {
     const el2 = { nativeElement: e2 } as ElementRef;
 
     expect(service.getChartAsImageUrl(el1, el2)).toBeTruthy();
+  });
+
+  it('should get the fill colour', () => {
+    expect(service.getFillColour(0)).toBeTruthy();
+    expect(service.getFillColour(1)).toBeFalsy();
   });
 
   it('should download', () => {

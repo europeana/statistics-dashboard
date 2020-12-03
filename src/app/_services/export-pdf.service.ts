@@ -10,57 +10,54 @@ import { FmtTableData, TableRow } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class ExportPDFService {
+  getFillColour(rowIndex: number): string | null {
+    return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+  }
+
   download(tableData: FmtTableData, imgUrlData: string): void {
-    const html = {
-      content: [
-        { text: 'Tables', style: 'header' },
-        {
-          image: imgUrlData,
-          width: 300
-        },
-        {
-          table: {
-            body: [
-              tableData.columns.map((s: string) => {
-                return {
-                  text: s,
-                  style: 'tableHeader',
-                  alignment: 'center'
-                };
-              }),
-              ...tableData.tableRows.map((tr: TableRow) => {
-                return [tr.name, tr.count, tr.percent];
-              })
-            ],
-            margin: [0, 30]
+    pdfMake
+      .createPdf({
+        content: [
+          { text: 'Tables', style: 'header' },
+          {
+            image: imgUrlData,
+            width: 300,
+            alignment: 'center'
           },
-          layout: {
-            fillColor(rowIndex: number) {
-              return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+          {
+            table: {
+              body: [
+                tableData.columns.map((s: string) => {
+                  return {
+                    text: s,
+                    style: 'tableHeader',
+                    alignment: 'center'
+                  };
+                }),
+                ...tableData.tableRows.map((tr: TableRow) => {
+                  return [tr.name, tr.count, tr.percent];
+                })
+              ],
+              margin: [0, 30]
+            },
+            layout: {
+              fillColor: this.getFillColour
             }
           }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 12,
+            color: 'black'
+          }
         }
-      ],
-      styles: {
-        centerAlign: {
-          // alignment: 'center'
-        },
-        header: {
-          // background: 'red',
-          fontSize: 18,
-          bold: true
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 12,
-          color: 'black'
-        }
-      },
-      defaultStyle: {
-        // alignment: 'justify'
-      }
-    };
-    pdfMake.createPdf(html).download();
+      })
+      .download();
   }
 
   getChartAsImageUrl(canvas: ElementRef, source: ElementRef): Promise<string> {

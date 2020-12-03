@@ -101,9 +101,10 @@ const MockAPIData = {
 export class MockAPIService {
   errorMode = false;
 
-  loadAPIData(_: string): Observable<any> {
+  loadAPIData(_: string): Observable<RawFacet> {
     if (this.errorMode) {
-      return of({ items: [], totalResults: 0 });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return of(({ items: [], totalResults: 0 } as any) as RawFacet);
     }
     return of(MockAPIData);
   }
