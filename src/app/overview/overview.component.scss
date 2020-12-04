@@ -5,6 +5,7 @@
 @import "~@swimlane/ngx-datatable/themes/material.css";
 @import "~@swimlane/ngx-datatable/assets/icons.css";
 
+$transition-duration: 0.4s;
 $width-left-col: 200px;
 
 .switch-wrapper {
@@ -26,7 +27,7 @@ $width-left-col: 200px;
       position: absolute;
       right: 0;
       top: 0;
-      transition: 0.4s;
+      transition: $transition-duration;
 
       &::before {
         border-radius: 50%;
@@ -37,8 +38,7 @@ $width-left-col: 200px;
         left: 4px;
         bottom: 4px;
         background-color: white;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
+        transition: $transition-duration;
       }
     }
 
@@ -133,7 +133,7 @@ label {
   }
 }
 
-.filter-opener {
+.menu-opener {
   &.disabled {
     color: #aaa;
     pointer-events: none;
@@ -147,6 +147,63 @@ label {
 
 .datatable {
   margin: 1.6em 0;
+}
+
+.clear-filter {
+  background-image: url("data:image/svg+xml,%3Csvg viewbox='0 0 32 32' fill='%23ff0000' xmlns='http://www.w3.org/2000/svg'%3E%3Ctitle%3Ecross%3C/title%3E%3Cpath d='M31.708 25.708c-0-0-0-0-0-0l-9.708-9.708 9.708-9.708c0-0 0-0 0-0 0.105-0.105 0.18-0.227 0.229-0.357 0.133-0.356 0.057-0.771-0.229-1.057l-4.586-4.586c-0.286-0.286-0.702-0.361-1.057-0.229-0.13 0.048-0.252 0.124-0.357 0.228 0 0-0 0-0 0l-9.708 9.708-9.708-9.708c-0-0-0-0-0-0-0.105-0.104-0.227-0.18-0.357-0.228-0.356-0.133-0.771-0.057-1.057 0.229l-4.586 4.586c-0.286 0.286-0.361 0.702-0.229 1.057 0.049 0.13 0.124 0.252 0.229 0.357 0 0 0 0 0 0l9.708 9.708-9.708 9.708c-0 0-0 0-0 0-0.104 0.105-0.18 0.227-0.229 0.357-0.133 0.355-0.057 0.771 0.229 1.057l4.586 4.586c0.286 0.286 0.702 0.361 1.057 0.229 0.13-0.049 0.252-0.124 0.357-0.229 0-0 0-0 0-0l9.708-9.708 9.708 9.708c0 0 0 0 0 0 0.105 0.105 0.227 0.18 0.357 0.229 0.356 0.133 0.771 0.057 1.057-0.229l4.586-4.586c0.286-0.286 0.362-0.702 0.229-1.057-0.049-0.13-0.124-0.252-0.229-0.357z'%3E%3C/path%3E%3C/svg%3E");
+  display: inline-block;
+  filter: grayscale(100%);
+  height: 32px;
+  left: 0;
+  opacity: 0.3;
+  position: absolute;
+  transform: scale(0.3);
+  transform-origin: -60% 36%;
+  transition: filter $transition-duration ease-in-out,
+    opacity $transition-duration ease-in-out;
+  width: 32px;
+
+  &:hover {
+    filter: grayscale(0);
+    opacity: 1;
+
+    // highlight items to remove
+    & + .applied-filter-summary {
+      li::before {
+        color: red;
+      }
+    }
+  }
+}
+
+.applied-filter-summary {
+  color: #999;
+  font-size: 0.7em;
+  font-style: italic;
+  list-style: none;
+  margin: 0.5em;
+
+  // apply custom bullets
+  li::before {
+    content: "\2022";
+    color: #999;
+    display: inline-block;
+    font-weight: bold;
+    margin-left: -1em;
+    transition: color $transition-duration ease-in-out;
+    width: 0.85em;
+  }
+}
+
+.filters-header + .clear-filter {
+  transform-origin: 90% 34%;
+
+  // highlight items to remove
+  &:hover + .filters .applied-filter-summary {
+    li::before {
+      color: red;
+    }
+  }
 }
 
 .filter-select {
@@ -174,14 +231,6 @@ label {
 
   &:last-child {
     margin-top: 2em;
-  }
-
-  .applied-filter-summary {
-    color: #999;
-    font-size: 0.7em;
-    font-style: italic;
-    list-style: circle;
-    margin: 0.5em 2em;
   }
 }
 
