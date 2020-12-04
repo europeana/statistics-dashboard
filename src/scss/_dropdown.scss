@@ -3,9 +3,9 @@
 .dropdown {
   margin: 0;
 
-  > a {
+  > .menu-opener {
     border: 1px solid $offwhite;
-    padding-right: 2rem;
+    padding-right: 1.125rem;
     position: relative;
 
     &::after {

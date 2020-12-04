@@ -3,13 +3,17 @@
     <li class="dropdown">
       <a
         (click)="toggleFilterMenu(group)"
-        class="filter-opener"
+        class="menu-opener"
         [ngClass]="{
           disabled: menuStates[group].disabled,
           open: menuStates[group].visible
         }"
-        >{{ group | renameApiFacet }}
-      </a>
+        >{{ group | renameApiFacet }} </a
+      ><a
+        class="clear-filter"
+        *ngIf="getCheckboxValuesPresent(group)"
+        (click)="clearFilter(group)"
+      ></a>
       <div *ngIf="menuStates[group].visible" class="dropdown-wrapper">
         <div class="dropdown-content">
           <fieldset
@@ -49,8 +53,14 @@
 
   <div class="metis-dashboard">
     <div class="metis-dashboard-left">
-      <h3 [title]="getFormattedFilterParam()">Filters</h3>
-
+      <h3 class="filters-header" [title]="getFormattedFilterParam()">
+        Filters
+      </h3>
+      <a
+        class="clear-filter"
+        *ngIf="getCheckboxValuesPresent()"
+        (click)="clearFilter()"
+      ></a>
       <ul class="filters" (clickOutside)="closeFilters()">
         <ng-container *ngIf="allFacetData">
           <ng-container *ngFor="let filter of facetConf">
@@ -257,6 +267,7 @@
       >
         <li class="dropdown">
           <a
+            class="menu-opener"
             (click)="toggleChartOptions()"
             [ngClass]="{ open: chartOptionsOpen }"
             ><h3>Charts</h3></a
@@ -291,6 +302,7 @@
 
         <li class="dropdown">
           <a
+            class="menu-opener"
             (click)="toggleDownloadOptions()"
             [ngClass]="{ open: downloadOptionsOpen }"
             ><h3>Downloads</h3></a

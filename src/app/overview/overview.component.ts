@@ -358,6 +358,14 @@ export class OverviewComponent extends DataPollingComponent {
       .join('');
   }
 
+  getCheckboxValuesPresent(filterName?: string): boolean {
+    return (filterName ? [filterName] : this.facetConf).some((name: string) => {
+      return Object.values(this.form.value[name] || {}).some((val: boolean) => {
+        return val;
+      });
+    });
+  }
+
   getSetCheckboxValues(filterName: string): Array<string> {
     const checkVals = this.form.value[filterName];
     return checkVals
@@ -430,6 +438,13 @@ export class OverviewComponent extends DataPollingComponent {
         value: val
       };
     });
+  }
+
+  clearFilter(filterName?: string): void {
+    (filterName ? [filterName] : this.facetConf).forEach((name: string) => {
+      this.form.get(name).reset();
+    });
+    this.refresh();
   }
 
   closeFilters(exempt = ''): void {

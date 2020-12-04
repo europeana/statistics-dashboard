@@ -162,6 +162,15 @@ describe('OverviewComponent', () => {
       });
     });
 
+    it('should tell if checkbox valueshave been set', () => {
+      expect(component.getCheckboxValuesPresent()).toBeFalsy();
+      expect(component.getCheckboxValuesPresent('TYPE')).toBeFalsy();
+      expect(component.getCheckboxValuesPresent('FAKE')).toBeFalsy();
+      setFilterValue1('TYPE');
+      expect(component.getCheckboxValuesPresent('TYPE')).toBeTruthy();
+      expect(component.getCheckboxValuesPresent()).toBeTruthy();
+    });
+
     it('should get the set checkbox values', () => {
       let selected = component.getSetCheckboxValues('filterContentTier');
       expect(selected.length).toEqual(0);
@@ -216,6 +225,19 @@ describe('OverviewComponent', () => {
       expect(component.menuStates['contentTier'].disabled).toBeTruthy();
       component.enableFilters();
       expect(component.menuStates['contentTier'].disabled).toBeFalsy();
+    });
+
+    it('should clear the filters', () => {
+      setFilterValue1('TYPE');
+      expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
+      component.clearFilter();
+      expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
+      setFilterValue1('TYPE');
+      expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
+      component.clearFilter('RIGHTS');
+      expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
+      component.clearFilter('TYPE');
+      expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
     });
 
     it('should switch the facet', () => {
