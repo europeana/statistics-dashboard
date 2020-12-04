@@ -192,9 +192,19 @@ describe('OverviewComponent', () => {
 
     it('should handle the from-date change', () => {
       expect(component.dateTo.nativeElement.getAttribute('min')).toBeFalsy();
+
       component.form.value.dateFrom = component.today;
       component.dateChange(true);
       expect(component.dateTo.nativeElement.getAttribute('min')).toBeTruthy();
+      expect(component.dateTo.nativeElement.getAttribute('min')).not.toEqual(
+        component.yearZero
+      );
+
+      component.form.value.dateFrom = null;
+      component.dateChange(true);
+      expect(component.dateTo.nativeElement.getAttribute('min')).toEqual(
+        component.yearZero
+      );
     });
 
     it('should handle the to-date change', () => {
@@ -203,9 +213,6 @@ describe('OverviewComponent', () => {
 
       expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
         component.today
-      );
-      expect(component.dateFrom.nativeElement.getAttribute('max')).not.toEqual(
-        yesterday
       );
 
       component.form.value.dateTo = yesterday.toISOString();

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   ViewChild,
@@ -35,7 +36,9 @@ import { DataPollingComponent } from '../data-polling';
   styleUrls: ['./overview.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class OverviewComponent extends DataPollingComponent {
+export class OverviewComponent
+  extends DataPollingComponent
+  implements AfterViewInit {
   @ViewChild('dataTable') dataTable: DatatableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('pieChart') pieChart: ElementRef;
@@ -44,6 +47,9 @@ export class OverviewComponent extends DataPollingComponent {
   @ViewChild('dateTo') dateTo: ElementRef;
 
   today = new Date().toISOString().split('T')[0];
+  yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'))
+    .toISOString()
+    .split('T')[0];
   totalResults = 0;
 
   chartTypes = ['Pie', 'Bar', 'Gauge'];
@@ -115,6 +121,12 @@ export class OverviewComponent extends DataPollingComponent {
     super();
     this.buildForm();
     this.beginPolling();
+  }
+
+  /** ngAfterViewInit
+   */
+  ngAfterViewInit(): void {
+    this.dateFrom.nativeElement.setAttribute('min', this.yearZero);
   }
 
   export(type: ExportType): false {
@@ -379,7 +391,10 @@ export class OverviewComponent extends DataPollingComponent {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
     if (isDateFrom) {
-      this.dateTo.nativeElement.setAttribute('min', valFrom);
+      this.dateTo.nativeElement.setAttribute(
+        'min',
+        valFrom ? valFrom : this.yearZero
+      );
     } else {
       this.dateFrom.nativeElement.setAttribute(
         'max',
@@ -499,7 +514,6 @@ export class OverviewComponent extends DataPollingComponent {
   /* - calculates percentage
   /* returns converted data wrapped in a FmtTableData object
   /*
-  /* @param
   */
   extractTableData(): void {
     const facetData = this.allFacetData[this.selFacetIndex].fields;
