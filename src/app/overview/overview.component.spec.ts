@@ -1,7 +1,7 @@
 import { ElementRef } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   DatatableComponent,
   DatatableRowDetailDirective
@@ -190,23 +190,6 @@ describe('OverviewComponent', () => {
       expect(selected.length).toEqual(2);
     });
 
-    it('should handle the from-date change', () => {
-      expect(component.dateTo.nativeElement.getAttribute('min')).toBeFalsy();
-
-      component.form.value.dateFrom = component.today;
-      component.dateChange(true);
-      expect(component.dateTo.nativeElement.getAttribute('min')).toBeTruthy();
-      expect(component.dateTo.nativeElement.getAttribute('min')).not.toEqual(
-        component.yearZero
-      );
-
-      component.form.value.dateFrom = null;
-      component.dateChange(true);
-      expect(component.dateTo.nativeElement.getAttribute('min')).toEqual(
-        component.yearZero
-      );
-    });
-
     it('should handle the to-date change', () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -226,6 +209,54 @@ describe('OverviewComponent', () => {
       expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
         component.today
       );
+    });
+
+    it('should validate dates', () => {
+      component.form.value.dateFrom = null;
+      component.form.value.dateTo = null;
+
+      const dateFrom = component.form.controls.dateFrom as FormControl;
+      const dateTo = component.form.controls.dateTo as FormControl;
+
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeFalsy();
+      expect(component.validateDateGeneric(dateTo, 'dateTo')).toBeFalsy();
+
+      const yesterYear = new Date(component.yearZero);
+      const yesterday = new Date();
+      const today = new Date(component.today);
+      const tomorrow = new Date(component.today);
+
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterYear.setDate(yesterYear.getDate() - 1);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      dateFrom.setValue(yesterYear.toISOString());
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeTruthy();
+
+      dateFrom.setValue('');
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeFalsy();
+
+      dateFrom.setValue(tomorrow.toISOString());
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeTruthy();
+
+      dateFrom.setValue('');
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeFalsy();
+
+      // comparison
+
+      dateFrom.setValue(today.toISOString());
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeFalsy();
+
+      dateTo.setValue(yesterday.toISOString());
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeTruthy();
+      expect(component.validateDateGeneric(dateTo, 'dateTo')).toBeTruthy();
+
+      dateTo.setValue(today.toISOString());
+      expect(component.validateDateGeneric(dateFrom, 'dateFrom')).toBeFalsy();
+      expect(component.validateDateGeneric(dateTo, 'dateTo')).toBeFalsy();
+
+      dateFrom.setValue(tomorrow.toISOString());
+      expect(component.validateDateGeneric(dateTo, 'dateTo')).toBeTruthy();
     });
 
     it('should enable the filters', () => {
@@ -376,6 +407,60 @@ describe('OverviewComponent', () => {
       expect(component.showBar).toBeFalsy();
       expect(component.showPie).toBeTruthy();
       expect(component.showGauge).toBeFalsy();
+    });
+  });
+
+  describe('Date handling', () => {
+    beforeEach(async(() => {
+      configureTestBed();
+    }));
+
+    beforeEach(b4Each);
+
+    it('should set the min-max attributes', () => {
+      expect(component.dateTo.nativeElement.getAttribute('min')).toBeFalsy();
+
+      component.form.value.dateFrom = component.today;
+      component.dateChange(true);
+      expect(component.dateTo.nativeElement.getAttribute('min')).toBeTruthy();
+      expect(component.dateTo.nativeElement.getAttribute('min')).not.toEqual(
+        component.yearZero
+      );
+
+      component.form.value.dateFrom = null;
+      component.dateChange(true);
+      expect(component.dateTo.nativeElement.getAttribute('min')).toEqual(
+        component.yearZero
+      );
+    });
+
+    it('should clear validation errors for the corresponding field', () => {
+      const tomorrow = new Date(component.today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // set dateTo to something invalid
+      component.form.controls.dateTo.setValue(tomorrow.toISOString());
+
+      expect(component.form.controls.dateTo.errors).toBeTruthy();
+
+      spyOn(component.form.controls.dateTo, 'updateValueAndValidity');
+      component.dateChange(true);
+      expect(
+        component.form.controls.dateTo.updateValueAndValidity
+      ).toHaveBeenCalled();
+
+      component.form.reset();
+
+      // set dateFrom to something invalid
+      component.form.controls.dateFrom.setValue(tomorrow.toISOString());
+
+      expect(component.form.controls.dateFrom.errors).toBeTruthy();
+
+      spyOn(component.form.controls.dateFrom, 'updateValueAndValidity');
+      component.dateChange(false);
+      expect(
+        component.form.controls.dateFrom.updateValueAndValidity
+      ).toHaveBeenCalled();
     });
   });
 
