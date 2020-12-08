@@ -69,6 +69,14 @@ input[type="date"],
   width: 11em;
 }
 
+input[type="date"]:not(:valid) {
+  border: 1px solid red;
+}
+
+.errors {
+  color: red;
+}
+
 .datasetName {
   margin-bottom: 1em;
 }

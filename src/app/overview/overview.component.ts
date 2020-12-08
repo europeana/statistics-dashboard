@@ -252,13 +252,66 @@ export class OverviewComponent
       showPercent: [false],
       chartType: [this.chartTypes[0]],
       datasetName: [''],
-      dateFrom: [''],
-      dateTo: ['']
+      dateFrom: ['', this.validateDateFrom.bind(this)],
+      dateTo: ['', this.validateDateTo.bind(this)]
     });
 
     this.facetConf.map((s: string) => {
       this.form.addControl(s, this.fb.group({}));
     });
+  }
+
+  /** validateDateGeneric
+  /* @param {FormControl} control - the field to validate
+  /* @param {string} fieldName - the field name
+  /* - returns an errors object map
+  */
+  validateDateGeneric(
+    control: FormControl,
+    fieldName: string
+  ): { [key: string]: boolean } | null {
+    const val = control.value || null;
+    let isTooEarly = false;
+    let isTooLate = false;
+    if (val) {
+      const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
+      let dateVal = new Date(val);
+      if (dateVal < new Date(this.yearZero)) {
+        isTooEarly = true;
+      } else if (dateVal > new Date(this.today)) {
+        isTooLate = true;
+      } else if (this.form.value[otherField].length > 0) {
+        let dateOtherVal = new Date(this.form.value[otherField]);
+        if (otherField === 'dateFrom') {
+          if (dateVal < dateOtherVal) {
+            isTooEarly = true;
+          }
+        } else if (dateVal > dateOtherVal) {
+          isTooLate = true;
+        }
+      }
+    }
+    return isTooEarly
+      ? { isTooEarly: isTooEarly }
+      : isTooLate
+      ? { isTooLate: isTooLate }
+      : null;
+  }
+
+  /** validateDateFrom
+  /* @param {FormControl} control - the field to validate
+  /* - returns an errors object map
+  */
+  validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
+    return this.validateDateGeneric(control, 'dateFrom');
+  }
+
+  /** validateDateTo
+  /* @param {FormControl} control - the field to validate
+  /* - returns an errors object map
+  */
+  validateDateTo(control: FormControl): { [key: string]: boolean } | null {
+    return this.validateDateGeneric(control, 'dateTo');
   }
 
   /** fixName
@@ -395,13 +448,26 @@ export class OverviewComponent
         'min',
         valFrom ? valFrom : this.yearZero
       );
+      // if the other is already in error, try to fix it
+      if (this.form.controls.dateTo.errors) {
+        this.form.controls.dateTo.updateValueAndValidity();
+      }
     } else {
       this.dateFrom.nativeElement.setAttribute(
         'max',
         valTo ? valTo : this.today
       );
+      // if the other is already in error, try to fix it
+      if (this.form.controls.dateFrom.errors) {
+        this.form.controls.dateFrom.updateValueAndValidity();
+      }
     }
-    this.refresh();
+    if (
+      !this.form.controls.dateFrom.errors &&
+      !this.form.controls.dateTo.errors
+    ) {
+      this.refresh();
+    }
   }
 
   enableFilters(): void {

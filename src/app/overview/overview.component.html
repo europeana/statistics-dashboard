@@ -1,4 +1,10 @@
 <form [formGroup]="form" class="dashboard-wrapper">
+  <ng-template #dateErrors let-field="field">
+    <ul class="errors">
+      <li *ngIf="form.get(field)!.errors!.isTooEarly">Date is too early</li>
+      <li *ngIf="form.get(field)!.errors!.isTooLate">Date is too late</li>
+    </ul>
+  </ng-template>
   <ng-template #cbFieldset let-group="group" let-options="options">
     <li class="dropdown">
       <a
@@ -97,6 +103,11 @@
             placeholder="{{ 'YYYY-MM-DD' }}"
             (change)="dateChange(true)"
           />
+          <ng-container *ngIf="form.get('dateFrom').errors">
+            <ng-content
+              *ngTemplateOutlet="dateErrors; context: { field: 'dateFrom' }"
+            ></ng-content>
+          </ng-container>
         </li>
         <li class="column">
           <h3 [title]="getFormattedDateParam()">Date To</h3>
@@ -108,6 +119,11 @@
             placeholder="{{ 'YYYY-MM-DD' }}"
             (change)="dateChange(false)"
           />
+          <ng-container *ngIf="form.get('dateTo').errors">
+            <ng-content
+              *ngTemplateOutlet="dateErrors; context: { field: 'dateTo' }"
+            ></ng-content>
+          </ng-container>
         </li>
       </ul>
     </div>
