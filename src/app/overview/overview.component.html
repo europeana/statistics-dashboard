@@ -1,10 +1,8 @@
 <form [formGroup]="form" class="dashboard-wrapper">
   <ng-template #dateErrors let-field="field">
     <ul class="errors">
-      <li *ngIf="form.get(field).errors.isTooEarly">ERROR EARLY</li>
-      <li></li>
-      <li *ngIf="form.get(field).errors.isTooLate">ERROR LATE</li>
-      <li></li>
+      <li *ngIf="form.get(field)!.errors!.isTooEarly">Date is too early</li>
+      <li *ngIf="form.get(field)!.errors!.isTooLate">Date is too late</li>
     </ul>
   </ng-template>
   <ng-template #cbFieldset let-group="group" let-options="options">
