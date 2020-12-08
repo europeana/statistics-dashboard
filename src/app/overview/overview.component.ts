@@ -448,6 +448,7 @@ export class OverviewComponent
         'min',
         valFrom ? valFrom : this.yearZero
       );
+
       // if the other is already in error, try to fix it
       if (this.form.controls.dateTo.errors) {
         this.form.controls.dateTo.updateValueAndValidity();
@@ -464,7 +465,9 @@ export class OverviewComponent
     }
     if (
       !this.form.controls.dateFrom.errors &&
-      !this.form.controls.dateTo.errors
+      !this.form.controls.dateTo.errors &&
+      this.dateFrom.nativeElement.validity.valid &&
+      this.dateTo.nativeElement.validity.valid
     ) {
       this.refresh();
     }
