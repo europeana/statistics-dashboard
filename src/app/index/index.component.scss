@@ -1,0 +1,37 @@
+$arrowColour: #a4cde1;
+
+.name {
+  margin-bottom: 0;
+  padding-bottom: 1em;
+  position: relative;
+
+  &::after {
+    border-color: transparent transparent transparent $arrowColour;
+    border-style: dashed dashed dashed solid;
+    border-width: 5px;
+    bottom: 0.45em;
+    content: " ";
+    height: 0;
+    margin-left: 5px;
+    overflow: hidden;
+    position: absolute;
+    top: 0.3em;
+    width: 0;
+  }
+}
+
+.provider {
+  display: none;
+}
+
+.providers-showing {
+  .provider {
+    display: block;
+  }
+
+  .name::after {
+    border-color: $arrowColour transparent transparent;
+    border-style: solid dashed dashed;
+    bottom: 2px;
+  }
+}

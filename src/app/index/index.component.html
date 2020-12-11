@@ -1,0 +1,28 @@
+<div class="dashboard-wrapper">
+  <div>
+    <a routerLink="/overview" routerLinkActive="active">overview</a>
+  </div>
+  <ul>
+    <li *ngFor="let dataProvider of dataProviderData">
+      <ul
+        class="data-provider"
+        [ngClass]="{ 'providers-showing': dataProvider.providersShowing }"
+      >
+        <li>
+          <a
+            class="name"
+            (click)="showHide(dataProvider, !dataProvider.providersShowing)"
+            >{{ dataProvider.name }}</a
+          >
+        </li>
+        <li class="provider">
+          <ul>
+            <li *ngFor="let provider of dataProvider.providers">
+              {{ provider }}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

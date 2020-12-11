@@ -13,10 +13,16 @@ import { AppComponent } from './app.component';
 
 import { RenameApiFacetPipe } from './_translate';
 
+import { IndexComponent } from './index/index.component';
 import { OverviewComponent } from './overview/overview.component';
 
 @NgModule({
-  declarations: [AppComponent, OverviewComponent, RenameApiFacetPipe],
+  declarations: [
+    AppComponent,
+    IndexComponent,
+    OverviewComponent,
+    RenameApiFacetPipe
+  ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,

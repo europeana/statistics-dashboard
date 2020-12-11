@@ -3,7 +3,7 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 import { async, TestBed } from '@angular/core/testing';
-import { RawFacet } from '../_models';
+import { DataProviderDatum, RawFacet } from '../_models';
 import { APIService } from './';
 
 describe('APIService', () => {
