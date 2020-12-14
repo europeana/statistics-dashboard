@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
 
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
 import { DataProviderDatum, Facet, FacetField, RawFacet } from '../_models';
 import { APIService } from '../_services';
 
@@ -9,17 +14,31 @@ import { APIService } from '../_services';
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent {
-  dataProviderData: Array<DataProviderDatum>;
+  dataProviderData: Array<DataProviderDatum> = [];
   api: APIService;
+  searchForm: FormGroup;
+  filter: RegExp;
 
-  constructor(api: APIService) {
+  constructor(api: APIService, fb: FormBuilder) {
     this.api = api;
+    this.setFilter();
     this.loadDataProviderNames();
+    this.searchForm = fb.group({
+      searchTerm: ['']
+    });
   }
 
-  showHide(item: DataProviderDatum, tf: boolean) {
+  setFilter(term?: string): void {
+    this.filter = new RegExp(term ? term : '.*');
+  }
+
+  showHide(itemName: string, tf: boolean) {
+    const item = this.dataProviderData.filter((datum: DataProviderDatum) => {
+      return datum.name === itemName;
+    })[0];
     item.providersShowing = tf;
-    if (tf && !item.providers) {
+
+    if (!item.providers) {
       this.setProviders(item);
     }
   }
@@ -33,24 +52,74 @@ export class IndexComponent {
           name: field.label
         };
       });
+      this.chainLoad();
     });
   }
 
-  setProviders(item: DataProviderDatum): void {
+  chainLoad(): void {
+    const nextToLoad = this.dataProviderData.find(
+      (datum: DataProviderDatum) => {
+        return !datum.providers;
+      }
+    );
+    if (nextToLoad) {
+      this.setProviders(nextToLoad, true);
+    }
+  }
+
+  setProviders(item: DataProviderDatum, doChainLoad = false): void {
     const name = encodeURIComponent(item.name);
     const nameParam = `&qf=DATA_PROVIDER:"${name}"`;
     const url = `https://api.europeana.eu/record/v2/search.json?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
 
-    this.api.loadAPIData(url).subscribe((data: RawFacet) => {
-      item.providers = data.facets
-        .filter((facet: Facet) => {
-          return facet.name === 'PROVIDER';
+    this.api
+      .loadAPIData(url)
+      .pipe(
+        switchMap((data: RawFacet) => {
+          return of(
+            data.facets
+              .filter((facet: Facet) => {
+                return facet.name === 'PROVIDER';
+              })
+              .pop()
+              .fields.map((field: FacetField) => {
+                return field.label;
+              })
+          );
         })
-        .pop()
-        .fields.map((field: FacetField) => {
-          console.log('adding ' + field.label);
-          return field.label;
-        });
+      )
+      .subscribe((providers: Array<string>) => {
+        item.providers = providers;
+        if (doChainLoad) {
+          this.chainLoad();
+        }
+      });
+  }
+
+  search(): void {
+    const term = this.searchForm.value.searchTerm;
+    this.setFilter(term);
+  }
+
+  getFiltered(): Array<DataProviderDatum> {
+    const filtered = this.searchForm.value.searchTerm.length > 0;
+    return this.dataProviderData.map((datum: DataProviderDatum) => {
+      const innerList =
+        filtered && datum.providers
+          ? datum.providers.filter((name: string) => {
+              return name.match(this.filter);
+            })
+          : datum.providers;
+      const providersShowing = filtered
+        ? innerList
+          ? innerList.length > 0
+          : false
+        : datum.providersShowing;
+      return {
+        name: datum.name,
+        providers: innerList,
+        providersShowing: providersShowing
+      };
     });
   }
 }

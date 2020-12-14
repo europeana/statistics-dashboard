@@ -2,8 +2,11 @@
   <div>
     <a routerLink="/overview" routerLinkActive="active">overview</a>
   </div>
+  <form [formGroup]="searchForm">
+    <input (keyup)="search()" formControlName="searchTerm" />
+  </form>
   <ul>
-    <li *ngFor="let dataProvider of dataProviderData">
+    <li *ngFor="let dataProvider of getFiltered()">
       <ul
         class="data-provider"
         [ngClass]="{ 'providers-showing': dataProvider.providersShowing }"
@@ -11,7 +14,10 @@
         <li>
           <a
             class="name"
-            (click)="showHide(dataProvider, !dataProvider.providersShowing)"
+            [ngClass]="{ 'providers-loaded': !!dataProvider.providers }"
+            (click)="
+              showHide(dataProvider.name, !dataProvider.providersShowing)
+            "
             >{{ dataProvider.name }}</a
           >
         </li>

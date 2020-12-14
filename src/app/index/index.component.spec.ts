@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
 import { DataProviderDatum } from '../_models';
@@ -12,6 +13,7 @@ describe('IndexComponent', () => {
 
   const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule],
       declarations: [IndexComponent],
       providers: [
         {
@@ -41,7 +43,7 @@ describe('IndexComponent', () => {
 
       expect(dataProviderDatum.providersShowing).toBeFalsy();
 
-      component.showHide(dataProviderDatum, true);
+      component.showHide(dataProviderDatum.name, true);
       expect(dataProviderDatum.providersShowing).toBeTruthy();
     });
   });
