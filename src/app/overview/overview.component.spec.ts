@@ -47,6 +47,13 @@ describe('OverviewComponent', () => {
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
     exportPDF = TestBed.inject(ExportPDFService);
+
+    // TODO: this is for data, not the search list
+    component.form.get('facetParameter').setValue('contentTier');
+    component.isShowingSearchList = false;
+    component.beginPolling();
+    // end TODO
+
     fixture.detectChanges();
   };
 

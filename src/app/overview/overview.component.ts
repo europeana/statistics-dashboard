@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   ViewChild,
@@ -36,9 +35,7 @@ import { DataPollingComponent } from '../data-polling';
   styleUrls: ['./overview.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class OverviewComponent
-  extends DataPollingComponent
-  implements AfterViewInit {
+export class OverviewComponent extends DataPollingComponent {
   @ViewChild('dataTable') dataTable: DatatableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('pieChart') pieChart: ElementRef;
@@ -100,17 +97,17 @@ export class OverviewComponent
 
   chartOptionsOpen = false;
   downloadOptionsOpen = false;
+  isShowingSearchList = true;
 
   showPie = true;
   showBar = false;
   showGauge = false;
-  showTab = true;
   isLoading = true;
+
   selFacetIndex = 0;
   allFacetData: Array<Facet>;
   chartData: Array<NameValue>;
   tableData: FmtTableData;
-  tableDataRowsVisible = 5;
 
   constructor(
     private api: APIService,
@@ -120,13 +117,6 @@ export class OverviewComponent
   ) {
     super();
     this.buildForm();
-    this.beginPolling();
-  }
-
-  /** ngAfterViewInit
-   */
-  ngAfterViewInit(): void {
-    this.dateFrom.nativeElement.setAttribute('min', this.yearZero);
   }
 
   export(type: ExportType): false {
@@ -154,20 +144,22 @@ export class OverviewComponent
   */
   getUrl(portal = false): string {
     let server;
-    const ct = this.getFormattedContentTierParam();
     const filterParam = this.getFormattedFilterParam();
     const datasetNameParam = this.getFormattedDatasetNameParam();
     const dateParam = this.getFormattedDateParam();
-    const auth = 'wskey=api2demo&rows=0';
-    const apiOnly = '&profile=facets' + this.getFormattedFacetParam();
+    let apiOnly = '';
+    let ct = '';
 
     if (portal) {
       server = 'https://www.europeana.eu/en/search';
     } else {
+      ct = this.getFormattedContentTierParam();
       server = 'https://api.europeana.eu/record/v2/search.json';
+      apiOnly =
+        '&wskey=api2demo&rows=0&profile=facets' + this.getFormattedFacetParam();
     }
     return (
-      `${server}?${auth}${ct}${apiOnly}${filterParam}${dateParam}` +
+      `${server}?rows=0${ct}${apiOnly}${filterParam}${dateParam}` +
       (datasetNameParam.length > 0 ? `&query=${datasetNameParam}` : '&query=*')
     );
   }
@@ -182,10 +174,14 @@ export class OverviewComponent
     }:"${encodeURIComponent(qfVal)}"`;
   }
 
+  setIsShowingSearchList(tf: boolean): void {
+    this.isShowingSearchList = tf;
+  }
+
   /** beginPolling
   /* - set up data polling for facet data
   */
-  beginPolling(): void {
+  beginPolling(fnCallback?: (refresh?: boolean) => void): void {
     this.pollRefresh = this.createNewDataPoller(
       60 * 100000,
       () => {
@@ -215,12 +211,14 @@ export class OverviewComponent
           this.extractTableData();
         } else {
           this.totalResults = 0;
-          this.tableDataRowsVisible = 2;
           this.chartData = [];
           this.tableData = {
             columns: this.columnNames,
             tableRows: []
           };
+        }
+        if (fnCallback) {
+          fnCallback();
         }
       }
     ).getPollingSubject();
@@ -247,7 +245,7 @@ export class OverviewComponent
   */
   buildForm(): void {
     this.form = this.fb.group({
-      facetParameter: [this.facetConf[0]],
+      facetParameter: [],
       contentTierZero: [false],
       showPercent: [false],
       chartType: [this.chartTypes[0]],
@@ -275,13 +273,13 @@ export class OverviewComponent
     let isTooLate = false;
     if (val) {
       const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
-      let dateVal = new Date(val);
+      const dateVal = new Date(val);
       if (dateVal < new Date(this.yearZero)) {
         isTooEarly = true;
       } else if (dateVal > new Date(this.today)) {
         isTooLate = true;
       } else if (this.form.value[otherField].length > 0) {
-        let dateOtherVal = new Date(this.form.value[otherField]);
+        const dateOtherVal = new Date(this.form.value[otherField]);
         if (otherField === 'dateFrom') {
           if (dateVal < dateOtherVal) {
             isTooEarly = true;
@@ -481,10 +479,20 @@ export class OverviewComponent
   }
 
   switchFacet(disableName: string): void {
-    this.enableFilters();
-    this.form.controls[disableName].disable();
-    this.menuStates[disableName].disabled = true;
-    this.refresh();
+    const onDataReady = (refresh = false): void => {
+      this.enableFilters();
+      this.form.controls[disableName].disable();
+      this.menuStates[disableName].disabled = true;
+      this.setIsShowingSearchList(false);
+      if (refresh) {
+        this.refresh();
+      }
+    };
+    if (!this.pollRefresh) {
+      this.beginPolling(onDataReady);
+    } else {
+      onDataReady(true);
+    }
   }
 
   refresh(): void {

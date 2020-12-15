@@ -38,7 +38,10 @@ describe('IndexComponent', () => {
     beforeEach(b4Each);
 
     it('should show and hide', () => {
-      let dataProviderDatum = { name: 'x', providers: [] } as DataProviderDatum;
+      const dataProviderDatum = {
+        name: 'x',
+        providers: []
+      } as DataProviderDatum;
       component.dataProviderData = [dataProviderDatum];
 
       expect(dataProviderDatum.providersShowing).toBeFalsy();

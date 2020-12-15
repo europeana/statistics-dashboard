@@ -1,7 +1,5 @@
-import { Component } from '@angular/core';
-
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-
+import { Component, Input } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -14,6 +12,8 @@ import { APIService } from '../_services';
   styleUrls: ['./index.component.scss']
 })
 export class IndexComponent {
+  @Input() showing?: boolean;
+
   dataProviderData: Array<DataProviderDatum> = [];
   api: APIService;
   searchForm: FormGroup;
@@ -32,7 +32,7 @@ export class IndexComponent {
     this.filter = new RegExp(term ? term : '.*');
   }
 
-  showHide(itemName: string, tf: boolean) {
+  showHide(itemName: string, tf: boolean): void {
     const item = this.dataProviderData.filter((datum: DataProviderDatum) => {
       return datum.name === itemName;
     })[0];
@@ -46,13 +46,16 @@ export class IndexComponent {
   loadDataProviderNames(): void {
     const url = `https://api.europeana.eu/record/v2/search.json?wskey=api2demo&rows=0&profile=facets&facet=DATA_PROVIDER&query=*`;
 
-    this.api.loadAPIData(url).subscribe((data: RawFacet) => {
+    const sub = this.api.loadAPIData(url).subscribe((data: RawFacet) => {
       this.dataProviderData = data.facets[0].fields.map((field: FacetField) => {
         return {
           name: field.label
         };
       });
       this.chainLoad();
+      setTimeout(() => {
+        sub.unsubscribe();
+      }, 1);
     });
   }
 
@@ -70,9 +73,10 @@ export class IndexComponent {
   setProviders(item: DataProviderDatum, doChainLoad = false): void {
     const name = encodeURIComponent(item.name);
     const nameParam = `&qf=DATA_PROVIDER:"${name}"`;
-    const url = `https://api.europeana.eu/record/v2/search.json?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
+    const server = 'https://api.europeana.eu/record/v2/search.json';
+    const url = `${server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
 
-    this.api
+    const sub = this.api
       .loadAPIData(url)
       .pipe(
         switchMap((data: RawFacet) => {
@@ -93,6 +97,9 @@ export class IndexComponent {
         if (doChainLoad) {
           this.chainLoad();
         }
+        setTimeout(() => {
+          sub.unsubscribe();
+        }, 1);
       });
   }
 
@@ -121,5 +128,10 @@ export class IndexComponent {
         providersShowing: providersShowing
       };
     });
+  }
+
+  getUrl(provider: string): string {
+    const server = 'https://www.europeana.eu/en/search';
+    return `${server}?qf=PROVIDER:"${encodeURIComponent(provider)}"`;
   }
 }

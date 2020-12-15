@@ -1,9 +1,11 @@
-<div class="dashboard-wrapper">
-  <div>
-    <a routerLink="/overview" routerLinkActive="active">overview</a>
-  </div>
+<div class="index-listing" [ngClass]="{ showing: showing }">
   <form [formGroup]="searchForm">
-    <input (keyup)="search()" formControlName="searchTerm" />
+    <input
+      (keyup)="search()"
+      class="search-term"
+      formControlName="searchTerm"
+      placeholder="Type to search"
+    />
   </form>
   <ul>
     <li *ngFor="let dataProvider of getFiltered()">
@@ -24,7 +26,9 @@
         <li class="provider">
           <ul>
             <li *ngFor="let provider of dataProvider.providers">
-              {{ provider }}
+              <a target="_blank" href="{{ getUrl(provider) }}">{{
+                provider
+              }}</a>
             </li>
           </ul>
         </li>
