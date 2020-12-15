@@ -6,16 +6,8 @@ import { OverviewComponent } from './overview/overview.component';
 
 const routes: Routes = [
   {
-    path: 'overview',
+    path: '**',
     component: OverviewComponent
-  },
-  {
-    path: 'index',
-    component: IndexComponent
-  },
-  {
-    path: '',
-    component: IndexComponent
   }
 ];
 
