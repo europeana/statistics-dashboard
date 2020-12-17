@@ -1,5 +1,11 @@
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
+export interface ProviderDatum {
+  name: string;
+  dataProviders?: Array<string>;
+  dataProvidersShowing?: boolean;
+}
+
 export interface MenuState {
   visible: boolean;
   disabled?: boolean;

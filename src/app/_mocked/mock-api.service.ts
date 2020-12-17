@@ -1,5 +1,18 @@
 import { Observable, of } from 'rxjs';
-import { RawFacet } from '../_models';
+import { ProviderDatum, RawFacet } from '../_models';
+
+const DataProviderData = [
+  {
+    name: 'Aa aaa aaaaa',
+    dataProviders: ['a1', 'a2', 'a3'],
+    dataProvidersShowing: true
+  },
+  {
+    name: 'Bb bbb bbbbb',
+    dataProviders: ['b1', 'b2', 'b3'],
+    dataProvidersShowing: true
+  }
+];
 
 const MockAPIData = {
   facets: [
@@ -107,6 +120,10 @@ export class MockAPIService {
       return of(({ items: [], totalResults: 0 } as any) as RawFacet);
     }
     return of(MockAPIData);
+  }
+
+  loadDataProviderData(): Observable<Array<ProviderDatum>> {
+    return of(DataProviderData);
   }
 }
 

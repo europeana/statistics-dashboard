@@ -1,0 +1,74 @@
+@import "../../scss/_variables";
+$arrowColour: #a4cde1;
+
+.icon-clear {
+  left: 16em;
+  top: 0.75em;
+  transform: scale(0.5);
+}
+
+.index-listing {
+  background: #fff;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  margin: 1.6em 0 0.75em 0;
+  padding: 0.75em;
+
+  position: absolute;
+
+  transition: transform 1s ease-in-out;
+  transform: scale(0) rotate(-90deg);
+  transform-origin: top left;
+  &.showing {
+    position: relative;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.name {
+  margin-bottom: 0;
+  padding-bottom: 1em;
+  position: relative;
+
+  &.data-providers-loaded:not(.empty)::after {
+    border-color: transparent transparent transparent $arrowColour;
+    border-style: dashed dashed dashed solid;
+    border-width: 5px;
+    bottom: 0.45em;
+    content: " ";
+    height: 0;
+    margin-left: 5px;
+    overflow: hidden;
+    position: absolute;
+    top: 0.3em;
+    width: 0;
+  }
+}
+
+.provider {
+  display: none;
+  margin-left: 2em;
+}
+
+.data-providers-showing {
+  .provider {
+    display: block;
+  }
+
+  .name::after {
+    border-color: $arrowColour transparent transparent;
+    border-style: solid dashed dashed;
+    bottom: 2px;
+  }
+}
+
+.name.empty {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.search-term {
+  border-radius: 1em;
+  margin: 0.5em 0 0.75em 0;
+  width: 15em;
+}

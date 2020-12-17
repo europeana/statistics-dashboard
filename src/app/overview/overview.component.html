@@ -16,7 +16,7 @@
         }"
         >{{ group | renameApiFacet }} </a
       ><a
-        class="clear-filter"
+        class="icon-clear"
         *ngIf="getCheckboxValuesPresent(group)"
         (click)="clearFilter(group)"
       ></a>
@@ -58,33 +58,35 @@
   </ng-template>
 
   <div class="metis-dashboard">
-    <div class="metis-dashboard-left">
-      <h3 class="filters-header" [title]="getFormattedFilterParam()">
-        Filters
-      </h3>
-      <a
-        class="clear-filter"
-        *ngIf="getCheckboxValuesPresent()"
-        (click)="clearFilter()"
-      ></a>
-      <ul class="filters" (clickOutside)="closeFilters()">
-        <ng-container *ngIf="allFacetData">
-          <ng-container *ngFor="let filter of facetConf">
-            <ng-content
-              *ngTemplateOutlet="
-                cbFieldset;
-                context: {
-                  options: getSelectOptions(filter, allFacetData),
-                  group: filter
-                }
-              "
-            ></ng-content>
+    <div class="metis-dashboard-left" *ngIf="!!form.value.facetParameter">
+      <div *ngIf="!isShowingSearchList">
+        <h3 class="filters-header" [title]="getFormattedFilterParam()">
+          Filters
+        </h3>
+        <a
+          class="icon-clear"
+          *ngIf="getCheckboxValuesPresent()"
+          (click)="clearFilter()"
+        ></a>
+        <ul class="filters" (clickOutside)="closeFilters()">
+          <ng-container *ngIf="allFacetData">
+            <ng-container *ngFor="let filter of facetConf">
+              <ng-content
+                *ngTemplateOutlet="
+                  cbFieldset;
+                  context: {
+                    options: getSelectOptions(filter, allFacetData),
+                    group: filter
+                  }
+                "
+              ></ng-content>
+            </ng-container>
           </ng-container>
-        </ng-container>
-      </ul>
+        </ul>
+      </div>
 
       <ul class="filters">
-        <li class="column">
+        <li class="column" *ngIf="!isShowingSearchList">
           <h3 [title]="getFormattedDateParam()">Dataset</h3>
           <input
             formControlName="datasetName"
@@ -93,12 +95,13 @@
             class="datasetName"
           />
         </li>
-        <li class="column">
+        <li class="column" *ngIf="!isShowingSearchList">
           <h3 [title]="getFormattedDateParam()">Date From</h3>
           <input
             formControlName="dateFrom"
             #dateFrom
             [attr.max]="today"
+            [attr.min]="yearZero"
             type="date"
             placeholder="{{ 'YYYY-MM-DD' }}"
             (change)="dateChange(true)"
@@ -109,7 +112,7 @@
             ></ng-content>
           </ng-container>
         </li>
-        <li class="column">
+        <li class="column" *ngIf="!isShowingSearchList">
           <h3 [title]="getFormattedDateParam()">Date To</h3>
           <input
             formControlName="dateTo"
@@ -125,14 +128,25 @@
             ></ng-content>
           </ng-container>
         </li>
+        <li class="column" *ngIf="!isShowingSearchList">
+          <h3><a (click)="setIsShowingSearchList(true)">Show List</a></h3>
+        </li>
+        <li class="column" *ngIf="isShowingSearchList">
+          <h3><a (click)="setIsShowingSearchList(false)">Show Data</a></h3>
+        </li>
       </ul>
     </div>
 
     <div class="metis-dashboard-right">
-      <h3 [title]="getFormattedContentTierParam() + getFormattedFacetParam()">
-        By {{ form.value.facetParameter | renameApiFacet }}
-        <span class="svg-icon-spin" [ngClass]="{ showing: isLoading }"></span>
-      </h3>
+      <ng-container *ngIf="!form.value.facetParameter">
+        <h3>Select a facet dimension</h3>
+      </ng-container>
+      <ng-container *ngIf="form.value.facetParameter">
+        <h3 [title]="getFormattedContentTierParam() + getFormattedFacetParam()">
+          By {{ form.value.facetParameter | renameApiFacet }}
+          <span class="svg-icon-spin" [ngClass]="{ showing: isLoading }"></span>
+        </h3>
+      </ng-container>
 
       <div class="facet-params">
         <div class="switch-wrapper">
@@ -157,18 +171,21 @@
         </label>
       </div>
 
+      <app-index [showing]="isShowingSearchList"></app-index>
+
       <ngx-datatable
-        *ngIf="showTab && tableData"
+        *ngIf="tableData"
         #dataTable
         id="dataTable"
         [rows]="tableData.tableRows"
+        [ngClass]="{ showing: !isShowingSearchList }"
         class="material expandable datatable fullscreen"
         [columnMode]="ColumnMode.flex"
         [headerHeight]="50"
         [footerHeight]="60"
         [rowHeight]="50"
-        [scrollbarV]="true"
-        [limit]="tableDataRowsVisible"
+        [scrollbarV]="false"
+        [limit]="5"
       >
         <!-- Mobile row detail -->
         <ngx-datatable-row-detail [rowHeight]="50">
@@ -279,6 +296,7 @@
       <ul
         *ngIf="allFacetData"
         class="options-wrapper"
+        [ngClass]="{ showing: !isShowingSearchList }"
         (clickOutside)="closeDisplayOptions()"
       >
         <li class="dropdown">
@@ -333,7 +351,13 @@
         </li>
       </ul>
 
-      <div *ngIf="chartData" class="chart-wrapper" id="pieChart" #pieChart>
+      <div
+        *ngIf="chartData"
+        class="chart-wrapper"
+        [ngClass]="{ showing: !isShowingSearchList }"
+        id="pieChart"
+        #pieChart
+      >
         <ngx-charts-pie-chart
           *ngIf="showPie"
           [scheme]="colorScheme"
