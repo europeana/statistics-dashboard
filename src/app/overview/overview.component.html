@@ -16,7 +16,7 @@
         }"
         >{{ group | renameApiFacet }} </a
       ><a
-        class="clear-filter"
+        class="icon-clear"
         *ngIf="getCheckboxValuesPresent(group)"
         (click)="clearFilter(group)"
       ></a>
@@ -64,7 +64,7 @@
           Filters
         </h3>
         <a
-          class="clear-filter"
+          class="icon-clear"
           *ngIf="getCheckboxValuesPresent()"
           (click)="clearFilter()"
         ></a>

@@ -18,6 +18,7 @@ export class IndexComponent {
   api: APIService;
   searchForm: FormGroup;
   filter: RegExp;
+  server = 'https://api.europeana.eu/record/v2/search.json';
 
   constructor(api: APIService, fb: FormBuilder) {
     this.api = api;
@@ -44,8 +45,7 @@ export class IndexComponent {
   }
 
   loadProviderNames(): void {
-    const server = 'https://api.europeana.eu/record/v2/search.json';
-    const url = `${server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&query=*`;
+    const url = `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&query=*`;
 
     const sub = this.api.loadAPIData(url).subscribe((data: RawFacet) => {
       this.dataProviderData = data.facets[0].fields.map((field: FacetField) => {
@@ -72,8 +72,7 @@ export class IndexComponent {
   setDataProviders(item: ProviderDatum, doChainLoad = false): void {
     const name = encodeURIComponent(item.name);
     const nameParam = `&qf=PROVIDER:"${name}"`;
-    const server = 'https://api.europeana.eu/record/v2/search.json';
-    const url = `${server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
+    const url = `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
 
     const sub = this.api
       .loadAPIData(url)
@@ -107,8 +106,16 @@ export class IndexComponent {
     this.setFilter(term);
   }
 
+  resetSearchTerm(): void {
+    this.searchForm.controls.searchTerm.setValue('');
+  }
+
+  getIsFiltered(): boolean {
+    return this.searchForm.value.searchTerm.length > 0;
+  }
+
   getFiltered(): Array<ProviderDatum> {
-    const filtered = this.searchForm.value.searchTerm.length > 0;
+    const filtered = this.getIsFiltered();
     return this.dataProviderData.map((datum: ProviderDatum) => {
       const innerList =
         filtered && datum.dataProviders
@@ -123,9 +130,9 @@ export class IndexComponent {
         : datum.dataProvidersShowing;
       return {
         name: datum.name,
-        providers: innerList,
+        dataProviders: innerList,
         dataProvidersShowing: dataProvidersShowing
-      };
+      } as ProviderDatum;
     });
   }
 

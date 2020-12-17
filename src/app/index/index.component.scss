@@ -1,6 +1,12 @@
 @import "../../scss/_variables";
 $arrowColour: #a4cde1;
 
+.icon-clear {
+  left: 16em;
+  top: 0.75em;
+  transform: scale(0.5);
+}
+
 .index-listing {
   background: #fff;
   box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
@@ -24,7 +30,7 @@ $arrowColour: #a4cde1;
   padding-bottom: 1em;
   position: relative;
 
-  &.providers-loaded::after {
+  &.data-providers-loaded:not(.empty)::after {
     border-color: transparent transparent transparent $arrowColour;
     border-style: dashed dashed dashed solid;
     border-width: 5px;
@@ -44,10 +50,11 @@ $arrowColour: #a4cde1;
   margin-left: 2em;
 }
 
-.providers-showing {
+.data-providers-showing {
   .provider {
     display: block;
   }
+
   .name::after {
     border-color: $arrowColour transparent transparent;
     border-style: solid dashed dashed;
@@ -55,7 +62,13 @@ $arrowColour: #a4cde1;
   }
 }
 
+.name.empty {
+  cursor: default;
+  opacity: 0.5;
+}
+
 .search-term {
+  border-radius: 1em;
   margin: 0.5em 0 0.75em 0;
   width: 15em;
 }

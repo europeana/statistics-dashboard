@@ -1,33 +1,39 @@
 <div class="index-listing" [ngClass]="{ showing: showing }">
-  <form [formGroup]="searchForm">
+  <form [formGroup]="searchForm" style="position: relative">
     <input
       (keyup)="search()"
       class="search-term"
       formControlName="searchTerm"
       placeholder="Type to search"
     />
+    <a
+      class="icon-clear"
+      *ngIf="getIsFiltered()"
+      (click)="resetSearchTerm()"
+    ></a>
   </form>
   <ul>
-    <li *ngFor="let dataProvider of getFiltered()">
+    <li *ngFor="let provider of getFiltered()">
       <ul
         class="data-provider"
-        [ngClass]="{ 'providers-showing': dataProvider.dataProvidersShowing }"
+        [ngClass]="{ 'data-providers-showing': provider.dataProvidersShowing }"
       >
         <li>
           <a
             class="name"
-            [ngClass]="{ 'providers-loaded': !!dataProvider.providers }"
-            (click)="
-              showHide(dataProvider.name, !dataProvider.dataProvidersShowing)
-            "
-            >{{ dataProvider.name }}</a
+            [ngClass]="{
+              'data-providers-loaded': !!provider.dataProviders,
+              empty: provider.dataProviders?.length === 0
+            }"
+            (click)="showHide(provider.name, !provider.dataProvidersShowing)"
+            >{{ provider.name }}</a
           >
         </li>
         <li class="provider">
           <ul>
-            <li *ngFor="let provider of dataProvider.providers">
-              <a target="_blank" href="{{ getUrl(provider) }}">{{
-                provider
+            <li *ngFor="let dataProvider of provider.dataProviders">
+              <a target="_blank" href="{{ getUrl(dataProvider) }}">{{
+                dataProvider
               }}</a>
             </li>
           </ul>

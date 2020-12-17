@@ -4,12 +4,12 @@ import { ProviderDatum, RawFacet } from '../_models';
 const DataProviderData = [
   {
     name: 'Aa aaa aaaaa',
-    providers: ['a1', 'a2', 'a3'],
+    dataProviders: ['a1', 'a2', 'a3'],
     dataProvidersShowing: true
   },
   {
     name: 'Bb bbb bbbbb',
-    providers: ['b1', 'b2', 'b3'],
+    dataProviders: ['b1', 'b2', 'b3'],
     dataProvidersShowing: true
   }
 ];

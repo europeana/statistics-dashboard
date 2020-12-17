@@ -30,6 +30,13 @@ describe('IndexComponent', () => {
     fixture.detectChanges();
   };
 
+  const getProvderDatum = (): ProviderDatum => {
+    return {
+      name: 'x',
+      dataProviders: []
+    } as ProviderDatum;
+  };
+
   describe('Normal Operations', () => {
     beforeEach(async(() => {
       configureTestBed();
@@ -38,16 +45,34 @@ describe('IndexComponent', () => {
     beforeEach(b4Each);
 
     it('should show and hide', () => {
-      const ProviderDatum = {
-        name: 'x',
-        providers: []
-      } as ProviderDatum;
-      component.dataProviderData = [ProviderDatum];
+      const providerDatum = getProvderDatum();
 
-      expect(ProviderDatum.dataProvidersShowing).toBeFalsy();
+      component.dataProviderData = [providerDatum];
+      expect(providerDatum.dataProvidersShowing).toBeFalsy();
 
-      component.showHide(ProviderDatum.name, true);
-      expect(ProviderDatum.dataProvidersShowing).toBeTruthy();
+      component.showHide(providerDatum.name, true);
+      expect(providerDatum.dataProvidersShowing).toBeTruthy();
+
+      component.showHide(providerDatum.name, false);
+      expect(providerDatum.dataProvidersShowing).toBeFalsy();
+
+      spyOn(component, 'setDataProviders');
+      component.showHide(providerDatum.name, true);
+
+      expect(component.setDataProviders).not.toHaveBeenCalled();
+
+      providerDatum.dataProviders = null;
+      component.showHide(providerDatum.name, true);
+      expect(component.setDataProviders).toHaveBeenCalled();
+    });
+
+    it('should trigger a chain load', () => {
+      const providerDatum = getProvderDatum();
+      spyOn(component, 'chainLoad');
+      component.setDataProviders(providerDatum);
+      expect(component.chainLoad).not.toHaveBeenCalled();
+      component.setDataProviders(providerDatum, true);
+      expect(component.chainLoad).toHaveBeenCalled();
     });
 
     it('should set the filter', () => {
@@ -66,6 +91,29 @@ describe('IndexComponent', () => {
       component.searchForm.value.searchTerm = '';
       component.setFilter();
       expect(component.filter.toString()).toEqual('/.*/');
+    });
+
+    it('should reset the search term', () => {
+      component.searchForm.value.searchTerm = 'A';
+      component.resetSearchTerm();
+      expect(component.searchForm.value.searchTerm).toEqual('');
+    });
+
+    it('should get the filtered', () => {
+      let term = '';
+      component.searchForm.value.searchTerm = '';
+      component.setFilter(term);
+
+      expect(component.getFiltered()[0].dataProviders.length).toEqual(2);
+      term = 'XXX';
+      component.searchForm.value.searchTerm = term;
+      component.setFilter(term);
+      expect(component.getFiltered()[0].dataProviders.length).toEqual(0);
+
+      term = 'A';
+      component.searchForm.value.searchTerm = term;
+      component.setFilter(term);
+      expect(component.getFiltered()[0].dataProviders.length).toEqual(1);
     });
   });
 });
