@@ -11,14 +11,14 @@
     <li *ngFor="let dataProvider of getFiltered()">
       <ul
         class="data-provider"
-        [ngClass]="{ 'providers-showing': dataProvider.providersShowing }"
+        [ngClass]="{ 'providers-showing': dataProvider.dataProvidersShowing }"
       >
         <li>
           <a
             class="name"
             [ngClass]="{ 'providers-loaded': !!dataProvider.providers }"
             (click)="
-              showHide(dataProvider.name, !dataProvider.providersShowing)
+              showHide(dataProvider.name, !dataProvider.dataProvidersShowing)
             "
             >{{ dataProvider.name }}</a
           >

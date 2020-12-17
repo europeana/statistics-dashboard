@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
-import { DataProviderDatum } from '../_models';
+import { ProviderDatum } from '../_models';
 import { APIService } from '../_services';
 
 import { IndexComponent } from './index.component';
@@ -38,16 +38,34 @@ describe('IndexComponent', () => {
     beforeEach(b4Each);
 
     it('should show and hide', () => {
-      const dataProviderDatum = {
+      const ProviderDatum = {
         name: 'x',
         providers: []
-      } as DataProviderDatum;
-      component.dataProviderData = [dataProviderDatum];
+      } as ProviderDatum;
+      component.dataProviderData = [ProviderDatum];
 
-      expect(dataProviderDatum.providersShowing).toBeFalsy();
+      expect(ProviderDatum.dataProvidersShowing).toBeFalsy();
 
-      component.showHide(dataProviderDatum.name, true);
-      expect(dataProviderDatum.providersShowing).toBeTruthy();
+      component.showHide(ProviderDatum.name, true);
+      expect(ProviderDatum.dataProvidersShowing).toBeTruthy();
+    });
+
+    it('should set the filter', () => {
+      expect(component.filter.toString()).toEqual('/.*/');
+      component.setFilter('A');
+      expect(component.filter.toString()).toEqual('/A/');
+      component.setFilter();
+      expect(component.filter.toString()).toEqual('/.*/');
+    });
+
+    it('should search', () => {
+      expect(component.filter.toString()).toEqual('/.*/');
+      component.searchForm.value.searchTerm = 'A';
+      component.search();
+      expect(component.filter.toString()).toEqual('/A/');
+      component.searchForm.value.searchTerm = '';
+      component.setFilter();
+      expect(component.filter.toString()).toEqual('/.*/');
     });
   });
 });

@@ -1,9 +1,9 @@
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
-export interface DataProviderDatum {
+export interface ProviderDatum {
   name: string;
-  providers?: Array<string>;
-  providersShowing?: boolean;
+  dataProviders?: Array<string>;
+  dataProvidersShowing?: boolean;
 }
 
 export interface MenuState {

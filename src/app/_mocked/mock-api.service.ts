@@ -1,16 +1,16 @@
 import { Observable, of } from 'rxjs';
-import { DataProviderDatum, RawFacet } from '../_models';
+import { ProviderDatum, RawFacet } from '../_models';
 
 const DataProviderData = [
   {
     name: 'Aa aaa aaaaa',
     providers: ['a1', 'a2', 'a3'],
-    providersShowing: true
+    dataProvidersShowing: true
   },
   {
     name: 'Bb bbb bbbbb',
     providers: ['b1', 'b2', 'b3'],
-    providersShowing: true
+    dataProvidersShowing: true
   }
 ];
 
@@ -122,7 +122,7 @@ export class MockAPIService {
     return of(MockAPIData);
   }
 
-  loadDataProviderData(): Observable<Array<DataProviderDatum>> {
+  loadDataProviderData(): Observable<Array<ProviderDatum>> {
     return of(DataProviderData);
   }
 }
