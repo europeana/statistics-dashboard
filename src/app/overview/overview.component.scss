@@ -91,16 +91,14 @@ datatable-scroller {
 .chart-wrapper,
 .options-wrapper,
 ngx-datatable.ngx-datatable {
-  transition: transform 1s ease-in-out;
-
-  transform: scale(0) rotate(-90deg) translateZ(0);
-  transform-origin: top right;
-
+  transition: opacity 1s ease-in-out;
+  opacity: 0;
   &.showing {
-    transform: scale(1) rotate(0deg) translateZ(0);
+    opacity: 1;
   }
   &:not(.showing) {
-    position: absolute;
+    max-height: 0;
+    overflow: hidden;
   }
 }
 
@@ -265,7 +263,7 @@ label {
   padding: 1em;
 }
 
-.chart-wrapper {
+.chart-wrapper.showing {
   height: 500px;
   max-width: 100%;
   padding-bottom: 5em;

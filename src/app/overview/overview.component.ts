@@ -14,6 +14,8 @@ import {
   DatatableRowDetailDirective
 } from '@swimlane/ngx-datatable';
 
+import { environment } from '../../environments/environment';
+
 import {
   ExportType,
   Facet,
@@ -146,22 +148,21 @@ export class OverviewComponent extends DataPollingComponent {
     let server;
     const filterParam = this.getFormattedFilterParam();
     const datasetNameParam = this.getFormattedDatasetNameParam();
+    const queryParam = (datasetNameParam.length > 0 ? `?query=${datasetNameParam}` : '?query=*')
     const dateParam = this.getFormattedDateParam();
+
     let apiOnly = '';
     let ct = '';
 
     if (portal) {
-      server = 'https://www.europeana.eu/en/search';
+      server = environment.serverPortal;
     } else {
       ct = this.getFormattedContentTierParam();
-      server = 'https://api.europeana.eu/record/v2/search.json';
+      server = environment.serverAPI;
       apiOnly =
         '&wskey=api2demo&rows=0&profile=facets' + this.getFormattedFacetParam();
     }
-    return (
-      `${server}?rows=0${ct}${apiOnly}${filterParam}${dateParam}` +
-      (datasetNameParam.length > 0 ? `&query=${datasetNameParam}` : '&query=*')
-    );
+    return `${server}${queryParam}${ct}${apiOnly}${filterParam}${dateParam}`;
   }
 
   /** getUrlRow
