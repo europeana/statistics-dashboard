@@ -104,7 +104,7 @@ describe('IndexComponent', () => {
       component.searchForm.value.searchTerm = '';
       component.setFilter(term);
 
-      expect(component.getFiltered()[0].dataProviders.length).toEqual(2);
+      expect(component.getFiltered()[0].dataProviders.length).toEqual(4);
       term = 'XXX';
       component.searchForm.value.searchTerm = term;
       component.setFilter(term);
@@ -112,8 +112,21 @@ describe('IndexComponent', () => {
 
       term = 'A';
       component.searchForm.value.searchTerm = term;
+
+      component.setFilter(term);
+      expect(component.getFiltered()[0].dataProviders.length).toEqual(2);
+
+      term = 'B';
+      component.searchForm.value.searchTerm = term;
+
       component.setFilter(term);
       expect(component.getFiltered()[0].dataProviders.length).toEqual(1);
+
+      component.dataProviderData[0].dataProviders = undefined;
+      term = 'XXX';
+      component.searchForm.value.searchTerm = term;
+      component.setFilter(term);
+      expect(component.getFiltered()[0].dataProviders).toBeFalsy();
     });
   });
 });

@@ -32,9 +32,11 @@
         <li class="provider">
           <ul>
             <li *ngFor="let dataProvider of provider.dataProviders">
-              <a target="_blank" href="{{ getUrl(dataProvider) }}">{{
-                dataProvider
-              }}</a>
+              <a
+                target="_blank"
+                href="{{ getUrl(dataProvider.name, dataProvider.isProvider) }}"
+                >{{ dataProvider.name }}</a
+              >
             </li>
           </ul>
         </li>

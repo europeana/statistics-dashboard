@@ -148,7 +148,8 @@ export class OverviewComponent extends DataPollingComponent {
     let server;
     const filterParam = this.getFormattedFilterParam();
     const datasetNameParam = this.getFormattedDatasetNameParam();
-    const queryParam = (datasetNameParam.length > 0 ? `?query=${datasetNameParam}` : '?query=*')
+    const queryParam =
+      datasetNameParam.length > 0 ? `?query=${datasetNameParam}` : '?query=*';
     const dateParam = this.getFormattedDateParam();
 
     let apiOnly = '';
@@ -497,7 +498,9 @@ export class OverviewComponent extends DataPollingComponent {
   }
 
   refresh(): void {
-    this.pollRefresh.next(true);
+    if (this.pollRefresh) {
+      this.pollRefresh.next(true);
+    }
   }
 
   selectOptionEnabled(group: string, val: string): boolean {

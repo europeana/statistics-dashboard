@@ -7,6 +7,37 @@
 
 $width-left-col: 200px;
 
+.header-bar {
+  display: flex;
+
+  .link-list a {
+    padding-left: 0.4em;
+    &::before {
+      content: "/ ";
+    }
+  }
+  &.list-mode {
+    .header-data,
+    .link-list {
+      display: none;
+    }
+  }
+
+  &:not(.list-mode) {
+    .link-data {
+      display: none;
+    }
+    .link-list {
+      opacity: 0.1;
+    }
+    &:hover {
+      .link-list {
+        opacity: 1;
+      }
+    }
+  }
+}
+
 .switch-wrapper {
   align-items: center;
   display: flex;

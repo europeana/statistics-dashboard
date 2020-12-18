@@ -3,7 +3,15 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { ProviderDatum, Facet, FacetField, RawFacet } from '../_models';
+import {
+  DataProviderDatum,
+  Facet,
+  FacetField,
+  ProviderDatum,
+  RawFacet
+} from '../_models';
+
+import { SubscriptionManager } from '../subscription-manager/subscription.manager';
 import { APIService } from '../_services';
 
 @Component({
@@ -11,7 +19,7 @@ import { APIService } from '../_services';
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss']
 })
-export class IndexComponent {
+export class IndexComponent extends SubscriptionManager {
   @Input() showing?: boolean;
 
   dataProviderData: Array<ProviderDatum> = [];
@@ -21,6 +29,7 @@ export class IndexComponent {
   server = 'https://api.europeana.eu/record/v2/search.json';
 
   constructor(api: APIService, fb: FormBuilder) {
+    super();
     this.api = api;
     this.setFilter();
     this.loadProviderNames();
@@ -44,20 +53,25 @@ export class IndexComponent {
     }
   }
 
-  loadProviderNames(): void {
-    const url = `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&query=*`;
+  getRootUrl(): string {
+    return `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER`;
+  }
 
-    const sub = this.api.loadAPIData(url).subscribe((data: RawFacet) => {
-      this.dataProviderData = data.facets[0].fields.map((field: FacetField) => {
-        return {
-          name: field.label
-        };
-      });
-      this.chainLoad();
-      setTimeout(() => {
-        sub.unsubscribe();
-      }, 1);
-    });
+  loadProviderNames(): void {
+    const url = `${this.getRootUrl()}&query=*`;
+
+    this.subs.push(
+      this.api.loadAPIData(url).subscribe((data: RawFacet) => {
+        this.dataProviderData = data.facets[0].fields.map(
+          (field: FacetField) => {
+            return {
+              name: field.label
+            };
+          }
+        );
+        this.chainLoad();
+      })
+    );
   }
 
   chainLoad(): void {
@@ -72,33 +86,39 @@ export class IndexComponent {
   setDataProviders(item: ProviderDatum, doChainLoad = false): void {
     const name = encodeURIComponent(item.name);
     const nameParam = `&qf=PROVIDER:"${name}"`;
-    const url = `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
+    const url = `${this.getRootUrl()}&facet=DATA_PROVIDER&query=*${nameParam}`;
 
-    const sub = this.api
-      .loadAPIData(url)
-      .pipe(
-        switchMap((data: RawFacet) => {
-          return of(
-            data.facets
+    this.subs.push(
+      this.api
+        .loadAPIData(url)
+        .pipe(
+          switchMap((data: RawFacet) => {
+            const res = data.facets
               .filter((facet: Facet) => {
                 return facet.name === 'DATA_PROVIDER';
               })
               .pop()
               .fields.map((field: FacetField) => {
-                return field.label;
-              })
-          );
+                return {
+                  name: field.label
+                } as DataProviderDatum;
+              });
+
+            res.unshift({
+              name: item.name,
+              isProvider: true
+            } as DataProviderDatum);
+
+            return of(res);
+          })
+        )
+        .subscribe((dataProviders: Array<DataProviderDatum>) => {
+          item.dataProviders = dataProviders;
+          if (doChainLoad) {
+            this.chainLoad();
+          }
         })
-      )
-      .subscribe((dataProviders: Array<string>) => {
-        item.dataProviders = dataProviders;
-        if (doChainLoad) {
-          this.chainLoad();
-        }
-        setTimeout(() => {
-          sub.unsubscribe();
-        }, 1);
-      });
+    );
   }
 
   search(): void {
@@ -116,18 +136,21 @@ export class IndexComponent {
 
   getFiltered(): Array<ProviderDatum> {
     const filtered = this.getIsFiltered();
+
     return this.dataProviderData.map((datum: ProviderDatum) => {
       const innerList =
         filtered && datum.dataProviders
-          ? datum.dataProviders.filter((name: string) => {
-              return name.match(this.filter);
+          ? datum.dataProviders.filter((item: DataProviderDatum) => {
+              return item.name.match(this.filter);
             })
           : datum.dataProviders;
+
       const dataProvidersShowing = filtered
         ? innerList
           ? innerList.length > 0
           : false
         : datum.dataProvidersShowing;
+
       return {
         name: datum.name,
         dataProviders: innerList,
@@ -136,8 +159,9 @@ export class IndexComponent {
     });
   }
 
-  getUrl(provider: string): string {
+  getUrl(dataProvider: string, isProvider = false): string {
     const server = 'https://www.europeana.eu/en/search';
-    return `${server}?qf=DATA_PROVIDER:"${encodeURIComponent(provider)}"`;
+    const facet = isProvider ? 'PROVIDER' : 'DATA_PROVIDER';
+    return `${server}?qf=${facet}:"${encodeURIComponent(dataProvider)}"`;
   }
 }

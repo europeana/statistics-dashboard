@@ -26,6 +26,7 @@ describe('OverviewComponent', () => {
   const testOptions = ['option_1', 'option_2'];
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
+  let api: APIService;
 
   const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
@@ -42,18 +43,17 @@ describe('OverviewComponent', () => {
     }).compileComponents();
   };
 
-  const b4Each = (): void => {
+  const b4Each = (beginPolling = true): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
     exportPDF = TestBed.inject(ExportPDFService);
-
-    // TODO: this is for data, not the search list
+    api = TestBed.inject(APIService);
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
-    component.beginPolling();
-    // end TODO
-
+    if (beginPolling) {
+      component.beginPolling();
+    }
     fixture.detectChanges();
   };
 
@@ -68,7 +68,9 @@ describe('OverviewComponent', () => {
       configureTestBed();
     }));
 
-    beforeEach(b4Each);
+    beforeEach(() => {
+      b4Each();
+    });
 
     it('should unfix the name', () => {
       expect(component.unfixName('_____')).toEqual('.');
@@ -422,7 +424,9 @@ describe('OverviewComponent', () => {
       configureTestBed();
     }));
 
-    beforeEach(b4Each);
+    beforeEach(() => {
+      b4Each();
+    });
 
     it('should set the min-max attributes', () => {
       expect(component.dateTo.nativeElement.getAttribute('min')).toBeFalsy();
@@ -476,7 +480,9 @@ describe('OverviewComponent', () => {
       configureTestBed();
     }));
 
-    beforeEach(b4Each);
+    beforeEach(() => {
+      b4Each();
+    });
 
     it('should export CSV', () => {
       component.downloadOptionsOpen = true;
@@ -505,10 +511,43 @@ describe('OverviewComponent', () => {
       configureTestBed(true);
     }));
 
-    beforeEach(b4Each);
+    beforeEach(() => {
+      b4Each();
+    });
 
-    it('should switch the chart type', () => {
+    it('should have no result', () => {
       expect(component.totalResults).toEqual(0);
+    });
+  });
+
+  describe('Polling', () => {
+    beforeEach(async(() => {
+      configureTestBed();
+    }));
+
+    beforeEach(() => {
+      b4Each(false);
+    });
+
+    it('should invoke the provided callback', () => {
+      const spy = jasmine.createSpy();
+      component.beginPolling(spy);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('should be invoked on facet switch', () => {
+      spyOn(component, 'beginPolling').and.callThrough();
+      component.switchFacet('TYPE');
+      expect(component.beginPolling).toHaveBeenCalled();
+    });
+
+    it('should be refreshed', () => {
+      spyOn(api, 'loadAPIData').and.callThrough();
+      component.refresh();
+      expect(api.loadAPIData).not.toHaveBeenCalled();
+      component.beginPolling();
+      component.refresh();
+      expect(api.loadAPIData).toHaveBeenCalled();
     });
   });
 });

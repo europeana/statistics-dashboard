@@ -4,12 +4,12 @@ import { ProviderDatum, RawFacet } from '../_models';
 const DataProviderData = [
   {
     name: 'Aa aaa aaaaa',
-    dataProviders: ['a1', 'a2', 'a3'],
+    dataProviders: [{ name: 'a1' }, { name: 'a2' }, { name: 'a3' }],
     dataProvidersShowing: true
   },
   {
     name: 'Bb bbb bbbbb',
-    dataProviders: ['b1', 'b2', 'b3'],
+    dataProviders: [{ name: 'b1' }, { name: 'b2' }, { name: 'b3' }],
     dataProvidersShowing: true
   }
 ];
@@ -85,7 +85,11 @@ const MockAPIData = {
       name: 'DATA_PROVIDER',
       fields: [
         {
-          label: 'Data Provider A',
+          label: 'Data Provider A1',
+          count: 2
+        },
+        {
+          label: 'Data Provider A2',
           count: 2
         },
         {
