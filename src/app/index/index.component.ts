@@ -53,8 +53,13 @@ export class IndexComponent extends SubscriptionManager {
     }
   }
 
+  getRootUrl(): string {
+    return `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER`;
+  }
+
   loadProviderNames(): void {
-    const url = `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&query=*`;
+    const url = `${this.getRootUrl()}&query=*`;
+
     this.subs.push(
       this.api.loadAPIData(url).subscribe((data: RawFacet) => {
         this.dataProviderData = data.facets[0].fields.map(
@@ -81,7 +86,7 @@ export class IndexComponent extends SubscriptionManager {
   setDataProviders(item: ProviderDatum, doChainLoad = false): void {
     const name = encodeURIComponent(item.name);
     const nameParam = `&qf=PROVIDER:"${name}"`;
-    const url = `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER&facet=DATA_PROVIDER&query=*${nameParam}`;
+    const url = `${this.getRootUrl()}&facet=DATA_PROVIDER&query=*${nameParam}`;
 
     this.subs.push(
       this.api

@@ -58,7 +58,7 @@
   </ng-template>
 
   <div class="metis-dashboard">
-    <div class="metis-dashboard-left" *ngIf="!!form.value.facetParameter">
+    <div class="metis-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <h3 class="filters-header" [title]="getFormattedFilterParam()">
           Filters
@@ -85,8 +85,8 @@
         </ul>
       </div>
 
-      <ul class="filters">
-        <li class="column" *ngIf="!isShowingSearchList">
+      <ul class="filters" *ngIf="!isShowingSearchList">
+        <li class="column">
           <h3 [title]="getFormattedDateParam()">Dataset</h3>
           <input
             formControlName="datasetName"
@@ -95,7 +95,7 @@
             class="datasetName"
           />
         </li>
-        <li class="column" *ngIf="!isShowingSearchList">
+        <li class="column">
           <h3 [title]="getFormattedDateParam()">Date From</h3>
           <input
             formControlName="dateFrom"
@@ -112,7 +112,7 @@
             ></ng-content>
           </ng-container>
         </li>
-        <li class="column" *ngIf="!isShowingSearchList">
+        <li class="column">
           <h3 [title]="getFormattedDateParam()">Date To</h3>
           <input
             formControlName="dateTo"
@@ -128,25 +128,37 @@
             ></ng-content>
           </ng-container>
         </li>
-        <li class="column" *ngIf="!isShowingSearchList">
-          <h3><a (click)="setIsShowingSearchList(true)">Show List</a></h3>
-        </li>
-        <li class="column" *ngIf="isShowingSearchList">
-          <h3><a (click)="setIsShowingSearchList(false)">Show Data</a></h3>
-        </li>
       </ul>
     </div>
 
     <div class="metis-dashboard-right">
-      <ng-container *ngIf="!form.value.facetParameter">
-        <h3>Select a facet dimension</h3>
-      </ng-container>
-      <ng-container *ngIf="form.value.facetParameter">
-        <h3 [title]="getFormattedContentTierParam() + getFormattedFacetParam()">
-          By {{ form.value.facetParameter | renameApiFacet }}
-          <span class="svg-icon-spin" [ngClass]="{ showing: isLoading }"></span>
-        </h3>
-      </ng-container>
+      <div class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
+        <ng-container *ngIf="!form.value.facetParameter">
+          <h3 class="header-data">Select a facet dimension</h3>
+        </ng-container>
+        <ng-container *ngIf="form.value.facetParameter">
+          <h3
+            class="header-data"
+            [title]="getFormattedContentTierParam() + getFormattedFacetParam()"
+          >
+            By {{ form.value.facetParameter | renameApiFacet }}
+            <span
+              class="svg-icon-spin"
+              [ngClass]="{ showing: isLoading }"
+            ></span>
+          </h3>
+        </ng-container>
+        <ng-container *ngIf="allFacetData">
+          <h3 class="link-list">
+            <a (click)="setIsShowingSearchList(true)" *ngIf="!isLoading"
+              >Show List</a
+            >
+          </h3>
+          <h3 class="link-data">
+            <a (click)="setIsShowingSearchList(false)">Show Data</a>
+          </h3>
+        </ng-container>
+      </div>
 
       <div class="facet-params">
         <div class="switch-wrapper">
