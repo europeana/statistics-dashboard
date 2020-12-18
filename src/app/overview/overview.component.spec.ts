@@ -26,6 +26,7 @@ describe('OverviewComponent', () => {
   const testOptions = ['option_1', 'option_2'];
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
+  let api: APIService;
 
   const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
@@ -47,6 +48,7 @@ describe('OverviewComponent', () => {
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
     exportPDF = TestBed.inject(ExportPDFService);
+    api = TestBed.inject(APIService);
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
     if (beginPolling) {
@@ -537,6 +539,15 @@ describe('OverviewComponent', () => {
       spyOn(component, 'beginPolling').and.callThrough();
       component.switchFacet('TYPE');
       expect(component.beginPolling).toHaveBeenCalled();
+    });
+
+    it('should be refreshed', () => {
+      spyOn(api, 'loadAPIData').and.callThrough();
+      component.refresh();
+      expect(api.loadAPIData).not.toHaveBeenCalled();
+      component.beginPolling();
+      component.refresh();
+      expect(api.loadAPIData).toHaveBeenCalled();
     });
   });
 });

@@ -498,7 +498,9 @@ export class OverviewComponent extends DataPollingComponent {
   }
 
   refresh(): void {
-    this.pollRefresh.next(true);
+    if (this.pollRefresh) {
+      this.pollRefresh.next(true);
+    }
   }
 
   selectOptionEnabled(group: string, val: string): boolean {
