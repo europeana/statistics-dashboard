@@ -122,7 +122,7 @@ export class IndexComponent extends SubscriptionManager {
   }
 
   search(): void {
-    const term = this.searchForm.value.searchTerm;
+    const term = this.searchForm.value.searchTerm.replace(/\\/g, '');
     this.setFilter(term);
   }
 
