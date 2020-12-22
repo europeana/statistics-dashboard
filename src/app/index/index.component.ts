@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import {
@@ -28,6 +28,11 @@ export class IndexComponent extends SubscriptionManager {
   filter: RegExp;
   server = 'https://api.europeana.eu/record/v2/search.json';
 
+  // TMP
+  startTime;
+  tickTimes = [];
+  // END TMP
+
   constructor(api: APIService, fb: FormBuilder) {
     super();
     this.api = api;
@@ -49,17 +54,18 @@ export class IndexComponent extends SubscriptionManager {
     item.dataProvidersShowing = tf;
 
     if (!item.dataProviders) {
-      this.setDataProviders(item);
+      this.subs.push(this.setDataProviders(item).subscribe());
     }
   }
 
   getRootUrl(): string {
-    return `${this.server}?wskey=api2demo&rows=0&profile=facets&facet=PROVIDER`;
+    const limitN = 50;
+    const limitS = `&f.DEFAULT.facet.limit=${limitN}`;
+    return `${this.server}?wskey=api2demo&rows=0&${limitS}&profile=facets&facet=PROVIDER`;
   }
 
   loadProviderNames(): void {
     const url = `${this.getRootUrl()}&query=*`;
-
     this.subs.push(
       this.api.loadAPIData(url).subscribe((data: RawFacet) => {
         this.dataProviderData = data.facets[0].fields.map(
@@ -69,11 +75,49 @@ export class IndexComponent extends SubscriptionManager {
             };
           }
         );
-        this.chainLoad();
+        this.batchLoad();
       })
     );
   }
 
+  batchLoad(): void {
+    if (!this.startTime) {
+      this.startTime = new Date().getTime();
+      console.log('START\n\t' + this.startTime);
+    }
+    const batchSize = 4;
+    const batchToLoad = this.dataProviderData
+      .filter((datum: ProviderDatum) => {
+        return !datum.dataProviders;
+      })
+      .slice(0, batchSize)
+      .map((datum: ProviderDatum) => {
+        return this.setDataProviders(datum);
+      });
+    if (batchToLoad.length > 0) {
+      const batch = forkJoin(batchToLoad).subscribe(() => {
+        const endTime = new Date().getTime();
+        const total = endTime - this.startTime;
+        this.tickTimes.push(total);
+        console.log(
+          'TICK\n\t' +
+            '\n\t\t' +
+            total +
+            ' (avg = ' +
+            total / this.tickTimes.length +
+            ')'
+        );
+        this.batchLoad();
+        batch.unsubscribe();
+      });
+    } else {
+      const endTime = new Date().getTime();
+      const total = endTime - this.startTime;
+      console.log('DONE\n\t' + endTime + '\n\t\t' + total);
+    }
+  }
+
+  /*
   chainLoad(): void {
     const nextToLoad = this.dataProviderData.find((datum: ProviderDatum) => {
       return !datum.dataProviders;
@@ -82,7 +126,43 @@ export class IndexComponent extends SubscriptionManager {
       this.setDataProviders(nextToLoad, true);
     }
   }
+  */
 
+  setDataProviders(item: ProviderDatum): Observable<boolean> {
+    const name = encodeURIComponent(item.name.replace(/\"/g, '\\"'));
+    const nameParam = `&qf=PROVIDER:"${name}"`;
+    const url = `${this.getRootUrl()}&facet=DATA_PROVIDER&query=*${nameParam}`;
+
+    return this.api.loadAPIData(url).pipe(
+      switchMap((data: RawFacet) => {
+        const facet = data.facets
+          .filter((facet: Facet) => {
+            return facet.name === 'DATA_PROVIDER';
+          })
+          .pop();
+
+        if (!facet) {
+          console.log('BROKEN URL = ' + url);
+        }
+
+        const res = facet.fields.map((field: FacetField) => {
+          return {
+            name: field.label
+          } as DataProviderDatum;
+        });
+
+        res.unshift({
+          name: item.name,
+          isProvider: true
+        } as DataProviderDatum);
+
+        item.dataProviders = res;
+        return of(true);
+      })
+    );
+  }
+
+  /*
   setDataProviders(item: ProviderDatum, doChainLoad = false): void {
     const name = encodeURIComponent(item.name);
     const nameParam = `&qf=PROVIDER:"${name}"`;
@@ -120,6 +200,7 @@ export class IndexComponent extends SubscriptionManager {
         })
     );
   }
+*/
 
   search(): void {
     const term = this.searchForm.value.searchTerm.replace(/\\/g, '');
@@ -160,6 +241,7 @@ export class IndexComponent extends SubscriptionManager {
   }
 
   getUrl(dataProvider: string, isProvider = false): string {
+    dataProvider = dataProvider.replace(/\"/g, '\\"');
     const server = 'https://www.europeana.eu/en/search';
     const facet = isProvider ? 'PROVIDER' : 'DATA_PROVIDER';
     return `${server}?qf=${facet}:"${encodeURIComponent(dataProvider)}"`;

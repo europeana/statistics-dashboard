@@ -69,10 +69,12 @@ describe('IndexComponent', () => {
     it('should trigger a chain load', () => {
       const providerDatum = getProvderDatum();
       spyOn(component, 'chainLoad');
-      component.setDataProviders(providerDatum);
+      const sub1 = component.setDataProviders(providerDatum);
       expect(component.chainLoad).not.toHaveBeenCalled();
-      component.setDataProviders(providerDatum, true);
+      const sub2 = component.setDataProviders(providerDatum, true);
       expect(component.chainLoad).toHaveBeenCalled();
+      sub1.unsubscribe();
+      sub2.unsubscribe();
     });
 
     it('should set the filter', () => {
