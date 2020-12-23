@@ -25,7 +25,13 @@
               'data-providers-loaded': !!provider.dataProviders,
               empty: provider.dataProviders?.length === 0
             }"
-            (click)="showHide(provider.name, !provider.dataProvidersShowing)"
+            (click)="
+              showHide(
+                provider.name,
+                !provider.dataProvidersShowing,
+                provider.dataProviders?.length === 0
+              )
+            "
             >{{ provider.name
             }}<span class="count">{{ provider.count }}</span></a
           >

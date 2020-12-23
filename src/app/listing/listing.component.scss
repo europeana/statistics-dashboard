@@ -73,12 +73,10 @@ $arrowColour: #a4cde1;
   margin-left: 2em;
 }
 
-.data-providers-showing {
-  .name::after {
-    border-color: $arrowColour transparent transparent;
-    border-style: solid dashed dashed;
-    bottom: 2px;
-  }
+.data-providers-showing .name::after {
+  border-color: $arrowColour transparent transparent;
+  border-style: solid dashed dashed;
+  bottom: 2px;
 }
 
 .search-term {

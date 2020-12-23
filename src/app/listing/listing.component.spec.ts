@@ -58,6 +58,16 @@ describe('ListingComponent', () => {
       expect(providerDatum.dataProvidersShowing).toBeTruthy();
       component.showHide(providerDatum.name, false);
       expect(providerDatum.dataProvidersShowing).toBeFalsy();
+      component.showHide(providerDatum.name, true, true);
+      expect(providerDatum.dataProvidersShowing).toBeFalsy();
+
+      providerDatum.dataProvidersForce = false;
+      providerDatum.dataProviders = [{ name: 'x', count: 1 }];
+      component.searchForm.value.searchTerm = 'x';
+      component.showHide(providerDatum.name, true);
+      expect(providerDatum.dataProvidersShowing).toBeFalsy();
+      expect(providerDatum.dataProvidersForce).toBeTruthy();
+
       spyOn(component, 'setDataProviders');
       component.showHide(providerDatum.name, true);
       expect(component.setDataProviders).not.toHaveBeenCalled();
@@ -69,6 +79,14 @@ describe('ListingComponent', () => {
       providerDatum.dataProviders = null;
       component.showHide(providerDatum.name, false);
       tick(1);
+    }));
+
+    it('should clear the force flag', fakeAsync(() => {
+      const providerDatum = getProvderDatum();
+      component.dataProviderData = [providerDatum];
+      providerDatum.dataProvidersForce = true;
+      component.clearForce();
+      expect(providerDatum.dataProvidersForce).toBeFalsy();
     }));
 
     it('should set the filter', () => {
@@ -122,6 +140,12 @@ describe('ListingComponent', () => {
 
       component.setFilter(term);
       expect(component.getFiltered()[0].dataProviders.length).toEqual(1);
+
+      term = 'c';
+      component.searchForm.value.searchTerm = term;
+
+      component.setFilter(term);
+      expect(component.getFiltered()[0].dataProviders.length).toEqual(0);
 
       component.dataProviderData[0].dataProviders = undefined;
       term = 'XXX';

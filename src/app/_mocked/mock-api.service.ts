@@ -22,6 +22,11 @@ const DataProviderData = [
     ],
     dataProvidersShowing: true,
     count: 21355
+  },
+  {
+    name: 'Cc ccc ccccc',
+    dataProvidersShowing: false,
+    count: 6529
   }
 ];
 
