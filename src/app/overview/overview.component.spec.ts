@@ -1,7 +1,14 @@
-import { ElementRef } from '@angular/core';
+import { ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick
+} from '@angular/core/testing';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+
 import {
   DatatableComponent,
   DatatableRowDetailDirective
@@ -24,6 +31,7 @@ describe('OverviewComponent', () => {
   let fixture: ComponentFixture<OverviewComponent>;
 
   const testOptions = ['option_1', 'option_2'];
+  const tickTime = 1;
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
   let api: APIService;
@@ -39,11 +47,12 @@ describe('OverviewComponent', () => {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
         }
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   };
 
-  const b4Each = (beginPolling = true): void => {
+  const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
@@ -51,9 +60,6 @@ describe('OverviewComponent', () => {
     api = TestBed.inject(APIService);
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
-    if (beginPolling) {
-      component.beginPolling();
-    }
     fixture.detectChanges();
   };
 
@@ -76,21 +82,34 @@ describe('OverviewComponent', () => {
       expect(component.unfixName('_____')).toEqual('.');
     });
 
-    it('should find the facet index', () => {
+    it('should load data on init', fakeAsync(() => {
+      component.beginPolling();
+      tick(1);
+      expect(component.allFacetData).toBeTruthy();
+      component.ngOnDestroy();
+    }));
+
+    it('should find the facet index', fakeAsync(() => {
+      component.beginPolling();
+      tick(1);
       component.facetConf.forEach((facet: string, i: number) => {
         expect(component.findFacetIndex(facet, component.allFacetData)).toEqual(
           i
         );
       });
-    });
+      component.ngOnDestroy();
+    }));
 
-    it('should get the select options', () => {
+    it('should get the select options', fakeAsync(() => {
+      component.beginPolling();
+      tick(1);
       component.facetConf.forEach((facet: string) => {
         expect(
           component.getSelectOptions(facet, component.allFacetData).length
         ).toBeGreaterThan(0);
       });
-    });
+      component.ngOnDestroy();
+    }));
 
     it('should get the url for a row', () => {
       const qfVal = 'contentTier';
@@ -268,11 +287,14 @@ describe('OverviewComponent', () => {
       expect(component.validateDateGeneric(dateTo, 'dateTo')).toBeTruthy();
     });
 
-    it('should enable the filters', () => {
-      expect(component.menuStates['contentTier'].disabled).toBeTruthy();
+    it('should enable the filters', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
+      component.menuStates['COUNTRY'].disabled = true;
       component.enableFilters();
-      expect(component.menuStates['contentTier'].disabled).toBeFalsy();
-    });
+      expect(component.menuStates['COUNTRY'].disabled).toBeFalsy();
+      component.ngOnDestroy();
+    }));
 
     it('should clear the filters', () => {
       setFilterValue1('TYPE');
@@ -287,13 +309,16 @@ describe('OverviewComponent', () => {
       expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
     });
 
-    it('should switch the facet', () => {
+    it('should switch the facet', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
       expect(component.menuStates['contentTier'].disabled).toBeTruthy();
       expect(component.menuStates['TYPE'].disabled).toBeFalsy();
       component.switchFacet('TYPE');
       expect(component.menuStates['contentTier'].disabled).toBeFalsy();
       expect(component.menuStates['TYPE'].disabled).toBeTruthy();
-    });
+      component.ngOnDestroy();
+    }));
 
     it('should determine if a select option is enabled', () => {
       expect(component.selectOptionEnabled('contentTier', '0')).toBeTruthy();
@@ -352,15 +377,20 @@ describe('OverviewComponent', () => {
       expect(component.downloadOptionsOpen).toBeFalsy();
     });
 
-    it('should extract data as a percent', () => {
+    it('should extract data as a percent', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
       component.extractChartData();
       expect(component.chartData[0].value).toEqual(17050500);
       component.form.value.showPercent = true;
       component.extractChartData();
       expect(component.chartData[0].value).toEqual(50.2);
-    });
+      component.ngOnDestroy();
+    }));
 
-    it('should close the filters', () => {
+    it('should close the filters', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
       const setAllTrue = (): void => {
         Object.keys(component.menuStates).forEach((s: string) => {
           component.menuStates[s].visible = true;
@@ -387,7 +417,8 @@ describe('OverviewComponent', () => {
       checkAllValue(true);
       component.closeFilters(exception);
       expect(component.menuStates[exception].visible).toBeTruthy();
-    });
+      component.ngOnDestroy();
+    }));
 
     it('should switch the chart type', () => {
       expect(component.showPie).toBeTruthy();
@@ -490,14 +521,17 @@ describe('OverviewComponent', () => {
       expect(component.downloadOptionsOpen).toBeFalsy();
     });
 
-    it('should export CSV', () => {
+    it('should export CSV', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
       spyOn(exportCSV, 'download');
       const elDownload = document.createElement('a');
       document.body.append(elDownload);
       component.downloadAnchor = { nativeElement: elDownload } as ElementRef;
       component.export(ExportType.CSV);
       expect(exportCSV.download).toHaveBeenCalled();
-    });
+      component.ngOnDestroy();
+    }));
 
     it('should export PDF', () => {
       spyOn(exportPDF, 'getChartAsImageUrl').and.callThrough();
@@ -526,14 +560,16 @@ describe('OverviewComponent', () => {
     }));
 
     beforeEach(() => {
-      b4Each(false);
+      b4Each();
     });
 
-    it('should invoke the provided callback', () => {
+    it('should invoke the provided callback', fakeAsync(() => {
       const spy = jasmine.createSpy();
       component.beginPolling(spy);
+      tick(tickTime);
       expect(spy).toHaveBeenCalled();
-    });
+      component.ngOnDestroy();
+    }));
 
     it('should be invoked on facet switch', () => {
       spyOn(component, 'beginPolling').and.callThrough();

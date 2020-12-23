@@ -1,4 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick
+} from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
@@ -44,38 +50,26 @@ describe('IndexComponent', () => {
 
     beforeEach(b4Each);
 
-    it('should show and hide', () => {
+    it('should show and hide', fakeAsync(() => {
       const providerDatum = getProvderDatum();
-
       component.dataProviderData = [providerDatum];
       expect(providerDatum.dataProvidersShowing).toBeFalsy();
-
       component.showHide(providerDatum.name, true);
       expect(providerDatum.dataProvidersShowing).toBeTruthy();
-
       component.showHide(providerDatum.name, false);
       expect(providerDatum.dataProvidersShowing).toBeFalsy();
-
       spyOn(component, 'setDataProviders');
       component.showHide(providerDatum.name, true);
-
       expect(component.setDataProviders).not.toHaveBeenCalled();
+    }));
 
-      providerDatum.dataProviders = null;
-      component.showHide(providerDatum.name, true);
-      expect(component.setDataProviders).toHaveBeenCalled();
-    });
-
-    it('should trigger a chain load', () => {
+    it('should show and hide 2', fakeAsync(() => {
       const providerDatum = getProvderDatum();
-      spyOn(component, 'chainLoad');
-      const sub1 = component.setDataProviders(providerDatum);
-      expect(component.chainLoad).not.toHaveBeenCalled();
-      const sub2 = component.setDataProviders(providerDatum, true);
-      expect(component.chainLoad).toHaveBeenCalled();
-      sub1.unsubscribe();
-      sub2.unsubscribe();
-    });
+      component.dataProviderData = [providerDatum];
+      providerDatum.dataProviders = null;
+      component.showHide(providerDatum.name, false);
+      tick(1);
+    }));
 
     it('should set the filter', () => {
       expect(component.filter.toString()).toEqual('/.*/');
@@ -101,12 +95,17 @@ describe('IndexComponent', () => {
       expect(component.searchForm.value.searchTerm).toEqual('');
     });
 
-    it('should get the filtered', () => {
+    it('should get the filtered', fakeAsync(() => {
       let term = '';
       component.searchForm.value.searchTerm = '';
       component.setFilter(term);
 
+      component.loadProviderNames();
+      tick(2);
+
+      expect(component.getIsFiltered()).toBeFalsy();
       expect(component.getFiltered()[0].dataProviders.length).toEqual(4);
+
       term = 'XXX';
       component.searchForm.value.searchTerm = term;
       component.setFilter(term);
@@ -128,7 +127,7 @@ describe('IndexComponent', () => {
       term = 'XXX';
       component.searchForm.value.searchTerm = term;
       component.setFilter(term);
-      expect(component.getFiltered()[0].dataProviders).toBeFalsy();
-    });
+      expect(component.getFiltered()[0].dataProviders.length).toBeFalsy();
+    }));
   });
 });
