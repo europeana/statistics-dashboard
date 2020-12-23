@@ -1,4 +1,4 @@
-import { ElementRef, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import {
   async,
