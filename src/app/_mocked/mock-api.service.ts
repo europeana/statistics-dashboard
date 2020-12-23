@@ -132,7 +132,9 @@ export class MockAPIService {
   loadAPIData(_: string): Observable<RawFacet> {
     if (this.errorMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return of(({ items: [], totalResults: 0 } as any) as RawFacet).pipe(delay(1));
+      return of(({ items: [], totalResults: 0 } as any) as RawFacet).pipe(
+        delay(1)
+      );
     }
     return of(MockAPIData).pipe(delay(1));
   }

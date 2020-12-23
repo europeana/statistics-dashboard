@@ -15,11 +15,11 @@ import { SubscriptionManager } from '../subscription-manager/subscription.manage
 import { APIService } from '../_services';
 
 @Component({
-  selector: 'app-index',
-  templateUrl: './index.component.html',
-  styleUrls: ['./index.component.scss']
+  selector: 'app-listing',
+  templateUrl: './listing.component.html',
+  styleUrls: ['./listing.component.scss']
 })
-export class IndexComponent extends SubscriptionManager {
+export class ListingComponent extends SubscriptionManager {
   @Input() showing?: boolean;
 
   dataProviderData: Array<ProviderDatum> = [];

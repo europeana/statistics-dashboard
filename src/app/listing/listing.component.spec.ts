@@ -11,16 +11,16 @@ import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
 import { ProviderDatum } from '../_models';
 import { APIService } from '../_services';
 
-import { IndexComponent } from './index.component';
+import { ListingComponent } from './listing.component';
 
-describe('IndexComponent', () => {
-  let component: IndexComponent;
-  let fixture: ComponentFixture<IndexComponent>;
+describe('ListingComponent', () => {
+  let component: ListingComponent;
+  let fixture: ComponentFixture<ListingComponent>;
 
   const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule],
-      declarations: [IndexComponent],
+      declarations: [ListingComponent],
       providers: [
         {
           provide: APIService,
@@ -31,7 +31,7 @@ describe('IndexComponent', () => {
   };
 
   const b4Each = (): void => {
-    fixture = TestBed.createComponent(IndexComponent);
+    fixture = TestBed.createComponent(ListingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   };
