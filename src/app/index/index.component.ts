@@ -59,7 +59,7 @@ export class IndexComponent extends SubscriptionManager {
   }
 
   getRootUrl(): string {
-    const limitN = 50;
+    const limitN = 1000;
     const limitS = `&f.DEFAULT.facet.limit=${limitN}`;
     return `${this.server}?wskey=api2demo&rows=0&${limitS}&profile=facets&facet=PROVIDER`;
   }
@@ -71,7 +71,8 @@ export class IndexComponent extends SubscriptionManager {
         this.dataProviderData = data.facets[0].fields.map(
           (field: FacetField) => {
             return {
-              name: field.label
+              name: field.label,
+              count: field.count
             };
           }
         );
@@ -86,6 +87,7 @@ export class IndexComponent extends SubscriptionManager {
       console.log('START\n\t' + this.startTime);
     }
     const batchSize = 4;
+
     const batchToLoad = this.dataProviderData
       .filter((datum: ProviderDatum) => {
         return !datum.dataProviders;
@@ -141,22 +143,20 @@ export class IndexComponent extends SubscriptionManager {
           })
           .pop();
 
-        if (!facet) {
-          console.log('BROKEN URL = ' + url);
-        }
-
-        const res = facet.fields.map((field: FacetField) => {
+        const dataProviders = facet.fields.map((field: FacetField) => {
           return {
+            count: field.count,
             name: field.label
           } as DataProviderDatum;
         });
 
-        res.unshift({
+        dataProviders.unshift({
+          count: item.count,
           name: item.name,
           isProvider: true
         } as DataProviderDatum);
 
-        item.dataProviders = res;
+        item.dataProviders = dataProviders;
         return of(true);
       })
     );
@@ -216,28 +216,24 @@ export class IndexComponent extends SubscriptionManager {
   }
 
   getFiltered(): Array<ProviderDatum> {
-    const filtered = this.getIsFiltered();
+    return !this.getIsFiltered()
+      ? this.dataProviderData
+      : this.dataProviderData.map((datum: ProviderDatum) => {
+          const innerList = datum.dataProviders
+            ? datum.dataProviders.filter((item: DataProviderDatum) => {
+                return item.name.match(this.filter);
+              })
+            : [];
 
-    return this.dataProviderData.map((datum: ProviderDatum) => {
-      const innerList =
-        filtered && datum.dataProviders
-          ? datum.dataProviders.filter((item: DataProviderDatum) => {
-              return item.name.match(this.filter);
-            })
-          : datum.dataProviders;
+          const dataProvidersShowing = innerList ? innerList.length > 0 : false;
 
-      const dataProvidersShowing = filtered
-        ? innerList
-          ? innerList.length > 0
-          : false
-        : datum.dataProvidersShowing;
-
-      return {
-        name: datum.name,
-        dataProviders: innerList,
-        dataProvidersShowing: dataProvidersShowing
-      } as ProviderDatum;
-    });
+          return {
+            count: datum.count,
+            name: datum.name,
+            dataProviders: innerList,
+            dataProvidersShowing: dataProvidersShowing
+          } as ProviderDatum;
+        });
   }
 
   getUrl(dataProvider: string, isProvider = false): string {

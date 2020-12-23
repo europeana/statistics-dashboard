@@ -1,6 +1,19 @@
 @import "../../scss/_variables";
 $arrowColour: #a4cde1;
 
+.count {
+  color: #82abcc;
+  display: inline-block;
+  margin-left: 0.5em;
+
+  &::after {
+    content: ")";
+  }
+  &::before {
+    content: "(";
+  }
+}
+
 .icon-clear {
   left: 16em;
   top: 0.75em;
@@ -32,6 +45,15 @@ $arrowColour: #a4cde1;
   padding-bottom: 1em;
   position: relative;
 
+  &.empty {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  &:not(.empty):hover .count {
+    color: #053048;
+  }
+
   &.data-providers-loaded:not(.empty)::after {
     border-color: transparent transparent transparent $arrowColour;
     border-style: dashed dashed dashed solid;
@@ -48,25 +70,15 @@ $arrowColour: #a4cde1;
 }
 
 .provider {
-  display: none;
   margin-left: 2em;
 }
 
 .data-providers-showing {
-  .provider {
-    display: block;
-  }
-
   .name::after {
     border-color: $arrowColour transparent transparent;
     border-style: solid dashed dashed;
     bottom: 2px;
   }
-}
-
-.name.empty {
-  cursor: default;
-  opacity: 0.5;
 }
 
 .search-term {
