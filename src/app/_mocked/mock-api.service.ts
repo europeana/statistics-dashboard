@@ -1,16 +1,32 @@
 import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 import { ProviderDatum, RawFacet } from '../_models';
 
 const DataProviderData = [
   {
     name: 'Aa aaa aaaaa',
-    dataProviders: [{ name: 'a1' }, { name: 'a2' }, { name: 'a3' }],
-    dataProvidersShowing: true
+    dataProviders: [
+      { name: 'a1', count: 1 },
+      { name: 'a2', count: 2 },
+      { name: 'a3', count: 3 }
+    ],
+    dataProvidersShowing: true,
+    count: 18787
   },
   {
     name: 'Bb bbb bbbbb',
-    dataProviders: [{ name: 'b1' }, { name: 'b2' }, { name: 'b3' }],
-    dataProvidersShowing: true
+    dataProviders: [
+      { name: 'b1', count: 1 },
+      { name: 'b2', count: 2 },
+      { name: 'b3', count: 3 }
+    ],
+    dataProvidersShowing: true,
+    count: 21355
+  },
+  {
+    name: 'Cc ccc ccccc',
+    dataProvidersShowing: false,
+    count: 6529
   }
 ];
 
@@ -121,13 +137,15 @@ export class MockAPIService {
   loadAPIData(_: string): Observable<RawFacet> {
     if (this.errorMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return of(({ items: [], totalResults: 0 } as any) as RawFacet);
+      return of(({ items: [], totalResults: 0 } as any) as RawFacet).pipe(
+        delay(1)
+      );
     }
-    return of(MockAPIData);
+    return of(MockAPIData).pipe(delay(1));
   }
 
   loadDataProviderData(): Observable<Array<ProviderDatum>> {
-    return of(DataProviderData);
+    return of(DataProviderData).pipe(delay(1));
   }
 }
 

@@ -13,13 +13,13 @@ import { AppComponent } from './app.component';
 
 import { RenameApiFacetPipe } from './_translate';
 
-import { IndexComponent } from './index/index.component';
+import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    IndexComponent,
+    ListingComponent,
     OverviewComponent,
     RenameApiFacetPipe
   ],

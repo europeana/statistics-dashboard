@@ -1,10 +1,14 @@
-export interface ProviderDatum {
+interface ProviderDatumBase {
   name: string;
-  dataProviders?: Array<DataProviderDatum>;
-  dataProvidersShowing?: boolean;
+  count: number;
 }
 
-export interface DataProviderDatum {
-  name: string;
+export interface ProviderDatum extends ProviderDatumBase {
+  dataProviders?: Array<DataProviderDatum>;
+  dataProvidersShowing?: boolean;
+  dataProvidersForce?: boolean;
+}
+
+export interface DataProviderDatum extends ProviderDatumBase {
   isProvider?: boolean;
 }
