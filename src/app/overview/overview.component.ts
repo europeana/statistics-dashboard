@@ -104,7 +104,7 @@ export class OverviewComponent extends DataPollingComponent {
   showPie = true;
   showBar = false;
   showGauge = false;
-  isLoading = true;
+  isLoading = false;
 
   selFacetIndex = 0;
   allFacetData: Array<Facet>;

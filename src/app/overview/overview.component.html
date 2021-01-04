@@ -1,4 +1,10 @@
-<form [formGroup]="form" class="dashboard-wrapper">
+<form
+  [formGroup]="form"
+  class="dashboard-wrapper"
+  [ngClass]="{
+    'loading-modal': isLoading && !allFacetData
+  }"
+>
   <ng-template #dateErrors let-field="field">
     <ul class="errors">
       <li *ngIf="form.get(field)!.errors!.isTooEarly">Date is too early</li>
