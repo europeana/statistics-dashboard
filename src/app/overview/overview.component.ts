@@ -482,9 +482,11 @@ export class OverviewComponent extends DataPollingComponent {
 
   switchFacet(disableName: string): void {
     const onDataReady = (refresh = false): void => {
-      this.enableFilters();
-      this.form.controls[disableName].disable();
-      this.menuStates[disableName].disabled = true;
+      if (this.form.value['facetParameter'] === disableName) {
+        this.enableFilters();
+        this.form.controls[disableName].disable();
+        this.menuStates[disableName].disabled = true;
+      }
       this.setIsShowingSearchList(false);
       if (refresh) {
         this.refresh();
