@@ -314,6 +314,7 @@ describe('OverviewComponent', () => {
       tick(tickTime);
       expect(component.menuStates['contentTier'].disabled).toBeTruthy();
       expect(component.menuStates['TYPE'].disabled).toBeFalsy();
+      component.form.get('facetParameter').setValue('TYPE');
       component.switchFacet('TYPE');
       expect(component.menuStates['contentTier'].disabled).toBeFalsy();
       expect(component.menuStates['TYPE'].disabled).toBeTruthy();
