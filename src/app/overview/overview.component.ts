@@ -151,19 +151,21 @@ export class OverviewComponent extends DataPollingComponent {
     const queryParam =
       datasetNameParam.length > 0 ? `?query=${datasetNameParam}` : '?query=*';
     const dateParam = this.getFormattedDateParam();
+    const ct = this.getFormattedContentTierParam();
 
     let apiOnly = '';
-    let ct = '';
 
     if (portal) {
       server = environment.serverPortal;
     } else {
-      ct = this.getFormattedContentTierParam();
       server = environment.serverAPI;
       apiOnly =
         '&wskey=api2demo&rows=0&profile=facets' + this.getFormattedFacetParam();
     }
-    return `${server}${queryParam}${ct}${apiOnly}${filterParam}${dateParam}`;
+
+    let res = `${server}${queryParam}${ct}${apiOnly}${filterParam}${dateParam}`;
+    console.log('url > ' + res);
+    return res;
   }
 
   /** getUrlRow
