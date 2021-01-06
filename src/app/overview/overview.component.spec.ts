@@ -111,11 +111,6 @@ describe('OverviewComponent', () => {
       component.ngOnDestroy();
     }));
 
-    it('should get the url for a row', () => {
-      const qfVal = 'contentTier';
-      expect(component.getUrlRow(qfVal).indexOf(qfVal)).toBeTruthy();
-    });
-
     it('should get the url for a dataset', () => {
       expect(component.getUrl().indexOf('edm_datasetName')).toEqual(-1);
       component.form.get('datasetName').setValue('XXX');
@@ -448,6 +443,60 @@ describe('OverviewComponent', () => {
       expect(component.showBar).toBeFalsy();
       expect(component.showPie).toBeTruthy();
       expect(component.showGauge).toBeFalsy();
+    });
+  });
+
+  describe('Url Generation', () => {
+    beforeEach(async(() => {
+      configureTestBed();
+    }));
+
+    beforeEach(() => {
+      b4Each();
+      component.form.value.facetParameter = 'contentTier';
+    });
+
+    it('should include the facet selection', () => {
+      [2, 3, 4].forEach((qfVal: number) => {
+        const wrongVal = qfVal * 3;
+        expect(component.getUrlRow(`${qfVal}`).indexOf(`${wrongVal}`)).toEqual(
+          -1
+        );
+        expect(
+          component.getUrlRow(`${qfVal}`).indexOf(`${qfVal}`)
+        ).toBeGreaterThan(-1);
+      });
+
+      ['video', 'text', '3d', 'audio'].forEach((qfVal: 'string') => {
+        const wrongVal = 'hologram';
+        expect(component.getUrlRow(qfVal).indexOf(wrongVal)).toEqual(-1);
+        expect(component.getUrlRow(qfVal).indexOf(qfVal)).toBeGreaterThan(-1);
+      });
+    });
+
+    it('should include contentTierZero', () => {
+      const ctZeroDetect = 'contentTier:(0';
+      expect(component.getUrlRow('1').indexOf(ctZeroDetect)).toEqual(-1);
+      component.form.value.contentTierZero = true;
+      expect(component.getUrlRow('X').indexOf(ctZeroDetect)).toBeGreaterThan(
+        -1
+      );
+    });
+
+    it('should include the date range', () => {
+      const dateDetect = new Date().toISOString();
+      expect(component.getUrlRow('X').indexOf(dateDetect)).toEqual(-1);
+      component.form.value.dateFrom = dateDetect;
+      component.form.value.dateTo = dateDetect;
+      expect(component.getUrlRow('X').indexOf(dateDetect)).toBeGreaterThan(-1);
+    });
+
+    it('should include the filter selection', () => {
+      const filterDetect = 'TYPE';
+      expect(component.getUrlRow('X').indexOf(filterDetect)).toEqual(-1);
+      setFilterValue1(filterDetect);
+      const newRes = component.getUrlRow('X');
+      expect(newRes.indexOf(filterDetect)).toBeGreaterThan(-1);
     });
   });
 
