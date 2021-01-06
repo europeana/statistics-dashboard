@@ -94,6 +94,16 @@ $width-left-col: 200px;
   }
 }
 
+input[type="checkbox"] {
+  &:enabled {
+    cursor: pointer;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
 input[type="date"],
 .datasetName {
   width: 11em;

@@ -65,9 +65,7 @@ export class OverviewComponent extends DataPollingComponent {
     'PROVIDER'
   ];
 
-  menuStates: { [key: string]: MenuState } = {
-    filterContentTier: { visible: false }
-  };
+  menuStates: { [key: string]: MenuState } = {};
 
   contentTiersOptions = Array(5)
     .fill(0)
@@ -152,7 +150,6 @@ export class OverviewComponent extends DataPollingComponent {
       datasetNameParam.length > 0 ? `?query=${datasetNameParam}` : '?query=*';
     const dateParam = this.getFormattedDateParam();
     const ct = this.getFormattedContentTierParam();
-
     let apiOnly = '';
 
     if (portal) {
@@ -357,9 +354,8 @@ export class OverviewComponent extends DataPollingComponent {
   */
   getFormattedContentTierParam(): string {
     let res = '';
-    const filterContentTierParam = this.getSetCheckboxValues(
-      'filterContentTier'
-    );
+    const filterContentTierParam = this.getSetCheckboxValues('contentTier');
+
     res = (filterContentTierParam.length > 0
       ? filterContentTierParam
       : this.form.value.contentTierZero
@@ -505,8 +501,9 @@ export class OverviewComponent extends DataPollingComponent {
   }
 
   selectOptionEnabled(group: string, val: string): boolean {
-    const ctZero = this.form.value.contentTierZero;
-    return !(group === 'contentTier' && val === '0' && ctZero);
+    return val === '0' && group === 'contentTier'
+      ? this.form.value.contentTierZero
+      : true;
   }
 
   toggleExpandRow(row: DatatableRowDetailDirective): false {

@@ -149,18 +149,27 @@ describe('OverviewComponent', () => {
         return `&qf=contentTier:(${encodeURIComponent(s)})`;
       };
 
-      let expected = fmt('1 OR 2 OR 3 OR 4');
+      const expectOneToFour = fmt('1 OR 2 OR 3 OR 4');
+      const expectZeroToFour = fmt('0 OR 1 OR 2 OR 3 OR 4');
 
-      expect(component.getFormattedContentTierParam()).toEqual(expected);
+      expect(component.getFormattedContentTierParam()).toEqual(expectOneToFour);
 
       component.form.get('contentTierZero').setValue(true);
-      expected = fmt('0 OR 1 OR 2 OR 3 OR 4');
 
-      expect(component.getFormattedContentTierParam()).toEqual(expected);
+      expect(component.getFormattedContentTierParam()).toEqual(
+        expectZeroToFour
+      );
 
-      setFilterValue1('filterContentTier');
-      expected = fmt('1');
-      expect(component.getFormattedContentTierParam()).toEqual(expected);
+      component.addMenuCheckboxes('contentTier', ['0', '1', '2']);
+      component.form.get(`contentTier.0`).setValue(true);
+
+      expect(component.getFormattedContentTierParam()).toEqual(fmt('0'));
+
+      component.form.get(`contentTier.1`).setValue(true);
+      expect(component.getFormattedContentTierParam()).toEqual(fmt('0 OR 1'));
+
+      component.form.get(`contentTier.0`).setValue(false);
+      expect(component.getFormattedContentTierParam()).toEqual(fmt('1'));
     });
 
     it('should add menu checkboxes', () => {
@@ -317,9 +326,9 @@ describe('OverviewComponent', () => {
     }));
 
     it('should determine if a select option is enabled', () => {
-      expect(component.selectOptionEnabled('contentTier', '0')).toBeTruthy();
-      component.form.get('contentTierZero').setValue(true);
       expect(component.selectOptionEnabled('contentTier', '0')).toBeFalsy();
+      component.form.get('contentTierZero').setValue(true);
+      expect(component.selectOptionEnabled('contentTier', '0')).toBeTruthy();
     });
 
     it('should toggle row expansion', () => {
