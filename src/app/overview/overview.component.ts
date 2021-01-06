@@ -162,10 +162,7 @@ export class OverviewComponent extends DataPollingComponent {
       apiOnly =
         '&wskey=api2demo&rows=0&profile=facets' + this.getFormattedFacetParam();
     }
-
-    let res = `${server}${queryParam}${ct}${apiOnly}${filterParam}${dateParam}`;
-    console.log('url > ' + res);
-    return res;
+    return `${server}${queryParam}${ct}${apiOnly}${filterParam}${dateParam}`;
   }
 
   /** getUrlRow
