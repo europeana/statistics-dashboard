@@ -63,8 +63,8 @@
     </li>
   </ng-template>
 
-  <div class="metis-dashboard">
-    <div class="metis-dashboard-left" *ngIf="!isShowingSearchList">
+  <div class="statistics-dashboard">
+    <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <h3 class="filters-header" [title]="getFormattedFilterParam()">
           Filters
@@ -137,7 +137,7 @@
       </ul>
     </div>
 
-    <div class="metis-dashboard-right">
+    <div class="statistics-dashboard-right">
       <div class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngIf="!form.value.facetParameter">
           <h3 class="header-data">Select a facet dimension</h3>
@@ -377,6 +377,14 @@
         id="pieChart"
         #pieChart
       >
+        <app-pie-chart
+          *ngIf="showPie"
+          [colours]="colours"
+          [results]="chartData"
+        ></app-pie-chart>
+
+        <div *ngIf="showPie" style="height: 4em"></div>
+
         <ngx-charts-pie-chart
           *ngIf="showPie"
           [scheme]="colorScheme"
@@ -387,6 +395,14 @@
           [doughnut]="false"
         >
         </ngx-charts-pie-chart>
+
+        <app-bar-chart
+          *ngIf="showBar"
+          [colours]="colours"
+          [results]="chartData"
+        ></app-bar-chart>
+
+        <div *ngIf="showBar" style="height: 4em"></div>
 
         <ngx-charts-bar-vertical
           *ngIf="showBar"

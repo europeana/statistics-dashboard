@@ -13,14 +13,19 @@ import { AppComponent } from './app.component';
 
 import { RenameApiFacetPipe } from './_translate';
 
+import { BarComponent } from './chart/bar.component';
+import { PieComponent } from './chart/pie.component';
+
 import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    BarComponent,
     ListingComponent,
     OverviewComponent,
+    PieComponent,
     RenameApiFacetPipe
   ],
   imports: [

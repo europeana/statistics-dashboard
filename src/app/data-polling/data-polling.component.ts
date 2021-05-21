@@ -43,7 +43,8 @@ export interface PollingSubjectAccesor {
 })
 export class DataPollingComponent
   extends SubscriptionManager
-  implements OnDestroy {
+  implements OnDestroy
+{
   allPollingInfo: Array<DataPollerInfo> = [];
   allRefreshSubs: Array<Subscription> = [];
   pollRateDropped = false;

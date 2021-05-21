@@ -338,12 +338,12 @@ label {
   }
 }
 
-.metis-dashboard {
+.statistics-dashboard {
   display: flex;
   flex-direction: column-reverse;
 }
 
-.metis-dashboard-right {
+.statistics-dashboard-right {
   min-width: 0;
 }
 
@@ -357,7 +357,7 @@ label {
     width: $width-left-col;
   }
 
-  .metis-dashboard {
+  .statistics-dashboard {
     flex-direction: row;
   }
 }
