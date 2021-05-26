@@ -99,7 +99,7 @@ export class OverviewComponent extends DataPollingComponent {
 
   chartOptionsOpen = false;
   downloadOptionsOpen = false;
-  isShowingSearchList = true;
+  isShowingSearchList = false;
 
   showBar = true;
   showPie = false;

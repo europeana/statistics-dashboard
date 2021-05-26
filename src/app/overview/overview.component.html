@@ -190,7 +190,9 @@
         </label>
       </div>
 
-      <app-listing [showing]="isShowingSearchList"></app-listing>
+      <ng-container *ngIf="isShowingSearchList">
+        <app-listing [showing]="true"></app-listing>
+      </ng-container>
 
       <ngx-datatable
         *ngIf="tableData"
