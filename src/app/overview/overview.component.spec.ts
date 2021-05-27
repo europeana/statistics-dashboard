@@ -333,14 +333,14 @@ describe('OverviewComponent', () => {
 
     it('should toggle row expansion', () => {
       const spy = jasmine.createSpy();
-      component.dataTable = ({
+      component.dataTable = {
         rowDetail: {
           toggleExpandRow: spy
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as DatatableComponent;
+      } as any as DatatableComponent;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      component.toggleExpandRow(({} as any) as DatatableRowDetailDirective);
+      component.toggleExpandRow({} as any as DatatableRowDetailDirective);
       expect(spy).toHaveBeenCalled();
     });
 

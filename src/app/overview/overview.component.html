@@ -1,3 +1,37 @@
+<ng-container *ngIf="isShowingSplashMap">
+  <div class="splash-map">
+    <a (click)="closeSplashMap()" style="float: right">X</a>
+    <h1>Europeana Complete Dataset</h1>
+    <div style="display: flex; justify-content: space-evenly">
+      <div style="min-width: 1000px; width: 100%">
+        <app-map-chart [results]="chartData"></app-map-chart>
+      </div>
+
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          margin: 2em;
+          font-size: 22px;
+        "
+      >
+        <div
+          *ngFor="let countryRow of chartData.slice(0, 8)"
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <h3>{{ countryRow.name }}</h3>
+          {{ countryRow.value }}
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
 <form
   [formGroup]="form"
   class="dashboard-wrapper"
@@ -63,8 +97,8 @@
     </li>
   </ng-template>
 
-  <div class="metis-dashboard">
-    <div class="metis-dashboard-left" *ngIf="!isShowingSearchList">
+  <div class="statistics-dashboard">
+    <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <h3 class="filters-header" [title]="getFormattedFilterParam()">
           Filters
@@ -137,7 +171,7 @@
       </ul>
     </div>
 
-    <div class="metis-dashboard-right">
+    <div class="statistics-dashboard-right">
       <div class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngIf="!form.value.facetParameter">
           <h3 class="header-data">Select a facet dimension</h3>
@@ -190,7 +224,9 @@
         </label>
       </div>
 
-      <app-listing [showing]="isShowingSearchList"></app-listing>
+      <ng-container *ngIf="isShowingSearchList">
+        <app-listing [showing]="true"></app-listing>
+      </ng-container>
 
       <ngx-datatable
         *ngIf="tableData"
@@ -377,6 +413,14 @@
         id="pieChart"
         #pieChart
       >
+        <app-pie-chart
+          *ngIf="showPie"
+          [colours]="colours"
+          [results]="chartData"
+        ></app-pie-chart>
+
+        <div *ngIf="showPie" style="height: 4em"></div>
+
         <ngx-charts-pie-chart
           *ngIf="showPie"
           [scheme]="colorScheme"
@@ -387,6 +431,14 @@
           [doughnut]="false"
         >
         </ngx-charts-pie-chart>
+
+        <app-bar-chart
+          *ngIf="showBar"
+          [colours]="colours"
+          [results]="chartData"
+        ></app-bar-chart>
+
+        <div *ngIf="showBar" style="height: 4em"></div>
 
         <ngx-charts-bar-vertical
           *ngIf="showBar"

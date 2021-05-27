@@ -1,0 +1,123 @@
+<a (click)="toggleCtrls()">
+  <ng-container *ngIf="!ctrlsOpen"> configure &gt;&gt;</ng-container>
+  <ng-container *ngIf="ctrlsOpen"> close &lt;&lt;</ng-container>
+</a>
+
+<div *ngIf="ctrlsOpen" class="am4-ctrls">
+  <div class="sub-group">
+    <h4>Max Widths (px)</h4>
+    <label
+      ><input
+        type="number"
+        [(ngModel)]="maxLabelWidth"
+        (change)="applySettings()"
+      />Labels</label
+    >
+  </div>
+
+  <div class="sub-group">
+    <h4>Labels</h4>
+    <label [ngClass]="{ disabled: labelWrap }"
+      ><input
+        type="checkbox"
+        [(ngModel)]="labelTruncate"
+        (change)="applySettings()"
+      />Truncate</label
+    >
+    <label [ngClass]="{ disabled: labelTruncate }"
+      ><input
+        type="checkbox"
+        [(ngModel)]="labelWrap"
+        (change)="applySettings()"
+      />Wrap</label
+    >
+  </div>
+
+  <div class="sub-group">
+    <h4>Stroke</h4>
+    <label [ngClass]="{ disabled: is3D }"
+      ><input
+        type="number"
+        [(ngModel)]="strokeWidth"
+        (change)="applySettings()"
+      />Width</label
+    >
+    <label [ngClass]="{ disabled: is3D }"
+      ><input
+        type="number"
+        [(ngModel)]="strokeOpacity"
+        (change)="applySettings()"
+        ng-pattern="/^[0-9]+(\.[0-9]{1})?$/"
+        max="1"
+        min="0"
+        step="0.1"
+      />Opacity</label
+    >
+    <label [ngClass]="{ disabled: is3D }"
+      ><input
+        type="color"
+        [(ngModel)]="strokeColour"
+        (change)="applySettings()"
+      />Colour</label
+    >
+  </div>
+
+  <div class="sub-group">
+    <h4>Legend</h4>
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="chartLegend"
+        (change)="applySettings(true)"
+      />Show</label
+    >
+  </div>
+
+  <div class="sub-group">
+    <h4>Misc</h4>
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="isHorizontal"
+        (change)="applySettings(true)"
+      />Horizontal</label
+    >
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="hasLines"
+        (change)="applySettings(true)"
+      />Lines</label
+    >
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="hasScroll"
+        (change)="applySettings(true)"
+      />Scroll</label
+    >
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="showExports"
+        (change)="applySettings(true)"
+      />Exports</label
+    >
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="is3D"
+        (change)="applySettings(true)"
+      />3D</label
+    >
+    <label [ngClass]="{ disabled: !is3D }"
+      ><input
+        type="checkbox"
+        [(ngModel)]="isCylindrical"
+        (change)="applySettings(true)"
+      />Cylinder</label
+    >
+  </div>
+</div>
+<div id="barChart"></div>
+<div id="barLegend" [ngClass]="{ offscreen: !chartLegend }"></div>

@@ -51,7 +51,7 @@ export class OverviewComponent extends DataPollingComponent {
     .split('T')[0];
   totalResults = 0;
 
-  chartTypes = ['Pie', 'Bar', 'Gauge'];
+  chartTypes = ['Bar', 'Pie', 'Gauge'];
   columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
@@ -71,22 +71,24 @@ export class OverviewComponent extends DataPollingComponent {
     .fill(0)
     .map((x, index) => `${x + index}`);
 
+  colours = [
+    '#1676AA',
+    '#37B98B',
+    '#E11D53',
+    '#7F3978',
+    '#D43900',
+    '#FFAE00',
+    '#F22F24',
+    '#D43900',
+    '#E11D53',
+    '#37B98B',
+    '#4BC0F0',
+    '#1676AA',
+    '#7F3978'
+  ];
+
   colorScheme = {
-    domain: [
-      '#1676AA',
-      '#37B98B',
-      '#E11D53',
-      '#7F3978',
-      '#D43900',
-      '#FFAE00',
-      '#F22F24',
-      '#D43900',
-      '#E11D53',
-      '#37B98B',
-      '#4BC0F0',
-      '#1676AA',
-      '#7F3978'
-    ]
+    domain: this.colours
   };
 
   ColumnMode = ColumnMode;
@@ -97,10 +99,11 @@ export class OverviewComponent extends DataPollingComponent {
 
   chartOptionsOpen = false;
   downloadOptionsOpen = false;
-  isShowingSearchList = true;
+  isShowingSearchList = false;
+  isShowingSplashMap = true;
 
-  showPie = true;
-  showBar = false;
+  showBar = true;
+  showPie = false;
   showGauge = false;
   isLoading = false;
 
@@ -117,6 +120,9 @@ export class OverviewComponent extends DataPollingComponent {
   ) {
     super();
     this.buildForm();
+    const facet = 'COUNTRY';
+    (this.form.get('facetParameter') as FormControl).setValue(facet);
+    this.switchFacet(facet);
   }
 
   export(type: ExportType): false {
@@ -174,6 +180,10 @@ export class OverviewComponent extends DataPollingComponent {
 
   setIsShowingSearchList(tf: boolean): void {
     this.isShowingSearchList = tf;
+  }
+
+  closeSplashMap(): void {
+    this.isShowingSplashMap = false;
   }
 
   /** beginPolling
@@ -356,11 +366,12 @@ export class OverviewComponent extends DataPollingComponent {
     let res = '';
     const filterContentTierParam = this.getSetCheckboxValues('contentTier');
 
-    res = (filterContentTierParam.length > 0
-      ? filterContentTierParam
-      : this.form.value.contentTierZero
-      ? this.contentTiersOptions
-      : this.contentTiersOptions.slice(1)
+    res = (
+      filterContentTierParam.length > 0
+        ? filterContentTierParam
+        : this.form.value.contentTierZero
+        ? this.contentTiersOptions
+        : this.contentTiersOptions.slice(1)
     ).join(' OR ');
     return `&qf=contentTier:(${encodeURIComponent(res)})`;
   }
