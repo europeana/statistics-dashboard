@@ -1,3 +1,37 @@
+<ng-container *ngIf="isShowingSplashMap">
+  <div class="splash-map">
+    <a (click)="closeSplashMap()" style="float: right">X</a>
+    <h1>Europeana Complete Dataset</h1>
+    <div style="display: flex; justify-content: space-evenly">
+      <div style="min-width: 1000px; width: 100%">
+        <app-map-chart [results]="chartData"></app-map-chart>
+      </div>
+
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          margin: 2em;
+          font-size: 22px;
+        "
+      >
+        <div
+          *ngFor="let countryRow of chartData.slice(0, 8)"
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <h3>{{ countryRow.name }}</h3>
+          {{ countryRow.value }}
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
 <form
   [formGroup]="form"
   class="dashboard-wrapper"

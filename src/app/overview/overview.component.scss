@@ -7,6 +7,18 @@
 
 $width-left-col: 200px;
 
+.splash-map {
+  background: $white;
+  border: 1px solid $gray-med;
+  height: calc(100% - 8em);
+  margin: 4em;
+  overflow: hidden;
+  padding: 1.5em;
+  position: fixed;
+  width: calc(100% - 8em);
+  z-index: 1;
+}
+
 .header-bar {
   display: flex;
 

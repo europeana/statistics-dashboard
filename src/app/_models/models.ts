@@ -1,5 +1,9 @@
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
+export interface IHash {
+  [details: string]: string;
+}
+
 export interface MenuState {
   visible: boolean;
   disabled?: boolean;

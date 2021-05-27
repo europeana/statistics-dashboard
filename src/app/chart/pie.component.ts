@@ -26,8 +26,8 @@ export class PieComponent {
   alignLabels = false;
   bendLabels = false;
   chartLegend = true;
-  groupOther = false;
-  useThreshold = true;
+  groupOther = true;
+  useThreshold = false;
   groupThreshold = 2;
   groupLimit = 10;
   chartRadius = 70;

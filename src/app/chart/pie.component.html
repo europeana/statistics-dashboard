@@ -53,21 +53,21 @@
       ><input
         type="checkbox"
         [(ngModel)]="alignLabels"
-        (change)="applySettings()"
+        (change)="applySettings(true)"
       />Align</label
     >
     <label
       ><input
         type="checkbox"
         [(ngModel)]="labelTruncate"
-        (change)="applySettings()"
+        (change)="applySettings(true)"
       />Truncate</label
     >
     <label [ngClass]="{ disabled: labelTruncate }"
       ><input
         type="checkbox"
         [(ngModel)]="labelWrap"
-        (change)="applySettings()"
+        (change)="applySettings(true)"
       />Wrap</label
     >
     <label [ngClass]="{ disabled: alignLabels || rotateLabels }">
@@ -135,7 +135,7 @@
       ><input
         type="number"
         [(ngModel)]="groupLimit"
-        (change)="applySettings()"
+        (change)="applySettings(true)"
         min="2"
       />Limit</label
     >

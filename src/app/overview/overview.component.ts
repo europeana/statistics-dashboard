@@ -100,6 +100,7 @@ export class OverviewComponent extends DataPollingComponent {
   chartOptionsOpen = false;
   downloadOptionsOpen = false;
   isShowingSearchList = false;
+  isShowingSplashMap = true;
 
   showBar = true;
   showPie = false;
@@ -119,6 +120,9 @@ export class OverviewComponent extends DataPollingComponent {
   ) {
     super();
     this.buildForm();
+    const facet = 'COUNTRY';
+    (this.form.get('facetParameter') as FormControl).setValue(facet);
+    this.switchFacet(facet);
   }
 
   export(type: ExportType): false {
@@ -176,6 +180,10 @@ export class OverviewComponent extends DataPollingComponent {
 
   setIsShowingSearchList(tf: boolean): void {
     this.isShowingSearchList = tf;
+  }
+
+  closeSplashMap(): void {
+    this.isShowingSplashMap = false;
   }
 
   /** beginPolling
