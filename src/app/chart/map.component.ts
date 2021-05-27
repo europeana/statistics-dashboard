@@ -36,6 +36,9 @@ export class MapComponent {
     if (!this.chart) {
       return;
     }
+    if (!this._results) {
+      return;
+    }
 
     this.polygonSeries.data = this._results.map((nv: NameValue) => {
       return {
