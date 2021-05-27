@@ -24,6 +24,7 @@
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
               "core-js",
+              "polylabel",
               "raf",
               "xlsx",
               "@babel/runtime"
