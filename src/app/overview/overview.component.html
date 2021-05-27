@@ -16,17 +16,19 @@
           font-size: 22px;
         "
       >
-        <div
-          *ngFor="let countryRow of chartData.slice(0, 8)"
-          style="
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-          "
-        >
-          <h3>{{ countryRow.name }}</h3>
-          {{ countryRow.value }}
-        </div>
+        <ng-container *ngIf="chartData">
+          <div
+            *ngFor="let countryRow of chartData.slice(0, 8)"
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+            "
+          >
+            <h3>{{ countryRow.name }}</h3>
+            {{ countryRow.value }}
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>
