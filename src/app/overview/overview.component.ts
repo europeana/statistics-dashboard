@@ -100,7 +100,7 @@ export class OverviewComponent extends DataPollingComponent {
   chartOptionsOpen = false;
   downloadOptionsOpen = false;
   isShowingSearchList = false;
-  isShowingSplashMap = false;
+  isShowingSplashMap = true;
 
   showBar = true;
   showPie = false;

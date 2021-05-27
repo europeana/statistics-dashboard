@@ -165,13 +165,13 @@ export class MapComponent {
       this.updateData();
 
       const fn = (): void => {
-        this.zoomToCountries(['IS', 'TR', 'ES', 'NO']);
+        this.zoomToCountries();
       };
       chart.events.on('ready', fn);
     });
   }
 
-  zoomToCountries(zoomTo: Array<string>): void {
+  zoomToCountries(zoomTo = ['IS', 'TR', 'ES', 'NO']): void {
     this.browserOnly((): void => {
       // Init extrems
       let north, south, west, east;

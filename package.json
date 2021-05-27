@@ -10,7 +10,8 @@
     "lint": "eslint --ext .js,.ts src/app --fix",
     "e2e": "ng e2e",
     "prettier": "prettier --write 'src/**/*.{ts,js,json,scss,html}' '*.{js,json}'",
-    "dist": "ng build --progress=false --prod && cp src/static/manifest.yml src/static/Staticfile src/static/nginx.conf dist"
+    "dist": "ng build --build-optimizer=false --progress=false --prod && cp src/static/manifest.yml src/static/Staticfile src/static/nginx.conf dist",
+    "lite": "test -d ./dist/statistics-dashboard && lite-server --baseDir=./dist/statistics-dashboard || echo '(run dist first)'"
   },
   "private": true,
   "dependencies": {
@@ -55,6 +56,7 @@
     "karma-coverage": "^2.0.3",
     "karma-jasmine": "~3.3.0",
     "karma-jasmine-html-reporter": "^1.6.0",
+    "lite-server": "^2.6.1",
     "prettier": "^2.3.0",
     "protractor": "~7.0.0",
     "ts-node": "~8.3.0",
