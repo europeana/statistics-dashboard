@@ -47,19 +47,21 @@ export class MapComponent {
   }
 
   updateData(): void {
-    if (!this.chart) {
-      return;
-    }
-    if (!this._results) {
-      return;
-    }
+    this.browserOnly((): void => {
+      if (!this.chart) {
+        return;
+      }
+      if (!this._results) {
+        return;
+      }
 
-    this.polygonSeries.data = this._results.map((nv: NameValue) => {
-      return {
-        id: this.countryCodes[nv.name],
-        name: nv.name,
-        value: nv.value
-      };
+      this.polygonSeries.data = this._results.map((nv: NameValue) => {
+        return {
+          id: this.countryCodes[nv.name],
+          name: nv.name,
+          value: nv.value
+        };
+      });
     });
   }
 
@@ -170,28 +172,30 @@ export class MapComponent {
   }
 
   zoomToCountries(zoomTo: Array<string>): void {
-    // Init extrems
-    let north, south, west, east;
+    this.browserOnly((): void => {
+      // Init extrems
+      let north, south, west, east;
 
-    // Find extreme coordinates for all pre-zoom countries
-    for (let i = 0; i < zoomTo.length; i++) {
-      const country = this.polygonSeries.getPolygonById(zoomTo[i]);
-      if (north == undefined || country.north > north) {
-        north = country.north;
-      }
-      if (south == undefined || country.south < south) {
-        south = country.south;
-      }
-      if (west == undefined || country.west < west) {
-        west = country.west;
-      }
-      if (east == undefined || country.east > east) {
-        east = country.east;
-      }
+      // Find extreme coordinates for all pre-zoom countries
+      for (let i = 0; i < zoomTo.length; i++) {
+        const country = this.polygonSeries.getPolygonById(zoomTo[i]);
+        if (north == undefined || country.north > north) {
+          north = country.north;
+        }
+        if (south == undefined || country.south < south) {
+          south = country.south;
+        }
+        if (west == undefined || country.west < west) {
+          west = country.west;
+        }
+        if (east == undefined || country.east > east) {
+          east = country.east;
+        }
 
-      country.isActive = true;
-      // Pre-zoom
-      this.chart.zoomToRectangle(north, east, south, west, 1, true);
-    }
+        country.isActive = true;
+        // Pre-zoom
+        this.chart.zoomToRectangle(north, east, south, west, 1, true);
+      }
+    });
   }
 }
