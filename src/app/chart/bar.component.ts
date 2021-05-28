@@ -9,7 +9,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import { NameValue } from '../_models';
 
-export interface CustomLegendItem {
+interface CustomLegendItem {
   name: 'string';
   fill: 'string';
   customData: { hide(): void; show(): void };
@@ -36,13 +36,13 @@ export class BarComponent {
   hasLines = true;
   hasScroll = true;
   maxLabelWidth = 250;
-  labelTruncate = true;
+  labelTruncate = false;
   labelWrap = false;
 
   is3D = true;
   isCylindrical = false;
-  isHorizontal = false;
-  showExports = false;
+  isHorizontal = true;
+  showExports = true;
   strokeColour = '#67b7dc';
   strokeOpacity = 1.0;
   strokeWidth = 2;
@@ -50,6 +50,7 @@ export class BarComponent {
   @Input() colours: Array<string>;
   @Input() set results(results: Array<NameValue>) {
     this._results = results;
+
     if (this.chart) {
       this.chart.data = this._results;
       this.drawChart();
@@ -190,6 +191,10 @@ export class BarComponent {
     });
   }
 
+  zoomTop5(): void {
+    this.categoryAxis.zoomToIndexes(0, 5, false, true);
+  }
+
   /** drawChart
   /* - instantiates chart and axes according to rotation
   /* - assigns data
@@ -237,7 +242,7 @@ export class BarComponent {
           chart.scrollbarX = new am4core.Scrollbar();
         }
 
-        // Label rotation
+        // Label / rotation
         this.categoryAxis.renderer.labels.template.horizontalCenter = 'right';
         this.categoryAxis.renderer.labels.template.verticalCenter = 'middle';
         this.categoryAxis.renderer.labels.template.rotation = 270;

@@ -34,7 +34,7 @@
   </div>
 
   <div class="sub-group">
-    <h4>Stroke</h4>
+    <h4>Stroke (available when not 3D)</h4>
     <label [ngClass]="{ disabled: is3D }"
       ><input
         type="number"
@@ -74,6 +74,18 @@
   </div>
 
   <div class="sub-group">
+    <h4>Zoom</h4>
+    <a (click)="zoomTop5()">zoom to top 5</a>
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="hasScroll"
+        (change)="applySettings(true)"
+      />Scroll bar</label
+    >
+  </div>
+
+  <div class="sub-group">
     <h4>Misc</h4>
     <label
       ><input
@@ -88,13 +100,6 @@
         [(ngModel)]="hasLines"
         (change)="applySettings(true)"
       />Lines</label
-    >
-    <label
-      ><input
-        type="checkbox"
-        [(ngModel)]="hasScroll"
-        (change)="applySettings(true)"
-      />Scroll</label
     >
     <label
       ><input

@@ -1,6 +1,8 @@
 <ng-container *ngIf="isShowingSplashMap">
   <div class="splash-map">
-    <a (click)="closeSplashMap()" style="float: right">X</a>
+    <a (click)="closeSplashMap()" style="float: right; font-weight: bold"
+      >(close)</a
+    >
     <h1>Europeana Complete Dataset</h1>
     <div style="display: flex; justify-content: space-evenly">
       <div style="min-width: 1000px; width: 100%">
@@ -8,13 +10,7 @@
       </div>
 
       <div
-        style="
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-          margin: 2em;
-          font-size: 22px;
-        "
+        style="display: flex; flex-direction: column; width: 100%; margin: 2em"
       >
         <ng-container *ngIf="chartData">
           <div
