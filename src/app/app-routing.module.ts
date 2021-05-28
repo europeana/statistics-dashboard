@@ -3,11 +3,18 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { OverviewComponent } from './overview/overview.component';
 
+import { SplashComponent } from './splash/splash.component';
+
 const routes: Routes = [
   {
-    path: '**',
+    path: 'data/:facet',
     component: OverviewComponent
-  }
+  },
+  {
+    path: '',
+    component: SplashComponent
+  },
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

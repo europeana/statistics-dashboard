@@ -1,11 +1,13 @@
 import {
   Component,
   ElementRef,
+  OnInit,
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 
 import {
@@ -37,7 +39,7 @@ import { DataPollingComponent } from '../data-polling';
   styleUrls: ['./overview.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class OverviewComponent extends DataPollingComponent {
+export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('dataTable') dataTable: DatatableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('pieChart') pieChart: ElementRef;
@@ -100,7 +102,6 @@ export class OverviewComponent extends DataPollingComponent {
   chartOptionsOpen = false;
   downloadOptionsOpen = false;
   isShowingSearchList = false;
-  isShowingSplashMap = true;
 
   showBar = true;
   showPie = false;
@@ -116,13 +117,25 @@ export class OverviewComponent extends DataPollingComponent {
     private api: APIService,
     private csv: ExportCSVService,
     private pdf: ExportPDFService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private readonly route: ActivatedRoute
   ) {
     super();
     this.buildForm();
-    const facet = 'COUNTRY';
-    (this.form.get('facetParameter') as FormControl).setValue(facet);
-    this.switchFacet(facet);
+    this.initialiseMenuStates();
+  }
+
+  ngOnInit(): void {
+    this.subs.push(
+      this.route.params.subscribe((params) => {
+        if (params.facet) {
+          (this.form.get('facetParameter') as FormControl).setValue(
+            params.facet
+          );
+          this.switchFacet(params.facet);
+        }
+      })
+    );
   }
 
   export(type: ExportType): false {
@@ -182,10 +195,6 @@ export class OverviewComponent extends DataPollingComponent {
     this.isShowingSearchList = tf;
   }
 
-  closeSplashMap(): void {
-    this.isShowingSplashMap = false;
-  }
-
   /** beginPolling
   /* - set up data polling for facet data
   */
@@ -215,7 +224,7 @@ export class OverviewComponent extends DataPollingComponent {
           this.totalResults = rawResult.totalResults;
 
           // set pie and table data
-          this.extractChartData();
+          this.chartData = this.extractChartData();
           this.extractTableData();
         } else {
           this.totalResults = 0;
@@ -232,14 +241,17 @@ export class OverviewComponent extends DataPollingComponent {
     ).getPollingSubject();
   }
 
-  addMenuCheckboxes(name: string, options: Array<string>): void {
-    const checkboxes = this.form.get(name) as FormGroup;
-    if (!this.menuStates[name]) {
+  initialiseMenuStates(): void {
+    this.facetConf.forEach((name: string) => {
       this.menuStates[name] = {
         visible: false,
         disabled: this.form.value.facetParameter === name
       };
-    }
+    });
+  }
+
+  addMenuCheckboxes(name: string, options: Array<string>): void {
+    const checkboxes = this.form.get(name) as FormGroup;
     options.forEach((option: string) => {
       const fName = this.fixName(option);
       if (!this.form.get(name + '.' + fName)) {
@@ -486,6 +498,10 @@ export class OverviewComponent extends DataPollingComponent {
     });
   }
 
+  /** switchFacet
+  /* Trigger data load with callback to disable a facet (in form and menuStates)
+  /* @param { string: disableName } - name of the facet to disable
+  */
   switchFacet(disableName: string): void {
     const onDataReady = (refresh = false): void => {
       if (this.form.value['facetParameter'] === disableName) {
@@ -530,11 +546,15 @@ export class OverviewComponent extends DataPollingComponent {
     return total;
   }
 
-  extractChartData(): void {
-    const facetFields = this.allFacetData[this.selFacetIndex].fields;
+  /** extractChartData
+  /*
+  /* @param { number: facetIndex } - default = selFacetIndex
+  /* returns Array<NameValue>
+  */
+  extractChartData(facetIndex = this.selFacetIndex): Array<NameValue> {
+    const facetFields = this.allFacetData[facetIndex].fields;
     const total = this.getCountTotal(facetFields);
-
-    this.chartData = facetFields.map((f: FacetField) => {
+    return facetFields.map((f: FacetField) => {
       const val = this.form.value.showPercent
         ? parseFloat(((f.count / total) * 100).toFixed(2))
         : f.count;

@@ -1,0 +1,93 @@
+<div class="splash">
+  <h1>Europeana Complete Dataset</h1>
+
+  <div class="container-v">
+    <div class="container-h">
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >Explore by content quality and its licensing</span
+        >
+
+        <div class="entry-card-content">
+          <a class="data-link" routerLink="/data/contentTier"
+            >View by content tier</a
+          >
+        </div>
+      </div>
+
+      <div class="entry-card">
+        <span class="entry-card-header">Explore by metadata quality</span>
+
+        <div class="entry-card-content">
+          <a class="data-link" routerLink="/data/metadataTier"
+            >View by metadata tier</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-card">
+      <span class="entry-card-header">Explore by providing countries</span>
+
+      <div class="entry-card-content">
+        <div *ngIf="splashData['COUNTRY']" class="container-h">
+          <div class="map-container">
+            <app-map-chart [results]="splashData['COUNTRY']"></app-map-chart>
+          </div>
+
+          <div class="data-rows">
+            <div
+              *ngFor="let countryRow of splashData['COUNTRY'].slice(0, 8)"
+              class="container-h"
+            >
+              <h3>{{ countryRow.name }}</h3>
+              {{ countryRow.value }}
+            </div>
+          </div>
+        </div>
+
+        <a class="data-link" routerLink="/data/COUNTRY">View by countries</a>
+      </div>
+    </div>
+
+    <div class="container-h">
+      <div class="entry-card">
+        <span class="entry-card-header">Explore by type of content</span>
+
+        <div class="entry-card-content">
+          <a class="data-link" routerLink="/data/TYPE">View by type</a>
+        </div>
+      </div>
+
+      <div class="entry-card">
+        <span class="entry-card-header">Explore by rights statement</span>
+
+        <div class="entry-card-content">
+          <a class="data-link" routerLink="/data/RIGHTS"
+            >View by rights statement</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="container-h">
+      <div class="entry-card">
+        <span class="entry-card-header">Explore by data provider</span>
+
+        <div class="entry-card-content">
+          <a class="data-link" routerLink="/data/DATA_PROVIDER"
+            >View by data provider</a
+          >
+        </div>
+      </div>
+
+      <div class="entry-card">
+        <span class="entry-card-header">Explore by provider</span>
+
+        <div class="entry-card-content">
+          <a class="data-link" routerLink="/data/PROVIDER">View by provider</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

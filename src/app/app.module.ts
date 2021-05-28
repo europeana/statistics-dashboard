@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -19,6 +20,7 @@ import { PieComponent } from './chart/pie.component';
 
 import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
+import { SplashComponent } from './splash/splash.component';
 
 @NgModule({
   declarations: [
@@ -28,12 +30,14 @@ import { OverviewComponent } from './overview/overview.component';
     MapComponent,
     OverviewComponent,
     PieComponent,
-    RenameApiFacetPipe
+    RenameApiFacetPipe,
+    SplashComponent
   ],
   imports: [
+    AppRoutingModule,
     BrowserAnimationsModule,
     BrowserModule,
-    AppRoutingModule,
+    CommonModule,
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
