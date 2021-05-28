@@ -9,6 +9,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import * as am4plugins_sliceGrouper from '@amcharts/amcharts4/plugins/sliceGrouper';
 
 import { NameValue } from '../_models';
+
 @Component({
   selector: 'app-pie-chart',
   templateUrl: './pie.component.html',
@@ -40,7 +41,7 @@ export class PieComponent {
   legendExternal = true;
   legendPosition = 'bottom';
   rotateLabels = false;
-  showExports = false;
+  showExports = true;
   showTotals = true;
   chartRadiusInner = this.showTotals ? 40 : 0;
   tooltipTruncate = false;
