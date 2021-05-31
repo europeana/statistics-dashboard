@@ -9,11 +9,6 @@ export interface MenuState {
   disabled?: boolean;
 }
 
-export interface FacetField {
-  count: number;
-  label: string;
-}
-
 export interface TableRow {
   name: HeaderNameType;
   count: string;
@@ -25,19 +20,14 @@ export interface FmtTableData {
   tableRows: Array<TableRow>;
 }
 
-export interface Facet {
-  name: string;
-  fields: Array<FacetField>;
-}
-
 export interface NameValue {
   name: string;
   value: number;
 }
 
-export interface RawFacet {
-  facets: Array<Facet>;
-  totalResults: number;
+export interface IdValue {
+  id: string;
+  value: number;
 }
 
 export enum ExportType {

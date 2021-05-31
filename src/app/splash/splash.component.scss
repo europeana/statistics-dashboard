@@ -1,0 +1,67 @@
+@import "../../scss/_variables";
+
+.container-h {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .entry-card {
+    width: 100%;
+  }
+}
+
+.container-v,
+.data-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-link {
+  display: inline-block;
+  font-weight: bold;
+  margin-left: auto;
+  &::after {
+    content: " >";
+  }
+}
+
+.data-rows {
+  margin: 2em;
+  width: 50%;
+}
+
+.entry-card {
+  margin: 1em;
+}
+
+.entry-card-content {
+  background: $white;
+  padding: 1em;
+}
+
+.entry-card-header {
+  color: $gray-med;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.map-container {
+  min-width: 1000px;
+  width: 100%;
+}
+
+.splash {
+  margin: 2em;
+}
+
+.splash-map {
+  border: 1px solid $gray-med;
+  font-size: 22px;
+  height: calc(100% - 8em);
+  margin: 4em;
+  overflow: hidden;
+  padding: 1.5em;
+  position: fixed;
+  width: calc(100% - 8em);
+  z-index: 1;
+}

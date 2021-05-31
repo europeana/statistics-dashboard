@@ -1,5 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActivatedRoute, Params } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+
 import {
   async,
   ComponentFixture,
@@ -35,8 +38,13 @@ describe('OverviewComponent', () => {
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
   let api: APIService;
+  let params: BehaviorSubject<Params>;
 
-  const configureTestBed = (errorMode = false): void => {
+  const configureTestBed = (errorMode = false, urlParam = null): void => {
+    params = new BehaviorSubject(
+      (urlParam ? { facet: urlParam } : {}) as Params
+    );
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, ReactiveFormsModule],
       declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
@@ -46,6 +54,10 @@ describe('OverviewComponent', () => {
         {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: { params: params }
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -69,6 +81,26 @@ describe('OverviewComponent', () => {
     component.form.get(`${group}.1`).setValue(true);
   };
 
+  describe('Route Parameter', () => {
+    beforeEach(async(() => {
+      configureTestBed(false, 'COUNTRY');
+    }));
+
+    beforeEach(() => {
+      b4Each();
+    });
+
+    it('should poll on initialisation', fakeAsync(() => {
+      component.ngOnInit();
+      tick(1);
+
+      const ctrlFacet = component.form.controls.facetParameter as FormControl;
+      expect(ctrlFacet.value).toBe('COUNTRY');
+      expect(component.allFacetData).toBeTruthy();
+      component.ngOnDestroy();
+    }));
+  });
+
   describe('Normal Operations', () => {
     beforeEach(async(() => {
       configureTestBed();
@@ -81,13 +113,6 @@ describe('OverviewComponent', () => {
     it('should unfix the name', () => {
       expect(component.unfixName('_____')).toEqual('.');
     });
-
-    it('should load data on init', fakeAsync(() => {
-      component.beginPolling();
-      tick(1);
-      expect(component.allFacetData).toBeTruthy();
-      component.ngOnDestroy();
-    }));
 
     it('should find the facet index', fakeAsync(() => {
       component.beginPolling();
@@ -316,7 +341,7 @@ describe('OverviewComponent', () => {
     it('should switch the facet', fakeAsync(() => {
       component.beginPolling();
       tick(tickTime);
-      expect(component.menuStates['contentTier'].disabled).toBeTruthy();
+      expect(component.menuStates['contentTier'].disabled).toBeFalsy();
       expect(component.menuStates['TYPE'].disabled).toBeFalsy();
       component.form.get('facetParameter').setValue('TYPE');
       component.switchFacet('TYPE');
@@ -329,6 +354,8 @@ describe('OverviewComponent', () => {
       expect(component.selectOptionEnabled('contentTier', '0')).toBeFalsy();
       component.form.get('contentTierZero').setValue(true);
       expect(component.selectOptionEnabled('contentTier', '0')).toBeTruthy();
+      component.form.get('contentTierZero').setValue(true);
+      expect(component.selectOptionEnabled('contentTier', '1')).toBeTruthy();
     });
 
     it('should toggle row expansion', () => {
@@ -385,10 +412,10 @@ describe('OverviewComponent', () => {
     it('should extract data as a percent', fakeAsync(() => {
       component.beginPolling();
       tick(tickTime);
-      component.extractChartData();
+      component.chartData = component.extractChartData();
       expect(component.chartData[0].value).toEqual(17050500);
       component.form.value.showPercent = true;
-      component.extractChartData();
+      component.chartData = component.extractChartData();
       expect(component.chartData[0].value).toEqual(50.2);
       component.ngOnDestroy();
     }));
@@ -426,13 +453,18 @@ describe('OverviewComponent', () => {
     }));
 
     it('should switch the chart type', () => {
-      expect(component.showPie).toBeTruthy();
+      expect(component.showBar).toBeTruthy();
 
       component.form.get('chartType').setValue('Bar');
       component.switchChartType();
-
-      expect(component.showPie).toBeFalsy();
       expect(component.showBar).toBeTruthy();
+      expect(component.showPie).toBeFalsy();
+
+      component.form.get('chartType').setValue('Pie');
+      component.switchChartType();
+
+      expect(component.showBar).toBeFalsy();
+      expect(component.showPie).toBeTruthy();
 
       component.form.get('chartType').setValue('Gauge');
       component.switchChartType();
@@ -608,9 +640,13 @@ describe('OverviewComponent', () => {
       b4Each();
     });
 
-    it('should have no result', () => {
+    it('should have no result', fakeAsync(() => {
       expect(component.totalResults).toEqual(0);
-    });
+      component.beginPolling();
+      tick(1);
+      expect(component.totalResults).toEqual(0);
+      component.ngOnDestroy();
+    }));
   });
 
   describe('Polling', () => {

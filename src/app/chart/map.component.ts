@@ -27,6 +27,7 @@ export class MapComponent {
   @Input() set results(results: Array<NameValue>) {
     this._results = results;
     this.updateData();
+    am4core.options.autoDispose = true;
   }
 
   constructor(

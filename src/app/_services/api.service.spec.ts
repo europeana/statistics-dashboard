@@ -28,4 +28,8 @@ describe('APIService', () => {
     http.expectOne(testUrl);
     http.verify();
   });
+
+  it('should load the ISO country codes', () => {
+    expect(service.loadISOCountryCodes()).toBeTruthy();
+  });
 });
