@@ -1,15 +1,15 @@
-<a (click)="toggleCtrls()">
-  <ng-container *ngIf="!ctrlsOpen"> configure &gt;&gt;</ng-container>
-  <ng-container *ngIf="ctrlsOpen"> close &lt;&lt;</ng-container>
+<a (click)="toggleCtrls()" *ngIf="settings.configurable">
+  <ng-container *ngIf="!settings.ctrlsOpen"> configure &gt;&gt;</ng-container>
+  <ng-container *ngIf="settings.ctrlsOpen"> close &lt;&lt;</ng-container>
 </a>
 
-<div *ngIf="ctrlsOpen" class="am4-ctrls">
+<div *ngIf="settings.ctrlsOpen && settings.ctrlsOpen" class="am4-ctrls">
   <div class="sub-group">
     <h4>Max Widths (px)</h4>
     <label
       ><input
         type="number"
-        [(ngModel)]="maxLabelWidth"
+        [(ngModel)]="settings.maxLabelWidth"
         (change)="applySettings()"
       />Labels</label
     >
@@ -17,17 +17,17 @@
 
   <div class="sub-group">
     <h4>Labels</h4>
-    <label [ngClass]="{ disabled: labelWrap }"
+    <label [ngClass]="{ disabled: settings.labelWrap }"
       ><input
         type="checkbox"
-        [(ngModel)]="labelTruncate"
+        [(ngModel)]="settings.labelTruncate"
         (change)="applySettings()"
       />Truncate</label
     >
-    <label [ngClass]="{ disabled: labelTruncate }"
+    <label [ngClass]="{ disabled: settings.labelTruncate }"
       ><input
         type="checkbox"
-        [(ngModel)]="labelWrap"
+        [(ngModel)]="settings.labelWrap"
         (change)="applySettings()"
       />Wrap</label
     >
@@ -35,17 +35,17 @@
 
   <div class="sub-group">
     <h4>Stroke (available when not 3D)</h4>
-    <label [ngClass]="{ disabled: is3D }"
+    <label [ngClass]="{ disabled: settings.is3D }"
       ><input
         type="number"
-        [(ngModel)]="strokeWidth"
+        [(ngModel)]="settings.strokeWidth"
         (change)="applySettings()"
       />Width</label
     >
-    <label [ngClass]="{ disabled: is3D }"
+    <label [ngClass]="{ disabled: settings.is3D }"
       ><input
         type="number"
-        [(ngModel)]="strokeOpacity"
+        [(ngModel)]="settings.strokeOpacity"
         (change)="applySettings()"
         ng-pattern="/^[0-9]+(\.[0-9]{1})?$/"
         max="1"
@@ -53,10 +53,10 @@
         step="0.1"
       />Opacity</label
     >
-    <label [ngClass]="{ disabled: is3D }"
+    <label [ngClass]="{ disabled: settings.is3D }"
       ><input
         type="color"
-        [(ngModel)]="strokeColour"
+        [(ngModel)]="settings.strokeColour"
         (change)="applySettings()"
       />Colour</label
     >
@@ -67,7 +67,7 @@
     <label
       ><input
         type="checkbox"
-        [(ngModel)]="chartLegend"
+        [(ngModel)]="settings.chartLegend"
         (change)="applySettings(true)"
       />Show</label
     >
@@ -79,7 +79,7 @@
     <label
       ><input
         type="checkbox"
-        [(ngModel)]="hasScroll"
+        [(ngModel)]="settings.hasScroll"
         (change)="applySettings(true)"
       />Scroll bar</label
     >
@@ -90,39 +90,39 @@
     <label
       ><input
         type="checkbox"
-        [(ngModel)]="isHorizontal"
+        [(ngModel)]="settings.isHorizontal"
         (change)="applySettings(true)"
       />Horizontal</label
     >
     <label
       ><input
         type="checkbox"
-        [(ngModel)]="hasLines"
+        [(ngModel)]="settings.hasLines"
         (change)="applySettings(true)"
       />Lines</label
     >
     <label
       ><input
         type="checkbox"
-        [(ngModel)]="showExports"
+        [(ngModel)]="settings.showExports"
         (change)="applySettings(true)"
       />Exports</label
     >
     <label
       ><input
         type="checkbox"
-        [(ngModel)]="is3D"
+        [(ngModel)]="settings.is3D"
         (change)="applySettings(true)"
       />3D</label
     >
-    <label [ngClass]="{ disabled: !is3D }"
+    <label [ngClass]="{ disabled: !settings.is3D }"
       ><input
         type="checkbox"
-        [(ngModel)]="isCylindrical"
+        [(ngModel)]="settings.isCylindrical"
         (change)="applySettings(true)"
       />Cylinder</label
     >
   </div>
 </div>
-<div id="barChart"></div>
-<div id="barLegend" [ngClass]="{ offscreen: !chartLegend }"></div>
+<div id="{{ chartId }}" class="bar-chart"></div>
+<div id="barLegend" [ngClass]="{ offscreen: !settings.chartLegend }"></div>

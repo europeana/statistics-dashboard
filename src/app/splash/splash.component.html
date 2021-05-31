@@ -1,24 +1,86 @@
 <div class="splash">
-  <h1>Europeana Complete Dataset</h1>
+  <h1>Europeana complete dataset</h1>
+
+  <ng-template #chartSummary let-facetName="facetName">
+    <span
+      class="container-h"
+      *ngIf="splashData[facetName] && splashData[facetName][0]; let data"
+    >
+      <span class="container-v">
+        <span class="bold">Top tier</span>
+        <span class="total bold">{{ data.name }}</span>
+      </span>
+      <span class="container-v">
+        <span>Top tier records count</span>
+        <span class="total">{{ data.value }}</span>
+      </span>
+      <span class="container-v">
+        <span>Corresponding percentage</span>
+        <span class="total">{{
+          percent(data.value, totalsData[facetName])
+        }}</span>
+      </span>
+    </span>
+  </ng-template>
+
+  <ng-template #dataRows let-facetName="facetName" let-title="title">
+    <div class="data-rows" *ngIf="splashData[facetName]">
+      <div class="data-rows-title">
+        <span>{{ title }}</span>
+        <span>RECORDS PROVIDED</span>
+      </div>
+      <div
+        *ngFor="let countryRow of splashData[facetName].slice(0, 8)"
+        class="container-h"
+      >
+        <span>{{ countryRow.name }}</span>
+        <span>{{ countryRow.value }}</span>
+        <span>{{ percent(countryRow.value, totalsData[facetName]) }}</span>
+      </div>
+    </div>
+  </ng-template>
 
   <div class="container-v">
-    <div class="container-h">
+    <div class="container-h entry-card-pair">
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by content quality and its licensing</span
-        >
-
+          >Explore by content quality and its licensing<a class="info-icon"></a
+        ></span>
         <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: 'contentTier' }
+            "
+          ></ng-content>
+          <app-bar-chart
+            *ngIf="splashData['contentTier']"
+            [colours]="[barColour]"
+            chartId="contentTypeChart"
+            [results]="splashData['contentTier']"
+          ></app-bar-chart>
           <a class="data-link" routerLink="/data/contentTier"
             >View by content tier</a
           >
         </div>
       </div>
-
       <div class="entry-card">
-        <span class="entry-card-header">Explore by metadata quality</span>
-
+        <span class="entry-card-header"
+          >Explore by metadata quality<a class="info-icon"></a
+        ></span>
         <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: 'metadataTier' }
+            "
+          ></ng-content>
+          <app-bar-chart
+            *ngIf="splashData['metadataTier']"
+            [colours]="[barColour]"
+            chartId="metadataTierChart"
+            [results]="splashData['metadataTier']"
+          ></app-bar-chart>
           <a class="data-link" routerLink="/data/metadataTier"
             >View by metadata tier</a
           >
@@ -27,42 +89,56 @@
     </div>
 
     <div class="entry-card">
-      <span class="entry-card-header">Explore by providing countries</span>
-
+      <span class="entry-card-header"
+        >Explore by providing countries<a class="info-icon"></a
+      ></span>
       <div class="entry-card-content">
-        <div *ngIf="splashData['COUNTRY']" class="container-h">
+        <div *ngIf="splashData['COUNTRY']" class="container-h entry-card-pair">
           <div class="map-container">
             <app-map-chart [results]="splashData['COUNTRY']"></app-map-chart>
           </div>
-
-          <div class="data-rows">
-            <div
-              *ngFor="let countryRow of splashData['COUNTRY'].slice(0, 8)"
-              class="container-h"
-            >
-              <h3>{{ countryRow.name }}</h3>
-              {{ countryRow.value }}
-            </div>
-          </div>
+          <ng-content
+            *ngTemplateOutlet="
+              dataRows;
+              context: { facetName: 'COUNTRY', title: 'COUNTRY' }
+            "
+          ></ng-content>
         </div>
-
         <a class="data-link" routerLink="/data/COUNTRY">View by countries</a>
       </div>
     </div>
 
-    <div class="container-h">
+    <div class="container-h entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header">Explore by type of content</span>
-
+        <span class="entry-card-header"
+          >Explore by type of content<a class="info-icon"></a
+        ></span>
         <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="chartSummary; context: { facetName: 'TYPE' }"
+          ></ng-content>
+          <app-bar-chart
+            *ngIf="splashData['TYPE']"
+            [colours]="[barColour]"
+            chartId="typeChart"
+            [results]="splashData['TYPE']"
+          ></app-bar-chart>
           <a class="data-link" routerLink="/data/TYPE">View by type</a>
         </div>
       </div>
-
       <div class="entry-card">
-        <span class="entry-card-header">Explore by rights statement</span>
-
+        <span class="entry-card-header"
+          >Explore by rights statement<a class="info-icon"></a
+        ></span>
         <div class="entry-card-content">
+          <div *ngIf="splashData['RIGHTS']" class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: { facetName: 'RIGHTS', title: 'RIGHTS STATEMENT' }
+              "
+            ></ng-content>
+          </div>
           <a class="data-link" routerLink="/data/RIGHTS"
             >View by rights statement</a
           >
@@ -70,21 +146,38 @@
       </div>
     </div>
 
-    <div class="container-h">
+    <div class="container-h entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header">Explore by data provider</span>
-
+        <span class="entry-card-header"
+          >Explore by data provider<a class="info-icon"></a
+        ></span>
         <div class="entry-card-content">
+          <div *ngIf="splashData['DATA_PROVIDER']" class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: { facetName: 'DATA_PROVIDER', title: 'DATA PROVIDER' }
+              "
+            ></ng-content>
+          </div>
           <a class="data-link" routerLink="/data/DATA_PROVIDER"
             >View by data provider</a
           >
         </div>
       </div>
-
       <div class="entry-card">
-        <span class="entry-card-header">Explore by provider</span>
-
+        <span class="entry-card-header"
+          >Explore by provider<a class="info-icon"></a
+        ></span>
         <div class="entry-card-content">
+          <div *ngIf="splashData['PROVIDER']" class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: { facetName: 'PROVIDER', title: 'PROVIDER' }
+              "
+            ></ng-content>
+          </div>
           <a class="data-link" routerLink="/data/PROVIDER">View by provider</a>
         </div>
       </div>
