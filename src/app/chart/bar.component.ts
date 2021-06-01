@@ -7,7 +7,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { NameValue } from '../_models';
+import { ChartSettings, NameValue } from '../_models';
+import { BarChartDefaults } from './chart-defaults';
 
 interface CustomLegendItem {
   name: 'string';
@@ -22,45 +23,24 @@ interface CustomLegendItem {
 })
 export class BarComponent {
   private chart: am4charts.XYChart;
-  series: am4charts.ColumnSeries;
+  _results: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
+  legendContainer: am4core.Container;
+  series: am4charts.ColumnSeries;
+  settings = Object.assign({}, BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
 
-  legendContainer: am4core.Container;
-
-  _results: Array<NameValue>;
-
-  // controls
-  chartDefaults = {
-    configurable: false,
-    ctrlsOpen: false,
-    hasLines: true,
-    hasScroll: false,
-    is3D: false,
-    isCylindrical: false,
-    isHorizontal: true,
-    labelTruncate: false,
-    labelWrap: false,
-    maxLabelWidth: 250,
-    showExports: false,
-    strokeColour: '#000',
-    strokeOpacity: 1.0,
-    strokeWidth: 0,
-    chartLegend: false // used to set class 'offscreen' for demo
-  };
-
-  settings = Object.assign({}, this.chartDefaults);
-
-  //@Input() chartId: string;
   @Input() chartId = 'barChart';
   @Input() colours: Array<string>;
   @Input() set results(results: Array<NameValue>) {
     this._results = results;
-
     if (this.chart) {
       this.chart.data = this._results;
       this.drawChart();
     }
+  }
+  @Input() set extraSettings(extraSettings: ChartSettings) {
+    this.settings = Object.assign(this.settings, extraSettings);
   }
 
   constructor(@Inject(PLATFORM_ID) private platformId, private zone: NgZone) {
@@ -269,6 +249,15 @@ export class BarComponent {
 
       this.series.columns.template.fillOpacity = 0.8;
       this.chart.data = this._results;
+
+      if (this.settings.prefixValueAxis) {
+        this.categoryAxis.renderer.labels.template.adapter.add(
+          'text',
+          (label, target, key) => {
+            return `${this.settings.prefixValueAxis} ${label}`;
+          }
+        );
+      }
 
       if (this.settings.chartLegend) {
         this.addLegend();

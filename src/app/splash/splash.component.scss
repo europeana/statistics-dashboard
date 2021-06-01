@@ -64,7 +64,8 @@ app-bar-chart {
 .data-link {
   color: #0a72cc;
   display: inline-block;
-  font-weight: bold;
+  font-size: 14;
+  font-weight: 600;
   margin: 2em 0 0 auto;
 
   &::after {
@@ -105,7 +106,7 @@ app-bar-chart {
 
 h1,
 .entry-card {
-  margin: 16px 0;
+  margin: 18px 12px;
 
   @media (min-width: $bp-xxl) {
     margin: 16px;
@@ -113,7 +114,7 @@ h1,
 }
 
 .entry-card {
-  min-height: 30em;
+  min-height: 35em;
 }
 
 .entry-card-content {
@@ -123,12 +124,14 @@ h1,
   flex-direction: column;
   height: calc(100% - #{$card-header-height});
   justify-content: space-between;
-  padding: 2em;
+  padding: 21px 25px;
 }
 
 .entry-card-header {
   align-items: center;
   display: flex;
+  font-size: 12px;
+  font-weight: 600;
   line-height: $card-header-pixels-line-height;
   margin-bottom: $card-header-pixels-margin-bottom;
   text-transform: uppercase;
@@ -161,9 +164,33 @@ h1,
   }
 }
 
+.page-title {
+  font-size: 24px;
+}
+
+.percent::after {
+  content: "%";
+}
+
+.splash-map {
+  border: 1px solid $gray-med;
+  font-size: 22px;
+  height: calc(100% - 8em);
+  margin: 4em;
+  overflow: hidden;
+  padding: 1.5em;
+  position: fixed;
+  width: calc(100% - 8em);
+  z-index: 1;
+}
+
 .total {
-  font-size: 30px;
-  line-height: 34px;
+  font-size: 32px;
+  line-height: 1.4;
+}
+
+.totals {
+  margin-bottom: 10px;
 }
 
 @media (min-width: $bp-xxl) {
@@ -188,16 +215,4 @@ h1,
     width: 80%;
     max-width: 80em;
   }
-}
-
-.splash-map {
-  border: 1px solid $gray-med;
-  font-size: 22px;
-  height: calc(100% - 8em);
-  margin: 4em;
-  overflow: hidden;
-  padding: 1.5em;
-  position: fixed;
-  width: calc(100% - 8em);
-  z-index: 1;
 }

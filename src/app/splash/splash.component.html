@@ -1,9 +1,9 @@
 <div class="splash">
-  <h1>Europeana complete dataset</h1>
+  <h1 class="page-title">Europeana complete dataset</h1>
 
   <ng-template #chartSummary let-facetName="facetName">
     <span
-      class="container-h"
+      class="container-h totals"
       *ngIf="splashData[facetName] && splashData[facetName][0]; let data"
     >
       <span class="container-v">
@@ -12,11 +12,11 @@
       </span>
       <span class="container-v">
         <span>Top tier records count</span>
-        <span class="total">{{ data.value }}</span>
+        <span class="total">{{ data.value | number }}</span>
       </span>
       <span class="container-v">
         <span>Corresponding percentage</span>
-        <span class="total">{{
+        <span class="total percent">{{
           percent(data.value, totalsData[facetName])
         }}</span>
       </span>
@@ -44,7 +44,10 @@
     <div class="container-h entry-card-pair">
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by content quality and its licensing<a class="info-icon"></a
+          >Explore by content quality and its licensing<a
+            class="info-icon"
+            title="TODO: link to documentation"
+          ></a
         ></span>
         <div class="entry-card-content">
           <ng-content
@@ -57,6 +60,7 @@
             *ngIf="splashData['contentTier']"
             [colours]="[barColour]"
             chartId="contentTypeChart"
+            [extraSettings]="{ prefixValueAxis: 'Tier' }"
             [results]="splashData['contentTier']"
           ></app-bar-chart>
           <a class="data-link" routerLink="/data/contentTier"
@@ -66,7 +70,10 @@
       </div>
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by metadata quality<a class="info-icon"></a
+          >Explore by metadata quality<a
+            class="info-icon"
+            title="TODO: link to documentation"
+          ></a
         ></span>
         <div class="entry-card-content">
           <ng-content
@@ -79,6 +86,7 @@
             *ngIf="splashData['metadataTier']"
             [colours]="[barColour]"
             chartId="metadataTierChart"
+            [extraSettings]="{ prefixValueAxis: 'Tier' }"
             [results]="splashData['metadataTier']"
           ></app-bar-chart>
           <a class="data-link" routerLink="/data/metadataTier"
@@ -90,7 +98,10 @@
 
     <div class="entry-card">
       <span class="entry-card-header"
-        >Explore by providing countries<a class="info-icon"></a
+        >Explore by providing countries<a
+          class="info-icon"
+          title="TODO: link to documentation"
+        ></a
       ></span>
       <div class="entry-card-content">
         <div *ngIf="splashData['COUNTRY']" class="container-h entry-card-pair">
@@ -111,7 +122,10 @@
     <div class="container-h entry-card-pair">
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by type of content<a class="info-icon"></a
+          >Explore by type of content<a
+            class="info-icon"
+            title="TODO: link to documentation"
+          ></a
         ></span>
         <div class="entry-card-content">
           <ng-content
@@ -128,7 +142,10 @@
       </div>
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by rights statement<a class="info-icon"></a
+          >Explore by rights statement<a
+            class="info-icon"
+            title="TODO: link to documentation"
+          ></a
         ></span>
         <div class="entry-card-content">
           <div *ngIf="splashData['RIGHTS']" class="container-h">
@@ -149,7 +166,10 @@
     <div class="container-h entry-card-pair">
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by data provider<a class="info-icon"></a
+          >Explore by data provider<a
+            class="info-icon"
+            title="TODO: link to documentation"
+          ></a
         ></span>
         <div class="entry-card-content">
           <div *ngIf="splashData['DATA_PROVIDER']" class="container-h">
@@ -167,7 +187,10 @@
       </div>
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by provider<a class="info-icon"></a
+          >Explore by provider<a
+            class="info-icon"
+            title="TODO: link to documentation"
+          ></a
         ></span>
         <div class="entry-card-content">
           <div *ngIf="splashData['PROVIDER']" class="container-h">
