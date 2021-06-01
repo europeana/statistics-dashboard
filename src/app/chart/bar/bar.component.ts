@@ -7,8 +7,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { ChartSettings, NameValue } from '../_models';
-import { BarChartDefaults } from './chart-defaults';
+import { ChartSettings, NameValue } from '../../_models';
+import { BarChartDefaults } from '../chart-defaults';
 
 interface CustomLegendItem {
   name: 'string';
