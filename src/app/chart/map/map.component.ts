@@ -7,8 +7,8 @@ import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
 
-import { APIService } from '../_services';
-import { IHash, NameValue } from '../_models';
+import { APIService } from '../../_services';
+import { IHash, NameValue } from '../../_models';
 
 @Component({
   selector: 'app-map-chart',

@@ -5,6 +5,7 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
+import { Location } from '@angular/common';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -17,6 +18,7 @@ import {
 } from '@swimlane/ngx-datatable';
 
 import { environment } from '../../environments/environment';
+import { BarChartCool } from '../chart/chart-defaults';
 
 import {
   ExportType,
@@ -46,6 +48,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('canvas') canvas: ElementRef;
   @ViewChild('dateFrom') dateFrom: ElementRef;
   @ViewChild('dateTo') dateTo: ElementRef;
+
+  // Make chart settings available to template
+  public BarChartCool = BarChartCool;
 
   today = new Date().toISOString().split('T')[0];
   yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'))
@@ -118,7 +123,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     private csv: ExportCSVService,
     private pdf: ExportPDFService,
     private fb: FormBuilder,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private location: Location
   ) {
     super();
     this.buildForm();
@@ -503,6 +509,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { string: disableName } - name of the facet to disable
   */
   switchFacet(disableName: string): void {
+    this.location.replaceState(`/data/${disableName}/`);
     const onDataReady = (refresh = false): void => {
       if (this.form.value['facetParameter'] === disableName) {
         this.enableFilters();

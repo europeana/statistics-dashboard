@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { environment } from '../../environments/environment';
 import { SubscriptionManager } from '../subscription-manager/subscription.manager';
-import { FacetField, IdValue, NameValue, RawFacet } from '../_models';
+import { Facet, FacetField, IdValue, NameValue, RawFacet } from '../_models';
 import { APIService } from '../_services';
 
 @Component({
@@ -11,32 +11,60 @@ import { APIService } from '../_services';
   styleUrls: ['./splash.component.scss']
 })
 export class SplashComponent extends SubscriptionManager {
+  barColour = '#0771ce';
+  facetNames = [
+    'contentTier',
+    'COUNTRY',
+    'DATA_PROVIDER',
+    'metadataTier',
+    'PROVIDER',
+    'RIGHTS',
+    'TYPE'
+  ];
+  facetParam = this.facetNames
+    .map((s: string) => {
+      return `&facet=${s}`;
+    })
+    .join('');
+  isLoading = true;
   splashData: { [facetName: string]: Array<NameValue> | Array<IdValue> } = {};
+  totalsData: { [facetName: string]: number } = {};
+  url = `${environment.serverAPI}?query=*&wskey=api2demo&rows=0&profile=facets${this.facetParam}`;
 
   constructor(private api: APIService) {
     super();
-    this.loadData('COUNTRY');
+    this.loadData();
   }
 
-  getUrl(facet: string): string {
-    return `${environment.serverAPI}?query=*&wskey=api2demo&rows=0&profile=facets&facet=${facet}`;
-  }
-
-  loadData(facetName: string): void {
+  loadData(): void {
+    this.isLoading = true;
     const sub = this.api
-      .loadAPIData(this.getUrl(facetName))
+      .loadAPIData(this.url)
       .subscribe((rawResult: RawFacet) => {
-        if (rawResult.facets) {
-          this.splashData[facetName] = rawResult.facets[0].fields.map(
-            (f: FacetField) => {
-              return {
-                name: f.label,
-                value: f.count
-              };
-            }
-          );
-        }
+        this.isLoading = false;
+
+        rawResult.facets.forEach((f: Facet) => {
+          this.splashData[f.name] = f.fields.map((f: FacetField) => {
+            return {
+              name: f.label,
+              value: f.count
+            };
+          });
+          this.totalsData[f.name] = f.fields.reduce(function (
+            prev: FacetField,
+            curr: FacetField
+          ) {
+            return {
+              label: '',
+              count: prev.count + curr.count
+            };
+          }).count;
+        });
       });
     this.subs.push(sub);
+  }
+
+  percent(figure: number, total: number): number {
+    return parseFloat(((figure / total) * 100).toFixed(2));
   }
 }

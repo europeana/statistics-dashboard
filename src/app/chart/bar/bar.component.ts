@@ -7,7 +7,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { NameValue } from '../_models';
+import { ChartSettings, NameValue } from '../../_models';
+import { BarChartDefaults } from '../chart-defaults';
 
 interface CustomLegendItem {
   name: 'string';
@@ -22,39 +23,24 @@ interface CustomLegendItem {
 })
 export class BarComponent {
   private chart: am4charts.XYChart;
-  series: am4charts.ColumnSeries;
+  _results: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
+  legendContainer: am4core.Container;
+  series: am4charts.ColumnSeries;
+  settings = Object.assign({}, BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
 
-  legendContainer: am4core.Container;
-
-  _results: Array<NameValue>;
-
-  // controls
-  ctrlsOpen = false;
-  chartLegend = true; // used to set class 'offscreen' for demo
-  hasLines = true;
-  hasScroll = true;
-  maxLabelWidth = 250;
-  labelTruncate = false;
-  labelWrap = false;
-
-  is3D = true;
-  isCylindrical = false;
-  isHorizontal = true;
-  showExports = true;
-  strokeColour = '#67b7dc';
-  strokeOpacity = 1.0;
-  strokeWidth = 2;
-
+  @Input() chartId = 'barChart';
   @Input() colours: Array<string>;
   @Input() set results(results: Array<NameValue>) {
     this._results = results;
-
     if (this.chart) {
       this.chart.data = this._results;
       this.drawChart();
     }
+  }
+  @Input() set extraSettings(extraSettings: ChartSettings) {
+    this.settings = Object.assign(this.settings, extraSettings);
   }
 
   constructor(@Inject(PLATFORM_ID) private platformId, private zone: NgZone) {
@@ -84,7 +70,7 @@ export class BarComponent {
   /* Template utility for showing / hiding control panel
   */
   toggleCtrls(): void {
-    this.ctrlsOpen = !this.ctrlsOpen;
+    this.settings.ctrlsOpen = !this.settings.ctrlsOpen;
   }
 
   /** addLegend
@@ -135,7 +121,7 @@ export class BarComponent {
     series.events.on('ready', (): void => {
       seriesReady = true;
       const legenddata = [];
-      const xyTarget = this.isHorizontal ? 'categoryY' : 'categoryX';
+      const xyTarget = this.settings.isHorizontal ? 'categoryY' : 'categoryX';
 
       series.columns.each(function (column) {
         legenddata.push({
@@ -158,14 +144,16 @@ export class BarComponent {
       return;
     }
 
-    this.categoryAxis.renderer.labels.template.maxWidth = this.maxLabelWidth;
-    this.categoryAxis.renderer.labels.template.truncate = this.labelTruncate;
-    this.categoryAxis.renderer.labels.template.wrap = this.labelWrap;
+    this.categoryAxis.renderer.labels.template.maxWidth =
+      this.settings.maxLabelWidth;
+    this.categoryAxis.renderer.labels.template.truncate =
+      this.settings.labelTruncate;
+    this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
 
     const columnTemplate = this.series.columns.template;
-    columnTemplate.stroke = am4core.color(this.strokeColour);
-    columnTemplate.strokeWidth = this.strokeWidth;
-    columnTemplate.strokeOpacity = this.strokeOpacity;
+    columnTemplate.stroke = am4core.color(this.settings.strokeColour);
+    columnTemplate.strokeWidth = this.settings.strokeWidth;
+    columnTemplate.strokeOpacity = this.settings.strokeOpacity;
   }
 
   /** createSeries
@@ -173,8 +161,8 @@ export class BarComponent {
   /* - build colour model
   */
   createSeries(): void {
-    if (this.is3D) {
-      if (this.isCylindrical) {
+    if (this.settings.is3D) {
+      if (this.settings.isCylindrical) {
         this.series = this.chart.series.push(new am4charts.ConeSeries());
       } else {
         this.series = this.chart.series.push(new am4charts.ColumnSeries3D());
@@ -204,16 +192,20 @@ export class BarComponent {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
 
-      this.chart = am4core.create('barChart', am4charts.XYChart);
+      this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
       // Create axes
 
       this.categoryAxis = new am4charts.CategoryAxis();
       this.valueAxis = new am4charts.ValueAxis();
+
+      this.valueAxis.numberFormatter = new am4core.NumberFormatter();
+      this.valueAxis.numberFormatter.numberFormat = '#.0a';
+
       this.categoryAxis.dataFields.category = 'name';
 
-      if (this.isHorizontal) {
+      if (this.settings.isHorizontal) {
         chart.yAxes.push(this.categoryAxis);
         chart.xAxes.push(this.valueAxis);
 
@@ -224,9 +216,10 @@ export class BarComponent {
         this.series.columns.template.tooltipText =
           '{categoryY}: [bold]{valueX}[/]';
 
-        if (this.hasScroll) {
+        if (this.settings.hasScroll) {
           chart.scrollbarY = new am4core.Scrollbar();
         }
+        this.valueAxis.paddingRight = 25;
       } else {
         chart.xAxes.push(this.categoryAxis);
         chart.yAxes.push(this.valueAxis);
@@ -238,7 +231,7 @@ export class BarComponent {
         this.series.columns.template.tooltipText =
           '{categoryX}: [bold]{valueY}[/]';
 
-        if (this.hasScroll) {
+        if (this.settings.hasScroll) {
           chart.scrollbarX = new am4core.Scrollbar();
         }
 
@@ -248,20 +241,32 @@ export class BarComponent {
         this.categoryAxis.renderer.labels.template.rotation = 270;
       }
 
-      if (!this.hasLines) {
-        this.categoryAxis.renderer.grid.template.disabled = true;
+      this.categoryAxis.renderer.grid.template.disabled = true;
+
+      if (!this.settings.hasLines) {
         this.valueAxis.renderer.grid.template.disabled = true;
       }
 
       this.series.columns.template.fillOpacity = 0.8;
       this.chart.data = this._results;
 
-      this.addLegend();
+      if (this.settings.prefixValueAxis) {
+        this.categoryAxis.renderer.labels.template.adapter.add(
+          'text',
+          (label: string) => {
+            return `${this.settings.prefixValueAxis} ${label}`;
+          }
+        );
+      }
+
+      if (this.settings.chartLegend) {
+        this.addLegend();
+      }
       this.applySettings();
     });
 
     // this has to be outside browserOnly()
-    if (this.showExports) {
+    if (this.settings.showExports) {
       this.chart.exporting.menu = new am4core.ExportMenu();
       this.chart.exporting.menu.align = 'right';
 
