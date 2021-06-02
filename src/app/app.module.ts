@@ -15,10 +15,8 @@ import { AppComponent } from './app.component';
 import { RenameApiFacetPipe } from './_translate';
 
 import { BarComponent, MapComponent, PieComponent } from './chart';
-
-//import { BarComponent } from './chart/bar.component';
-//import { MapComponent } from './chart/map.component';
-//import { PieComponent } from './chart/pie.component';
+import { FooterComponent } from './footer';
+import { HeaderComponent } from './header';
 
 import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
@@ -28,6 +26,8 @@ import { SplashComponent } from './splash/splash.component';
   declarations: [
     AppComponent,
     BarComponent,
+    FooterComponent,
+    HeaderComponent,
     ListingComponent,
     MapComponent,
     OverviewComponent,

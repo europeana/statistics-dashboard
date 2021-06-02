@@ -16,5 +16,15 @@ export const BarChartDefaults: ChartSettings = {
   strokeColour: '#000',
   strokeOpacity: 1.0,
   strokeWidth: 0,
-  chartLegend: false // used to set class 'offscreen' for demo
+  chartLegend: false // used to set class 'offscreen'
+};
+
+export const BarChartCool: ChartSettings = {
+  configurable: true,
+  hasLines: true,
+  hasScroll: true,
+  is3D: true,
+  isHorizontal: true,
+  maxLabelWidth: 250,
+  showExports: true
 };

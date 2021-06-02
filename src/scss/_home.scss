@@ -1,0 +1,14 @@
+@import "variables";
+
+.fit-to-page {
+  margin: 0;
+  @media (min-width: $bp-small-3) {
+    margin: 0 2em 2em 2em;
+  }
+
+  @media (min-width: $bp-xl) {
+    margin: 0 auto 2em auto;
+    max-width: $max-width;
+    width: 80%;
+  }
+}

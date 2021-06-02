@@ -1,4 +1,3 @@
-<a routerLink="/">Home</a>
 <form
   [formGroup]="form"
   class="dashboard-wrapper"
@@ -402,6 +401,7 @@
         <app-bar-chart
           *ngIf="showBar"
           [colours]="colours"
+          [extraSettings]="BarChartCool"
           [results]="chartData"
         ></app-bar-chart>
 

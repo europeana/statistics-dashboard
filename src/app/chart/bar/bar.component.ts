@@ -253,7 +253,7 @@ export class BarComponent {
       if (this.settings.prefixValueAxis) {
         this.categoryAxis.renderer.labels.template.adapter.add(
           'text',
-          (label, target, key) => {
+          (label: string) => {
             return `${this.settings.prefixValueAxis} ${label}`;
           }
         );

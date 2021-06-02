@@ -26,6 +26,7 @@ export class SplashComponent extends SubscriptionManager {
       return `&facet=${s}`;
     })
     .join('');
+  isLoading = true;
   splashData: { [facetName: string]: Array<NameValue> | Array<IdValue> } = {};
   totalsData: { [facetName: string]: number } = {};
   url = `${environment.serverAPI}?query=*&wskey=api2demo&rows=0&profile=facets${this.facetParam}`;
@@ -36,36 +37,34 @@ export class SplashComponent extends SubscriptionManager {
   }
 
   loadData(): void {
+    this.isLoading = true;
     const sub = this.api
       .loadAPIData(this.url)
       .subscribe((rawResult: RawFacet) => {
-        if (rawResult.facets) {
-          rawResult.facets.forEach((f: Facet) => {
-            this.splashData[f.name] = f.fields.map((f: FacetField) => {
-              return {
-                name: f.label,
-                value: f.count
-              };
-            });
-            this.totalsData[f.name] = f.fields.reduce(function (
-              prev: FacetField,
-              curr: FacetField
-            ) {
-              return {
-                label: '',
-                count: prev.count + curr.count
-              };
-            }).count;
+        this.isLoading = false;
+
+        rawResult.facets.forEach((f: Facet) => {
+          this.splashData[f.name] = f.fields.map((f: FacetField) => {
+            return {
+              name: f.label,
+              value: f.count
+            };
           });
-        }
+          this.totalsData[f.name] = f.fields.reduce(function (
+            prev: FacetField,
+            curr: FacetField
+          ) {
+            return {
+              label: '',
+              count: prev.count + curr.count
+            };
+          }).count;
+        });
       });
     this.subs.push(sub);
   }
 
   percent(figure: number, total: number): number {
-    if (isNaN(parseFloat(((figure / total) * 100).toFixed(2)))) {
-      console.log('NAN from ' + figure + ', ' + total);
-    }
     return parseFloat(((figure / total) * 100).toFixed(2));
   }
 }

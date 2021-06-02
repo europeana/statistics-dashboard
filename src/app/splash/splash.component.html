@@ -1,6 +1,4 @@
-<div class="splash">
-  <h1 class="page-title">Europeana complete dataset</h1>
-
+<div class="fit-to-page">
   <ng-template #chartSummary let-facetName="facetName">
     <span
       class="container-h totals"
@@ -41,8 +39,10 @@
   </ng-template>
 
   <div class="container-v">
-    <div class="container-h entry-card-pair">
-      <div class="entry-card">
+    <div class="spinner" *ngIf="isLoading"></div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="splashData['contentTier']">
         <span class="entry-card-header"
           >Explore by content quality and its licensing<a
             class="info-icon"
@@ -68,7 +68,7 @@
           >
         </div>
       </div>
-      <div class="entry-card">
+      <div class="entry-card" *ngIf="splashData['metadataTier']">
         <span class="entry-card-header"
           >Explore by metadata quality<a
             class="info-icon"
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <div class="entry-card">
+    <div class="entry-card" *ngIf="splashData['COUNTRY']">
       <span class="entry-card-header"
         >Explore by providing countries<a
           class="info-icon"
@@ -104,7 +104,7 @@
         ></a
       ></span>
       <div class="entry-card-content">
-        <div *ngIf="splashData['COUNTRY']" class="container-h entry-card-pair">
+        <div *ngIf="splashData['COUNTRY']" class="entry-card-pair">
           <div class="map-container">
             <app-map-chart [results]="splashData['COUNTRY']"></app-map-chart>
           </div>
@@ -119,8 +119,8 @@
       </div>
     </div>
 
-    <div class="container-h entry-card-pair">
-      <div class="entry-card">
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="splashData['TYPE']">
         <span class="entry-card-header"
           >Explore by type of content<a
             class="info-icon"
@@ -140,7 +140,7 @@
           <a class="data-link" routerLink="/data/TYPE">View by type</a>
         </div>
       </div>
-      <div class="entry-card">
+      <div class="entry-card" *ngIf="splashData['RIGHTS']">
         <span class="entry-card-header"
           >Explore by rights statement<a
             class="info-icon"
@@ -163,8 +163,8 @@
       </div>
     </div>
 
-    <div class="container-h entry-card-pair">
-      <div class="entry-card">
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="splashData['DATA_PROVIDER']">
         <span class="entry-card-header"
           >Explore by data provider<a
             class="info-icon"
@@ -185,7 +185,7 @@
           >
         </div>
       </div>
-      <div class="entry-card">
+      <div class="entry-card" *ngIf="splashData['PROVIDER']">
         <span class="entry-card-header"
           >Explore by provider<a
             class="info-icon"
