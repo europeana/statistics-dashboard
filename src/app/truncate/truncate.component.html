@@ -1,0 +1,23 @@
+<span class="text-outer" #contentRef>
+  <span class="full-text">{{ text }}</span>
+</span>
+
+<br />
+<br />
+
+<a (click)="run()">RUN</a>
+
+<br />
+<br />
+
+<span class="text-outer">
+  <span class="text-left" #elRefTextLeft
+    ><span>{{ textLeft }}</span></span
+  >
+  <span
+    class="text-right"
+    #elRefTextRight
+    [ngClass]="{ 'with-leading-space': applySpace }"
+    >{{ textRight }}</span
+  >
+</span>

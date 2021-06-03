@@ -7,6 +7,18 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
+.record-list {
+  display: grid;
+  column-gap: 20px;
+
+  // 70px is the target - less the column gap is 50
+  grid-template-columns: 100fr 1fr minmax(50px, 50px);
+
+  .numeric {
+    text-align: right;
+  }
+}
+
 app-bar-chart {
   height: 100%;
 }
@@ -42,23 +54,6 @@ app-bar-chart {
 
 .data-rows {
   width: 100%;
-
-  > .container-h {
-    align-items: center;
-    border-top: 1px solid #d8d8d8;
-    padding: 14px 0;
-
-    :first-child {
-      flex-grow: 1;
-    }
-    :last-child {
-      text-align: right;
-      width: 6em;
-      &::after {
-        content: "%";
-      }
-    }
-  }
 
   @media (min-width: $bp-xxl) {
     margin: 0em 2em;
@@ -172,9 +167,9 @@ app-bar-chart {
 }
 
 @media (min-width: $bp-xxl) {
-  .entry-card {
-    min-height: 35em;
-  }
+  //  .entry-card {
+  //    min-height: 35em;
+  //  }
 
   .map-container {
     max-width: 50%;

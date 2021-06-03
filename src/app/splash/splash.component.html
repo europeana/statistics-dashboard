@@ -29,6 +29,26 @@
       </div>
       <div
         *ngFor="let countryRow of splashData[facetName].slice(0, 8)"
+        class="record-list"
+      >
+        <span>{{ countryRow.name }}</span>
+        <span class="numeric">{{ countryRow.value }}</span>
+        <span class="numeric percent">{{
+          percent(countryRow.value, totalsData[facetName])
+        }}</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <!--
+  <ng-template #dataRows let-facetName="facetName" let-title="title">
+    <div class="data-rows" *ngIf="splashData[facetName]">
+      <div class="data-rows-title">
+        <span>{{ title }}</span>
+        <span>RECORDS PROVIDED</span>
+      </div>
+      <div
+        *ngFor="let countryRow of splashData[facetName].slice(0, 8)"
         class="container-h"
       >
         <span>{{ countryRow.name }}</span>
@@ -37,9 +57,16 @@
       </div>
     </div>
   </ng-template>
+-->
 
   <div class="container-v">
     <div class="spinner" *ngIf="isLoading"></div>
+
+    <h2>Truncate test</h2>
+    <app-truncate
+      text="AAll work and no play makes Andy a dull boy. All work and no play makes Andy a dull boy. All work and no play makes Andy a dull boy.Z"
+    ></app-truncate>
+    <h2 style="margin-top: 1em">End truncate test</h2>
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="splashData['contentTier']">

@@ -21,6 +21,7 @@ import { HeaderComponent } from './header';
 import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { SplashComponent } from './splash/splash.component';
+import { TruncateComponent } from './truncate';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { SplashComponent } from './splash/splash.component';
     OverviewComponent,
     PieComponent,
     RenameApiFacetPipe,
-    SplashComponent
+    SplashComponent,
+    TruncateComponent
   ],
   imports: [
     AppRoutingModule,
