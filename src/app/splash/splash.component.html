@@ -28,12 +28,14 @@
         <span>RECORDS PROVIDED</span>
       </div>
       <div
-        *ngFor="let countryRow of splashData[facetName].slice(0, 8)"
-        class="container-h"
+        *ngFor="let row of splashData[facetName].slice(0, 8)"
+        class="container-h record-list"
       >
-        <span>{{ countryRow.name }}</span>
-        <span>{{ countryRow.value }}</span>
-        <span>{{ percent(countryRow.value, totalsData[facetName]) }}</span>
+        <app-truncate [text]="row.name"></app-truncate>
+        <span class="numeric">{{ row.value }}</span>
+        <span class="numeric percent">{{
+          percent(row.value, totalsData[facetName])
+        }}</span>
       </div>
     </div>
   </ng-template>
@@ -96,7 +98,7 @@
       </div>
     </div>
 
-    <div class="entry-card" *ngIf="splashData['COUNTRY']">
+    <div class="entry-card double-card" *ngIf="splashData['COUNTRY']">
       <span class="entry-card-header"
         >Explore by providing countries<a
           class="info-icon"

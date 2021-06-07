@@ -1,0 +1,11 @@
+<span class="text-outer">
+  <span class="text-left" #elRefTextLeft
+    ><span>{{ textLeft }}</span></span
+  >
+  <span
+    class="text-right"
+    #elRefTextRight
+    [ngClass]="{ 'with-leading-space': applySpace }"
+    >{{ textRight }}</span
+  >
+</span>

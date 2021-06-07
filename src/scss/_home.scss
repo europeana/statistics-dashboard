@@ -3,11 +3,11 @@
 .fit-to-page {
   margin: 0;
   @media (min-width: $bp-small-3) {
-    margin: 0 2em 2em 2em;
+    margin: 0 32px 32px 32px;
   }
 
   @media (min-width: $bp-xl) {
-    margin: 0 auto 2em auto;
+    margin: 0 auto 32px auto;
     max-width: $max-width;
     width: 80%;
   }
