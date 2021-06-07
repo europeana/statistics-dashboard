@@ -1,37 +1,18 @@
-.full-text {
-  background: #fff;
-  //overflow: hidden;
+.text-left {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-left,
+.text-right {
   white-space: nowrap;
 }
 
-.text-left {
-  overflow: hidden;
-}
-
 .text-outer {
-  border: 1px solid #ccc;
   display: flex;
   flex-direction: row;
 }
 
 .text-right.with-leading-space {
   padding-left: 0.4em;
-}
-
-.text-left,
-.text-right {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* test... */
-
-/*
-*/
-.text-left {
-  background: yellow;
-}
-
-.text-right {
-  background: orange;
 }

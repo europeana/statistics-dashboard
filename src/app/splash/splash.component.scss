@@ -7,15 +7,23 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
-.record-list {
-  display: grid;
-  column-gap: 20px;
+app-truncate {
+  overflow: hidden;
+}
 
-  // 70px is the target - less the column gap is 50
-  grid-template-columns: 100fr 1fr minmax(50px, 50px);
+.record-list {
+  align-items: center;
+  border-top: 1px solid #d8d8d8;
+  padding: 14px 0;
+
+  :first-child {
+    flex-grow: 1;
+  }
 
   .numeric {
+    margin-left: 6px;
     text-align: right;
+    min-width: 6em;
   }
 }
 
@@ -53,15 +61,8 @@ app-bar-chart {
 }
 
 .data-rows {
-  width: 100%;
-
-  @media (min-width: $bp-xxl) {
-    margin: 0em 2em;
-  }
-}
-
-.data-rows {
   font-size: 12px;
+  width: 100%;
 }
 
 .data-rows-title {
@@ -71,7 +72,12 @@ app-bar-chart {
 }
 
 .entry-card {
+  padding: 18px 12px;
   width: 100%;
+
+  @media (min-width: $bp-desktop) {
+    padding: 16px;
+  }
 }
 
 .entry-card-content {
@@ -97,18 +103,14 @@ app-bar-chart {
 
 .entry-card-pair {
   width: 100%;
-  @media (min-width: $bp-xxl) {
+  @media (min-width: $bp-desktop) {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-  }
-}
 
-.entry-card {
-  padding: 18px 12px;
-
-  @media (min-width: $bp-xxl) {
-    padding: 16px;
+    .entry-card {
+      width: 50%;
+    }
   }
 }
 
@@ -166,10 +168,10 @@ app-bar-chart {
   margin-bottom: 10px;
 }
 
-@media (min-width: $bp-xxl) {
-  //  .entry-card {
-  //    min-height: 35em;
-  //  }
+@media (min-width: $bp-desktop) {
+  .double-card .data-rows {
+    margin-left: 2em;
+  }
 
   .map-container {
     max-width: 50%;
