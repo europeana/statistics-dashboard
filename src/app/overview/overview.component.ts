@@ -233,7 +233,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* returns the (portal) url for a specific item
   */
   getUrlRow(qfVal: string): string {
-    return `${environment.serverPortal}${this.getUrl(true)}&qf=${
+    return `${environment.serverPortal}${this.getUrl()}&qf=${
       this.form.value.facetParameter
     }:"${encodeURIComponent(qfVal)}"`;
   }
