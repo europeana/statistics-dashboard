@@ -12,7 +12,7 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-import { RenameApiFacetPipe } from './_translate';
+import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
 
 import { BarComponent, MapComponent, PieComponent } from './chart';
 import { FooterComponent } from './footer';
@@ -34,6 +34,7 @@ import { TruncateComponent } from './truncate';
     OverviewComponent,
     PieComponent,
     RenameApiFacetPipe,
+    RenameRightsPipe,
     SplashComponent,
     TruncateComponent
   ],

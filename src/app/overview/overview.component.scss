@@ -8,6 +8,13 @@
 
 $width-left-col: 200px;
 
+.dates {
+  margin-left: auto;
+  .date + .date {
+    margin-left: 12px;
+  }
+}
+
 .header-bar {
   display: flex;
 
@@ -30,12 +37,22 @@ $width-left-col: 200px;
     }
     .link-list {
       opacity: 0.1;
-    }
-    &:hover {
-      .link-list {
+      &:hover {
         opacity: 1;
       }
     }
+  }
+}
+
+.rm-filter {
+  background: $gray-lightest;
+  color: $gray-med;
+  margin-left: 24px;
+  padding: 0 8px;
+
+  fieldset {
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -46,6 +63,7 @@ $width-left-col: 200px;
     padding-right: 0.4em;
   }
   .switch {
+    padding-bottom: 0.4rem;
     position: relative;
     width: 60px;
 
@@ -74,7 +92,7 @@ $width-left-col: 200px;
     }
 
     input:checked + .slider {
-      background-color: $eu-jade;
+      background-color: $stats-blue;
     }
 
     input:focus + .slider {
@@ -315,17 +333,8 @@ label {
   padding-bottom: 5em;
 }
 
-.facet-params {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-
-  label {
-    align-items: center;
-    display: flex;
-    height: 34px;
-    padding: 0;
-  }
+.facet-param {
+  font-size: revert;
 }
 
 .mobile-row {
