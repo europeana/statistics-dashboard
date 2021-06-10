@@ -8,8 +8,8 @@ import {
 import { Location } from '@angular/common';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { combineLatest, Subject } from 'rxjs';
 
 import {
   ColumnMode,
@@ -26,6 +26,7 @@ import {
   FacetField,
   FmtTableData,
   HeaderNameType,
+  IHashArray,
   MenuState,
   NameValue,
   RawFacet,
@@ -73,7 +74,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   ];
 
   menuStates: { [key: string]: MenuState } = {};
-
   contentTiersOptions = Array(5)
     .fill(0)
     .map((x, index) => `${x + index}`);
@@ -115,8 +115,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   selFacetIndex = 0;
   allFacetData: Array<Facet>;
+
   chartData: Array<NameValue>;
   tableData: FmtTableData;
+
+  filterData: IHashArray = {};
+  queryParams: Params = {};
 
   constructor(
     private api: APIService,
@@ -124,6 +128,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     private pdf: ExportPDFService,
     private fb: FormBuilder,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
+
     private location: Location
   ) {
     super();
@@ -131,16 +137,34 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.initialiseMenuStates();
   }
 
+  /** ngOnInit
+  /* Event hook: subscribe to changes in the route / query params
+  /*
+  */
   ngOnInit(): void {
     this.subs.push(
-      this.route.params.subscribe((params) => {
-        if (params.facet) {
-          (this.form.get('facetParameter') as FormControl).setValue(
-            params.facet
-          );
-          this.switchFacet(params.facet);
+      combineLatest(this.route.params, this.route.queryParams).subscribe(
+        (params) => {
+          console.log(params);
+          console.log(JSON.stringify(params));
+          if (params[0].facet) {
+            this.form.controls.facetParameter.setValue(params[0].facet);
+          }
+          const combinedParams = {};
+          if (params.length > 1) {
+            params.slice(1).forEach((ob) => {
+              Object.keys(ob).forEach((s: string) => {
+                combinedParams[s] = Array.isArray(ob[s]) ? ob[s] : [ob[s]];
+              });
+            });
+          }
+          this.queryParams = combinedParams;
+          this.setCtZeroInputToQueryParam();
+          this.setDateInputsToQueryParams();
+          this.setDatasetNameInputToQueryParam();
+          this.urlChanged();
         }
-      })
+      )
     );
   }
 
@@ -164,27 +188,44 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getUrl
-  /* @param {boolean} portal - the url type returned
-  /* returns the url (portal or api) according to the form state
+  /* returns a url parameter string (for api or the portal) according to the form state
+  /* @returns string
   */
-  getUrl(portal = false): string {
-    let server;
-    const filterParam = this.getFormattedFilterParam();
+  getUrl(): string {
+    // filterParam cannot rely on checkbox values as filters aren't built until the allFacetData is initialised
+    const nonFilterQPs = [
+      'content-tier-zero',
+      'date-from',
+      'date-to',
+      'dataset-name'
+    ];
+    let filterParam = Object.keys(this.queryParams)
+      .map((key: string) => {
+        const innerRes = [];
+        const values = `${this.queryParams[key]}`.split(',');
+
+        if (!nonFilterQPs.includes(key)) {
+          values.forEach((valPart: string) => {
+            innerRes.push(`${key}:"${encodeURIComponent(valPart)}"`);
+          });
+        }
+        return innerRes.join('&qf=');
+      })
+      .join('&qf=');
+
+    if (filterParam.length > 0) {
+      filterParam = `&qf=${filterParam}`;
+    }
+
     const datasetNameParam = this.getFormattedDatasetNameParam();
-    const queryParam =
-      datasetNameParam.length > 0 ? `?query=${datasetNameParam}` : '?query=*';
+    const queryParam = `?query=${
+      datasetNameParam.length > 0 ? datasetNameParam : '*'
+    }`;
+
     const dateParam = this.getFormattedDateParam();
     const ct = this.getFormattedContentTierParam();
-    let apiOnly = '';
 
-    if (portal) {
-      server = environment.serverPortal;
-    } else {
-      server = environment.serverAPI;
-      apiOnly =
-        '&wskey=api2demo&rows=0&profile=facets' + this.getFormattedFacetParam();
-    }
-    return `${server}${queryParam}${ct}${apiOnly}${filterParam}${dateParam}`;
+    return `${queryParam}${ct}${filterParam}${dateParam}`;
   }
 
   /** getUrlRow
@@ -192,7 +233,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* returns the (portal) url for a specific item
   */
   getUrlRow(qfVal: string): string {
-    return `${this.getUrl(true)}&qf=${
+    return `${environment.serverPortal}${this.getUrl(true)}&qf=${
       this.form.value.facetParameter
     }:"${encodeURIComponent(qfVal)}"`;
   }
@@ -209,21 +250,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       60 * 100000,
       () => {
         this.isLoading = true;
-        return this.api.loadAPIData(this.getUrl());
+        const url = `${this.getUrl()}&rows=0&profile=facets${this.getFormattedFacetParam()}`;
+        return this.api.loadAPIData(url);
       },
       (rawResult: RawFacet) => {
         this.isLoading = false;
+
         if (rawResult.facets) {
           this.selFacetIndex = this.findFacetIndex(
             this.form.value.facetParameter,
             rawResult.facets
           );
 
+          // initialise filterData and add checkboxes
           this.facetConf.forEach((name: string) => {
-            this.addMenuCheckboxes(
-              name,
-              this.getSelectOptions(name, rawResult.facets)
-            );
+            const filterOps = this.getFilterOptions(name, rawResult.facets);
+            this.filterData[name] = filterOps;
+            this.addOrUpdateFilterControls(name, filterOps);
           });
 
           this.allFacetData = rawResult.facets;
@@ -256,12 +299,27 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
-  addMenuCheckboxes(name: string, options: Array<string>): void {
+  /** addOrUpdateFilterControls
+  /*
+  /* Adds a FormControl for each option, updates the value if the control exists
+  /*
+  /* @param { string } name - the name of the filter
+  /* @param { Array<string> } options - the filter options
+  /*
+  */
+  addOrUpdateFilterControls(name: string, options: Array<string>): void {
     const checkboxes = this.form.get(name) as FormGroup;
+
     options.forEach((option: string) => {
       const fName = this.fixName(option);
-      if (!this.form.get(name + '.' + fName)) {
-        checkboxes.addControl(fName, new FormControl(false));
+      const ctrl = this.form.get(`${name}.${fName}`);
+      const defaultValue =
+        this.queryParams[name] && this.queryParams[name].includes(option);
+
+      if (!ctrl) {
+        checkboxes.addControl(fName, new FormControl(defaultValue));
+      } else {
+        (ctrl as FormControl).setValue(defaultValue);
       }
     });
   }
@@ -365,11 +423,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
-  /** getSelectOptions
+  /** getFilterOptions
   /* @param {string} facetName - the name of the facet
   /* returns Array<string> of values for a facet
   */
-  getSelectOptions(facetName: string, facetData: Array<Facet>): Array<string> {
+  getFilterOptions(facetName: string, facetData: Array<Facet>): Array<string> {
     const matchIndex = this.findFacetIndex(facetName, facetData);
     return facetData[matchIndex].fields.map((ff: FacetField) => {
       return ff.label;
@@ -377,8 +435,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getFormattedContentTierParam
-  /* returns concatenated filterContentTier values if present
-  /* returns contentTierZero value if filterContentTier values not present
+  /* @returns { string } - concatenated filterContentTier values if present
+  /* @returns { string } - contentTierZero value if filterContentTier values not present
   */
   getFormattedContentTierParam(): string {
     let res = '';
@@ -395,7 +453,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getFormattedFacetParam
-  /* returns facets names formatted as url parameters
+  /* get a string containing all facet names formatted as a url parameters
+  /* @returns string
   */
   getFormattedFacetParam(): string {
     return this.facetConf
@@ -406,14 +465,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getFormattedDatasetNameParam
-   */
+  /* get an empty string or the prefixed value of form.datasetName
+  /* @returns string
+  */
   getFormattedDatasetNameParam(): string {
     const val = this.form.value.datasetName;
     return val ? `edm_datasetName:${val}` : '';
   }
 
   /** getFormattedDateParam
-   */
+  /* get an empty string or the formatted date range
+  /* @returns string
+  */
   getFormattedDateParam(): string {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
@@ -421,33 +484,59 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       const range = `${new Date(valFrom).toISOString()}+TO+${new Date(
         valTo
       ).toISOString()}`;
-      return `&qf=timestamp_update:%5B${range}%5D`;
+      return `&qf=timestamp_update:${encodeURIComponent(
+        '['
+      )}${range}${encodeURIComponent(']')}`;
     }
     return '';
   }
 
-  /** getFormattedFilterParam
-  /* returns concatentated filter names-value pairs formatted as url parameters
-  /* @param {string} def - the default return value
+  /** setCTZeroInputToQueryParam
+  /* updates the form value 'contentTierZero' to the page query parameter 'content-tier-zero'
   */
-  getFormattedFilterParam(): string {
-    return this.facetConf
-      .slice(1)
-      .filter((filterName: string) => {
-        return this.form.controls[filterName].enabled;
-      })
-      .map((filterName: string) => {
-        return this.getSetCheckboxValues(filterName)
-          .map((value: string) => {
-            const unfixed = this.unfixName(value);
-            return `&qf=${filterName}:"${encodeURIComponent(unfixed)}"`;
-          })
-          .join('');
-      })
-      .join('');
+  setCtZeroInputToQueryParam(): void {
+    const param = this.queryParams['content-tier-zero'];
+    this.form.controls.contentTierZero.setValue(
+      param ? param[0] === 'true' : false
+    );
   }
 
-  getCheckboxValuesPresent(filterName?: string): boolean {
+  /** setDateInputsToQueryParams
+  /* updates the form values to the page query parameters for 'dateFrom' (date-from) and 'dateTo' (date-to)
+  **/
+  setDateInputsToQueryParams(): void {
+    const paramFrom = this.queryParams['date-from'];
+    const paramTo = this.queryParams['date-to'];
+    this.form.controls.dateFrom.setValue(paramFrom ? paramFrom[0] : '');
+    this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
+  }
+
+  /** setDatasetNameInputToQueryParam
+  /* updates the form value 'datasetName' to the page query parameter 'dataset-name'
+  */
+  setDatasetNameInputToQueryParam(): void {
+    const param = this.queryParams['dataset-name'];
+    if (param) {
+      this.form.controls.datasetName.setValue(param[0]);
+    }
+  }
+
+  /** getEnabledFilterNames
+  /* get a list of filter names that are enabled in the form
+  /* @returns Array<string>
+  */
+  getEnabledFilterNames(): Array<string> {
+    return this.facetConf.slice(1).filter((filterName: string) => {
+      return this.form.controls[filterName].enabled;
+    });
+  }
+
+  /** isFilterApplied
+  /* Template utility
+  /* @param { string? : filterName } - the filter to check (any if not supplied)
+  /* @returns boolean
+  */
+  isFilterApplied(filterName?: string): boolean {
     return (filterName ? [filterName] : this.facetConf).some((name: string) => {
       return Object.values(this.form.value[name] || {}).some((val: boolean) => {
         return val;
@@ -455,6 +544,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
+  /** getSetCheckboxValues
+  /*
+  /* gets the names of the set values in a filter
+  /*
+  /* @param { string? } filterName - the filter to return
+  /* @returns Array<string>
+  */
   getSetCheckboxValues(filterName: string): Array<string> {
     const checkVals = this.form.value[filterName];
     return checkVals
@@ -464,6 +560,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       : [];
   }
 
+  /** dateChange
+  /* Template utility: corrects @min / @max on the element and calls 'updatePageUrl' if valid
+  /* @param {boolean} isDateFrom - flag if dateFrom is the caller
+  */
   dateChange(isDateFrom: boolean): void {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
@@ -493,7 +593,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.dateFrom.nativeElement.validity.valid &&
       this.dateTo.nativeElement.validity.valid
     ) {
-      this.refresh();
+      this.updatePageUrl();
     }
   }
 
@@ -504,33 +604,55 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
-  /** switchFacet
-  /* Trigger data load with callback to disable a facet (in form and menuStates)
-  /* @param { string: disableName } - name of the facet to disable
+  /** updatePageUrl
+  /* Navigate to url according to form state
   */
-  switchFacet(disableName: string): void {
-    this.location.replaceState(`/data/${disableName}/`);
-    const onDataReady = (refresh = false): void => {
-      if (this.form.value['facetParameter'] === disableName) {
-        this.enableFilters();
-        this.form.controls[disableName].disable();
-        this.menuStates[disableName].disabled = true;
+  updatePageUrl(): void {
+    const qp = {};
+
+    this.getEnabledFilterNames().forEach((filterName: string) => {
+      const filterVals = this.getSetCheckboxValues(filterName);
+      if (filterVals.length > 0) {
+        qp[filterName] = filterVals;
       }
+    });
+
+    const ctZero = this.form.value.contentTierZero;
+    const dataset = this.form.value.datasetName;
+    const valFrom = this.form.value.dateFrom;
+    const valTo = this.form.value.dateTo;
+
+    if (valFrom) {
+      qp['date-from'] = new Date(valFrom).toISOString().split('T')[0];
+    }
+    if (valTo) {
+      qp['date-to'] = new Date(valTo).toISOString().split('T')[0];
+    }
+    if (dataset) {
+      qp['dataset-name'] = dataset;
+    }
+    if (ctZero) {
+      qp['content-tier-zero'] = true;
+    }
+    this.router.navigate([`data/${this.form.value['facetParameter']}`], {
+      queryParams: qp
+    });
+  }
+
+  urlChanged(): void {
+    const onDataReady = (refresh = false): void => {
+      this.enableFilters();
+      this.menuStates[this.form.value['facetParameter']].disabled = true;
       this.setIsShowingSearchList(false);
+
       if (refresh) {
-        this.refresh();
+        this.pollRefresh.next(true);
       }
     };
     if (!this.pollRefresh) {
       this.beginPolling(onDataReady);
     } else {
       onDataReady(true);
-    }
-  }
-
-  refresh(): void {
-    if (this.pollRefresh) {
-      this.pollRefresh.next(true);
     }
   }
 
@@ -555,8 +677,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** extractChartData
   /*
-  /* @param { number: facetIndex } - default = selFacetIndex
-  /* returns Array<NameValue>
+  /* @param { number } facetIndex - the index of the facet to use
+  /* @returns Array<NameValue>
   */
   extractChartData(facetIndex = this.selFacetIndex): Array<NameValue> {
     const facetFields = this.allFacetData[facetIndex].fields;
@@ -572,13 +694,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
+  /** clearFilter
+  /*
+  /* clears the form values for a single filter or all filters
+  /* @param { number } filterName - the name of filter to clear
+  */
   clearFilter(filterName?: string): void {
     (filterName ? [filterName] : this.facetConf).forEach((name: string) => {
       this.form.get(name).reset();
     });
-    this.refresh();
+    this.updatePageUrl();
   }
 
+  /** closeFilters
+  /*
+  /* Template utility for closing menus
+  /* @param { string } exempt - optional filter to ignore
+  */
   closeFilters(exempt = ''): void {
     Object.keys(this.menuStates)
       .filter((s: string) => {

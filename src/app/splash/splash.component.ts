@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-
-import { environment } from '../../environments/environment';
 import { SubscriptionManager } from '../subscription-manager/subscription.manager';
 import { Facet, FacetField, IdValue, NameValue, RawFacet } from '../_models';
 import { APIService } from '../_services';
@@ -29,7 +27,7 @@ export class SplashComponent extends SubscriptionManager {
   isLoading = true;
   splashData: { [facetName: string]: Array<NameValue> | Array<IdValue> } = {};
   totalsData: { [facetName: string]: number } = {};
-  url = `${environment.serverAPI}?query=*&wskey=api2demo&rows=0&profile=facets${this.facetParam}`;
+  url = `?query=*&rows=0&profile=facets${this.facetParam}`;
 
   constructor(private api: APIService) {
     super();

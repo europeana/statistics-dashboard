@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { IHash, RawFacet } from '../_models';
 
 @Injectable({ providedIn: 'root' })
@@ -263,6 +264,8 @@ export class APIService {
   }
 
   loadAPIData(url: string): Observable<RawFacet> {
-    return this.http.get<RawFacet>(url);
+    return this.http.get<RawFacet>(
+      `${environment.serverAPI}${url}&wskey=${environment.wskey}`
+    );
   }
 }
