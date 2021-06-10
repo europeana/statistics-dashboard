@@ -6,8 +6,5 @@ export const environment = {
 
   intervalStatus: 2500,
   intervalStatusMax: 60000 * 9.5,
-  test: {
-    username: 'username',
-    password: 'password'
-  }
+  wskey: 'api2demo'
 };
