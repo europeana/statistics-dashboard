@@ -145,12 +145,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.subs.push(
       combineLatest(this.route.params, this.route.queryParams).subscribe(
         (params) => {
-          console.log(params);
-          console.log(JSON.stringify(params));
           if (params[0].facet) {
             this.form.controls.facetParameter.setValue(params[0].facet);
           }
+
           const combinedParams = {};
+
           if (params.length > 1) {
             params.slice(1).forEach((ob) => {
               Object.keys(ob).forEach((s: string) => {
@@ -202,7 +202,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     let filterParam = Object.keys(this.queryParams)
       .map((key: string) => {
         const innerRes = [];
-        const values = `${this.queryParams[key]}`.split(',');
+        const values = this.queryParams[key];
 
         if (!nonFilterQPs.includes(key)) {
           values.forEach((valPart: string) => {
@@ -311,7 +311,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const checkboxes = this.form.get(name) as FormGroup;
 
     options.forEach((option: string) => {
-      const fName = this.fixName(option);
+      const fName = this.toInputSafeName(option);
       const ctrl = this.form.get(`${name}.${fName}`);
       const defaultValue =
         this.queryParams[name] && this.queryParams[name].includes(option);
@@ -396,19 +396,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return this.validateDateGeneric(control, 'dateTo');
   }
 
-  /** fixName
+  /** toInputSafeName
   /* @param {string} s - the target string
-  /* - removes the dot character from a string
+  /* - replaces the dot character in a string with 5 underscores
   */
-  fixName(s: string): string {
+  toInputSafeName(s: string): string {
     return s.replace(/\./g, '_____');
   }
 
-  /** unfixName
+  /** fromInputSafeName
   /* @param {string} s - the target string
-  /* - removes the dot character from a string
+  /* - replaces the 5 underscore characters in a string with a dot
   */
-  unfixName(s: string): string {
+  fromInputSafeName(s: string): string {
     return s.replace(/_____/g, '.');
   }
 
@@ -546,7 +546,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** getSetCheckboxValues
   /*
-  /* gets the names of the set values in a filter
+  /* gets the values of the set values in a filter
   /*
   /* @param { string? } filterName - the filter to return
   /* @returns Array<string>
@@ -554,10 +554,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   getSetCheckboxValues(filterName: string): Array<string> {
     const checkVals = this.form.value[filterName];
     return checkVals
-      ? Object.keys(checkVals).filter((key: string) => {
-          return checkVals[key];
-        })
+      ? Object.keys(checkVals)
+          .filter((key: string) => {
+            return checkVals[key];
+          })
+          .map(this.fromInputSafeName)
       : [];
+  }
+
+  /** datesClear
+  /* Template utility: removes the date fields from the form and calls updatePageUrl
+  */
+  datesClear(): void {
+    this.form.controls.dateFrom.setValue('');
+    this.form.controls.dateTo.setValue('');
+    this.updatePageUrl();
   }
 
   /** dateChange

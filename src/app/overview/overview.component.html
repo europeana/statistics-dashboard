@@ -46,17 +46,19 @@
                   type="checkbox"
                   [value]="option"
                   (change)="updatePageUrl()"
-                  [formControlName]="fixName(option)"
+                  [formControlName]="toInputSafeName(option)"
                   [attr.disabled]="
                     !selectOptionEnabled(group, option) ? true : null
                   "
                 />
-                {{ option }}
+                {{ option | renameRights }}
               </label>
             </ng-container>
           </fieldset>
         </div>
       </div>
+
+      <!--summary of applied -->
 
       <ng-container *ngIf="!menuStates[group].visible">
         <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
@@ -69,6 +71,29 @@
       </ng-container>
     </li>
   </ng-template>
+
+  <!-- filterRemoval -->
+
+  <ng-template #filterRemoval let-group="group" let-options="options">
+    <ng-container *ngFor="let val of options; let i = index">
+      <li class="rm-filter">
+        <fieldset [formGroupName]="group">
+          <input
+            id="rm_filter_{{ i }}"
+            type="checkbox"
+            (change)="updatePageUrl()"
+            [value]="val"
+            [formControlName]="toInputSafeName(val)"
+          />
+          <label for="rm_filter_{{ i }}">
+            {{ group | renameApiFacet }} : {{ val | renameRights }}
+          </label>
+        </fieldset>
+      </li>
+    </ng-container>
+  </ng-template>
+
+  <!-- End templates / Begin main -->
 
   <div class="statistics-dashboard">
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
@@ -166,7 +191,16 @@
             class="header-data"
             [title]="getFormattedContentTierParam() + getFormattedFacetParam()"
           >
-            By {{ form.value.facetParameter | renameApiFacet }}
+            By
+            <select
+              class="facet-param"
+              formControlName="facetParameter"
+              (change)="updatePageUrl()"
+            >
+              <option *ngFor="let facet of facetConf" [ngValue]="facet">
+                {{ facet | renameApiFacet }}
+              </option>
+            </select>
             <span
               class="svg-icon-spin"
               [ngClass]="{ showing: isLoading }"
@@ -183,19 +217,42 @@
             <a (click)="setIsShowingSearchList(false)">Show Data</a>
           </h3>
         </ng-container>
+
+        <ng-container *ngIf="form.value.dateFrom || form.value.dateTo">
+          <span class="dates">
+            <a
+              (click)="datesClear()"
+              class="date"
+              *ngIf="form.value.dateFrom; let date"
+            >
+              {{ date }}
+            </a>
+            <a
+              (click)="dateChange()"
+              class="date"
+              *ngIf="form.value.dateTo; let date"
+            >
+              {{ date }}
+            </a>
+          </span>
+        </ng-container>
       </div>
 
-      <div class="facet-params">
-        <label *ngFor="let facet of facetConf; let i = index">
-          <input
-            type="radio"
-            value="{{ facet }}"
-            formControlName="facetParameter"
-            (change)="updatePageUrl()"
-          />
-          {{ facet | renameApiFacet }}
-        </label>
-      </div>
+      <!-- DUPLICATE header bar! -->
+
+      <ul class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
+        <ng-container *ngFor="let filter of facetConf">
+          <ng-content
+            *ngTemplateOutlet="
+              filterRemoval;
+              context: {
+                options: getSetCheckboxValues(filter),
+                group: filter
+              }
+            "
+          ></ng-content>
+        </ng-container>
+      </ul>
 
       <ng-container *ngIf="isShowingSearchList">
         <app-listing [showing]="true"></app-listing>

@@ -112,7 +112,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should unfix the name', () => {
-      expect(component.unfixName('_____')).toEqual('.');
+      expect(component.fromInputSafeName('_____')).toEqual('.');
     });
 
     it('should find the facet index', fakeAsync(() => {
