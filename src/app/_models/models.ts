@@ -4,6 +4,10 @@ export interface IHash {
   [details: string]: string;
 }
 
+export interface IHashArray {
+  [details: string]: Array<string>;
+}
+
 export interface MenuState {
   visible: boolean;
   disabled?: boolean;

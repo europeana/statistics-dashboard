@@ -1,8 +1,4 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute, Params } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
-
 import {
   async,
   ComponentFixture,
@@ -10,6 +6,10 @@ import {
   TestBed,
   tick
 } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActivatedRoute, Params } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { BehaviorSubject, of } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import {
@@ -37,7 +37,6 @@ describe('OverviewComponent', () => {
   const tickTime = 1;
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
-  let api: APIService;
   let params: BehaviorSubject<Params>;
 
   const configureTestBed = (errorMode = false, urlParam = null): void => {
@@ -46,7 +45,11 @@ describe('OverviewComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ReactiveFormsModule],
+      imports: [
+        HttpClientTestingModule,
+        ReactiveFormsModule,
+        RouterTestingModule
+      ],
       declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
       providers: [
         { provide: ExportCSVService, useClass: MockExportCSVService },
@@ -57,7 +60,7 @@ describe('OverviewComponent', () => {
         },
         {
           provide: ActivatedRoute,
-          useValue: { params: params }
+          useValue: { params: params, queryParams: of({ COUNTRY: 'Italy' }) }
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -69,7 +72,6 @@ describe('OverviewComponent', () => {
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
     exportPDF = TestBed.inject(ExportPDFService);
-    api = TestBed.inject(APIService);
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
     fixture.detectChanges();
@@ -77,7 +79,7 @@ describe('OverviewComponent', () => {
 
   const setFilterValue1 = (group: string): void => {
     component.form.addControl(group, new FormBuilder().group({}));
-    component.addMenuCheckboxes(group, ['1', '2']);
+    component.addOrUpdateFilterControls(group, ['1', '2']);
     component.form.get(`${group}.1`).setValue(true);
   };
 
@@ -93,7 +95,6 @@ describe('OverviewComponent', () => {
     it('should poll on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
-
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe('COUNTRY');
       expect(component.allFacetData).toBeTruthy();
@@ -130,7 +131,7 @@ describe('OverviewComponent', () => {
       tick(1);
       component.facetConf.forEach((facet: string) => {
         expect(
-          component.getSelectOptions(facet, component.allFacetData).length
+          component.getFilterOptions(facet, component.allFacetData).length
         ).toBeGreaterThan(0);
       });
       component.ngOnDestroy();
@@ -160,15 +161,6 @@ describe('OverviewComponent', () => {
       expect(component.getFormattedDateParam().length).toBeTruthy();
     });
 
-    it('should get the formatted filter param', () => {
-      let param = component.getFormattedFilterParam();
-      expect(param.length).toBeFalsy();
-      setFilterValue1('TYPE');
-      param = component.getFormattedFilterParam();
-      expect(param.length).toBeTruthy();
-      expect(param).toEqual('&qf=TYPE:"1"');
-    });
-
     it('should get the formatted content tier param', () => {
       const fmt = (s: string): string => {
         return `&qf=contentTier:(${encodeURIComponent(s)})`;
@@ -185,7 +177,7 @@ describe('OverviewComponent', () => {
         expectZeroToFour
       );
 
-      component.addMenuCheckboxes('contentTier', ['0', '1', '2']);
+      component.addOrUpdateFilterControls('contentTier', ['0', '1', '2']);
       component.form.get(`contentTier.0`).setValue(true);
 
       expect(component.getFormattedContentTierParam()).toEqual(fmt('0'));
@@ -206,13 +198,13 @@ describe('OverviewComponent', () => {
       });
 
       form.addControl(testName, new FormBuilder().group({}));
-      component.addMenuCheckboxes(testName, testOptions);
+      component.addOrUpdateFilterControls(testName, testOptions);
 
       testOptions.forEach((s: string) => {
         expect(form.get(`${testName}.${s}`)).toBeTruthy();
       });
 
-      component.addMenuCheckboxes(testName, testOptions);
+      component.addOrUpdateFilterControls(testName, testOptions);
 
       testOptions.forEach((s: string) => {
         expect(form.get(`${testName}.${s}`)).toBeTruthy();
@@ -220,12 +212,12 @@ describe('OverviewComponent', () => {
     });
 
     it('should tell if checkbox valueshave been set', () => {
-      expect(component.getCheckboxValuesPresent()).toBeFalsy();
-      expect(component.getCheckboxValuesPresent('TYPE')).toBeFalsy();
-      expect(component.getCheckboxValuesPresent('FAKE')).toBeFalsy();
+      expect(component.isFilterApplied()).toBeFalsy();
+      expect(component.isFilterApplied('TYPE')).toBeFalsy();
+      expect(component.isFilterApplied('FAKE')).toBeFalsy();
       setFilterValue1('TYPE');
-      expect(component.getCheckboxValuesPresent('TYPE')).toBeTruthy();
-      expect(component.getCheckboxValuesPresent()).toBeTruthy();
+      expect(component.isFilterApplied('TYPE')).toBeTruthy();
+      expect(component.isFilterApplied()).toBeTruthy();
     });
 
     it('should get the set checkbox values', () => {
@@ -236,7 +228,7 @@ describe('OverviewComponent', () => {
         'filterContentTier',
         new FormBuilder().group({})
       );
-      component.addMenuCheckboxes('filterContentTier', ['1', '2']);
+      component.addOrUpdateFilterControls('filterContentTier', ['1', '2']);
 
       component.form.get('filterContentTier.1').setValue(true);
       selected = component.getSetCheckboxValues('filterContentTier');
@@ -338,18 +330,6 @@ describe('OverviewComponent', () => {
       expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
     });
 
-    it('should switch the facet', fakeAsync(() => {
-      component.beginPolling();
-      tick(tickTime);
-      expect(component.menuStates['contentTier'].disabled).toBeFalsy();
-      expect(component.menuStates['TYPE'].disabled).toBeFalsy();
-      component.form.get('facetParameter').setValue('TYPE');
-      component.switchFacet('TYPE');
-      expect(component.menuStates['contentTier'].disabled).toBeFalsy();
-      expect(component.menuStates['TYPE'].disabled).toBeTruthy();
-      component.ngOnDestroy();
-    }));
-
     it('should determine if a select option is enabled', () => {
       expect(component.selectOptionEnabled('contentTier', '0')).toBeFalsy();
       component.form.get('contentTierZero').setValue(true);
@@ -373,7 +353,7 @@ describe('OverviewComponent', () => {
 
     it('should toggle the filter menu', () => {
       const gName = 'PROVIDER';
-      component.addMenuCheckboxes(gName, testOptions);
+      component.addOrUpdateFilterControls(gName, testOptions);
       expect(component.menuStates[gName].visible).toBeFalsy();
       component.toggleFilterMenu(gName);
       expect(component.menuStates[gName].visible).toBeTruthy();
@@ -531,14 +511,6 @@ describe('OverviewComponent', () => {
       component.form.value.dateTo = dateDetect;
       expect(component.getUrlRow('X').indexOf(dateDetect)).toBeGreaterThan(-1);
     });
-
-    it('should include the filter selection', () => {
-      const filterDetect = 'TYPE';
-      expect(component.getUrlRow('X').indexOf(filterDetect)).toEqual(-1);
-      setFilterValue1(filterDetect);
-      const newRes = component.getUrlRow('X');
-      expect(newRes.indexOf(filterDetect)).toBeGreaterThan(-1);
-    });
   });
 
   describe('Date handling', () => {
@@ -665,20 +637,5 @@ describe('OverviewComponent', () => {
       expect(spy).toHaveBeenCalled();
       component.ngOnDestroy();
     }));
-
-    it('should be invoked on facet switch', () => {
-      spyOn(component, 'beginPolling').and.callThrough();
-      component.switchFacet('TYPE');
-      expect(component.beginPolling).toHaveBeenCalled();
-    });
-
-    it('should be refreshed', () => {
-      spyOn(api, 'loadAPIData').and.callThrough();
-      component.refresh();
-      expect(api.loadAPIData).not.toHaveBeenCalled();
-      component.beginPolling();
-      component.refresh();
-      expect(api.loadAPIData).toHaveBeenCalled();
-    });
   });
 });

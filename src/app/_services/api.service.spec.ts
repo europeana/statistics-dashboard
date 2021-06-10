@@ -3,6 +3,7 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 import { async, TestBed } from '@angular/core/testing';
+import { environment } from '../../environments/environment';
 import { RawFacet } from '../_models';
 import { APIService } from './';
 
@@ -20,12 +21,12 @@ describe('APIService', () => {
   }));
 
   it('should load the API data', () => {
-    const testUrl = 'http://europeana-api-data';
-    const sub = service.loadAPIData(testUrl).subscribe((res: RawFacet) => {
+    const baseUrl = `${environment.serverAPI}&wskey=${environment.wskey}`;
+    const sub = service.loadAPIData('').subscribe((res: RawFacet) => {
       expect(res).toBeTruthy();
     });
     sub.unsubscribe();
-    http.expectOne(testUrl);
+    http.expectOne(baseUrl);
     http.verify();
   });
 
