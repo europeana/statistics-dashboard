@@ -61,6 +61,14 @@
                   "maximumError": "6mb"
                 }
               ]
+            },
+            "e2e": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.e2e.ts"
+                }
+              ]
             }
           }
         },
@@ -72,6 +80,9 @@
           "configurations": {
             "production": {
               "browserTarget": "statistics-dashboard:build:production"
+            },
+            "e2e": {
+              "browserTarget": "statistics-dashboard:build:e2e"
             }
           }
         },

@@ -48,7 +48,9 @@ describe('OverviewComponent', () => {
       imports: [
         HttpClientTestingModule,
         ReactiveFormsModule,
-        RouterTestingModule
+        RouterTestingModule.withRoutes([
+          { path: '**.*', component: OverviewComponent }
+        ])
       ],
       declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
       providers: [
