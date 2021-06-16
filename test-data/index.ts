@@ -18,9 +18,12 @@ import {
 new (class extends TestDataServer {
   serverName = 'statistics-dashboard';
 
-  getParamMap(route: string): IHashArray {
+  getQueryMap(route: string): IHashArray {
     const params = url.parse(route, true).query;
     const qfMap: IHashArray = {};
+    if (!params || !params['qf']) {
+      return qfMap;
+    }
 
     // function for adding a string to the qf parameter map
     const addToQF = (qf: string): void => {
@@ -39,13 +42,11 @@ new (class extends TestDataServer {
       }
     };
 
-    const paramArray = Array.isArray(params['qf'])
-      ? params['qf']
-      : [params['qf']];
-
-    paramArray.forEach((qf: string) => {
-      addToQF(qf);
-    });
+    (Array.isArray(params['qf']) ? params['qf'] : [params['qf']]).forEach(
+      (qf: string) => {
+        addToQF(qf);
+      }
+    );
 
     return qfMap;
   }
@@ -163,11 +164,10 @@ new (class extends TestDataServer {
       });
     };
 
-    // addCHO... all of them or a subset, depending on filter
+    // Add CHOs: all of them or a subset, depending on filter
 
-    const paramMap = this.getParamMap(request.url as string);
+    const paramMap = this.getQueryMap(request.url as string);
 
-    //if (!params['qf']) {
     if (Object.keys(paramMap).length === 0) {
       allCHOs.forEach((cho: CHO) => {
         addCHO(cho);

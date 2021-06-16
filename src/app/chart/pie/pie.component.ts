@@ -32,7 +32,6 @@ export class PieComponent {
   groupThreshold = 2;
   groupLimit = 10;
   chartRadius = 70;
-  is3D = false;
   isRadial = true;
   labelCutoffPercent = 1.5;
   labelsRadius = 15;
@@ -191,21 +190,15 @@ export class PieComponent {
     this.browserOnly((): void => {
       am4core.useTheme(am4themes_animated);
 
-      if (this.is3D) {
-        this.chart = am4core.create('pie', am4charts.PieChart3D);
-        this.pieSeries = this.chart.series.push(new am4charts.PieSeries3D());
-      } else {
-        this.chart = am4core.create('pie', am4charts.PieChart);
-        this.pieSeries = this.chart.series.push(new am4charts.PieSeries());
+      this.chart = am4core.create('pie', am4charts.PieChart);
+      this.pieSeries = this.chart.series.push(new am4charts.PieSeries());
 
-        if (this.isRadial) {
-          const rgm = new am4core.RadialGradientModifier();
-          rgm.brightnesses.push(-0.8, -0.8, -0.5, 0, -0.5);
-          this.pieSeries.slices.template.fillModifier = rgm;
-          this.pieSeries.slices.template.strokeModifier = rgm;
-          this.pieSeries.slices.template.strokeOpacity = 0.4;
-          this.pieSeries.slices.template.strokeWidth = 0;
-        }
+      if (this.isRadial) {
+        const rgm = new am4core.RadialGradientModifier();
+        rgm.brightnesses.push(-0.8, -0.8, -0.5, 0, -0.5);
+        this.pieSeries.slices.template.fillModifier = rgm;
+        this.pieSeries.slices.template.strokeModifier = rgm;
+        this.pieSeries.slices.template.strokeWidth = 0;
       }
 
       const pieSeries = this.pieSeries;
@@ -235,11 +228,6 @@ export class PieComponent {
           colours[event.target.dataItem.index % colours.length]
         );
       });
-
-      //pieSeries.labels.template.text = "{category}: {value}";
-      //pieSeries.slices.template.stroke = am4core.color('#000');
-      //pieSeries.slices.template.strokeWidth = 1;
-      //pieSeries.slices.template.strokeOpacity = 1;
 
       if (this.showExports) {
         this.chart.exporting.menu = new am4core.ExportMenu();

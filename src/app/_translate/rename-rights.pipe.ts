@@ -5,17 +5,29 @@
 */
 import { Pipe, PipeTransform } from '@angular/core';
 
-const rightsNames: { [key: string]: string } = {
-  'http://rightsstatements.org/vocab/InC/1.0/': 'In Copyright',
-  'http://creativecommons.org/publicdomain/zero/1.0/': 'CC0 1.0 Universal',
-  'http://creativecommons.org/licenses/by-nc-nd/4.0/': 'CC BY-NC-ND 4.0'
-};
+import { IHash } from '../_models';
+import { APIService } from '../_services';
 
 @Pipe({
   name: 'renameRights'
 })
 export class RenameRightsPipe implements PipeTransform {
+  rightsNames: IHash;
+
+  constructor(private api: APIService) {
+    this.rightsNames = api.loadRightsStatements();
+  }
   transform(value: string): string {
-    return rightsNames[value] || value;
+    const replaced =
+      this.rightsNames[
+        value
+          .replace(/http(s)?:/, '')
+          .split('?')[0]
+          .replace(/[\/]$/, '')
+      ];
+    if (replaced) {
+      return replaced.split('?')[0].trim();
+    }
+    return value;
   }
 }

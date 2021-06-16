@@ -191,19 +191,12 @@
       />Label cut-off (%)</label
     >
 
-    <label [ngClass]="{ disabled: is3D }"
+    <label
       ><input
         type="checkbox"
         [(ngModel)]="isRadial"
         (change)="applySettings(true)"
       />Radial</label
-    >
-    <label [ngClass]="{ disabled: isRadial }"
-      ><input
-        type="checkbox"
-        [(ngModel)]="is3D"
-        (change)="applySettings(true)"
-      />3D</label
     >
     <label
       ><input

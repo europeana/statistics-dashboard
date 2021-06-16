@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { SubscriptionManager } from '../subscription-manager/subscription.manager';
+import { facetNames } from '../_data';
 import { Facet, FacetField, IdValue, NameValue, RawFacet } from '../_models';
 import { APIService } from '../_services';
 
@@ -10,16 +11,7 @@ import { APIService } from '../_services';
 })
 export class SplashComponent extends SubscriptionManager {
   barColour = '#0771ce';
-  facetNames = [
-    'contentTier',
-    'COUNTRY',
-    'DATA_PROVIDER',
-    'metadataTier',
-    'PROVIDER',
-    'RIGHTS',
-    'TYPE'
-  ];
-  facetParam = this.facetNames
+  facetParam = facetNames
     .map((s: string) => {
       return `&facet=${s}`;
     })

@@ -3,28 +3,21 @@ import { ChartSettings } from '../_models';
 export const BarChartDefaults: ChartSettings = {
   configurable: false,
   ctrlsOpen: false,
-  hasLines: true,
   hasScroll: false,
-  is3D: false,
   isCylindrical: false,
   isHorizontal: true,
   labelTruncate: false,
-  labelWrap: false,
-  maxLabelWidth: 250,
+  labelWrap: true,
+  maxLabelWidth: 150,
   prefixValueAxis: null,
   showExports: false,
-  strokeColour: '#000',
-  strokeOpacity: 1.0,
-  strokeWidth: 0,
   chartLegend: false // used to set class 'offscreen'
 };
 
 export const BarChartCool: ChartSettings = {
-  configurable: true,
-  hasLines: true,
+  configurable: false,
   hasScroll: true,
-  is3D: true,
   isHorizontal: true,
   maxLabelWidth: 250,
-  showExports: true
+  showExports: false
 };
