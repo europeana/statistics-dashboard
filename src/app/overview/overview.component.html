@@ -79,13 +79,13 @@
       <li class="rm-filter">
         <fieldset [formGroupName]="group">
           <input
-            id="rm_filter_{{ i }}"
+            id="rm_filter_{{ group }}_{{ i }}"
             type="checkbox"
             (change)="updatePageUrl()"
             [value]="val"
             [formControlName]="toInputSafeName(val)"
           />
-          <label for="rm_filter_{{ i }}">
+          <label for="rm_filter_{{ group }}_{{ i }}">
             {{ group | renameApiFacet }} : {{ val | renameRights }}
           </label>
         </fieldset>
@@ -219,7 +219,7 @@
         </ng-container>
 
         <ng-container *ngIf="form.value.dateFrom || form.value.dateTo">
-          <span class="dates">
+          <span class="date-removal">
             <a
               (click)="datesClear()"
               class="date"
@@ -238,9 +238,7 @@
         </ng-container>
       </div>
 
-      <!-- DUPLICATE header bar! -->
-
-      <ul class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
+      <ul class="rm-filters" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngFor="let filter of facetConf">
           <ng-content
             *ngTemplateOutlet="

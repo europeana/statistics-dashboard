@@ -26,6 +26,7 @@ export class BarComponent {
   _results: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
   legendContainer: am4core.Container;
+  preferredNumberBars = 5;
   series: am4charts.ColumnSeries;
   settings = Object.assign({}, BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
@@ -113,7 +114,11 @@ export class BarComponent {
       }
     };
 
-    this.chart.events.on('datavalidated', resizeLegend);
+    this.chart.events.on('datavalidated', () => {
+      resizeLegend();
+      console.log('datavalidated ever called???');
+    });
+
     legend.events.on('datavalidated', resizeLegend);
     this.chart.events.on('maxsizechanged', resizeLegend);
     legend.events.on('maxsizechanged', resizeLegend);
@@ -149,11 +154,6 @@ export class BarComponent {
     this.categoryAxis.renderer.labels.template.truncate =
       this.settings.labelTruncate;
     this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
-
-    const columnTemplate = this.series.columns.template;
-    columnTemplate.stroke = am4core.color(this.settings.strokeColour);
-    columnTemplate.strokeWidth = this.settings.strokeWidth;
-    columnTemplate.strokeOpacity = this.settings.strokeOpacity;
   }
 
   /** createSeries
@@ -161,15 +161,7 @@ export class BarComponent {
   /* - build colour model
   */
   createSeries(): void {
-    if (this.settings.is3D) {
-      if (this.settings.isCylindrical) {
-        this.series = this.chart.series.push(new am4charts.ConeSeries());
-      } else {
-        this.series = this.chart.series.push(new am4charts.ColumnSeries3D());
-      }
-    } else {
-      this.series = this.chart.series.push(new am4charts.ColumnSeries());
-    }
+    this.series = this.chart.series.push(new am4charts.ColumnSeries());
 
     const colours = this.colours;
     this.series.columns.template.events.once('inited', function (event) {
@@ -179,8 +171,15 @@ export class BarComponent {
     });
   }
 
-  zoomTop5(): void {
-    this.categoryAxis.zoomToIndexes(0, 5, false, true);
+  zoomTop(): void {
+    if (this._results.length > this.preferredNumberBars) {
+      this.categoryAxis.zoomToIndexes(
+        this._results.length - this.preferredNumberBars,
+        this._results.length,
+        false,
+        true
+      );
+    }
   }
 
   /** drawChart
@@ -195,8 +194,11 @@ export class BarComponent {
       this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
-      // Create axes
+      this.chart.events.on('ready', () => {
+        this.zoomTop();
+      });
 
+      // Create axes
       this.categoryAxis = new am4charts.CategoryAxis();
       this.valueAxis = new am4charts.ValueAxis();
 
@@ -217,7 +219,9 @@ export class BarComponent {
           '{categoryY}: [bold]{valueX}[/]';
 
         if (this.settings.hasScroll) {
-          chart.scrollbarY = new am4core.Scrollbar();
+          if (this._results.length > this.preferredNumberBars) {
+            chart.scrollbarY = new am4core.Scrollbar();
+          }
         }
         this.valueAxis.paddingRight = 25;
       } else {
@@ -242,10 +246,7 @@ export class BarComponent {
       }
 
       this.categoryAxis.renderer.grid.template.disabled = true;
-
-      if (!this.settings.hasLines) {
-        this.valueAxis.renderer.grid.template.disabled = true;
-      }
+      this.valueAxis.renderer.grid.template.disabled = true;
 
       this.series.columns.template.fillOpacity = 0.8;
       this.chart.data = this._results;

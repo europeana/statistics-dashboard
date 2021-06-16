@@ -8,7 +8,7 @@
 
 $width-left-col: 200px;
 
-.dates {
+.date-removal {
   margin-left: auto;
   .date + .date {
     margin-left: 12px;
@@ -44,11 +44,24 @@ $width-left-col: 200px;
   }
 }
 
+.rm-filters {
+  display: flex;
+  flex-wrap: wrap;
+
+  &.list-mode {
+    display: none;
+  }
+}
+
 .rm-filter {
   background: $gray-lightest;
   color: $gray-med;
-  margin-left: 24px;
+  margin: 4px 0;
   padding: 0 8px;
+
+  &:not(:last-child) {
+    margin-right: 24px;
+  }
 
   fieldset {
     display: flex;
@@ -221,12 +234,12 @@ label {
   }
 }
 
-.loading-modal::after,
-.svg-icon-spin {
+.loading-modal::after {
   background-image: svg-url-icon-spinner(#{$gray-med});
 }
 
 .svg-icon-spin {
+  background-image: svg-url-icon-spinner(#{$stats-blue});
   display: none;
   height: 23px;
   position: absolute;
