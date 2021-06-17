@@ -173,12 +173,7 @@ export class BarComponent {
 
   zoomTop(): void {
     if (this._results.length > this.preferredNumberBars) {
-      this.categoryAxis.zoomToIndexes(
-        this._results.length - this.preferredNumberBars,
-        this._results.length,
-        false,
-        true
-      );
+      this.categoryAxis.zoomToIndexes(0, 5, false, true);
     }
   }
 
