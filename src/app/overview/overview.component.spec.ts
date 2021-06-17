@@ -7,9 +7,9 @@ import {
   tick
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import {
@@ -37,19 +37,25 @@ describe('OverviewComponent', () => {
   const tickTime = 1;
   let exportCSV: ExportCSVService;
   let exportPDF: ExportPDFService;
-  let params: BehaviorSubject<Params>;
+  const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
+  const queryParams = new BehaviorSubject({ COUNTRY: 'Italy' } as Params);
 
-  const configureTestBed = (errorMode = false, urlParam = null): void => {
-    params = new BehaviorSubject(
-      (urlParam ? { facet: urlParam } : {}) as Params
-    );
+  let api: APIService;
 
+  const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
-          { path: '**.*', component: OverviewComponent }
+          { path: 'data/contentTier', component: OverviewComponent },
+          { path: 'data/COUNTRY', component: OverviewComponent },
+          { path: 'data/COUNTRY?TYPE=TEXT', component: OverviewComponent },
+          {
+            path: 'data/COUNTRY?TYPE=TEXT&TYPE=VIDEO',
+            component: OverviewComponent
+          },
+          { path: 'data/TYPE', component: OverviewComponent }
         ])
       ],
       declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
@@ -62,11 +68,13 @@ describe('OverviewComponent', () => {
         },
         {
           provide: ActivatedRoute,
-          useValue: { params: params, queryParams: of({ COUNTRY: 'Italy' }) }
+          useValue: { params: params, queryParams: queryParams }
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
+
+    api = TestBed.inject(APIService);
   };
 
   const b4Each = (): void => {
@@ -87,11 +95,12 @@ describe('OverviewComponent', () => {
 
   describe('Route Parameter', () => {
     beforeEach(async(() => {
-      configureTestBed(false, 'COUNTRY');
+      configureTestBed(false);
     }));
 
     beforeEach(() => {
       b4Each();
+      params.next({ facet: 'COUNTRY' });
     });
 
     it('should poll on initialisation', fakeAsync(() => {
@@ -112,6 +121,28 @@ describe('OverviewComponent', () => {
     beforeEach(() => {
       b4Each();
     });
+
+    it('should load selectively', fakeAsync(() => {
+      spyOn(api, 'loadAPIData').and.callThrough();
+
+      params.next({ facet: 'COUNTRY' });
+      tick(1);
+      fixture.detectChanges();
+      expect(api.loadAPIData).toHaveBeenCalledTimes(1);
+
+      params.next({ facet: 'TYPE' });
+      tick(1);
+      fixture.detectChanges();
+      expect(api.loadAPIData).toHaveBeenCalledTimes(1);
+
+      queryParams.next({ TYPE: ['SOUND', 'VIDEO'] });
+      tick(1);
+      fixture.detectChanges();
+
+      expect(api.loadAPIData).toHaveBeenCalledTimes(2);
+
+      component.ngOnDestroy();
+    }));
 
     it('should unfix the name', () => {
       expect(component.fromInputSafeName('_____')).toEqual('.');
@@ -390,17 +421,6 @@ describe('OverviewComponent', () => {
       expect(component.chartOptionsOpen).toBeFalsy();
       expect(component.downloadOptionsOpen).toBeFalsy();
     });
-
-    it('should extract data as a percent', fakeAsync(() => {
-      component.beginPolling();
-      tick(tickTime);
-      component.chartData = component.extractChartData();
-      expect(component.chartData[0].value).toEqual(17050500);
-      component.form.value.showPercent = true;
-      component.chartData = component.extractChartData();
-      expect(component.chartData[0].value).toEqual(50.2);
-      component.ngOnDestroy();
-    }));
 
     it('should close the filters', fakeAsync(() => {
       component.beginPolling();

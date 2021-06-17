@@ -36,16 +36,33 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+To run the unit tests in development (watch mode):
 
-<!---
-## Running end-to-end tests
+    npm run test:dev
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
--->
+
+### E2E tests (development)
+
+To run the cypress tests:
+
+    npm run test:e2e
+
+
+To run the cypress tests in development (watch mode), start the dev server in one terminal window:
+
+    npm run start:ci
+
+...start the dev data server in another terminal window:
+
+    npm run start:ci-data
+
+...and then run cypress in another window:
+
+    npm run cypress
 
 ## Deploy
 
 We use jenkins to deploy. Make sure you can access [https://jenkins.eanadev.org/](https://jenkins.eanadev.org/) and use the following jobs:
 
-- `develop_deploy-test_metis-ui-angular_bluemix`
+- `statistics-dashboard-test`
+- `statistics-dashboard-acceptance`

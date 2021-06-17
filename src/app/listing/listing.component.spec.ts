@@ -73,14 +73,6 @@ describe('ListingComponent', () => {
       expect(component.setDataProviders).not.toHaveBeenCalled();
     }));
 
-    it('should show and hide 2', fakeAsync(() => {
-      const providerDatum = getProvderDatum();
-      component.dataProviderData = [providerDatum];
-      providerDatum.dataProviders = null;
-      component.showHide(providerDatum.name, false);
-      tick(1);
-    }));
-
     it('should clear the force flag', fakeAsync(() => {
       const providerDatum = getProvderDatum();
       component.dataProviderData = [providerDatum];
