@@ -195,7 +195,7 @@
             <select
               class="facet-param"
               formControlName="facetParameter"
-              (change)="updatePageUrl()"
+              (change)="switchFacet()"
             >
               <option *ngFor="let facet of facetConf" [ngValue]="facet">
                 {{ facet | renameApiFacet }}

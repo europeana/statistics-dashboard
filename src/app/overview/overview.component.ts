@@ -9,6 +9,7 @@ import {
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import {
   ColumnMode,
@@ -142,35 +143,42 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   ngOnInit(): void {
     this.subs.push(
-      combineLatest(this.route.params, this.route.queryParams).subscribe(
-        (params) => {
-          if (params[0].facet) {
-            this.form.controls.facetParameter.setValue(params[0].facet);
-          }
+      combineLatest(this.route.params, this.route.queryParams)
+        .pipe(
+          map((results) => {
+            const qp = results[1];
+            const qpValArrays = {};
 
-          const combinedParams = {};
-
-          if (params.length > 1) {
-            params.slice(1).forEach((ob) => {
-              Object.keys(ob).forEach((s: string) => {
-                combinedParams[s] = Array.isArray(ob[s]) ? ob[s] : [ob[s]];
-              });
+            Object.keys(qp).forEach((s: string) => {
+              qpValArrays[s] = Array.isArray(qp[s]) ? qp[s] : [qp[s]];
             });
+
+            return {
+              params: results[0],
+              queryParams: qpValArrays
+            };
+          })
+        )
+        .subscribe((combined) => {
+          const params = combined.params;
+          const queryParams = combined.queryParams;
+          const loadNeeded =
+            !this.allFacetData ||
+            JSON.stringify(queryParams) !== JSON.stringify(this.queryParams);
+
+          if (params.facet) {
+            this.form.controls.facetParameter.setValue(params.facet);
           }
 
-          //  TODO: stop using combine:
-          //      facet change should load only if it isn't present
-          //      (filters load on every qp change)
-          //  so no need to refresh on facet switch
-
-          this.queryParams = combinedParams;
+          this.queryParams = queryParams;
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetNameInputToQueryParam();
 
-          this.urlChanged();
-        }
-      )
+          if (loadNeeded) {
+            this.triggerLoad();
+          }
+        })
     );
   }
 
@@ -254,6 +262,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         rawResult.facets
       );
 
+      if (this.selFacetIndex < 0) {
+        console.error('unreadable data');
+        return;
+      }
+
       // initialise filterData and add checkboxes
       this.facetConf.forEach((name: string) => {
         const filterOps = this.getFilterOptions(name, rawResult.facets);
@@ -294,42 +307,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           fnCallback();
         }
       }
-      /*
-      (rawResult: RawFacet) => {
-        this.isLoading = false;
-
-        if (rawResult.facets) {
-          this.selFacetIndex = this.findFacetIndex(
-            this.form.value.facetParameter,
-            rawResult.facets
-          );
-
-          // initialise filterData and add checkboxes
-          this.facetConf.forEach((name: string) => {
-            const filterOps = this.getFilterOptions(name, rawResult.facets);
-            this.filterData[name] = filterOps;
-            this.addOrUpdateFilterControls(name, filterOps);
-          });
-
-          this.allFacetData = rawResult.facets;
-          this.totalResults = rawResult.totalResults;
-
-          // set pie and table data
-          this.chartData = this.extractChartData();
-          this.extractTableData();
-        } else {
-          this.totalResults = 0;
-          this.chartData = [];
-          this.tableData = {
-            columns: this.columnNames,
-            tableRows: []
-          };
-        }
-        if (fnCallback) {
-          fnCallback();
-        }
-      }
-      */
     ).getPollingSubject();
   }
 
@@ -693,12 +670,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
-  urlChanged(): void {
-    const onDataReady = (refresh = false): void => {
-      this.enableFilters();
-      this.menuStates[this.form.value['facetParameter']].disabled = true;
-      this.setIsShowingSearchList(false);
+  updateMenuAvailability(): void {
+    this.enableFilters();
+    this.menuStates[this.form.value['facetParameter']].disabled = true;
+    this.setIsShowingSearchList(false);
+  }
 
+  /** triggerLoad
+  /* invokes beginPolling or triggers a data refresh
+  /* calls updateMenuAvailability once data is loaded
+  **/
+  triggerLoad(): void {
+    const onDataReady = (refresh = false): void => {
+      this.updateMenuAvailability();
       if (refresh) {
         this.pollRefresh.next(true);
       }
@@ -710,21 +694,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }
   }
 
-  /* TODO: on select change... once params and query params are handled separately
+  /** switchFacet
+  /* UI soft-refresh: re-process data / update menus / update page url
+  **/
   switchFacet(): void {
     // re-process currently-loaded data
     this.processResult({
       facets: this.allFacetData,
       totalResults: this.totalResults
     });
-
-    // update filters and url
-    this.enableFilters();
-    this.menuStates[this.form.value['facetParameter']].disabled = true;
-
+    this.updateMenuAvailability();
     this.updatePageUrl();
   }
-  */
 
   selectOptionEnabled(group: string, val: string): boolean {
     return val === '0' && group === 'contentTier'
