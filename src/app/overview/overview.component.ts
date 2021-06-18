@@ -19,6 +19,7 @@ import {
 
 import { environment } from '../../environments/environment';
 import { BarChartCool } from '../chart/chart-defaults';
+import { BarComponent } from '../chart';
 
 import {
   ExportType,
@@ -45,7 +46,7 @@ import { DataPollingComponent } from '../data-polling';
 export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('dataTable') dataTable: DatatableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
-  @ViewChild('pieChart') pieChart: ElementRef;
+  @ViewChild(BarComponent) barChart: BarComponent;
   @ViewChild('canvas') canvas: ElementRef;
   @ViewChild('dateFrom') dateFrom: ElementRef;
   @ViewChild('dateTo') dateTo: ElementRef;
@@ -59,7 +60,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .split('T')[0];
   totalResults = 0;
 
-  chartTypes = ['Bar', 'Pie', 'Gauge'];
   columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
@@ -80,39 +80,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .fill(0)
     .map((x, index) => `${x + index}`);
 
-  colours = [
-    '#1676AA',
-    '#37B98B',
-    '#E11D53',
-    '#7F3978',
-    '#D43900',
-    '#FFAE00',
-    '#F22F24',
-    '#D43900',
-    '#E11D53',
-    '#37B98B',
-    '#4BC0F0',
-    '#1676AA',
-    '#7F3978'
-  ];
-
-  colorScheme = {
-    domain: this.colours
-  };
-
   ColumnMode = ColumnMode;
 
   pollRefresh: Subject<boolean>;
 
   form: FormGroup;
 
-  chartOptionsOpen = false;
   downloadOptionsOpen = false;
   isShowingSearchList = false;
 
   showBar = true;
-  showPie = false;
-  showGauge = false;
   isLoading = false;
 
   selFacetIndex = 0;
@@ -192,11 +169,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       );
       this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
-      this.pdf
-        .getChartAsImageUrl(this.canvas, this.pieChart)
-        .then((imgUrl: string) => {
-          this.pdf.download(this.tableData, imgUrl);
-        });
+      this.barChart.getSvgData().then((imgUrl: string) => {
+        this.pdf.download(this.tableData, imgUrl);
+      });
     }
     return false;
   }
@@ -278,7 +253,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.totalResults = rawResult.totalResults;
 
       // set pie and table data
-      this.chartData = this.extractChartData();
+      this.extractChartData();
       this.extractTableData();
     } else {
       this.totalResults = 0;
@@ -352,7 +327,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       facetParameter: [],
       contentTierZero: [false],
       showPercent: [false],
-      chartType: [this.chartTypes[0]],
       datasetName: [''],
       dateFrom: ['', this.validateDateFrom.bind(this)],
       dateTo: ['', this.validateDateTo.bind(this)]
@@ -731,18 +705,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { number } facetIndex - the index of the facet to use
   /* @returns Array<NameValue>
   */
-  extractChartData(facetIndex = this.selFacetIndex): Array<NameValue> {
+  extractChartData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allFacetData[facetIndex].fields;
     const total = this.getCountTotal(facetFields);
-    return facetFields.map((f: FacetField) => {
-      const val = this.form.value.showPercent
-        ? parseFloat(((f.count / total) * 100).toFixed(2))
-        : f.count;
-      return {
-        name: f.label,
-        value: val
-      };
-    });
+    this.chartData = facetFields
+      .slice(0, 5)
+      .reverse()
+      .map((f: FacetField) => {
+        const val = this.form.value.showPercent
+          ? parseFloat(((f.count / total) * 100).toFixed(2))
+          : f.count;
+        return {
+          name: f.label,
+          value: val
+        };
+      });
   }
 
   /** clearFilter
@@ -777,35 +754,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.menuStates[filterName].visible = !this.menuStates[filterName].visible;
   }
 
-  toggleChartOptions(): void {
-    this.downloadOptionsOpen = false;
-    this.chartOptionsOpen = !this.chartOptionsOpen;
-  }
-
   toggleDownloadOptions(): void {
-    this.chartOptionsOpen = false;
     this.downloadOptionsOpen = !this.downloadOptionsOpen;
   }
 
   closeDisplayOptions(): void {
-    this.chartOptionsOpen = false;
     this.downloadOptionsOpen = false;
-  }
-
-  switchChartType(): void {
-    if (this.form.value.chartType === 'Bar') {
-      this.showPie = false;
-      this.showBar = true;
-      this.showGauge = false;
-    } else if (this.form.value.chartType === 'Gauge') {
-      this.showPie = false;
-      this.showBar = false;
-      this.showGauge = true;
-    } else if (this.form.value.chartType === 'Pie') {
-      this.showPie = true;
-      this.showBar = false;
-      this.showGauge = false;
-    }
   }
 
   /* extractTableData

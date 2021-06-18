@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ClickOutsideModule } from 'ng-click-outside';
 
@@ -14,7 +13,7 @@ import { AppComponent } from './app.component';
 
 import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
 
-import { BarComponent, MapComponent, PieComponent } from './chart';
+import { BarComponent, MapComponent } from './chart';
 import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
 
@@ -32,7 +31,6 @@ import { TruncateComponent } from './truncate';
     ListingComponent,
     MapComponent,
     OverviewComponent,
-    PieComponent,
     RenameApiFacetPipe,
     RenameRightsPipe,
     SplashComponent,
@@ -47,7 +45,6 @@ import { TruncateComponent } from './truncate';
     HttpClientModule,
     ReactiveFormsModule,
     ClickOutsideModule,
-    NgxChartsModule,
     NgxDatatableModule
   ],
   providers: [],

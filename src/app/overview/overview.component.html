@@ -95,7 +95,7 @@
 
   <!-- End templates / Begin main -->
 
-  <div class="statistics-dashboard">
+  <div class="statistics-dashboard fit-to-page">
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <h3 class="filters-header">Filters</h3>
@@ -376,43 +376,20 @@
         </ngx-datatable-footer>
       </ngx-datatable>
 
+      <label style="display: inline-block"
+        ><input
+          type="checkbox"
+          formControlName="showPercent"
+          (change)="extractChartData()"
+        />As percentages</label
+      >
+
       <ul
         *ngIf="allFacetData"
         class="options-wrapper"
         [ngClass]="{ showing: !isShowingSearchList }"
         (clickOutside)="closeDisplayOptions()"
       >
-        <li class="dropdown">
-          <a
-            class="menu-opener"
-            (click)="toggleChartOptions()"
-            [ngClass]="{ open: chartOptionsOpen }"
-            ><h3>Charts</h3></a
-          >
-          <div *ngIf="chartOptionsOpen" class="dropdown-wrapper">
-            <div class="dropdown-content">
-              <div class="chart-settings">
-                <label *ngFor="let chartType of chartTypes; let i = index">
-                  <input
-                    type="radio"
-                    value="{{ chartType }}"
-                    (change)="switchChartType()"
-                    formControlName="chartType"
-                  />
-                  {{ chartType }}
-                </label>
-                <label
-                  ><input
-                    type="checkbox"
-                    formControlName="showPercent"
-                    (change)="extractChartData()"
-                  />%</label
-                >
-              </div>
-            </div>
-          </div>
-        </li>
-
         <li>
           <a #downloadAnchor></a>
         </li>
@@ -438,58 +415,16 @@
         *ngIf="chartData"
         class="chart-wrapper"
         [ngClass]="{ showing: !isShowingSearchList }"
-        id="pieChart"
-        #pieChart
+        id="barChart"
+        #barChart
       >
-        <app-pie-chart
-          *ngIf="showPie"
-          [colours]="colours"
-          [results]="chartData"
-        ></app-pie-chart>
-
-        <div *ngIf="showPie" style="height: 4em"></div>
-
-        <ngx-charts-pie-chart
-          *ngIf="showPie"
-          [scheme]="colorScheme"
-          [results]="chartData"
-          [gradient]="true"
-          [legend]="false"
-          [labels]="true"
-          [doughnut]="false"
-        >
-        </ngx-charts-pie-chart>
-
         <app-bar-chart
           *ngIf="showBar"
-          [colours]="colours"
+          [showPercent]="form.value.showPercent"
           [extraSettings]="BarChartCool"
           [results]="chartData"
         ></app-bar-chart>
-
-        <div *ngIf="showBar" style="height: 4em"></div>
-
-        <ngx-charts-bar-vertical
-          *ngIf="showBar"
-          [scheme]="colorScheme"
-          [results]="chartData"
-          [gradient]="true"
-          [xAxis]="true"
-          [yAxis]="true"
-          [legend]="false"
-          [showXAxisLabel]="true"
-          [showYAxisLabel]="true"
-        ></ngx-charts-bar-vertical>
-
-        <ngx-charts-gauge
-          *ngIf="showGauge"
-          [scheme]="colorScheme"
-          [results]="chartData"
-          [legend]="false"
-          [legendPosition]="'below'"
-        ></ngx-charts-gauge>
       </div>
-      <img style="display: none" #canvas />
     </div>
   </div>
 </form>

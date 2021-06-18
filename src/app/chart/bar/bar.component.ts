@@ -25,6 +25,7 @@ export class BarComponent {
   private chart: am4charts.XYChart;
   _results: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
+  colours = ['#0a72cc'];
   legendContainer: am4core.Container;
   preferredNumberBars = 5;
   series: am4charts.ColumnSeries;
@@ -32,7 +33,7 @@ export class BarComponent {
   valueAxis: am4charts.ValueAxis;
 
   @Input() chartId = 'barChart';
-  @Input() colours: Array<string>;
+  @Input() showPercent: boolean;
   @Input() set results(results: Array<NameValue>) {
     this._results = results;
     if (this.chart) {
@@ -162,6 +163,7 @@ export class BarComponent {
   */
   createSeries(): void {
     this.series = this.chart.series.push(new am4charts.ColumnSeries());
+    this.series.calculatePercent = true;
 
     const colours = this.colours;
     this.series.columns.template.events.once('inited', function (event) {
@@ -177,6 +179,11 @@ export class BarComponent {
     }
   }
 
+  getSvgData(): Promise<string> {
+    this.chart.exporting.useWebFonts = false;
+    return this.chart.exporting.getImage('png');
+  }
+
   /** drawChart
   /* - instantiates chart and axes according to rotation
   /* - assigns data
@@ -189,16 +196,14 @@ export class BarComponent {
       this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
-      this.chart.events.on('ready', () => {
-        this.zoomTop();
-      });
-
       // Create axes
       this.categoryAxis = new am4charts.CategoryAxis();
       this.valueAxis = new am4charts.ValueAxis();
 
       this.valueAxis.numberFormatter = new am4core.NumberFormatter();
-      this.valueAxis.numberFormatter.numberFormat = '#.0a';
+      this.valueAxis.numberFormatter.numberFormat = this.showPercent
+        ? '#.0a%'
+        : '#.0a';
 
       this.categoryAxis.dataFields.category = 'name';
 
@@ -210,8 +215,9 @@ export class BarComponent {
 
         this.series.dataFields.valueX = 'value';
         this.series.dataFields.categoryY = 'name';
-        this.series.columns.template.tooltipText =
-          '{categoryY}: [bold]{valueX}[/]';
+        this.series.columns.template.tooltipText = this.showPercent
+          ? '{categoryY}: [bold]{valueX.percent}%[/]'
+          : '{categoryY}: [bold]{valueX}[/]';
 
         if (this.settings.hasScroll) {
           if (this._results.length > this.preferredNumberBars) {

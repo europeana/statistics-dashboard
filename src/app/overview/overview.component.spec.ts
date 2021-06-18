@@ -7,7 +7,7 @@ import {
   tick
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -21,12 +21,11 @@ import {
   createMockPipe,
   MockAPIService,
   MockAPIServiceErrors,
-  MockExportCSVService,
-  MockExportPDFService
+  MockExportCSVService
 } from '../_mocked';
 import { ExportType } from '../_models';
-import { APIService, ExportCSVService, ExportPDFService } from '../_services';
-
+import { APIService, ExportCSVService } from '../_services';
+import { BarComponent } from '../chart';
 import { OverviewComponent } from './overview.component';
 
 describe('OverviewComponent', () => {
@@ -36,7 +35,6 @@ describe('OverviewComponent', () => {
   const testOptions = ['option_1', 'option_2'];
   const tickTime = 1;
   let exportCSV: ExportCSVService;
-  let exportPDF: ExportPDFService;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({ COUNTRY: 'Italy' } as Params);
 
@@ -61,7 +59,6 @@ describe('OverviewComponent', () => {
       declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
       providers: [
         { provide: ExportCSVService, useClass: MockExportCSVService },
-        { provide: ExportPDFService, useClass: MockExportPDFService },
         {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
@@ -81,7 +78,6 @@ describe('OverviewComponent', () => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
-    exportPDF = TestBed.inject(ExportPDFService);
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
     fixture.detectChanges();
@@ -147,6 +143,17 @@ describe('OverviewComponent', () => {
     it('should unfix the name', () => {
       expect(component.fromInputSafeName('_____')).toEqual('.');
     });
+
+    it('should extract data as a percent', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
+      component.extractChartData(0);
+      expect(component.chartData[0].value).toEqual(16916984);
+      component.form.value.showPercent = true;
+      component.extractChartData(0);
+      expect(component.chartData[0].value).toEqual(49.8);
+      component.ngOnDestroy();
+    }));
 
     it('should find the facet index', fakeAsync(() => {
       component.beginPolling();
@@ -392,33 +399,17 @@ describe('OverviewComponent', () => {
       expect(component.menuStates[gName].visible).toBeTruthy();
     });
 
-    it('should toggle the chart options', () => {
-      component.downloadOptionsOpen = true;
-      component.chartOptionsOpen = true;
-      component.toggleChartOptions();
-      expect(component.downloadOptionsOpen).toBeFalsy();
-      expect(component.chartOptionsOpen).toBeFalsy();
-      component.toggleChartOptions();
-      expect(component.downloadOptionsOpen).toBeFalsy();
-      expect(component.chartOptionsOpen).toBeTruthy();
-    });
-
     it('should toggle the download options', () => {
-      component.chartOptionsOpen = true;
       component.downloadOptionsOpen = true;
       component.toggleDownloadOptions();
-      expect(component.chartOptionsOpen).toBeFalsy();
       expect(component.downloadOptionsOpen).toBeFalsy();
       component.toggleDownloadOptions();
-      expect(component.chartOptionsOpen).toBeFalsy();
       expect(component.downloadOptionsOpen).toBeTruthy();
     });
 
     it('should close the display options', () => {
-      component.chartOptionsOpen = true;
       component.downloadOptionsOpen = true;
       component.closeDisplayOptions();
-      expect(component.chartOptionsOpen).toBeFalsy();
       expect(component.downloadOptionsOpen).toBeFalsy();
     });
 
@@ -453,40 +444,6 @@ describe('OverviewComponent', () => {
       expect(component.menuStates[exception].visible).toBeTruthy();
       component.ngOnDestroy();
     }));
-
-    it('should switch the chart type', () => {
-      expect(component.showBar).toBeTruthy();
-
-      component.form.get('chartType').setValue('Bar');
-      component.switchChartType();
-      expect(component.showBar).toBeTruthy();
-      expect(component.showPie).toBeFalsy();
-
-      component.form.get('chartType').setValue('Pie');
-      component.switchChartType();
-
-      expect(component.showBar).toBeFalsy();
-      expect(component.showPie).toBeTruthy();
-
-      component.form.get('chartType').setValue('Gauge');
-      component.switchChartType();
-
-      expect(component.showBar).toBeFalsy();
-      expect(component.showGauge).toBeTruthy();
-
-      component.form.get('chartType').setValue('Pie');
-      component.switchChartType();
-
-      expect(component.showPie).toBeTruthy();
-      expect(component.showGauge).toBeFalsy();
-
-      component.form.get('chartType').setValue('X');
-      component.switchChartType();
-
-      expect(component.showBar).toBeFalsy();
-      expect(component.showPie).toBeTruthy();
-      expect(component.showGauge).toBeFalsy();
-    });
   });
 
   describe('Url Generation', () => {
@@ -598,12 +555,13 @@ describe('OverviewComponent', () => {
 
     beforeEach(() => {
       b4Each();
-    });
-
-    it('should export CSV', () => {
-      component.downloadOptionsOpen = true;
-      component.export('X' as ExportType);
-      expect(component.downloadOptionsOpen).toBeFalsy();
+      component.barChart = {
+        getSvgData: () => {
+          return new Promise((resolve) => {
+            resolve('svg');
+          });
+        }
+      } as unknown as BarComponent;
     });
 
     it('should export CSV', fakeAsync(() => {
@@ -619,9 +577,9 @@ describe('OverviewComponent', () => {
     }));
 
     it('should export PDF', () => {
-      spyOn(exportPDF, 'getChartAsImageUrl').and.callThrough();
+      spyOn(component.barChart, 'getSvgData').and.callThrough();
       component.export(ExportType.PDF);
-      expect(exportPDF.getChartAsImageUrl).toHaveBeenCalled();
+      expect(component.barChart.getSvgData).toHaveBeenCalled();
     });
   });
 

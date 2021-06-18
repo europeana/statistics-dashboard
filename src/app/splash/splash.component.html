@@ -31,7 +31,7 @@
         *ngFor="let row of splashData[facetName].slice(0, 8)"
         class="container-h record-list"
       >
-        <app-truncate [text]="row.name"></app-truncate>
+        <app-truncate [text]="row.name | renameRights"></app-truncate>
         <span class="numeric">{{ row.value }}</span>
         <span class="numeric percent">{{
           percent(row.value, totalsData[facetName])
