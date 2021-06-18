@@ -202,7 +202,7 @@ export class BarComponent {
 
       this.valueAxis.numberFormatter = new am4core.NumberFormatter();
       this.valueAxis.numberFormatter.numberFormat = this.showPercent
-        ? '#.0a%'
+        ? '#.'
         : '#.0a';
 
       this.categoryAxis.dataFields.category = 'name';
@@ -257,6 +257,15 @@ export class BarComponent {
           'text',
           (label: string) => {
             return `${this.settings.prefixValueAxis} ${label}`;
+          }
+        );
+      }
+
+      if (this.showPercent) {
+        this.valueAxis.renderer.labels.template.adapter.add(
+          'text',
+          (label: string) => {
+            return `${label}%`;
           }
         );
       }

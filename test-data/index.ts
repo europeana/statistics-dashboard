@@ -2,7 +2,7 @@ import * as url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server';
 import { RawFacet, Facet, FacetField, IHashArray } from '../src/app/_models';
-import { facetNames, STATIC_DATA_RIGHTS } from '../src/app/_data';
+import { facetNames } from '../src/app/_data';
 import {
   CHO,
   CountryDescriptor,
@@ -12,7 +12,8 @@ import {
 import {
   STATIC_COUNTRIES,
   STATIC_DATA_PROVIDERS,
-  STATIC_PROVIDERS
+  STATIC_PROVIDERS,
+  STATIC_RIGHTS
 } from './static-data';
 
 new (class extends TestDataServer {
@@ -80,9 +81,8 @@ new (class extends TestDataServer {
     };
 
     const getRights = (i: number) => {
-      const keys = Object.keys(STATIC_DATA_RIGHTS);
-      const index = i % keys.length;
-      return STATIC_DATA_RIGHTS[keys[index]];
+      const index = i % STATIC_RIGHTS.length;
+      return STATIC_RIGHTS[index];
     };
 
     const types = ['TEXT', 'IMAGE', 'SOUND', 'VIDEO', '3D'];

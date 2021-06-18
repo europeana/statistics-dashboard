@@ -20,11 +20,15 @@ import {
 import { environment } from '../../environments/environment';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
+import { facetNames } from '../_data';
+import { rightsUrlMatch } from '../_helpers';
 
 import {
   ExportType,
   Facet,
   FacetField,
+  FacetFieldProcessed,
+  FacetProcessed,
   FmtTableData,
   HeaderNameType,
   IHashArray,
@@ -63,16 +67,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
-  facetConf = [
-    'contentTier',
-    'metadataTier',
-    'COUNTRY',
-    'TYPE',
-    'RIGHTS',
-    'DATA_PROVIDER',
-    'PROVIDER'
-  ];
-
+  facetConf = facetNames;
   nonFilterQPs = ['content-tier-zero', 'date-from', 'date-to', 'dataset-name'];
 
   menuStates: { [key: string]: MenuState } = {};
@@ -93,7 +88,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   isLoading = false;
 
   selFacetIndex = 0;
-  allFacetData: Array<Facet>;
+  allProcessedFacetData: Array<FacetProcessed>;
 
   chartData: Array<NameValue>;
   tableData: FmtTableData;
@@ -140,7 +135,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           const params = combined.params;
           const queryParams = combined.queryParams;
           const loadNeeded =
-            !this.allFacetData ||
+            !this.allProcessedFacetData ||
             JSON.stringify(queryParams) !== JSON.stringify(this.queryParams);
 
           if (params.facet) {
@@ -181,7 +176,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns string
   */
   getUrl(): string {
-    // filterParam cannot rely on checkbox values as filters aren't built until the allFacetData is initialised
+    // filterParam cannot rely on checkbox values as filters aren't built until the allProcessedFacetData is initialised
 
     let filterParam = Object.keys(this.queryParams)
       .map((key: string) => {
@@ -228,33 +223,40 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.isShowingSearchList = tf;
   }
 
-  processResult(rawResult: RawFacet): void {
-    this.isLoading = false;
-
+  /** processResult
+  /*
+  /* augment raw result data with percent fields
+  /* @returns { boolean } - if valid
+  **/
+  processResult(rawResult: RawFacet): boolean {
     if (rawResult.facets) {
-      this.selFacetIndex = this.findFacetIndex(
-        this.form.value.facetParameter,
-        rawResult.facets
-      );
-
-      if (this.selFacetIndex < 0) {
-        console.error('unreadable data');
-        return;
-      }
-
-      // initialise filterData and add checkboxes
-      this.facetConf.forEach((name: string) => {
-        const filterOps = this.getFilterOptions(name, rawResult.facets);
-        this.filterData[name] = filterOps;
-        this.addOrUpdateFilterControls(name, filterOps);
-      });
-
-      this.allFacetData = rawResult.facets;
       this.totalResults = rawResult.totalResults;
+      this.allProcessedFacetData = new Array(rawResult.facets.length);
 
-      // set pie and table data
-      this.extractChartData();
-      this.extractTableData();
+      rawResult.facets.forEach((f: Facet) => {
+        this.allProcessedFacetData[this.facetConf.indexOf(f.name)] = {
+          name: f.name,
+          fields: f.fields.map((ff: FacetField) => {
+            let labelFormatted = undefined;
+            if (f.name === 'RIGHTS') {
+              const formatted = rightsUrlMatch(ff.label);
+              if (formatted) {
+                labelFormatted = formatted;
+              }
+            }
+
+            return {
+              count: ff.count,
+              label: ff.label,
+              percent: parseFloat(
+                ((ff.count / this.totalResults) * 100).toFixed(2)
+              ),
+              labelFormatted: labelFormatted
+            };
+          })
+        };
+      });
+      return true;
     } else {
       this.totalResults = 0;
       this.chartData = [];
@@ -262,7 +264,36 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         columns: this.columnNames,
         tableRows: []
       };
+      return false;
     }
+  }
+
+  /**
+  /* postProcessResult
+  /*
+  /* handles data-driven UI
+  */
+  postProcessResult(): void {
+    this.selFacetIndex = this.findFacetIndex(
+      this.form.value.facetParameter,
+      this.allProcessedFacetData
+    );
+
+    if (this.selFacetIndex < 0) {
+      console.error('unreadable data');
+      return;
+    }
+
+    // initialise filterData and add checkboxes
+    this.facetConf.forEach((name: string) => {
+      const filterOps = this.getFilterOptions(name, this.allProcessedFacetData);
+      this.filterData[name] = filterOps;
+      this.addOrUpdateFilterControls(name, filterOps);
+    });
+
+    // set pie and table data
+    this.extractChartData();
+    this.extractTableData();
   }
 
   /** beginPolling
@@ -277,7 +308,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         return this.api.loadAPIData(url);
       },
       (rawResult: RawFacet) => {
-        this.processResult(rawResult);
+        this.isLoading = false;
+        if (this.processResult(rawResult)) {
+          this.postProcessResult();
+        }
         if (fnCallback) {
           fnCallback();
         }
@@ -411,7 +445,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param {string} facetName - the name of the facet
   /* @param {Array<Facet>} facetData - the array to search
   */
-  findFacetIndex(facetName: string, facetData: Array<Facet>): number {
+  findFacetIndex(facetName: string, facetData: Array<FacetProcessed>): number {
     return facetData.findIndex((f: Facet) => {
       return f.name === facetName;
     });
@@ -421,7 +455,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param {string} facetName - the name of the facet
   /* returns Array<string> of values for a facet
   */
-  getFilterOptions(facetName: string, facetData: Array<Facet>): Array<string> {
+  getFilterOptions(
+    facetName: string,
+    facetData: Array<FacetProcessed>
+  ): Array<string> {
     const matchIndex = this.findFacetIndex(facetName, facetData);
     return facetData[matchIndex].fields.map((ff: FacetField) => {
       return ff.label;
@@ -673,10 +710,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   **/
   switchFacet(): void {
     // re-process currently-loaded data
-    this.processResult({
-      facets: this.allFacetData,
-      totalResults: this.totalResults
-    });
+    this.postProcessResult();
     this.updateMenuAvailability();
     this.updatePageUrl();
   }
@@ -690,36 +724,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   toggleExpandRow(row: DatatableRowDetailDirective): false {
     this.dataTable.rowDetail.toggleExpandRow(row);
     return false;
-  }
-
-  getCountTotal(facetData: Array<FacetField>): number {
-    let total = 0;
-    facetData.forEach((f: FacetField) => {
-      total += f.count;
-    });
-    return total;
-  }
-
-  /** extractChartData
-  /*
-  /* @param { number } facetIndex - the index of the facet to use
-  /* @returns Array<NameValue>
-  */
-  extractChartData(facetIndex = this.selFacetIndex): void {
-    const facetFields = this.allFacetData[facetIndex].fields;
-    const total = this.getCountTotal(facetFields);
-    this.chartData = facetFields
-      .slice(0, 5)
-      .reverse()
-      .map((f: FacetField) => {
-        const val = this.form.value.showPercent
-          ? parseFloat(((f.count / total) * 100).toFixed(2))
-          : f.count;
-        return {
-          name: f.label,
-          value: val
-        };
-      });
   }
 
   /** clearFilter
@@ -762,24 +766,37 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.downloadOptionsOpen = false;
   }
 
+  /** extractChartData
+  /*
+  /* sets this.chartData
+  /* @param { number } facetIndex - the index of the facet to use
+  */
+  extractChartData(facetIndex = this.selFacetIndex): void {
+    const facetFields = this.allProcessedFacetData[facetIndex].fields;
+    this.chartData = facetFields
+      .slice(0, 5)
+      .reverse()
+      .map((ff: FacetFieldProcessed) => {
+        return {
+          name: ff.labelFormatted ? ff.labelFormatted : ff.label,
+          value: this.form.value.showPercent ? ff.percent : ff.count
+        };
+      });
+  }
+
   /* extractTableData
   /*
-  /* - maps array of FacetField objects to TableRow data
-  /* - calculates percentage
-  /* returns converted data wrapped in a FmtTableData object
-  /*
+  /* sets this.tableData
   */
   extractTableData(): void {
-    const facetData = this.allFacetData[this.selFacetIndex].fields;
-    const total = this.getCountTotal(facetData);
-
+    const facetData = this.allProcessedFacetData[this.selFacetIndex].fields;
     this.tableData = {
       columns: this.columnNames,
-      tableRows: facetData.map((f: FacetField) => {
+      tableRows: facetData.map((ff: FacetFieldProcessed) => {
         return {
-          name: f.label,
-          count: `${f.count}`,
-          percent: `${((f.count / total) * 100).toFixed(2)}%`
+          name: ff.labelFormatted ? ff.labelFormatted : ff.label,
+          count: `${ff.count}`,
+          percent: `${ff.percent}`
         } as TableRow;
       })
     };

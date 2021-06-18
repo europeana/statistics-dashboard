@@ -29,6 +29,10 @@ export interface NameValue {
   value: number;
 }
 
+export interface NameValuePercent extends NameValue {
+  percent: number;
+}
+
 export interface IdValue {
   id: string;
   value: number;
