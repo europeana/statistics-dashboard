@@ -30,7 +30,7 @@ const DataProviderData = [
   }
 ];
 
-const MockAPIData = {
+export const MockAPIData = {
   facets: [
     {
       name: 'contentTier',

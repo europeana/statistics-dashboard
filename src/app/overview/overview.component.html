@@ -2,7 +2,7 @@
   [formGroup]="form"
   class="dashboard-wrapper"
   [ngClass]="{
-    'loading-modal': isLoading && !allFacetData
+    'loading-modal': isLoading && !allProcessedFacetData
   }"
 >
   <!-- templates -->
@@ -119,7 +119,7 @@
             </ul>
           </li>
 
-          <ng-container *ngIf="allFacetData">
+          <ng-container *ngIf="allProcessedFacetData">
             <ng-container *ngFor="let filter of facetConf">
               <ng-content
                 *ngTemplateOutlet="
@@ -207,7 +207,7 @@
             ></span>
           </h3>
         </ng-container>
-        <ng-container *ngIf="allFacetData">
+        <ng-container *ngIf="allProcessedFacetData">
           <h3 class="link-list">
             <a (click)="setIsShowingSearchList(true)" *ngIf="!isLoading"
               >Show List</a
@@ -385,7 +385,7 @@
       >
 
       <ul
-        *ngIf="allFacetData"
+        *ngIf="allProcessedFacetData"
         class="options-wrapper"
         [ngClass]="{ showing: !isShowingSearchList }"
         (clickOutside)="closeDisplayOptions()"

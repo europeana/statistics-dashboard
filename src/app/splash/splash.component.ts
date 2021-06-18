@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
 import { SubscriptionManager } from '../subscription-manager/subscription.manager';
 import { facetNames } from '../_data';
-import { Facet, FacetField, IdValue, NameValue, RawFacet } from '../_models';
+import {
+  Facet,
+  FacetField,
+  IdValue,
+  NameValuePercent,
+  RawFacet
+} from '../_models';
 import { APIService } from '../_services';
 
 @Component({
@@ -17,7 +23,9 @@ export class SplashComponent extends SubscriptionManager {
     })
     .join('');
   isLoading = true;
-  splashData: { [facetName: string]: Array<NameValue> | Array<IdValue> } = {};
+  splashData: {
+    [facetName: string]: Array<NameValuePercent> | Array<IdValue>;
+  } = {};
   totalsData: { [facetName: string]: number } = {};
   url = `?query=*&rows=0&profile=facets${this.facetParam}`;
 
@@ -34,12 +42,6 @@ export class SplashComponent extends SubscriptionManager {
         this.isLoading = false;
 
         rawResult.facets.forEach((f: Facet) => {
-          this.splashData[f.name] = f.fields.map((f: FacetField) => {
-            return {
-              name: f.label,
-              value: f.count
-            };
-          });
           this.totalsData[f.name] = f.fields.reduce(function (
             prev: FacetField,
             curr: FacetField
@@ -49,6 +51,14 @@ export class SplashComponent extends SubscriptionManager {
               count: prev.count + curr.count
             };
           }).count;
+
+          this.splashData[f.name] = f.fields.map((ff: FacetField) => {
+            return {
+              name: ff.label,
+              value: ff.count,
+              percent: this.percent(ff.count, this.totalsData[f.name])
+            };
+          });
         });
       });
     this.subs.push(sub);

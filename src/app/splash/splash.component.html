@@ -14,9 +14,7 @@
       </span>
       <span class="container-v">
         <span>Corresponding percentage</span>
-        <span class="total percent">{{
-          percent(data.value, totalsData[facetName])
-        }}</span>
+        <span class="total percent">{{ data.percent }}</span>
       </span>
     </span>
   </ng-template>
@@ -33,9 +31,7 @@
       >
         <app-truncate [text]="row.name | renameRights"></app-truncate>
         <span class="numeric">{{ row.value }}</span>
-        <span class="numeric percent">{{
-          percent(row.value, totalsData[facetName])
-        }}</span>
+        <span class="numeric percent">{{ row.percent }}</span>
       </div>
     </div>
   </ng-template>

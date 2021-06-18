@@ -19,6 +19,7 @@ import {
 
 import {
   createMockPipe,
+  MockAPIData,
   MockAPIService,
   MockAPIServiceErrors,
   MockExportCSVService
@@ -104,7 +105,7 @@ describe('OverviewComponent', () => {
       tick(1);
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe('COUNTRY');
-      expect(component.allFacetData).toBeTruthy();
+      expect(component.allProcessedFacetData).toBeTruthy();
       component.ngOnDestroy();
     }));
   });
@@ -145,23 +146,20 @@ describe('OverviewComponent', () => {
     });
 
     it('should extract data as a percent', fakeAsync(() => {
-      component.beginPolling();
-      tick(tickTime);
-      component.extractChartData(0);
-      expect(component.chartData[0].value).toEqual(16916984);
-      component.form.value.showPercent = true;
-      component.extractChartData(0);
-      expect(component.chartData[0].value).toEqual(49.8);
-      component.ngOnDestroy();
+      const data = Object.assign({}, MockAPIData);
+      expect(component.allProcessedFacetData).toBeFalsy();
+      component.processResult(data);
+      expect(component.allProcessedFacetData).toBeTruthy();
+      expect(component.allProcessedFacetData[0].fields[0].percent).toBeTruthy();
     }));
 
     it('should find the facet index', fakeAsync(() => {
       component.beginPolling();
       tick(1);
       component.facetConf.forEach((facet: string, i: number) => {
-        expect(component.findFacetIndex(facet, component.allFacetData)).toEqual(
-          i
-        );
+        expect(
+          component.findFacetIndex(facet, component.allProcessedFacetData)
+        ).toEqual(i);
       });
       component.ngOnDestroy();
     }));
@@ -171,7 +169,8 @@ describe('OverviewComponent', () => {
       tick(1);
       component.facetConf.forEach((facet: string) => {
         expect(
-          component.getFilterOptions(facet, component.allFacetData).length
+          component.getFilterOptions(facet, component.allProcessedFacetData)
+            .length
         ).toBeGreaterThan(0);
       });
       component.ngOnDestroy();
