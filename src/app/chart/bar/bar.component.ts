@@ -35,7 +35,9 @@ export class BarComponent {
   @Input() chartId = 'barChart';
   @Input() showPercent: boolean;
   @Input() set results(results: Array<NameValue>) {
-    this._results = results;
+    this._results = this.settings.isHorizontal
+      ? results.slice().reverse()
+      : results;
     if (this.chart) {
       this.chart.data = this._results;
       this.drawChart();
@@ -163,7 +165,6 @@ export class BarComponent {
   */
   createSeries(): void {
     this.series = this.chart.series.push(new am4charts.ColumnSeries());
-    this.series.calculatePercent = true;
 
     const colours = this.colours;
     this.series.columns.template.events.once('inited', function (event) {
@@ -196,6 +197,10 @@ export class BarComponent {
       this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
+      chart.paddingTop = 0;
+      chart.paddingRight = 0;
+      chart.paddingLeft = 0;
+
       // Create axes
       this.categoryAxis = new am4charts.CategoryAxis();
       this.valueAxis = new am4charts.ValueAxis();
@@ -215,9 +220,9 @@ export class BarComponent {
 
         this.series.dataFields.valueX = 'value';
         this.series.dataFields.categoryY = 'name';
-        this.series.columns.template.tooltipText = this.showPercent
-          ? '{categoryY}: [bold]{valueX.percent}%[/]'
-          : '{categoryY}: [bold]{valueX}[/]';
+
+        const labelSuffix = this.showPercent ? '%' : '';
+        this.series.columns.template.tooltipText = `{categoryY}: [bold]{valueX}[/]${labelSuffix}`;
 
         if (this.settings.hasScroll) {
           if (this._results.length > this.preferredNumberBars) {
@@ -246,10 +251,27 @@ export class BarComponent {
         this.categoryAxis.renderer.labels.template.rotation = 270;
       }
 
+      // disable grid lines
       this.categoryAxis.renderer.grid.template.disabled = true;
       this.valueAxis.renderer.grid.template.disabled = true;
 
-      this.series.columns.template.fillOpacity = 0.8;
+      // axis / tick styling
+      this.categoryAxis.renderer.ticks.template.disabled = false;
+      this.categoryAxis.renderer.ticks.template.strokeOpacity = 1;
+      this.categoryAxis.renderer.ticks.template.stroke =
+        am4core.color('#CCC');
+      this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
+      this.categoryAxis.renderer.ticks.template.length = 9;
+
+      this.categoryAxis.renderer.labels.template.fontSize = 12;
+      this.categoryAxis.renderer.labels.template.fontWeight = '600';
+      this.categoryAxis.renderer.labels.template.marginRight = 9;
+      this.categoryAxis.renderer.labels.template.fill =
+        am4core.color('#4D4D4D');
+      this.valueAxis.renderer.labels.template.fontSize = 12;
+      this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
+
+      this.series.columns.template.fillOpacity = 1;
       this.chart.data = this._results;
 
       if (this.settings.prefixValueAxis) {

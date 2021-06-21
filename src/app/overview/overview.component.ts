@@ -234,6 +234,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.allProcessedFacetData = new Array(rawResult.facets.length);
 
       rawResult.facets.forEach((f: Facet) => {
+        const runningTotal = f.fields.reduce(function (
+          a: FacetField,
+          b: FacetField
+        ) {
+          return {
+            label: '',
+            count: a.count + b.count
+          };
+        }).count;
+
         this.allProcessedFacetData[this.facetConf.indexOf(f.name)] = {
           name: f.name,
           fields: f.fields.map((ff: FacetField) => {
@@ -244,13 +254,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                 labelFormatted = formatted;
               }
             }
-
             return {
               count: ff.count,
               label: ff.label,
-              percent: parseFloat(
-                ((ff.count / this.totalResults) * 100).toFixed(2)
-              ),
+              percent: parseFloat(((ff.count / runningTotal) * 100).toFixed(2)),
               labelFormatted: labelFormatted
             };
           })
@@ -773,15 +780,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   extractChartData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
-    this.chartData = facetFields
-      .slice(0, 5)
-      .reverse()
-      .map((ff: FacetFieldProcessed) => {
-        return {
-          name: ff.labelFormatted ? ff.labelFormatted : ff.label,
-          value: this.form.value.showPercent ? ff.percent : ff.count
-        };
-      });
+    this.chartData = facetFields.slice(0, 5).map((ff: FacetFieldProcessed) => {
+      return {
+        name: ff.labelFormatted ? ff.labelFormatted : ff.label,
+        value: this.form.value.showPercent ? ff.percent : ff.count
+      };
+    });
   }
 
   /* extractTableData

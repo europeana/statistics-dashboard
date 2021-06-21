@@ -30,19 +30,28 @@ body {
   width: 100%;
 }
 
-.loading-modal::after {
-  background-color: #000;
-  background-position: center;
-  background-repeat: no-repeat;
+.loading-modal::after,
+.loading-modal::before {
   bottom: 0;
   content: " ";
   display: block;
   left: 0;
-  opacity: 0.4;
   position: fixed;
   right: 0;
-  transform: scale(5);
   top: 0;
+  z-index: 12;
+}
+
+.loading-modal::after {
+  background-image: svg-url-icon-spinner(#{$stats-blue});
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(5);
+}
+
+.loading-modal::before {
+  background-color: #000;
+  opacity: 0.1;
 }
 
 .icon-clear {

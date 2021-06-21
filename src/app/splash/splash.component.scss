@@ -7,6 +7,8 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
+$faint-gray: #828282;
+
 app-truncate {
   overflow: hidden;
 }
@@ -14,7 +16,11 @@ app-truncate {
 .record-list {
   align-items: center;
   border-top: 1px solid #d8d8d8;
-  padding: 14px 0;
+  padding: 4px 0;
+
+  &:last-child {
+    border-bottom: 1px solid #d8d8d8;
+  }
 
   :first-child {
     flex-grow: 1;
@@ -53,7 +59,7 @@ app-bar-chart {
   display: inline-block;
   font-size: 14px;
   font-weight: 600;
-  margin: 2em 0 0 auto;
+  margin: 14px 0 0 auto;
 
   &::after {
     content: " >";
@@ -66,9 +72,10 @@ app-bar-chart {
 }
 
 .data-rows-title {
-  color: #828282;
+  color: $faint-gray;
   font-size: 14px;
-  padding: 16px 0;
+  font-weight: 600;
+  padding: 9px 0 14px 0;
 }
 
 .entry-card {
@@ -87,7 +94,7 @@ app-bar-chart {
   flex-direction: column;
   height: calc(100% - #{$card-header-height});
   justify-content: space-between;
-  padding: 21px 25px;
+  padding: 26px 25px 20px 25px;
 }
 
 .entry-card-header {
@@ -118,9 +125,20 @@ app-bar-chart {
   background-image: svg-url-icon-info(#b7b7b7);
   height: 1em;
   margin-left: 4px;
+  position: relative;
   width: 1em;
   &:hover {
     background-image: svg-url-icon-info($gray-light);
+  }
+
+  // click-target accessibility
+  &::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 32px;
+    left: -8px;
+    top: -4px;
   }
 }
 
@@ -135,16 +153,6 @@ app-bar-chart {
 
 .percent::after {
   content: "%";
-}
-
-.spinner {
-  background: svg-url-icon-spinner($stats-blue) center no-repeat;
-  bottom: 0;
-  left: 0;
-  position: fixed;
-  top: 0;
-  transform: scale(5);
-  right: 0;
 }
 
 .splash-map {
@@ -164,8 +172,13 @@ app-bar-chart {
   line-height: 1.4;
 }
 
+.total-title {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .totals {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 @media (min-width: $bp-desktop) {
