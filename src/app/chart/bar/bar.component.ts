@@ -251,6 +251,9 @@ export class BarComponent {
         this.categoryAxis.renderer.labels.template.rotation = 270;
       }
 
+      // force show all labels
+      this.categoryAxis.renderer.minGridDistance = 30;
+
       // disable grid lines
       this.categoryAxis.renderer.grid.template.disabled = true;
       this.valueAxis.renderer.grid.template.disabled = true;
