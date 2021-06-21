@@ -133,7 +133,7 @@ app-bar-chart {
 
   // click-target accessibility
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     height: 20px;
     width: 32px;

@@ -261,8 +261,7 @@ export class BarComponent {
       // axis / tick styling
       this.categoryAxis.renderer.ticks.template.disabled = false;
       this.categoryAxis.renderer.ticks.template.strokeOpacity = 1;
-      this.categoryAxis.renderer.ticks.template.stroke =
-        am4core.color('#CCC');
+      this.categoryAxis.renderer.ticks.template.stroke = am4core.color('#CCC');
       this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
       this.categoryAxis.renderer.ticks.template.length = 9;
 
