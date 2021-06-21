@@ -39,10 +39,6 @@ describe('SplashComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load data', () => {
-    component.loadData();
-  });
-
   it('should calculate percentages', () => {
     expect(component.percent(5, 10)).toEqual(50);
   });
