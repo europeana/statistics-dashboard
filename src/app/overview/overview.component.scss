@@ -234,10 +234,6 @@ label {
   }
 }
 
-.loading-modal::after {
-  background-image: svg-url-icon-spinner(#{$gray-med});
-}
-
 .svg-icon-spin {
   background-image: svg-url-icon-spinner(#{$stats-blue});
   display: none;
@@ -258,7 +254,7 @@ label {
 
 .icon-clear {
   transform: scale(0.3);
-  transform-origin: -60% 36%;
+  transform-origin: -60% 30%;
 
   // highlight items to remove
   &:hover + .applied-filter-summary li::before {
@@ -285,8 +281,8 @@ label {
   }
 }
 
-.filters-header + .icon-clear {
-  transform-origin: 90% 34%;
+.filters-header .icon-clear {
+  transform-origin: -60% 30%;
 
   // highlight items to remove
   &:hover + .filters .applied-filter-summary {

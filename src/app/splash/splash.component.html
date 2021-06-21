@@ -1,19 +1,24 @@
-<div class="fit-to-page">
-  <ng-template #chartSummary let-facetName="facetName">
+<div
+  class="fit-to-page"
+  [ngClass]="{
+    'loading-modal': isLoading && !splashData['TYPE']
+  }"
+>
+  <ng-template #chartSummary let-facetName="facetName" let-topLabel="topLabel">
     <span
       class="container-h totals"
       *ngIf="splashData[facetName] && splashData[facetName][0]; let data"
     >
       <span class="container-v">
-        <span class="bold">Top tier</span>
+        <span class="total-title bold">Top {{ topLabel }}</span>
         <span class="total bold">{{ data.name }}</span>
       </span>
       <span class="container-v">
-        <span>Top tier records count</span>
+        <span class="total-title">Top {{ topLabel }} records count</span>
         <span class="total">{{ data.value | number }}</span>
       </span>
       <span class="container-v">
-        <span>Corresponding percentage</span>
+        <span class="total-title">Corresponding percentage</span>
         <span class="total percent">{{ data.percent }}</span>
       </span>
     </span>
@@ -37,21 +42,21 @@
   </ng-template>
 
   <div class="container-v">
-    <div class="spinner" *ngIf="isLoading"></div>
-
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="splashData['contentTier']">
         <span class="entry-card-header"
           >Explore by content quality and its licensing<a
             class="info-icon"
-            title="TODO: link to documentation"
+            href="https://pro.europeana.eu/page/edm-documentation"
+            target="_blank"
+            title="Documentation"
           ></a
         ></span>
         <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
               chartSummary;
-              context: { facetName: 'contentTier' }
+              context: { facetName: 'contentTier', topLabel: 'tier' }
             "
           ></ng-content>
           <app-bar-chart
@@ -73,14 +78,16 @@
         <span class="entry-card-header"
           >Explore by metadata quality<a
             class="info-icon"
-            title="TODO: link to documentation"
+            href="https://pro.europeana.eu/share-your-data/metadata"
+            target="_blank"
+            title="Documentation"
           ></a
         ></span>
         <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
               chartSummary;
-              context: { facetName: 'metadataTier' }
+              context: { facetName: 'metadataTier', topLabel: 'tier' }
             "
           ></ng-content>
           <app-bar-chart
@@ -101,12 +108,7 @@
     </div>
 
     <div class="entry-card double-card" *ngIf="splashData['COUNTRY']">
-      <span class="entry-card-header"
-        >Explore by providing countries<a
-          class="info-icon"
-          title="TODO: link to documentation"
-        ></a
-      ></span>
+      <span class="entry-card-header">Explore by providing countries</span>
       <div class="entry-card-content">
         <div *ngIf="splashData['COUNTRY']" class="entry-card-pair">
           <div class="map-container">
@@ -130,15 +132,13 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="splashData['TYPE']">
-        <span class="entry-card-header"
-          >Explore by type of content<a
-            class="info-icon"
-            title="TODO: link to documentation"
-          ></a
-        ></span>
+        <span class="entry-card-header">Explore by type of content</span>
         <div class="entry-card-content">
           <ng-content
-            *ngTemplateOutlet="chartSummary; context: { facetName: 'TYPE' }"
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: 'TYPE', topLabel: 'type' }
+            "
           ></ng-content>
           <app-bar-chart
             *ngIf="splashData['TYPE']"
@@ -158,7 +158,9 @@
         <span class="entry-card-header"
           >Explore by rights statement<a
             class="info-icon"
-            title="TODO: link to documentation"
+            href="https://pro.europeana.eu/page/available-rights-statements"
+            target="_blank"
+            title="Documentation"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -182,12 +184,7 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="splashData['DATA_PROVIDER']">
-        <span class="entry-card-header"
-          >Explore by data provider<a
-            class="info-icon"
-            title="TODO: link to documentation"
-          ></a
-        ></span>
+        <span class="entry-card-header">Explore by data provider</span>
         <div class="entry-card-content">
           <div *ngIf="splashData['DATA_PROVIDER']" class="container-h">
             <ng-content
@@ -206,12 +203,7 @@
         </div>
       </div>
       <div class="entry-card" *ngIf="splashData['PROVIDER']">
-        <span class="entry-card-header"
-          >Explore by provider<a
-            class="info-icon"
-            title="TODO: link to documentation"
-          ></a
-        ></span>
+        <span class="entry-card-header">Explore by provider</span>
         <div class="entry-card-content">
           <div *ngIf="splashData['PROVIDER']" class="container-h">
             <ng-content

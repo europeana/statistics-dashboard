@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { SubscriptionManager } from '../subscription-manager/subscription.manager';
 import { facetNames } from '../_data';
+import { DataPollingComponent } from '../data-polling';
 import {
   Facet,
   FacetField,
@@ -15,7 +15,7 @@ import { APIService } from '../_services';
   templateUrl: './splash.component.html',
   styleUrls: ['./splash.component.scss']
 })
-export class SplashComponent extends SubscriptionManager {
+export class SplashComponent extends DataPollingComponent {
   barColour = '#0771ce';
   facetParam = facetNames
     .map((s: string) => {
@@ -31,16 +31,18 @@ export class SplashComponent extends SubscriptionManager {
 
   constructor(private api: APIService) {
     super();
-    this.loadData();
+    this.beginPolling();
   }
 
-  loadData(): void {
-    this.isLoading = true;
-    const sub = this.api
-      .loadAPIData(this.url)
-      .subscribe((rawResult: RawFacet) => {
+  beginPolling(): void {
+    this.createNewDataPoller(
+      60 * 100000,
+      () => {
+        this.isLoading = true;
+        return this.api.loadAPIData(this.url);
+      },
+      (rawResult: RawFacet) => {
         this.isLoading = false;
-
         rawResult.facets.forEach((f: Facet) => {
           this.totalsData[f.name] = f.fields.reduce(function (
             prev: FacetField,
@@ -60,8 +62,8 @@ export class SplashComponent extends SubscriptionManager {
             };
           });
         });
-      });
-    this.subs.push(sub);
+      }
+    );
   }
 
   percent(figure: number, total: number): number {

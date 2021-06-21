@@ -98,12 +98,14 @@
   <div class="statistics-dashboard fit-to-page">
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
-        <h3 class="filters-header">Filters</h3>
-        <a
-          class="icon-clear"
-          *ngIf="isFilterApplied()"
-          (click)="clearFilter()"
-        ></a>
+        <h3 class="filters-header">
+          <a
+            class="icon-clear"
+            *ngIf="isFilterApplied()"
+            (click)="clearFilter()"
+          ></a>
+          Filters
+        </h3>
         <ul class="filters" (clickOutside)="closeFilters()">
           <li>
             <ul class="switch-wrapper">
@@ -218,7 +220,7 @@
           </h3>
         </ng-container>
 
-        <ng-container *ngIf="form.value.dateFrom || form.value.dateTo">
+        <ng-container *ngIf="form.value.dateFrom && form.value.dateTo">
           <span class="date-removal">
             <a
               (click)="datesClear()"
