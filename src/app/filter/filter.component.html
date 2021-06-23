@@ -1,0 +1,31 @@
+<li class="dropdown" *ngIf="form && group" [formGroup]="form">
+  <a
+    (click)="toggle()"
+    class="menu-opener"
+    [ngClass]="{
+      disabled: disabled,
+      open: open
+    }"
+    >{{ group | renameApiFacet }}
+  </a>
+  <div *ngIf="open" class="dropdown-wrapper">
+    <div class="dropdown-content">
+      <fieldset [formGroupName]="group" class="checkboxes" [ngClass]="group">
+        <ng-container *ngFor="let option of options">
+          <label>
+            <input
+              type="checkbox"
+              [value]="option"
+              (change)="changed()"
+              [formControlName]="toInputSafeName(option)"
+              [attr.disabled]="
+                !selectOptionEnabled(group, option) ? true : null
+              "
+            />
+            {{ option | renameRights }}
+          </label>
+        </ng-container>
+      </fieldset>
+    </div>
+  </div>
+</li>

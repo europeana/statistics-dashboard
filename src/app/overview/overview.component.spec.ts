@@ -369,14 +369,6 @@ describe('OverviewComponent', () => {
       expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
     });
 
-    it('should determine if a select option is enabled', () => {
-      expect(component.selectOptionEnabled('contentTier', '0')).toBeFalsy();
-      component.form.get('contentTierZero').setValue(true);
-      expect(component.selectOptionEnabled('contentTier', '0')).toBeTruthy();
-      component.form.get('contentTierZero').setValue(true);
-      expect(component.selectOptionEnabled('contentTier', '1')).toBeTruthy();
-    });
-
     it('should toggle row expansion', () => {
       const spy = jasmine.createSpy();
       component.dataTable = {
@@ -388,14 +380,6 @@ describe('OverviewComponent', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       component.toggleExpandRow({} as any as DatatableRowDetailDirective);
       expect(spy).toHaveBeenCalled();
-    });
-
-    it('should toggle the filter menu', () => {
-      const gName = 'PROVIDER';
-      component.addOrUpdateFilterControls(gName, testOptions);
-      expect(component.menuStates[gName].visible).toBeFalsy();
-      component.toggleFilterMenu(gName);
-      expect(component.menuStates[gName].visible).toBeTruthy();
     });
 
     it('should toggle the download options', () => {
@@ -411,38 +395,6 @@ describe('OverviewComponent', () => {
       component.closeDisplayOptions();
       expect(component.downloadOptionsOpen).toBeFalsy();
     });
-
-    it('should close the filters', fakeAsync(() => {
-      component.beginPolling();
-      tick(tickTime);
-      const setAllTrue = (): void => {
-        Object.keys(component.menuStates).forEach((s: string) => {
-          component.menuStates[s].visible = true;
-        });
-      };
-
-      const checkAllValue = (tf: boolean): void => {
-        let allVal = true;
-        Object.keys(component.menuStates).forEach((s: string) => {
-          if (component.menuStates[s].visible != tf) {
-            allVal = false;
-          }
-        });
-        expect(allVal).toBeTruthy();
-      };
-
-      setAllTrue();
-      checkAllValue(true);
-      component.closeFilters();
-      checkAllValue(false);
-      setAllTrue();
-
-      const exception = 'TYPE';
-      checkAllValue(true);
-      component.closeFilters(exception);
-      expect(component.menuStates[exception].visible).toBeTruthy();
-      component.ngOnDestroy();
-    }));
   });
 
   describe('Url Generation', () => {

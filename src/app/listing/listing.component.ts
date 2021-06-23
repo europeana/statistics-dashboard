@@ -26,7 +26,6 @@ export class ListingComponent extends SubscriptionManager {
   api: APIService;
   searchForm: FormGroup;
   filter: RegExp;
-  server = 'https://api.europeana.eu/record/v2/search.json';
 
   constructor(api: APIService, fb: FormBuilder) {
     super();
@@ -67,7 +66,7 @@ export class ListingComponent extends SubscriptionManager {
   getRootUrl(): string {
     const limitN = 1000;
     const limitS = `&f.DEFAULT.facet.limit=${limitN}`;
-    return `${this.server}?wskey=api2demo&rows=0&${limitS}&profile=facets&facet=PROVIDER`;
+    return `?rows=0&${limitS}&profile=facets&facet=PROVIDER`;
   }
 
   loadProviderNames(): void {

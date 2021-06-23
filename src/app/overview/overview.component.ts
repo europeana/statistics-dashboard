@@ -564,7 +564,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns Array<string>
   */
   getEnabledFilterNames(): Array<string> {
-    return this.facetConf.slice(1).filter((filterName: string) => {
+    return this.facetConf.filter((filterName: string) => {
       return this.form.controls[filterName].enabled;
     });
   }
@@ -722,12 +722,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.updatePageUrl();
   }
 
-  selectOptionEnabled(group: string, val: string): boolean {
-    return val === '0' && group === 'contentTier'
-      ? this.form.value.contentTierZero
-      : true;
-  }
-
   toggleExpandRow(row: DatatableRowDetailDirective): false {
     this.dataTable.rowDetail.toggleExpandRow(row);
     return false;
@@ -743,26 +737,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.form.get(name).reset();
     });
     this.updatePageUrl();
-  }
-
-  /** closeFilters
-  /*
-  /* Template utility for closing menus
-  /* @param { string } exempt - optional filter to ignore
-  */
-  closeFilters(exempt = ''): void {
-    Object.keys(this.menuStates)
-      .filter((s: string) => {
-        return s !== exempt;
-      })
-      .forEach((s: string) => {
-        this.menuStates[s].visible = false;
-      });
-  }
-
-  toggleFilterMenu(filterName: string): void {
-    this.closeFilters(filterName);
-    this.menuStates[filterName].visible = !this.menuStates[filterName].visible;
   }
 
   toggleDownloadOptions(): void {

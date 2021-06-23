@@ -23,11 +23,66 @@ body {
   word-wrap: break-word;
 }
 
+.am4-ctrls {
+  display: flex;
+  justify-content: space-around;
+  margin: 1em 0 2em 0;
+
+  input,
+  label {
+    display: inline-block;
+  }
+
+  select {
+    display: block;
+  }
+
+  input[type="number"] {
+    margin: 4px;
+    width: 5em;
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .sub-group {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
 /* dashboard wrapper */
 .dashboard-wrapper {
   background-color: $offwhite;
   display: inline-block;
   width: 100%;
+}
+
+.icon-clear {
+  background-image: svg-url-icon-x($gray-med);
+  display: inline-block;
+  height: 32px;
+  left: 0;
+  opacity: 0.3;
+  position: absolute;
+  transition: filter $transition-duration ease-in-out,
+    opacity $transition-duration ease-in-out;
+  width: 32px;
+
+  &:hover {
+    background-image: svg-url-icon-x($eu-red);
+    opacity: 1;
+
+    // highlight items to remove
+    & + .applied-filter-summary {
+      li::before {
+        color: red;
+      }
+    }
+  }
 }
 
 .loading-modal::after,
@@ -54,27 +109,10 @@ body {
   opacity: 0.1;
 }
 
-.icon-clear {
-  background-image: svg-url-icon-x($gray-med);
-  display: inline-block;
-  height: 32px;
-  left: 0;
-  opacity: 0.3;
-  position: absolute;
-  transition: filter $transition-duration ease-in-out,
-    opacity $transition-duration ease-in-out;
-  width: 32px;
-
-  &:hover {
-    background-image: svg-url-icon-x($eu-red);
-    opacity: 1;
-
-    // highlight items to remove
-    & + .applied-filter-summary {
-      li::before {
-        color: red;
-      }
-    }
+.menu-opener {
+  &.disabled {
+    color: #aaa;
+    pointer-events: none;
   }
 }
 
@@ -106,37 +144,6 @@ body {
   .amcharts-amexport-menu-level-0.amcharts-amexport-top {
     margin-right: 1em;
     top: -40px;
-  }
-}
-
-.am4-ctrls {
-  display: flex;
-  justify-content: space-around;
-  margin: 1em 0 2em 0;
-
-  input,
-  label {
-    display: inline-block;
-  }
-
-  select {
-    display: block;
-  }
-
-  input[type="number"] {
-    margin: 4px;
-    width: 5em;
-  }
-
-  .disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  .sub-group {
-    display: flex;
-    flex-direction: column;
   }
 }
 

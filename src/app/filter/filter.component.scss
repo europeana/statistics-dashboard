@@ -1,0 +1,33 @@
+@import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+
+.checkboxes {
+  display: inline-grid;
+  grid-auto-flow: row;
+
+  @media (min-width: $bp-med) {
+    grid-template-columns: repeat(2, auto);
+  }
+
+  @media (min-width: $bp-xl) {
+    grid-template-columns: repeat(3, auto);
+  }
+
+  &.DATA_PROVIDER,
+  &.PROVIDER,
+  &.RIGHTS {
+    @media (min-width: $bp-med) {
+      grid-template-columns: repeat(1, auto);
+    }
+
+    @media (min-width: $bp-xl) {
+      grid-template-columns: repeat(2, auto);
+    }
+  }
+
+  white-space: nowrap;
+  label {
+    display: block;
+    margin: 0 0.6em;
+  }
+}

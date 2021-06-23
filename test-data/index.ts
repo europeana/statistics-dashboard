@@ -18,7 +18,21 @@ import {
 
 new (class extends TestDataServer {
   serverName = 'statistics-dashboard';
+  allCHOs: Array<CHO>;
 
+  constructor() {
+    super();
+    this.allCHOs = this.generateCHOs(1000);
+  }
+
+  // remove filter-exclusion data
+  clearExclusions(): void {
+    this.allCHOs.forEach((cho: CHO) => {
+      cho.exclusions = [];
+    });
+  }
+
+  // url parse utility
   getQueryMap(route: string): IHashArray {
     const params = url.parse(route, true).query;
     const qfMap: IHashArray = {};
@@ -121,6 +135,8 @@ new (class extends TestDataServer {
   ): void => {
     response.setHeader('Access-Control-Allow-Origin', '*');
 
+    this.clearExclusions();
+
     if (request.method === 'OPTIONS') {
       response.setHeader(
         'Access-Control-Allow-Headers',
@@ -142,7 +158,6 @@ new (class extends TestDataServer {
     response.setHeader('Content-Type', 'application/json;charset=UTF-8');
     response.statusCode = 200;
 
-    const allCHOs = this.generateCHOs(1000);
     const facetNameMap = {};
 
     facetNames.forEach((facetName: string) => {
@@ -169,7 +184,7 @@ new (class extends TestDataServer {
     const paramMap = this.getQueryMap(request.url as string);
 
     if (Object.keys(paramMap).length === 0) {
-      allCHOs.forEach((cho: CHO) => {
+      this.allCHOs.forEach((cho: CHO) => {
         addCHO(cho);
       });
     } else {
@@ -184,12 +199,13 @@ new (class extends TestDataServer {
         return acceptValues.includes(`${cho[paramName]}`);
       };
 
-      allCHOs.forEach((cho: CHO) => {
+      this.allCHOs.forEach((cho: CHO) => {
         let includeRecord = true;
 
         Object.keys(paramMap).forEach((key: string) => {
           if (!testParam(cho, key, paramMap[key])) {
             includeRecord = false;
+            // record that this record was excluded by this filter
             cho.exclusions.push(key);
           }
         });
@@ -211,7 +227,7 @@ new (class extends TestDataServer {
       const innerMap = facetNameMap[facetName];
 
       // supply facet options other than the actual selection
-      allCHOs.forEach((cho: CHO) => {
+      this.allCHOs.forEach((cho: CHO) => {
         if (cho.exclusions.length === 1 && cho.exclusions[0] === facetName) {
           innerMap[cho[facetName]] = { label: cho[facetName], count: 0 };
         }
@@ -228,7 +244,7 @@ new (class extends TestDataServer {
             } as FacetField;
           })
           .sort((a: FacetField, b: FacetField) => {
-            return a.count > b.count ? 1 : b.count > a.count ? -1 : 0;
+            return a.count > b.count ? -1 : b.count > a.count ? 1 : 0;
           })
       });
     });

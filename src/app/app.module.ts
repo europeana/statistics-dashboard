@@ -14,6 +14,7 @@ import { AppComponent } from './app.component';
 import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
 
 import { BarComponent, MapComponent } from './chart';
+import { FilterComponent } from './filter';
 import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
 
@@ -26,6 +27,7 @@ import { TruncateComponent } from './truncate';
   declarations: [
     AppComponent,
     BarComponent,
+    FilterComponent,
     FooterComponent,
     HeaderComponent,
     ListingComponent,
