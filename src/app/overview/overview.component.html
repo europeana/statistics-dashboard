@@ -5,9 +5,7 @@
     'loading-modal': isLoading && !allProcessedFacetData
   }"
 >
-  <!-- templates -->
-
-  <!-- date error -->
+  <!-- date error template -->
 
   <ng-template #dateErrors let-field="field">
     <ul class="errors">
@@ -16,7 +14,7 @@
     </ul>
   </ng-template>
 
-  <!-- filterRemoval -->
+  <!-- filterRemoval template -->
 
   <ng-template #filterRemoval let-group="group" let-options="options">
     <ng-container *ngFor="let val of options; let i = index">
@@ -37,7 +35,7 @@
     </ng-container>
   </ng-template>
 
-  <!-- End templates / Begin main -->
+  <!-- Main -->
 
   <div class="statistics-dashboard fit-to-page">
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
@@ -64,19 +62,18 @@
                 <span class="slider round"></span>
               </label>
             </ul>
-          </li>
-
-          <ng-container *ngIf="allProcessedFacetData">
-            <ng-container *ngFor="let filter of facetConf">
-              <app-filter
-                [form]="form"
-                [group]="filter"
-                [disabled]="menuStates[filter].disabled"
-                [options]="filterData[filter]"
-                (valueChanged)="updatePageUrl()"
-              ></app-filter>
+            <ng-container *ngIf="allProcessedFacetData">
+              <ng-container *ngFor="let filter of facetConf">
+                <app-filter
+                  [form]="form"
+                  [group]="filter"
+                  [options]="filterData[filter]"
+                  [state]="filterStates[filter]"
+                  (valueChanged)="updatePageUrl()"
+                ></app-filter>
+              </ng-container>
             </ng-container>
-          </ng-container>
+          </li>
         </ul>
       </div>
 

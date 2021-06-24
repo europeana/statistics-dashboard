@@ -109,13 +109,6 @@ body {
   opacity: 0.1;
 }
 
-.menu-opener {
-  &.disabled {
-    color: #aaa;
-    pointer-events: none;
-  }
-}
-
 @media (min-width: $bp-small-3) {
   .dashboard-wrapper {
     padding: 0 1.2rem;

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { FilterComponent } from '.';
 
 describe('OverviewComponent', () => {
@@ -28,6 +28,3 @@ describe('OverviewComponent', () => {
     expect(component.selectOptionEnabled('contentTier', '1')).toBeTruthy();
   });
 });
-
-/*
- */

@@ -1,31 +1,44 @@
-<li class="dropdown" *ngIf="form && group" [formGroup]="form">
-  <a
-    (click)="toggle()"
-    class="menu-opener"
-    [ngClass]="{
-      disabled: disabled,
-      open: open
-    }"
-    >{{ group | renameApiFacet }}
-  </a>
-  <div *ngIf="open" class="dropdown-wrapper">
-    <div class="dropdown-content">
-      <fieldset [formGroupName]="group" class="checkboxes" [ngClass]="group">
-        <ng-container *ngFor="let option of options">
-          <label>
-            <input
-              type="checkbox"
-              [value]="option"
-              (change)="changed()"
-              [formControlName]="toInputSafeName(option)"
-              [attr.disabled]="
-                !selectOptionEnabled(group, option) ? true : null
-              "
-            />
-            {{ option | renameRights }}
-          </label>
-        </ng-container>
-      </fieldset>
-    </div>
-  </div>
-</li>
+<ul class="filter" *ngIf="form && group" [formGroup]="form">
+  <li>
+    <a
+      (click)="toggle()"
+      class="filter-opener"
+      [ngClass]="{
+        disabled: state.disabled,
+        open: state.visible
+      }"
+      >{{ group | renameApiFacet }}
+    </a>
+  </li>
+  <li *ngIf="state.visible" class="checkboxes">
+    <ul
+      *ngFor="let option of options; let i = index"
+      [formGroupName]="group"
+      class="checkbox-labelled"
+    >
+      <li
+        class="checkmarked-checkbox"
+        [ngClass]="{
+          checked: form.value[group][option.name]
+        }"
+      >
+        <input
+          id="add_filter_{{ group }}_{{ i }}"
+          class="checkbox"
+          type="checkbox"
+          [value]="option.name"
+          (change)="changed()"
+          [formControlName]="option.name"
+          [attr.disabled]="
+            !selectOptionEnabled(group, option.name) ? true : null
+          "
+        />
+      </li>
+      <li>
+        <label class="filter-label" for="add_filter_{{ group }}_{{ i }}">
+          {{ option.label | renameRights }}
+        </label>
+      </li>
+    </ul>
+  </li>
+</ul>

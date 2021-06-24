@@ -24,7 +24,7 @@ import {
   MockAPIServiceErrors,
   MockExportCSVService
 } from '../_mocked';
-import { ExportType } from '../_models';
+import { ExportType, NameLabel } from '../_models';
 import { APIService, ExportCSVService } from '../_services';
 import { BarComponent } from '../chart';
 import { OverviewComponent } from './overview.component';
@@ -33,7 +33,11 @@ describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
 
-  const testOptions = ['option_1', 'option_2'];
+  const contentTierNameLabels = [
+    { name: '0', label: '0' },
+    { name: '1', label: '1' },
+    { name: '2', label: '2' }
+  ];
   const tickTime = 1;
   let exportCSV: ExportCSVService;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
@@ -86,7 +90,7 @@ describe('OverviewComponent', () => {
 
   const setFilterValue1 = (group: string): void => {
     component.form.addControl(group, new FormBuilder().group({}));
-    component.addOrUpdateFilterControls(group, ['1', '2']);
+    component.addOrUpdateFilterControls(group, contentTierNameLabels);
     component.form.get(`${group}.1`).setValue(true);
   };
 
@@ -216,7 +220,7 @@ describe('OverviewComponent', () => {
         expectZeroToFour
       );
 
-      component.addOrUpdateFilterControls('contentTier', ['0', '1', '2']);
+      component.addOrUpdateFilterControls('contentTier', contentTierNameLabels);
       component.form.get(`contentTier.0`).setValue(true);
 
       expect(component.getFormattedContentTierParam()).toEqual(fmt('0'));
@@ -232,21 +236,16 @@ describe('OverviewComponent', () => {
       const testName = 'test';
       const form = component.form;
 
-      testOptions.forEach((s: string) => {
-        expect(form.get(`${testName}.${s}`)).toBeFalsy();
+      contentTierNameLabels.forEach((nl: NameLabel) => {
+        expect(form.get(`${testName}.${nl.name}`)).toBeFalsy();
       });
 
       form.addControl(testName, new FormBuilder().group({}));
-      component.addOrUpdateFilterControls(testName, testOptions);
 
-      testOptions.forEach((s: string) => {
-        expect(form.get(`${testName}.${s}`)).toBeTruthy();
-      });
+      component.addOrUpdateFilterControls(testName, contentTierNameLabels);
 
-      component.addOrUpdateFilterControls(testName, testOptions);
-
-      testOptions.forEach((s: string) => {
-        expect(form.get(`${testName}.${s}`)).toBeTruthy();
+      contentTierNameLabels.forEach((nl: NameLabel) => {
+        expect(form.get(`${testName}.${nl.name}`)).toBeTruthy();
       });
     });
 
@@ -267,7 +266,10 @@ describe('OverviewComponent', () => {
         'filterContentTier',
         new FormBuilder().group({})
       );
-      component.addOrUpdateFilterControls('filterContentTier', ['1', '2']);
+      component.addOrUpdateFilterControls(
+        'filterContentTier',
+        contentTierNameLabels
+      );
 
       component.form.get('filterContentTier.1').setValue(true);
       selected = component.getSetCheckboxValues('filterContentTier');
@@ -350,9 +352,9 @@ describe('OverviewComponent', () => {
     it('should enable the filters', fakeAsync(() => {
       component.beginPolling();
       tick(tickTime);
-      component.menuStates['COUNTRY'].disabled = true;
+      component.filterStates['COUNTRY'].disabled = true;
       component.enableFilters();
-      expect(component.menuStates['COUNTRY'].disabled).toBeFalsy();
+      expect(component.filterStates['COUNTRY'].disabled).toBeFalsy();
       component.ngOnDestroy();
     }));
 
