@@ -397,6 +397,38 @@ describe('OverviewComponent', () => {
       component.closeDisplayOptions();
       expect(component.downloadOptionsOpen).toBeFalsy();
     });
+
+    it('should close the filters', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
+      const setAllTrue = (): void => {
+        Object.keys(component.filterStates).forEach((s: string) => {
+          component.filterStates[s].visible = true;
+        });
+      };
+
+      const checkAllValue = (tf: boolean): void => {
+        let allVal = true;
+        Object.keys(component.filterStates).forEach((s: string) => {
+          if (component.filterStates[s].visible != tf) {
+            allVal = false;
+          }
+        });
+        expect(allVal).toBeTruthy();
+      };
+
+      setAllTrue();
+      checkAllValue(true);
+      component.closeFilters();
+      checkAllValue(false);
+      setAllTrue();
+
+      const exception = 'TYPE';
+      checkAllValue(true);
+      component.closeFilters(exception);
+      expect(component.filterStates[exception].visible).toBeTruthy();
+      component.ngOnDestroy();
+    }));
   });
 
   describe('Url Generation', () => {

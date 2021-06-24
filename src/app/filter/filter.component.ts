@@ -15,6 +15,7 @@ export class FilterComponent {
   @Input() state: FilterState;
 
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
+  @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
 
   changed(): void {
     this.valueChanged.emit(true);
@@ -22,6 +23,7 @@ export class FilterComponent {
 
   toggle(): void {
     this.state.visible = !this.state.visible;
+    this.visibilityChanged.emit(this.group);
   }
 
   selectOptionEnabled(group: string, val: string): boolean {
