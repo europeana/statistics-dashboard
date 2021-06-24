@@ -1,6 +1,7 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
+$gap: 8px;
 $row-height: 32px;
 $total-height: #{$row-height * 5};
 $total-width: 268px;
@@ -18,7 +19,7 @@ $total-width: 268px;
   min-width: $total-width;
   overflow: hidden;
   overflow-y: auto;
-  padding: 0 8px;
+  padding-bottom: 16px;
   position: absolute;
   z-index: 1;
 }
@@ -27,10 +28,15 @@ $total-width: 268px;
   align-items: center;
   display: flex;
   flex-direction: row;
+  padding-left: 8px;
   position: relative;
 
   &:hover {
     background-color: $offwhite;
+  }
+
+  :last-child {
+    width: 100%;
   }
 }
 
@@ -50,7 +56,7 @@ $total-width: 268px;
 .filter-opener {
   color: $gray-faint;
   display: block;
-  padding: 8px;
+  padding: $gap;
   position: relative;
 
   &::after {
@@ -59,10 +65,9 @@ $total-width: 268px;
     border-top: 0.25rem solid $gray-light;
     content: "";
     height: 0;
-    margin-top: -0.125rem;
     position: absolute;
-    right: 0.5rem;
-    top: 50%;
+    right: 5px;
+    top: 21px;
     width: 0;
   }
 
@@ -86,19 +91,34 @@ $total-width: 268px;
   width: 18px;
 
   &::before {
+    bottom: 0;
     background-image: svg-url-icon-checkbox("#000");
     background-position: center;
     background-repeat: no-repeat;
     display: block;
     content: "";
-    position: absolute;
-    top: 0;
     left: 0;
+    position: absolute;
     right: 0;
-    bottom: 0;
+    top: 0;
+    width: 100%;
   }
 
   &.checked::before {
     background-image: svg-url-icon-checkbox-checked("#000");
   }
+}
+
+.selection {
+  position: relative;
+  top: 5px;
+}
+
+.selection + .opener-name {
+  color: $stats-blue;
+  font-size: 8px;
+  font-weight: 600;
+  position: absolute;
+  top: 5px;
+  left: $gap;
 }

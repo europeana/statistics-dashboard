@@ -145,10 +145,6 @@ describe('OverviewComponent', () => {
       component.ngOnDestroy();
     }));
 
-    it('should unfix the name', () => {
-      expect(component.fromInputSafeName('_____')).toEqual('.');
-    });
-
     it('should extract data as a percent', fakeAsync(() => {
       const data = Object.assign({}, MockAPIData);
       expect(component.allProcessedFacetData).toBeFalsy();

@@ -7,6 +7,11 @@ $gray-med: #4d4d4d;
 $gray-faint: #828282;
 $gray-5: #d8d8d8;
 
+/* Zeplin styleguide colours */
+
+$grey-3: #999999;
+$near-black: $gray-med;
+
 $black: #1a1a1a;
 $opacity-black: rgba(0, 0, 0, 0.7);
 $opacity-gray-light: rgba(119, 119, 119, 0.6);
@@ -30,7 +35,7 @@ $blue-dark: #293745;
 $linkblue: #095f90;
 $accent: $eu-blue !default;
 
-$textcolour_body: $gray-med;
+$textcolour_body: $near-black;
 $textcolour_highlight: $accent;
 $textcolour_link: $linkblue;
 $text_secondary: $gray-light;
@@ -61,34 +66,6 @@ $stats-blue: #0a72cc;
 /* Layout */
 $max-width: 1280px;
 $offset-left-1: 4.5rem;
-
-/* Defaults */
-$space: 1.6rem;
-$space-and-half: $space * 1.5;
-$space-double: $space * 2;
-$space-triple: $space * 3;
-$space-quad: $space * 4;
-$space-half: $space / 2;
-$space-quarter: $space / 4;
-$pad: 1rem;
-$pad-and-half: $pad * 1.5;
-$pad-double: $pad * 2;
-$pad-half: $pad / 2;
-$pad-quarter: $pad / 4;
-
-/* Borders */
-$border-med: 3px;
-$border-thick: 7px;
-$base-border-radius: 4px;
-
-/* Global navigation */
-$globalnavheight: $space-triple;
-$globalnavheight-with-search-small: $space * 4.875;
-$globalnavheight-with-search-large: $space * 6.5;
-
-/* Global Off screen navigation */
-$menuwidth_right: 250px;
-$menu_top: 300px;
 
 /* Breakpoints */
 $bp-small: 24em;
