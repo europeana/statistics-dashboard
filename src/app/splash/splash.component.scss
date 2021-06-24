@@ -7,19 +7,17 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
-$faint-gray: #828282;
-
 app-truncate {
   overflow: hidden;
 }
 
 .record-list {
   align-items: center;
-  border-top: 1px solid #d8d8d8;
+  border-top: 1px solid $gray-5;
   padding: 4px 0;
 
   &:last-child {
-    border-bottom: 1px solid #d8d8d8;
+    border-bottom: 1px solid $gray-5;
   }
 
   :first-child {
@@ -72,7 +70,7 @@ app-bar-chart {
 }
 
 .data-rows-title {
-  color: $faint-gray;
+  color: $gray-faint;
   font-size: 14px;
   font-weight: 600;
   padding: 9px 0 14px 0;

@@ -69,6 +69,7 @@
                   [group]="filter"
                   [options]="filterData[filter]"
                   [state]="filterStates[filter]"
+                  (visibilityChanged)="closeFilters($event)"
                   (valueChanged)="updatePageUrl()"
                 ></app-filter>
               </ng-container>

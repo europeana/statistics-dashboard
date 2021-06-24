@@ -148,12 +148,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           this.setDateInputsToQueryParams();
           this.setDatasetNameInputToQueryParam();
 
-          Object.keys(queryParams).forEach((qp) => {
-            if (Object.keys(this.filterStates).includes(qp)) {
-              this.filterStates[qp].visible = true;
-            }
-          });
-
           if (loadNeeded) {
             this.triggerLoad();
           }
@@ -476,9 +470,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   ): Array<NameLabel> {
     const matchIndex = this.findFacetIndex(facetName, facetData);
     return facetData[matchIndex].fields.map((ff: FacetField) => {
+      let prefix = '';
+      if (['contentTier', 'metadataTier'].includes(facetName)) {
+        prefix = 'Tier ';
+      }
       return {
         name: this.toInputSafeName(ff.label),
-        label: ff.label
+        label: prefix + ff.label
       };
     });
   }
@@ -748,6 +746,22 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.form.get(name).reset();
     });
     this.updatePageUrl();
+  }
+
+  /** closeFilters
+  /*
+  /* Utility for closing menus
+  /* @param { string } exempt - optional filter to ignore
+  */
+  closeFilters(exempt = ''): void {
+    console.log('exempt ' + exempt);
+    Object.keys(this.filterStates)
+      .filter((s: string) => {
+        return s !== exempt;
+      })
+      .forEach((s: string) => {
+        this.filterStates[s].visible = false;
+      });
   }
 
   toggleDownloadOptions(): void {
