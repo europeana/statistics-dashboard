@@ -21,7 +21,7 @@ import { environment } from '../../environments/environment';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
 import { facetNames } from '../_data';
-import { rightsUrlMatch } from '../_helpers';
+import { getFormValueList, rightsUrlMatch } from '../_helpers';
 
 import {
   ExportType,
@@ -441,14 +441,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return s.replace(/\./g, '_____');
   }
 
-  /** fromInputSafeName
-  /* @param {string} s - the target string
-  /* - replaces the 5 underscore characters in a string with a dot
-  */
-  fromInputSafeName(s: string): string {
-    return s.replace(/_____/g, '.');
-  }
-
   /** findFacetIndex
   /* - get the index of an item in the array
   /* @param {string} facetName - the name of the facet
@@ -599,14 +591,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns Array<string>
   */
   getSetCheckboxValues(filterName: string): Array<string> {
-    const checkVals = this.form.value[filterName];
-    return checkVals
-      ? Object.keys(checkVals)
-          .filter((key: string) => {
-            return checkVals[key];
-          })
-          .map(this.fromInputSafeName)
-      : [];
+    return getFormValueList(this.form, filterName) as Array<string>;
   }
 
   /** datesClear

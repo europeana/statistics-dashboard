@@ -6,6 +6,7 @@
 @import "~@swimlane/ngx-datatable/themes/material.css";
 @import "~@swimlane/ngx-datatable/assets/icons.css";
 
+$gap: 8px;
 $width-left-col: 200px;
 
 .date-removal {
@@ -62,9 +63,9 @@ $width-left-col: 200px;
 
 .rm-filter {
   background: $gray-lightest;
-  color: $gray-med;
+  color: $near-black;
   margin: 4px 0;
-  padding: 0 8px;
+  padding: 0 $gap;
 
   &:not(:last-child) {
     margin-right: 24px;
@@ -148,6 +149,12 @@ input[type="date"],
   width: 11em;
 }
 
+input[type="date"],
+input[type="text"] {
+  margin-top: 5px;
+  padding: 5px;
+}
+
 input[type="date"]:not(:valid) {
   border: 1px solid red;
 }
@@ -188,7 +195,7 @@ ngx-datatable.ngx-datatable {
   margin: 0.4em 0.7em;
 
   .table-footer-total {
-    border-bottom: 1px solid #999;
+    border-bottom: 1px solid $grey-3;
     display: inline-block;
     margin-bottom: 0.4em;
   }
@@ -196,6 +203,7 @@ ngx-datatable.ngx-datatable {
 
 h3 {
   display: inline-block;
+  font-weight: 600;
   position: relative;
 }
 
@@ -221,18 +229,8 @@ label {
   margin: 1.6em 0;
 }
 
-.icon-clear {
-  transform: scale(0.3);
-  transform-origin: -60% 30%;
-
-  // highlight items to remove
-  &:hover + .applied-filter-summary li::before {
-    color: red;
-  }
-}
-
 .applied-filter-summary {
-  color: #999;
+  color: $grey-3;
   font-size: 0.7em;
   font-style: italic;
   list-style: none;
@@ -241,7 +239,7 @@ label {
   // apply custom bullets
   li::before {
     content: "\2022";
-    color: #999;
+    color: $grey-3;
     display: inline-block;
     font-weight: bold;
     margin-left: -1em;
@@ -250,15 +248,13 @@ label {
   }
 }
 
-.filters-header .icon-clear {
-  transform-origin: -60% 30%;
-
-  // highlight items to remove
-  &:hover + .filters .applied-filter-summary {
-    li::before {
-      color: red;
-    }
-  }
+.filters-header {
+  color: $grey-3;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 0;
+  margin-top: 20px;
+  margin: $gap;
 }
 
 .filter-select {
@@ -312,7 +308,15 @@ label {
 }
 
 .facet-param {
-  font-size: revert;
+  border: 0;
+  background: none;
+  border-bottom: 1px dashed $near-black;
+  margin-bottom: 20px;
+  text-indent: 0;
+}
+
+.header-data {
+  color: $near-black;
 }
 
 .mobile-row {

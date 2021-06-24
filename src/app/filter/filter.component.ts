@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
+import { getFormValueList } from '../_helpers';
 import { FilterState, NameLabel } from '../_models';
 
 @Component({
@@ -19,6 +20,22 @@ export class FilterComponent {
 
   changed(): void {
     this.valueChanged.emit(true);
+  }
+
+  getSetCheckboxValues(filterName: string): string {
+    return getFormValueList(this.form, filterName)
+      .map((s: string) => {
+        let prefix = '';
+        if (['contentTier', 'metadataTier'].includes(this.group)) {
+          prefix = 'Tier ';
+        }
+        return prefix + s;
+      })
+      .join(', ');
+  }
+
+  hide(): void {
+    this.state.visible = false;
   }
 
   toggle(): void {

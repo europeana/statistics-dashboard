@@ -14,11 +14,11 @@ context('statistics-dashboard', () => {
 
     it('should open and close the filters', () => {
       cy.visit(`/data/COUNTRY`);
-      cy.get(selFilterOpener).first().click();
+      cy.get(selFilterOpener).first().click({force: true});
       cy.get(selFilterOpened).should('have.length', 1);
-      cy.get(selFilterOpener).last().click();
+      cy.get(selFilterOpener).last().click({force: true});
       cy.get(selFilterOpened).should('have.length', 1);
-      cy.get(selFilterOpener).last().click();
+      cy.get(selFilterOpener).last().click({force: true});
       cy.get(selFilterOpened).should('have.length', 0);
     });
 

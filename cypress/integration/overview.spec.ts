@@ -3,7 +3,8 @@ import { facetNames } from '../../src/app/_data';
 context('statistics-dashboard', () => {
   describe('overview', () => {
 
-    const selLinkHeader = '[data-e2e=link-home-header]';
+    const selLinkHomeHeader = '[data-e2e=link-home-header]';
+    const selLinkHome = '[data-e2e=link-home]';
     const selCTZero = '[data-e2e=ct-zero-switch]';
     const urlParamCTZero = 'content-tier-zero=true';
 
@@ -11,9 +12,17 @@ context('statistics-dashboard', () => {
       facetNames.forEach((url: string) => {
         cy.visit(`/data/${url}`)
         cy.url().should('contain', url);
-        cy.get(selLinkHeader).click();
+        cy.get(selLinkHomeHeader).click();
         cy.url().should('not.contain', url);
       });
+    });
+
+    it('should show the home link', () => {
+      const url = '/data/COUNTRY';
+      cy.visit(url);
+      cy.get(selLinkHome).should('have.length', 1);
+      cy.get(selLinkHome).click({ force: true });
+      cy.url().should('not.contain', url);
     });
 
     it('should respond to the CT-Zero option', () => {

@@ -40,28 +40,28 @@
   <div class="statistics-dashboard fit-to-page">
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
-        <h3 class="filters-header">
-          <a
-            class="icon-clear"
-            *ngIf="isFilterApplied()"
-            (click)="clearFilter()"
-          ></a>
-          Filters
-        </h3>
         <ul class="filters">
           <li>
-            <ul class="switch-wrapper">
-              <span> CT Zero </span>
-              <label class="switch">
-                <input
-                  data-e2e="ct-zero-switch"
-                  type="checkbox"
-                  formControlName="contentTierZero"
-                  (change)="updatePageUrl()"
-                />
-                <span class="slider round"></span>
-              </label>
-            </ul>
+            <a data-e2e="link-home" routerLink="/">Home</a>
+          </li>
+          <li class="switch-wrapper">
+            <span> CT Zero </span>
+            <label class="switch">
+              <input
+                data-e2e="ct-zero-switch"
+                type="checkbox"
+                formControlName="contentTierZero"
+                (change)="updatePageUrl()"
+              />
+              <span class="slider round"></span>
+            </label>
+          </li>
+        </ul>
+
+        <h3 class="filters-header">Filters</h3>
+
+        <ul class="filters">
+          <li>
             <ng-container *ngIf="allProcessedFacetData">
               <ng-container *ngFor="let filter of facetConf">
                 <app-filter
@@ -79,15 +79,6 @@
       </div>
 
       <ul class="filters inputs" *ngIf="!isShowingSearchList">
-        <li class="column">
-          <h3>Dataset</h3>
-          <input
-            formControlName="datasetName"
-            (keyup.enter)="updatePageUrl()"
-            placeholder="Dataset Name"
-            class="datasetName"
-          />
-        </li>
         <li class="column">
           <h3 [title]="getFormattedDateParam()">Date From</h3>
           <input
@@ -120,6 +111,15 @@
               *ngTemplateOutlet="dateErrors; context: { field: 'dateTo' }"
             ></ng-content>
           </ng-container>
+        </li>
+        <li class="column">
+          <input
+            formControlName="datasetName"
+            (keyup.enter)="updatePageUrl()"
+            placeholder="Dataset Id"
+            class="datasetName"
+            type="text"
+          />
         </li>
       </ul>
     </div>

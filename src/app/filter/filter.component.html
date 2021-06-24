@@ -1,4 +1,9 @@
-<ul class="filter" *ngIf="form && group" [formGroup]="form">
+<ul
+  class="filter"
+  *ngIf="form && group"
+  [formGroup]="form"
+  (clickOutside)="hide()"
+>
   <li>
     <a
       (click)="toggle()"
@@ -7,7 +12,15 @@
         disabled: state.disabled,
         open: state.visible
       }"
-      >{{ group | renameApiFacet }}
+    >
+      <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
+        <span class="selection">
+          {{ setVals }}
+        </span>
+      </ng-container>
+      <span class="opener-name">
+        {{ group | renameApiFacet }}
+      </span>
     </a>
   </li>
   <li *ngIf="state.visible" class="checkboxes">
