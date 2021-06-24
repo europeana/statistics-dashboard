@@ -5,9 +5,7 @@
     'loading-modal': isLoading && !allProcessedFacetData
   }"
 >
-  <!-- templates -->
-
-  <!-- date error -->
+  <!-- date error template -->
 
   <ng-template #dateErrors let-field="field">
     <ul class="errors">
@@ -16,63 +14,7 @@
     </ul>
   </ng-template>
 
-  <!-- filter template -->
-
-  <ng-template #cbFieldset let-group="group" let-options="options">
-    <li class="dropdown">
-      <a
-        (click)="toggleFilterMenu(group)"
-        class="menu-opener"
-        [ngClass]="{
-          disabled: menuStates[group].disabled,
-          open: menuStates[group].visible
-        }"
-        >{{ group | renameApiFacet }} </a
-      ><a
-        class="icon-clear"
-        *ngIf="isFilterApplied(group)"
-        (click)="clearFilter(group)"
-      ></a>
-      <div *ngIf="menuStates[group].visible" class="dropdown-wrapper">
-        <div class="dropdown-content">
-          <fieldset
-            [formGroupName]="group"
-            class="checkboxes"
-            [ngClass]="group"
-          >
-            <ng-container *ngFor="let option of options">
-              <label>
-                <input
-                  type="checkbox"
-                  [value]="option"
-                  (change)="updatePageUrl()"
-                  [formControlName]="toInputSafeName(option)"
-                  [attr.disabled]="
-                    !selectOptionEnabled(group, option) ? true : null
-                  "
-                />
-                {{ option | renameRights }}
-              </label>
-            </ng-container>
-          </fieldset>
-        </div>
-      </div>
-
-      <!--summary of applied -->
-
-      <ng-container *ngIf="!menuStates[group].visible">
-        <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
-          <ng-container *ngIf="setVals.length > 0">
-            <ul class="applied-filter-summary">
-              <li *ngFor="let val of setVals">{{ val }}</li>
-            </ul>
-          </ng-container>
-        </ng-container>
-      </ng-container>
-    </li>
-  </ng-template>
-
-  <!-- filterRemoval -->
+  <!-- filterRemoval template -->
 
   <ng-template #filterRemoval let-group="group" let-options="options">
     <ng-container *ngFor="let val of options; let i = index">
@@ -93,7 +35,7 @@
     </ng-container>
   </ng-template>
 
-  <!-- End templates / Begin main -->
+  <!-- Main -->
 
   <div class="statistics-dashboard fit-to-page">
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
@@ -106,12 +48,13 @@
           ></a>
           Filters
         </h3>
-        <ul class="filters" (clickOutside)="closeFilters()">
+        <ul class="filters">
           <li>
             <ul class="switch-wrapper">
               <span> CT Zero </span>
               <label class="switch">
                 <input
+                  data-e2e="ct-zero-switch"
                   type="checkbox"
                   formControlName="contentTierZero"
                   (change)="updatePageUrl()"
@@ -119,21 +62,18 @@
                 <span class="slider round"></span>
               </label>
             </ul>
-          </li>
-
-          <ng-container *ngIf="allProcessedFacetData">
-            <ng-container *ngFor="let filter of facetConf">
-              <ng-content
-                *ngTemplateOutlet="
-                  cbFieldset;
-                  context: {
-                    options: filterData[filter],
-                    group: filter
-                  }
-                "
-              ></ng-content>
+            <ng-container *ngIf="allProcessedFacetData">
+              <ng-container *ngFor="let filter of facetConf">
+                <app-filter
+                  [form]="form"
+                  [group]="filter"
+                  [options]="filterData[filter]"
+                  [state]="filterStates[filter]"
+                  (valueChanged)="updatePageUrl()"
+                ></app-filter>
+              </ng-container>
             </ng-container>
-          </ng-container>
+          </li>
         </ul>
       </div>
 
@@ -378,7 +318,8 @@
         </ngx-datatable-footer>
       </ngx-datatable>
 
-      <label style="display: inline-block"
+      <label
+        style="display: {{ isShowingSearchList ? 'none' : 'inline-block' }}"
         ><input
           type="checkbox"
           formControlName="showPercent"

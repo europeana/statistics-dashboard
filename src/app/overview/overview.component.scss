@@ -44,6 +44,13 @@ $width-left-col: 200px;
   }
 }
 
+.menu-opener {
+  &.disabled {
+    color: #aaa;
+    pointer-events: none;
+  }
+}
+
 .rm-filters {
   display: flex;
   flex-wrap: wrap;
@@ -194,44 +201,6 @@ h3 {
 
 label {
   cursor: pointer;
-}
-
-.checkboxes {
-  display: inline-grid;
-  grid-auto-flow: row;
-
-  @media (min-width: $bp-med) {
-    grid-template-columns: repeat(2, auto);
-  }
-
-  @media (min-width: $bp-xl) {
-    grid-template-columns: repeat(3, auto);
-  }
-
-  &.DATA_PROVIDER,
-  &.PROVIDER,
-  &.RIGHTS {
-    @media (min-width: $bp-med) {
-      grid-template-columns: repeat(1, auto);
-    }
-
-    @media (min-width: $bp-xl) {
-      grid-template-columns: repeat(2, auto);
-    }
-  }
-
-  white-space: nowrap;
-  label {
-    display: block;
-    margin: 0 0.6em;
-  }
-}
-
-.menu-opener {
-  &.disabled {
-    color: #aaa;
-    pointer-events: none;
-  }
 }
 
 .svg-icon-spin {

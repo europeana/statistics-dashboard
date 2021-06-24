@@ -23,35 +23,42 @@ body {
   word-wrap: break-word;
 }
 
+.am4-ctrls {
+  display: flex;
+  justify-content: space-around;
+  margin: 1em 0 2em 0;
+
+  input,
+  label {
+    display: inline-block;
+  }
+
+  select {
+    display: block;
+  }
+
+  input[type="number"] {
+    margin: 4px;
+    width: 5em;
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .sub-group {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
 /* dashboard wrapper */
 .dashboard-wrapper {
   background-color: $offwhite;
   display: inline-block;
   width: 100%;
-}
-
-.loading-modal::after,
-.loading-modal::before {
-  bottom: 0;
-  content: " ";
-  display: block;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 12;
-}
-
-.loading-modal::after {
-  background-image: svg-url-icon-spinner(#{$stats-blue});
-  background-position: center;
-  background-repeat: no-repeat;
-  transform: scale(5);
-}
-
-.loading-modal::before {
-  background-color: #000;
-  opacity: 0.1;
 }
 
 .icon-clear {
@@ -76,6 +83,30 @@ body {
       }
     }
   }
+}
+
+.loading-modal::after,
+.loading-modal::before {
+  bottom: 0;
+  content: " ";
+  display: block;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 12;
+}
+
+.loading-modal::after {
+  background-image: svg-url-icon-spinner(#{$stats-blue});
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(5);
+}
+
+.loading-modal::before {
+  background-color: #000;
+  opacity: 0.1;
 }
 
 @media (min-width: $bp-small-3) {
@@ -106,37 +137,6 @@ body {
   .amcharts-amexport-menu-level-0.amcharts-amexport-top {
     margin-right: 1em;
     top: -40px;
-  }
-}
-
-.am4-ctrls {
-  display: flex;
-  justify-content: space-around;
-  margin: 1em 0 2em 0;
-
-  input,
-  label {
-    display: inline-block;
-  }
-
-  select {
-    display: block;
-  }
-
-  input[type="number"] {
-    margin: 4px;
-    width: 5em;
-  }
-
-  .disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  .sub-group {
-    display: flex;
-    flex-direction: column;
   }
 }
 

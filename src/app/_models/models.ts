@@ -8,7 +8,7 @@ export interface IHashArray {
   [details: string]: Array<string>;
 }
 
-export interface MenuState {
+export interface FilterState {
   visible: boolean;
   disabled?: boolean;
 }
@@ -24,6 +24,11 @@ export interface FmtTableData {
   tableRows: Array<TableRow>;
 }
 
+export interface NameLabel {
+  name: string;
+  label: string;
+}
+
 export interface NameValue {
   name: string;
   value: number;
@@ -36,6 +41,10 @@ export interface NameValuePercent extends NameValue {
 export interface IdValue {
   id: string;
   value: number;
+}
+
+export interface IHashArrayNameLabel {
+  [details: string]: Array<NameLabel>;
 }
 
 export enum ExportType {

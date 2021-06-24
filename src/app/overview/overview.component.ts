@@ -29,10 +29,11 @@ import {
   FacetField,
   FacetFieldProcessed,
   FacetProcessed,
+  FilterState,
   FmtTableData,
   HeaderNameType,
-  IHashArray,
-  MenuState,
+  IHashArrayNameLabel,
+  NameLabel,
   NameValue,
   RawFacet,
   TableRow
@@ -70,7 +71,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   facetConf = facetNames;
   nonFilterQPs = ['content-tier-zero', 'date-from', 'date-to', 'dataset-name'];
 
-  menuStates: { [key: string]: MenuState } = {};
+  filterStates: { [key: string]: FilterState } = {};
   contentTiersOptions = Array(5)
     .fill(0)
     .map((x, index) => `${x + index}`);
@@ -93,7 +94,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   chartData: Array<NameValue>;
   tableData: FmtTableData;
 
-  filterData: IHashArray = {};
+  filterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
 
   constructor(
@@ -106,7 +107,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   ) {
     super();
     this.buildForm();
-    this.initialiseMenuStates();
+    this.initialiseFilterStates();
   }
 
   /** ngOnInit
@@ -146,6 +147,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetNameInputToQueryParam();
+
+          Object.keys(queryParams).forEach((qp) => {
+            if (Object.keys(this.filterStates).includes(qp)) {
+              this.filterStates[qp].visible = true;
+            }
+          });
 
           if (loadNeeded) {
             this.triggerLoad();
@@ -292,6 +299,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }
 
     // initialise filterData and add checkboxes
+
     this.facetConf.forEach((name: string) => {
       const filterOps = this.getFilterOptions(name, this.allProcessedFacetData);
       this.filterData[name] = filterOps;
@@ -326,9 +334,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     ).getPollingSubject();
   }
 
-  initialiseMenuStates(): void {
+  initialiseFilterStates(): void {
     this.facetConf.forEach((name: string) => {
-      this.menuStates[name] = {
+      this.filterStates[name] = {
         visible: false,
         disabled: this.form.value.facetParameter === name
       };
@@ -343,14 +351,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { Array<string> } options - the filter options
   /*
   */
-  addOrUpdateFilterControls(name: string, options: Array<string>): void {
+  addOrUpdateFilterControls(name: string, options: Array<NameLabel>): void {
     const checkboxes = this.form.get(name) as FormGroup;
 
-    options.forEach((option: string) => {
-      const fName = this.toInputSafeName(option);
+    options.forEach((option: NameLabel) => {
+      const fName = option.name;
       const ctrl = this.form.get(`${name}.${fName}`);
       const defaultValue =
-        this.queryParams[name] && this.queryParams[name].includes(option);
+        this.queryParams[name] && this.queryParams[name].includes(option.name);
 
       if (!ctrl) {
         checkboxes.addControl(fName, new FormControl(defaultValue));
@@ -465,10 +473,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   getFilterOptions(
     facetName: string,
     facetData: Array<FacetProcessed>
-  ): Array<string> {
+  ): Array<NameLabel> {
     const matchIndex = this.findFacetIndex(facetName, facetData);
     return facetData[matchIndex].fields.map((ff: FacetField) => {
-      return ff.label;
+      return {
+        name: this.toInputSafeName(ff.label),
+        label: ff.label
+      };
     });
   }
 
@@ -564,7 +575,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns Array<string>
   */
   getEnabledFilterNames(): Array<string> {
-    return this.facetConf.slice(1).filter((filterName: string) => {
+    return this.facetConf.filter((filterName: string) => {
       return this.form.controls[filterName].enabled;
     });
   }
@@ -649,7 +660,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   enableFilters(): void {
     this.facetConf.forEach((name: string) => {
       this.form.controls[name].enable();
-      this.menuStates[name].disabled = false;
+      this.filterStates[name].disabled = false;
     });
   }
 
@@ -690,7 +701,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   updateMenuAvailability(): void {
     this.enableFilters();
-    this.menuStates[this.form.value['facetParameter']].disabled = true;
+    this.filterStates[this.form.value['facetParameter']].disabled = true;
     this.setIsShowingSearchList(false);
   }
 
@@ -722,12 +733,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.updatePageUrl();
   }
 
-  selectOptionEnabled(group: string, val: string): boolean {
-    return val === '0' && group === 'contentTier'
-      ? this.form.value.contentTierZero
-      : true;
-  }
-
   toggleExpandRow(row: DatatableRowDetailDirective): false {
     this.dataTable.rowDetail.toggleExpandRow(row);
     return false;
@@ -743,26 +748,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.form.get(name).reset();
     });
     this.updatePageUrl();
-  }
-
-  /** closeFilters
-  /*
-  /* Template utility for closing menus
-  /* @param { string } exempt - optional filter to ignore
-  */
-  closeFilters(exempt = ''): void {
-    Object.keys(this.menuStates)
-      .filter((s: string) => {
-        return s !== exempt;
-      })
-      .forEach((s: string) => {
-        this.menuStates[s].visible = false;
-      });
-  }
-
-  toggleFilterMenu(filterName: string): void {
-    this.closeFilters(filterName);
-    this.menuStates[filterName].visible = !this.menuStates[filterName].visible;
   }
 
   toggleDownloadOptions(): void {
