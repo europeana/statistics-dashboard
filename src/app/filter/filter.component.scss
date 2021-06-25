@@ -35,6 +35,10 @@ $total-width: 268px;
     background-color: $offwhite;
   }
 
+  :first-child {
+    min-width: 22px;
+  }
+
   :last-child {
     width: 100%;
   }
@@ -48,7 +52,7 @@ $total-width: 268px;
 
 .filter-label {
   font-size: 14px;
-  line-height: 14px;
+  line-height: $row-height;
   margin-left: 9px;
   white-space: nowrap;
 }

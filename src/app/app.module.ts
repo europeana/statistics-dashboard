@@ -22,11 +22,13 @@ import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { SplashComponent } from './splash/splash.component';
 import { TruncateComponent } from './truncate';
+import { DatesComponent } from './dates/dates.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BarComponent,
+    DatesComponent,
     FilterComponent,
     FooterComponent,
     HeaderComponent,

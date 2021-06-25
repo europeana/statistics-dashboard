@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-
-import { getFormValueList } from '../_helpers';
+import { getFormValueList, rightsUrlMatch } from '../_helpers';
 import { FilterState, NameLabel } from '../_models';
 
 @Component({
@@ -12,7 +11,7 @@ import { FilterState, NameLabel } from '../_models';
 export class FilterComponent {
   @Input() form: FormGroup;
   @Input() group: string;
-  @Input() options: Array<NameLabel>;
+  @Input() options?: Array<NameLabel>;
   @Input() state: FilterState;
 
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
@@ -28,6 +27,9 @@ export class FilterComponent {
         let prefix = '';
         if (['contentTier', 'metadataTier'].includes(this.group)) {
           prefix = 'Tier ';
+        } else if (this.group === 'RIGHTS') {
+          const swapped = rightsUrlMatch(s);
+          s = swapped ? swapped : s;
         }
         return prefix + s;
       })

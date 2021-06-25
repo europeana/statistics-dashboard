@@ -1,6 +1,6 @@
 <ul
   class="filter"
-  *ngIf="form && group"
+  *ngIf="form && group && !state.disabled"
   [formGroup]="form"
   (clickOutside)="hide()"
 >
@@ -9,7 +9,6 @@
       (click)="toggle()"
       class="filter-opener"
       [ngClass]="{
-        disabled: state.disabled,
         open: state.visible
       }"
     >
@@ -23,35 +22,44 @@
       </span>
     </a>
   </li>
-  <li *ngIf="state.visible" class="checkboxes">
-    <ul
-      *ngFor="let option of options; let i = index"
-      [formGroupName]="group"
-      class="checkbox-labelled"
-    >
-      <li
-        class="checkmarked-checkbox"
-        [ngClass]="{
-          checked: form.value[group][option.name]
-        }"
+
+  <ng-template #dates>
+    <li *ngIf="state.visible">
+      <app-dates [form]="form" (valueChanged)="changed()"></app-dates>
+    </li>
+  </ng-template>
+
+  <ng-container *ngIf="options; else dates">
+    <li *ngIf="state.visible" class="checkboxes">
+      <ul
+        *ngFor="let option of options; let i = index"
+        [formGroupName]="group"
+        class="checkbox-labelled"
       >
-        <input
-          id="add_filter_{{ group }}_{{ i }}"
-          class="checkbox"
-          type="checkbox"
-          [value]="option.name"
-          (change)="changed()"
-          [formControlName]="option.name"
-          [attr.disabled]="
-            !selectOptionEnabled(group, option.name) ? true : null
-          "
-        />
-      </li>
-      <li>
-        <label class="filter-label" for="add_filter_{{ group }}_{{ i }}">
-          {{ option.label | renameRights }}
-        </label>
-      </li>
-    </ul>
-  </li>
+        <li
+          class="checkmarked-checkbox"
+          [ngClass]="{
+            checked: form.value[group][option.name]
+          }"
+        >
+          <input
+            id="add_filter_{{ group }}_{{ i }}"
+            class="checkbox"
+            type="checkbox"
+            [value]="option.name"
+            (change)="changed()"
+            [formControlName]="option.name"
+            [attr.disabled]="
+              !selectOptionEnabled(group, option.name) ? true : null
+            "
+          />
+        </li>
+        <li>
+          <label class="filter-label" for="add_filter_{{ group }}_{{ i }}">
+            {{ option.label | renameRights }}
+          </label>
+        </li>
+      </ul>
+    </li>
+  </ng-container>
 </ul>

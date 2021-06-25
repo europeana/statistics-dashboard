@@ -17,7 +17,7 @@ context('statistics-dashboard', () => {
       });
     });
 
-    it('should show the home link', () => {
+    it('should have a working home link', () => {
       const url = '/data/COUNTRY';
       cy.visit(url);
       cy.get(selLinkHome).should('have.length', 1);

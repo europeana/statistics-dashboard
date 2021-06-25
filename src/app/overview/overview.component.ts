@@ -21,7 +21,12 @@ import { environment } from '../../environments/environment';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
 import { facetNames } from '../_data';
-import { getFormValueList, rightsUrlMatch } from '../_helpers';
+import {
+  fromInputSafeName,
+  getFormValueList,
+  rightsUrlMatch,
+  validateDateGeneric
+} from '../_helpers';
 
 import {
   ExportType,
@@ -53,16 +58,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild(BarComponent) barChart: BarComponent;
   @ViewChild('canvas') canvas: ElementRef;
-  @ViewChild('dateFrom') dateFrom: ElementRef;
-  @ViewChild('dateTo') dateTo: ElementRef;
 
   // Make chart settings available to template
   public BarChartCool = BarChartCool;
 
-  today = new Date().toISOString().split('T')[0];
-  yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'))
-    .toISOString()
-    .split('T')[0];
   totalResults = 0;
 
   columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
@@ -112,7 +111,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** ngOnInit
   /* Event hook: subscribe to changes in the route / query params
-  /*
   */
   ngOnInit(): void {
     this.subs.push(
@@ -123,7 +121,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             const qpValArrays = {};
 
             Object.keys(qp).forEach((s: string) => {
-              qpValArrays[s] = Array.isArray(qp[s]) ? qp[s] : [qp[s]];
+              qpValArrays[s] = (Array.isArray(qp[s]) ? qp[s] : [qp[s]]).map(
+                (qpVal: string) => {
+                  return this.toInputSafeName(qpVal);
+                }
+              );
             });
 
             return {
@@ -144,6 +146,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           }
 
           this.queryParams = queryParams;
+
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetNameInputToQueryParam();
@@ -186,7 +189,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
         if (!this.nonFilterQPs.includes(key)) {
           values.forEach((valPart: string) => {
-            innerRes.push(`${key}:"${encodeURIComponent(valPart)}"`);
+            innerRes.push(
+              `${key}:"${encodeURIComponent(fromInputSafeName(valPart))}"`
+            );
           });
           return innerRes.join('&qf=');
         }
@@ -318,6 +323,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       },
       (rawResult: RawFacet) => {
         this.isLoading = false;
+
         if (this.processResult(rawResult)) {
           this.postProcessResult();
         }
@@ -335,6 +341,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         disabled: this.form.value.facetParameter === name
       };
     });
+    this.filterStates.dates = { visible: false, disabled: false };
   }
 
   /** addOrUpdateFilterControls
@@ -380,49 +387,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
-  /** validateDateGeneric
-  /* @param {FormControl} control - the field to validate
-  /* @param {string} fieldName - the field name
-  /* - returns an errors object map
-  */
-  validateDateGeneric(
-    control: FormControl,
-    fieldName: string
-  ): { [key: string]: boolean } | null {
-    const val = control.value || null;
-    let isTooEarly = false;
-    let isTooLate = false;
-    if (val) {
-      const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
-      const dateVal = new Date(val);
-      if (dateVal < new Date(this.yearZero)) {
-        isTooEarly = true;
-      } else if (dateVal > new Date(this.today)) {
-        isTooLate = true;
-      } else if (this.form.value[otherField].length > 0) {
-        const dateOtherVal = new Date(this.form.value[otherField]);
-        if (otherField === 'dateFrom') {
-          if (dateVal < dateOtherVal) {
-            isTooEarly = true;
-          }
-        } else if (dateVal > dateOtherVal) {
-          isTooLate = true;
-        }
-      }
-    }
-    return isTooEarly
-      ? { isTooEarly: isTooEarly }
-      : isTooLate
-      ? { isTooLate: isTooLate }
-      : null;
-  }
-
   /** validateDateFrom
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
   validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
-    return this.validateDateGeneric(control, 'dateFrom');
+    return validateDateGeneric(control, 'dateFrom');
   }
 
   /** validateDateTo
@@ -430,7 +400,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* - returns an errors object map
   */
   validateDateTo(control: FormControl): { [key: string]: boolean } | null {
-    return this.validateDateGeneric(control, 'dateTo');
+    return validateDateGeneric(control, 'dateTo');
   }
 
   /** toInputSafeName
@@ -603,43 +573,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.updatePageUrl();
   }
 
-  /** dateChange
-  /* Template utility: corrects @min / @max on the element and calls 'updatePageUrl' if valid
-  /* @param {boolean} isDateFrom - flag if dateFrom is the caller
-  */
-  dateChange(isDateFrom: boolean): void {
-    const valFrom = this.form.value.dateFrom;
-    const valTo = this.form.value.dateTo;
-    if (isDateFrom) {
-      this.dateTo.nativeElement.setAttribute(
-        'min',
-        valFrom ? valFrom : this.yearZero
-      );
-
-      // if the other is already in error, try to fix it
-      if (this.form.controls.dateTo.errors) {
-        this.form.controls.dateTo.updateValueAndValidity();
-      }
-    } else {
-      this.dateFrom.nativeElement.setAttribute(
-        'max',
-        valTo ? valTo : this.today
-      );
-      // if the other is already in error, try to fix it
-      if (this.form.controls.dateFrom.errors) {
-        this.form.controls.dateFrom.updateValueAndValidity();
-      }
-    }
-    if (
-      !this.form.controls.dateFrom.errors &&
-      !this.form.controls.dateTo.errors &&
-      this.dateFrom.nativeElement.validity.valid &&
-      this.dateTo.nativeElement.validity.valid
-    ) {
-      this.updatePageUrl();
-    }
-  }
-
   enableFilters(): void {
     this.facetConf.forEach((name: string) => {
       this.form.controls[name].enable();
@@ -682,7 +615,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
-  updateMenuAvailability(): void {
+  updateFilterAvailability(): void {
     this.enableFilters();
     this.filterStates[this.form.value['facetParameter']].disabled = true;
     this.setIsShowingSearchList(false);
@@ -690,11 +623,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** triggerLoad
   /* invokes beginPolling or triggers a data refresh
-  /* calls updateMenuAvailability once data is loaded
+  /* calls updateFilterAvailability once data is loaded
   **/
   triggerLoad(): void {
     const onDataReady = (refresh = false): void => {
-      this.updateMenuAvailability();
+      this.updateFilterAvailability();
       if (refresh) {
         this.pollRefresh.next(true);
       }
@@ -712,7 +645,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   switchFacet(): void {
     // re-process currently-loaded data
     this.postProcessResult();
-    this.updateMenuAvailability();
+    this.updateFilterAvailability();
     this.updatePageUrl();
   }
 
@@ -739,7 +672,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { string } exempt - optional filter to ignore
   */
   closeFilters(exempt = ''): void {
-    console.log('exempt ' + exempt);
     Object.keys(this.filterStates)
       .filter((s: string) => {
         return s !== exempt;
@@ -764,7 +696,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   extractChartData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
-    this.chartData = facetFields.slice(0, 5).map((ff: FacetFieldProcessed) => {
+    this.chartData = facetFields.map((ff: FacetFieldProcessed) => {
       return {
         name: ff.labelFormatted ? ff.labelFormatted : ff.label,
         value: this.form.value.showPercent ? ff.percent : ff.count

@@ -27,7 +27,7 @@ export class BarComponent {
   categoryAxis: am4charts.CategoryAxis;
   colours = ['#0a72cc'];
   legendContainer: am4core.Container;
-  preferredNumberBars = 5;
+  preferredNumberBars = 15;
   series: am4charts.ColumnSeries;
   settings = Object.assign({}, BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
@@ -176,7 +176,12 @@ export class BarComponent {
 
   zoomTop(): void {
     if (this._results.length > this.preferredNumberBars) {
-      this.categoryAxis.zoomToIndexes(0, 5, false, true);
+      this.categoryAxis.zoomToIndexes(
+        this._results.length - this.preferredNumberBars,
+        this._results.length,
+        false,
+        true
+      );
     }
   }
 
@@ -197,9 +202,17 @@ export class BarComponent {
       this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
-      chart.paddingTop = 0;
-      chart.paddingRight = 0;
-      chart.paddingLeft = 0;
+      this.chart.events.on('ready', () => {
+        this.zoomTop();
+      });
+
+      ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
+        (s: string) => {
+          if (this.settings[s]) {
+            chart[s] = this.settings[s];
+          }
+        }
+      );
 
       // Create axes
       this.categoryAxis = new am4charts.CategoryAxis();
