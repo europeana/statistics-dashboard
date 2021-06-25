@@ -144,17 +144,6 @@ input[type="checkbox"] {
   }
 }
 
-input[type="date"],
-.datasetName {
-  width: 11em;
-}
-
-input[type="date"],
-input[type="text"] {
-  margin-top: 5px;
-  padding: 5px;
-}
-
 input[type="date"]:not(:valid) {
   border: 1px solid red;
 }
@@ -165,6 +154,7 @@ input[type="date"]:not(:valid) {
 
 .datasetName {
   margin-bottom: 1em;
+  margin-left: $gap;
 }
 
 app-overview {

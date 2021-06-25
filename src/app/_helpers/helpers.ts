@@ -24,11 +24,12 @@ export function getFormValueList(
   field: string
 ): Array<string> {
   const vals = form.value[field];
-  return vals
+  const res = vals
     ? Object.keys(vals)
         .filter((key: string) => {
           return vals[key];
         })
         .map(fromInputSafeName)
     : [];
+  return res;
 }

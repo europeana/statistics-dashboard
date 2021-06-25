@@ -1,0 +1,52 @@
+<ul class="dates" [formGroup]="form">
+  <ng-template #dateErrors let-field="field">
+    <ul class="errors">
+      <li *ngIf="form.get(field)!.errors!.isTooEarly">Date is too early</li>
+      <li *ngIf="form.get(field)!.errors!.isTooLate">Date is too late</li>
+    </ul>
+  </ng-template>
+
+  <li>From</li>
+  <li>
+    <input
+      formControlName="dateFrom"
+      #dateFrom
+      [attr.max]="today"
+      [attr.min]="yearZero"
+      type="date"
+      placeholder="{{ 'YYYY-MM-DD' }}"
+      (change)="dateChange(true)"
+    />
+  </li>
+
+  <li *ngIf="form.get('dateFrom').errors">
+    <ng-content
+      *ngTemplateOutlet="dateErrors; context: { field: 'dateFrom' }"
+    ></ng-content>
+  </li>
+
+  <li>To</li>
+  <li>
+    <input
+      formControlName="dateTo"
+      #dateTo
+      [attr.max]="today"
+      type="date"
+      placeholder="{{ 'YYYY-MM-DD' }}"
+      (change)="dateChange(false)"
+    />
+  </li>
+  <li>
+    <ng-container *ngIf="form.get('dateTo').errors">
+      <ng-content
+        *ngTemplateOutlet="dateErrors; context: { field: 'dateTo' }"
+      ></ng-content>
+    </ng-container>
+  </li>
+  <ng-template #dateErrors let-field="field">
+    <ul class="errors">
+      <li *ngIf="form.get(field)!.errors!.isTooEarly">Date is too early</li>
+      <li *ngIf="form.get(field)!.errors!.isTooLate">Date is too late</li>
+    </ul>
+  </ng-template>
+</ul>

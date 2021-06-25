@@ -73,45 +73,22 @@
                   (valueChanged)="updatePageUrl()"
                 ></app-filter>
               </ng-container>
+
+              <!-- DATES FILTER -->
+
+              <app-filter
+                [form]="form"
+                [group]="'dates'"
+                [state]="filterStates['dates']"
+                (visibilityChanged)="closeFilters($event)"
+                (valueChanged)="updatePageUrl()"
+              ></app-filter>
             </ng-container>
           </li>
         </ul>
       </div>
 
       <ul class="filters inputs" *ngIf="!isShowingSearchList">
-        <li class="column">
-          <h3 [title]="getFormattedDateParam()">Date From</h3>
-          <input
-            formControlName="dateFrom"
-            #dateFrom
-            [attr.max]="today"
-            [attr.min]="yearZero"
-            type="date"
-            placeholder="{{ 'YYYY-MM-DD' }}"
-            (change)="dateChange(true)"
-          />
-          <ng-container *ngIf="form.get('dateFrom').errors">
-            <ng-content
-              *ngTemplateOutlet="dateErrors; context: { field: 'dateFrom' }"
-            ></ng-content>
-          </ng-container>
-        </li>
-        <li class="column">
-          <h3 [title]="getFormattedDateParam()">Date To</h3>
-          <input
-            formControlName="dateTo"
-            #dateTo
-            [attr.max]="today"
-            type="date"
-            placeholder="{{ 'YYYY-MM-DD' }}"
-            (change)="dateChange(false)"
-          />
-          <ng-container *ngIf="form.get('dateTo').errors">
-            <ng-content
-              *ngTemplateOutlet="dateErrors; context: { field: 'dateTo' }"
-            ></ng-content>
-          </ng-container>
-        </li>
         <li class="column">
           <input
             formControlName="datasetName"
@@ -171,7 +148,7 @@
               {{ date }}
             </a>
             <a
-              (click)="dateChange()"
+              (click)="datesClear()"
               class="date"
               *ngIf="form.value.dateTo; let date"
             >
