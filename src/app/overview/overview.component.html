@@ -30,22 +30,24 @@
   <!-- Main -->
 
   <div class="statistics-dashboard fit-to-page">
+    <!-- Left -->
+
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <ul class="filters">
           <li>
-            <a data-e2e="link-home" routerLink="/">Home</a>
+            <a class="home-link" data-e2e="link-home" routerLink="/">Home</a>
           </li>
-          <li class="switch-wrapper">
-            <span> CT Zero </span>
-            <label class="switch">
+          <li class="container-h">
+            <span class="icon ct-zero"></span>
+            <label class="icon ct-zero-label">
+              content tier zero
               <input
                 data-e2e="ct-zero-switch"
                 type="checkbox"
                 formControlName="contentTierZero"
                 (change)="updatePageUrl()"
               />
-              <span class="slider round"></span>
             </label>
           </li>
         </ul>
@@ -84,14 +86,18 @@
             formControlName="datasetName"
             (keyup.enter)="updatePageUrl()"
             placeholder="Dataset Id"
-            class="datasetName"
+            class="dataset-name"
             type="text"
           />
         </li>
       </ul>
     </div>
 
+    <!-- Right -->
+
     <div class="statistics-dashboard-right">
+      <!-- Header -->
+
       <div class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngIf="!form.value.facetParameter">
           <h3 class="header-data">Select a facet dimension</h3>
@@ -169,200 +175,205 @@
         <app-listing [showing]="true"></app-listing>
       </ng-container>
 
-      <ngx-datatable
-        *ngIf="tableData"
-        #dataTable
-        id="dataTable"
-        [rows]="tableData.tableRows"
-        [ngClass]="{ showing: !isShowingSearchList }"
-        class="material expandable datatable fullscreen"
-        [columnMode]="ColumnMode.flex"
-        [headerHeight]="50"
-        [footerHeight]="60"
-        [rowHeight]="50"
-        [scrollbarV]="false"
-        [limit]="5"
-      >
-        <!-- Mobile row detail -->
-        <ngx-datatable-row-detail [rowHeight]="50">
-          <ng-template
-            let-row="row"
-            let-expanded="expanded"
-            ngx-datatable-row-detail-template
-          >
-            <div class="mobile-row">
-              <span
-                *ngFor="let col of tableData.columns | slice: 1"
-                class="mobile-row-detail"
-              >
-                {{ row[col] }}</span
-              >
-            </div>
-          </ng-template>
-        </ngx-datatable-row-detail>
-
-        <!-- Mobile controls -->
-        <ngx-datatable-column
-          [width]="50"
-          [resizeable]="false"
-          [sortable]="false"
-          [draggable]="false"
-          [canAutoResize]="false"
+      <!-- Data Area -->
+      <div class="data-area">
+        <ngx-datatable
+          *ngIf="tableData"
+          #dataTable
+          id="dataTable"
+          [rows]="tableData.tableRows"
+          [ngClass]="{ showing: !isShowingSearchList }"
+          class="material expandable datatable fullscreen"
+          [columnMode]="ColumnMode.flex"
+          [headerHeight]="50"
+          [footerHeight]="60"
+          [rowHeight]="50"
+          [scrollbarV]="false"
+          [limit]="5"
         >
-          <ng-template
-            let-row="row"
-            let-expanded="expanded"
-            ngx-datatable-cell-template
-          >
-            <a
-              href="#"
-              [class.datatable-icon-right]="!expanded"
-              [class.datatable-icon-down]="expanded"
-              title="Expand / Collapse Row"
-              (click)="toggleExpandRow(row)"
-              class="desktop-hidden"
+          <!-- Mobile row detail -->
+          <ngx-datatable-row-detail [rowHeight]="50">
+            <ng-template
+              let-row="row"
+              let-expanded="expanded"
+              ngx-datatable-row-detail-template
             >
-            </a>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <!-- Col 0 -->
-        <ngx-datatable-column
-          name="{{ tableData.columns[0] | titlecase }}"
-          [flexGrow]="3"
-          [minWidth]="200"
-        >
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <a target="_blank" [href]="getUrlRow(value)">
-              {{ value }}
-            </a>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <!-- Col >= 1 -->
-        <ngx-datatable-column
-          *ngFor="let col of tableData.columns | slice: 1; index as i"
-          name="{{ col | titlecase }}"
-          [flexGrow]="1"
-        >
-          <ng-template
-            let-column="column"
-            let-sort="sortFn"
-            ngx-datatable-header-template
-          >
-            <span class="mobile-hidden">{{ column.name }}</span>
-          </ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <span class="mobile-hidden">{{ value }}</span>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-footer *ngIf="true">
-          <ng-template
-            ngx-datatable-footer-template
-            let-rowCount="rowCount"
-            let-pageSize="pageSize"
-            let-selectedCount="selectedCount"
-            let-curPage="curPage"
-            let-offset="offset"
-          >
-            <div class="table-footer">
-              <div class="table-footer-total">
-                <strong>Total</strong>: {{ totalResults }}
+              <div class="mobile-row">
+                <span
+                  *ngFor="let col of tableData.columns | slice: 1"
+                  class="mobile-row-detail"
+                >
+                  {{ row[col] }}</span
+                >
               </div>
-              <a [href]="getUrl(true)" target="_blank">View in portal</a>
-            </div>
+            </ng-template>
+          </ngx-datatable-row-detail>
 
-            <datatable-pager
-              [pagerLeftArrowIcon]="'datatable-icon-left'"
-              [pagerRightArrowIcon]="'datatable-icon-right'"
-              [pagerPreviousIcon]="'datatable-icon-prev'"
-              [pagerNextIcon]="'datatable-icon-skip'"
-              [page]="curPage"
-              [size]="pageSize"
-              [count]="rowCount"
-              [hidden]="!(rowCount / pageSize > 1)"
-              (change)="dataTable.onFooterPage($event)"
+          <!-- Mobile controls -->
+          <ngx-datatable-column
+            [width]="50"
+            [resizeable]="false"
+            [sortable]="false"
+            [draggable]="false"
+            [canAutoResize]="false"
+          >
+            <ng-template
+              let-row="row"
+              let-expanded="expanded"
+              ngx-datatable-cell-template
             >
-            </datatable-pager>
-          </ng-template>
-        </ngx-datatable-footer>
-      </ngx-datatable>
+              <a
+                href="#"
+                [class.datatable-icon-right]="!expanded"
+                [class.datatable-icon-down]="expanded"
+                title="Expand / Collapse Row"
+                (click)="toggleExpandRow(row)"
+                class="desktop-hidden"
+              >
+              </a>
+            </ng-template>
+          </ngx-datatable-column>
 
-      <label
-        style="display: {{ isShowingSearchList ? 'none' : 'inline-block' }}"
-        ><input
-          type="checkbox"
-          formControlName="showPercent"
-          (change)="extractChartData()"
-        />As percentages</label
-      >
-
-      <ul
-        *ngIf="allProcessedFacetData"
-        class="options-wrapper"
-        [ngClass]="{ showing: !isShowingSearchList }"
-        (clickOutside)="closeDisplayOptions()"
-      >
-        <li>
-          <a #downloadAnchor></a>
-        </li>
-
-        <li class="dropdown">
-          <a
-            class="menu-opener"
-            (click)="toggleDownloadOptions()"
-            [ngClass]="{ open: downloadOptionsOpen }"
-            ><h3>Downloads</h3></a
+          <!-- Col 0 -->
+          <ngx-datatable-column
+            name="{{ tableData.columns[0] | titlecase }}"
+            [flexGrow]="3"
+            [minWidth]="200"
           >
-          <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
-            <ul class="dropdown-content">
-              <li *ngFor="let exportType of exportTypes">
-                <a (click)="export(exportType)">{{ exportType }}</a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              <a target="_blank" [href]="getUrlRow(value)">
+                {{ value }}
+              </a>
+            </ng-template>
+          </ngx-datatable-column>
 
-      <!-- SNAPSHOTS -->
-      <ul *ngIf="experimental">
-        <!-- TODO: it should never be possible to add the current series to itself
-             so add new field to CompareData (i.e. the query params as a string)
-             and compare to the global (query params as string) to selectively add
-        -->
-        <li *ngFor="let item of compareData | keyvalue" class="compare-data">
-          <a
-            (click)="addSeriesToChart([item.key])"
-            class="compare-data-link"
-            [ngClass]="{ disabled: item.value.applied }"
-            >{{ item.value.label }}</a
+          <!-- Col >= 1 -->
+          <ngx-datatable-column
+            *ngFor="let col of tableData.columns | slice: 1; index as i"
+            name="{{ col | titlecase }}"
+            [flexGrow]="1"
           >
-          <a
-            (click)="removeSeriesFromChart(item.key)"
-            class="compare-data-link-remove"
-            *ngIf="item.value.applied"
-            >X</a
-          >
-        </li>
-      </ul>
-      <!-- END SNAPSHOTS -->
+            <ng-template
+              let-column="column"
+              let-sort="sortFn"
+              ngx-datatable-header-template
+            >
+              <span class="mobile-hidden">{{ column.name }}</span>
+            </ng-template>
+            <ng-template let-value="value" ngx-datatable-cell-template>
+              <span class="mobile-hidden">{{ value }}</span>
+            </ng-template>
+          </ngx-datatable-column>
 
-      <div
-        *ngIf="chartData"
-        class="chart-wrapper"
-        [ngClass]="{ showing: !isShowingSearchList }"
-      >
-        <app-bar-chart
-        #barChart
-          [showPercent]="form.value.showPercent"
-          [extraSettings]="
-            ['contentTier', 'metadataTier'].includes(form.value.facetParameter)
-              ? barChartSettingsTiers
-              : barChartSettings
-          "
-          [results]="chartData"
-        ></app-bar-chart>
+          <ngx-datatable-footer *ngIf="true">
+            <ng-template
+              ngx-datatable-footer-template
+              let-rowCount="rowCount"
+              let-pageSize="pageSize"
+              let-selectedCount="selectedCount"
+              let-curPage="curPage"
+              let-offset="offset"
+            >
+              <div class="table-footer">
+                <div class="table-footer-total">
+                  <strong>Total</strong>: {{ totalResults }}
+                </div>
+                <a [href]="getUrl(true)" target="_blank">View in portal</a>
+              </div>
+
+              <datatable-pager
+                [pagerLeftArrowIcon]="'datatable-icon-left'"
+                [pagerRightArrowIcon]="'datatable-icon-right'"
+                [pagerPreviousIcon]="'datatable-icon-prev'"
+                [pagerNextIcon]="'datatable-icon-skip'"
+                [page]="curPage"
+                [size]="pageSize"
+                [count]="rowCount"
+                [hidden]="!(rowCount / pageSize > 1)"
+                (change)="dataTable.onFooterPage($event)"
+              >
+              </datatable-pager>
+            </ng-template>
+          </ngx-datatable-footer>
+        </ngx-datatable>
+
+        <label
+          style="display: {{ isShowingSearchList ? 'none' : 'inline-block' }}"
+          ><input
+            type="checkbox"
+            formControlName="showPercent"
+            (change)="extractChartData()"
+          />As percentages</label
+        >
+
+        <ul
+          *ngIf="allProcessedFacetData"
+          class="options-wrapper"
+          [ngClass]="{ showing: !isShowingSearchList }"
+          (clickOutside)="closeDisplayOptions()"
+        >
+          <li>
+            <a #downloadAnchor></a>
+          </li>
+
+          <li class="dropdown">
+            <a
+              class="menu-opener"
+              (click)="toggleDownloadOptions()"
+              [ngClass]="{ open: downloadOptionsOpen }"
+              ><h3>Downloads</h3></a
+            >
+            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
+              <ul class="dropdown-content">
+                <li *ngFor="let exportType of exportTypes">
+                  <a (click)="export(exportType)">{{ exportType }}</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+
+        <!-- SNAPSHOTS -->
+        <ul *ngIf="experimental">
+          <!-- TODO: it should never be possible to add the current series to itself
+               so add new field to CompareData (i.e. the query params as a string)
+               and compare to the global (query params as string) to selectively add
+          -->
+          <li *ngFor="let item of compareData | keyvalue" class="compare-data">
+            <a
+              (click)="addSeriesToChart([item.key])"
+              class="compare-data-link"
+              [ngClass]="{ disabled: item.value.applied }"
+              >{{ item.value.label }}</a
+            >
+            <a
+              (click)="removeSeriesFromChart(item.key)"
+              class="compare-data-link-remove"
+              *ngIf="item.value.applied"
+              >X</a
+            >
+          </li>
+        </ul>
+        <!-- END SNAPSHOTS -->
+
+        <div
+          *ngIf="chartData"
+          class="chart-wrapper"
+          [ngClass]="{ showing: !isShowingSearchList }"
+        >
+          <app-bar-chart
+            #barChart
+            [showPercent]="form.value.showPercent"
+            [extraSettings]="
+              ['contentTier', 'metadataTier'].includes(
+                form.value.facetParameter
+              )
+                ? barChartSettingsTiers
+                : barChartSettings
+            "
+            [results]="chartData"
+          ></app-bar-chart>
+        </div>
       </div>
     </div>
   </div>

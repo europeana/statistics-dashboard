@@ -505,6 +505,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     this.facetConf.map((s: string) => {
       this.form.addControl(s, this.fb.group({}));
+      this.form.addControl(`filter_list_${s}`, new FormControl(''));
     });
   }
 
