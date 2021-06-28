@@ -129,10 +129,6 @@ input[type="text"] {
 @media (min-width: $bp-xl) {
   .dashboard-wrapper .statistics-dashboard {
     display: flex;
-    .statistics-dashboard-left {
-      margin-right: $spacing-l;
-      width: 306px;
-    }
     .statistics-dashboard-right {
       flex-grow: 1;
       padding-left: $spacing-l;

@@ -35,20 +35,20 @@
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <ul class="filters">
-          <li>
+          <li class="padded-left">
             <a class="home-link" data-e2e="link-home" routerLink="/">Home</a>
           </li>
-          <li class="container-h">
-            <span class="icon ct-zero"></span>
-            <label class="icon ct-zero-label">
-              content tier zero
-              <input
-                data-e2e="ct-zero-switch"
-                type="checkbox"
-                formControlName="contentTierZero"
-                (change)="updatePageUrl()"
-              />
-            </label>
+
+          <li class="ct-zero padded-left">
+            <app-checkbox
+              [form]="form"
+              [labelText]="
+                (form.value.contentTierZero ? 'Disable' : 'Enable') +
+                ' content tier zero'
+              "
+              (valueChanged)="updatePageUrl()"
+              controlName="contentTierZero"
+            ></app-checkbox>
           </li>
         </ul>
 

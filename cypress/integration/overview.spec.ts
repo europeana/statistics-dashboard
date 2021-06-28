@@ -5,7 +5,7 @@ context('statistics-dashboard', () => {
 
     const selLinkHomeHeader = '[data-e2e=link-home-header]';
     const selLinkHome = '[data-e2e=link-home]';
-    const selCTZero = '[data-e2e=ct-zero-switch]';
+    const selCTZero = '.ct-zero input';
     const urlParamCTZero = 'content-tier-zero=true';
 
     it('should show for all urls', () => {

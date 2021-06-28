@@ -109,7 +109,6 @@ input[type="date"]:not(:valid) {
 }
 
 .dataset-name {
-  margin-bottom: 1em;
   margin-left: $spacing-s;
 }
 
@@ -219,16 +218,6 @@ label {
 .filters {
   display: flex;
   flex-direction: column;
-}
-
-.filters {
-  > li:not(:last-child) {
-    margin-bottom: 1em;
-  }
-
-  &.inputs {
-    margin-top: 2em;
-  }
 }
 
 .dropdown {

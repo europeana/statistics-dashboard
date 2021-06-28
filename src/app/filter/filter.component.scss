@@ -1,13 +1,7 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
-$row-height: 32px;
-$total-height: #{$row-height * 5};
 $total-width: 268px;
-
-.checkbox {
-  opacity: 0;
-}
 
 .checkbox-filter {
   border-bottom: 1px solid $gray-5;
@@ -21,14 +15,10 @@ $total-width: 268px;
   .checkbox-filter-input {
     border: 0;
     box-shadow: none;
+    font-size: 14px;
     margin-left: $spacing-s;
     width: 100%;
   }
-}
-
-.checkbox-filter-input,
-.filter-label {
-  font-size: 14px;
 }
 
 .checkboxes {
@@ -41,63 +31,10 @@ $total-width: 268px;
   z-index: 1;
 }
 
-.checkboxes-list {
-  display: flex;
-  flex-direction: column;
-  max-height: $total-height;
-  overflow: hidden;
-  overflow-y: auto;
-}
-
-.checkbox-labelled {
-  padding: 0;
-  position: relative;
-
-  &:hover {
-    background-color: $offwhite;
-  }
-
-  :first-child {
-    min-width: $width-icon-filter;
-  }
-
-  :last-child {
-    width: 100%;
-  }
-}
-
-.checkmarked-checkbox {
-  height: $width-icon-filter;
-  position: relative;
-  width: $width-icon-filter;
-
-  &::before {
-    bottom: 0;
-    background-image: svg-url-icon-checkbox("#000");
-    background-position: center;
-    background-repeat: no-repeat;
-    content: "";
-    display: block;
-    position: absolute;
-    min-width: $width-icon-filter;
-    height: $width-icon-filter;
-  }
-
-  &.checked::before {
-    background-image: svg-url-icon-checkbox-checked("#000");
-  }
-}
-
 .filter {
   color: #000;
   position: relative;
   width: $total-width;
-}
-
-.filter-label {
-  line-height: $row-height;
-  margin: 0 $spacing-s;
-  white-space: nowrap;
 }
 
 .filter-opener {

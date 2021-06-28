@@ -1,7 +1,9 @@
 @import "functions/_icon_urls";
 @import "_variables";
 
-.ct-zero,
+$row-height: 32px;
+$total-height: #{$row-height * 5};
+
 .dataset-name,
 .home-link,
 .icon {
@@ -9,14 +11,42 @@
   background-size: 20px 20px;
 }
 
+.checkboxes-list {
+  display: flex;
+  flex-direction: column;
+  margin-left: $spacing-s;
+  max-height: $total-height;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
 .filters {
   .container-h {
+    align-items: center;
     display: flex;
     flex-direction: row;
-
-    align-items: center;
     margin: $spacing-s;
     padding: $spacing-s 0;
+  }
+
+  .padded-left {
+    margin-left: $spacing-s;
+  }
+
+  .ct-zero .checkmarked-checkbox {
+    &::before {
+      background-image: svg-url-icon-eye-disabled($gray-med);
+    }
+    &.checked::before {
+      background-image: svg-url-icon-eye($gray-med);
+    }
+  }
+
+  .filter-label {
+    font-size: 14px;
+    line-height: $row-height;
+    margin: 0 $spacing-s;
+    white-space: nowrap;
   }
 
   .icon {
@@ -31,20 +61,10 @@
 }
 
 .ct-zero.icon {
-  //margin-left: -20px;
-  //margin-bottom: 10px;
-
-  //&.icon{
   display: none;
-  //}
 }
 
 /*
-.ct-zero{
-  background-image: svg-url-icon-eye-disabled($gray-med);
-  background-image: svg-url-icon-eye($gray-med);
-}
-
 .home-link {
   background-image: svg-url-icon-home($gray-med);
 }
