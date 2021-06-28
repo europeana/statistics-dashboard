@@ -12,13 +12,18 @@
         open: state.visible
       }"
     >
-      <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
-        <span class="selection">
-          {{ setVals }}
+      <span class="container-h">
+        <span class="icon filter-icon-{{ group }}"> </span>
+        <span class="opener-name-container">
+          <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
+            <span class="selection">
+              {{ setVals }}
+            </span>
+          </ng-container>
+          <span class="opener-name">
+            {{ group | renameApiFacet }}
+          </span>
         </span>
-      </ng-container>
-      <span class="opener-name">
-        {{ group | renameApiFacet }}
       </span>
     </a>
   </li>
@@ -33,11 +38,12 @@
     <ng-container *ngIf="_options; else dates">
       <li class="checkboxes">
         <ul>
-          <li class="checkbox-filter">
+          <li class="checkbox-filter container-h">
             <span class="icon"></span>
             <input
               class="checkbox-filter-input"
               (keyup)="filterOptions($event)"
+              formControlName="filter_list_{{ group }}"
               placeholder="Search"
             />
           </li>
@@ -47,7 +53,7 @@
             <ul
               *ngFor="let option of filteredOptions; let i = index"
               [formGroupName]="group"
-              class="checkbox-labelled"
+              class="checkbox-labelled container-h"
             >
               <li
                 class="checkmarked-checkbox"

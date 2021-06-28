@@ -65,7 +65,13 @@ $stats-blue: #0a72cc;
 
 /* Layout */
 $max-width: 1280px;
-$offset-left-1: 4.5rem;
+
+$spacing-xs: 4px;
+$spacing-s: 8px;
+$spacing-m: 12px;
+$spacing-l: 24px;
+
+$width-icon-filter: 18px;
 
 /* Breakpoints */
 $bp-small: 24em;

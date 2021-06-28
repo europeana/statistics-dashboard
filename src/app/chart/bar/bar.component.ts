@@ -210,8 +210,7 @@ export class BarComponent {
       series.dataFields.valueX = valueField;
       series.dataFields.categoryY = 'name';
       series.columns.template.tooltipText = `{categoryY}: [bold]{valueX}[/]${labelSuffix}`;
-    }
-    else {
+    } else {
       series.dataFields.valueY = valueField;
       series.dataFields.categoryX = 'name';
       series.columns.template.tooltipText = `{categoryX}: [bold]{valueY}[/]${labelSuffix}`;

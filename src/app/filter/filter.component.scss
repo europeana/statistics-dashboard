@@ -1,35 +1,27 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
-$gap: 8px;
 $row-height: 32px;
 $total-height: #{$row-height * 5};
 $total-width: 268px;
-$width-icon: 18px;
 
 .checkbox {
   opacity: 0;
 }
 
 .checkbox-filter {
-  align-items: center;
   border-bottom: 1px solid $gray-5;
-  display: flex;
-  flex-direction: row;
-  margin: $gap;
-  padding: $gap 0;
+  margin-left: 0;
 
   .icon {
     background: svg-url-icon-search("#333") center no-repeat;
-    display: block;
-    height: $width-icon;
-    min-width: $width-icon;
+    top: 0;
   }
 
   .checkbox-filter-input {
     border: 0;
     box-shadow: none;
-    margin-left: $gap;
+    margin-left: $spacing-s;
     width: 100%;
   }
 }
@@ -41,7 +33,7 @@ $width-icon: 18px;
 
 .checkboxes {
   background: $white;
-  border-radius: 0 0 $gap $gap;
+  border-radius: 0 0 $spacing-s $spacing-s;
   box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
   min-width: $total-width;
   padding-bottom: 16px;
@@ -58,10 +50,7 @@ $width-icon: 18px;
 }
 
 .checkbox-labelled {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  padding-left: $gap;
+  padding: 0;
   position: relative;
 
   &:hover {
@@ -69,11 +58,33 @@ $width-icon: 18px;
   }
 
   :first-child {
-    min-width: $width-icon;
+    min-width: $width-icon-filter;
   }
 
   :last-child {
     width: 100%;
+  }
+}
+
+.checkmarked-checkbox {
+  height: $width-icon-filter;
+  position: relative;
+  width: $width-icon-filter;
+
+  &::before {
+    bottom: 0;
+    background-image: svg-url-icon-checkbox("#000");
+    background-position: center;
+    background-repeat: no-repeat;
+    content: "";
+    display: block;
+    position: absolute;
+    min-width: $width-icon-filter;
+    height: $width-icon-filter;
+  }
+
+  &.checked::before {
+    background-image: svg-url-icon-checkbox-checked("#000");
   }
 }
 
@@ -85,14 +96,13 @@ $width-icon: 18px;
 
 .filter-label {
   line-height: $row-height;
-  margin: 0 $gap;
+  margin: 0 $spacing-s;
   white-space: nowrap;
 }
 
 .filter-opener {
   color: $gray-faint;
   display: block;
-  padding: $gap 20px $gap $gap;
   position: relative;
 
   &::after {
@@ -102,51 +112,37 @@ $width-icon: 18px;
     height: 16px;
     line-height: 6px;
     position: absolute;
-    right: $gap;
+    right: $spacing-s;
     top: 14px;
   }
 
-  &:hover {
-    color: $gray-faint;
-  }
-
   &.open {
-    background: $gray-5;
+    background-color: $gray-5;
     color: #000;
 
     &::after {
       transform: rotate(180deg);
     }
   }
-}
 
-.checkmarked-checkbox {
-  height: $width-icon;
-  position: relative;
-  width: $width-icon;
-
-  &::before {
-    bottom: 0;
-    background-image: svg-url-icon-checkbox("#000");
-    background-position: center;
-    background-repeat: no-repeat;
-    content: "";
-    display: block;
-    position: absolute;
-    min-width: $width-icon;
-    height: $width-icon;
-  }
-
-  &.checked::before {
-    background-image: svg-url-icon-checkbox-checked("#000");
+  .container-h {
+    margin: 0;
   }
 }
 
 .opener-name {
+  margin: 0 $spacing-s;
   text-transform: capitalize;
 }
 
+.opener-name-container {
+  position: relative;
+  paddin: 8px 20px 8px 8px;
+}
+
 .selection {
+  display: inline-block;
+  margin: 0 30px 0 $spacing-s;
   position: relative;
   top: 5px;
 }
@@ -155,7 +151,8 @@ $width-icon: 18px;
   color: $stats-blue;
   font-size: 8px;
   font-weight: 600;
+  line-height: 8px;
   position: absolute;
-  top: 5px;
-  left: $gap;
+  top: 0px;
+  left: 0;
 }

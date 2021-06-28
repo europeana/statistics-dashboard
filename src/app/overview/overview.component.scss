@@ -6,20 +6,24 @@
 @import "~@swimlane/ngx-datatable/themes/material.css";
 @import "~@swimlane/ngx-datatable/assets/icons.css";
 
-$gap: 8px;
 $width-left-col: 200px;
 
 .compare-data {
   display: flex;
 }
+
 .compare-data-link-remove {
   margin-left: 8px;
+}
+
+.ct-zero-label {
+  margin-left: $spacing-s;
 }
 
 .date-removal {
   margin-left: auto;
   .date + .date {
-    margin-left: 12px;
+    margin-left: $spacing-m;
   }
 }
 
@@ -63,6 +67,7 @@ $width-left-col: 200px;
 .rm-filters {
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: $spacing-m;
 
   &.list-mode {
     display: none;
@@ -73,7 +78,7 @@ $width-left-col: 200px;
   background: $gray-lightest;
   color: $near-black;
   margin: 4px 0;
-  padding: 0 $gap;
+  padding: 0 $spacing-s;
 
   &:not(:last-child) {
     margin-right: 24px;
@@ -82,63 +87,6 @@ $width-left-col: 200px;
   fieldset {
     display: flex;
     align-items: center;
-  }
-}
-
-.switch-wrapper {
-  align-items: center;
-  display: flex;
-  > span {
-    padding-right: 0.4em;
-  }
-  .switch {
-    padding-bottom: 0.4rem;
-    position: relative;
-    width: 60px;
-
-    .slider {
-      background-color: #ccc;
-      bottom: 0;
-      border-radius: 34px;
-      cursor: pointer;
-      left: 0;
-      position: absolute;
-      right: 0;
-      top: 0;
-      transition: $transition-duration;
-
-      &::before {
-        border-radius: 50%;
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: $transition-duration;
-      }
-    }
-
-    input:checked + .slider {
-      background-color: $stats-blue;
-    }
-
-    input:focus + .slider {
-      box-shadow: 0 0 1px $eu-jade;
-    }
-
-    input:checked + .slider:before {
-      -webkit-transform: translateX(26px);
-      -ms-transform: translateX(26px);
-      transform: translateX(26px);
-    }
-
-    input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
   }
 }
 
@@ -160,9 +108,9 @@ input[type="date"]:not(:valid) {
   color: red;
 }
 
-.datasetName {
+.dataset-name {
   margin-bottom: 1em;
-  margin-left: $gap;
+  margin-left: $spacing-s;
 }
 
 app-overview {
@@ -252,7 +200,7 @@ label {
   font-weight: bold;
   margin-bottom: 0;
   margin-top: 20px;
-  margin: $gap;
+  margin: $spacing-s;
 }
 
 .filter-select {
@@ -302,7 +250,13 @@ label {
 .chart-wrapper.showing {
   height: 500px;
   max-width: 100%;
-  padding-bottom: 5em;
+  padding-bottom: $spacing-m;
+}
+
+.data-area {
+  background-color: $white;
+  border-radius: $spacing-m;
+  padding: 20px 26px;
 }
 
 .facet-param {
@@ -331,10 +285,6 @@ label {
 .statistics-dashboard {
   display: flex;
   flex-direction: column-reverse;
-}
-
-.statistics-dashboard-right {
-  min-width: 0;
 }
 
 @media (min-width: $bp-xl) {
