@@ -1,10 +1,14 @@
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
-export interface IHash {
+export interface IHashString {
   [details: string]: string;
 }
 
-export interface IHashArray {
+export interface IHashNumber {
+  [details: string]: number;
+}
+
+export interface IHashStringArray {
   [details: string]: Array<string>;
 }
 

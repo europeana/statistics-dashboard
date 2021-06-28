@@ -7,7 +7,8 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { ChartSettings, NameValue } from '../../_models';
+import { ChartSettings, ColourSeriesData, NameValue } from '../../_models';
+
 import { BarChartDefaults } from '../chart-defaults';
 
 interface CustomLegendItem {
@@ -25,19 +26,20 @@ export class BarComponent {
   private chart: am4charts.XYChart;
   _results: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
-  colours = ['#0a72cc'];
+  colours = ['#0a72cc']; // TODO import from data file
   legendContainer: am4core.Container;
   preferredNumberBars = 15;
+
+  allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
+
   settings = Object.assign({}, BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
 
   @Input() chartId = 'barChart';
   @Input() showPercent: boolean;
   @Input() set results(results: Array<NameValue>) {
-    this._results = this.settings.isHorizontal
-      ? results.slice().reverse()
-      : results;
+    this._results = results;
     if (this.chart) {
       this.chart.data = this._results;
       this.drawChart();
@@ -159,29 +161,68 @@ export class BarComponent {
     this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
   }
 
+  removeSeries(id: string): void {
+    const series = this.allSeries[id];
+    if (series) {
+      this.chart.series
+        .removeIndex(this.chart.series.indexOf(series))
+        .dispose();
+      delete this.allSeries[id];
+    } else {
+      console.log(`can't find series to remove (${id})`);
+    }
+    this.chart.invalidateData();
+  }
+
+  addSeries(csds: Array<ColourSeriesData>): void {
+    csds.forEach((csd: ColourSeriesData) => {
+      const series = this.createSeries([csd.colour], csd.seriesName);
+      this.allSeries[csd.seriesName] = series;
+
+      // TODO: make this possible for percentages, i.e. this.chart.dataPercent.forEach(...)
+
+      this.chart.data.forEach((cd) => {
+        cd[csd.seriesName] = csd.data[cd.name];
+      });
+    });
+
+    this.chart.invalidateData();
+  }
+
   /** createSeries
   /* - instantiates series class
   /* - build colour model
   */
-  createSeries(): void {
-    this.series = this.chart.series.push(new am4charts.ColumnSeries());
+  createSeries(
+    colours: Array<string>,
+    valueField = 'value'
+  ): am4charts.ColumnSeries {
+    const series = this.chart.series.push(new am4charts.ColumnSeries());
+    const labelSuffix = this.showPercent ? '%' : '';
 
-    const colours = this.colours;
-    this.series.columns.template.events.once('inited', function (event) {
+    series.columns.template.events.once('inited', function (event) {
       event.target.fill = am4core.color(
         colours[event.target.dataItem.index % colours.length]
       );
     });
+
+    if (this.settings.isHorizontal) {
+      series.dataFields.valueX = valueField;
+      series.dataFields.categoryY = 'name';
+      series.columns.template.tooltipText = `{categoryY}: [bold]{valueX}[/]${labelSuffix}`;
+    }
+    else {
+      series.dataFields.valueY = valueField;
+      series.dataFields.categoryX = 'name';
+      series.columns.template.tooltipText = `{categoryX}: [bold]{valueY}[/]${labelSuffix}`;
+    }
+    series.columns.template.fillOpacity = 1;
+    return series;
   }
 
   zoomTop(): void {
     if (this._results.length > this.preferredNumberBars) {
-      this.categoryAxis.zoomToIndexes(
-        this._results.length - this.preferredNumberBars,
-        this._results.length,
-        false,
-        true
-      );
+      this.categoryAxis.zoomToIndexes(1, this.preferredNumberBars, false, true);
     }
   }
 
@@ -229,13 +270,9 @@ export class BarComponent {
         chart.yAxes.push(this.categoryAxis);
         chart.xAxes.push(this.valueAxis);
 
-        this.createSeries();
+        this.categoryAxis.renderer.inversed = true;
 
-        this.series.dataFields.valueX = 'value';
-        this.series.dataFields.categoryY = 'name';
-
-        const labelSuffix = this.showPercent ? '%' : '';
-        this.series.columns.template.tooltipText = `{categoryY}: [bold]{valueX}[/]${labelSuffix}`;
+        this.series = this.createSeries(this.colours);
 
         if (this.settings.hasScroll) {
           if (this._results.length > this.preferredNumberBars) {
@@ -247,12 +284,7 @@ export class BarComponent {
         chart.xAxes.push(this.categoryAxis);
         chart.yAxes.push(this.valueAxis);
 
-        this.createSeries();
-
-        this.series.dataFields.valueY = 'value';
-        this.series.dataFields.categoryX = 'name';
-        this.series.columns.template.tooltipText =
-          '{categoryX}: [bold]{valueY}[/]';
+        this.series = this.createSeries(this.colours);
 
         if (this.settings.hasScroll) {
           chart.scrollbarX = new am4core.Scrollbar();
@@ -286,9 +318,9 @@ export class BarComponent {
       this.valueAxis.renderer.labels.template.fontSize = 12;
       this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
 
-      this.series.columns.template.fillOpacity = 1;
       this.chart.data = this._results;
 
+      // TODO: remove this adapter when we're not using a prefix
       if (this.settings.prefixValueAxis) {
         this.categoryAxis.renderer.labels.template.adapter.add(
           'text',

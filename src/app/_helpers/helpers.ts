@@ -15,8 +15,20 @@ export function rightsUrlMatch(url: string): string | null {
   return null;
 }
 
+/** fromInputSafeName
+/* @param {string} s - the target string
+/* - replaces the 5 underscores sequence in a string with a dot character
+*/
 export function fromInputSafeName(s: string): string {
   return s.replace(/_____/g, '.');
+}
+
+/** toInputSafeName
+/* @param {string} s - the target string
+/* - replaces the dot character in a string with 5 underscores
+*/
+export function toInputSafeName(s: string): string {
+  return s.replace(/\./g, '_____');
 }
 
 export function getFormValueList(

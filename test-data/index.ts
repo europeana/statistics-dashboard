@@ -1,7 +1,12 @@
 import * as url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server';
-import { RawFacet, Facet, FacetField, IHashArray } from '../src/app/_models';
+import {
+  RawFacet,
+  Facet,
+  FacetField,
+  IHashStringArray
+} from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
 import {
   CHO,
@@ -33,9 +38,9 @@ new (class extends TestDataServer {
   }
 
   // url parse utility
-  getQueryMap(route: string): IHashArray {
+  getQueryMap(route: string): IHashStringArray {
     const params = url.parse(route, true).query;
-    const qfMap: IHashArray = {};
+    const qfMap: IHashStringArray = {};
     if (!params || !params['qf']) {
       return qfMap;
     }

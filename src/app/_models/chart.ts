@@ -1,3 +1,11 @@
+import { IHashNumber } from '.';
+
+export interface ColourSeriesData {
+  data: IHashNumber;
+  colour: string;
+  seriesName: string;
+}
+
 export interface ChartSettings {
   configurable: boolean;
   ctrlsOpen?: boolean;
