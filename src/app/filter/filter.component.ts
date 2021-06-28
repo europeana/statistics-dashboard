@@ -11,7 +11,13 @@ import { FilterState, NameLabel } from '../_models';
 export class FilterComponent {
   @Input() form: FormGroup;
   @Input() group: string;
-  @Input() options?: Array<NameLabel>;
+
+  filteredOptions?: Array<NameLabel>;
+  _options?: Array<NameLabel>;
+  @Input() set options(ops: Array<NameLabel>) {
+    this._options = ops;
+    this.filteredOptions = ops;
+  }
   @Input() state: FilterState;
 
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
@@ -19,6 +25,16 @@ export class FilterComponent {
 
   changed(): void {
     this.valueChanged.emit(true);
+  }
+
+  filterOptions(evt: { target: { value: string } }): void {
+    if (!this._options) {
+      return;
+    }
+    const term = evt.target.value;
+    this.filteredOptions = this._options.filter((nl: NameLabel) => {
+      return nl.name.includes(term);
+    });
   }
 
   getSetCheckboxValues(filterName: string): string {

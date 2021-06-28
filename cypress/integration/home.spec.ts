@@ -16,6 +16,8 @@ context('statistics-dashboard', () => {
     const selLinkDataDataProvider = '[data-e2e=link-entry-provider]';
     const selLinkDataProvider = '[data-e2e=link-entry-data-provider]';
     const selLinkInfo = '.entry-card-header a.info-icon';
+    const selMap = '#mapChart';
+    const selMapLegend = '#mapLegend';
 
     it('should show the header with home link and title', () => {
       console.log('selHeaderTitle ' + selHeaderTitle)
@@ -26,6 +28,11 @@ context('statistics-dashboard', () => {
 
     it('should show information links', () => {
       cy.get(selLinkInfo).should('have.length', 3);
+    });
+
+    it('should show a map', () => {
+      cy.get(selMap).should('have.length', 1);
+      cy.get(selMapLegend).should('have.length', 1);
     });
 
     it('should show the data entry point links', () => {

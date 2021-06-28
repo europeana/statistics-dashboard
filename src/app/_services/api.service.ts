@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { IHash, RawFacet } from '../_models';
+import { IHashString, RawFacet } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
   constructor(private readonly http: HttpClient) {}
 
-  loadISOCountryCodes(): IHash {
+  loadISOCountryCodes(): IHashString {
     return {
       Bangladesh: 'BD',
       Belgium: 'BE',

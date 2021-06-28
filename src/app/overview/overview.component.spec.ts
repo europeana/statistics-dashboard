@@ -24,6 +24,7 @@ import {
   MockAPIData,
   MockAPIService,
   MockAPIServiceErrors,
+  MockBarComponent,
   MockExportCSVService
 } from '../_mocked';
 import { ExportType, NameLabel } from '../_models';
@@ -63,7 +64,12 @@ describe('OverviewComponent', () => {
           { path: 'data/TYPE', component: OverviewComponent }
         ])
       ],
-      declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
+      declarations: [
+        OverviewComponent,
+        MockBarComponent,
+        createMockPipe('renameApiFacet')
+      ],
+      //declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
       providers: [
         { provide: ExportCSVService, useClass: MockExportCSVService },
         {
@@ -88,6 +94,7 @@ describe('OverviewComponent', () => {
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
     fixture.detectChanges();
+    component.barChart = new MockBarComponent() as unknown as BarComponent;
   };
 
   const setFilterValue1 = (group: string): void => {
@@ -413,13 +420,6 @@ describe('OverviewComponent', () => {
 
     beforeEach(() => {
       b4Each();
-      component.barChart = {
-        getSvgData: () => {
-          return new Promise((resolve) => {
-            resolve('svg');
-          });
-        }
-      } as unknown as BarComponent;
     });
 
     it('should export CSV', fakeAsync(() => {

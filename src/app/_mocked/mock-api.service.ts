@@ -1,6 +1,6 @@
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { ProviderDatum, RawFacet } from '../_models';
+import { IHashString, ProviderDatum, RawFacet } from '../_models';
 
 const DataProviderData = [
   {
@@ -142,6 +142,12 @@ export class MockAPIService {
       );
     }
     return of(MockAPIData).pipe(delay(1));
+  }
+
+  loadISOCountryCodes(): IHashString {
+    return {
+      Belgium: 'BE'
+    };
   }
 
   loadDataProviderData(): Observable<Array<ProviderDatum>> {

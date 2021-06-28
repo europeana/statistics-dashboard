@@ -24,42 +24,62 @@
   </li>
 
   <ng-template #dates>
-    <li *ngIf="state.visible">
+    <li>
       <app-dates [form]="form" (valueChanged)="changed()"></app-dates>
     </li>
   </ng-template>
 
-  <ng-container *ngIf="options; else dates">
-    <li *ngIf="state.visible" class="checkboxes">
-      <ul
-        *ngFor="let option of options; let i = index"
-        [formGroupName]="group"
-        class="checkbox-labelled"
-      >
-        <li
-          class="checkmarked-checkbox"
-          [ngClass]="{
-            checked: form.value[group][option.name]
-          }"
-        >
-          <input
-            id="add_filter_{{ group }}_{{ i }}"
-            class="checkbox"
-            type="checkbox"
-            [value]="option.name"
-            (change)="changed()"
-            [formControlName]="option.name"
-            [attr.disabled]="
-              !selectOptionEnabled(group, option.name) ? true : null
-            "
-          />
-        </li>
-        <li>
-          <label class="filter-label" for="add_filter_{{ group }}_{{ i }}">
-            {{ option.label | renameRights }}
-          </label>
-        </li>
-      </ul>
-    </li>
+  <ng-container *ngIf="state.visible">
+    <ng-container *ngIf="_options; else dates">
+      <li class="checkboxes">
+        <ul>
+          <li class="checkbox-filter">
+            <span class="icon"></span>
+            <input
+              class="checkbox-filter-input"
+              (keyup)="filterOptions($event)"
+              placeholder="Search"
+            />
+          </li>
+        </ul>
+        <ul class="checkboxes-list">
+          <li>
+            <ul
+              *ngFor="let option of filteredOptions; let i = index"
+              [formGroupName]="group"
+              class="checkbox-labelled"
+            >
+              <li
+                class="checkmarked-checkbox"
+                [ngClass]="{
+                  checked: form.value[group][option.name]
+                }"
+              >
+                <input
+                  id="add_filter_{{ group }}_{{ i }}"
+                  class="checkbox"
+                  data-e2e="cb-filter"
+                  type="checkbox"
+                  (change)="changed()"
+                  [value]="option.name"
+                  [formControlName]="option.name"
+                  [attr.disabled]="
+                    !selectOptionEnabled(group, option.name) ? true : null
+                  "
+                />
+              </li>
+              <li>
+                <label
+                  class="filter-label"
+                  for="add_filter_{{ group }}_{{ i }}"
+                >
+                  {{ option.label | renameRights }}
+                </label>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ng-container>
   </ng-container>
 </ul>

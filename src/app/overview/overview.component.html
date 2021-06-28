@@ -5,15 +5,6 @@
     'loading-modal': isLoading && !allProcessedFacetData
   }"
 >
-  <!-- date error template -->
-
-  <ng-template #dateErrors let-field="field">
-    <ul class="errors">
-      <li *ngIf="form.get(field)!.errors!.isTooEarly">Date is too early</li>
-      <li *ngIf="form.get(field)!.errors!.isTooLate">Date is too late</li>
-    </ul>
-  </ng-template>
-
   <!-- filterRemoval template -->
 
   <ng-template #filterRemoval let-group="group" let-options="options">
@@ -22,6 +13,7 @@
         <fieldset [formGroupName]="group">
           <input
             id="rm_filter_{{ group }}_{{ i }}"
+            data-e2e="rm-filter"
             type="checkbox"
             (change)="updatePageUrl()"
             [value]="val"
@@ -73,8 +65,6 @@
                   (valueChanged)="updatePageUrl()"
                 ></app-filter>
               </ng-container>
-
-              <!-- DATES FILTER -->
 
               <app-filter
                 [form]="form"
@@ -133,13 +123,16 @@
               >Show List</a
             >
           </h3>
+          <h3 class="link-list" *ngIf="!isLoading && experimental">
+            <a (click)="storeSeries()">Store Series</a>
+          </h3>
           <h3 class="link-data">
             <a (click)="setIsShowingSearchList(false)">Show Data</a>
           </h3>
         </ng-container>
 
         <ng-container *ngIf="form.value.dateFrom && form.value.dateTo">
-          <span class="date-removal">
+          <span class="date-removal" data-e2e="date-summary">
             <a
               (click)="datesClear()"
               class="date"
@@ -332,17 +325,42 @@
         </li>
       </ul>
 
+      <!-- SNAPSHOTS -->
+      <ul *ngIf="experimental">
+        <!-- TODO: it should never be possible to add the current series to itself
+             so add new field to CompareData (i.e. the query params as a string)
+             and compare to the global (query params as string) to selectively add
+        -->
+        <li *ngFor="let item of compareData | keyvalue" class="compare-data">
+          <a
+            (click)="addSeriesToChart([item.key])"
+            class="compare-data-link"
+            [ngClass]="{ disabled: item.value.applied }"
+            >{{ item.value.label }}</a
+          >
+          <a
+            (click)="removeSeriesFromChart(item.key)"
+            class="compare-data-link-remove"
+            *ngIf="item.value.applied"
+            >X</a
+          >
+        </li>
+      </ul>
+      <!-- END SNAPSHOTS -->
+
       <div
         *ngIf="chartData"
         class="chart-wrapper"
         [ngClass]="{ showing: !isShowingSearchList }"
-        id="barChart"
-        #barChart
       >
         <app-bar-chart
-          *ngIf="showBar"
+        #barChart
           [showPercent]="form.value.showPercent"
-          [extraSettings]="BarChartCool"
+          [extraSettings]="
+            ['contentTier', 'metadataTier'].includes(form.value.facetParameter)
+              ? barChartSettingsTiers
+              : barChartSettings
+          "
           [results]="chartData"
         ></app-bar-chart>
       </div>

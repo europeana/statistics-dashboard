@@ -8,7 +8,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
 
 import { APIService } from '../../_services';
-import { IHash, NameValue } from '../../_models';
+import { IHashString, NameValue } from '../../_models';
 
 @Component({
   selector: 'app-map-chart',
@@ -19,7 +19,7 @@ export class MapComponent {
   _results: Array<NameValue>;
   chart: am4maps.MapChart;
   polygonSeries: am4maps.MapPolygonSeries;
-  countryCodes: IHash;
+  countryCodes: IHashString;
 
   // controls
   hasLegend = true;
@@ -36,6 +36,7 @@ export class MapComponent {
     private api: APIService
   ) {
     this.countryCodes = api.loadISOCountryCodes();
+    am4core.options.autoDispose = true;
   }
 
   // Run the function only in the browser / (exempt rendering from change detection)
