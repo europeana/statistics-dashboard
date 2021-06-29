@@ -14,7 +14,7 @@
       <div *ngIf="!isShowingSearchList">
         <ul class="filters">
           <li class="container-h">
-            <span class="icon home"> </span>
+            <span class="icon filter-icon-home"> </span>
             <a
               class="filter-title padded-left"
               data-e2e="link-home"
@@ -41,9 +41,15 @@
               </span>
               <label class="filter-title padded-left" for="ctZero">
                 {{ form.value.contentTierZero ? "Disable" : "Enable" }}
-                content tier zero
+                content tier 0
               </label>
             </span>
+            <a
+              class="info-icon"
+              href="https://pro.europeana.eu/page/edm-documentation"
+              target="_blank"
+              title="Documentation"
+            ></a>
           </li>
         </ul>
 
@@ -76,11 +82,12 @@
       </div>
 
       <ul class="filters inputs" *ngIf="!isShowingSearchList">
-        <li class="column">
+        <li class="container-h dataset-name-wrapper">
+          <span class="icon filter-icon-dataset"></span>
           <input
             formControlName="datasetName"
             (keyup.enter)="updatePageUrl()"
-            placeholder="Dataset Id"
+            placeholder="Dataset ID"
             class="dataset-name"
             type="text"
           />
@@ -154,17 +161,59 @@
 
       <ul class="rm-filters" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngFor="let filter of facetConf">
-          <ng-container *ngFor="let option of filterData[filter]">
-            <span class="rm-filter" *ngIf="form.value[filter][option.name]">
-              <app-checkbox
-                [form]="form"
-                [controlName]="option.name"
-                [labelText]="option.label | renameRights"
-                [group]="filter"
-                [value]="option.name"
-                (valueChanged)="updatePageUrl()"
-              ></app-checkbox>
-            </span>
+          <ng-container *ngFor="let option of getSetCheckboxValues(filter)">
+            <ng-container
+              *ngFor="let optionDisplay of [fromInputSafeName(option)]"
+            >
+              <span
+                class="rm-filter"
+                *ngIf="form.value[filter][option]"
+                [formGroupName]="filter"
+                [ngClass]="{ disabled: isDeadFacet(filter, option) }"
+              >
+                <!--
+                  TODO: figure out the error using the template (it removes the first item - not the one clicked)
+                -->
+                <!--
+                <app-checkbox
+                  [form]="form"
+                  [controlName]="toInputSafeName(option)"
+                  [labelText]="option | renameRights"
+                  [group]="filter"
+                  [value]="option"
+                  (valueChanged)="updatePageUrl()"
+                ></app-checkbox>
+                -->
+                <span
+                  class="checkbox-labelled {{ filter }}"
+                  [data-filter]="filter"
+                >
+                  <span
+                    class="checkmarked-checkbox"
+                    [ngClass]="{
+                      checked: form.value[filter][option]
+                    }"
+                  >
+                    <input
+                      id="cb_{{ filter }}_{{ option }}"
+                      class="checkbox"
+                      type="checkbox"
+                      (change)="updatePageUrl()"
+                      [value]="option"
+                      [formControlName]="option"
+                    />
+                  </span>
+                  <span>
+                    <label
+                      class="filter-label"
+                      for="cb_{{ filter }}_{{ option }}"
+                    >
+                      {{ optionDisplay | renameRights }}
+                    </label>
+                  </span>
+                </span>
+              </span>
+            </ng-container>
           </ng-container>
         </ng-container>
       </ul>

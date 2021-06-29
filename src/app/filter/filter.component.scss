@@ -41,6 +41,10 @@ $total-width: 268px;
   max-height: $total-height;
   overflow: hidden;
   overflow-y: auto;
+
+  .checkbox-labelled:hover {
+    background-color: $offwhite;
+  }
 }
 
 .filter {

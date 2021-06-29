@@ -119,27 +119,6 @@ app-bar-chart {
   }
 }
 
-.info-icon {
-  background-image: svg-url-icon-info(#b7b7b7);
-  height: 1em;
-  margin-left: 4px;
-  position: relative;
-  width: 1em;
-  &:hover {
-    background-image: svg-url-icon-info($gray-light);
-  }
-
-  // click-target accessibility
-  &::before {
-    content: "";
-    position: absolute;
-    height: 20px;
-    width: 32px;
-    left: -8px;
-    top: -4px;
-  }
-}
-
 .map-container {
   width: 100%;
   max-width: 100%;
