@@ -1,54 +1,134 @@
 @import "functions/_icon_urls";
 @import "_variables";
 
-.ct-zero,
 .dataset-name,
-.home-link,
 .icon {
   background-repeat: no-repeat;
-  background-size: 20px 20px;
+  background-size: 18px auto;
+  background-position: center;
 }
 
-.filters {
+.filters,
+.rm-filters {
+  .checkbox {
+    opacity: 0;
+  }
+
+  .checkbox-labelled,
   .container-h {
+    align-items: center;
     display: flex;
     flex-direction: row;
+  }
 
-    align-items: center;
-    margin: $spacing-s;
+  .checkbox-labelled {
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    &:hover {
+      background-color: $offwhite;
+    }
+
+    :first-child {
+      min-width: $width-icon-filter;
+    }
+
+    :last-child {
+      width: 100%;
+    }
+  }
+
+  .checkmarked-checkbox {
+    height: $width-icon-filter;
+    position: relative;
+    width: $width-icon-filter;
+
+    &::before {
+      bottom: 0;
+      background-image: svg-url-icon-checkbox("#000");
+      background-position: center;
+      background-repeat: no-repeat;
+      content: "";
+      display: block;
+      position: absolute;
+      min-width: $width-icon-filter;
+      height: $width-icon-filter;
+    }
+
+    &.checked::before {
+      background-image: svg-url-icon-checkbox-checked("#000");
+    }
+  }
+
+  .padded-left {
+    margin-left: $spacing-s;
+  }
+
+  .container-h {
     padding: $spacing-s 0;
+    .icon {
+      align-self: flex-start;
+      position: relative;
+      top: $spacing-xs;
+    }
+  }
+
+  .ct-zero .checkmarked-checkbox {
+    &::before {
+      background-image: svg-url-icon-eye-disabled($gray-med);
+    }
+    &.checked::before {
+      background-image: svg-url-icon-eye($gray-med);
+    }
+  }
+
+  .filter-label {
+    font-size: 14px;
+    margin: 0 $spacing-s;
+    white-space: nowrap;
+  }
+
+  .filter-title {
+    color: $gray-faint;
   }
 
   .icon {
-    align-self: flex-start;
     display: block;
     height: $width-icon-filter;
     margin-left: $spacing-s;
     min-width: $width-icon-filter;
-    position: relative;
-    top: 3px;
   }
 }
 
-.ct-zero.icon {
-  //margin-left: -20px;
-  //margin-bottom: 10px;
+// Filter Removal
 
-  //&.icon{
-  display: none;
-  //}
+.rm-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-m;
+
+  &.list-mode {
+    display: none;
+  }
+
+  .rm-filter {
+    background: $gray-lightest;
+    color: $near-black;
+    padding: $spacing-s $spacing-s;
+
+    &:not(:last-child) {
+      margin-right: 24px;
+    }
+  }
 }
 
-/*
-.ct-zero{
-  background-image: svg-url-icon-eye-disabled($gray-med);
-  background-image: svg-url-icon-eye($gray-med);
-}
-
-.home-link {
+.home {
   background-image: svg-url-icon-home($gray-med);
 }
 
+/*
 .dataset-name {
   background-image: svg-url-icon-dataset-id($gray-med);
 }

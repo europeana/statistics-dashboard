@@ -64,32 +64,6 @@ $width-left-col: 200px;
   }
 }
 
-.rm-filters {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: $spacing-m;
-
-  &.list-mode {
-    display: none;
-  }
-}
-
-.rm-filter {
-  background: $gray-lightest;
-  color: $near-black;
-  margin: 4px 0;
-  padding: 0 $spacing-s;
-
-  &:not(:last-child) {
-    margin-right: 24px;
-  }
-
-  fieldset {
-    display: flex;
-    align-items: center;
-  }
-}
-
 input[type="checkbox"] {
   &:enabled {
     cursor: pointer;
@@ -109,7 +83,6 @@ input[type="date"]:not(:valid) {
 }
 
 .dataset-name {
-  margin-bottom: 1em;
   margin-left: $spacing-s;
 }
 
@@ -198,9 +171,9 @@ label {
   color: $grey-3;
   font-size: 12px;
   font-weight: bold;
-  margin-bottom: 0;
-  margin-top: 20px;
-  margin: $spacing-s;
+  line-height: 38px;
+  text-transform: uppercase;
+  margin-left: $spacing-s;
 }
 
 .filter-select {
@@ -219,16 +192,6 @@ label {
 .filters {
   display: flex;
   flex-direction: column;
-}
-
-.filters {
-  > li:not(:last-child) {
-    margin-bottom: 1em;
-  }
-
-  &.inputs {
-    margin-top: 2em;
-  }
 }
 
 .dropdown {

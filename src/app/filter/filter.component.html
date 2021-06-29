@@ -7,7 +7,7 @@
   <li>
     <a
       (click)="toggle()"
-      class="filter-opener"
+      class="filter-opener filter-title"
       [ngClass]="{
         open: state.visible
       }"
@@ -53,7 +53,7 @@
             <ul
               *ngFor="let option of filteredOptions; let i = index"
               [formGroupName]="group"
-              class="checkbox-labelled container-h"
+              class="checkbox-labelled"
             >
               <li
                 class="checkmarked-checkbox"

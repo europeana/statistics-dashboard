@@ -4,14 +4,15 @@ context('statistics-dashboard', () => {
     const selDateFrom = '[data-e2e="dateFrom"]';
     const selDateTo = '[data-e2e="dateTo"]';
     const selDateSummary = '[data-e2e="date-summary"]';
-    const selFilter = '.filter';
+    const selFiltersHeader = '.filters-header';
+    const selFilter = `${selFiltersHeader} + .filters .filter`;
     const selFilterOpener = '.filter-opener';
     const selFilterOpenerName = `${selFilterOpener} .opener-name`;
     const selFilterOpened = `${selFilter} .checkboxes-list`;
-    const selFilterRemove = `[data-e2e="rm-filter"]`;
-    const selCheckbox = `${selFilter} [data-e2e="cb-filter"]`;
+    const selFilterRemove = `.rm-filter`;
+    const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
-    const selFilterValueLabel = `.filter-label`;
+    const selFilterValueLabel = `${selFilter} .filter-label`;
 
     it('should not include filters for the current dimension', () => {
       cy.visit('/data/COUNTRY');
@@ -46,7 +47,7 @@ context('statistics-dashboard', () => {
       cy.get(selFilterRemove).should('have.length', 1);
     });
 
-    it('should search the filters', () => {
+    it('should search the filters and rememebr the term when re-opened', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selFilterValueLabel).should('have.length', 0);
       cy.get(selFilterOpener).first().click({force: true});
@@ -59,6 +60,10 @@ context('statistics-dashboard', () => {
       cy.get(selSearch).type('Ge', 1);
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
+
+      cy.get(selFiltersHeader).click();
+      cy.get(selFilterOpener).first().click({force: true});
+      cy.get(selSearch).should('have.value', 'Ge');
     });
 
     it('should allow date range definitions', () => {

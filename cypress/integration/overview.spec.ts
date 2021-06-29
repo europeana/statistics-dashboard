@@ -5,7 +5,7 @@ context('statistics-dashboard', () => {
 
     const selLinkHomeHeader = '[data-e2e=link-home-header]';
     const selLinkHome = '[data-e2e=link-home]';
-    const selCTZero = '[data-e2e=ct-zero-switch]';
+    const selCTZero = '.ct-zero input';
     const urlParamCTZero = 'content-tier-zero=true';
 
     it('should show for all urls', () => {
@@ -52,11 +52,11 @@ context('statistics-dashboard', () => {
       cy.url().should('contain', filteredTypes[1]);
       cy.get('.rm-filter').should('have.length', 2);
 
-      cy.get('#rm_filter_TYPE_0').click({ force: true });
+      cy.get('.rm-filter input').first().click({ force: true });
       cy.get('.rm-filter').should('have.length', 1);
       cy.url().should('not.contain', filteredTypes[0]);
 
-      cy.get('#rm_filter_TYPE_0').click({ force: true });
+      cy.get('.rm-filter input').first().click({ force: true });
       cy.get('.rm-filter').should('have.length', 0);
       cy.url().should('not.contain', filteredTypes[1]);
     });

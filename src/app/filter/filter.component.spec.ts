@@ -55,7 +55,7 @@ describe('FilterComponent', () => {
     expect(component.filteredOptions).toBeFalsy();
     component.filterOptions(evt);
     expect(component.filteredOptions).toBeFalsy();
-    component.options = [{ name: 'option_1', label: 'option 1' }];
+    component.options = [{ name: 'option_1', label: 'option_1' }];
     component.filterOptions(evt);
     expect(component.filteredOptions.length).toEqual(1);
   });

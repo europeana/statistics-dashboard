@@ -14,6 +14,7 @@ import { AppComponent } from './app.component';
 import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
 
 import { BarComponent, MapComponent } from './chart';
+import { CheckboxComponent } from './checkbox';
 import { FilterComponent } from './filter';
 import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
@@ -28,6 +29,7 @@ import { DatesComponent } from './dates/dates.component';
   declarations: [
     AppComponent,
     BarComponent,
+    CheckboxComponent,
     DatesComponent,
     FilterComponent,
     FooterComponent,
