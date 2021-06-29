@@ -56,10 +56,15 @@ $width-left-col: 200px;
   }
 }
 
+.rm-filter {
+  background-color: $stats-blue;
+}
+
+.rm-filter,
 .compare-data-link,
 .menu-opener {
   &.disabled {
-    color: #aaa;
+    opacity: 0.4;
     pointer-events: none;
   }
 }
@@ -83,7 +88,27 @@ input[type="date"]:not(:valid) {
 }
 
 .dataset-name {
-  margin-left: $spacing-s;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin-right: $spacing-s;
+
+  &[type="text"] {
+    margin: 0 0 0 $spacing-s;
+    padding: 0;
+    width: 100%;
+  }
+}
+
+.dataset-name-wrapper {
+  border: 1px solid $gray-5;
+  border-radius: $spacing-s;
+  margin-top: $spacing-s;
+
+  &.container-h .icon {
+    align-self: center;
+    position: static;
+  }
 }
 
 app-overview {
@@ -188,7 +213,6 @@ label {
   float: right;
 }
 
-.column,
 .filters {
   display: flex;
   flex-direction: column;

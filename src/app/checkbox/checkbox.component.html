@@ -1,44 +1,24 @@
 <span [formGroup]="form" class="checkbox-labelled">
-  <ng-template #nogroup>
-    <span
-      class="checkmarked-checkbox"
-      [ngClass]="{
-        checked: form.value[controlName]
-      }"
-    >
-      <input
-        id="cb_{{ instanceId }}"
-        class="checkbox"
-        type="checkbox"
-        (change)="changed()"
-        [value]="value"
-        [formControlName]="controlName"
-      />
-    </span>
-  </ng-template>
-
-  <ng-container *ngIf="group; else nogroup">
-    <span
-      class="checkmarked-checkbox"
-      [ngClass]="{
-        checked: form.value[group][controlName]
-      }"
-      [formGroupName]="group"
-    >
-      <input
-        id="cb_{{ instanceId }}"
-        class="checkbox"
-        type="checkbox"
-        (change)="changed()"
-        [value]="value"
-        [formControlName]="controlName"
-      />
-    </span>
-  </ng-container>
+  <span
+    class="checkmarked-checkbox"
+    [ngClass]="{
+      checked: form.value[group][controlName]
+    }"
+    [formGroupName]="group"
+  >
+    <input
+      id="cb_{{ instanceId }}"
+      class="checkbox"
+      type="checkbox"
+      (change)="changed()"
+      [value]="value"
+      [formControlName]="controlName"
+    />
+  </span>
 
   <span>
     <label class="filter-label" for="cb_{{ instanceId }}">
-      {{ labelText | renameRights }}
+      {{ labelText }}
     </label>
   </span>
 </span>

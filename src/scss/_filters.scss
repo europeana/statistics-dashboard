@@ -26,10 +26,6 @@
     padding: 0;
     position: relative;
 
-    &:hover {
-      background-color: $offwhite;
-    }
-
     :first-child {
       min-width: $width-icon-filter;
     }
@@ -46,7 +42,6 @@
 
     &::before {
       bottom: 0;
-      background-image: svg-url-icon-checkbox("#000");
       background-position: center;
       background-repeat: no-repeat;
       content: "";
@@ -54,10 +49,6 @@
       position: absolute;
       min-width: $width-icon-filter;
       height: $width-icon-filter;
-    }
-
-    &.checked::before {
-      background-image: svg-url-icon-checkbox-checked("#000");
     }
   }
 
@@ -71,15 +62,6 @@
       align-self: flex-start;
       position: relative;
       top: $spacing-xs;
-    }
-  }
-
-  .ct-zero .checkmarked-checkbox {
-    &::before {
-      background-image: svg-url-icon-eye-disabled($gray-med);
-    }
-    &.checked::before {
-      background-image: svg-url-icon-eye($gray-med);
     }
   }
 
@@ -101,6 +83,10 @@
   }
 }
 
+.filters .info-icon {
+  margin-left: $spacing-s;
+}
+
 // Filter Removal
 
 .rm-filters {
@@ -114,25 +100,95 @@
   }
 
   .rm-filter {
-    background: $gray-lightest;
-    color: $near-black;
-    padding: $spacing-s $spacing-s;
-
+    border-radius: $spacing-s;
+    color: $white;
+    padding: $spacing-xs $spacing-s;
     &:not(:last-child) {
       margin-right: 24px;
     }
   }
 }
 
-.home {
+// Icons
+
+.filters {
+  .checkmarked-checkbox {
+    &::before {
+      background-image: svg-url-icon-checkbox("#000");
+    }
+    &.checked::before {
+      background-image: svg-url-icon-checkbox-checked("#000");
+    }
+  }
+
+  .ct-zero .checkmarked-checkbox {
+    &::before {
+      background-image: svg-url-icon-eye-disabled($gray-med);
+    }
+    &.checked::before {
+      background-image: svg-url-icon-eye($gray-med);
+    }
+  }
+}
+
+.rm-filters {
+  .contentTier,
+  .metadataTier {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-metadata($white);
+      }
+    }
+  }
+
+  .COUNTRY {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-flag($white);
+      }
+    }
+  }
+
+  .DATA_PROVIDER {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-data-provider($white);
+      }
+    }
+  }
+
+  .PROVIDER {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-content-provider($white);
+      }
+    }
+  }
+
+  .RIGHTS {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-rights($white);
+      }
+    }
+  }
+
+  .TYPE {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-types($white);
+      }
+    }
+  }
+}
+
+.filter-icon-home {
   background-image: svg-url-icon-home($gray-med);
 }
 
-/*
-.dataset-name {
+.filter-icon-dataset {
   background-image: svg-url-icon-dataset-id($gray-med);
 }
-*/
 
 .filter-icon-COUNTRY {
   background-image: svg-url-icon-flag($gray-med);

@@ -25,7 +25,6 @@ import { RenameRightsPipe } from '../_translate';
 
 import {
   fromInputSafeName,
-  getFormValueList,
   rightsUrlMatch,
   toInputSafeName,
   validateDateGeneric
@@ -77,6 +76,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   // Make variables available to template
   public barChartSettings = BarChartCool;
   public toInputSafeName = toInputSafeName;
+  public fromInputSafeName = fromInputSafeName;
 
   barChartSettingsTiers = Object.assign(
     {
@@ -683,7 +683,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns Array<string>
   */
   getSetCheckboxValues(filterName: string): Array<string> {
-    return getFormValueList(this.form, filterName) as Array<string>;
+    const vals = this.form.value[filterName];
+    return vals
+      ? Object.keys(vals).filter((key: string) => {
+          return vals[key];
+        })
+      : [];
+  }
+
+  /** isDeadFacet
+  /* Detect if a facet value is present in the filterData
+  /* @returns boolean
+  */
+  isDeadFacet(filterName: string, filterValue: string): boolean {
+    const res = this.filterData[filterName].findIndex((nl: NameLabel) => {
+      return nl.name === filterValue;
+    });
+    return res === -1;
   }
 
   /** datesClear
