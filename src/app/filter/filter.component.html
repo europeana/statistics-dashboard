@@ -7,7 +7,7 @@
   <li>
     <a
       (click)="toggle()"
-      class="filter-opener"
+      class="filter-opener filter-title"
       [ngClass]="{
         open: state.visible
       }"
@@ -53,15 +53,35 @@
             <ul
               *ngFor="let option of filteredOptions; let i = index"
               [formGroupName]="group"
+              class="checkbox-labelled"
             >
-              <app-checkbox
-                [form]="form"
-                [controlName]="option.name"
-                [labelText]="option.label | renameRights"
-                [group]="group"
-                [value]="option.name"
-                (valueChanged)="changed()"
-              ></app-checkbox>
+              <li
+                class="checkmarked-checkbox"
+                [ngClass]="{
+                  checked: form.value[group][option.name]
+                }"
+              >
+                <input
+                  id="add_filter_{{ group }}_{{ i }}"
+                  class="checkbox"
+                  data-e2e="cb-filter"
+                  type="checkbox"
+                  (change)="changed()"
+                  [value]="option.name"
+                  [formControlName]="option.name"
+                  [attr.disabled]="
+                    !selectOptionEnabled(group, option.name) ? true : null
+                  "
+                />
+              </li>
+              <li>
+                <label
+                  class="filter-label"
+                  for="add_filter_{{ group }}_{{ i }}"
+                >
+                  {{ option.label | renameRights }}
+                </label>
+              </li>
             </ul>
           </li>
         </ul>

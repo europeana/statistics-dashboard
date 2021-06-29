@@ -21,6 +21,8 @@ import { environment } from '../../environments/environment';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
 import { facetNames } from '../_data';
+import { RenameRightsPipe } from '../_translate';
+
 import {
   fromInputSafeName,
   getFormValueList,
@@ -63,6 +65,7 @@ interface CompareData {
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
+  providers: [RenameRightsPipe],
   encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent extends DataPollingComponent implements OnInit {
@@ -128,7 +131,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     private pdf: ExportPDFService,
     private fb: FormBuilder,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly renameRights: RenameRightsPipe
   ) {
     super();
     this.buildForm();
@@ -547,12 +551,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const matchIndex = this.findFacetIndex(facetName, facetData);
     return facetData[matchIndex].fields.map((ff: FacetField) => {
       let prefix = '';
+      let label = ff.label;
+
       if (['contentTier', 'metadataTier'].includes(facetName)) {
         prefix = 'Tier ';
+      } else if ('RIGHTS' === facetName) {
+        label = this.renameRights.transform(label);
       }
       return {
         name: toInputSafeName(ff.label),
-        label: prefix + ff.label
+        label: prefix + label
       };
     });
   }

@@ -33,7 +33,7 @@ export class FilterComponent {
     }
     const term = evt.target.value;
     this.filteredOptions = this._options.filter((nl: NameLabel) => {
-      return nl.name.includes(term);
+      return nl.label.includes(term);
     });
   }
 

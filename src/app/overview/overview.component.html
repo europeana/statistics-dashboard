@@ -5,28 +5,6 @@
     'loading-modal': isLoading && !allProcessedFacetData
   }"
 >
-  <!-- filterRemoval template -->
-
-  <ng-template #filterRemoval let-group="group" let-options="options">
-    <ng-container *ngFor="let val of options; let i = index">
-      <li class="rm-filter">
-        <fieldset [formGroupName]="group">
-          <input
-            id="rm_filter_{{ group }}_{{ i }}"
-            data-e2e="rm-filter"
-            type="checkbox"
-            (change)="updatePageUrl()"
-            [value]="val"
-            [formControlName]="toInputSafeName(val)"
-          />
-          <label for="rm_filter_{{ group }}_{{ i }}">
-            {{ group | renameApiFacet }} : {{ val | renameRights }}
-          </label>
-        </fieldset>
-      </li>
-    </ng-container>
-  </ng-template>
-
   <!-- Main -->
 
   <div class="statistics-dashboard fit-to-page">
@@ -35,20 +13,37 @@
     <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
       <div *ngIf="!isShowingSearchList">
         <ul class="filters">
-          <li class="padded-left">
-            <a class="home-link" data-e2e="link-home" routerLink="/">Home</a>
+          <li class="container-h">
+            <span class="icon home"> </span>
+            <a
+              class="filter-title padded-left"
+              data-e2e="link-home"
+              routerLink="/"
+              >Home</a
+            >
           </li>
 
-          <li class="ct-zero padded-left">
-            <app-checkbox
-              [form]="form"
-              [labelText]="
-                (form.value.contentTierZero ? 'Disable' : 'Enable') +
-                ' content tier zero'
-              "
-              (valueChanged)="updatePageUrl()"
-              controlName="contentTierZero"
-            ></app-checkbox>
+          <li class="ct-zero container-h">
+            <span [formGroup]="form" class="checkbox-labelled padded-left">
+              <span
+                class="checkmarked-checkbox"
+                [ngClass]="{
+                  checked: form.value.contentTierZero
+                }"
+              >
+                <input
+                  id="ctZero"
+                  class="checkbox"
+                  type="checkbox"
+                  (change)="updatePageUrl()"
+                  formControlName="contentTierZero"
+                />
+              </span>
+              <label class="filter-title padded-left" for="ctZero">
+                {{ form.value.contentTierZero ? "Disable" : "Enable" }}
+                content tier zero
+              </label>
+            </span>
           </li>
         </ul>
 
@@ -159,15 +154,18 @@
 
       <ul class="rm-filters" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngFor="let filter of facetConf">
-          <ng-content
-            *ngTemplateOutlet="
-              filterRemoval;
-              context: {
-                options: getSetCheckboxValues(filter),
-                group: filter
-              }
-            "
-          ></ng-content>
+          <ng-container *ngFor="let option of filterData[filter]">
+            <span class="rm-filter" *ngIf="form.value[filter][option.name]">
+              <app-checkbox
+                [form]="form"
+                [controlName]="option.name"
+                [labelText]="option.label | renameRights"
+                [group]="filter"
+                [value]="option.name"
+                (valueChanged)="updatePageUrl()"
+              ></app-checkbox>
+            </span>
+          </ng-container>
         </ng-container>
       </ul>
 

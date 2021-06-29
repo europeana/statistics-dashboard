@@ -9,7 +9,7 @@ context('statistics-dashboard', () => {
     const selFilterOpener = '.filter-opener';
     const selFilterOpenerName = `${selFilterOpener} .opener-name`;
     const selFilterOpened = `${selFilter} .checkboxes-list`;
-    const selFilterRemove = `[data-e2e="rm-filter"]`;
+    const selFilterRemove = `.rm-filter`;
     const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
     const selFilterValueLabel = `${selFilter} .filter-label`;

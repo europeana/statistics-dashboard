@@ -1,14 +1,17 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
+$row-height: 32px;
+$total-height: #{$row-height * 5};
 $total-width: 268px;
 
 .checkbox-filter {
   border-bottom: 1px solid $gray-5;
-  margin-left: 0;
+  margin: 0 $spacing-s $spacing-xs $spacing-s;
 
   .icon {
     background: svg-url-icon-search("#333") center no-repeat;
+    margin-left: 0;
     top: 0;
   }
 
@@ -31,14 +34,26 @@ $total-width: 268px;
   z-index: 1;
 }
 
+.checkboxes-list {
+  display: flex;
+  flex-direction: column;
+  margin-left: $spacing-s;
+  max-height: $total-height;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
 .filter {
   color: #000;
   position: relative;
   width: $total-width;
 }
 
+.filter-label {
+  line-height: $row-height;
+}
+
 .filter-opener {
-  color: $gray-faint;
   display: block;
   position: relative;
 
@@ -61,10 +76,6 @@ $total-width: 268px;
       transform: rotate(180deg);
     }
   }
-
-  .container-h {
-    margin: 0;
-  }
 }
 
 .opener-name {
@@ -74,7 +85,7 @@ $total-width: 268px;
 
 .opener-name-container {
   position: relative;
-  paddin: 8px 20px 8px 8px;
+  paddin: $spacing-s 20px $spacing-s $spacing-s;
 }
 
 .selection {
