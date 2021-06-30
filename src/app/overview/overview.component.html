@@ -132,8 +132,19 @@
             >
           </h3>
           <h3 class="link-list" *ngIf="!isLoading && experimental">
-            <a (click)="storeSeries()">Store Series</a>
+            <a
+              (click)="saveSeries()"
+              title="Make a snapshot of this data available for comparison"
+              >Compare</a
+            >
           </h3>
+
+          <a
+            *ngIf="!isLoading && experimental"
+            (click)="saveSeries()"
+            class="icon-snapshot"
+          ></a>
+
           <h3 class="link-data">
             <a (click)="setIsShowingSearchList(false)">Show Data</a>
           </h3>
@@ -158,6 +169,8 @@
           </span>
         </ng-container>
       </div>
+
+      <!-- Filter removal -->
 
       <ul class="rm-filters" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngFor="let filter of facetConf">
@@ -221,6 +234,36 @@
       <ng-container *ngIf="isShowingSearchList">
         <app-listing [showing]="true"></app-listing>
       </ng-container>
+
+      <!-- SNAPSHOTS -->
+
+      <div class="snapshots" *ngIf="experimental">
+        <ul class="comparison-list">
+          <ng-container *ngFor="let item of compareData | keyvalue">
+            <ng-container *ngIf="item.value.saved">
+              <li class="compare-data">
+                <a
+                  (click)="removeSeriesFromChart(item.key)"
+                  class="compare-data-link-remove"
+                  *ngIf="item.value.applied"
+                  >X</a
+                >
+                <a
+                  *ngIf="item.value.saved"
+                  (click)="addSeriesToChart([item.key])"
+                  class="compare-data-link"
+                  [ngClass]="{ disabled: item.value.applied }"
+                  >{{ item.value.label }}</a
+                >
+              </li>
+            </ng-container>
+          </ng-container>
+
+          <li class="icon-snapshot"></li>
+        </ul>
+      </div>
+
+      <!-- END SNAPSHOTS -->
 
       <!-- Data Area -->
       <div class="data-area">
@@ -349,7 +392,7 @@
           ><input
             type="checkbox"
             formControlName="showPercent"
-            (change)="extractChartData()"
+            (change)="togglePercent()"
           />As percentages</label
         >
 
@@ -380,31 +423,7 @@
           </li>
         </ul>
 
-        <!-- SNAPSHOTS -->
-        <ul *ngIf="experimental">
-          <!-- TODO: it should never be possible to add the current series to itself
-               so add new field to CompareData (i.e. the query params as a string)
-               and compare to the global (query params as string) to selectively add
-          -->
-          <li *ngFor="let item of compareData | keyvalue" class="compare-data">
-            <a
-              (click)="addSeriesToChart([item.key])"
-              class="compare-data-link"
-              [ngClass]="{ disabled: item.value.applied }"
-              >{{ item.value.label }}</a
-            >
-            <a
-              (click)="removeSeriesFromChart(item.key)"
-              class="compare-data-link-remove"
-              *ngIf="item.value.applied"
-              >X</a
-            >
-          </li>
-        </ul>
-        <!-- END SNAPSHOTS -->
-
         <div
-          *ngIf="chartData"
           class="chart-wrapper"
           [ngClass]="{ showing: !isShowingSearchList }"
         >
@@ -418,7 +437,6 @@
                 ? barChartSettingsTiers
                 : barChartSettings
             "
-            [results]="chartData"
           ></app-bar-chart>
         </div>
       </div>

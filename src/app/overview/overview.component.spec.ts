@@ -69,7 +69,6 @@ describe('OverviewComponent', () => {
         MockBarComponent,
         createMockPipe('renameApiFacet')
       ],
-      //declarations: [OverviewComponent, createMockPipe('renameApiFacet')],
       providers: [
         { provide: ExportCSVService, useClass: MockExportCSVService },
         {

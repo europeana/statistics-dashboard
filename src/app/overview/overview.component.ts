@@ -32,6 +32,7 @@ import {
 
 import {
   ColourSeriesData,
+  CompareData,
   ExportType,
   Facet,
   FacetField,
@@ -44,21 +45,13 @@ import {
   IHashNumber,
   NameLabel,
   NameValue,
+  NameValuePercent,
   RawFacet,
   TableRow
 } from '../_models';
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
-
-interface CompareData {
-  [key: string]: {
-    name: string;
-    label: string;
-    data: IHashNumber;
-    applied: boolean;
-  };
-}
 
 @Component({
   selector: 'app-overview',
@@ -80,8 +73,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   barChartSettingsTiers = Object.assign(
     {
-      // TODO: renable when bar can remove this.categoryAxis.renderer.labels.template.adapter
-      // prefixValueAxis: 'Tier'
+      prefixValueAxis: 'Tier'
     },
     BarChartCool
   );
@@ -91,7 +83,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
-  experimental = false;
+  experimental = true;
 
   facetConf = facetNames;
   nonFilterQPs = ['content-tier-zero', 'date-from', 'date-to', 'dataset-name'];
@@ -115,10 +107,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   selFacetIndex = 0;
   allProcessedFacetData: Array<FacetProcessed>;
 
-  chartData: Array<NameValue>;
-
   compareData: CompareData;
-  compareDataAllFacets: { [key: string]: CompareData } = {};
+  compareDataAllFacets: { [key: string]: CompareData } = facetNames.reduce(
+    (map, s: string) => {
+      map[s] = {};
+      return map;
+    },
+    {}
+  );
 
   tableData: FmtTableData;
 
@@ -173,13 +169,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           if (params.facet) {
             this.form.controls.facetParameter.setValue(params.facet);
-            this.compareData = this.compareDataAllFacets[params.facet];
-            if (!this.compareData) {
-              this.compareData = {};
-              this.compareDataAllFacets[params.facet] = this.compareData;
-            }
           }
-
           this.queryParams = queryParams;
 
           this.setCtZeroInputToQueryParam();
@@ -307,7 +297,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       return true;
     } else {
       this.totalResults = 0;
-      this.chartData = [];
       this.tableData = {
         columns: this.columnNames,
         tableRows: []
@@ -379,29 +368,42 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.filterStates.dates = { visible: false, disabled: false };
   }
 
+  seriesNameFromUrl(): string {
+    return JSON.stringify(this.queryParams).replace(
+      /[:\".,\s\(\)\[\]\{\}]/g,
+      ''
+    );
+  }
+
+  saveSeries(): void {
+    const data = this.compareData[this.seriesNameFromUrl()];
+    data.saved = true;
+  }
+
+  iHashNumberFromNVPs(
+    src: Array<NameValuePercent>,
+    percent = false
+  ): IHashNumber {
+    return src.reduce(function (map: IHashNumber, nvp: NameValuePercent) {
+      map[nvp.name] = percent ? nvp.percent : nvp.value;
+      return map;
+    }, {});
+  }
+
   /** storeSeries
   /*
   /*  Store series data
   */
-  storeSeries(): void {
-    const hash: IHashNumber = this.chartData.reduce(function (
-      map: IHashNumber,
-      nv: NameValue
-    ) {
-      map[nv.name] = nv.value;
-      return map;
-    },
-    {});
+  storeSeries(
+    applied: boolean,
+    saved: boolean,
+    nvs: Array<NameValuePercent>
+  ): void {
+    const name = this.seriesNameFromUrl();
+    let label = `All (${this.form.value.facetParameter})`;
 
-    const name = JSON.stringify(this.queryParams).replace(
-      /[:\".,\s\(\)\[\]\{\}]/g,
-      ''
-    );
-    let label = 'All';
-
+    // Generate human-readable label
     if (Object.keys(this.queryParams).length > 0) {
-      // TODO maybe reuse the function that labels the facet headers..?
-      // or utilises pipes
       label = Object.keys(this.queryParams)
         .map((key: string) => {
           const innerRes = [];
@@ -421,52 +423,66 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.compareData[name] = {
       name: name,
       label: label,
-      data: hash,
-      applied: false
+      data: this.iHashNumberFromNVPs(nvs),
+      dataPercent: this.iHashNumberFromNVPs(nvs, true),
+      applied: applied,
+      saved: saved
     };
   }
 
+  /** removeSeriesFromChart
+  /*  Sets series.applied to false and removes it from the chart
+  /* @param { string : seriesKey } - the key of the series to remove
+   */
   removeSeriesFromChart(seriesKey: string): void {
     this.barChart.removeSeries(seriesKey);
     this.compareData[seriesKey].applied = false;
   }
 
-  addSeriesToChart(seriesKeys: Array<string>): void {
-    if (!this.barChart) {
-      return;
-    }
-    // TODO: colour codes
-
-    const seriesData = seriesKeys.map((seriesKey: string) => {
+  /** addSeriesToChart
+  /*  Adds (multiple) ColourSeriesData to the bar chart
+  /* @param { Array<string> : compareKeys } - the keys of the stored compareData to add
+   */
+  addSeriesToChart(compareKeys: Array<string>): void {
+    const seriesData = compareKeys.map((seriesKey: string) => {
       this.compareData[seriesKey].applied = true;
       return {
-        data: this.compareData[seriesKey].data,
+        data: this.form.value.showPercent
+          ? this.compareData[seriesKey].dataPercent
+          : this.compareData[seriesKey].data,
         colour: '#FF0000',
         seriesName: seriesKey
       } as ColourSeriesData;
     });
-
     this.barChart.addSeries(seriesData);
   }
 
-  showAppliedSeries(): void {
-    // We can't rely on this.compareData not being stale after a facet switch...
-    const realTimeCompareData =
-      this.compareDataAllFacets[this.form.value.facetParameter];
+  /** addAppliedSeriesToChart
+  /*  adds all compareData entries (where applied = true)
+   */
+  addAppliedSeriesToChart(): void {
+    const keys = Object.keys(this.compareData);
 
-    if (!realTimeCompareData) {
+    if (!keys.length) {
+      console.log('No compare data');
       return;
     }
 
-    const appliedKeys = Object.keys(realTimeCompareData).filter(
-      (key: string) => {
-        // TODO: wouldn't the key.length check stop it restoring the 'all' series?
-        return key.length > 0 && realTimeCompareData[key].applied;
-      }
-    );
+    const appliedKeys = keys.filter((key: string) => {
+      return this.compareData[key].applied;
+    });
 
     const fn = (): void => this.addSeriesToChart(appliedKeys);
     setTimeout(fn, 0);
+  }
+
+  /** togglePercent
+  /*  removes all series objects from the barchart
+  /*  re-applies series....
+   */
+  togglePercent(): void {
+    this.barChart.removeAllSeries();
+    this.addAppliedSeriesToChart();
   }
 
   /** addOrUpdateFilterControls
@@ -829,29 +845,37 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** extractChartData
   /*
-  /* sets this.chartData
   /* @param { number } facetIndex - the index of the facet to use
   */
   extractChartData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
 
-    this.chartData = facetFields.map((ff: FacetFieldProcessed) => {
+    if (this.barChart) {
+      // force refresh of axes when switching category
+      this.barChart.drawChart();
+    }
+
+    const chartData = facetFields.map((ff: FacetFieldProcessed) => {
       return {
         name: ff.labelFormatted ? ff.labelFormatted : ff.label,
-        value: this.form.value.showPercent ? ff.percent : ff.count
+        value: ff.count,
+        percent: ff.percent
       };
     });
 
-    // TODO: there is nothing within the experimental approach that prevents percentage values
-    //  from being plotted against non-percentages
+    const selFacet = this.form.value.facetParameter;
 
-    // save the "All" series by default
-    if (Object.keys(this.queryParams).length === 0) {
-      this.storeSeries();
-    }
+    this.compareData = this.compareDataAllFacets[selFacet];
+
+    // switch off other series
+    Object.keys(this.compareData).forEach((key: string) => {
+      this.compareData[key].applied = false;
+    });
+
+    this.storeSeries(true, false, chartData);
 
     // show other applied
-    this.showAppliedSeries();
+    this.addAppliedSeriesToChart();
   }
 
   /* extractTableData

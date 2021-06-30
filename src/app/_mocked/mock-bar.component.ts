@@ -10,7 +10,11 @@ export class MockBarComponent {
   }
 
   addSeries(_): void {
-    console.log('addSeries');
+    console.log('MockBarComponent.addSeries');
+  }
+
+  drawChart(): void {
+    console.log('MockBarComponent.drawChart');
   }
 
   getSvgData(): Promise<string> {

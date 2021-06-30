@@ -1,11 +1,5 @@
 import { IHashNumber } from '.';
 
-export interface ColourSeriesData {
-  data: IHashNumber;
-  colour: string;
-  seriesName: string;
-}
-
 export interface ChartSettings {
   configurable: boolean;
   ctrlsOpen?: boolean;
@@ -21,4 +15,21 @@ export interface ChartSettings {
   prefixValueAxis?: string;
   showExports?: boolean;
   chartLegend?: boolean;
+}
+
+export interface ColourSeriesData {
+  data: IHashNumber;
+  colour: string;
+  seriesName: string;
+}
+
+export interface CompareData {
+  [key: string]: {
+    name: string;
+    label: string;
+    data: IHashNumber;
+    dataPercent: IHashNumber;
+    applied: boolean;
+    saved?: boolean;
+  };
 }
