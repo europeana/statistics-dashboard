@@ -30,6 +30,7 @@ import {
 import { ExportType, NameLabel } from '../_models';
 import { APIService, ExportCSVService } from '../_services';
 import { BarComponent } from '../chart';
+import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
 
 describe('OverviewComponent', () => {
@@ -67,6 +68,7 @@ describe('OverviewComponent', () => {
       declarations: [
         OverviewComponent,
         MockBarComponent,
+        SnapshotsComponent,
         createMockPipe('renameApiFacet')
       ],
       providers: [
@@ -421,9 +423,7 @@ describe('OverviewComponent', () => {
       b4Each();
     });
 
-    it('should export CSV', fakeAsync(() => {
-      component.beginPolling();
-      tick(tickTime);
+    it('should export CSV', () => {
       spyOn(exportCSV, 'download');
       const elDownload = document.createElement('a');
       document.body.append(elDownload);
@@ -431,7 +431,7 @@ describe('OverviewComponent', () => {
       component.export(ExportType.CSV);
       expect(exportCSV.download).toHaveBeenCalled();
       component.ngOnDestroy();
-    }));
+    });
 
     it('should export PDF', () => {
       spyOn(component.barChart, 'getSvgData').and.callThrough();

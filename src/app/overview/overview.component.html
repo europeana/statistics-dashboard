@@ -131,20 +131,6 @@
               >Show List</a
             >
           </h3>
-          <h3 class="link-list" *ngIf="!isLoading && experimental">
-            <a
-              (click)="saveSeries()"
-              title="Make a snapshot of this data available for comparison"
-              >Compare</a
-            >
-          </h3>
-
-          <a
-            *ngIf="!isLoading && experimental"
-            (click)="saveSeries()"
-            class="icon-snapshot"
-          ></a>
-
           <h3 class="link-data">
             <a (click)="setIsShowingSearchList(false)">Show Data</a>
           </h3>
@@ -236,51 +222,15 @@
       </ng-container>
 
       <!-- SNAPSHOTS -->
-
-      <div class="snapshots" *ngIf="experimental">
-        <ng-template #comparisonItem let-key="key" let-item="item">
-          <ng-container *ngIf="item.saved">
-            <li class="compare-data">
-              <a
-                (click)="toggleSeriesInChart(key)"
-                class="compare-data-link"
-                [ngClass]="{ applied: item.applied }"
-                [ngStyle]="{
-                  'border-color': colours[item._colourIndex]
-                }"
-                >{{ item.label }}</a
-              >
-            </li>
-          </ng-container>
-        </ng-template>
-
-        <ul class="comparison-list">
-          <ng-container *ngFor="let item of compareData | keyvalue">
-            <ng-container *ngIf="item.value.applied">
-              <ng-content
-                *ngTemplateOutlet="
-                  comparisonItem;
-                  context: { key: item.key, item: item.value }
-                "
-              ></ng-content>
-            </ng-container>
-          </ng-container>
-
-          <ng-container *ngFor="let item of compareData | keyvalue">
-            <ng-container *ngIf="!item.value.applied">
-              <ng-content
-                *ngTemplateOutlet="
-                  comparisonItem;
-                  context: { key: item.key, item: item.value }
-                "
-              ></ng-content>
-            </ng-container>
-          </ng-container>
-
-          <li class="icon-snapshot"></li>
-        </ul>
-      </div>
-
+      <ng-container *ngIf="experimental">
+        <app-snapshots
+          #snapshots
+          [facetName]="form.value.facetParameter"
+          (hideItem)="removeSeriesFromChart($event)"
+          (showItems)="addSeriesToChart($event)"
+        >
+        </app-snapshots>
+      </ng-container>
       <!-- END SNAPSHOTS -->
 
       <!-- Data Area -->

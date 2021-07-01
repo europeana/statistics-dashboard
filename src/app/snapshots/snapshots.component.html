@@ -1,0 +1,44 @@
+<div class="snapshots">
+  <ng-template #comparisonItem let-key="key" let-item="item">
+    <ng-container *ngIf="item.saved">
+      <li class="compare-data">
+        <a
+          (click)="toggle(key)"
+          class="compare-data-link"
+          [ngClass]="{ applied: item.applied, pin: !item.applied }"
+          ><span
+            class="legend-square"
+            [ngStyle]="{
+              'background-color': colours[item._colourIndex]
+            }"
+          ></span
+          ><span>{{ item.label }}</span></a
+        >
+      </li>
+    </ng-container>
+  </ng-template>
+
+  <ul class="comparison-list">
+    <ng-container *ngFor="let item of compareData | keyvalue">
+      <ng-container *ngIf="item.value.applied">
+        <ng-content
+          *ngTemplateOutlet="
+            comparisonItem;
+            context: { key: item.key, item: item.value }
+          "
+        ></ng-content>
+      </ng-container>
+    </ng-container>
+
+    <ng-container *ngFor="let item of compareData | keyvalue">
+      <ng-container *ngIf="!item.value.applied">
+        <ng-content
+          *ngTemplateOutlet="
+            comparisonItem;
+            context: { key: item.key, item: item.value }
+          "
+        ></ng-content>
+      </ng-container>
+    </ng-container>
+  </ul>
+</div>

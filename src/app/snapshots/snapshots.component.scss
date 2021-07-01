@@ -1,0 +1,70 @@
+@import "../../scss/_variables";
+
+.pin {
+  position: relative;
+  &::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns:dc='http://purl.org/dc/elements/1.1/' xmlns:cc='http://creativecommons.org/ns%23' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns%23' xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' xmlns:sodipodi='http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd' xmlns:inkscape='http://www.inkscape.org/namespaces/inkscape' viewBox='0 -256 1792 1792' id='svg2' version='1.1' inkscape:version='0.48.3.1 r9886' width='100%25' height='100%25' sodipodi:docname='pushpin_font_awesome.svg'%3E%3Cmetadata id='metadata12'%3E%3Crdf:rdf%3E%3Ccc:work rdf:about=''%3E%3Cdc:format%3Eimage/svg+xml%3C/dc:format%3E%3Cdc:type rdf:resource='http://purl.org/dc/dcmitype/StillImage'%3E%3C/dc:type%3E%3C/cc:work%3E%3C/rdf:rdf%3E%3C/metadata%3E%3Cdefs id='defs10'%3E%3C/defs%3E%3Csodipodi:namedview pagecolor='%23ffffff' bordercolor='%23666666' borderopacity='1' objecttolerance='10' gridtolerance='10' guidetolerance='10' inkscape:pageopacity='0' inkscape:pageshadow='2' inkscape:window-width='640' inkscape:window-height='480' id='namedview8' showgrid='false' inkscape:zoom='0.13169643' inkscape:cx='896' inkscape:cy='896' inkscape:window-x='0' inkscape:window-y='25' inkscape:window-maximized='0' inkscape:current-layer='svg2'%3E%3C/sodipodi:namedview%3E%3Cg transform='matrix%281,0,0,-1,318.91525,1209.4915%29' id='g4'%3E%3Cpath d='m 480,672 v 448 q 0,14 -9,23 -9,9 -23,9 -14,0 -23,-9 -9,-9 -9,-23 V 672 q 0,-14 9,-23 9,-9 23,-9 14,0 23,9 9,9 9,23 z m 672,-352 q 0,-26 -19,-45 -19,-19 -45,-19 H 659 l -51,-483 q -2,-12 -10.5,-20.5 Q 589,-256 577,-256 h -1 q -27,0 -32,27 L 468,256 H 64 Q 38,256 19,275 0,294 0,320 0,443 78.5,541.5 157,640 256,640 v 512 q -52,0 -90,38 -38,38 -38,90 0,52 38,90 38,38 90,38 h 640 q 52,0 90,-38 38,-38 38,-90 0,-52 -38,-90 -38,-38 -90,-38 V 640 q 99,0 177.5,-98.5 Q 1152,443 1152,320 z' id='path6' inkscape:connector-curvature='0' style='fill:currentColor'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    content: "";
+    display: block;
+    height: 12px;
+    right: -16px;
+    transform: rotate(90deg);
+    transition: transform 20ms;
+    position: absolute;
+    width: 12px;
+  }
+  &:hover::after {
+    transform: rotate(0deg);
+  }
+}
+
+.compare-data {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.compare-data-link-remove {
+  margin-right: 8px;
+}
+
+.compare-data-link {
+  align-items: center;
+  color: $gray-faint;
+  display: flex;
+  flex-direction: row;
+
+  font-size: 14px;
+
+  .legend-square {
+    display: block;
+    margin-right: 4px;
+    opacity: 0;
+    pointer-events: none;
+    height: 12px;
+    width: 12px;
+  }
+
+  &.applied {
+    font-weight: 600;
+    .legend-square {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+}
+
+.comparison-list + .comparison-list {
+  font-size: 8px;
+}
+
+.snapshots {
+  margin: 24px 0;
+  text-align: right;
+
+  .comparison-list {
+    border-radius: 8px;
+    display: inline-flex;
+    flex-direction: column;
+  }
+}

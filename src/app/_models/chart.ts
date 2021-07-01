@@ -23,6 +23,17 @@ export interface ColourSeriesData {
   seriesName: string;
 }
 
+export interface CompareDataDescriptor {
+  _colourIndex: number;
+  applied: boolean;
+  data: IHashNumber;
+  dataPercent: IHashNumber;
+  label: string;
+  name: string;
+  saved?: boolean;
+}
+
+/*
 export interface CompareData {
   [key: string]: {
     _colourIndex: number;
@@ -31,8 +42,10 @@ export interface CompareData {
     dataPercent: IHashNumber;
     label: string;
     name: string;
-    // make the order pinned (>count) the order used for activated
-    //pinnedCount?: number;
     saved?: boolean;
   };
+}
+*/
+export interface CompareData {
+  [key: string]: CompareDataDescriptor;
 }
