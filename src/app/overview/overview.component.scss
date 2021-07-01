@@ -50,10 +50,10 @@ $width-left-col: 200px;
 
 .rm-filter {
   background-color: $stats-blue;
+  margin-top: $spacing-s;
 }
 
 .rm-filter,
-.compare-data-link,
 .menu-opener {
   &.disabled {
     opacity: 0.4;

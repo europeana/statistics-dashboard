@@ -18,18 +18,21 @@ export interface ChartSettings {
 }
 
 export interface ColourSeriesData {
-  data: IHashNumber;
   colour: string;
+  data: IHashNumber;
   seriesName: string;
 }
 
 export interface CompareData {
   [key: string]: {
-    name: string;
-    label: string;
+    _colourIndex: number;
+    applied: boolean;
     data: IHashNumber;
     dataPercent: IHashNumber;
-    applied: boolean;
+    label: string;
+    name: string;
+    // make the order pinned (>count) the order used for activated
+    //pinnedCount?: number;
     saved?: boolean;
   };
 }

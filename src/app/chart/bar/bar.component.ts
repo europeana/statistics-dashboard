@@ -18,9 +18,10 @@ import {
   ChartSettings,
   ColourSeriesData,
   IHashNumber,
-  NameValue,
-  NameValuePercent
+  NameValue
 } from '../../_models';
+
+import { colours } from '../../_data';
 
 import { BarChartDefaults } from '../chart-defaults';
 
@@ -81,6 +82,10 @@ export class BarComponent implements AfterViewInit {
   */
   ngAfterViewInit(): void {
     this.drawChart();
+    this.addSeriesFromResult();
+  }
+
+  addSeriesFromResult(): void {
     if (this._results) {
       this.addSeries([
         {
@@ -92,7 +97,7 @@ export class BarComponent implements AfterViewInit {
             return map;
           },
           {}),
-          colour: '#0a72cc',
+          colour: colours[0],
           seriesName: 'seriesKey'
         } as ColourSeriesData
       ]);
@@ -181,23 +186,6 @@ export class BarComponent implements AfterViewInit {
     });
   }
 
-  /** applySettings
-  /* - updates chart variables according to inputs
-  /* @param { boolean: force } - flag whether to invoke drawChart function
-  */
-  applySettings(force = false): void {
-    if (force) {
-      this.drawChart();
-      return;
-    }
-
-    this.categoryAxis.renderer.labels.template.maxWidth =
-      this.settings.maxLabelWidth;
-    this.categoryAxis.renderer.labels.template.truncate =
-      this.settings.labelTruncate;
-    this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
-  }
-
   removeSeries(id: string): void {
     const series = this.allSeries[id];
 
@@ -205,13 +193,13 @@ export class BarComponent implements AfterViewInit {
       const seriesIndex = this.chart.series.indexOf(series);
 
       if (seriesIndex === -1) {
-        console.log(`series (${id}) has negative index`);
+        console.log(`Bar: series (${id}) has negative index`);
       } else {
         this.chart.series.removeIndex(seriesIndex).dispose();
         delete this.allSeries[id];
       }
     } else {
-      console.log(`can't find series to remove (${id})`);
+      console.log(`Bar: can't find series to remove (${id})`);
     }
     this.chart.invalidateData();
   }
@@ -220,6 +208,10 @@ export class BarComponent implements AfterViewInit {
     Object.keys(this.allSeries).forEach((id: string) => {
       this.removeSeries(id);
     });
+  }
+
+  getChartSeriesCount(): number {
+    return this.chart.series.length;
   }
 
   /** addSeries
@@ -257,7 +249,7 @@ export class BarComponent implements AfterViewInit {
       this.chart.data.length > this.preferredNumberBars
     ) {
       anySeries.events.on('ready', (): void => {
-        const fn = () => {
+        const fn = (): void => {
           this.chart.scrollbarY = new am4core.Scrollbar();
           this.categoryAxis.zoomToIndexes(
             1,
@@ -300,6 +292,7 @@ export class BarComponent implements AfterViewInit {
       series.columns.template.tooltipText = `{categoryX}: [bold]{valueY}[/]${labelSuffix}`;
     }
     series.columns.template.fillOpacity = 1;
+    series.columns.template.strokeWidth = 0;
     return series;
   }
 
@@ -381,6 +374,13 @@ export class BarComponent implements AfterViewInit {
       this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
       this.categoryAxis.renderer.ticks.template.length = 9;
 
+      // labels
+      this.categoryAxis.renderer.labels.template.maxWidth =
+        this.settings.maxLabelWidth;
+      this.categoryAxis.renderer.labels.template.truncate =
+        this.settings.labelTruncate;
+      this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
+
       this.categoryAxis.renderer.labels.template.fontSize = 12;
       this.categoryAxis.renderer.labels.template.fontWeight = '600';
       this.categoryAxis.renderer.labels.template.marginRight = 9;
@@ -408,7 +408,6 @@ export class BarComponent implements AfterViewInit {
       );
 
       this.addLegend();
-      this.applySettings();
     });
 
     // this has to be outside browserOnly()
