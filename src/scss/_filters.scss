@@ -132,7 +132,14 @@
 }
 
 .rm-filters {
-  .contentTier,
+  .contentTier {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-content-tier($white);
+      }
+    }
+  }
+
   .metadataTier {
     .checkmarked-checkbox {
       &::before {
@@ -190,6 +197,10 @@
   background-image: svg-url-icon-dataset-id($gray-med);
 }
 
+.filter-icon-contentTier {
+  background-image: svg-url-icon-content-tier($gray-med);
+}
+
 .filter-icon-COUNTRY {
   background-image: svg-url-icon-flag($gray-med);
 }
@@ -202,7 +213,6 @@
   background-image: svg-url-icon-calendar($gray-med);
 }
 
-.filter-icon-contentTier,
 .filter-icon-metadataTier {
   background-image: svg-url-icon-metadata($gray-med);
 }
