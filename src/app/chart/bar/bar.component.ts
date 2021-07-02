@@ -191,13 +191,10 @@ export class BarComponent implements AfterViewInit {
 
     if (series) {
       const seriesIndex = this.chart.series.indexOf(series);
-
-      if (seriesIndex === -1) {
-        console.log(`Bar: series (${id}) has negative index`);
-      } else {
+      if (seriesIndex > -1) {
         this.chart.series.removeIndex(seriesIndex).dispose();
-        delete this.allSeries[id];
       }
+      delete this.allSeries[id];
     } else {
       console.log(`Bar: can't find series to remove (${id})`);
     }
