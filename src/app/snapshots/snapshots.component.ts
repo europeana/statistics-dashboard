@@ -131,7 +131,10 @@ export class SnapshotsComponent {
   /** toggle
   /* Emits showItems event or hideItem event according to a CompareData applied property
   */
-  toggle(key: string): void {
+  toggle(key: string, current = false): void {
+    if (current) {
+      return;
+    }
     const cd = this.compareDataAllFacets[this._facetName][key];
     if (cd.applied) {
       this.hideItem.emit(key);

@@ -3,9 +3,9 @@
     <ng-container *ngIf="item.current || item.saved">
       <li class="compare-data">
         <a
-          (click)="toggle(key)"
+          (click)="toggle(key, item.current)"
           class="compare-data-link"
-          [ngClass]="{ applied: item.applied }"
+          [ngClass]="{ applied: item.applied, current: item.current }"
           ><span
             class="legend-square"
             [ngStyle]="{
