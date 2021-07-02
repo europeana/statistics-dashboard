@@ -53,6 +53,13 @@ export class SnapshotsComponent {
     });
   }
 
+  clearColourIndexes(): void {
+    const cd = this.compareDataAllFacets[this._facetName];
+    return Object.keys(cd).forEach((key: string) => {
+      cd[key]._colourIndex = -1;
+    });
+  }
+
   getNextAvailableColourIndex(): number {
     const cd = this.compareDataAllFacets[this._facetName];
 

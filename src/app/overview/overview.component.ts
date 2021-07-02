@@ -359,16 +359,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   seriesNameFromUrl(): string {
-    const res = JSON.stringify(this.queryParams).replace(
+    return JSON.stringify(this.queryParams).replace(
       /[:\".,\s\(\)\[\]\{\}]/g,
       ''
     );
-
-    if (res.length === 0) {
-      return this.form.value.facetParameter;
-    }
-
-    return res;
   }
 
   iHashNumberFromNVPs(
@@ -400,9 +394,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           const innerRes = [];
           const values = this.queryParams[key];
           if (!this.nonFilterQPs.includes(key)) {
-            values.forEach((valPart: string) => {
-              innerRes.push(valPart);
-            });
+            values
+              .map((s: string) => {
+                return fromInputSafeName(s);
+              })
+              .forEach((valPart: string) => {
+                innerRes.push(valPart);
+              });
             return `${key} (${innerRes.join(' or ')})`;
           }
           return '';
@@ -427,7 +425,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { string : seriesKey } - the key of the series to remove
    */
   removeSeriesFromChart(seriesKey: string): void {
-    console.log('removeSeriesFromChart');
     this.barChart.removeSeries(seriesKey);
     this.snapshots.unapply(seriesKey);
   }
@@ -466,6 +463,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
    */
   togglePercent(): void {
     this.barChart.removeAllSeries();
+    this.snapshots.clearColourIndexes();
     this.addAppliedSeriesToChart();
   }
 
@@ -740,7 +738,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const qp = {};
 
     this.getEnabledFilterNames().forEach((filterName: string) => {
-      const filterVals = this.getSetCheckboxValues(filterName);
+      const filterVals = this.getSetCheckboxValues(filterName).map(
+        (s: string) => {
+          return fromInputSafeName(s);
+        }
+      );
       if (filterVals.length > 0) {
         qp[filterName] = filterVals;
       }
