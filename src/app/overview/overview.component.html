@@ -109,7 +109,7 @@
             class="header-data"
             [title]="getFormattedContentTierParam() + getFormattedFacetParam()"
           >
-            Europeana database by
+            <span class="facet-param-text"> Europeana database by </span>
             <select
               class="facet-param"
               formControlName="facetParameter"
@@ -226,20 +226,75 @@
         <app-listing [showing]="true"></app-listing>
       </ng-container>
 
-      <!-- SNAPSHOTS -->
-      <ng-container *ngIf="experimental">
-        <app-snapshots
-          #snapshots
-          [facetName]="form.value.facetParameter"
-          (hideItem)="removeSeriesFromChart($event)"
-          (showItems)="addSeriesToChart($event)"
-        >
-        </app-snapshots>
-      </ng-container>
-      <!-- END SNAPSHOTS -->
-
       <!-- Data Area -->
       <div class="data-area">
+        <label
+          [ngStyle]="{
+            display: isShowingSearchList ? 'none' : 'inline-block'
+          }"
+          ><input
+            type="checkbox"
+            formControlName="showPercent"
+            (change)="togglePercent()"
+          />As percentages</label
+        >
+
+        <div
+          class="chart-wrapper"
+          [ngClass]="{ showing: !isShowingSearchList }"
+        >
+          <app-bar-chart
+            #barChart
+            [showPercent]="form.value.showPercent"
+            [extraSettings]="
+              ['contentTier', 'metadataTier'].includes(
+                form.value.facetParameter
+              )
+                ? barChartSettingsTiers
+                : barChartSettings
+            "
+          ></app-bar-chart>
+        </div>
+
+        <!-- SNAPSHOTS -->
+        <ng-container *ngIf="experimental">
+          <app-snapshots
+            #snapshots
+            [facetName]="form.value.facetParameter"
+            (hideItem)="removeSeriesFromChart($event)"
+            (showItems)="addSeriesToChart($event)"
+          >
+          </app-snapshots>
+        </ng-container>
+        <!-- END SNAPSHOTS -->
+
+        <ul
+          *ngIf="allProcessedFacetData"
+          class="options-wrapper"
+          [ngClass]="{ showing: !isShowingSearchList }"
+          (clickOutside)="closeDisplayOptions()"
+        >
+          <li>
+            <a #downloadAnchor></a>
+          </li>
+
+          <li class="dropdown">
+            <a
+              class="menu-opener"
+              (click)="toggleDownloadOptions()"
+              [ngClass]="{ open: downloadOptionsOpen }"
+              ><h3>Downloads</h3></a
+            >
+            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
+              <ul class="dropdown-content">
+                <li *ngFor="let exportType of exportTypes">
+                  <a (click)="export(exportType)">{{ exportType }}</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+
         <ngx-datatable
           *ngIf="tableData"
           #dataTable
@@ -359,59 +414,6 @@
             </ng-template>
           </ngx-datatable-footer>
         </ngx-datatable>
-
-        <label
-          style="display: {{ isShowingSearchList ? 'none' : 'inline-block' }}"
-          ><input
-            type="checkbox"
-            formControlName="showPercent"
-            (change)="togglePercent()"
-          />As percentages</label
-        >
-
-        <ul
-          *ngIf="allProcessedFacetData"
-          class="options-wrapper"
-          [ngClass]="{ showing: !isShowingSearchList }"
-          (clickOutside)="closeDisplayOptions()"
-        >
-          <li>
-            <a #downloadAnchor></a>
-          </li>
-
-          <li class="dropdown">
-            <a
-              class="menu-opener"
-              (click)="toggleDownloadOptions()"
-              [ngClass]="{ open: downloadOptionsOpen }"
-              ><h3>Downloads</h3></a
-            >
-            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
-              <ul class="dropdown-content">
-                <li *ngFor="let exportType of exportTypes">
-                  <a (click)="export(exportType)">{{ exportType }}</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-
-        <div
-          class="chart-wrapper"
-          [ngClass]="{ showing: !isShowingSearchList }"
-        >
-          <app-bar-chart
-            #barChart
-            [showPercent]="form.value.showPercent"
-            [extraSettings]="
-              ['contentTier', 'metadataTier'].includes(
-                form.value.facetParameter
-              )
-                ? barChartSettingsTiers
-                : barChartSettings
-            "
-          ></app-bar-chart>
-        </div>
       </div>
     </div>
   </div>

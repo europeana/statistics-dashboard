@@ -868,9 +868,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* sets this.tableData
   */
   extractTableData(): void {
-    if (this.experimental) {
-      return;
-    }
     const facetData = this.allProcessedFacetData[this.selFacetIndex].fields;
     this.tableData = {
       columns: this.columnNames,
