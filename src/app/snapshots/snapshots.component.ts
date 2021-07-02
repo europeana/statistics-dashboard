@@ -126,6 +126,10 @@ export class SnapshotsComponent {
   toggleSaved(key: string): void {
     const cd = this.compareDataAllFacets[this._facetName][key];
     cd.saved = !cd.saved;
+
+    if (!cd.saved) {
+      this.hideItem.emit(key);
+    }
   }
 
   /** toggle
