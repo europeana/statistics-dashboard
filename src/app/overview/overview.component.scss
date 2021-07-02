@@ -48,6 +48,10 @@ $width-left-col: 200px;
   }
 }
 
+.menu-opener {
+  color: $gray-faint;
+}
+
 .rm-filter {
   background-color: $stats-blue;
   margin-top: $spacing-s;
@@ -229,7 +233,7 @@ label {
 .chart-wrapper.showing {
   height: 500px;
   max-width: 100%;
-  padding-bottom: $spacing-m;
+  padding: $spacing-m 0;
 }
 
 .data-area {
@@ -242,7 +246,10 @@ label {
   border: 0;
   background: none;
   border-bottom: 1px dashed $near-black;
+  cursor: pointer;
+  font-weight: 600;
   margin-bottom: 20px;
+  margin-left: -2px;
   text-indent: 0;
 }
 

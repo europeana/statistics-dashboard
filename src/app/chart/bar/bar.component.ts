@@ -135,7 +135,7 @@ export class BarComponent implements AfterViewInit {
 
       legend.itemContainers.template.events.on(
         'hit',
-        function (ev: { type: 'hit'; target: am4core.Container }) {
+        (ev: { type: 'hit'; target: am4core.Container }) => {
           const context = ev.target.dataItem.dataContext as CustomLegendItem;
           if (!ev.target.isActive) {
             context.customData.hide();
@@ -210,10 +210,6 @@ export class BarComponent implements AfterViewInit {
     });
   }
 
-  getChartSeriesCount(): number {
-    return this.chart.series.length;
-  }
-
   /** addSeries
   /*
   /* creates chart.data if it doesn't exist
@@ -250,9 +246,25 @@ export class BarComponent implements AfterViewInit {
     ) {
       anySeries.events.on('ready', (): void => {
         const fn = (): void => {
+          const customiseGrip = (grip): void => {
+            grip.icon.disabled = true;
+            grip.background.fill = am4core.color('#0a72cc');
+            grip.background.fillOpacity = 0.8;
+            //grip.background.disabled = true;
+          };
           this.chart.scrollbarY = new am4core.Scrollbar();
+          customiseGrip(this.chart.scrollbarY.startGrip);
+          customiseGrip(this.chart.scrollbarY.endGrip);
+
+          this.chart.scrollbarY.background.fill = am4core.color('#0a72cc');
+          this.chart.scrollbarY.background.fillOpacity = 0.1;
+
+          this.chart.scrollbarY.thumb.background.fill =
+            am4core.color('#0a72cc');
+          this.chart.scrollbarY.thumb.background.fillOpacity = 0.2;
+
           this.categoryAxis.zoomToIndexes(
-            1,
+            0,
             this.preferredNumberBars,
             false,
             true

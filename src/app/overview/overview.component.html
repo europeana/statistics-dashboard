@@ -109,7 +109,7 @@
             class="header-data"
             [title]="getFormattedContentTierParam() + getFormattedFacetParam()"
           >
-            By
+            Europeana database by
             <select
               class="facet-param"
               formControlName="facetParameter"
@@ -164,7 +164,12 @@
             <ng-container
               *ngFor="let optionDisplay of [fromInputSafeName(option)]"
             >
-              <span
+              <!--
+                TODO: span changed to label to fix awkawrd clicking.
+                      Replicate this change on other filters post-merge?
+                      .filter-label (co) assignment of margin: 0 8px; needs changed to padding
+              -->
+              <label
                 class="rm-filter"
                 *ngIf="form.value[filter][option]"
                 [formGroupName]="filter"
@@ -211,7 +216,7 @@
                     </label>
                   </span>
                 </span>
-              </span>
+              </label>
             </ng-container>
           </ng-container>
         </ng-container>

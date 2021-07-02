@@ -24,28 +24,17 @@ export interface ColourSeriesData {
 }
 
 export interface CompareDataDescriptor {
-  _colourIndex: number;
+  _colourIndex?: number;
   applied: boolean;
+  current?: boolean;
   data: IHashNumber;
   dataPercent: IHashNumber;
   label: string;
   name: string;
+  pinIndex: number;
   saved?: boolean;
 }
 
-/*
-export interface CompareData {
-  [key: string]: {
-    _colourIndex: number;
-    applied: boolean;
-    data: IHashNumber;
-    dataPercent: IHashNumber;
-    label: string;
-    name: string;
-    saved?: boolean;
-  };
-}
-*/
 export interface CompareData {
   [key: string]: CompareDataDescriptor;
 }

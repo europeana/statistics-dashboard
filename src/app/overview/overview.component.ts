@@ -403,7 +403,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             values.forEach((valPart: string) => {
               innerRes.push(valPart);
             });
-            return `${key} (${innerRes.join(', ')})`;
+            return `${key} (${innerRes.join(' or ')})`;
           }
           return '';
         })
@@ -412,12 +412,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }
 
     this.snapshots.snap(this.form.value.facetParameter, name, {
-      _colourIndex: 0,
       name: name,
       label: label,
       data: this.iHashNumberFromNVPs(nvs),
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
       applied: applied,
+      pinIndex: 0,
       saved: saved
     });
   }
@@ -439,12 +439,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
     const fn = (): void => {
-      const seriesCount = this.barChart.getChartSeriesCount();
       const seriesData = this.snapshots.getSeriesData(
         this.form.value.facetParameter,
         seriesKeys,
-        this.form.value.showPercent,
-        seriesCount
+        this.form.value.showPercent
       );
       this.barChart.addSeries(seriesData);
     };
@@ -858,7 +856,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       };
     });
 
-    this.storeSeries(true, true, chartData);
+    // show unsaved
+    this.storeSeries(true, false, chartData);
 
     // show other applied
     this.addAppliedSeriesToChart();
