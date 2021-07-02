@@ -109,7 +109,7 @@
             class="header-data"
             [title]="getFormattedContentTierParam() + getFormattedFacetParam()"
           >
-            By
+            <span class="facet-param-text"> Europeana database by </span>
             <select
               class="facet-param"
               formControlName="facetParameter"
@@ -130,9 +130,6 @@
             <a (click)="setIsShowingSearchList(true)" *ngIf="!isLoading"
               >Show List</a
             >
-          </h3>
-          <h3 class="link-list" *ngIf="!isLoading && experimental">
-            <a (click)="storeSeries()">Store Series</a>
           </h3>
           <h3 class="link-data">
             <a (click)="setIsShowingSearchList(false)">Show Data</a>
@@ -159,13 +156,20 @@
         </ng-container>
       </div>
 
+      <!-- Filter removal -->
+
       <ul class="rm-filters" [ngClass]="{ 'list-mode': isShowingSearchList }">
         <ng-container *ngFor="let filter of facetConf">
           <ng-container *ngFor="let option of getSetCheckboxValues(filter)">
             <ng-container
               *ngFor="let optionDisplay of [fromInputSafeName(option)]"
             >
-              <span
+              <!--
+                TODO: span changed to label to fix awkawrd clicking.
+                      Replicate this change on other filters post-merge?
+                      .filter-label (co) assignment of margin: 0 8px; needs changed to padding
+              -->
+              <label
                 class="rm-filter"
                 *ngIf="form.value[filter][option]"
                 [formGroupName]="filter"
@@ -212,7 +216,7 @@
                     </label>
                   </span>
                 </span>
-              </span>
+              </label>
             </ng-container>
           </ng-container>
         </ng-container>
@@ -224,6 +228,73 @@
 
       <!-- Data Area -->
       <div class="data-area">
+        <label
+          [ngStyle]="{
+            display: isShowingSearchList ? 'none' : 'inline-block'
+          }"
+          ><input
+            type="checkbox"
+            formControlName="showPercent"
+            (change)="togglePercent()"
+          />As percentages</label
+        >
+
+        <div
+          class="chart-wrapper"
+          [ngClass]="{ showing: !isShowingSearchList }"
+        >
+          <app-bar-chart
+            #barChart
+            [showPercent]="form.value.showPercent"
+            [extraSettings]="
+              ['contentTier', 'metadataTier'].includes(
+                form.value.facetParameter
+              )
+                ? barChartSettingsTiers
+                : barChartSettings
+            "
+          ></app-bar-chart>
+        </div>
+
+        <!-- SNAPSHOTS -->
+        <ng-container *ngIf="experimental">
+          <app-snapshots
+            #snapshots
+            [facetName]="form.value.facetParameter"
+            (hideItem)="removeSeriesFromChart($event)"
+            (showItems)="addSeriesToChart($event)"
+          >
+          </app-snapshots>
+        </ng-container>
+        <!-- END SNAPSHOTS -->
+
+        <ul
+          *ngIf="allProcessedFacetData"
+          class="options-wrapper"
+          [ngClass]="{ showing: !isShowingSearchList }"
+          (clickOutside)="closeDisplayOptions()"
+        >
+          <li>
+            <a #downloadAnchor></a>
+          </li>
+
+          <li class="dropdown">
+            <a
+              class="menu-opener"
+              (click)="toggleDownloadOptions()"
+              [ngClass]="{ open: downloadOptionsOpen }"
+              ><h3>Downloads</h3></a
+            >
+            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
+              <ul class="dropdown-content">
+                <li *ngFor="let exportType of exportTypes">
+                  <a (click)="export(exportType)">{{ exportType }}</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+
         <ngx-datatable
           *ngIf="tableData"
           #dataTable
@@ -343,84 +414,6 @@
             </ng-template>
           </ngx-datatable-footer>
         </ngx-datatable>
-
-        <label
-          style="display: {{ isShowingSearchList ? 'none' : 'inline-block' }}"
-          ><input
-            type="checkbox"
-            formControlName="showPercent"
-            (change)="extractChartData()"
-          />As percentages</label
-        >
-
-        <ul
-          *ngIf="allProcessedFacetData"
-          class="options-wrapper"
-          [ngClass]="{ showing: !isShowingSearchList }"
-          (clickOutside)="closeDisplayOptions()"
-        >
-          <li>
-            <a #downloadAnchor></a>
-          </li>
-
-          <li class="dropdown">
-            <a
-              class="menu-opener"
-              (click)="toggleDownloadOptions()"
-              [ngClass]="{ open: downloadOptionsOpen }"
-              ><h3>Downloads</h3></a
-            >
-            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
-              <ul class="dropdown-content">
-                <li *ngFor="let exportType of exportTypes">
-                  <a (click)="export(exportType)">{{ exportType }}</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-
-        <!-- SNAPSHOTS -->
-        <ul *ngIf="experimental">
-          <!-- TODO: it should never be possible to add the current series to itself
-               so add new field to CompareData (i.e. the query params as a string)
-               and compare to the global (query params as string) to selectively add
-          -->
-          <li *ngFor="let item of compareData | keyvalue" class="compare-data">
-            <a
-              (click)="addSeriesToChart([item.key])"
-              class="compare-data-link"
-              [ngClass]="{ disabled: item.value.applied }"
-              >{{ item.value.label }}</a
-            >
-            <a
-              (click)="removeSeriesFromChart(item.key)"
-              class="compare-data-link-remove"
-              *ngIf="item.value.applied"
-              >X</a
-            >
-          </li>
-        </ul>
-        <!-- END SNAPSHOTS -->
-
-        <div
-          *ngIf="chartData"
-          class="chart-wrapper"
-          [ngClass]="{ showing: !isShowingSearchList }"
-        >
-          <app-bar-chart
-            #barChart
-            [showPercent]="form.value.showPercent"
-            [extraSettings]="
-              ['contentTier', 'metadataTier'].includes(
-                form.value.facetParameter
-              )
-                ? barChartSettingsTiers
-                : barChartSettings
-            "
-            [results]="chartData"
-          ></app-bar-chart>
-        </div>
       </div>
     </div>
   </div>

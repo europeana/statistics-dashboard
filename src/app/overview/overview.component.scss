@@ -8,14 +8,6 @@
 
 $width-left-col: 200px;
 
-.compare-data {
-  display: flex;
-}
-
-.compare-data-link-remove {
-  margin-left: 8px;
-}
-
 .ct-zero-label {
   margin-left: $spacing-s;
 }
@@ -56,12 +48,16 @@ $width-left-col: 200px;
   }
 }
 
+.menu-opener {
+  color: $gray-faint;
+}
+
 .rm-filter {
   background-color: $stats-blue;
+  margin-top: $spacing-s;
 }
 
 .rm-filter,
-.compare-data-link,
 .menu-opener {
   &.disabled {
     opacity: 0.4;
@@ -209,10 +205,6 @@ label {
   width: $bp-small;
 }
 
-.options-wrapper {
-  float: right;
-}
-
 .filters {
   display: flex;
   flex-direction: column;
@@ -237,7 +229,7 @@ label {
 .chart-wrapper.showing {
   height: 500px;
   max-width: 100%;
-  padding-bottom: $spacing-m;
+  padding: $spacing-m 0;
 }
 
 .data-area {
@@ -250,8 +242,14 @@ label {
   border: 0;
   background: none;
   border-bottom: 1px dashed $near-black;
+  cursor: pointer;
+  font-weight: 600;
   margin-bottom: 20px;
   text-indent: 0;
+}
+
+.facet-param-text {
+  margin-right: -2px;
 }
 
 .header-data {

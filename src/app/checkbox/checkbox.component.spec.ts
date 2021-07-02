@@ -15,8 +15,9 @@ describe('CheckboxComponent', () => {
     }).compileComponents();
   });
 
-  /*
   beforeEach(() => {
+    console.log(!!FormBuilder + '' + !!component + '' + !!fixture);
+    /*
     fixture = TestBed.createComponent(CheckboxComponent);
     component = fixture.componentInstance;
     component.form = new FormBuilder().group({
@@ -27,8 +28,10 @@ describe('CheckboxComponent', () => {
     component.labelText = '';
     component.value = 'YES'
     fixture.detectChanges();
+    */
   });
 
+  /*
   it('should create', () => {
     expect(component).toBeTruthy();
   });

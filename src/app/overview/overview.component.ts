@@ -17,11 +17,13 @@ import {
   DatatableRowDetailDirective
 } from '@swimlane/ngx-datatable';
 
+import { facetNames } from '../_data';
+import { RenameRightsPipe } from '../_translate';
+
 import { environment } from '../../environments/environment';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
-import { facetNames } from '../_data';
-import { RenameRightsPipe } from '../_translate';
+import { SnapshotsComponent } from '../snapshots';
 
 import {
   fromInputSafeName,
@@ -31,7 +33,6 @@ import {
 } from '../_helpers';
 
 import {
-  ColourSeriesData,
   ExportType,
   Facet,
   FacetField,
@@ -43,22 +44,13 @@ import {
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
-  NameValue,
+  NameValuePercent,
   RawFacet,
   TableRow
 } from '../_models';
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
-
-interface CompareData {
-  [key: string]: {
-    name: string;
-    label: string;
-    data: IHashNumber;
-    applied: boolean;
-  };
-}
 
 @Component({
   selector: 'app-overview',
@@ -71,6 +63,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('dataTable') dataTable: DatatableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('barChart') barChart: BarComponent;
+  @ViewChild('snapshots') snapshots: SnapshotsComponent;
   @ViewChild('canvas') canvas: ElementRef;
 
   // Make variables available to template
@@ -80,8 +73,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   barChartSettingsTiers = Object.assign(
     {
-      // TODO: renable when bar can remove this.categoryAxis.renderer.labels.template.adapter
-      // prefixValueAxis: 'Tier'
+      prefixValueAxis: 'Tier'
     },
     BarChartCool
   );
@@ -91,7 +83,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
-  experimental = false;
+  experimental = true;
 
   facetConf = facetNames;
   nonFilterQPs = ['content-tier-zero', 'date-from', 'date-to', 'dataset-name'];
@@ -114,11 +106,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   selFacetIndex = 0;
   allProcessedFacetData: Array<FacetProcessed>;
-
-  chartData: Array<NameValue>;
-
-  compareData: CompareData;
-  compareDataAllFacets: { [key: string]: CompareData } = {};
 
   tableData: FmtTableData;
 
@@ -173,13 +160,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           if (params.facet) {
             this.form.controls.facetParameter.setValue(params.facet);
-            this.compareData = this.compareDataAllFacets[params.facet];
-            if (!this.compareData) {
-              this.compareData = {};
-              this.compareDataAllFacets[params.facet] = this.compareData;
-            }
           }
-
           this.queryParams = queryParams;
 
           this.setCtZeroInputToQueryParam();
@@ -199,7 +180,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (type === ExportType.CSV) {
       const res = this.csv.csvFromTableRows(
         this.columnNames,
-        this.tableData.tableRows
+        this.tableData ? this.tableData.tableRows : []
       );
       this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
@@ -307,7 +288,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       return true;
     } else {
       this.totalResults = 0;
-      this.chartData = [];
       this.tableData = {
         columns: this.columnNames,
         tableRows: []
@@ -358,7 +338,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       },
       (rawResult: RawFacet) => {
         this.isLoading = false;
-
         if (this.processResult(rawResult)) {
           this.postProcessResult();
         }
@@ -379,29 +358,43 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.filterStates.dates = { visible: false, disabled: false };
   }
 
+  seriesNameFromUrl(): string {
+    const res = JSON.stringify(this.queryParams).replace(
+      /[:\".,\s\(\)\[\]\{\}]/g,
+      ''
+    );
+
+    if (res.length === 0) {
+      return this.form.value.facetParameter;
+    }
+
+    return res;
+  }
+
+  iHashNumberFromNVPs(
+    src: Array<NameValuePercent>,
+    percent = false
+  ): IHashNumber {
+    return src.reduce(function (map: IHashNumber, nvp: NameValuePercent) {
+      map[nvp.name] = percent ? nvp.percent : nvp.value;
+      return map;
+    }, {});
+  }
+
   /** storeSeries
   /*
   /*  Store series data
   */
-  storeSeries(): void {
-    const hash: IHashNumber = this.chartData.reduce(function (
-      map: IHashNumber,
-      nv: NameValue
-    ) {
-      map[nv.name] = nv.value;
-      return map;
-    },
-    {});
+  storeSeries(
+    applied: boolean,
+    saved: boolean,
+    nvs: Array<NameValuePercent>
+  ): void {
+    const name = this.seriesNameFromUrl();
+    let label = `All (${this.form.value.facetParameter})`;
 
-    const name = JSON.stringify(this.queryParams).replace(
-      /[:\".,\s\(\)\[\]\{\}]/g,
-      ''
-    );
-    let label = 'All';
-
+    // Generate human-readable label
     if (Object.keys(this.queryParams).length > 0) {
-      // TODO maybe reuse the function that labels the facet headers..?
-      // or utilises pipes
       label = Object.keys(this.queryParams)
         .map((key: string) => {
           const innerRes = [];
@@ -410,7 +403,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             values.forEach((valPart: string) => {
               innerRes.push(valPart);
             });
-            return `${key} (${innerRes.join(', ')})`;
+            return `${key} (${innerRes.join(' or ')})`;
           }
           return '';
         })
@@ -418,55 +411,62 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         .join(' and ');
     }
 
-    this.compareData[name] = {
+    this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
       label: label,
-      data: hash,
-      applied: false
-    };
-  }
-
-  removeSeriesFromChart(seriesKey: string): void {
-    this.barChart.removeSeries(seriesKey);
-    this.compareData[seriesKey].applied = false;
-  }
-
-  addSeriesToChart(seriesKeys: Array<string>): void {
-    if (!this.barChart) {
-      return;
-    }
-    // TODO: colour codes
-
-    const seriesData = seriesKeys.map((seriesKey: string) => {
-      this.compareData[seriesKey].applied = true;
-      return {
-        data: this.compareData[seriesKey].data,
-        colour: '#FF0000',
-        seriesName: seriesKey
-      } as ColourSeriesData;
+      data: this.iHashNumberFromNVPs(nvs),
+      dataPercent: this.iHashNumberFromNVPs(nvs, true),
+      applied: applied,
+      pinIndex: 0,
+      saved: saved
     });
-
-    this.barChart.addSeries(seriesData);
   }
 
-  showAppliedSeries(): void {
-    // We can't rely on this.compareData not being stale after a facet switch...
-    const realTimeCompareData =
-      this.compareDataAllFacets[this.form.value.facetParameter];
+  /** removeSeriesFromChart
+  /*  Sets series.applied to false and removes it from the chart
+  /* @param { string : seriesKey } - the key of the series to remove
+   */
+  removeSeriesFromChart(seriesKey: string): void {
+    console.log('removeSeriesFromChart');
+    this.barChart.removeSeries(seriesKey);
+    this.snapshots.unapply(seriesKey);
+  }
 
-    if (!realTimeCompareData) {
-      return;
-    }
-
-    const appliedKeys = Object.keys(realTimeCompareData).filter(
-      (key: string) => {
-        // TODO: wouldn't the key.length check stop it restoring the 'all' series?
-        return key.length > 0 && realTimeCompareData[key].applied;
-      }
-    );
-
-    const fn = (): void => this.addSeriesToChart(appliedKeys);
+  /** addSeriesToChart
+  /*  Add series data to the bar chart
+  /*  (colours handled by snapshots)
+  /* @param { Array<string> : seriesKeys } - the series to visualise
+   */
+  addSeriesToChart(seriesKeys: Array<string>): void {
+    const fn = (): void => {
+      const seriesData = this.snapshots.getSeriesData(
+        this.form.value.facetParameter,
+        seriesKeys,
+        this.form.value.showPercent
+      );
+      this.barChart.addSeries(seriesData);
+    };
     setTimeout(fn, 0);
+  }
+
+  /** addAppliedSeriesToChart
+  /*  adds all compareData entries (where applied = true)
+   */
+  addAppliedSeriesToChart(): void {
+    const fn = (): void =>
+      this.addSeriesToChart(
+        this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+      );
+    setTimeout(fn, 0);
+  }
+
+  /** togglePercent
+  /*  removes all series objects from the barchart
+  /*  re-applies series....
+   */
+  togglePercent(): void {
+    this.barChart.removeAllSeries();
+    this.addAppliedSeriesToChart();
   }
 
   /** addOrUpdateFilterControls
@@ -711,11 +711,26 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.updatePageUrl();
   }
 
+  /** enableFilters
+  /* enables all filter form controls
+  /* sets disabled to false on related filterStates
+  */
   enableFilters(): void {
     this.facetConf.forEach((name: string) => {
       this.form.controls[name].enable();
       this.filterStates[name].disabled = false;
     });
+  }
+
+  /** updateFilterAvailability
+  /* calls enableFilters
+  /* disables filter form controls according to active facet
+  /* sets disabled to true on related filterState
+  */
+  updateFilterAvailability(): void {
+    this.enableFilters();
+    this.filterStates[this.form.value['facetParameter']].disabled = true;
+    this.setIsShowingSearchList(false);
   }
 
   /** updatePageUrl
@@ -751,12 +766,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
       queryParams: qp
     });
-  }
-
-  updateFilterAvailability(): void {
-    this.enableFilters();
-    this.filterStates[this.form.value['facetParameter']].disabled = true;
-    this.setIsShowingSearchList(false);
   }
 
   /** triggerLoad
@@ -829,29 +838,29 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** extractChartData
   /*
-  /* sets this.chartData
   /* @param { number } facetIndex - the index of the facet to use
   */
   extractChartData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
 
-    this.chartData = facetFields.map((ff: FacetFieldProcessed) => {
+    if (this.barChart) {
+      // force refresh of axes when switching category
+      this.barChart.drawChart();
+    }
+
+    const chartData = facetFields.map((ff: FacetFieldProcessed) => {
       return {
         name: ff.labelFormatted ? ff.labelFormatted : ff.label,
-        value: this.form.value.showPercent ? ff.percent : ff.count
+        value: ff.count,
+        percent: ff.percent
       };
     });
 
-    // TODO: there is nothing within the experimental approach that prevents percentage values
-    //  from being plotted against non-percentages
-
-    // save the "All" series by default
-    if (Object.keys(this.queryParams).length === 0) {
-      this.storeSeries();
-    }
+    // show unsaved
+    this.storeSeries(true, false, chartData);
 
     // show other applied
-    this.showAppliedSeries();
+    this.addAppliedSeriesToChart();
   }
 
   /* extractTableData

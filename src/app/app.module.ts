@@ -22,6 +22,7 @@ import { HeaderComponent } from './header';
 import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { SplashComponent } from './splash/splash.component';
+import { SnapshotsComponent } from './snapshots/snapshots.component';
 import { TruncateComponent } from './truncate';
 import { DatesComponent } from './dates/dates.component';
 
@@ -40,6 +41,7 @@ import { DatesComponent } from './dates/dates.component';
     RenameApiFacetPipe,
     RenameRightsPipe,
     SplashComponent,
+    SnapshotsComponent,
     TruncateComponent
   ],
   imports: [

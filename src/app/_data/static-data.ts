@@ -8,6 +8,8 @@ export const facetNames = [
   'TYPE'
 ];
 
+export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
+
 export const RightsStatements = {
   '//creativecommons.org/licenses/by-nc-nd': 'CC BY-NC-ND',
   '//creativecommons.org/licenses/by-nc-nd/2.0': 'CC BY-NC-ND 2.0',

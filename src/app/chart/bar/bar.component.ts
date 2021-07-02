@@ -1,4 +1,11 @@
-import { Component, Inject, Input, NgZone, PLATFORM_ID } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  Inject,
+  Input,
+  NgZone,
+  PLATFORM_ID
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 // amCharts imports
@@ -7,7 +14,14 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { ChartSettings, ColourSeriesData, NameValue } from '../../_models';
+import {
+  ChartSettings,
+  ColourSeriesData,
+  IHashNumber,
+  NameValue
+} from '../../_models';
+
+import { colours } from '../../_data';
 
 import { BarChartDefaults } from '../chart-defaults';
 
@@ -22,11 +36,10 @@ interface CustomLegendItem {
   templateUrl: './bar.component.html',
   styleUrls: ['./bar.component.scss']
 })
-export class BarComponent {
+export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
-  _results: Array<NameValue>;
+  _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
-  colours = ['#0a72cc']; // TODO import from data file
   legendContainer: am4core.Container;
   preferredNumberBars = 15;
 
@@ -39,18 +52,17 @@ export class BarComponent {
   @Input() chartId = 'barChart';
   @Input() showPercent: boolean;
   @Input() set results(results: Array<NameValue>) {
+    // empty setter forces it to be ready before AfterViewInit
     this._results = results;
-    if (this.chart) {
-      this.chart.data = this._results;
-      this.drawChart();
-    }
   }
   @Input() set extraSettings(extraSettings: ChartSettings) {
     this.settings = Object.assign(this.settings, extraSettings);
   }
 
   constructor(@Inject(PLATFORM_ID) private platformId, private zone: NgZone) {
-    am4core.options.autoDispose = true;
+    this.browserOnly(() => {
+      am4core.options.autoDispose = true;
+    });
   }
 
   /** browserOnly
@@ -66,10 +78,30 @@ export class BarComponent {
   }
 
   /** ngAfterViewInit
-  /* Event hook: calls drawChart
+  /* Event hook: calls drawChart and generates a series for the decalarative use case
   */
   ngAfterViewInit(): void {
     this.drawChart();
+    this.addSeriesFromResult();
+  }
+
+  addSeriesFromResult(): void {
+    if (this._results) {
+      this.addSeries([
+        {
+          data: this._results.reduce(function (
+            map: IHashNumber,
+            nv: NameValue
+          ) {
+            map[nv.name] = nv.value;
+            return map;
+          },
+          {}),
+          colour: colours[0],
+          seriesName: 'seriesKey'
+        } as ColourSeriesData
+      ]);
+    }
   }
 
   /** toggleCtrls
@@ -84,31 +116,41 @@ export class BarComponent {
   /* - create custom items from series
   /* - add event handling for resize / click
   */
-  addLegend(): void {
+  addLegend(series?: am4charts.ColumnSeries): void {
+    if (!this.settings.chartLegend) {
+      return;
+    }
+
     const legendId = 'barLegend';
-    let seriesReady = false;
+    let legend = this.chart.legend;
 
-    this.chart.legend = new am4charts.Legend();
+    if (!legend) {
+      legend = new am4charts.Legend();
+      this.chart.legend = legend;
 
-    const legend = this.chart.legend;
-    const series = this.series;
+      this.legendContainer = am4core.create(legendId, am4core.Container);
+      this.legendContainer.width = am4core.percent(100);
+      this.legendContainer.height = am4core.percent(100);
+      legend.parent = this.legendContainer;
 
-    this.legendContainer = am4core.create(legendId, am4core.Container);
-    this.legendContainer.width = am4core.percent(100);
-    this.legendContainer.height = am4core.percent(100);
-    legend.parent = this.legendContainer;
-
-    legend.itemContainers.template.events.on(
-      'hit',
-      function (ev: { type: 'hit'; target: am4core.Container }) {
-        const context = ev.target.dataItem.dataContext as CustomLegendItem;
-        if (!ev.target.isActive) {
-          context.customData.hide();
-        } else {
-          context.customData.show();
+      legend.itemContainers.template.events.on(
+        'hit',
+        (ev: { type: 'hit'; target: am4core.Container }) => {
+          const context = ev.target.dataItem.dataContext as CustomLegendItem;
+          if (!ev.target.isActive) {
+            context.customData.hide();
+          } else {
+            context.customData.show();
+          }
         }
-      }
-    );
+      );
+    }
+
+    if (!series) {
+      return;
+    }
+
+    let seriesReady = false;
 
     const resizeLegend = (): void => {
       if (legend.appeared && seriesReady) {
@@ -144,47 +186,93 @@ export class BarComponent {
     });
   }
 
-  /** applySettings
-  /* - updates chart variables according to inputs
-  /* @param { boolean: force } - flag whether to invoke drawChart function
-  */
-  applySettings(force = false): void {
-    if (force) {
-      this.drawChart();
-      return;
-    }
-
-    this.categoryAxis.renderer.labels.template.maxWidth =
-      this.settings.maxLabelWidth;
-    this.categoryAxis.renderer.labels.template.truncate =
-      this.settings.labelTruncate;
-    this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
-  }
-
   removeSeries(id: string): void {
     const series = this.allSeries[id];
+
     if (series) {
-      this.chart.series
-        .removeIndex(this.chart.series.indexOf(series))
-        .dispose();
-      delete this.allSeries[id];
+      const seriesIndex = this.chart.series.indexOf(series);
+
+      if (seriesIndex === -1) {
+        console.log(`Bar: series (${id}) has negative index`);
+      } else {
+        this.chart.series.removeIndex(seriesIndex).dispose();
+        delete this.allSeries[id];
+      }
     } else {
-      console.log(`can't find series to remove (${id})`);
+      console.log(`Bar: can't find series to remove (${id})`);
     }
     this.chart.invalidateData();
   }
 
-  addSeries(csds: Array<ColourSeriesData>): void {
-    csds.forEach((csd: ColourSeriesData) => {
-      const series = this.createSeries([csd.colour], csd.seriesName);
-      this.allSeries[csd.seriesName] = series;
-
-      // TODO: make this possible for percentages, i.e. this.chart.dataPercent.forEach(...)
-
-      this.chart.data.forEach((cd) => {
-        cd[csd.seriesName] = csd.data[cd.name];
-      });
+  removeAllSeries(): void {
+    Object.keys(this.allSeries).forEach((id: string) => {
+      this.removeSeries(id);
     });
+  }
+
+  /** addSeries
+  /*
+  /* creates chart.data if it doesn't exist
+  /* adds series data to the chart data
+  /* adds series object to the chart / the allSeries track-map
+  /*
+  /* @param { Array<ColourSeriesData> : csds } series info
+   */
+  addSeries(csds: Array<ColourSeriesData>): void {
+    let anySeries;
+
+    csds.forEach((csd: ColourSeriesData) => {
+      if (!this.chart.data.length) {
+        this.chart.data = Object.keys(csd.data).map((s: string) => {
+          const res = { name: s };
+          res[csd.seriesName] = csd.data[s];
+          return res;
+        });
+      } else {
+        this.chart.data.forEach((cd) => {
+          cd[csd.seriesName] = csd.data[cd.name];
+        });
+      }
+
+      anySeries = this.createSeries([csd.colour], csd.seriesName);
+      this.addLegend(anySeries);
+      this.allSeries[csd.seriesName] = anySeries;
+    });
+
+    if (
+      anySeries &&
+      this.settings.hasScroll &&
+      this.chart.data.length > this.preferredNumberBars
+    ) {
+      anySeries.events.on('ready', (): void => {
+        const fn = (): void => {
+          const customiseGrip = (grip): void => {
+            grip.icon.disabled = true;
+            grip.background.fill = am4core.color('#0a72cc');
+            grip.background.fillOpacity = 0.8;
+            //grip.background.disabled = true;
+          };
+          this.chart.scrollbarY = new am4core.Scrollbar();
+          customiseGrip(this.chart.scrollbarY.startGrip);
+          customiseGrip(this.chart.scrollbarY.endGrip);
+
+          this.chart.scrollbarY.background.fill = am4core.color('#0a72cc');
+          this.chart.scrollbarY.background.fillOpacity = 0.1;
+
+          this.chart.scrollbarY.thumb.background.fill =
+            am4core.color('#0a72cc');
+          this.chart.scrollbarY.thumb.background.fillOpacity = 0.2;
+
+          this.categoryAxis.zoomToIndexes(
+            0,
+            this.preferredNumberBars,
+            false,
+            true
+          );
+        };
+        setTimeout(fn, 0);
+      });
+    }
 
     this.chart.invalidateData();
   }
@@ -216,11 +304,12 @@ export class BarComponent {
       series.columns.template.tooltipText = `{categoryX}: [bold]{valueY}[/]${labelSuffix}`;
     }
     series.columns.template.fillOpacity = 1;
+    series.columns.template.strokeWidth = 0;
     return series;
   }
 
   zoomTop(): void {
-    if (this._results.length > this.preferredNumberBars) {
+    if (this._results && this._results.length > this.preferredNumberBars) {
       this.categoryAxis.zoomToIndexes(1, this.preferredNumberBars, false, true);
     }
   }
@@ -238,7 +327,6 @@ export class BarComponent {
   drawChart(): void {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
-
       this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
@@ -268,22 +356,11 @@ export class BarComponent {
       if (this.settings.isHorizontal) {
         chart.yAxes.push(this.categoryAxis);
         chart.xAxes.push(this.valueAxis);
-
         this.categoryAxis.renderer.inversed = true;
-
-        this.series = this.createSeries(this.colours);
-
-        if (this.settings.hasScroll) {
-          if (this._results.length > this.preferredNumberBars) {
-            chart.scrollbarY = new am4core.Scrollbar();
-          }
-        }
         this.valueAxis.paddingRight = 25;
       } else {
         chart.xAxes.push(this.categoryAxis);
         chart.yAxes.push(this.valueAxis);
-
-        this.series = this.createSeries(this.colours);
 
         if (this.settings.hasScroll) {
           chart.scrollbarX = new am4core.Scrollbar();
@@ -309,6 +386,13 @@ export class BarComponent {
       this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
       this.categoryAxis.renderer.ticks.template.length = 9;
 
+      // labels
+      this.categoryAxis.renderer.labels.template.maxWidth =
+        this.settings.maxLabelWidth;
+      this.categoryAxis.renderer.labels.template.truncate =
+        this.settings.labelTruncate;
+      this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
+
       this.categoryAxis.renderer.labels.template.fontSize = 12;
       this.categoryAxis.renderer.labels.template.fontWeight = '600';
       this.categoryAxis.renderer.labels.template.marginRight = 9;
@@ -317,31 +401,25 @@ export class BarComponent {
       this.valueAxis.renderer.labels.template.fontSize = 12;
       this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
 
-      this.chart.data = this._results;
-
-      // TODO: remove this adapter when we're not using a prefix
-      if (this.settings.prefixValueAxis) {
-        this.categoryAxis.renderer.labels.template.adapter.add(
-          'text',
-          (label: string) => {
-            return `${this.settings.prefixValueAxis} ${label}`;
+      this.categoryAxis.renderer.labels.template.adapter.add(
+        'text',
+        (label: string) => {
+          let prefix = '';
+          if (this.settings.prefixValueAxis) {
+            prefix = `${this.settings.prefixValueAxis} `;
           }
-        );
-      }
+          return `${prefix}${label}`;
+        }
+      );
 
-      if (this.showPercent) {
-        this.valueAxis.renderer.labels.template.adapter.add(
-          'text',
-          (label: string) => {
-            return `${label}%`;
-          }
-        );
-      }
+      this.valueAxis.renderer.labels.template.adapter.add(
+        'text',
+        (label: string) => {
+          return `${label}${this.showPercent ? '%' : ''}`;
+        }
+      );
 
-      if (this.settings.chartLegend) {
-        this.addLegend();
-      }
-      this.applySettings();
+      this.addLegend();
     });
 
     // this has to be outside browserOnly()

@@ -5,41 +5,12 @@
 
 <div *ngIf="settings.ctrlsOpen && settings.ctrlsOpen" class="am4-ctrls">
   <div class="sub-group">
-    <h4>Max Widths (px)</h4>
-    <label
-      ><input
-        type="number"
-        [(ngModel)]="settings.maxLabelWidth"
-        (change)="applySettings()"
-      />Labels</label
-    >
-  </div>
-
-  <div class="sub-group">
-    <h4>Labels</h4>
-    <label [ngClass]="{ disabled: settings.labelWrap }"
-      ><input
-        type="checkbox"
-        [(ngModel)]="settings.labelTruncate"
-        (change)="applySettings()"
-      />Truncate</label
-    >
-    <label [ngClass]="{ disabled: settings.labelTruncate }"
-      ><input
-        type="checkbox"
-        [(ngModel)]="settings.labelWrap"
-        (change)="applySettings()"
-      />Wrap</label
-    >
-  </div>
-
-  <div class="sub-group">
     <h4>Legend</h4>
     <label
       ><input
         type="checkbox"
         [(ngModel)]="settings.chartLegend"
-        (change)="applySettings(true)"
+        (change)="drawChart()"
       />Show</label
     >
   </div>
@@ -51,7 +22,7 @@
       ><input
         type="checkbox"
         [(ngModel)]="settings.hasScroll"
-        (change)="applySettings(true)"
+        (change)="drawChart()"
       />Scroll bar</label
     >
   </div>
@@ -62,14 +33,14 @@
       ><input
         type="checkbox"
         [(ngModel)]="settings.isHorizontal"
-        (change)="applySettings(true)"
+        (change)="drawChart()"
       />Horizontal</label
     >
     <label
       ><input
         type="checkbox"
         [(ngModel)]="settings.showExports"
-        (change)="applySettings(true)"
+        (change)="drawChart()"
       />Exports</label
     >
   </div>
