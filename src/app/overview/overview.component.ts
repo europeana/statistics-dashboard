@@ -67,11 +67,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('canvas') canvas: ElementRef;
 
   // Make variables available to template
-  public barChartSettings = BarChartCool;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
 
-  barChartSettingsTiers = Object.assign(
+  public barChartSettings = Object.assign(
+    {
+      prefixValueAxis: ''
+    },
+    BarChartCool
+  );
+
+  public barChartSettingsTiers = Object.assign(
     {
       prefixValueAxis: 'Tier'
     },
