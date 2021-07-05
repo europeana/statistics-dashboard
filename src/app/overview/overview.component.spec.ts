@@ -11,12 +11,6 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-
-import {
-  DatatableComponent,
-  DatatableRowDetailDirective
-} from '@swimlane/ngx-datatable';
-
 import { today } from '../_helpers';
 
 import {
@@ -40,7 +34,8 @@ describe('OverviewComponent', () => {
   const contentTierNameLabels = [
     { name: '0', label: '0' },
     { name: '1', label: '1' },
-    { name: '2', label: '2' }
+    { name: '2', label: '2' },
+    { name: '3', label: '3' }
   ];
   const tickTime = 1;
   let exportCSV: ExportCSVService;
@@ -102,6 +97,10 @@ describe('OverviewComponent', () => {
     component.form.addControl(group, new FormBuilder().group({}));
     component.addOrUpdateFilterControls(group, contentTierNameLabels);
     component.form.get(`${group}.1`).setValue(true);
+  };
+
+  const fmtParamCT = (s: string): string => {
+    return `&qf=contentTier:(${encodeURIComponent(s)})`;
   };
 
   describe('Route Parameter', () => {
@@ -211,12 +210,8 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the formatted content tier param', () => {
-      const fmt = (s: string): string => {
-        return `&qf=contentTier:(${encodeURIComponent(s)})`;
-      };
-
-      const expectOneToFour = fmt('1 OR 2 OR 3 OR 4');
-      const expectZeroToFour = fmt('0 OR 1 OR 2 OR 3 OR 4');
+      const expectOneToFour = fmtParamCT('1 OR 2 OR 3 OR 4');
+      const expectZeroToFour = fmtParamCT('0 OR 1 OR 2 OR 3 OR 4');
 
       expect(component.getFormattedContentTierParam()).toEqual(expectOneToFour);
 
@@ -227,15 +222,17 @@ describe('OverviewComponent', () => {
       );
 
       component.addOrUpdateFilterControls('contentTier', contentTierNameLabels);
-      component.form.get(`contentTier.0`).setValue(true);
+      component.form.get('contentTier.0').setValue(true);
 
-      expect(component.getFormattedContentTierParam()).toEqual(fmt('0'));
+      expect(component.getFormattedContentTierParam()).toEqual(fmtParamCT('0'));
 
-      component.form.get(`contentTier.1`).setValue(true);
-      expect(component.getFormattedContentTierParam()).toEqual(fmt('0 OR 1'));
+      component.form.get('contentTier.1').setValue(true);
+      expect(component.getFormattedContentTierParam()).toEqual(
+        fmtParamCT('0 OR 1')
+      );
 
-      component.form.get(`contentTier.0`).setValue(false);
-      expect(component.getFormattedContentTierParam()).toEqual(fmt('1'));
+      component.form.get('contentTier.0').setValue(false);
+      expect(component.getFormattedContentTierParam()).toEqual(fmtParamCT('1'));
     });
 
     it('should add menu checkboxes', () => {
@@ -265,25 +262,31 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the set checkbox values', () => {
-      let selected = component.getSetCheckboxValues('filterContentTier');
+      const fName = 'contentTier';
+      let selected = component.getSetCheckboxValues(fName);
       expect(selected.length).toEqual(0);
 
-      component.form.addControl(
-        'filterContentTier',
-        new FormBuilder().group({})
-      );
-      component.addOrUpdateFilterControls(
-        'filterContentTier',
-        contentTierNameLabels
-      );
+      component.form.addControl(fName, new FormBuilder().group({}));
+      component.addOrUpdateFilterControls(fName, contentTierNameLabels);
 
-      component.form.get('filterContentTier.1').setValue(true);
-      selected = component.getSetCheckboxValues('filterContentTier');
+      component.form.get(`${fName}.1`).setValue(true);
+      selected = component.getSetCheckboxValues(fName);
       expect(selected.length).toEqual(1);
 
-      component.form.get('filterContentTier.2').setValue(true);
-      selected = component.getSetCheckboxValues('filterContentTier');
+      component.form.get(`${fName}.2`).setValue(true);
+      selected = component.getSetCheckboxValues(fName);
       expect(selected.length).toEqual(2);
+
+      component.form.get(`${fName}.3`).setValue(false);
+      expect(component.getFormattedContentTierParam()).toEqual(
+        fmtParamCT('1 OR 2')
+      );
+
+      component.form.get(`${fName}.2`).disable();
+      expect(component.getFormattedContentTierParam()).toEqual(fmtParamCT('1'));
+
+      selected = component.getSetCheckboxValues(fName);
+      expect(selected.length).toEqual(1);
     });
 
     it('should enable the filters', fakeAsync(() => {
@@ -306,19 +309,6 @@ describe('OverviewComponent', () => {
       expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
       component.clearFilter('TYPE');
       expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
-    });
-
-    it('should toggle row expansion', () => {
-      const spy = jasmine.createSpy();
-      component.dataTable = {
-        rowDetail: {
-          toggleExpandRow: spy
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any as DatatableComponent;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      component.toggleExpandRow({} as any as DatatableRowDetailDirective);
-      expect(spy).toHaveBeenCalled();
     });
 
     it('should toggle the download options', () => {

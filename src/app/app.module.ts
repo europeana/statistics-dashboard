@@ -23,6 +23,7 @@ import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { SplashComponent } from './splash/splash.component';
 import { SnapshotsComponent } from './snapshots/snapshots.component';
+import { TableComponent } from './table';
 import { TruncateComponent } from './truncate';
 import { DatesComponent } from './dates/dates.component';
 
@@ -42,6 +43,7 @@ import { DatesComponent } from './dates/dates.component';
     RenameRightsPipe,
     SplashComponent,
     SnapshotsComponent,
+    TableComponent,
     TruncateComponent
   ],
   imports: [

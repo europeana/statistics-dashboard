@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { CheckboxComponent } from './checkbox.component';
 
 describe('CheckboxComponent', () => {
@@ -16,30 +16,30 @@ describe('CheckboxComponent', () => {
   });
 
   beforeEach(() => {
-    console.log(!!FormBuilder + '' + !!component + '' + !!fixture);
-    /*
     fixture = TestBed.createComponent(CheckboxComponent);
     component = fixture.componentInstance;
-    component.form = new FormBuilder().group({
-      testField: ['']
-    });
-    component.group = 'testGroup';
-    component.controlName = 'testField';
-    component.labelText = '';
-    component.value = 'YES'
+    expect(component).toBeTruthy();
     fixture.detectChanges();
-    */
   });
 
-  /*
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should implement ControlValueAccessor', () => {
+    expect(component.registerOnChange).toBeTruthy();
+    expect(component.registerOnTouched).toBeTruthy();
+    expect(component.writeValue).toBeTruthy();
+    component.writeValue();
+    component.registerOnTouched();
+    component.registerOnChange(() => {
+      console.log('unimplemented');
+    });
+  });
+
   it('should handle the field change', () => {
     spyOn(component.valueChanged, 'emit');
-    component.changed();
+    component.onChange();
     expect(component.valueChanged.emit).toHaveBeenCalled();
   });
-  */
 });

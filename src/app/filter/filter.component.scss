@@ -1,8 +1,7 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
-$row-height: 32px;
-$total-height: #{$row-height * 5};
+$total-height: #{$filter-row-height * 5};
 $total-width: 268px;
 
 .checkbox-filter {
@@ -51,10 +50,6 @@ $total-width: 268px;
   color: #000;
   position: relative;
   width: $total-width;
-}
-
-.filter-label {
-  line-height: $row-height;
 }
 
 .filter-opener {
