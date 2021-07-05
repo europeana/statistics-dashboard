@@ -1,3 +1,5 @@
+import { HeaderNameType } from '../_models';
+
 export const facetNames = [
   'contentTier',
   'COUNTRY',
@@ -9,6 +11,10 @@ export const facetNames = [
 ];
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
+
+export const tableColumnNames = ['name', 'count', 'percent'].map(
+  (x) => x as HeaderNameType
+);
 
 export const RightsStatements = {
   '//creativecommons.org/licenses/by-nc-nd': 'CC BY-NC-ND',

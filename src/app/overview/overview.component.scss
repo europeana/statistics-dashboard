@@ -57,12 +57,13 @@ $width-left-col: 200px;
   margin-top: $spacing-s;
 }
 
-.rm-filter,
-.menu-opener {
-  &.disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
+.rm-filter.dead-facet {
+  opacity: 0.4;
+}
+
+.menu-opener.disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 input[type="checkbox"] {
@@ -116,8 +117,7 @@ datatable-scroller {
 }
 
 .chart-wrapper,
-.options-wrapper,
-ngx-datatable.ngx-datatable {
+.options-wrapper {
   transition: opacity 1s ease-in-out;
   opacity: 0;
   &.showing {

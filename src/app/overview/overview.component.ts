@@ -11,13 +11,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import {
-  ColumnMode,
-  DatatableComponent,
-  DatatableRowDetailDirective
-} from '@swimlane/ngx-datatable';
-
-import { facetNames } from '../_data';
+import { facetNames, tableColumnNames } from '../_data';
 import { RenameRightsPipe } from '../_translate';
 
 import { environment } from '../../environments/environment';
@@ -40,7 +34,6 @@ import {
   FacetProcessed,
   FilterState,
   FmtTableData,
-  HeaderNameType,
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
@@ -51,6 +44,7 @@ import {
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
+import { TableComponent } from '../table';
 
 @Component({
   selector: 'app-overview',
@@ -60,7 +54,7 @@ import { DataPollingComponent } from '../data-polling';
   encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent extends DataPollingComponent implements OnInit {
-  @ViewChild('dataTable') dataTable: DatatableComponent;
+  @ViewChild('table') table: TableComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
@@ -86,7 +80,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   totalResults = 0;
 
-  columnNames = ['name', 'count', 'percent'].map((x) => x as HeaderNameType);
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
   experimental = true;
@@ -98,8 +91,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   contentTiersOptions = Array(5)
     .fill(0)
     .map((x, index) => `${x + index}`);
-
-  ColumnMode = ColumnMode;
 
   pollRefresh: Subject<boolean>;
 
@@ -185,7 +176,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     if (type === ExportType.CSV) {
       const res = this.csv.csvFromTableRows(
-        this.columnNames,
+        tableColumnNames,
         this.tableData ? this.tableData.tableRows : []
       );
       this.csv.download(res, this.downloadAnchor);
@@ -211,9 +202,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
         if (!this.nonFilterQPs.includes(key)) {
           values.forEach((valPart: string) => {
-            innerRes.push(
-              `${key}:"${encodeURIComponent(fromInputSafeName(valPart))}"`
-            );
+            if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
+              innerRes.push(
+                `${key}:"${encodeURIComponent(fromInputSafeName(valPart))}"`
+              );
+            }
           });
           return innerRes.join('&qf=');
         }
@@ -295,7 +288,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     } else {
       this.totalResults = 0;
       this.tableData = {
-        columns: this.columnNames,
+        columns: tableColumnNames,
         tableRows: []
       };
       return false;
@@ -700,6 +693,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns boolean
   */
   isDeadFacet(filterName: string, filterValue: string): boolean {
+    if (Object.keys(this.filterData).length === 0) {
+      return false;
+    }
     const res = this.filterData[filterName].findIndex((nl: NameLabel) => {
       return nl.name === filterValue;
     });
@@ -740,7 +736,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /** updatePageUrl
   /* Navigate to url according to form state
   */
-  updatePageUrl(): void {
+  updatePageUrl(skipLoad?: boolean): void {
     const qp = {};
 
     this.getEnabledFilterNames().forEach((filterName: string) => {
@@ -771,6 +767,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       qp['content-tier-zero'] = true;
     }
 
+    if (skipLoad) {
+      this.queryParams = qp;
+    }
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
       queryParams: qp
     });
@@ -802,11 +801,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.postProcessResult();
     this.updateFilterAvailability();
     this.updatePageUrl();
-  }
-
-  toggleExpandRow(row: DatatableRowDetailDirective): false {
-    this.dataTable.rowDetail.toggleExpandRow(row);
-    return false;
   }
 
   /** clearFilter
@@ -864,8 +858,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       };
     });
 
-    // show unsaved
-    this.storeSeries(true, false, chartData);
+    const filtersApplied = Object.keys(this.queryParams).length > 0;
+
+    // store as hidden unless "all"
+    this.storeSeries(
+      true,
+      !filtersApplied,
+      chartData
+    );
 
     // show other applied
     this.addAppliedSeriesToChart();
@@ -878,7 +878,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   extractTableData(): void {
     const facetData = this.allProcessedFacetData[this.selFacetIndex].fields;
     this.tableData = {
-      columns: this.columnNames,
+      columns: tableColumnNames,
       tableRows: facetData.map((ff: FacetFieldProcessed) => {
         return {
           name: ff.labelFormatted ? ff.labelFormatted : ff.label,

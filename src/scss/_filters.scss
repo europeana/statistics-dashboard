@@ -67,6 +67,7 @@
 
   .filter-label {
     font-size: 14px;
+    line-height: $filter-row-height;
     margin: 0 $spacing-s;
     white-space: nowrap;
   }
