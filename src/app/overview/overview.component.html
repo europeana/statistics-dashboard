@@ -221,8 +221,8 @@
           <app-snapshots
             #snapshots
             [facetName]="form.value.facetParameter"
-            (hideItem)="removeSeriesFromChart($event)"
-            (showItems)="addSeriesToChart($event)"
+            (hideItem)="removeSeries($event)"
+            (showItems)="addSeries($event)"
           >
           </app-snapshots>
         </ng-container>
@@ -258,8 +258,6 @@
         <app-table
           #table
           id="table"
-          *ngIf="tableData"
-          [tableData]="tableData"
           [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
         ></app-table>

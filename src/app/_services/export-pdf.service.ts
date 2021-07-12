@@ -35,7 +35,11 @@ export class ExportPDFService {
                   };
                 }),
                 ...tableData.tableRows.map((tr: TableRow) => {
-                  return [tr.name, tr.count, tr.percent];
+                  const result = [];
+                  tableData.columns.forEach((s: string) => {
+                    result.push(tr[s]);
+                  });
+                  return result;
                 })
               ],
               margin: [0, 30]

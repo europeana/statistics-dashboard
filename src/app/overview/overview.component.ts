@@ -11,7 +11,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { facetNames, tableColumnNames } from '../_data';
+import { facetNames } from '../_data';
 import { RenameRightsPipe } from '../_translate';
 
 import { environment } from '../../environments/environment';
@@ -38,8 +38,7 @@ import {
   IHashNumber,
   NameLabel,
   NameValuePercent,
-  RawFacet,
-  TableRow
+  RawFacet
 } from '../_models';
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
@@ -176,13 +175,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     if (type === ExportType.CSV) {
       const res = this.csv.csvFromTableRows(
-        tableColumnNames,
-        this.tableData ? this.tableData.tableRows : []
+        this.table.getColumnNames(),
+        this.table.getTableRows()
       );
       this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
       this.barChart.getSvgData().then((imgUrl: string) => {
-        this.pdf.download(this.tableData, imgUrl);
+        this.pdf.download(this.table.getTableData(), imgUrl);
       });
     }
     return false;
@@ -287,10 +286,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       return true;
     } else {
       this.totalResults = 0;
-      this.tableData = {
-        columns: tableColumnNames,
-        tableRows: []
-      };
+      this.table.reset();
       return false;
     }
   }
@@ -320,8 +316,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
 
     // set pie and table data
-    this.extractChartData();
-    this.extractTableData();
+    this.extractSeriesData();
   }
 
   /** beginPolling
@@ -419,6 +414,15 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
+  /** removeSeries
+  /*  Invokes functions to remove series from the chart and table
+  /* @param { string : seriesKey } - the key of the series to remove
+   */
+  removeSeries(seriesKey: string): void {
+    this.removeSeriesFromChart(seriesKey);
+    this.showAppliedSeriesInTable();
+  }
+
   /** removeSeriesFromChart
   /*  Sets series.applied to false and removes it from the chart
   /* @param { string : seriesKey } - the key of the series to remove
@@ -428,18 +432,27 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.snapshots.unapply(seriesKey);
   }
 
+  /** addSeries
+  /*  Calls functions to add series data to the bar chart and the table
+  /* @param { Array<string> : seriesKeys } - the keys of the series to add
+   */
+  addSeries(seriesKeys: Array<string>): void {
+    this.addSeriesToChart(seriesKeys);
+    this.showAppliedSeriesInTable();
+  }
+
   /** addSeriesToChart
   /*  Add series data to the bar chart
   /*  (colours handled by snapshots)
-  /* @param { Array<string> : seriesKeys } - the series to visualise
+  /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
+    const seriesData = this.snapshots.prepSeriesData(
+      this.form.value.facetParameter,
+      seriesKeys,
+      this.form.value.showPercent
+    );
     const fn = (): void => {
-      const seriesData = this.snapshots.getSeriesData(
-        this.form.value.facetParameter,
-        seriesKeys,
-        this.form.value.showPercent
-      );
       this.barChart.addSeries(seriesData);
     };
     setTimeout(fn, 0);
@@ -449,11 +462,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /*  adds all compareData entries (where applied = true)
    */
   addAppliedSeriesToChart(): void {
-    const fn = (): void =>
-      this.addSeriesToChart(
-        this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
-      );
-    setTimeout(fn, 0);
+    this.addSeriesToChart(
+      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+    );
   }
 
   /** togglePercent
@@ -838,11 +849,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.downloadOptionsOpen = false;
   }
 
-  /** extractChartData
+  /** extractSeriesData
   /*
   /* @param { number } facetIndex - the index of the facet to use
   */
-  extractChartData(facetIndex = this.selFacetIndex): void {
+  extractSeriesData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
 
     if (this.barChart) {
@@ -861,31 +872,28 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const filtersApplied = Object.keys(this.queryParams).length > 0;
 
     // store as hidden unless "all"
-    this.storeSeries(
-      true,
-      !filtersApplied,
-      chartData
-    );
+    this.storeSeries(true, !filtersApplied, chartData);
 
     // show other applied
     this.addAppliedSeriesToChart();
+    this.showAppliedSeriesInTable();
   }
 
-  /* extractTableData
+  /* showAppliedSeriesInTable
   /*
-  /* sets this.tableData
+  /* sets table set table rows (combined series)
   */
-  extractTableData(): void {
-    const facetData = this.allProcessedFacetData[this.selFacetIndex].fields;
-    this.tableData = {
-      columns: tableColumnNames,
-      tableRows: facetData.map((ff: FacetFieldProcessed) => {
-        return {
-          name: ff.labelFormatted ? ff.labelFormatted : ff.label,
-          count: `${ff.count}`,
-          percent: `${ff.percent}`
-        } as TableRow;
-      })
-    };
+  showAppliedSeriesInTable(): void {
+    const seriesKeys = this.snapshots.filteredCDKeys(
+      this.form.value.facetParameter,
+      'applied'
+    );
+
+    const rows = this.snapshots.getSeriesDataForTable(
+      this.form.value.facetParameter,
+      seriesKeys
+    );
+
+    this.table.setRows(rows);
   }
 }

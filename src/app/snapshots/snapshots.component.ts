@@ -5,7 +5,9 @@ import { colours, facetNames } from '../_data';
 import {
   ColourSeriesData,
   CompareData,
-  CompareDataDescriptor
+  CompareDataDescriptor,
+  HeaderNameType,
+  TableRow
 } from '../_models';
 
 @Component({
@@ -79,7 +81,13 @@ export class SnapshotsComponent {
     return res > -1 ? res : 0;
   }
 
-  getSeriesData(
+  /** prepSeriesData
+  /* sets "applied" on series with identified by seriesKeys
+  /* assign colour indexes
+  /* @returns Array<ColourSeriesData> converts to data (for chart)
+  /*
+  */
+  prepSeriesData(
     facetName: string,
     seriesKeys: Array<string>,
     percent: boolean
@@ -98,6 +106,30 @@ export class SnapshotsComponent {
       };
       return csd;
     });
+  }
+
+  /** getSeriesDataForTable
+  /* converts to data for table
+  /*
+  */
+  getSeriesDataForTable(
+    facetName: string,
+    seriesKeys: Array<string>
+  ): Array<TableRow> {
+    const result: Array<TableRow> = [];
+    seriesKeys.forEach((seriesKey: string) => {
+      const cd = this.compareDataAllFacets[facetName][seriesKey];
+      Object.keys(cd.data).forEach((key: string) => {
+        result.push({
+          name: key as HeaderNameType,
+          count: cd.data[key] + '',
+          percent: cd.dataPercent[key] + '',
+          colour: cd._colourIndex,
+          series: cd.label
+        });
+      });
+    });
+    return result;
   }
 
   /** snap

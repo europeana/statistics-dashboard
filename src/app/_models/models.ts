@@ -21,6 +21,8 @@ export interface TableRow {
   name: HeaderNameType;
   count: string;
   percent: string;
+  colour?: number;
+  series: string;
 }
 
 export interface FmtTableData {
