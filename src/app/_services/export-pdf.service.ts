@@ -27,7 +27,7 @@ export class ExportPDFService {
           {
             table: {
               body: [
-                tableData.columns.map((s: string) => {
+                tableData.columns.slice(1).map((s: string) => {
                   return {
                     text: s,
                     style: 'tableHeader',
@@ -35,7 +35,11 @@ export class ExportPDFService {
                   };
                 }),
                 ...tableData.tableRows.map((tr: TableRow) => {
-                  return [tr.name, tr.count, tr.percent];
+                  const result = [];
+                  tableData.columns.slice(1).forEach((s: string) => {
+                    result.push(tr[s]);
+                  });
+                  return result;
                 })
               ],
               margin: [0, 30]

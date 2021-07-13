@@ -5,10 +5,6 @@ import { Component } from '@angular/core';
   template: ''
 })
 export class MockBarComponent {
-  constructor() {
-    console.log('create MockBarComponent');
-  }
-
   addSeries(_): void {
     console.log('MockBarComponent.addSeries');
   }

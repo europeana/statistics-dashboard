@@ -1,0 +1,19 @@
+.container-h {
+  display: flex;
+  align-items: center;
+}
+
+.name-cell {
+  width: 100%;
+}
+
+.series-cell {
+  width: 200px;
+}
+
+.series-colour {
+  display: inline-block;
+  height: 18px;
+  margin: 0 5px 0 12px;
+  width: 3px;
+}

@@ -12,21 +12,34 @@ describe('ExportCSVService', () => {
     service = TestBed.inject(ExportCSVService);
   }));
 
-  it('should covert', () => {
-    const testHeaders = ['name', 'count', 'percent'].map((s: string) => {
-      return s as HeaderNameType;
-    });
+  it('should convert', () => {
+    const testHeaders = ['series', 'name', 'count', 'percent'].map(
+      (s: string) => {
+        return s as HeaderNameType;
+      }
+    );
     const testData1 = [
-      { name: 'Andy' as HeaderNameType, count: '22', percent: '50' }
+      {
+        series: 'Series A',
+        name: 'Andy' as HeaderNameType,
+        count: '22',
+        percent: '50'
+      }
     ];
     const testData2 = [
-      { name: 'MacLean' as HeaderNameType, count: '22', percent: null }
+      {
+        series: 'Series B',
+        name: 'MacLean' as HeaderNameType,
+        count: '22',
+        percent: null
+      }
     ];
     expect(service.csvFromTableRows(testHeaders, testData1)).toEqual(
-      'name,count,percent\r\n"Andy","22","50"'
+      'series,name,count,percent\r\n"Series A","Andy","22","50"'
     );
+
     expect(service.csvFromTableRows(testHeaders, testData2)).toEqual(
-      'name,count,percent\r\n"MacLean","22",""'
+      'series,name,count,percent\r\n"Series B","MacLean","22",""'
     );
   });
 

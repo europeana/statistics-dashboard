@@ -19,11 +19,11 @@ import {
   MockAPIService,
   MockAPIServiceErrors,
   MockBarComponent,
-  MockExportCSVService
+  MockExportCSVService,
+  MockTableComponent
 } from '../_mocked';
 import { ExportType, NameLabel } from '../_models';
 import { APIService, ExportCSVService } from '../_services';
-import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
 
@@ -63,6 +63,7 @@ describe('OverviewComponent', () => {
       declarations: [
         OverviewComponent,
         MockBarComponent,
+        MockTableComponent,
         SnapshotsComponent,
         createMockPipe('renameApiFacet')
       ],
@@ -90,7 +91,6 @@ describe('OverviewComponent', () => {
     component.form.get('facetParameter').setValue('contentTier');
     component.isShowingSearchList = false;
     fixture.detectChanges();
-    component.barChart = new MockBarComponent() as unknown as BarComponent;
   };
 
   const setFilterValue1 = (group: string): void => {
