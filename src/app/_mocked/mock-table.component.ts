@@ -7,12 +7,11 @@ import { FmtTableData, TableRow } from '../_models';
   template: ''
 })
 export class MockTableComponent {
-
   getTableData(): FmtTableData {
     return {
       columns: [],
       tableRows: []
-    }
+    };
   }
 
   getTableRows(): Array<TableRow> {
@@ -34,5 +33,4 @@ export class MockTableComponent {
   toggleExpandRow(_: DatatableRowDetailDirective): false {
     return false;
   }
-
 }

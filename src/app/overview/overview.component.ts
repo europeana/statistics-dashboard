@@ -447,7 +447,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
-    const seriesData = this.snapshots.prepSeriesData(
+    const seriesData = this.snapshots.applySeries(
       this.form.value.facetParameter,
       seriesKeys,
       this.form.value.showPercent
@@ -894,6 +894,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       seriesKeys
     );
 
+    this.table.showingSeriesInfo = seriesKeys.length > 1;
     this.table.setRows(rows);
   }
 }

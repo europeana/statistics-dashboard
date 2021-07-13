@@ -61,20 +61,33 @@
 
   <!-- Col 0 (expand column) -->
   <ngx-datatable-column
-    name="{{ tableData.columns[0] | titlecase }}"
+    name="{{ tableData.columns[2] | titlecase }}"
     [flexGrow]="3"
     [minWidth]="200"
   >
-    <ng-template let-value="value" ngx-datatable-cell-template>
-      <a target="_blank" [href]="getUrlRow(value)">
-        {{ value }}
+    <ng-template let-value="value" let-row="row" ngx-datatable-cell-template>
+      <a target="_blank" [href]="getUrlRow(value)" class="container-h">
+        <span class="name-cell">
+          {{ value }}
+        </span>
+        <span *ngIf="showingSeriesInfo" class="container-h">
+          <span
+            class="series-colour"
+            [ngStyle]="{
+              backgroundColor: colours[row['colourIndex']]
+            }"
+          ></span>
+          <span>
+            {{ row.series }}
+          </span>
+        </span>
       </a>
     </ng-template>
   </ngx-datatable-column>
 
   <!-- Col >= 1 -->
   <ngx-datatable-column
-    *ngFor="let col of tableData.columns | slice: 1; index as i"
+    *ngFor="let col of tableData.columns | slice: 3; index as i"
     name="{{ col | titlecase }}"
     [flexGrow]="1"
   >

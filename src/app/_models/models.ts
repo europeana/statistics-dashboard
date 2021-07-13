@@ -21,7 +21,7 @@ export interface TableRow {
   name: HeaderNameType;
   count: string;
   percent: string;
-  colour?: number;
+  colourIndex?: number;
   series: string;
 }
 

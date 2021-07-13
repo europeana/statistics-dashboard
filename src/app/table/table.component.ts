@@ -5,11 +5,13 @@ import {
   DatatableRowDetailDirective
 } from '@swimlane/ngx-datatable';
 
+import { colours } from '../_data';
 import { FmtTableData, HeaderNameType, TableRow } from '../_models';
 
 @Component({
   selector: 'app-table',
-  templateUrl: './table.component.html'
+  templateUrl: './table.component.html',
+  styleUrls: ['./table.component.scss']
 })
 export class TableComponent {
   @ViewChild('dataTable') dataTable: DatatableComponent;
@@ -18,12 +20,15 @@ export class TableComponent {
   @Input() getUrlRow: (s: string) => string;
 
   tableData: FmtTableData;
+  showingSeriesInfo = false;
 
-  columnNames = ['series', 'colour', 'name', 'count', 'percent'].map(
+  columnNamesFull = ['colour', 'series', 'name', 'count', 'percent'].map(
     (x) => x as HeaderNameType
   );
+  columnNames = this.columnNamesFull.slice();
 
   public ColumnMode = ColumnMode;
+  public colours = colours;
 
   /** getColumnNames
   /*

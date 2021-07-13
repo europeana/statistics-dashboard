@@ -27,7 +27,7 @@ export class ExportPDFService {
           {
             table: {
               body: [
-                tableData.columns.map((s: string) => {
+                tableData.columns.slice(1).map((s: string) => {
                   return {
                     text: s,
                     style: 'tableHeader',
@@ -36,7 +36,7 @@ export class ExportPDFService {
                 }),
                 ...tableData.tableRows.map((tr: TableRow) => {
                   const result = [];
-                  tableData.columns.forEach((s: string) => {
+                  tableData.columns.slice(1).forEach((s: string) => {
                     result.push(tr[s]);
                   });
                   return result;

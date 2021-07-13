@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-
 import { colours, facetNames } from '../_data';
-
 import {
   ColourSeriesData,
   CompareData,
@@ -19,6 +17,7 @@ export class SnapshotsComponent {
   public colours = colours;
 
   _facetName: string;
+
   @Input() set facetName(facetName: string) {
     this._facetName = facetName;
 
@@ -30,7 +29,6 @@ export class SnapshotsComponent {
         });
       }
     });
-
     this.compareData = this.compareDataAllFacets[facetName];
   }
 
@@ -62,8 +60,14 @@ export class SnapshotsComponent {
     });
   }
 
-  getNextAvailableColourIndex(): number {
-    const cd = this.compareDataAllFacets[this._facetName];
+  /** getNextAvailableColourIndex
+  /* calculates the next available colour by looking at which have been used
+  /* within the current facet data
+  /* @param { string : facetName } - the active facet
+  /* @returns number
+  */
+  getNextAvailableColourIndex(facetName: string): number {
+    const cd = this.compareDataAllFacets[facetName];
 
     const usedIndexes = Object.keys(cd)
       .filter((key: string) => {
@@ -81,19 +85,21 @@ export class SnapshotsComponent {
     return res > -1 ? res : 0;
   }
 
-  /** prepSeriesData
+  /** applySeries
   /* sets "applied" on series with identified by seriesKeys
   /* assign colour indexes
+  /* @param { string : facetName } - the active facet
+  /* @param { Array<string> : seriesKeys } - the keys of the series to apply
+  /* @param { boolean : percent } - percent value switch
   /* @returns Array<ColourSeriesData> converts to data (for chart)
-  /*
   */
-  prepSeriesData(
+  applySeries(
     facetName: string,
     seriesKeys: Array<string>,
     percent: boolean
   ): Array<ColourSeriesData> {
     return seriesKeys.map((seriesKey: string) => {
-      const colourIndex = this.getNextAvailableColourIndex();
+      const colourIndex = this.getNextAvailableColourIndex(facetName);
       const cd = this.compareDataAllFacets[facetName][seriesKey];
 
       cd._colourIndex = colourIndex;
@@ -124,7 +130,7 @@ export class SnapshotsComponent {
           name: key as HeaderNameType,
           count: cd.data[key] + '',
           percent: cd.dataPercent[key] + '',
-          colour: cd._colourIndex,
+          colourIndex: cd._colourIndex,
           series: cd.label
         });
       });

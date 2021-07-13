@@ -13,14 +13,26 @@ describe('ExportCSVService', () => {
   }));
 
   it('should convert', () => {
-    const testHeaders = ['series', 'name', 'count', 'percent'].map((s: string) => {
-      return s as HeaderNameType;
-    });
+    const testHeaders = ['series', 'name', 'count', 'percent'].map(
+      (s: string) => {
+        return s as HeaderNameType;
+      }
+    );
     const testData1 = [
-      { series: 'Series A', name: 'Andy' as HeaderNameType, count: '22', percent: '50' }
+      {
+        series: 'Series A',
+        name: 'Andy' as HeaderNameType,
+        count: '22',
+        percent: '50'
+      }
     ];
     const testData2 = [
-      { series: 'Series B', name: 'MacLean' as HeaderNameType, count: '22', percent: null }
+      {
+        series: 'Series B',
+        name: 'MacLean' as HeaderNameType,
+        count: '22',
+        percent: null
+      }
     ];
     expect(service.csvFromTableRows(testHeaders, testData1)).toEqual(
       'series,name,count,percent\r\n"Series A","Andy","22","50"'

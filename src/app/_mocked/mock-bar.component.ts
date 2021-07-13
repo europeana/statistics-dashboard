@@ -5,7 +5,6 @@ import { Component } from '@angular/core';
   template: ''
 })
 export class MockBarComponent {
-
   addSeries(_): void {
     console.log('MockBarComponent.addSeries');
   }
