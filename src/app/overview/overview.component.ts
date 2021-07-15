@@ -429,6 +429,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** addSeries
+  /*  UI control
   /*  Calls functions to add series data to the bar chart and the table
   /* @param { Array<string> : seriesKeys } - the keys of the series to add
    */
@@ -441,12 +442,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /*  Add series data to the bar chart
   /*  (colours handled by snapshots)
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
+  /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
-  addSeriesToChart(seriesKeys: Array<string>): void {
+  addSeriesToChart(seriesKeys: Array<string>, reuseColours = false): void {
     const seriesData = this.snapshots.applySeries(
       this.form.value.facetParameter,
       seriesKeys,
-      this.form.value.showPercent
+      this.form.value.showPercent,
+      reuseColours
     );
     const fn = (): void => {
       this.barChart.addSeries(seriesData);
@@ -456,10 +459,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** addAppliedSeriesToChart
   /*  adds all compareData entries (where applied = true)
+  /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
-  addAppliedSeriesToChart(): void {
+  addAppliedSeriesToChart(reuseColours = false): void {
     this.addSeriesToChart(
-      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied'),
+      reuseColours
     );
   }
 
@@ -469,8 +474,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
    */
   togglePercent(): void {
     this.barChart.removeAllSeries();
-    this.snapshots.clearColourIndexes();
-    this.addAppliedSeriesToChart();
+    this.addAppliedSeriesToChart(true);
   }
 
   /** addOrUpdateFilterControls

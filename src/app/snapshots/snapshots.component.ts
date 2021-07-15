@@ -53,13 +53,6 @@ export class SnapshotsComponent {
     });
   }
 
-  clearColourIndexes(): void {
-    const cd = this.compareDataAllFacets[this._facetName];
-    return Object.keys(cd).forEach((key: string) => {
-      cd[key]._colourIndex = -1;
-    });
-  }
-
   /** getNextAvailableColourIndex
   /* calculates the next available colour by looking at which have been used
   /* within the current facet data
@@ -96,13 +89,19 @@ export class SnapshotsComponent {
   applySeries(
     facetName: string,
     seriesKeys: Array<string>,
-    percent: boolean
+    percent: boolean,
+    reuseColours = false
   ): Array<ColourSeriesData> {
     return seriesKeys.map((seriesKey: string) => {
-      const colourIndex = this.getNextAvailableColourIndex(facetName);
       const cd = this.compareDataAllFacets[facetName][seriesKey];
 
-      cd._colourIndex = colourIndex;
+      let colourIndex = cd._colourIndex;
+
+      if (!reuseColours) {
+        colourIndex = this.getNextAvailableColourIndex(facetName);
+        cd._colourIndex = colourIndex;
+      }
+
       cd.applied = true;
 
       const csd: ColourSeriesData = {
