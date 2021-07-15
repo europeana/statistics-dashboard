@@ -35,8 +35,8 @@ describe('ExportPDFService', () => {
     const model = {
       columns: ['a', 'b', 'c'],
       tableRows: [
-        { name: 'name', count: '1', percent: '1' } as TableRow,
-        { name: 'name', count: '2', percent: '2' } as TableRow
+        { name: 'name', count: 1, percent: 1 } as TableRow,
+        { name: 'name', count: 2, percent: 2 } as TableRow
       ]
     };
     expect(service.download(model, ''));

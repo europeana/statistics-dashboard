@@ -19,9 +19,10 @@ export interface FilterState {
 
 export interface TableRow {
   name: HeaderNameType;
-  count: string;
-  percent: string;
+  count: number;
+  percent: number;
   colourIndex?: number;
+  highlight?: boolean;
   series: string;
 }
 

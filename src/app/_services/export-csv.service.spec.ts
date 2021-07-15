@@ -22,24 +22,24 @@ describe('ExportCSVService', () => {
       {
         series: 'Series A',
         name: 'Andy' as HeaderNameType,
-        count: '22',
-        percent: '50'
+        count: 22,
+        percent: 50
       }
     ];
     const testData2 = [
       {
         series: 'Series B',
         name: 'MacLean' as HeaderNameType,
-        count: '22',
+        count: 22,
         percent: null
       }
     ];
     expect(service.csvFromTableRows(testHeaders, testData1)).toEqual(
-      'series,name,count,percent\r\n"Series A","Andy","22","50"'
+      'series,name,count,percent\r\n"Series A","Andy",22,50'
     );
 
     expect(service.csvFromTableRows(testHeaders, testData2)).toEqual(
-      'series,name,count,percent\r\n"Series B","MacLean","22",""'
+      'series,name,count,percent\r\n"Series B","MacLean",22,""'
     );
   });
 

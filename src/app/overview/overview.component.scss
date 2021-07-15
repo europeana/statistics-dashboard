@@ -1,11 +1,6 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
-@import "~@swimlane/ngx-datatable/index.css";
-@import "~@swimlane/ngx-datatable/themes/bootstrap.css";
-@import "~@swimlane/ngx-datatable/themes/material.css";
-@import "~@swimlane/ngx-datatable/assets/icons.css";
-
 $width-left-col: 200px;
 
 .ct-zero-label {
@@ -256,17 +251,6 @@ label {
   color: $near-black;
 }
 
-.mobile-row {
-  font-size: 14px;
-  padding-left: 60px;
-}
-
-.mobile-row-detail {
-  &:not(:last-child)::after {
-    content: ", ";
-  }
-}
-
 .statistics-dashboard {
   display: flex;
   flex-direction: column-reverse;
@@ -284,23 +268,5 @@ label {
 
   .statistics-dashboard {
     flex-direction: row;
-  }
-}
-
-@media screen and (max-width: 800px) {
-  .desktop-hidden {
-    display: initial;
-  }
-  .mobile-hidden {
-    display: none;
-  }
-}
-
-@media screen and (min-width: 800px) {
-  .desktop-hidden {
-    display: none;
-  }
-  .mobile-hidden {
-    display: initial;
   }
 }

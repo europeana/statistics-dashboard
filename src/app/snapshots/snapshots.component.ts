@@ -53,13 +53,6 @@ export class SnapshotsComponent {
     });
   }
 
-  clearColourIndexes(): void {
-    const cd = this.compareDataAllFacets[this._facetName];
-    return Object.keys(cd).forEach((key: string) => {
-      cd[key]._colourIndex = -1;
-    });
-  }
-
   /** getNextAvailableColourIndex
   /* calculates the next available colour by looking at which have been used
   /* within the current facet data
@@ -96,13 +89,19 @@ export class SnapshotsComponent {
   applySeries(
     facetName: string,
     seriesKeys: Array<string>,
-    percent: boolean
+    percent: boolean,
+    reuseColours = false
   ): Array<ColourSeriesData> {
     return seriesKeys.map((seriesKey: string) => {
-      const colourIndex = this.getNextAvailableColourIndex(facetName);
       const cd = this.compareDataAllFacets[facetName][seriesKey];
 
-      cd._colourIndex = colourIndex;
+      let colourIndex = cd._colourIndex;
+
+      if (!reuseColours) {
+        colourIndex = this.getNextAvailableColourIndex(facetName);
+        cd._colourIndex = colourIndex;
+      }
+
       cd.applied = true;
 
       const csd: ColourSeriesData = {
@@ -115,24 +114,38 @@ export class SnapshotsComponent {
   }
 
   /** getSeriesDataForTable
-  /* converts to data for table
-  /*
-  */
+  /* converts to grouped / interplated data for table
+  **/
   getSeriesDataForTable(
     facetName: string,
     seriesKeys: Array<string>
   ): Array<TableRow> {
-    const result: Array<TableRow> = [];
+    const allKeysInAllSeries: { [groupName: string]: true } = {};
+
     seriesKeys.forEach((seriesKey: string) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       Object.keys(cd.data).forEach((key: string) => {
-        result.push({
-          name: key as HeaderNameType,
-          count: cd.data[key] + '',
-          percent: cd.dataPercent[key] + '',
-          colourIndex: cd._colourIndex,
-          series: cd.label
-        });
+        allKeysInAllSeries[key] = true;
+      });
+    });
+
+    const result: Array<TableRow> = [];
+
+    Object.keys(allKeysInAllSeries).forEach((groupKey: string) => {
+      // check all series for groupKey
+
+      seriesKeys.forEach((seriesKey: string) => {
+        const cd = this.compareDataAllFacets[facetName][seriesKey];
+
+        if (cd.data[groupKey]) {
+          result.push({
+            name: groupKey as HeaderNameType,
+            count: cd.data[groupKey],
+            percent: cd.dataPercent[groupKey],
+            colourIndex: cd._colourIndex,
+            series: cd.label
+          });
+        }
       });
     });
     return result;

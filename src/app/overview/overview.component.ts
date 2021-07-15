@@ -33,7 +33,7 @@ import {
   FacetFieldProcessed,
   FacetProcessed,
   FilterState,
-  FmtTableData,
+  HeaderNameType,
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
@@ -43,7 +43,7 @@ import {
 
 import { APIService, ExportCSVService, ExportPDFService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
-import { TableComponent } from '../table';
+import { GridComponent } from '../grid';
 
 @Component({
   selector: 'app-overview',
@@ -53,7 +53,7 @@ import { TableComponent } from '../table';
   encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent extends DataPollingComponent implements OnInit {
-  @ViewChild('table') table: TableComponent;
+  @ViewChild('grid') grid: GridComponent;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
@@ -76,8 +76,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     },
     BarChartCool
   );
-
-  totalResults = 0;
 
   exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
 
@@ -102,8 +100,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   selFacetIndex = 0;
   allProcessedFacetData: Array<FacetProcessed>;
-
-  tableData: FmtTableData;
 
   filterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
@@ -175,13 +171,15 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     if (type === ExportType.CSV) {
       const res = this.csv.csvFromTableRows(
-        this.table.getColumnNames(),
-        this.table.getTableRows()
+        ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
+          return x as HeaderNameType;
+        }),
+        this.grid.getTableRows()
       );
       this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
       this.barChart.getSvgData().then((imgUrl: string) => {
-        this.pdf.download(this.table.getTableData(), imgUrl);
+        this.pdf.download(this.grid.tableData, imgUrl);
       });
     }
     return false;
@@ -250,7 +248,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   **/
   processResult(rawResult: RawFacet): boolean {
     if (rawResult.facets) {
-      this.totalResults = rawResult.totalResults;
       this.allProcessedFacetData = new Array(rawResult.facets.length);
 
       rawResult.facets.forEach((f: Facet) => {
@@ -285,8 +282,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       });
       return true;
     } else {
-      this.totalResults = 0;
-      this.table.reset();
+      this.grid.setRows([]);
       return false;
     }
   }
@@ -433,6 +429,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** addSeries
+  /*  UI control
   /*  Calls functions to add series data to the bar chart and the table
   /* @param { Array<string> : seriesKeys } - the keys of the series to add
    */
@@ -445,12 +442,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /*  Add series data to the bar chart
   /*  (colours handled by snapshots)
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
+  /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
-  addSeriesToChart(seriesKeys: Array<string>): void {
+  addSeriesToChart(seriesKeys: Array<string>, reuseColours = false): void {
+    if (!reuseColours) {
+      seriesKeys = seriesKeys.reverse();
+    }
+
     const seriesData = this.snapshots.applySeries(
       this.form.value.facetParameter,
       seriesKeys,
-      this.form.value.showPercent
+      this.form.value.showPercent,
+      reuseColours
     );
     const fn = (): void => {
       this.barChart.addSeries(seriesData);
@@ -460,10 +463,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** addAppliedSeriesToChart
   /*  adds all compareData entries (where applied = true)
+  /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
-  addAppliedSeriesToChart(): void {
+  addAppliedSeriesToChart(reuseColours = false): void {
     this.addSeriesToChart(
-      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied'),
+      reuseColours
     );
   }
 
@@ -473,8 +478,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
    */
   togglePercent(): void {
     this.barChart.removeAllSeries();
-    this.snapshots.clearColourIndexes();
-    this.addAppliedSeriesToChart();
+    this.addAppliedSeriesToChart(true);
   }
 
   /** addOrUpdateFilterControls
@@ -894,7 +898,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       seriesKeys
     );
 
-    this.table.showingSeriesInfo = seriesKeys.length > 1;
-    this.table.setRows(rows);
+    this.grid.showingSeriesInfo = seriesKeys.length > 1;
+    this.grid.setRows(rows);
   }
 }
