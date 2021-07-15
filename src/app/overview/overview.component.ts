@@ -445,6 +445,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
   addSeriesToChart(seriesKeys: Array<string>, reuseColours = false): void {
+    if (!reuseColours) {
+      seriesKeys = seriesKeys.reverse();
+    }
+
     const seriesData = this.snapshots.applySeries(
       this.form.value.facetParameter,
       seriesKeys,

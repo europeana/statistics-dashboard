@@ -71,19 +71,19 @@ input {
   }
 }
 
+.highlight {
+  //background-color: $offwhite;
+}
+
+.search {
+  width: 100px;
+}
+
 .search-control,
 .navigation-controls {
   color: $gray-faint;
   font-size: 11px;
   line-height: 1.5;
-}
-
-.highlight {
-  background-color: $offwhite;
-}
-
-.search {
-  width: 100px;
 }
 
 .search-icon {

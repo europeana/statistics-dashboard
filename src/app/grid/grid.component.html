@@ -1,6 +1,7 @@
 <div *ngIf="tableData">
   <div class="data-grid" [ngClass]="{ 'with-series': showingSeriesInfo }">
     <span class="cell-wide search-control container-h">
+      <!--
       <span class="search-icon"></span>
 
       <input
@@ -9,6 +10,7 @@
         [(ngModel)]="filterString"
         (keyup)="onKeyup()"
       />
+      -->
     </span>
 
     <span class="navigation-controls">
@@ -25,7 +27,7 @@
 
     <span class="cell-header"><a (click)="sort('count')">Count</a></span>
 
-    <span class="cell-header"><a (click)="sort('count')">Percent</a></span>
+    <span class="cell-header"><a (click)="sort('percent')">Percent</a></span>
 
     <ng-container *ngFor="let row of pageRows; let i = index">
       <span class="cell-name" [ngClass]="{ highlight: row.highlight }">

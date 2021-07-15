@@ -12,6 +12,7 @@ export class GridComponent {
   @Input() getUrlRow: (s: string) => string;
   @Input() title: string;
 
+  // TODO: get rid
   columnNames = ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
     return x as HeaderNameType;
   });
@@ -25,7 +26,8 @@ export class GridComponent {
   unfilteredPageRows = [];
   sortedAsc = {
     count: true,
-    name: false
+    name: false,
+    percent: true
   };
 
   tableData: FmtTableData;
