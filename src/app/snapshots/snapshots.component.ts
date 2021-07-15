@@ -115,24 +115,38 @@ export class SnapshotsComponent {
   }
 
   /** getSeriesDataForTable
-  /* converts to data for table
-  /*
-  */
+  /* converts to grouped / interplated data for table
+  **/
   getSeriesDataForTable(
     facetName: string,
     seriesKeys: Array<string>
   ): Array<TableRow> {
-    const result: Array<TableRow> = [];
+    const allKeysInAllSeries: { [groupName: string]: true } = {};
+
     seriesKeys.forEach((seriesKey: string) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       Object.keys(cd.data).forEach((key: string) => {
-        result.push({
-          name: key as HeaderNameType,
-          count: cd.data[key] + '',
-          percent: cd.dataPercent[key] + '',
-          colourIndex: cd._colourIndex,
-          series: cd.label
-        });
+        allKeysInAllSeries[key] = true;
+      });
+    });
+
+    const result: Array<TableRow> = [];
+
+    Object.keys(allKeysInAllSeries).forEach((groupKey: string) => {
+      // check all series for groupKey
+
+      seriesKeys.forEach((seriesKey: string) => {
+        const cd = this.compareDataAllFacets[facetName][seriesKey];
+
+        if (cd.data[groupKey]) {
+          result.push({
+            name: groupKey as HeaderNameType,
+            count: cd.data[groupKey],
+            percent: cd.dataPercent[groupKey],
+            colourIndex: cd._colourIndex,
+            series: cd.label
+          });
+        }
       });
     });
     return result;

@@ -20,7 +20,7 @@ import {
   MockAPIServiceErrors,
   MockBarComponent,
   MockExportCSVService,
-  MockTableComponent
+  MockGridComponent
 } from '../_mocked';
 import { ExportType, NameLabel } from '../_models';
 import { APIService, ExportCSVService } from '../_services';
@@ -63,7 +63,7 @@ describe('OverviewComponent', () => {
       declarations: [
         OverviewComponent,
         MockBarComponent,
-        MockTableComponent,
+        MockGridComponent,
         SnapshotsComponent,
         createMockPipe('renameApiFacet')
       ],
@@ -440,10 +440,10 @@ describe('OverviewComponent', () => {
     });
 
     it('should have no result', fakeAsync(() => {
-      expect(component.totalResults).toEqual(0);
+      expect(component.allProcessedFacetData).toBeFalsy();
       component.beginPolling();
       tick(1);
-      expect(component.totalResults).toEqual(0);
+      expect(component.allProcessedFacetData).toBeFalsy();
       component.ngOnDestroy();
     }));
   });

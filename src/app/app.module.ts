@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ClickOutsideModule } from 'ng-click-outside';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -18,12 +17,12 @@ import { CheckboxComponent } from './checkbox';
 import { FilterComponent } from './filter';
 import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
-
+import { GridComponent } from './grid';
+import { GridPaginatorComponent } from './grid-paginator';
 import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { SplashComponent } from './splash/splash.component';
 import { SnapshotsComponent } from './snapshots/snapshots.component';
-import { TableComponent } from './table';
 import { TruncateComponent } from './truncate';
 import { DatesComponent } from './dates/dates.component';
 
@@ -35,6 +34,8 @@ import { DatesComponent } from './dates/dates.component';
     DatesComponent,
     FilterComponent,
     FooterComponent,
+    GridComponent,
+    GridPaginatorComponent,
     HeaderComponent,
     ListingComponent,
     MapComponent,
@@ -43,7 +44,6 @@ import { DatesComponent } from './dates/dates.component';
     RenameRightsPipe,
     SplashComponent,
     SnapshotsComponent,
-    TableComponent,
     TruncateComponent
   ],
   imports: [
@@ -54,8 +54,7 @@ import { DatesComponent } from './dates/dates.component';
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-    ClickOutsideModule,
-    NgxDatatableModule
+    ClickOutsideModule
   ],
   providers: [],
   bootstrap: [AppComponent]

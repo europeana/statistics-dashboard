@@ -1,0 +1,60 @@
+<div *ngIf="tableData">
+  <div class="data-grid" [ngClass]="{ 'with-series': showingSeriesInfo }">
+    <span class="cell-wide search-control container-h">
+      <span class="search-icon"></span>
+
+      <input
+        class="search"
+        placeholder="Search..."
+        [(ngModel)]="filterString"
+        (keyup)="onKeyup()"
+      />
+    </span>
+
+    <span class="navigation-controls">
+      <app-grid-paginator
+        #paginator
+        [rows]="tableData.tableRows"
+        (change)="setPage($event)"
+      ></app-grid-paginator>
+    </span>
+
+    <span class="cell-header cell-wide" (click)="sort('name')">
+      {{ title }}
+    </span>
+
+    <span class="cell-header"><a (click)="sort('count')">Count</a></span>
+
+    <span class="cell-header"><a (click)="sort('count')">Percent</a></span>
+
+    <ng-container *ngFor="let row of pageRows; let i = index">
+      <span class="cell-name" [ngClass]="{ highlight: row.highlight }">
+        <a target="_blank" [href]="getUrlRow(row.name)">{{ row.name }}</a>
+      </span>
+
+      <span
+        *ngIf="showingSeriesInfo"
+        class="cell-series container-h"
+        [ngClass]="{ highlight: row.highlight }"
+      >
+        <span
+          class="series-colour"
+          [ngStyle]="{
+            backgroundColor: colours[row['colourIndex']]
+          }"
+        ></span>
+        <span>
+          {{ row.series }}
+        </span>
+      </span>
+
+      <span class="cell-count" [ngClass]="{ highlight: row.highlight }">
+        {{ row.count }}
+      </span>
+
+      <span class="cell-percent" [ngClass]="{ highlight: row.highlight }">
+        {{ row.percent }}%
+      </span>
+    </ng-container>
+  </div>
+</div>

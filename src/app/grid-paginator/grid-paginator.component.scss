@@ -1,0 +1,17 @@
+.active {
+  font-weight: 600;
+}
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.paginator {
+  display: flex;
+  flex-direction: row;
+
+  > li {
+    padding: 4px;
+  }
+}

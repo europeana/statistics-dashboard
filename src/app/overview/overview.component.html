@@ -188,6 +188,16 @@
 
       <!-- Data Area -->
       <div class="data-area">
+        <app-grid
+          #grid
+          id="grid"
+          title="Europeana database by {{
+            form.value.facetParameter | renameApiFacet
+          }}"
+          [getUrl]="getUrl.bind(this)"
+          [getUrlRow]="getUrlRow.bind(this)"
+        ></app-grid>
+
         <label
           [ngStyle]="{
             display: isShowingSearchList ? 'none' : 'inline-block'
@@ -254,13 +264,6 @@
             </div>
           </li>
         </ul>
-
-        <app-table
-          #table
-          id="table"
-          [getUrl]="getUrl.bind(this)"
-          [getUrlRow]="getUrlRow.bind(this)"
-        ></app-table>
       </div>
     </div>
   </div>
