@@ -1,36 +1,44 @@
-<div *ngIf="tableData">
+<div *ngIf="gridRows">
   <div class="data-grid" [ngClass]="{ 'with-series': showingSeriesInfo }">
     <span class="cell-wide search-control container-h">
-      <!--
       <span class="search-icon"></span>
-
       <input
         class="search"
         placeholder="Search..."
         [(ngModel)]="filterString"
-        (keyup)="onKeyup()"
+        (keyup)="updateRows()"
       />
-      -->
     </span>
 
     <span class="navigation-controls">
       <app-grid-paginator
         #paginator
-        [rows]="tableData.tableRows"
+        [rows]="gridRows"
         (change)="setPage($event)"
       ></app-grid-paginator>
     </span>
 
-    <span class="cell-header cell-wide" (click)="sort('name')">
+    <span class="cell-header cell-wide">
       {{ title }}
     </span>
 
-    <span class="cell-header"><a (click)="sort('count')">Count</a></span>
+    <span
+      class="cell-header"
+      data-e2e="grid-sort-count"
+      [ngClass]="{ active: isHeaderActive('count') }"
+      ><a (click)="sort('count')">Count {{ sortStates["count"] }}</a></span
+    >
 
-    <span class="cell-header"><a (click)="sort('percent')">Percent</a></span>
+    <span class="cell-header" [ngClass]="{ active: isHeaderActive('percent') }"
+      ><a (click)="sort('percent')">Percent</a></span
+    >
 
     <ng-container *ngFor="let row of pageRows; let i = index">
-      <span class="cell-name" [ngClass]="{ highlight: row.highlight }">
+      <span
+        class="cell-name"
+        [ngClass]="{ highlight: row.highlight }"
+        data-e2e="grid-row-name"
+      >
         <a target="_blank" [href]="getUrlRow(row.name)">{{ row.name }}</a>
       </span>
 

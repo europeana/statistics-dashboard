@@ -12,25 +12,15 @@ export class GridComponent {
   @Input() getUrlRow: (s: string) => string;
   @Input() title: string;
 
-  // TODO: get rid
-  columnNames = ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
-    return x as HeaderNameType;
-  });
-
-  rowName: string;
-  highlight = false;
-
   filterString = '';
-
   pageRows: Array<TableRow>;
   unfilteredPageRows = [];
-  sortedAsc = {
-    count: true,
-    name: false,
-    percent: true
+  sortStates = {
+    count: 0,
+    percent: 0
   };
 
-  tableData: FmtTableData;
+  gridRows: Array<TableRow>;
   showingSeriesInfo = false;
 
   public colours = colours;
@@ -47,85 +37,123 @@ export class GridComponent {
     });
   }
 
-  bgHighlightSwitch(rowName: string): boolean {
-    if (this.rowName !== rowName) {
-      this.highlight = !this.highlight;
-    }
-    this.rowName = rowName;
-    return this.highlight;
-  }
-
-  /** getTableRows
-  /*
-  **/
-  getTableRows(): Array<TableRow> {
-    return this.tableData.tableRows;
-  }
-
-  onKeyup(): void {
-    const val = this.filterString;
-
-    // filter our data
-    const temp = this.unfilteredPageRows.filter(function (d) {
-      return d.name.toLowerCase().indexOf(val) !== -1 || !val;
+  autoSort(rows: Array<TableRow>): void {
+    ['count', 'percent'].every((field: string) => {
+      if (this.sortStates[field] !== 0) {
+        this.sortRows(rows, field);
+        return false;
+      }
+      return true;
     });
+  }
 
-    this.updateRows(temp);
+  getData(): FmtTableData {
+    return {
+      columns: ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
+        return x as HeaderNameType;
+      }),
+      tableRows: this.gridRows
+    };
+  }
+
+  /** getFilteredRows
+  /* @returns unfilteredPageRows filtered by filterString
+  **/
+  getFilteredRows(): Array<TableRow> {
+    const filter = this.filterString;
+    return this.unfilteredPageRows.filter(function (d) {
+      return d.name.toLowerCase().indexOf(filter) !== -1 || !filter;
+    });
+  }
+
+  /** isHeaderActive
+  /* template utility
+  /* @param { string : state }
+  **/
+  isHeaderActive(state: string): boolean {
+    return this.sortStates[state] !== 0;
   }
 
   /** setRows
-  /* from parent
+  /* called from parent when data changes
   **/
   setRows(rows: Array<TableRow>): void {
-    this.applyHighlights(rows);
-    this.tableData = {
-      columns: this.columnNames,
-      tableRows: rows
-    };
     this.unfilteredPageRows = rows;
+    this.updateRows();
   }
 
   /** setPage
-  /* from pager
+  /* called from pager when page changes - sets pageRows
+  /* @param { Array<TableRow> : rows } - the rows
   **/
   setPage(rows: Array<TableRow>): void {
     this.pageRows = rows;
   }
 
+  /** bumpSortState
+  /* Moves sort state one iteration through (looped) sequence -1, 0, 1
+  /* Clears other sort states
+  /* @param { string : header }
+  **/
+  bumpSortState(header: string): void {
+    const ss = this.sortStates;
+    let val = ss[header];
+    val += 1;
+    if (val > 1) {
+      val = -1;
+    }
+    Object.keys(ss).forEach((key: string) => {
+      ss[key] = 0;
+    });
+    ss[header] = val;
+  }
+
   /** sort
+  /* Template utility: bumps sort state and calls updateRows
   /* @param { string : field } - the field to sort on
   **/
   sort(field: string): void {
-    const rows = this.tableData.tableRows
-      .slice()
-      .sort((rowA: TableRow, rowB: TableRow) => {
-        if (this.sortedAsc[field]) {
-          return rowA[field] > rowB[field]
-            ? 1
-            : rowA[field] === rowB[field]
-            ? 0
-            : -1;
-        } else {
-          return rowA[field] < rowB[field]
-            ? 1
-            : rowA[field] === rowB[field]
-            ? 0
-            : -1;
-        }
-      });
+    this.bumpSortState(field);
+    this.updateRows(field);
+  }
 
-    this.sortedAsc[field] = !this.sortedAsc[field];
-    this.updateRows(rows);
+  /** sortRows
+  /* Sort an array of TableRow objects
+  /* @param { Array<TableRow> : rows } - the rows to sort
+  /* @param { string : field } - the field to sort on
+  **/
+  sortRows(rows: Array<TableRow>, field: string): void {
+    rows.sort((rowA: TableRow, rowB: TableRow) => {
+      const sortState = this.sortStates[field];
+      if (sortState === 1) {
+        return rowA[field] > rowB[field]
+          ? 1
+          : rowA[field] === rowB[field]
+          ? 0
+          : -1;
+      } else if (sortState === -1) {
+        return rowA[field] < rowB[field]
+          ? 1
+          : rowA[field] === rowB[field]
+          ? 0
+          : -1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   /** updateRows
   /* @param { Array<TableRow> : rows }
   **/
-  updateRows(rows: Array<TableRow>): void {
-    // colour code data
+  updateRows(sortField?: string): void {
+    const rows = this.getFilteredRows();
+    if (sortField) {
+      this.sortRows(rows, sortField);
+    } else {
+      this.autoSort(rows);
+    }
     this.applyHighlights(rows);
-
-    // update the rows
-    this.tableData.tableRows = rows;
+    this.gridRows = rows;
   }
 }

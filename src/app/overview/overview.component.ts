@@ -33,7 +33,6 @@ import {
   FacetFieldProcessed,
   FacetProcessed,
   FilterState,
-  HeaderNameType,
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
@@ -167,19 +166,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   export(type: ExportType): false {
+    const gridData = this.grid.getData();
     this.downloadOptionsOpen = false;
 
     if (type === ExportType.CSV) {
       const res = this.csv.csvFromTableRows(
-        ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
-          return x as HeaderNameType;
-        }),
-        this.grid.getTableRows()
+        gridData.columns,
+        gridData.tableRows
       );
       this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
       this.barChart.getSvgData().then((imgUrl: string) => {
-        this.pdf.download(this.grid.tableData, imgUrl);
+        this.pdf.download(gridData, imgUrl);
       });
     }
     return false;

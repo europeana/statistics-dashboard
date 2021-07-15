@@ -18,8 +18,11 @@ export class MockGridComponent {
     return false;
   }
 
-  getTableRows(): Array<TableRow> {
-    return [];
+  getData() {
+    return {
+      columns: [],
+      tableData: []
+    };
   }
 
   setPage(_: number): void {

@@ -10,6 +10,7 @@
 
   <li>
     <a
+      data-e2e="grid-page-prev"
       (click)="setPage(activePageIndex - 1)"
       [ngClass]="{ disabled: !canPrev() }"
       >&lt;</a
@@ -27,6 +28,7 @@
 
   <li>
     <a
+      data-e2e="grid-page-next"
       (click)="setPage(activePageIndex + 1)"
       [ngClass]="{ disabled: !canNext() }"
       >&gt;</a
