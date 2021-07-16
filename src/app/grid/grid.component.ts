@@ -23,6 +23,8 @@ export class GridComponent {
   pagerInfo: PagerInfo;
 
   unfilteredPageRows: Array<TableRow> = [];
+  summaryRows: Array<TableRow> = [];
+
   sortStates = {
     count: 0,
     percent: 0
@@ -88,9 +90,7 @@ export class GridComponent {
   getFilteredRows(): Array<TableRow> {
     const filter = this.filterString;
     return this.unfilteredPageRows.filter(function (tr: TableRow) {
-      return (
-        tr.isTotal || tr.name.toLowerCase().indexOf(filter) !== -1 || !filter
-      );
+      return tr.name.toLowerCase().indexOf(filter) !== -1 || !filter;
     });
   }
 
@@ -113,7 +113,17 @@ export class GridComponent {
   /* called from parent when data changes
   **/
   setRows(rows: Array<TableRow>): void {
-    this.unfilteredPageRows = rows;
+    const normalRows = [];
+    const summaryRows = [];
+    rows.forEach((tr: TableRow) => {
+      if (tr.isTotal) {
+        summaryRows.push(tr);
+      } else {
+        normalRows.push(tr);
+      }
+    });
+    this.summaryRows = summaryRows;
+    this.unfilteredPageRows = normalRows;
     this.updateRows();
   }
 
@@ -143,32 +153,24 @@ export class GridComponent {
   /* @param { string : field } - the field to sort on
   **/
   sortRows(rows: Array<TableRow>, field: string): void {
-    rows
-      .sort((rowA: TableRow, rowB: TableRow) => {
-        const sortState = this.sortStates[field];
-        if (sortState === 1) {
-          return rowA[field] > rowB[field]
-            ? 1
-            : rowA[field] === rowB[field]
-            ? 0
-            : -1;
-        } else if (sortState === -1) {
-          return rowA[field] < rowB[field]
-            ? 1
-            : rowA[field] === rowB[field]
-            ? 0
-            : -1;
-        } else {
-          return 0;
-        }
-      })
-      .sort((rowA: TableRow, rowB: TableRow) => {
-        return rowA.isTotal && !rowB.isTotal
-          ? -1
-          : rowA.isTotal && rowB.isTotal
+    rows.sort((rowA: TableRow, rowB: TableRow) => {
+      const sortState = this.sortStates[field];
+      if (sortState === 1) {
+        return rowA[field] > rowB[field]
+          ? 1
+          : rowA[field] === rowB[field]
           ? 0
-          : 1;
-      });
+          : -1;
+      } else if (sortState === -1) {
+        return rowA[field] < rowB[field]
+          ? 1
+          : rowA[field] === rowB[field]
+          ? 0
+          : -1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   /** updateRows

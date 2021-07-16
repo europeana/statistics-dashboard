@@ -230,8 +230,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param {string} qfVal - the specific item's value for the currently-selected facet
   /* returns the (portal) url for a specific item
   */
-  getUrlRow(qfVal: string): string {
-    return `${environment.serverPortal}${this.getUrl()}&qf=${
+  getUrlRow(qfVal?: string): string {
+    const rootUrl = `${environment.serverPortal}${this.getUrl()}`;
+    if (!qfVal) {
+      return rootUrl;
+    }
+    return `${rootUrl}&qf=${
       this.form.value.facetParameter
     }:"${encodeURIComponent(qfVal)}"`;
   }

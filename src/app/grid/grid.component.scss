@@ -50,6 +50,12 @@ a {
   border-right: 1px solid $gray-5;
 }
 
+.cell-summary-name {
+  .series-colour {
+    margin: 0 12px 0 0;
+  }
+}
+
 .container-h {
   align-items: center;
   display: flex;
@@ -66,7 +72,7 @@ a {
   }
 
   &.with-series {
-    grid-template-columns: minmax(8em, 3fr) minmax(8em, 3fr) auto auto auto;
+    grid-template-columns: minmax(8em, 3fr) auto auto auto auto;
 
     > .cell-name {
       border-right: 0;

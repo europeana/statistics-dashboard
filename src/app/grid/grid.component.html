@@ -1,4 +1,23 @@
 <div *ngIf="gridRows">
+  <ng-template #linkOut let-row="row" let-total="row.isTotal">
+    <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
+      <a
+        target="_blank"
+        class="link-out"
+        [href]="getUrlRow(total ? null : row.name)"
+      ></a>
+    </span>
+  </ng-template>
+
+  <ng-template #seriesColour let-row="row">
+    <span
+      class="series-colour"
+      [ngStyle]="{
+        backgroundColor: colours[row['colourIndex']]
+      }"
+    ></span>
+  </ng-template>
+
   <div class="data-grid" [ngClass]="{ 'with-series': showingSeriesInfo }">
     <span class="cell-wide search-control container-h">
       <span class="search-icon"></span>
@@ -40,7 +59,7 @@
     </span>
 
     <span
-      class="cell-header"
+      class="cell-header text-right"
       data-e2e="grid-sort-count"
       [ngClass]="{
         active: sortStates['count'] !== 0,
@@ -50,7 +69,7 @@
     >
 
     <span
-      class="cell-header"
+      class="cell-header text-right"
       [ngClass]="{
         active: sortStates['percent'] !== 0,
         descending: sortStates['percent'] === -1
@@ -61,6 +80,32 @@
     <span class="cell-header">View in Europeana</span>
 
     <ng-container *ngIf="pagerInfo">
+      <!-- Summary rows -->
+
+      <ng-container *ngFor="let row of summaryRows">
+        <span class="cell-summary-name cell-wide">
+          <span class="container-h" style="background: pink; min-width: 0">
+            <ng-content
+              *ngTemplateOutlet="seriesColour; context: { row: row }"
+            ></ng-content>
+            <!--
+          <app-truncate [text]="row.series"></app-truncate>
+          -->
+            {{ row.series }}
+          </span>
+        </span>
+        <span class="text-right">
+          {{ row.count }}
+        </span>
+        <span class="text-right"> {{ row.percent }}% </span>
+
+        <ng-content
+          *ngTemplateOutlet="linkOut; context: { row: row }"
+        ></ng-content>
+      </ng-container>
+
+      <!-- Rows -->
+
       <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
         <span
           class="cell-name"
@@ -76,15 +121,14 @@
           class="cell-series container-h"
           [ngClass]="{ highlight: row.highlight }"
         >
-          <span
-            class="series-colour"
-            [ngStyle]="{
-              backgroundColor: colours[row['colourIndex']]
-            }"
-          ></span>
+          <ng-content
+            *ngTemplateOutlet="seriesColour; context: { row: row }"
+          ></ng-content>
+          <!--
           <span class="series-info" [title]="row.series">
-            <app-truncate [text]="row.series"></app-truncate>
+            {{ row.series }}
           </span>
+          -->
         </span>
 
         <span
@@ -101,9 +145,9 @@
           {{ row.percent }}%
         </span>
 
-        <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
-          <a target="_blank" class="link-out" [href]="getUrlRow(row.name)"></a>
-        </span>
+        <ng-content
+          *ngTemplateOutlet="linkOut; context: { row: row }"
+        ></ng-content>
       </ng-container>
     </ng-container>
   </div>
