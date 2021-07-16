@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { colours } from '../_data';
-import { FmtTableData, HeaderNameType, TableRow } from '../_models';
+import { FmtTableData, HeaderNameType, PagerInfo, TableRow } from '../_models';
+import { GridPaginatorComponent } from '../grid-paginator';
 
 @Component({
   selector: 'app-grid',
@@ -11,9 +12,17 @@ export class GridComponent {
   @Input() getUrl: (s: string) => string;
   @Input() getUrlRow: (s: string) => string;
   @Input() title: string;
+  @ViewChild('paginator') paginator: GridPaginatorComponent;
 
   filterString = '';
   pageRows: Array<TableRow>;
+
+  maxPageSize = 10;
+  maxPageSizes = [5, 10, 15].map((option: number) => {
+    return { title: `${option}`, value: option };
+  });
+  pagesAvailable = 0;
+
   unfilteredPageRows = [];
   sortStates = {
     count: 0,
@@ -47,6 +56,24 @@ export class GridComponent {
     });
   }
 
+  /** bumpSortState
+  /* Moves sort state one iteration through (looped) sequence -1, 0, 1
+  /* Clears other sort states
+  /* @param { string : header }
+  **/
+  bumpSortState(header: string): void {
+    const ss = this.sortStates;
+    let val = ss[header];
+    val += 1;
+    if (val > 1) {
+      val = -1;
+    }
+    Object.keys(ss).forEach((key: string) => {
+      ss[key] = 0;
+    });
+    ss[header] = val;
+  }
+
   getData(): FmtTableData {
     return {
       columns: ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
@@ -66,12 +93,18 @@ export class GridComponent {
     });
   }
 
-  /** isHeaderActive
-  /* template utility
-  /* @param { string : state }
+  /** goToPage
+  /* @param { KeyboardEvent : event }
   **/
-  isHeaderActive(state: string): boolean {
-    return this.sortStates[state] !== 0;
+  goToPage(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      const input = event.target as HTMLInputElement;
+      const val = input.value.replace(/\D/g, '');
+      if (val.length > 0) {
+        const pageNum = parseInt(val);
+        this.paginator.setPage(Math.min(this.pagesAvailable, pageNum) - 1);
+      }
+    }
   }
 
   /** setRows
@@ -82,30 +115,18 @@ export class GridComponent {
     this.updateRows();
   }
 
-  /** setPage
-  /* called from pager when page changes - sets pageRows
+  /** setPagerInfo
+  /* handle page info from pager when page changes
   /* @param { Array<TableRow> : rows } - the rows
   **/
-  setPage(rows: Array<TableRow>): void {
+  setPagerInfo(pagerInfo: PagerInfo): void {
+    const rows = pagerInfo.rows;
     this.pageRows = rows;
-  }
 
-  /** bumpSortState
-  /* Moves sort state one iteration through (looped) sequence -1, 0, 1
-  /* Clears other sort states
-  /* @param { string : header }
-  **/
-  bumpSortState(header: string): void {
-    const ss = this.sortStates;
-    let val = ss[header];
-    val += 1;
-    if (val > 1) {
-      val = -1;
-    }
-    Object.keys(ss).forEach((key: string) => {
-      ss[key] = 0;
-    });
-    ss[header] = val;
+    const fn = (): void => {
+      this.pagesAvailable = pagerInfo.pageCount;
+    };
+    setTimeout(fn, 0);
   }
 
   /** sort

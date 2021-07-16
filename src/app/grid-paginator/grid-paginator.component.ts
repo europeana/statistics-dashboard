@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { TableRow } from '../_models';
+import { PagerInfo, TableRow } from '../_models';
 
 @Component({
   selector: 'app-grid-paginator',
@@ -12,22 +12,30 @@ export class GridPaginatorComponent {
     this.setPage(0);
   }
 
-  @Output() change: EventEmitter<Array<TableRow>> = new EventEmitter();
+  @Input() set maxPageSize(maxPageSize: number) {
+    this._maxPageSize = maxPageSize;
+    if (this.pages) {
+      const allPages = this.pages[0].concat(...this.pages.splice(1));
+      this.pages = this.calculatePages(allPages);
+      this.setPage(0);
+    }
+  }
+  @Output() change: EventEmitter<PagerInfo> = new EventEmitter();
 
   activePageIndex = 0;
   pages: Array<Array<TableRow>>;
-  maxPageSize = 10;
+  _maxPageSize = 10;
   totalPageCount: number;
 
   calculatePages(rows: Array<TableRow>): Array<Array<TableRow>> {
     const pages = ([] = Array.from(
       {
-        length: Math.ceil(rows.length / this.maxPageSize)
+        length: Math.ceil(rows.length / this._maxPageSize)
       },
       (v, i: number) => {
         return rows.slice(
-          i * this.maxPageSize,
-          i * this.maxPageSize + this.maxPageSize
+          i * this._maxPageSize,
+          i * this._maxPageSize + this._maxPageSize
         );
       }
     ));
@@ -46,6 +54,9 @@ export class GridPaginatorComponent {
 
   setPage(index: number): void {
     this.activePageIndex = index;
-    this.change.emit(this.pages[index]);
+    this.change.emit({
+      pageCount: this.pages.length,
+      rows: this.pages[index]
+    });
   }
 }

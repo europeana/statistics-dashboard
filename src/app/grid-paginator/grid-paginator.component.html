@@ -1,15 +1,6 @@
 <ul *ngIf="pages && pages.length > 1" class="paginator">
   <li>
     <a
-      (click)="setPage(0)"
-      [ngClass]="{ disabled: !canPrev() }"
-      href="javascript:void(0)"
-      >&lt;&lt;</a
-    >
-  </li>
-
-  <li>
-    <a
       data-e2e="grid-page-prev"
       (click)="setPage(activePageIndex - 1)"
       [ngClass]="{ disabled: !canPrev() }"
@@ -32,14 +23,6 @@
       (click)="setPage(activePageIndex + 1)"
       [ngClass]="{ disabled: !canNext() }"
       >&gt;</a
-    >
-  </li>
-
-  <li>
-    <a
-      (click)="setPage(totalPageCount - 1)"
-      [ngClass]="{ disabled: !canNext() }"
-      >&gt;&gt;</a
     >
   </li>
 </ul>
