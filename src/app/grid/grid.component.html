@@ -61,50 +61,50 @@
     <span class="cell-header">View in Europeana</span>
 
     <ng-container *ngIf="pagerInfo">
-    <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
-      <span
-        class="cell-name"
-        [ngClass]="{ highlight: row.highlight }"
-        data-e2e="grid-row-name"
-        [title]="row.name"
-      >
-        <app-truncate [text]="row.name"></app-truncate>
-      </span>
-
-      <span
-        *ngIf="showingSeriesInfo"
-        class="cell-series container-h"
-        [ngClass]="{ highlight: row.highlight }"
-      >
+      <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
         <span
-          class="series-colour"
-          [ngStyle]="{
-            backgroundColor: colours[row['colourIndex']]
-          }"
-        ></span>
-        <span class="series-info" [title]="row.series">
-          <app-truncate [text]="row.series"></app-truncate>
+          class="cell-name"
+          [ngClass]="{ highlight: row.highlight }"
+          data-e2e="grid-row-name"
+          [title]="row.name"
+        >
+          <app-truncate [text]="row.name"></app-truncate>
         </span>
-      </span>
 
-      <span
-        class="text-right"
-        [ngClass]="{
-          highlight: row.highlight,
-          bold: row.isTotal
-        }"
-      >
-        {{ row.count }}
-      </span>
+        <span
+          *ngIf="showingSeriesInfo"
+          class="cell-series container-h"
+          [ngClass]="{ highlight: row.highlight }"
+        >
+          <span
+            class="series-colour"
+            [ngStyle]="{
+              backgroundColor: colours[row['colourIndex']]
+            }"
+          ></span>
+          <span class="series-info" [title]="row.series">
+            <app-truncate [text]="row.series"></app-truncate>
+          </span>
+        </span>
 
-      <span class="text-right" [ngClass]="{ highlight: row.highlight }">
-        {{ row.percent }}%
-      </span>
+        <span
+          class="text-right"
+          [ngClass]="{
+            highlight: row.highlight,
+            bold: row.isTotal
+          }"
+        >
+          {{ row.count }}
+        </span>
 
-      <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
-        <a target="_blank" class="link-out" [href]="getUrlRow(row.name)"></a>
-      </span>
-    </ng-container>
+        <span class="text-right" [ngClass]="{ highlight: row.highlight }">
+          {{ row.percent }}%
+        </span>
+
+        <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
+          <a target="_blank" class="link-out" [href]="getUrlRow(row.name)"></a>
+        </span>
+      </ng-container>
     </ng-container>
   </div>
 </div>

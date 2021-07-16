@@ -22,7 +22,7 @@ export class GridComponent {
 
   pagerInfo: PagerInfo;
 
-  unfilteredPageRows = [];
+  unfilteredPageRows: Array<TableRow> = [];
   sortStates = {
     count: 0,
     percent: 0
@@ -87,8 +87,10 @@ export class GridComponent {
   **/
   getFilteredRows(): Array<TableRow> {
     const filter = this.filterString;
-    return this.unfilteredPageRows.filter(function (d) {
-      return d.name.toLowerCase().indexOf(filter) !== -1 || !filter;
+    return this.unfilteredPageRows.filter(function (tr: TableRow) {
+      return (
+        tr.isTotal || tr.name.toLowerCase().indexOf(filter) !== -1 || !filter
+      );
     });
   }
 
@@ -101,7 +103,7 @@ export class GridComponent {
       const val = input.value.replace(/\D/g, '');
       if (val.length > 0) {
         const pageNum = Math.min(this.pagerInfo.pageCount, parseInt(val));
-        this.paginator.setPage(pageNum - 1);
+        this.paginator.setPage(Math.max(0, pageNum - 1));
       }
       input.value = '';
     }
@@ -141,24 +143,32 @@ export class GridComponent {
   /* @param { string : field } - the field to sort on
   **/
   sortRows(rows: Array<TableRow>, field: string): void {
-    rows.sort((rowA: TableRow, rowB: TableRow) => {
-      const sortState = this.sortStates[field];
-      if (sortState === 1) {
-        return rowA[field] > rowB[field]
-          ? 1
-          : rowA[field] === rowB[field]
+    rows
+      .sort((rowA: TableRow, rowB: TableRow) => {
+        const sortState = this.sortStates[field];
+        if (sortState === 1) {
+          return rowA[field] > rowB[field]
+            ? 1
+            : rowA[field] === rowB[field]
+            ? 0
+            : -1;
+        } else if (sortState === -1) {
+          return rowA[field] < rowB[field]
+            ? 1
+            : rowA[field] === rowB[field]
+            ? 0
+            : -1;
+        } else {
+          return 0;
+        }
+      })
+      .sort((rowA: TableRow, rowB: TableRow) => {
+        return rowA.isTotal && !rowB.isTotal
+          ? -1
+          : rowA.isTotal && rowB.isTotal
           ? 0
-          : -1;
-      } else if (sortState === -1) {
-        return rowA[field] < rowB[field]
-          ? 1
-          : rowA[field] === rowB[field]
-          ? 0
-          : -1;
-      } else {
-        return 0;
-      }
-    });
+          : 1;
+      });
   }
 
   /** updateRows
