@@ -121,26 +121,43 @@ export class SnapshotsComponent {
     seriesKeys: Array<string>
   ): Array<TableRow> {
     const allKeysInAllSeries: { [groupName: string]: true } = {};
+    const result: Array<TableRow> = [];
+    const cds = this.compareDataAllFacets[facetName];
+
+    // sort series keys (by pinIndex)
+
+    this.getSortKeys(seriesKeys);
+
+    // collect all possible category values and assign totals
 
     seriesKeys.forEach((seriesKey: string) => {
-      const cd = this.compareDataAllFacets[facetName][seriesKey];
+      const cd = cds[seriesKey];
+
       Object.keys(cd.data).forEach((key: string) => {
         allKeysInAllSeries[key] = true;
       });
+
+      result.push({
+        name: 'Total', // name will not be shown in the grid
+        count: cd.total,
+        isTotal: true,
+        percent: 100,
+        colourIndex: cd._colourIndex,
+        series: cd.label
+      });
     });
 
-    const result: Array<TableRow> = [];
+    // interpolate rows: check all series for category value's groupKey - add row if it has data
 
     Object.keys(allKeysInAllSeries).forEach((groupKey: string) => {
-      // check all series for groupKey
-
       seriesKeys.forEach((seriesKey: string) => {
-        const cd = this.compareDataAllFacets[facetName][seriesKey];
+        const cd = cds[seriesKey];
+        const count = cd.data[groupKey];
 
-        if (cd.data[groupKey]) {
+        if (count) {
           result.push({
             name: groupKey as HeaderNameType,
-            count: cd.data[groupKey],
+            count: count,
             percent: cd.dataPercent[groupKey],
             colourIndex: cd._colourIndex,
             series: cd.label
@@ -172,9 +189,14 @@ export class SnapshotsComponent {
     cdd.current = true;
   }
 
-  getSortKeys(): Array<string> {
+  getSortKeys(keys?: Array<string>): Array<string> {
     const cd = this.compareDataAllFacets[this._facetName];
-    return Object.keys(cd).sort((keyA: string, keyB: string) => {
+
+    if (!keys) {
+      keys = Object.keys(cd);
+    }
+
+    return keys.sort((keyA: string, keyB: string) => {
       const indexA = cd[keyA].pinIndex;
       const indexB = cd[keyB].pinIndex;
       return indexB - indexA;

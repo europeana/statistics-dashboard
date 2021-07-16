@@ -55,8 +55,9 @@ export class GridPaginatorComponent {
   setPage(index: number): void {
     this.activePageIndex = index;
     this.change.emit({
+      currentPage: index,
       pageCount: this.pages.length,
-      rows: this.pages[index]
+      pageRows: this.pages[index]
     });
   }
 }

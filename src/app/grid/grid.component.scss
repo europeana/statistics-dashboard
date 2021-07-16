@@ -3,6 +3,10 @@
 
 $series-colour-width: 3px;
 
+.bold {
+  font-weight: 600;
+}
+
 .cell-header {
   border-top: 1px solid $gray-5;
   position: relative;
@@ -62,8 +66,7 @@ a {
   }
 
   &.with-series {
-    //grid-template-columns: minmax(8em, 3fr) auto auto auto auto;
-    grid-template-columns: minmax(8em, 4fr) minmax(8em, 2fr) auto auto auto;
+    grid-template-columns: minmax(8em, 3fr) minmax(8em, 3fr) auto auto auto;
 
     > .cell-name {
       border-right: 0;
@@ -85,15 +88,27 @@ a {
   }
 }
 
-.highlight {
-  background-color: $offwhite;
+.go-to,
+.max-page-size,
+.search {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  width: 35px;
 }
 
 .go-to,
 .max-page-size {
-  background: transparent;
-  border: 0;
-  width: 35px;
+  border-bottom: 1px dashed $gray-5;
+}
+
+.go-to {
+  text-align: center;
+  width: 24px;
+}
+
+.highlight {
+  background-color: $offwhite;
 }
 
 .link-out {
@@ -103,22 +118,28 @@ a {
   height: 12px;
 }
 
+.max-page-size {
+  color: $gray-faint;
+}
+
 .navigation-controls {
+  font-size: 10px;
   justify-content: space-between;
 }
 
 .search {
-  border: none;
-  box-shadow: none;
   margin-left: 4px;
   width: 100%;
+}
+
+.search-control {
+  font-size: 11px;
 }
 
 .search-control,
 .navigation-controls {
   border-top: 1px solid $gray-5;
   color: $gray-faint;
-  font-size: 11px;
 }
 
 .search-icon {

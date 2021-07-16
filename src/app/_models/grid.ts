@@ -1,6 +1,7 @@
 import { TableRow } from '.';
 
 export interface PagerInfo {
+  currentPage: number;
   pageCount: number;
-  rows: Array<TableRow>;
+  pageRows: Array<TableRow>;
 }

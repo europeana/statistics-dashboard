@@ -1,11 +1,11 @@
 <ul *ngIf="pages && pages.length > 1" class="paginator">
   <li>
     <a
+      class="previous"
       data-e2e="grid-page-prev"
       (click)="setPage(activePageIndex - 1)"
       [ngClass]="{ disabled: !canPrev() }"
-      >&lt;</a
-    >
+    ></a>
   </li>
 
   <li *ngFor="let page of pages; let i = index">
@@ -19,10 +19,10 @@
 
   <li>
     <a
+      class="next"
       data-e2e="grid-page-next"
       (click)="setPage(activePageIndex + 1)"
       [ngClass]="{ disabled: !canNext() }"
-      >&gt;</a
-    >
+    ></a>
   </li>
 </ul>

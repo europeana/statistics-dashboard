@@ -1,3 +1,4 @@
+// TODO: rm
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
 export interface IHashString {
@@ -18,12 +19,13 @@ export interface FilterState {
 }
 
 export interface TableRow {
-  name: HeaderNameType;
+  name: string;
   count: number;
   percent: number;
   colourIndex?: number;
   highlight?: boolean;
   series: string;
+  isTotal?: boolean;
 }
 
 export interface FmtTableData {

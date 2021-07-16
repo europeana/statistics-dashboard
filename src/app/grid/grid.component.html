@@ -11,15 +11,20 @@
     </span>
 
     <span class="navigation-controls container-h">
-      <span *ngIf="pagesAvailable > 1" class="container-h">
-        <span>Rows per page</span>
+      <span *ngIf="pagerInfo && pagerInfo.pageCount > 1" class="container-h">
+        <span>Rows per page:</span>
         <select class="max-page-size" [(ngModel)]="maxPageSize">
           <option *ngFor="let mps of maxPageSizes" [ngValue]="mps.value">
             {{ mps.title }}
           </option>
         </select>
-        <span>Go to</span>
-        <input pattern="[0-9]+" class="go-to" (keyup)="goToPage($event)" />
+        <span>Go to:</span>
+        <input
+          pattern="[0-9]+"
+          class="go-to"
+          (keyup)="goToPage($event)"
+          placeholder="{{ pagerInfo.currentPage + 1 }}"
+        />
       </span>
 
       <app-grid-paginator
@@ -55,7 +60,8 @@
 
     <span class="cell-header">View in Europeana</span>
 
-    <ng-container *ngFor="let row of pageRows; let i = index">
+    <ng-container *ngIf="pagerInfo">
+    <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
       <span
         class="cell-name"
         [ngClass]="{ highlight: row.highlight }"
@@ -81,7 +87,13 @@
         </span>
       </span>
 
-      <span class="text-right" [ngClass]="{ highlight: row.highlight }">
+      <span
+        class="text-right"
+        [ngClass]="{
+          highlight: row.highlight,
+          bold: row.isTotal
+        }"
+      >
         {{ row.count }}
       </span>
 
@@ -92,6 +104,7 @@
       <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
         <a target="_blank" class="link-out" [href]="getUrlRow(row.name)"></a>
       </span>
+    </ng-container>
     </ng-container>
   </div>
 </div>

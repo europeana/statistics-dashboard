@@ -15,13 +15,12 @@ export class GridComponent {
   @ViewChild('paginator') paginator: GridPaginatorComponent;
 
   filterString = '';
-  pageRows: Array<TableRow>;
-
   maxPageSize = 10;
   maxPageSizes = [5, 10, 15].map((option: number) => {
     return { title: `${option}`, value: option };
   });
-  pagesAvailable = 0;
+
+  pagerInfo: PagerInfo;
 
   unfilteredPageRows = [];
   sortStates = {
@@ -101,9 +100,10 @@ export class GridComponent {
       const input = event.target as HTMLInputElement;
       const val = input.value.replace(/\D/g, '');
       if (val.length > 0) {
-        const pageNum = parseInt(val);
-        this.paginator.setPage(Math.min(this.pagesAvailable, pageNum) - 1);
+        const pageNum = Math.min(this.pagerInfo.pageCount, parseInt(val));
+        this.paginator.setPage(pageNum - 1);
       }
+      input.value = '';
     }
   }
 
@@ -120,11 +120,8 @@ export class GridComponent {
   /* @param { Array<TableRow> : rows } - the rows
   **/
   setPagerInfo(pagerInfo: PagerInfo): void {
-    const rows = pagerInfo.rows;
-    this.pageRows = rows;
-
     const fn = (): void => {
-      this.pagesAvailable = pagerInfo.pageCount;
+      this.pagerInfo = pagerInfo;
     };
     setTimeout(fn, 0);
   }
