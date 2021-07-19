@@ -31,16 +31,21 @@ export class GridComponent {
   };
 
   gridRows: Array<TableRow>;
-  showingSeriesInfo = false;
+  isShowingSeriesInfo = false;
 
   public colours = colours;
 
   applyHighlights(rows: Array<TableRow>): void {
-    let highlight = true;
+    let highlight = false;
     let currName = '';
+    let displayIndex = 1;
     rows.forEach((row: TableRow) => {
       if (row.name !== currName) {
         highlight = !highlight;
+        row.displayIndex = displayIndex;
+        displayIndex++;
+      } else {
+        delete row.displayIndex;
       }
       currName = row.name;
       row.highlight = highlight;

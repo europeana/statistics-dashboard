@@ -1,4 +1,5 @@
 <span class="text-outer">
+  <app-resize [time]="debounceMS" (sizeChanged)="splitText()"></app-resize>
   <span class="text-left" #elRefTextLeft
     ><span>{{ textLeft }}</span></span
   >

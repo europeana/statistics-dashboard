@@ -18,8 +18,8 @@
     ></span>
   </ng-template>
 
-  <div class="data-grid" [ngClass]="{ 'with-series': showingSeriesInfo }">
-    <span class="cell-wide search-control container-h">
+  <div class="data-grid" [ngClass]="{ 'with-series': isShowingSeriesInfo }">
+    <span class="search-control container-h cell-first-wide">
       <span class="search-icon"></span>
       <input
         class="search"
@@ -30,15 +30,23 @@
     </span>
 
     <span class="navigation-controls container-h">
-      <span *ngIf="pagerInfo && pagerInfo.pageCount > 1" class="container-h">
-        <span>Rows per page:</span>
-        <select class="max-page-size" [(ngModel)]="maxPageSize">
+      <span
+        class="conditional-controls container-h"
+        *ngIf="pagerInfo && pagerInfo.pageCount > 1"
+      >
+        <label for="maxPageSize">Rows per page:</label>
+        <select
+          id="maxPageSize"
+          class="max-page-size"
+          [(ngModel)]="maxPageSize"
+        >
           <option *ngFor="let mps of maxPageSizes" [ngValue]="mps.value">
             {{ mps.title }}
           </option>
         </select>
-        <span>Go to:</span>
+        <label for="goTo">Go to:</label>
         <input
+          id="goTo"
           pattern="[0-9]+"
           class="go-to"
           (keyup)="goToPage($event)"
@@ -54,9 +62,7 @@
       ></app-grid-paginator>
     </span>
 
-    <span class="cell-header cell-wide">
-      {{ title }}
-    </span>
+    <span class="cell-header cell-first-wide"> Records by {{ title }} </span>
 
     <span
       class="cell-header text-right"
@@ -81,23 +87,29 @@
 
     <ng-container *ngIf="pagerInfo">
       <!-- Summary rows -->
+      <ng-template #labelTotal><span class="bold">Total</span></ng-template>
 
       <ng-container *ngFor="let row of summaryRows">
-        <span class="cell-summary-name cell-wide">
-          <span class="container-h" style="background: pink; min-width: 0">
-            <ng-content
-              *ngTemplateOutlet="seriesColour; context: { row: row }"
-            ></ng-content>
-            <!--
-          <app-truncate [text]="row.series"></app-truncate>
-          -->
+        <span class="cell-prefix">
+          <ng-container *ngIf="isShowingSeriesInfo">
+            <span class="container-h">
+              <ng-content
+                *ngTemplateOutlet="seriesColour; context: { row: row }"
+              ></ng-content>
+            </span>
+          </ng-container>
+        </span>
+
+        <span class="cell-name cell-wide">
+          <ng-container *ngIf="isShowingSeriesInfo; else labelTotal">
             {{ row.series }}
-          </span>
+          </ng-container>
         </span>
-        <span class="text-right">
-          {{ row.count }}
+
+        <span class="bold black text-right">
+          {{ row.count | number }}
         </span>
-        <span class="text-right"> {{ row.percent }}% </span>
+        <span class="black text-right"> {{ row.percent }}% </span>
 
         <ng-content
           *ngTemplateOutlet="linkOut; context: { row: row }"
@@ -107,6 +119,10 @@
       <!-- Rows -->
 
       <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
+        <span [ngClass]="{ highlight: row.highlight }">
+          {{ row.displayIndex }}
+        </span>
+
         <span
           class="cell-name"
           [ngClass]="{ highlight: row.highlight }"
@@ -117,14 +133,14 @@
         </span>
 
         <span
-          *ngIf="showingSeriesInfo"
+          *ngIf="isShowingSeriesInfo"
           class="cell-series container-h"
           [ngClass]="{ highlight: row.highlight }"
         >
           <ng-content
             *ngTemplateOutlet="seriesColour; context: { row: row }"
           ></ng-content>
-          <!--
+          <!-- TODO: do we need this text or is it redundant and unwieldy?
           <span class="series-info" [title]="row.series">
             {{ row.series }}
           </span>
@@ -138,7 +154,7 @@
             bold: row.isTotal
           }"
         >
-          {{ row.count }}
+          {{ row.count | number }}
         </span>
 
         <span class="text-right" [ngClass]="{ highlight: row.highlight }">

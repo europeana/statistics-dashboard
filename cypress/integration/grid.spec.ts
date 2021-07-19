@@ -52,9 +52,9 @@ context('statistics-dashboard', () => {
     it('should go to the user-typed page', () => {
       cy.visit('/data/COUNTRY');
       // assumes page of 10 entries
-      const pageOneCountries = ['Belgium', 'Greece'];
-      const pageTwoCountries = ['Holy See (Vatican City State)', 'Slovenia'];
-      const pageThreeCountries = ['Netherlands', 'Czech Republic'];
+      const pageOneCountries = ['Belgium', 'Holy See (Vatican City State)'];
+      const pageTwoCountries = ['Ireland', 'Netherlands'];
+      const pageThreeCountries = ['Iceland', 'Czech Republic'];
 
       assertRowLength(pageOneCountries, 1);
       assertRowLength(pageTwoCountries, 0);

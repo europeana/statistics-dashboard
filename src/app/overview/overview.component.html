@@ -5,11 +5,13 @@
     'loading-modal': isLoading && !allProcessedFacetData
   }"
 >
+  <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
+
   <div class="statistics-dashboard fit-to-page">
     <!-- Left -->
 
-    <div class="statistics-dashboard-left" *ngIf="!isShowingSearchList">
-      <div *ngIf="!isShowingSearchList">
+    <div class="statistics-dashboard-left">
+      <div>
         <ul class="filters">
           <li class="container-h">
             <span class="icon filter-icon-home"> </span>
@@ -79,7 +81,7 @@
         </ul>
       </div>
 
-      <ul class="filters inputs" *ngIf="!isShowingSearchList">
+      <ul class="filters inputs">
         <li class="container-h dataset-name-wrapper">
           <span class="icon filter-icon-dataset"></span>
           <input
@@ -98,7 +100,7 @@
     <div class="statistics-dashboard-right">
       <!-- Header -->
 
-      <div class="header-bar" [ngClass]="{ 'list-mode': isShowingSearchList }">
+      <div class="header-bar">
         <ng-container *ngIf="!form.value.facetParameter">
           <h3 class="header-data">Select a facet dimension</h3>
         </ng-container>
@@ -123,16 +125,31 @@
             ></span>
           </h3>
         </ng-container>
-        <ng-container *ngIf="allProcessedFacetData">
-          <h3 class="link-list">
-            <a (click)="setIsShowingSearchList(true)" *ngIf="!isLoading"
-              >Show List</a
+
+        <ul
+          *ngIf="allProcessedFacetData"
+          (clickOutside)="closeDisplayOptions()"
+        >
+          <li>
+            <a #downloadAnchor></a>
+          </li>
+
+          <li class="dropdown">
+            <a
+              class="menu-opener"
+              (click)="toggleDownloadOptions()"
+              [ngClass]="{ open: downloadOptionsOpen }"
+              ><h3 style="padding-top: 3px">Downloads</h3></a
             >
-          </h3>
-          <h3 class="link-data">
-            <a (click)="setIsShowingSearchList(false)">Show Data</a>
-          </h3>
-        </ng-container>
+            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
+              <ul class="dropdown-content">
+                <li *ngFor="let exportType of exportTypes">
+                  <a (click)="export(exportType)">{{ exportType }}</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
 
         <ng-container *ngIf="form.value.dateFrom && form.value.dateTo">
           <span class="date-removal" data-e2e="date-summary">
@@ -156,7 +173,7 @@
 
       <!-- Filter removal -->
 
-      <ul class="rm-filters" [ngClass]="{ 'list-mode': isShowingSearchList }">
+      <ul class="rm-filters">
         <ng-container *ngFor="let filter of facetConf">
           <ng-container *ngIf="filter !== form.value.facetParameter">
             <ng-container *ngFor="let option of getSetCheckboxValues(filter)">
@@ -182,27 +199,9 @@
         </ng-container>
       </ul>
 
-      <ng-container *ngIf="isShowingSearchList">
-        <app-listing [showing]="true"></app-listing>
-      </ng-container>
-
       <!-- Data Area -->
       <div class="data-area">
-        <label
-          [ngStyle]="{
-            display: isShowingSearchList ? 'none' : 'inline-block'
-          }"
-          ><input
-            type="checkbox"
-            formControlName="showPercent"
-            (change)="togglePercent()"
-          />As percentages</label
-        >
-
-        <div
-          class="chart-wrapper"
-          [ngClass]="{ showing: !isShowingSearchList }"
-        >
+        <div class="chart-wrapper">
           <app-bar-chart
             #barChart
             [showPercent]="form.value.showPercent"
@@ -216,6 +215,14 @@
           ></app-bar-chart>
         </div>
 
+        <label style="position: relative; float: right; top: -4px; right: 4px"
+          >As percentages
+          <input
+            type="checkbox"
+            formControlName="showPercent"
+            (change)="refreshChart()"
+        /></label>
+
         <!-- SNAPSHOTS -->
         <ng-container *ngIf="experimental">
           <app-snapshots
@@ -228,39 +235,10 @@
         </ng-container>
         <!-- END SNAPSHOTS -->
 
-        <ul
-          *ngIf="allProcessedFacetData"
-          class="options-wrapper"
-          [ngClass]="{ showing: !isShowingSearchList }"
-          (clickOutside)="closeDisplayOptions()"
-        >
-          <li>
-            <a #downloadAnchor></a>
-          </li>
-
-          <li class="dropdown">
-            <a
-              class="menu-opener"
-              (click)="toggleDownloadOptions()"
-              [ngClass]="{ open: downloadOptionsOpen }"
-              ><h3>Downloads</h3></a
-            >
-            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
-              <ul class="dropdown-content">
-                <li *ngFor="let exportType of exportTypes">
-                  <a (click)="export(exportType)">{{ exportType }}</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-
         <app-grid
           #grid
           id="grid"
-          title="Europeana database by {{
-            form.value.facetParameter | renameApiFacet
-          }}"
+          title="{{ form.value.facetParameter | renameApiFacet }}"
           [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
         ></app-grid>

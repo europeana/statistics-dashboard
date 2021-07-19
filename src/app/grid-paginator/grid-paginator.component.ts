@@ -24,32 +24,42 @@ export class GridPaginatorComponent {
 
   activePageIndex = 0;
   pages: Array<Array<TableRow>>;
+  ranges: Array<Array<number>>;
   _maxPageSize = 10;
   totalPageCount: number;
+  totalRows: number;
 
   calculatePages(rows: Array<TableRow>): Array<Array<TableRow>> {
-    const pages = ([] = Array.from(
+    const ranges = ([] = Array.from(
       {
         length: Math.ceil(rows.length / this._maxPageSize)
       },
       (v, i: number) => {
-        return rows.slice(
-          i * this._maxPageSize,
-          i * this._maxPageSize + this._maxPageSize
-        );
+        const lowerIndex = i * this._maxPageSize;
+        const upperIndex = i * this._maxPageSize + this._maxPageSize;
+        return [lowerIndex, upperIndex];
       }
     ));
 
+    const pages = ranges.map((range: Array<number>) => {
+      return rows.slice(range[0], range[1]);
+    });
+
+    this.ranges = ranges.map((range: Array<number>) => {
+      return [range[0] + 1, Math.min(range[1], rows.length)];
+    });
+
+    this.totalRows = rows.length;
     this.totalPageCount = pages.length;
     return pages;
   }
 
-  canPrev(): boolean {
-    return this.activePageIndex > 0;
-  }
-
   canNext(): boolean {
     return this.activePageIndex + 1 < this.totalPageCount;
+  }
+
+  canPrev(): boolean {
+    return this.activePageIndex > 0;
   }
 
   setPage(index: number): void {

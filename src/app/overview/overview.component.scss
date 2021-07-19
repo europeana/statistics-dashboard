@@ -7,40 +7,13 @@ $width-left-col: 200px;
   margin-left: $spacing-s;
 }
 
-.date-removal {
-  margin-left: auto;
-  .date + .date {
-    margin-left: $spacing-m;
-  }
+.date-removal .date + .date {
+  margin-left: $spacing-m;
 }
 
 .header-bar {
   display: flex;
-
-  .link-list a {
-    padding-left: 0.4em;
-    &::before {
-      content: "/ ";
-    }
-  }
-  &.list-mode {
-    .header-data,
-    .link-list {
-      display: none;
-    }
-  }
-
-  &:not(.list-mode) {
-    .link-data {
-      display: none;
-    }
-    .link-list {
-      opacity: 0.1;
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
+  justify-content: space-between;
 }
 
 .menu-opener {
@@ -54,6 +27,10 @@ $width-left-col: 200px;
 
 .rm-filter.dead-facet {
   opacity: 0.4;
+}
+
+.rm-filters {
+  margin-top: $spacing-s;
 }
 
 .menu-opener.disabled {
@@ -109,19 +86,6 @@ app-overview {
 
 datatable-scroller {
   width: 100% !important;
-}
-
-.chart-wrapper,
-.options-wrapper {
-  transition: opacity 1s ease-in-out;
-  opacity: 0;
-  &.showing {
-    opacity: 1;
-  }
-  &:not(.showing) {
-    max-height: 0;
-    overflow: hidden;
-  }
 }
 
 .table-footer {
@@ -207,8 +171,14 @@ label {
 
 .dropdown {
   position: relative;
-  a.open::after {
-    transform: rotate(180deg);
+  & > .menu-opener {
+    color: $gray-med;
+    &:hover::after {
+      border-top-color: $gray-med;
+    }
+    &.open::after {
+      transform: rotate(180deg);
+    }
   }
 }
 
@@ -221,10 +191,10 @@ label {
   padding: 1em;
 }
 
-.chart-wrapper.showing {
-  height: 500px;
+.chart-wrapper {
+  height: 300px;
+  margin: 0 -$spacing-s;
   max-width: 100%;
-  padding: $spacing-m 0;
 }
 
 .data-area {
@@ -239,7 +209,6 @@ label {
   border-bottom: 1px dashed $near-black;
   cursor: pointer;
   font-weight: 600;
-  margin-bottom: 20px;
   text-indent: 0;
 }
 

@@ -21,6 +21,7 @@ export interface FilterState {
 export interface TableRow {
   name: string;
   count: number;
+  displayIndex?: number;
   percent: number;
   colourIndex?: number;
   highlight?: boolean;

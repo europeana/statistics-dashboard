@@ -19,8 +19,8 @@ import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
 import { GridComponent } from './grid';
 import { GridPaginatorComponent } from './grid-paginator';
-import { ListingComponent } from './listing/listing.component';
 import { OverviewComponent } from './overview/overview.component';
+import { ResizeComponent } from './resize';
 import { SplashComponent } from './splash/splash.component';
 import { SnapshotsComponent } from './snapshots/snapshots.component';
 import { TruncateComponent } from './truncate';
@@ -37,11 +37,11 @@ import { DatesComponent } from './dates/dates.component';
     GridComponent,
     GridPaginatorComponent,
     HeaderComponent,
-    ListingComponent,
     MapComponent,
     OverviewComponent,
     RenameApiFacetPipe,
     RenameRightsPipe,
+    ResizeComponent,
     SplashComponent,
     SnapshotsComponent,
     TruncateComponent

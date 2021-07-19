@@ -2,6 +2,12 @@
 @import "../../scss/functions/_icon_urls";
 
 $series-colour-width: 3px;
+$space-cell-v: 7px;
+
+label[for="goTo"],
+label[for="maxPageSize"] {
+  white-space: nowrap;
+}
 
 .bold {
   font-weight: 600;
@@ -13,31 +19,30 @@ $series-colour-width: 3px;
 
   &.active {
     font-weight: 600;
-    &::after {
+    &::before {
       content: "⌄";
     }
   }
-  &.descending::after {
-    top: 3px;
-    transform: rotate(0deg);
+  &.descending::before {
+    transform: translateY(-2px) rotate(0deg);
   }
-
-  &::after {
-    line-height: 12px;
-    position: absolute;
-    right: $spacing-s;
-    top: 10px;
-    transform: rotate(180deg);
+  &::before {
+    display: inline-block;
+    transform: translateY(4px) rotate(180deg);
   }
 }
 
+.black,
 .cell-header,
+.cell-name,
 a {
   color: #000;
 }
 
 .cell-link-out {
-  text-align: center;
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
 }
 
 .cell-name {
@@ -45,15 +50,14 @@ a {
   font-weight: 600;
 }
 
-.cell-series,
-.cell-wide {
-  border-right: 1px solid $gray-5;
+.cell-prefix {
+  padding: $space-cell-v $spacing-s $space-cell-v 0;
 }
 
-.cell-summary-name {
-  .series-colour {
-    margin: 0 12px 0 0;
-  }
+.cell-series,
+.cell-first-wide,
+.cell-wide {
+  border-right: 1px solid $gray-5;
 }
 
 .container-h {
@@ -65,30 +69,41 @@ a {
 .data-grid {
   display: grid;
   font-size: 12px;
-  grid-template-columns: minmax(8em, 3fr) auto auto auto;
+  grid-template-columns: auto minmax(8em, 3fr) auto auto auto;
 
   > .navigation-controls {
-    grid-column: 2 / 5;
+    grid-column: 3 / 6;
+  }
+
+  > .cell-first-wide {
+    grid-column: 1 / 3;
   }
 
   &.with-series {
-    grid-template-columns: minmax(8em, 3fr) auto auto auto auto;
+    grid-template-columns: auto minmax(8em, 3fr) auto auto auto auto;
 
-    > .cell-name {
+    > .cell-name:not(.cell-wide) {
       border-right: 0;
     }
 
     > .cell-wide {
-      grid-column: 1 / 3;
+      grid-column: 2 / 4;
     }
+
+    > .cell-first-wide {
+      grid-column: 1 / 4;
+    }
+
     > .navigation-controls {
-      grid-column: 3 / 6;
+      grid-column: 4 / 7;
     }
   }
 
   > span {
-    padding: 2px 20px;
-    &:not(.navigation-controls, .search-control) {
+    &:not(.cell-prefix) {
+      padding: $space-cell-v 8px;
+    }
+    &:not(.cell-header, .navigation-controls, .search-control) {
       border-bottom: 1px solid $gray-5;
     }
   }
@@ -105,12 +120,15 @@ a {
 
 .go-to,
 .max-page-size {
-  border-bottom: 1px dashed $gray-5;
+  border-bottom: 1px solid $gray-5;
 }
 
 .go-to {
+  border-radius: 0;
+  font-size: 10px;
+  margin-right: 12px;
   text-align: center;
-  width: 24px;
+  width: 20px;
 }
 
 .highlight {
@@ -118,19 +136,36 @@ a {
 }
 
 .link-out {
-  background: svg-url-icon-external($gray-faint) no-repeat;
-  display: inline-block;
-  width: 12px;
   height: 12px;
+  &::after {
+    content: "";
+    background-image: svg-url-icon-external($gray-faint);
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .max-page-size {
-  color: $gray-faint;
+  color: $gray-med;
+  font-size: 10px;
+  margin-right: 4px;
+  padding: 0;
+
+  &:focus {
+    color: #000;
+  }
 }
 
 .navigation-controls {
-  font-size: 10px;
-  justify-content: space-between;
+  color: $gray-med;
+  font-size: 11px;
+  justify-content: flex-end;
+  .conditional-controls {
+    margin-right: auto;
+  }
 }
 
 .search {
@@ -139,13 +174,13 @@ a {
 }
 
 .search-control {
+  color: $gray-faint;
   font-size: 11px;
 }
 
 .search-control,
 .navigation-controls {
   border-top: 1px solid $gray-5;
-  color: $gray-faint;
 }
 
 .search-icon {
@@ -158,7 +193,6 @@ a {
 .series-colour {
   display: inline-block;
   height: 18px;
-  margin: 0 5px 0 12px;
   min-width: $series-colour-width;
   width: $series-colour-width;
 }

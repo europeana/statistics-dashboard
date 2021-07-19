@@ -5,6 +5,7 @@ import {
   TestBed,
   tick
 } from '@angular/core/testing';
+import { ResizeComponent } from '../resize';
 import { TruncateComponent } from './';
 
 describe('TruncateComponent', () => {
@@ -12,7 +13,9 @@ describe('TruncateComponent', () => {
   let fixture: ComponentFixture<TruncateComponent>;
 
   const configureTestBed = (): void => {
-    TestBed.configureTestingModule({}).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [TruncateComponent, ResizeComponent]
+    }).compileComponents();
   };
 
   beforeEach(async(() => {

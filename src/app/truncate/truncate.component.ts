@@ -1,16 +1,11 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
-import { fromEvent } from 'rxjs';
-import { debounceTime, tap } from 'rxjs/operators';
-
-import { SubscriptionManager } from '../subscription-manager';
-
 @Component({
   selector: 'app-truncate',
   templateUrl: './truncate.component.html',
   styleUrls: ['./truncate.component.scss']
 })
-export class TruncateComponent extends SubscriptionManager implements OnInit {
+export class TruncateComponent implements OnInit {
   applySpace = false;
   debounceMS = 500;
   maxRecursions = 100;
@@ -23,25 +18,11 @@ export class TruncateComponent extends SubscriptionManager implements OnInit {
   @ViewChild('elRefTextLeft') elRefTextLeft: ElementRef;
   @ViewChild('elRefTextRight') elRefTextRight: ElementRef;
 
-  constructor() {
-    super();
-  }
-
   ngOnInit(): void {
     if (!this.text) {
       return;
     }
     this.splitText();
-    this.subs.push(
-      fromEvent(window, 'resize')
-        .pipe(
-          debounceTime(this.debounceMS),
-          tap(() => {
-            this.splitText();
-          })
-        )
-        .subscribe()
-    );
   }
 
   /** isEllipsisActive

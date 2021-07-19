@@ -1,4 +1,4 @@
-<ul *ngIf="pages && pages.length > 1" class="paginator">
+<ul *ngIf="pages" class="paginator">
   <li>
     <a
       class="previous"
@@ -8,13 +8,9 @@
     ></a>
   </li>
 
-  <li *ngFor="let page of pages; let i = index">
-    <a
-      (click)="setPage(i)"
-      href="javascript:void(0)"
-      [ngClass]="{ active: i === activePageIndex }"
-      >{{ i + 1 }}</a
-    >
+  <li class="range">
+    {{ ranges[this.activePageIndex][0] }} -
+    {{ ranges[this.activePageIndex][1] }} of {{ totalRows }}
   </li>
 
   <li>

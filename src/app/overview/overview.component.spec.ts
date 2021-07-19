@@ -89,7 +89,6 @@ describe('OverviewComponent', () => {
     component = fixture.componentInstance;
     exportCSV = TestBed.inject(ExportCSVService);
     component.form.get('facetParameter').setValue('contentTier');
-    component.isShowingSearchList = false;
     fixture.detectChanges();
   };
 

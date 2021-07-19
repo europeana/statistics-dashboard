@@ -96,10 +96,6 @@
   flex-wrap: wrap;
   margin-bottom: $spacing-m;
 
-  &.list-mode {
-    display: none;
-  }
-
   .rm-filter {
     border-radius: $spacing-s;
     color: $white;

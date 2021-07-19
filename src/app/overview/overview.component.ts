@@ -89,12 +89,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .map((x, index) => `${x + index}`);
 
   pollRefresh: Subject<boolean>;
-
   form: FormGroup;
 
   downloadOptionsOpen = false;
-  isShowingSearchList = false;
-
   isLoading = false;
 
   selFacetIndex = 0;
@@ -146,12 +143,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         .subscribe((combined) => {
           const params = combined.params;
           const queryParams = combined.queryParams;
+          const facetChanged =
+            params.facet &&
+            params.facet != this.form.controls.facetParameter.value;
           const loadNeeded =
             !this.allProcessedFacetData ||
             JSON.stringify(queryParams) !== JSON.stringify(this.queryParams);
 
-          if (params.facet) {
+          if (facetChanged) {
             this.form.controls.facetParameter.setValue(params.facet);
+            if (this.allProcessedFacetData) {
+              this.switchFacet();
+            }
           }
           this.queryParams = queryParams;
 
@@ -240,10 +243,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }:"${encodeURIComponent(qfVal)}"`;
   }
 
-  setIsShowingSearchList(tf: boolean): void {
-    this.isShowingSearchList = tf;
-  }
-
   /** processResult
   /*
   /* augment raw result data with percent fields
@@ -255,15 +254,15 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.allProcessedTotals = new Array(rawResult.facets.length);
 
       rawResult.facets.forEach((f: Facet) => {
-        const runningTotal = f.fields.reduce(function (
-          a: FacetField,
-          b: FacetField
-        ) {
-          return {
-            label: '',
-            count: a.count + b.count
-          };
-        }).count;
+        const runningTotal =
+          f.fields.length > 0
+            ? f.fields.reduce(function (a: FacetField, b: FacetField) {
+                return {
+                  label: '',
+                  count: a.count + b.count
+                };
+              }).count
+            : 0;
 
         const facetIndex = this.facetConf.indexOf(f.name);
 
@@ -479,11 +478,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     );
   }
 
-  /** togglePercent
+  /** refreshChart
+  /* (conditionally) calls drawChart on chart object
   /*  removes all series objects from the barchart
-  /*  re-applies series....
+  /*  re-applies active series
+  /* @param { boolean : redrawChart } - flag redraw
    */
-  togglePercent(): void {
+  refreshChart(redrawChart = false): void {
+    if (redrawChart) {
+      this.barChart.drawChart();
+    }
     this.barChart.removeAllSeries();
     this.addAppliedSeriesToChart(true);
   }
@@ -752,7 +756,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   updateFilterAvailability(): void {
     this.enableFilters();
     this.filterStates[this.form.value['facetParameter']].disabled = true;
-    this.setIsShowingSearchList(false);
   }
 
   /** updatePageUrl
@@ -906,7 +909,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       seriesKeys
     );
 
-    this.grid.showingSeriesInfo = seriesKeys.length > 1;
+    this.grid.isShowingSeriesInfo = seriesKeys.length > 1;
     this.grid.setRows(rows);
   }
 }
