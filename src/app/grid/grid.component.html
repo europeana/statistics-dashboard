@@ -1,62 +1,170 @@
-<div *ngIf="tableData">
-  <div class="data-grid" [ngClass]="{ 'with-series': showingSeriesInfo }">
-    <span class="cell-wide search-control container-h">
-      <!--
-      <span class="search-icon"></span>
+<div *ngIf="gridRows">
+  <ng-template #linkOut let-row="row" let-total="row.isTotal">
+    <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
+      <a
+        target="_blank"
+        class="link-out"
+        [href]="getUrlRow(total ? null : row.name)"
+      ></a>
+    </span>
+  </ng-template>
 
+  <ng-template #seriesColour let-row="row">
+    <span
+      class="series-colour"
+      [ngStyle]="{
+        backgroundColor: colours[row['colourIndex']]
+      }"
+    ></span>
+  </ng-template>
+
+  <div class="data-grid" [ngClass]="{ 'with-series': isShowingSeriesInfo }">
+    <span class="search-control container-h cell-first-wide">
+      <span class="search-icon"></span>
       <input
         class="search"
         placeholder="Search..."
         [(ngModel)]="filterString"
-        (keyup)="onKeyup()"
+        (keyup)="updateRows()"
       />
-      -->
     </span>
 
-    <span class="navigation-controls">
+    <span class="navigation-controls container-h">
+      <span
+        class="conditional-controls container-h"
+        *ngIf="pagerInfo && pagerInfo.pageCount > 1"
+      >
+        <label for="maxPageSize">Rows per page:</label>
+        <select
+          id="maxPageSize"
+          class="max-page-size"
+          [(ngModel)]="maxPageSize"
+        >
+          <option *ngFor="let mps of maxPageSizes" [ngValue]="mps.value">
+            {{ mps.title }}
+          </option>
+        </select>
+        <label for="goTo">Go to:</label>
+        <input
+          id="goTo"
+          pattern="[0-9]+"
+          class="go-to"
+          (keyup)="goToPage($event)"
+          placeholder="{{ pagerInfo.currentPage + 1 }}"
+        />
+      </span>
+
       <app-grid-paginator
         #paginator
-        [rows]="tableData.tableRows"
-        (change)="setPage($event)"
+        [maxPageSize]="maxPageSize"
+        [rows]="gridRows"
+        (change)="setPagerInfo($event)"
       ></app-grid-paginator>
     </span>
 
-    <span class="cell-header cell-wide" (click)="sort('name')">
-      {{ title }}
-    </span>
+    <span class="cell-header cell-first-wide"> Records by {{ title }} </span>
 
-    <span class="cell-header"><a (click)="sort('count')">Count</a></span>
+    <span
+      class="cell-header text-right"
+      data-e2e="grid-sort-count"
+      [ngClass]="{
+        active: sortStates['count'] !== 0,
+        descending: sortStates['count'] === -1
+      }"
+      ><a (click)="sort('count')">Count</a></span
+    >
 
-    <span class="cell-header"><a (click)="sort('percent')">Percent</a></span>
+    <span
+      class="cell-header text-right"
+      [ngClass]="{
+        active: sortStates['percent'] !== 0,
+        descending: sortStates['percent'] === -1
+      }"
+      ><a (click)="sort('percent')">Percent</a></span
+    >
 
-    <ng-container *ngFor="let row of pageRows; let i = index">
-      <span class="cell-name" [ngClass]="{ highlight: row.highlight }">
-        <a target="_blank" [href]="getUrlRow(row.name)">{{ row.name }}</a>
-      </span>
+    <span class="cell-header">View in Europeana</span>
 
-      <span
-        *ngIf="showingSeriesInfo"
-        class="cell-series container-h"
-        [ngClass]="{ highlight: row.highlight }"
-      >
-        <span
-          class="series-colour"
-          [ngStyle]="{
-            backgroundColor: colours[row['colourIndex']]
-          }"
-        ></span>
-        <span>
-          {{ row.series }}
+    <ng-container *ngIf="pagerInfo">
+      <!-- Summary rows -->
+      <ng-template #labelTotal><span class="bold">Total</span></ng-template>
+
+      <ng-container *ngFor="let row of summaryRows">
+        <span class="cell-prefix">
+          <ng-container *ngIf="isShowingSeriesInfo">
+            <span class="container-h">
+              <ng-content
+                *ngTemplateOutlet="seriesColour; context: { row: row }"
+              ></ng-content>
+            </span>
+          </ng-container>
         </span>
-      </span>
 
-      <span class="cell-count" [ngClass]="{ highlight: row.highlight }">
-        {{ row.count }}
-      </span>
+        <span class="cell-name cell-wide">
+          <ng-container *ngIf="isShowingSeriesInfo; else labelTotal">
+            {{ row.series }}
+          </ng-container>
+        </span>
 
-      <span class="cell-percent" [ngClass]="{ highlight: row.highlight }">
-        {{ row.percent }}%
-      </span>
+        <span class="bold black text-right">
+          {{ row.count | number }}
+        </span>
+        <span class="black text-right"> {{ row.percent }}% </span>
+
+        <ng-content
+          *ngTemplateOutlet="linkOut; context: { row: row }"
+        ></ng-content>
+      </ng-container>
+
+      <!-- Rows -->
+
+      <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
+        <span [ngClass]="{ highlight: row.highlight }">
+          {{ row.displayIndex }}
+        </span>
+
+        <span
+          class="cell-name"
+          [ngClass]="{ highlight: row.highlight }"
+          data-e2e="grid-row-name"
+          [title]="row.name"
+        >
+          <app-truncate [text]="row.name"></app-truncate>
+        </span>
+
+        <span
+          *ngIf="isShowingSeriesInfo"
+          class="cell-series container-h"
+          [ngClass]="{ highlight: row.highlight }"
+        >
+          <ng-content
+            *ngTemplateOutlet="seriesColour; context: { row: row }"
+          ></ng-content>
+          <!-- TODO: do we need this text or is it redundant and unwieldy?
+          <span class="series-info" [title]="row.series">
+            {{ row.series }}
+          </span>
+          -->
+        </span>
+
+        <span
+          class="text-right"
+          [ngClass]="{
+            highlight: row.highlight,
+            bold: row.isTotal
+          }"
+        >
+          {{ row.count | number }}
+        </span>
+
+        <span class="text-right" [ngClass]="{ highlight: row.highlight }">
+          {{ row.percent }}%
+        </span>
+
+        <ng-content
+          *ngTemplateOutlet="linkOut; context: { row: row }"
+        ></ng-content>
+      </ng-container>
     </ng-container>
   </div>
 </div>

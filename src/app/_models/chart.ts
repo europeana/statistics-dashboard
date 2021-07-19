@@ -33,6 +33,7 @@ export interface CompareDataDescriptor {
   name: string;
   pinIndex: number;
   saved?: boolean;
+  total: number;
 }
 
 export interface CompareData {

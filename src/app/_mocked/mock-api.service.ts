@@ -88,7 +88,7 @@ export const MockAPIData = {
       name: 'RIGHTS',
       fields: [
         {
-          label: 'http://this.rights',
+          label: 'http://creativecommons.org/licenses/by-nc-nd',
           count: 684
         },
         {

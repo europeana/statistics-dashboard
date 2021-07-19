@@ -21,6 +21,6 @@ export const BarChartCool: ChartSettings = {
   hasScroll: true,
   isHorizontal: true,
   maxLabelWidth: 250,
-  paddingTop: 20,
+  paddingTop: 8,
   showExports: false
 };

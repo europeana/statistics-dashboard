@@ -1,17 +1,42 @@
+@import "../../scss/_variables";
+
 .active {
   font-weight: 600;
 }
 
-.disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
 .paginator {
+  color: $gray-med;
   display: flex;
   flex-direction: row;
+}
 
-  > li {
-    padding: 4px;
+.next::after {
+  transform: rotate(270deg);
+  left: -4px;
+}
+
+.next,
+.previous {
+  color: #000;
+  position: relative;
+  &::after {
+    content: "⌄";
+    font-size: 14px;
+    line-height: 19px;
+    position: absolute;
   }
+
+  &.disabled {
+    color: $gray-faint;
+    pointer-events: none;
+  }
+}
+
+.previous::after {
+  transform: rotate(90deg);
+  right: -4px;
+}
+
+.range {
+  white-space: nowrap;
 }

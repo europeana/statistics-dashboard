@@ -1,43 +1,24 @@
-<ul *ngIf="pages && pages.length > 1" class="paginator">
+<ul *ngIf="pages" class="paginator">
   <li>
     <a
-      (click)="setPage(0)"
-      [ngClass]="{ disabled: !canPrev() }"
-      href="javascript:void(0)"
-      >&lt;&lt;</a
-    >
-  </li>
-
-  <li>
-    <a
+      class="previous"
+      data-e2e="grid-page-prev"
       (click)="setPage(activePageIndex - 1)"
       [ngClass]="{ disabled: !canPrev() }"
-      >&lt;</a
-    >
+    ></a>
   </li>
 
-  <li *ngFor="let page of pages; let i = index">
-    <a
-      (click)="setPage(i)"
-      href="javascript:void(0)"
-      [ngClass]="{ active: i === activePageIndex }"
-      >{{ i + 1 }}</a
-    >
+  <li class="range">
+    {{ ranges[this.activePageIndex][0] }} -
+    {{ ranges[this.activePageIndex][1] }} of {{ totalRows }}
   </li>
 
   <li>
     <a
+      class="next"
+      data-e2e="grid-page-next"
       (click)="setPage(activePageIndex + 1)"
       [ngClass]="{ disabled: !canNext() }"
-      >&gt;</a
-    >
-  </li>
-
-  <li>
-    <a
-      (click)="setPage(totalPageCount - 1)"
-      [ngClass]="{ disabled: !canNext() }"
-      >&gt;&gt;</a
-    >
+    ></a>
   </li>
 </ul>

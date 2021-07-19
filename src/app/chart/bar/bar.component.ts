@@ -41,7 +41,7 @@ export class BarComponent implements AfterViewInit {
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
   legendContainer: am4core.Container;
-  preferredNumberBars = 15;
+  preferredNumberBars = 10;
 
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
@@ -333,7 +333,7 @@ export class BarComponent implements AfterViewInit {
 
       ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
         (s: string) => {
-          if (this.settings[s]) {
+          if (!isNaN(this.settings[s])) {
             chart[s] = this.settings[s];
           }
         }

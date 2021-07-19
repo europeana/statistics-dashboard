@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TableRow } from '../_models';
+import { FmtTableData, TableRow } from '../_models';
 
 @Component({
   selector: 'app-grid',
@@ -18,8 +18,11 @@ export class MockGridComponent {
     return false;
   }
 
-  getTableRows(): Array<TableRow> {
-    return [];
+  getData(): FmtTableData {
+    return {
+      columns: [],
+      tableRows: []
+    };
   }
 
   setPage(_: number): void {

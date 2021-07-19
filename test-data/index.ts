@@ -47,9 +47,9 @@ new (class extends TestDataServer {
 
     // function for adding a string to the qf parameter map
     const addToQF = (qf: string): void => {
-      const param = qf.split(':');
-      const paramName = param[0];
-      const paramValue = this.unwrap(param[1]);
+      const paramIndex = qf.indexOf(':');
+      const paramName = qf.slice(0, paramIndex);
+      const paramValue = this.unwrap(qf.slice(paramIndex + 1));
 
       if (paramName === 'contentTier') {
         if (!qfMap['contentTier']) {

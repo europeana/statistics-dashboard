@@ -33,7 +33,6 @@ import {
   FacetFieldProcessed,
   FacetProcessed,
   FilterState,
-  HeaderNameType,
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
@@ -90,16 +89,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .map((x, index) => `${x + index}`);
 
   pollRefresh: Subject<boolean>;
-
   form: FormGroup;
 
   downloadOptionsOpen = false;
-  isShowingSearchList = false;
-
   isLoading = false;
 
   selFacetIndex = 0;
   allProcessedFacetData: Array<FacetProcessed>;
+  allProcessedTotals: Array<number>;
 
   filterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
@@ -146,12 +143,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         .subscribe((combined) => {
           const params = combined.params;
           const queryParams = combined.queryParams;
+          const facetChanged =
+            params.facet &&
+            params.facet != this.form.controls.facetParameter.value;
           const loadNeeded =
             !this.allProcessedFacetData ||
             JSON.stringify(queryParams) !== JSON.stringify(this.queryParams);
 
-          if (params.facet) {
+          if (facetChanged) {
             this.form.controls.facetParameter.setValue(params.facet);
+            if (this.allProcessedFacetData) {
+              this.switchFacet();
+            }
           }
           this.queryParams = queryParams;
 
@@ -167,19 +170,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   export(type: ExportType): false {
+    const gridData = this.grid.getData();
     this.downloadOptionsOpen = false;
 
     if (type === ExportType.CSV) {
       const res = this.csv.csvFromTableRows(
-        ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
-          return x as HeaderNameType;
-        }),
-        this.grid.getTableRows()
+        gridData.columns,
+        gridData.tableRows
       );
       this.csv.download(res, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
       this.barChart.getSvgData().then((imgUrl: string) => {
-        this.pdf.download(this.grid.tableData, imgUrl);
+        this.pdf.download(gridData, imgUrl);
       });
     }
     return false;
@@ -231,14 +233,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param {string} qfVal - the specific item's value for the currently-selected facet
   /* returns the (portal) url for a specific item
   */
-  getUrlRow(qfVal: string): string {
-    return `${environment.serverPortal}${this.getUrl()}&qf=${
+  getUrlRow(qfVal?: string): string {
+    const rootUrl = `${environment.serverPortal}${this.getUrl()}`;
+    if (!qfVal) {
+      return rootUrl;
+    }
+    return `${rootUrl}&qf=${
       this.form.value.facetParameter
     }:"${encodeURIComponent(qfVal)}"`;
-  }
-
-  setIsShowingSearchList(tf: boolean): void {
-    this.isShowingSearchList = tf;
   }
 
   /** processResult
@@ -249,19 +251,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   processResult(rawResult: RawFacet): boolean {
     if (rawResult.facets) {
       this.allProcessedFacetData = new Array(rawResult.facets.length);
+      this.allProcessedTotals = new Array(rawResult.facets.length);
 
       rawResult.facets.forEach((f: Facet) => {
-        const runningTotal = f.fields.reduce(function (
-          a: FacetField,
-          b: FacetField
-        ) {
-          return {
-            label: '',
-            count: a.count + b.count
-          };
-        }).count;
+        const runningTotal =
+          f.fields.length > 0
+            ? f.fields.reduce(function (a: FacetField, b: FacetField) {
+                return {
+                  label: '',
+                  count: a.count + b.count
+                };
+              }).count
+            : 0;
 
-        this.allProcessedFacetData[this.facetConf.indexOf(f.name)] = {
+        const facetIndex = this.facetConf.indexOf(f.name);
+
+        this.allProcessedTotals[facetIndex] = rawResult.totalResults;
+        this.allProcessedFacetData[facetIndex] = {
           name: f.name,
           fields: f.fields.map((ff: FacetField) => {
             let labelFormatted = undefined;
@@ -372,7 +378,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   storeSeries(
     applied: boolean,
     saved: boolean,
-    nvs: Array<NameValuePercent>
+    nvs: Array<NameValuePercent>,
+    seriesTotal: number
   ): void {
     const name = this.seriesNameFromUrl();
     let label = `All (${this.form.value.facetParameter})`;
@@ -406,7 +413,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
       applied: applied,
       pinIndex: 0,
-      saved: saved
+      saved: saved,
+      total: seriesTotal
     });
   }
 
@@ -445,9 +453,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
   addSeriesToChart(seriesKeys: Array<string>, reuseColours = false): void {
-    if (!reuseColours) {
-      seriesKeys = seriesKeys.reverse();
-    }
+    seriesKeys = seriesKeys.reverse();
 
     const seriesData = this.snapshots.applySeries(
       this.form.value.facetParameter,
@@ -472,11 +478,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     );
   }
 
-  /** togglePercent
+  /** refreshChart
+  /* (conditionally) calls drawChart on chart object
   /*  removes all series objects from the barchart
-  /*  re-applies series....
+  /*  re-applies active series
+  /* @param { boolean : redrawChart } - flag redraw
    */
-  togglePercent(): void {
+  refreshChart(redrawChart = false): void {
+    if (redrawChart) {
+      this.barChart.drawChart();
+    }
     this.barChart.removeAllSeries();
     this.addAppliedSeriesToChart(true);
   }
@@ -745,7 +756,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   updateFilterAvailability(): void {
     this.enableFilters();
     this.filterStates[this.form.value['facetParameter']].disabled = true;
-    this.setIsShowingSearchList(false);
   }
 
   /** updatePageUrl
@@ -859,6 +869,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   extractSeriesData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
+    const seriesTotal = this.allProcessedTotals[facetIndex];
 
     if (this.barChart) {
       // force refresh of axes when switching category
@@ -876,7 +887,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const filtersApplied = Object.keys(this.queryParams).length > 0;
 
     // store as hidden unless "all"
-    this.storeSeries(true, !filtersApplied, chartData);
+    this.storeSeries(true, !filtersApplied, chartData, seriesTotal);
 
     // show other applied
     this.addAppliedSeriesToChart();
@@ -898,7 +909,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       seriesKeys
     );
 
-    this.grid.showingSeriesInfo = seriesKeys.length > 1;
+    this.grid.isShowingSeriesInfo = seriesKeys.length > 1;
     this.grid.setRows(rows);
   }
 }
