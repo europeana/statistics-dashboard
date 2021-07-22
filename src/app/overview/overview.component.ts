@@ -1,10 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -27,12 +21,12 @@ import {
 } from '../_helpers';
 
 import {
-  ExportType,
   Facet,
   FacetField,
   FacetFieldProcessed,
   FacetProcessed,
   FilterState,
+  FmtTableData,
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
@@ -40,23 +34,22 @@ import {
   RawFacet
 } from '../_models';
 
-import { APIService, ExportCSVService, ExportPDFService } from '../_services';
+import { APIService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
+import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  providers: [RenameRightsPipe],
-  encapsulation: ViewEncapsulation.None
+  providers: [RenameRightsPipe]
 })
 export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
-  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
+  @ViewChild('export') export: ExportComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
-  @ViewChild('canvas') canvas: ElementRef;
 
   // Make variables available to template
   public toInputSafeName = toInputSafeName;
@@ -76,10 +69,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     BarChartCool
   );
 
-  exportTypes: Array<ExportType> = [ExportType.CSV, ExportType.PDF];
-
-  experimental = true;
-
   facetConf = facetNames;
   nonFilterQPs = ['content-tier-zero', 'date-from', 'date-to', 'dataset-name'];
 
@@ -90,8 +79,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   pollRefresh: Subject<boolean>;
   form: FormGroup;
-
-  downloadOptionsOpen = false;
   isLoading = false;
 
   selFacetIndex = 0;
@@ -103,8 +90,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   constructor(
     private api: APIService,
-    private csv: ExportCSVService,
-    private pdf: ExportPDFService,
     private fb: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -169,22 +154,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     );
   }
 
-  export(type: ExportType): false {
-    const gridData = this.grid.getData();
-    this.downloadOptionsOpen = false;
+  getGridData(): FmtTableData {
+    return this.grid.getData();
+  }
 
-    if (type === ExportType.CSV) {
-      const res = this.csv.csvFromTableRows(
-        gridData.columns,
-        gridData.tableRows
-      );
-      this.csv.download(res, this.downloadAnchor);
-    } else if (type === ExportType.PDF) {
-      this.barChart.getSvgData().then((imgUrl: string) => {
-        this.pdf.download(gridData, imgUrl);
-      });
-    }
-    return false;
+  getChartData(): Promise<string> {
+    return this.barChart.getSvgData();
   }
 
   /** getUrl
@@ -853,14 +828,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       .forEach((s: string) => {
         this.filterStates[s].visible = false;
       });
-  }
-
-  toggleDownloadOptions(): void {
-    this.downloadOptionsOpen = !this.downloadOptionsOpen;
-  }
-
-  closeDisplayOptions(): void {
-    this.downloadOptionsOpen = false;
   }
 
   /** extractSeriesData

@@ -14,6 +14,8 @@ import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
 
 import { BarComponent, MapComponent } from './chart';
 import { CheckboxComponent } from './checkbox';
+import { DatesComponent } from './dates/dates.component';
+import { ExportComponent } from './export';
 import { FilterComponent } from './filter';
 import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
@@ -24,7 +26,6 @@ import { ResizeComponent } from './resize';
 import { SplashComponent } from './splash/splash.component';
 import { SnapshotsComponent } from './snapshots/snapshots.component';
 import { TruncateComponent } from './truncate';
-import { DatesComponent } from './dates/dates.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { DatesComponent } from './dates/dates.component';
     BarComponent,
     CheckboxComponent,
     DatesComponent,
+    ExportComponent,
     FilterComponent,
     FooterComponent,
     GridComponent,

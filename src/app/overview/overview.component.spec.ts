@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   async,
   ComponentFixture,
@@ -19,11 +19,10 @@ import {
   MockAPIService,
   MockAPIServiceErrors,
   MockBarComponent,
-  MockExportCSVService,
   MockGridComponent
 } from '../_mocked';
-import { ExportType, NameLabel } from '../_models';
-import { APIService, ExportCSVService } from '../_services';
+import { NameLabel } from '../_models';
+import { APIService } from '../_services';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
 
@@ -38,7 +37,6 @@ describe('OverviewComponent', () => {
     { name: '3', label: '3' }
   ];
   const tickTime = 1;
-  let exportCSV: ExportCSVService;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({ COUNTRY: 'Italy' } as Params);
 
@@ -68,7 +66,6 @@ describe('OverviewComponent', () => {
         createMockPipe('renameApiFacet')
       ],
       providers: [
-        { provide: ExportCSVService, useClass: MockExportCSVService },
         {
           provide: APIService,
           useClass: errorMode ? MockAPIServiceErrors : MockAPIService
@@ -87,7 +84,6 @@ describe('OverviewComponent', () => {
   const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
-    exportCSV = TestBed.inject(ExportCSVService);
     component.form.get('facetParameter').setValue('contentTier');
     fixture.detectChanges();
   };
@@ -152,6 +148,19 @@ describe('OverviewComponent', () => {
 
       component.ngOnDestroy();
     }));
+
+    it('should post process', () => {
+      spyOn(component, 'extractSeriesData');
+      component.allProcessedFacetData = [];
+      component.postProcessResult();
+      expect(component.extractSeriesData).not.toHaveBeenCalled();
+
+      component.processResult(Object.assign({}, MockAPIData));
+      expect(component.extractSeriesData).not.toHaveBeenCalled();
+
+      component.postProcessResult();
+      expect(component.extractSeriesData).toHaveBeenCalled();
+    });
 
     it('should extract data as a percent', fakeAsync(() => {
       const data = Object.assign({}, MockAPIData);
@@ -288,6 +297,18 @@ describe('OverviewComponent', () => {
       expect(selected.length).toEqual(1);
     });
 
+    it('should clear the dates', () => {
+      component.form.get('dateFrom').setValue(new Date().toISOString());
+      expect(component.form.value.dateFrom).toBeTruthy();
+      component.datesClear();
+      expect(component.form.value.dateFrom).toBeFalsy();
+
+      component.form.get('dateTo').setValue(new Date().toISOString());
+      expect(component.form.value.dateTo).toBeTruthy();
+      component.datesClear();
+      expect(component.form.value.dateTo).toBeFalsy();
+    });
+
     it('should enable the filters', fakeAsync(() => {
       component.beginPolling();
       tick(tickTime);
@@ -308,20 +329,6 @@ describe('OverviewComponent', () => {
       expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
       component.clearFilter('TYPE');
       expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
-    });
-
-    it('should toggle the download options', () => {
-      component.downloadOptionsOpen = true;
-      component.toggleDownloadOptions();
-      expect(component.downloadOptionsOpen).toBeFalsy();
-      component.toggleDownloadOptions();
-      expect(component.downloadOptionsOpen).toBeTruthy();
-    });
-
-    it('should close the display options', () => {
-      component.downloadOptionsOpen = true;
-      component.closeDisplayOptions();
-      expect(component.downloadOptionsOpen).toBeFalsy();
     });
 
     it('should close the filters', fakeAsync(() => {
@@ -367,6 +374,10 @@ describe('OverviewComponent', () => {
       component.form.value.facetParameter = 'contentTier';
     });
 
+    it('should get the total figure', () => {
+      expect(component.getUrlRow()).toBeTruthy();
+    });
+
     it('should include the facet selection', () => {
       [2, 3, 4].forEach((qfVal: number) => {
         const wrongVal = qfVal * 3;
@@ -400,32 +411,6 @@ describe('OverviewComponent', () => {
       component.form.value.dateFrom = dateDetect;
       component.form.value.dateTo = dateDetect;
       expect(component.getUrlRow('X').indexOf(dateDetect)).toBeGreaterThan(-1);
-    });
-  });
-
-  describe('Exports', () => {
-    beforeEach(async(() => {
-      configureTestBed();
-    }));
-
-    beforeEach(() => {
-      b4Each();
-    });
-
-    it('should export CSV', () => {
-      spyOn(exportCSV, 'download');
-      const elDownload = document.createElement('a');
-      document.body.append(elDownload);
-      component.downloadAnchor = { nativeElement: elDownload } as ElementRef;
-      component.export(ExportType.CSV);
-      expect(exportCSV.download).toHaveBeenCalled();
-      component.ngOnDestroy();
-    });
-
-    it('should export PDF', () => {
-      spyOn(component.barChart, 'getSvgData').and.callThrough();
-      component.export(ExportType.PDF);
-      expect(component.barChart.getSvgData).toHaveBeenCalled();
     });
   });
 

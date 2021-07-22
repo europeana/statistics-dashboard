@@ -8,7 +8,7 @@
     ></a>
   </li>
 
-  <li class="range">
+  <li class="range" *ngIf="ranges[this.activePageIndex]">
     {{ ranges[this.activePageIndex][0] }} -
     {{ ranges[this.activePageIndex][1] }} of {{ totalRows }}
   </li>
