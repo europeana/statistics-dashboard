@@ -16,10 +16,6 @@ $width-left-col: 200px;
   justify-content: space-between;
 }
 
-.menu-opener {
-  color: $gray-faint;
-}
-
 .rm-filter {
   background-color: $stats-blue;
   margin-top: $spacing-s;
@@ -31,11 +27,6 @@ $width-left-col: 200px;
 
 .rm-filters {
   margin-top: $spacing-s;
-}
-
-.menu-opener.disabled {
-  opacity: 0.4;
-  pointer-events: none;
 }
 
 input[type="checkbox"] {
@@ -86,6 +77,23 @@ app-overview {
 
 datatable-scroller {
   width: 100% !important;
+}
+
+.export-opener {
+  display: inline-block;
+  height: 18px;
+  position: relative;
+  top: 6px;
+  width: 14px;
+}
+
+.export-opener-link-wrapper {
+  margin-top: 36px;
+  text-align: right;
+  .export-opener-link {
+    color: $stats-blue;
+    font-size: 14px;
+  }
 }
 
 .table-footer {
@@ -167,19 +175,6 @@ label {
 .filters {
   display: flex;
   flex-direction: column;
-}
-
-.dropdown {
-  position: relative;
-  & > .menu-opener {
-    color: $gray-med;
-    &:hover::after {
-      border-top-color: $gray-med;
-    }
-    &.open::after {
-      transform: rotate(180deg);
-    }
-  }
 }
 
 .chart-settings {

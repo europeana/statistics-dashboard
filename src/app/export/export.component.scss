@@ -1,0 +1,162 @@
+@import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+
+.align-right {
+  text-align: right;
+}
+
+.container-h {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.copy-btn,
+.export,
+.icon-item {
+  border-radius: 8px;
+}
+
+.copy-btn {
+  background: $stats-blue;
+  color: $white;
+  display: inline-block;
+  padding: 8px 16px;
+  margin: 27px 0;
+
+  &.disabled {
+    background: $offwhite;
+    pointer-events: none;
+  }
+}
+
+.copy-source {
+  background-color: $offwhite;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: $gray-faint;
+  font-size: 16px;
+  padding: 8px 16px;
+  &::placeholder {
+    color: $stats-blue;
+    opacity: 1;
+  }
+  &.copied {
+    border: 1px solid $stats-blue;
+  }
+}
+
+.export {
+  background: #fff;
+  box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
+  font-size: 14px;
+  padding: 26px 31px;
+  position: fixed;
+  transform: translateX(100%);
+  transition: transform 30ms;
+  right: 0;
+  width: 542px;
+  z-index: 1;
+
+  &.active {
+    transform: translateX(0);
+  }
+}
+
+.export-icon {
+  display: inline-block;
+  height: 18px;
+  margin-right: 14px;
+  width: 14px;
+}
+
+.icon-item {
+  border: 1px solid $gray-med;
+  padding: 8px;
+
+  + .icon-item {
+    margin-top: 22px;
+  }
+
+  &:hover {
+    .icon-csv {
+      background-image: svg-url-icon-csv($offwhite);
+    }
+    .icon-pdf {
+      background-image: svg-url-icon-pdf($offwhite);
+    }
+  }
+  &:active {
+    .icon-csv {
+      background-image: svg-url-icon-csv($stats-blue);
+    }
+    .icon-pdf {
+      background-image: svg-url-icon-pdf($stats-blue);
+    }
+  }
+  a {
+    color: $gray-med;
+    &:hover {
+      color: $offwhite;
+    }
+    &:active {
+      color: $stats-blue;
+    }
+  }
+}
+
+.hr {
+  border-bottom: 1px solid $gray-5;
+  margin-bottom: 32px;
+  margin-top: 11px;
+}
+
+.icon-csv,
+.icon-pdf {
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 24px;
+  width: 24px;
+}
+
+.icon-csv {
+  background-image: svg-url-icon-csv(#000);
+  background-size: 18px 18px;
+  margin: 0 3px;
+}
+
+.icon-pdf {
+  background-image: svg-url-icon-pdf(#000);
+  background-size: 14px 18px;
+  margin: 0 4px;
+}
+
+.label-top {
+  font-size: 24px;
+  line-height: 24px;
+}
+
+.pad-top {
+  margin-top: 12px;
+}
+
+.toggle {
+  height: 16px;
+  margin-left: auto;
+  width: 16px;
+
+  &::before,
+  &::after {
+    background: $gray-med;
+    content: "";
+    display: block;
+    height: 2px;
+    margin-top: 8px;
+    transform: rotate(45deg);
+    width: 16px;
+  }
+  &::after {
+    margin-top: -2px;
+    transform: rotate(-45deg);
+  }
+}

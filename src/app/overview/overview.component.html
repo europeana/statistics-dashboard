@@ -98,6 +98,12 @@
     <!-- Right -->
 
     <div class="statistics-dashboard-right">
+      <app-export
+        #export
+        [getGridData]="getGridData.bind(this)"
+        [getChartData]="getChartData.bind(this)"
+      ></app-export>
+
       <!-- Header -->
 
       <div class="header-bar">
@@ -126,31 +132,6 @@
           </h3>
         </ng-container>
 
-        <ul
-          *ngIf="allProcessedFacetData"
-          (clickOutside)="closeDisplayOptions()"
-        >
-          <li>
-            <a #downloadAnchor></a>
-          </li>
-
-          <li class="dropdown">
-            <a
-              class="menu-opener"
-              (click)="toggleDownloadOptions()"
-              [ngClass]="{ open: downloadOptionsOpen }"
-              ><h3 style="padding-top: 3px">Downloads</h3></a
-            >
-            <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
-              <ul class="dropdown-content">
-                <li *ngFor="let exportType of exportTypes">
-                  <a (click)="export(exportType)">{{ exportType }}</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-
         <ng-container *ngIf="form.value.dateFrom && form.value.dateTo">
           <span class="date-removal" data-e2e="date-summary">
             <a
@@ -169,6 +150,9 @@
             </a>
           </span>
         </ng-container>
+
+        <a (click)="export.toggleActive()" class="export-icon export-opener">
+        </a>
       </div>
 
       <!-- Filter removal -->
@@ -224,7 +208,7 @@
         /></label>
 
         <!-- SNAPSHOTS -->
-        <ng-container *ngIf="experimental">
+        <ng-container>
           <app-snapshots
             #snapshots
             [facetName]="form.value.facetParameter"
@@ -242,6 +226,12 @@
           [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
         ></app-grid>
+
+        <div class="export-opener-link-wrapper">
+          <a class="export-opener-link" (click)="export.toggleActive()"
+            >EXPORT DATA</a
+          >
+        </div>
       </div>
     </div>
   </div>
