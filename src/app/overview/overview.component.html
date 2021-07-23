@@ -197,7 +197,10 @@
             </ng-container>
           </ul>
         </div>
-        <div class="rm-filter-nav">
+        <div
+          class="rm-filter-nav"
+          *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
+        >
           <a
             class="rm-filter-nav-prev"
             (click)="scrollInfo.back()"
