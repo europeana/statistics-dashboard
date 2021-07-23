@@ -10,6 +10,8 @@ context('statistics-dashboard', () => {
     const selFilterOpenerName = `${selFilterOpener} .opener-name`;
     const selFilterOpened = `${selFilter} .checkboxes-list`;
     const selFilterRemove = `.rm-filter`;
+    const selFilterRemoveNav = `.rm-filter-nav`;
+
     const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
     const selFilterValueLabel = `${selFilter} .filter-label`;
@@ -45,6 +47,19 @@ context('statistics-dashboard', () => {
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selCheckbox).first().click({force: true});
       cy.get(selFilterRemove).should('have.length', 1);
+    });
+
+    it('should scroll the filter remove options', () => {
+      cy.visit(`/data/COUNTRY`);
+      cy.get(selFilterOpener).eq(1).click({force: true});
+      cy.get(selFilterRemove).should('have.length', 0);
+      cy.get(selFilterRemoveNav).should('have.length', 0);
+
+      for(let i=0; i<5; i++){
+        cy.get(selCheckbox).eq(i).click({force: true});
+      }
+      cy.get(selFilterRemove).should('have.length', 5);
+      cy.get(selFilterRemoveNav).should('have.length', 1);
     });
 
     it('should search the filters and rememebr the term when re-opened', () => {
