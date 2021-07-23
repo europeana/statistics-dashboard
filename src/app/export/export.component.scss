@@ -139,24 +139,3 @@
 .pad-top {
   margin-top: 12px;
 }
-
-.toggle {
-  height: 16px;
-  margin-left: auto;
-  width: 16px;
-
-  &::before,
-  &::after {
-    background: $gray-med;
-    content: "";
-    display: block;
-    height: 2px;
-    margin-top: 8px;
-    transform: rotate(45deg);
-    width: 16px;
-  }
-  &::after {
-    margin-top: -2px;
-    transform: rotate(-45deg);
-  }
-}

@@ -11,8 +11,8 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { today } from '../_helpers';
-
 import {
   createMockPipe,
   MockAPIData,
@@ -59,6 +59,7 @@ describe('OverviewComponent', () => {
         ])
       ],
       declarations: [
+        IsScrollableDirective,
         OverviewComponent,
         MockBarComponent,
         MockGridComponent,

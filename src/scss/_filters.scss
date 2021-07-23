@@ -8,6 +8,8 @@
   background-position: center;
 }
 
+// Filter Removal
+
 .filters,
 .rm-filters {
   .checkbox {
@@ -22,6 +24,7 @@
   }
 
   .checkbox-labelled {
+    cursor: pointer;
     margin: 0;
     padding: 0;
     position: relative;
@@ -88,16 +91,22 @@
   margin-left: $spacing-s;
 }
 
-// Filter Removal
+.rm-filters-outer {
+  position: relative;
+}
+
+.rm-filters-scroll {
+  overflow: hidden;
+}
 
 .rm-filters {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-bottom: $spacing-m;
 
   .rm-filter {
-    border-radius: $spacing-s;
+    border-radius: 24px;
     color: $white;
     padding: $spacing-xs $spacing-s;
     &:not(:last-child) {
