@@ -12,7 +12,7 @@
     <input
       #contentRef
       class="copy-source pad-top"
-      disabled
+      readonly="readonly"
       [ngClass]="{ copied: copied }"
       value="{{ copied ? '' : currentUrl }}"
       placeholder="Copied to clipboard!"
