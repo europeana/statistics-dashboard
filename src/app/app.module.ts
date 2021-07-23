@@ -7,11 +7,10 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
 
+import { IsScrollableDirective } from './_directives/is-scrollable';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
-
 import { BarComponent, MapComponent } from './chart';
 import { CheckboxComponent } from './checkbox';
 import { DatesComponent } from './dates/dates.component';
@@ -46,7 +45,8 @@ import { TruncateComponent } from './truncate';
     ResizeComponent,
     SplashComponent,
     SnapshotsComponent,
-    TruncateComponent
+    TruncateComponent,
+    IsScrollableDirective
   ],
   imports: [
     AppRoutingModule,

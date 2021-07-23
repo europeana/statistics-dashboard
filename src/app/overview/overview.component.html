@@ -156,32 +156,62 @@
       </div>
 
       <!-- Filter removal -->
+      <div class="rm-filters-outer">
+        <div class="rm-filters-scroll">
+          <ul
+            class="rm-filters"
+            id="scrollInfo"
+            #scrollInfo="scrollInfo"
+            appIsScrollable
+          >
+            <app-resize
+              [time]="200"
+              (sizeChanged)="scrollInfo.calc()"
+            ></app-resize>
 
-      <ul class="rm-filters">
-        <ng-container *ngFor="let filter of facetConf">
-          <ng-container *ngIf="filter !== form.value.facetParameter">
-            <ng-container *ngFor="let option of getSetCheckboxValues(filter)">
-              <ng-container
-                *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
-              >
-                <span
-                  class="rm-filter"
-                  *ngIf="form.value[filter][option]"
-                  [ngClass]="{ 'dead-facet': deadFacet }"
+            <ng-container *ngFor="let filter of facetConf">
+              <ng-container *ngIf="filter !== form.value.facetParameter">
+                <ng-container
+                  *ngFor="let option of getSetCheckboxValues(filter)"
                 >
-                  <app-checkbox
-                    [form]="form"
-                    [controlName]="option"
-                    [labelText]="fromInputSafeName(option) | renameRights"
-                    [group]="filter"
-                    (valueChanged)="updatePageUrl(deadFacet)"
-                  ></app-checkbox>
-                </span>
+                  <ng-container
+                    *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
+                  >
+                    <label
+                      class="rm-filter"
+                      *ngIf="form.value[filter][option]"
+                      [ngClass]="{ 'dead-facet': deadFacet }"
+                    >
+                      <app-checkbox
+                        [form]="form"
+                        [controlName]="option"
+                        [labelText]="fromInputSafeName(option) | renameRights"
+                        [group]="filter"
+                        (valueChanged)="updatePageUrl(deadFacet)"
+                      ></app-checkbox>
+                      <span class="x"></span>
+                    </label>
+                  </ng-container>
+                </ng-container>
               </ng-container>
             </ng-container>
-          </ng-container>
-        </ng-container>
-      </ul>
+          </ul>
+        </div>
+        <div class="rm-filter-nav">
+          <a
+            class="rm-filter-nav-prev"
+            (click)="scrollInfo.back()"
+            [ngClass]="{ active: scrollInfo.canScrollBack }"
+            >&lsaquo;</a
+          >
+          <a
+            class="rm-filter-nav-next"
+            (click)="scrollInfo.fwd()"
+            [ngClass]="{ active: scrollInfo.canScrollFwd }"
+            >&rsaquo;</a
+          >
+        </div>
+      </div>
 
       <!-- Data Area -->
       <div class="data-area">
