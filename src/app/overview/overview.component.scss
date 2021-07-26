@@ -3,6 +3,12 @@
 
 $width-left-col: 200px;
 
+.chart-and-summary,
+.statistics-dashboard {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 .ct-zero-label {
   margin-left: $spacing-s;
 }
@@ -231,6 +237,7 @@ label {
 }
 
 .chart-wrapper {
+  flex-grow: 1;
   height: 300px;
   margin: 0 -$spacing-s;
   max-width: 100%;
@@ -259,12 +266,12 @@ label {
   color: $near-black;
 }
 
-.statistics-dashboard {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
 @media (min-width: $bp-xl) {
+  .chart-and-summary,
+  .statistics-dashboard {
+    flex-direction: row;
+  }
+
   .filter-params {
     display: flex;
     flex-direction: column;
@@ -272,9 +279,5 @@ label {
 
   .filter-select {
     width: $width-left-col;
-  }
-
-  .statistics-dashboard {
-    flex-direction: row;
   }
 }

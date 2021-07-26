@@ -218,18 +218,24 @@
 
       <!-- Data Area -->
       <div class="data-area">
-        <div class="chart-wrapper">
-          <app-bar-chart
-            #barChart
-            [showPercent]="form.value.showPercent"
-            [extraSettings]="
-              ['contentTier', 'metadataTier'].includes(
-                form.value.facetParameter
-              )
-                ? barChartSettingsTiers
-                : barChartSettings
-            "
-          ></app-bar-chart>
+        <div class="chart-and-summary" *ngIf="allProcessedFacetData">
+          <div class="chart-wrapper">
+            <app-bar-chart
+              #barChart
+              [showPercent]="form.value.showPercent"
+              [extraSettings]="
+                ['contentTier', 'metadataTier'].includes(
+                  form.value.facetParameter
+                )
+                  ? barChartSettingsTiers
+                  : barChartSettings
+              "
+            ></app-bar-chart>
+          </div>
+          <app-grid-summary
+            [grandTotal]="allProcessedTotals[0]"
+            [summaryData]="getSummaryData()"
+          ></app-grid-summary>
         </div>
 
         <label style="position: relative; float: right; top: -4px; right: 4px"

@@ -162,6 +162,20 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return this.barChart.getSvgData();
   }
 
+  getSummaryData(): FacetProcessed {
+    const data = this.allProcessedFacetData.filter((facet: FacetProcessed) => {
+      return facet.name === this.form.value.facetParameter;
+    });
+
+    if (data.length > 0) {
+      return data[0];
+    }
+    return {
+      fields: [],
+      name: this.form.value.facetParameter
+    };
+  }
+
   /** getUrl
   /* returns a url parameter string (for api or the portal) according to the form state
   /* @returns string

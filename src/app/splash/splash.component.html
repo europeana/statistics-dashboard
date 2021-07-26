@@ -25,8 +25,8 @@
   </ng-template>
 
   <ng-template #dataRows let-facetName="facetName" let-title="title">
-    <div class="data-rows" *ngIf="splashData[facetName]">
-      <div class="data-rows-title">
+    <div class="container-v data-rows" *ngIf="splashData[facetName]">
+      <div class="container-h data-rows-title">
         <span>{{ title }}</span>
         <span>RECORDS PROVIDED</span>
       </div>

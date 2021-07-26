@@ -41,7 +41,7 @@ export class BarComponent implements AfterViewInit {
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
   legendContainer: am4core.Container;
-  preferredNumberBars = 10;
+  preferredNumberBars = 8;
 
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
@@ -390,7 +390,7 @@ export class BarComponent implements AfterViewInit {
         this.settings.labelTruncate;
       this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
 
-      this.categoryAxis.renderer.labels.template.fontSize = 12;
+      this.categoryAxis.renderer.labels.template.fontSize = 10;
       this.categoryAxis.renderer.labels.template.fontWeight = '600';
       this.categoryAxis.renderer.labels.template.marginRight = 9;
       this.categoryAxis.renderer.labels.template.fill =
