@@ -26,10 +26,10 @@ export class MockGridComponent {
   }
 
   setPage(_: number): void {
-    console.log(`setPage()`);
+    console.log('setPage()');
   }
 
   setRows(_: Array<TableRow>): void {
-    console.log(`setRows()`);
+    console.log('setRows()');
   }
 }

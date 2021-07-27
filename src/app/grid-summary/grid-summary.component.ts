@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FacetProcessed, FacetFieldProcessed } from '../_models';
+import { FacetFieldProcessed, FacetProcessed } from '../_models';
 
 @Component({
   selector: 'app-grid-summary',
@@ -8,7 +8,7 @@ import { FacetProcessed, FacetFieldProcessed } from '../_models';
 })
 export class GridSummaryComponent {
   _summaryData: FacetProcessed;
-  @Input() grandTotal: number = 2;
+  @Input() grandTotal: number;
   @Input() set summaryData(data: FacetProcessed) {
     this._summaryData = Object.assign({}, data);
     this._summaryData.fields.sort(

@@ -218,7 +218,7 @@
 
       <!-- Data Area -->
       <div class="data-area">
-        <div class="chart-and-summary" *ngIf="allProcessedFacetData">
+        <div class="chart-and-summary">
           <div class="chart-wrapper">
             <app-bar-chart
               #barChart
@@ -232,10 +232,13 @@
               "
             ></app-bar-chart>
           </div>
-          <app-grid-summary
-            [grandTotal]="allProcessedTotals[0]"
-            [summaryData]="getSummaryData()"
-          ></app-grid-summary>
+          <ng-container>
+            <app-grid-summary
+              *ngIf="allProcessedFacetData"
+              [grandTotal]="allProcessedTotals[0]"
+              [summaryData]="getSummaryData()"
+            ></app-grid-summary>
+          </ng-container>
         </div>
 
         <label style="position: relative; float: right; top: -4px; right: 4px"
