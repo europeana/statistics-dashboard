@@ -11,45 +11,12 @@ app-truncate {
   overflow: hidden;
 }
 
-.record-list {
-  align-items: center;
-  border-top: 1px solid $gray-5;
-  padding: 4px 0;
-
-  &:last-child {
-    border-bottom: 1px solid $gray-5;
-  }
-
-  :first-child {
-    flex-grow: 1;
-  }
-
-  .numeric {
-    margin-left: 6px;
-    text-align: right;
-    min-width: 6em;
-  }
-}
-
 app-bar-chart {
   height: 100%;
 }
 
-.bold {
-  font-weight: 600;
-}
-
-.container-h,
-.data-rows-title {
-  display: flex;
-  flex-direction: row;
+.container-h {
   justify-content: space-between;
-}
-
-.container-v,
-.data-rows {
-  display: flex;
-  flex-direction: column;
 }
 
 .data-link {
@@ -132,6 +99,26 @@ app-bar-chart {
   content: "%";
 }
 
+.record-list {
+  align-items: center;
+  border-top: 1px solid $gray-5;
+  padding: 4px 0;
+
+  &:last-child {
+    border-bottom: 1px solid $gray-5;
+  }
+
+  :first-child {
+    flex-grow: 1;
+  }
+
+  .numeric {
+    margin-left: 6px;
+    text-align: right;
+    min-width: 6em;
+  }
+}
+
 .splash-map {
   border: 1px solid $near-black;
   font-size: 22px;
@@ -142,20 +129,6 @@ app-bar-chart {
   position: fixed;
   width: calc(100% - 8em);
   z-index: 1;
-}
-
-.total {
-  font-size: 32px;
-  line-height: 1.4;
-}
-
-.total-title {
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.totals {
-  margin-bottom: 16px;
 }
 
 @media (min-width: $bp-desktop) {

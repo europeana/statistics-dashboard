@@ -63,6 +63,21 @@ input[type="text"] {
   }
 }
 
+.bold {
+  font-weight: 600;
+}
+
+.container-h {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.container-v {
+  display: flex;
+  flex-direction: column;
+}
+
 /* dashboard wrapper */
 .dashboard-wrapper {
   background-color: $offwhite;
@@ -121,6 +136,20 @@ input[type="text"] {
 .loading-modal::before {
   background-color: #000;
   opacity: 0.1;
+}
+
+.total {
+  font-size: 32px;
+  line-height: 1.4;
+}
+
+.total-title {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.totals {
+  margin-bottom: 16px;
 }
 
 @media (min-width: $bp-small-3) {

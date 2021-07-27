@@ -10,7 +10,11 @@ import { ClickOutsideModule } from 'ng-click-outside';
 import { IsScrollableDirective } from './_directives/is-scrollable';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { RenameApiFacetPipe, RenameRightsPipe } from './_translate';
+import {
+  RenameApiFacetPipe,
+  RenameApiFacetShortPipe,
+  RenameRightsPipe
+} from './_translate';
 import { BarComponent, MapComponent } from './chart';
 import { CheckboxComponent } from './checkbox';
 import { DatesComponent } from './dates/dates.component';
@@ -20,6 +24,7 @@ import { FooterComponent } from './footer';
 import { HeaderComponent } from './header';
 import { GridComponent } from './grid';
 import { GridPaginatorComponent } from './grid-paginator';
+import { GridSummaryComponent } from './grid-summary';
 import { OverviewComponent } from './overview/overview.component';
 import { ResizeComponent } from './resize';
 import { SplashComponent } from './splash/splash.component';
@@ -37,10 +42,12 @@ import { TruncateComponent } from './truncate';
     FooterComponent,
     GridComponent,
     GridPaginatorComponent,
+    GridSummaryComponent,
     HeaderComponent,
     MapComponent,
     OverviewComponent,
     RenameApiFacetPipe,
+    RenameApiFacetShortPipe,
     RenameRightsPipe,
     ResizeComponent,
     SplashComponent,

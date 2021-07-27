@@ -1,0 +1,13 @@
+@import "../../scss/_variables";
+
+.summary-grid {
+  column-gap: 4px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-left: 16px;
+  row-gap: 8px;
+
+  > * {
+    white-space: nowrap;
+  }
+}

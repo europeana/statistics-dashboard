@@ -9,10 +9,6 @@ label[for="maxPageSize"] {
   white-space: nowrap;
 }
 
-.bold {
-  font-weight: 600;
-}
-
 .cell-header {
   border-top: 1px solid $gray-5;
   position: relative;
@@ -58,12 +54,6 @@ a {
 .cell-first-wide,
 .cell-wide {
   border-right: 1px solid $gray-5;
-}
-
-.container-h {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
 }
 
 .data-grid {
