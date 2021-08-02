@@ -3,7 +3,7 @@ context('statistics-dashboard', () => {
 
     const selDateFrom = '[data-e2e="dateFrom"]';
     const selDateTo = '[data-e2e="dateTo"]';
-    const selDateSummary = '[data-e2e="date-summary"]';
+    const selCloseDateOverride = '[data-e2e="close-date-override"]';
     const selFiltersHeader = '.filters-header';
     const selFilter = `${selFiltersHeader} + .filters .filter`;
     const selFilterOpener = '.filter-opener';
@@ -87,15 +87,14 @@ context('statistics-dashboard', () => {
       cy.get(selDateTo).should('have.length', 0);
       cy.get(selFilterOpener).last().click({force: true});
       cy.get(selDateFrom).should('have.length', 1);
-      cy.get(selDateSummary).should('have.length', 0);
 
       const today = new Date().toISOString().split('T')[0];
       cy.get(selDateFrom).type(today);
       cy.get(selDateTo).type(today);
 
-      cy.get(selDateSummary).should('have.length', 1);
+      cy.get(selCloseDateOverride).should('be.visible');
       cy.get(selDateFrom).clear();
-      cy.get(selDateSummary).should('have.length', 0);
+      cy.get(selCloseDateOverride).should('not.be.visible');
     });
 
   });

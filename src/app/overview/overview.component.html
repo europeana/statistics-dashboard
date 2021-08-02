@@ -106,7 +106,7 @@
 
       <!-- Header -->
 
-      <div class="header-bar">
+      <div class="container-h header-bar">
         <ng-container *ngIf="!form.value.facetParameter">
           <h3 class="header-data">Select a facet dimension</h3>
         </ng-container>
@@ -132,22 +132,23 @@
           </h3>
         </ng-container>
 
-        <ng-container *ngIf="form.value.dateFrom && form.value.dateTo">
-          <span class="date-removal" data-e2e="date-summary">
-            <a
-              (click)="datesClear()"
-              class="date"
-              *ngIf="form.value.dateFrom; let date"
-            >
-              {{ date }}
+        <ng-container *ngIf="getFormattedDateStrings(); let dates">
+          <span
+            class="container-h date-removal"
+            [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
+          >
+            <a class="container-h when-set" (click)="datesClear()">
+              <span>Custom</span>
+              <span class="x" data-e2e="close-date-override"></span>
             </a>
-            <a
-              (click)="datesClear()"
-              class="date"
-              *ngIf="form.value.dateTo; let date"
-            >
-              {{ date }}
-            </a>
+            <span class="when-unset">Whole period</span>
+            <span class="date">
+              {{ dates[0] }}
+            </span>
+            <span class="separator"> - </span>
+            <span class="date">
+              {{ dates[1] }}
+            </span>
           </span>
         </ng-container>
 
@@ -234,6 +235,7 @@
           </div>
           <ng-container>
             <app-grid-summary
+              #gridSummary
               *ngIf="allProcessedFacetData"
               [grandTotal]="allProcessedTotals[0]"
               [summaryData]="getSummaryData()"
