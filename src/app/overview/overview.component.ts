@@ -16,8 +16,10 @@ import { SnapshotsComponent } from '../snapshots';
 import {
   fromInputSafeName,
   rightsUrlMatch,
+  today,
   toInputSafeName,
-  validateDateGeneric
+  validateDateGeneric,
+  yearZero
 } from '../_helpers';
 
 import {
@@ -38,6 +40,7 @@ import { APIService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
+import { GridSummaryComponent } from '../grid-summary';
 
 @Component({
   selector: 'app-overview',
@@ -47,6 +50,7 @@ import { GridComponent } from '../grid';
 })
 export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild('gridSummary') gridSummary: GridSummaryComponent;
   @ViewChild('export') export: ExportComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
@@ -277,7 +281,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       });
       return true;
     } else {
+      this.barChart.removeAllSeries();
       this.grid.setRows([]);
+      if(this.gridSummary) {
+        this.gridSummary.summaryData = { name: '', fields: [] };
+      }
       return false;
     }
   }
@@ -632,6 +640,20 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       )}${range}${encodeURIComponent(']')}`;
     }
     return '';
+  }
+
+  /** getFormattedDateStrings
+  /* gets the date range (set or default) as an arrat of string
+  /* @returns Array<string>
+  */
+  getFormattedDateStrings(): Array<string> {
+    const form = this.form;
+    const valFrom = form.value.dateFrom ? form.value.dateFrom : yearZero;
+    const valTo = form.value.dateTo ? form.value.dateTo : today;
+    return [valFrom, valTo].map((date: Date) => {
+      const parts = new Date(date).toDateString().split(' ').slice(1);
+      return [parts.slice(0, 2).join(' '), parts[2]].join(', ');
+    });
   }
 
   /** setCTZeroInputToQueryParam

@@ -1,4 +1,4 @@
-<div class="summary-grid totals">
+<div class="summary-grid totals" *ngIf="_summaryData.fields[0]">
   <span class="total-title"
     >Top {{ _summaryData.name | renameApiFacetShort }}</span
   >

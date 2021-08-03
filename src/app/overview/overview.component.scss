@@ -13,12 +13,54 @@ $width-left-col: 200px;
   margin-left: $spacing-s;
 }
 
-.date-removal .date + .date {
-  margin-left: $spacing-m;
+.date-removal {
+  color: $gray-med;
+  margin-right: $spacing-m;
+
+  &.set {
+    .when-set {
+      color: $gray-med;
+      display: flex;
+    }
+    .when-unset {
+      display: none;
+    }
+  }
+
+  &:not(.set) {
+    .when-set,
+    .x {
+      display: none;
+    }
+    .when-unset {
+      display: inline;
+    }
+  }
+
+  .date {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .separator {
+    margin: $spacing-s;
+  }
+
+  .when-set,
+  .when-unset {
+    background: $gray-5;
+    font-size: 9px;
+    margin-right: 10px;
+    padding: $spacing-xs;
+    white-space: nowrap;
+  }
+
+  .x {
+    transform: scale(0.5);
+  }
 }
 
 .header-bar {
-  display: flex;
   justify-content: space-between;
 }
 
@@ -132,9 +174,7 @@ datatable-scroller {
 .export-opener {
   display: inline-block;
   height: 18px;
-  position: relative;
-  top: 6px;
-  width: 14px;
+  width: 18px;
 }
 
 .export-opener-link-wrapper {
@@ -173,8 +213,7 @@ label {
   display: none;
   height: 23px;
   position: absolute;
-  right: -1.35em;
-  top: 0;
+  top: 2px;
   transform: scale(0.7);
   width: 23px;
   &.showing {
@@ -264,6 +303,7 @@ label {
 
 .header-data {
   color: $near-black;
+  margin-right: auto;
 }
 
 @media (min-width: $bp-xl) {
