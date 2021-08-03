@@ -283,7 +283,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     } else {
       this.barChart.removeAllSeries();
       this.grid.setRows([]);
-      if(this.gridSummary) {
+      if (this.gridSummary) {
         this.gridSummary.summaryData = { name: '', fields: [] };
       }
       return false;

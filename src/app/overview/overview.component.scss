@@ -15,7 +15,7 @@ $width-left-col: 200px;
 
 .date-removal {
   color: $gray-med;
-  margin-right: $spacing-m;
+  margin-right: $spacing-s;
 
   &.set {
     .when-set {
@@ -40,6 +40,19 @@ $width-left-col: 200px;
   .date {
     font-size: 14px;
     white-space: nowrap;
+
+    &:last-child {
+      display: flex;
+      align-items: center;
+      &::after {
+        background: $gray-5;
+        content: "";
+        display: block;
+        height: 32px;
+        margin-left: $spacing-s;
+        width: 1px;
+      }
+    }
   }
 
   .separator {
