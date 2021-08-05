@@ -16,6 +16,7 @@
     "prettier": "prettier --write '{src,test-data}/**/*.{ts,js,json,scss,html}' '*.{js,json}'",
     "start:ci": "ng serve --port 4280 --live-reload=false --configuration=e2e",
     "start:ci-data": "tsc --project tsconfig.test-data.json && npm run prep-test-data && (node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index.mjs)",
+    "start:ci-data-x": "tsc --project tsconfig.test-data.json && npm run prep-test-data && (node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index2.mjs)",
     "test": "ng test",
     "test:dev": "ng test --code-coverage",
     "test:e2e": "tsc --project tsconfig.test-data.json && npm run prep-test-data && ((node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index.mjs) & (npm run cypress:ci) ; fuser -k 3000/tcp)"

@@ -16,6 +16,10 @@ export interface CountryDescriptor {
   dataProviders: Array<number>;
 }
 
+export interface IHashBoolean {
+  [details: string]: boolean;
+}
+
 export interface ProviderDescriptor {
   id: number;
   name: string;
