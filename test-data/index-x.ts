@@ -31,20 +31,6 @@ new (class extends TestDataServer {
   // http://localhost:3000/?filters={%22contentTier%22:{%22values%22:null},%22TYPE%22:{%22breakdown%22:0,%22values%22:[%22IMAGE%22,%22SOUND%22]},%22COUNTRY%22:{%22values%22:[%22Netherlands%22,%22France%22]}}
   // or:
   // http://localhost:3000/?filters={%22contentTier%22:{%22xvalues%22:null},%22TYPE%22:{%22breakdown%22:0,%22values%22:[%22TEXT%22,%22IMAGE%22,%22SOUND%22,%22VIDEO%22]},%22COUNTRY%22:{%22values%22:[%22Germany%22,%22Netherlands%22,%22France%22,%22Italy%22,%22Slovenia%22]}}
-  getBreakdownRequest(route: string): BreakdownRequest {
-    const params = url.parse(route, true).query;
-    const res = { filters: { contentTier: {} } };
-
-    if (params && params.filters) {
-      // TODO: handlle POST
-
-      const parsed = JSON.parse(params.filters as string);
-
-      console.log('parsed parameter: ' + JSON.stringify(parsed, null, 4));
-      res.filters = parsed;
-    }
-    return res as BreakdownRequest;
-  }
 
   getDistinctValues(chos: Array<CHO>, filterName: string): Array<string> {
     return Object.keys(
@@ -104,8 +90,29 @@ new (class extends TestDataServer {
     response.setHeader('Content-Type', 'application/json;charset=UTF-8');
     response.statusCode = 200;
 
-    const breakdownRequest = this.getBreakdownRequest(request.url as string);
+    if (request.method === 'POST') {
+      let body = '';
+      request.on('data', (chunk) => {
+        body += chunk;
+      });
+      request.on('end', () => {
+        this.sendResponse(response, JSON.parse(body) as BreakdownRequest);
+      });
+    } else {
+      const breakdownRequest = { filters: { contentTier: {} } };
+      const params = url.parse(request.url, true).query;
 
+      if (params && params.filters) {
+        breakdownRequest.filters = JSON.parse(params.filters as string);
+      }
+      this.sendResponse(response, breakdownRequest);
+    }
+  };
+
+  sendResponse(
+    response: ServerResponse,
+    breakdownRequest: BreakdownRequest
+  ): void {
     const filteredCHOs = this.allCHOs.slice().filter((cho: CHO) => {
       let res = true;
       Object.keys(breakdownRequest.filters).forEach((fName: string) => {
@@ -135,5 +142,5 @@ new (class extends TestDataServer {
         results: [this.asBreakdown(filteredCHOs, breakdownRequest)]
       } as BreakdownResults)
     );
-  };
+  }
 })();

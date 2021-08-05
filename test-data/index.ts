@@ -1,11 +1,7 @@
 import * as url from 'url';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server';
-import {
-  Facet,
-  FacetField,
-  IHashStringArray
-} from '../src/app/_models';
+import { Facet, FacetField, IHashStringArray } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
 import { CHO } from './_models/test-models';
 import { DataGenerator } from './data-generator';
