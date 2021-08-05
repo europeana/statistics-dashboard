@@ -46,7 +46,12 @@ new (class extends TestDataServer {
     breakdownRequest: BreakdownRequest,
     depth = 0
   ): BreakdownResult {
-    const filterNames = Object.keys(breakdownRequest.filters);
+    const filterNames = Object.keys(breakdownRequest.filters).filter(
+      (fName: string) => {
+        return !['createdDate', 'datasetName'].includes(fName);
+      }
+    );
+
     const filterName = filterNames[depth];
     const possibleValues = this.getDistinctValues(chos, filterName);
 
@@ -62,7 +67,7 @@ new (class extends TestDataServer {
         );
 
         const nestedBreakdown =
-          Object.keys(breakdownRequest.filters).length > depth + 1
+          filterNames.length > depth + 1
             ? this.asBreakdown(valueCHOs, breakdownRequest, depth + 1)
             : undefined;
 
@@ -115,26 +120,28 @@ new (class extends TestDataServer {
   ): void {
     const filteredCHOs = this.allCHOs.slice().filter((cho: CHO) => {
       let res = true;
-      Object.keys(breakdownRequest.filters).forEach((fName: string) => {
-        const filter = breakdownRequest.filters[fName] as RequestFilter;
-        if (filter.values) {
-          if (!filter.values.includes(cho[fName])) {
-            res = false;
+      Object.keys(breakdownRequest.filters)
+        .filter((fName: string) => {
+          return !['createdDate', 'datasetName'].includes(fName);
+        })
+        .forEach((fName: string) => {
+          const filter = breakdownRequest.filters[fName] as RequestFilter;
+          if (filter.values) {
+            if (!filter.values.includes(cho[fName])) {
+              res = false;
+            }
           }
-        }
-      });
+        });
       return res;
     });
 
-    const filterOptions = Object.keys(breakdownRequest.filters).map(
-      (fName: string) => {
-        const possibleValues = this.getDistinctValues(filteredCHOs, fName);
-        return {
-          filter: fName,
-          availableOptions: possibleValues
-        };
-      }
-    );
+    const filterOptions = facetNames.map((fName: string) => {
+      const possibleValues = this.getDistinctValues(filteredCHOs, fName);
+      return {
+        filter: fName,
+        availableOptions: possibleValues
+      };
+    });
 
     response.end(
       JSON.stringify({

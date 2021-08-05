@@ -23,6 +23,8 @@ import {
 } from '../_helpers';
 
 import {
+  BreakdownRequest,
+  BreakdownResults,
   Facet,
   FacetField,
   FacetFieldProcessed,
@@ -92,6 +94,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   filterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
 
+  useDataServer = true;
+  dataServerData: BreakdownResults;
+
   constructor(
     private api: APIService,
     private fb: FormBuilder,
@@ -102,6 +107,60 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     super();
     this.buildForm();
     this.initialiseFilterStates();
+  }
+
+  getDataServerData(): void {
+    const breakdownRequest: BreakdownRequest = { filters: {} };
+
+    breakdownRequest.filters[this.form.value.facetParameter] = {
+      breakdown: 0
+    };
+
+    Object.keys(this.queryParams).forEach((key: string) => {
+      const sendValues = [];
+      const values = this.queryParams[key];
+
+      if (!this.nonFilterQPs.includes(key)) {
+        values.forEach((valPart: string) => {
+          if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
+            sendValues.push(encodeURIComponent(fromInputSafeName(valPart)));
+          }
+        });
+        breakdownRequest.filters[key] = { values: sendValues };
+      }
+    });
+
+    const valFrom = this.form.value.dateFrom;
+    const valTo = this.form.value.dateTo;
+
+    if (valFrom && valTo) {
+      breakdownRequest.filters['createdDate'] = {
+        from: new Date(valFrom).toISOString().split('T')[0],
+        to: new Date(valTo).toISOString().split('T')[0]
+      };
+    }
+
+    const valDatasetName = this.form.value.datasetName;
+    if (valDatasetName) {
+      breakdownRequest.filters['datasetName'] = {
+        values: [`edm_datasetName:${valDatasetName}`]
+      };
+    }
+
+    /*
+      TODO:
+      const ct = this.getFormattedContentTierParam();
+    */
+
+    console.log(JSON.stringify(breakdownRequest, null, 4));
+
+    this.subs.push(
+      this.api
+        .getBreakdowns(breakdownRequest)
+        .subscribe((breakdownResults: BreakdownResults) => {
+          this.dataServerData = breakdownResults;
+        })
+    );
   }
 
   /** ngOnInit
