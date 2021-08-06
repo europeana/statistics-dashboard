@@ -156,6 +156,21 @@
         </a>
       </div>
 
+      <!-- experiment -->
+      <div *ngIf="useDataServer">
+        Get current params from data server
+        <br />
+        <br />
+        <a (click)="getDataServerData()">Test Data Server</a>
+        /
+        <a (click)="getGeneralResults()">(General)</a>
+        <div *ngIf="dataServerData">
+          <h3>Result</h3>
+          <pre>{{ dataServerData | json }}</pre>
+        </div>
+      </div>
+      <!-- end experiment -->
+
       <!-- Filter removal -->
       <div class="rm-filters-outer">
         <div class="rm-filters-scroll">

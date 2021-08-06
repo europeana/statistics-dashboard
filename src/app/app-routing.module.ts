@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { OverviewComponent } from './overview/overview.component';
-
 import { SplashComponent } from './splash/splash.component';
+import { LandingComponent } from './landing/landing.component';
+import { environment } from '../environments/environment';
 
 const routes: Routes = [
   {
@@ -12,7 +12,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    component: SplashComponent
+    component: environment.useDataServer ? LandingComponent : SplashComponent
   },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

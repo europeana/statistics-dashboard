@@ -1,13 +1,7 @@
 import { Component } from '@angular/core';
 import { facetNames } from '../_data';
 import { DataPollingComponent } from '../data-polling';
-import {
-  Facet,
-  FacetField,
-  IdValue,
-  NameValuePercent,
-  RawFacet
-} from '../_models';
+import { Facet, FacetField, NameValuePercent, RawFacet } from '../_models';
 import { APIService } from '../_services';
 
 @Component({
@@ -24,7 +18,7 @@ export class SplashComponent extends DataPollingComponent {
     .join('');
   isLoading = true;
   splashData: {
-    [facetName: string]: Array<NameValuePercent> | Array<IdValue>;
+    [facetName: string]: Array<NameValuePercent>;
   } = {};
   totalsData: { [facetName: string]: number } = {};
   url = `?query=*&rows=0&profile=facets${this.facetParam}`;
