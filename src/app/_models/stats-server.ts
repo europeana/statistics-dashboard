@@ -1,8 +1,3 @@
-// GENERAL REQUEST
-
-// TODO
-//export interface DataRequest {}
-
 // FILTER / BREAKDOWN REQUEST
 
 export interface RequestFilterRange {
@@ -40,7 +35,10 @@ export interface BreakdownResult {
   by: string;
 }
 
-export interface BreakdownResults {
-  filterOptions: Array<FilterOption>;
+export interface GeneralResults {
   results: Array<BreakdownResult>;
+}
+
+export interface BreakdownResults extends GeneralResults {
+  filterOptions: Array<FilterOption>;
 }

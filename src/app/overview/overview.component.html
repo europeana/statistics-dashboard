@@ -162,6 +162,8 @@
         <br />
         <br />
         <a (click)="getDataServerData()">Test Data Server</a>
+        /
+        <a (click)="getDataServerDataGeneral()">(General)</a>
         <div *ngIf="dataServerData">
           <h3>Result</h3>
           <pre>{{ dataServerData | json }}</pre>

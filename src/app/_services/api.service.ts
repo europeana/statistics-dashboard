@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import {
   BreakdownRequest,
   BreakdownResults,
+  GeneralResults,
   IHashString,
   RawFacet
 } from '../_models';
@@ -25,9 +26,10 @@ export class APIService {
   }
 
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
-    return this.http.post<BreakdownResults>(
-      `http://localhost:3001/`,
-      request //JSON.stringify(request)
-    );
+    return this.http.post<BreakdownResults>(`http://localhost:3001/`, request);
+  }
+
+  getGeneralData(): Observable<GeneralResults> {
+    return this.http.get<GeneralResults>(`http://localhost:3001/`);
   }
 }
