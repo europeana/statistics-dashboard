@@ -29,7 +29,7 @@ export class APIService {
     return this.http.post<BreakdownResults>(`http://localhost:3001/`, request);
   }
 
-  getGeneralData(): Observable<GeneralResults> {
+  getGeneralResults(): Observable<GeneralResults> {
     return this.http.get<GeneralResults>(`http://localhost:3001/`);
   }
 }

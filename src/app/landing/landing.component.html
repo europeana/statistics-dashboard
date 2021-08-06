@@ -1,0 +1,226 @@
+<div
+  class="fit-to-page"
+  [ngClass]="{
+    'loading-modal': isLoading && !splashData['TYPE']
+  }"
+>
+  <ng-template #chartSummary let-facetName="facetName" let-topLabel="topLabel">
+    <span
+      class="container-h totals"
+      *ngIf="splashData[facetName] && splashData[facetName][0]; let data"
+    >
+      <span class="container-v">
+        <span class="total-title bold">Top {{ topLabel }}</span>
+        <span class="total bold">{{ data.name }}</span>
+      </span>
+      <span class="container-v">
+        <span class="total-title">Top {{ topLabel }} records count</span>
+        <span class="total">{{ data.value | number }}</span>
+      </span>
+      <span class="container-v">
+        <span class="total-title">Corresponding percentage</span>
+        <span class="total percent">{{ data.percent }}</span>
+      </span>
+    </span>
+  </ng-template>
+
+  <ng-template #dataRows let-facetName="facetName" let-title="title">
+    <div class="container-v data-rows" *ngIf="splashData[facetName]">
+      <div class="container-h data-rows-title">
+        <span>{{ title }}</span>
+        <span>RECORDS PROVIDED</span>
+      </div>
+      <div
+        *ngFor="let row of splashData[facetName].slice(0, 8)"
+        class="container-h record-list"
+      >
+        <app-truncate [text]="row.name | renameRights"></app-truncate>
+        <span class="numeric">{{ row.value }}</span>
+        <span class="numeric percent">{{ row.percent }}</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="container-v">
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="splashData['contentTier']">
+        <span class="entry-card-header"
+          >Explore by content quality and its licensing<a
+            class="info-icon"
+            href="https://pro.europeana.eu/page/edm-documentation"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: 'contentTier', topLabel: 'tier' }
+            "
+          ></ng-content>
+          <app-bar-chart
+            *ngIf="splashData['contentTier']"
+            [colours]="[barColour]"
+            chartId="contentTypeChart"
+            [extraSettings]="{ prefixValueAxis: 'Tier' }"
+            [results]="splashData['contentTier']"
+          ></app-bar-chart>
+          <a
+            class="data-link"
+            routerLink="/data/contentTier"
+            data-e2e="link-entry-ct"
+            >View by content tier</a
+          >
+        </div>
+      </div>
+      <div class="entry-card" *ngIf="splashData['metadataTier']">
+        <span class="entry-card-header"
+          >Explore by metadata quality<a
+            class="info-icon"
+            href="https://pro.europeana.eu/share-your-data/metadata"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: 'metadataTier', topLabel: 'tier' }
+            "
+          ></ng-content>
+          <app-bar-chart
+            *ngIf="splashData['metadataTier']"
+            [colours]="[barColour]"
+            chartId="metadataTierChart"
+            [extraSettings]="{ prefixValueAxis: 'Tier' }"
+            [results]="splashData['metadataTier']"
+          ></app-bar-chart>
+          <a
+            class="data-link"
+            routerLink="/data/metadataTier"
+            data-e2e="link-entry-metadata"
+            >View by metadata tier</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-card double-card" *ngIf="splashData['COUNTRY']">
+      <span class="entry-card-header">Explore by providing countries</span>
+      <div class="entry-card-content">
+        <div *ngIf="splashData['COUNTRY']" class="entry-card-pair">
+          <div class="map-container">
+            <app-map-chart [results]="splashData['COUNTRY']"></app-map-chart>
+          </div>
+          <ng-content
+            *ngTemplateOutlet="
+              dataRows;
+              context: { facetName: 'COUNTRY', title: 'COUNTRY' }
+            "
+          ></ng-content>
+        </div>
+        <a
+          class="data-link"
+          routerLink="/data/COUNTRY"
+          data-e2e="link-entry-country"
+          >View by countries</a
+        >
+      </div>
+    </div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="splashData['TYPE']">
+        <span class="entry-card-header">Explore by type of content</span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: 'TYPE', topLabel: 'type' }
+            "
+          ></ng-content>
+          <app-bar-chart
+            *ngIf="splashData['TYPE']"
+            [colours]="[barColour]"
+            chartId="typeChart"
+            [results]="splashData['TYPE']"
+          ></app-bar-chart>
+          <a
+            class="data-link"
+            routerLink="/data/TYPE"
+            data-e2e="link-entry-type"
+            >View by type</a
+          >
+        </div>
+      </div>
+      <div class="entry-card" *ngIf="splashData['RIGHTS']">
+        <span class="entry-card-header"
+          >Explore by rights statement<a
+            class="info-icon"
+            href="https://pro.europeana.eu/page/available-rights-statements"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <div *ngIf="splashData['RIGHTS']" class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: { facetName: 'RIGHTS', title: 'RIGHTS STATEMENT' }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/RIGHTS"
+            data-e2e="link-entry-rights"
+            >View by rights statement</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="splashData['DATA_PROVIDER']">
+        <span class="entry-card-header">Explore by data provider</span>
+        <div class="entry-card-content">
+          <div *ngIf="splashData['DATA_PROVIDER']" class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: { facetName: 'DATA_PROVIDER', title: 'DATA PROVIDER' }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/DATA_PROVIDER"
+            data-e2e="link-entry-data-provider"
+            >View by data provider</a
+          >
+        </div>
+      </div>
+      <div class="entry-card" *ngIf="splashData['PROVIDER']">
+        <span class="entry-card-header">Explore by provider</span>
+        <div class="entry-card-content">
+          <div *ngIf="splashData['PROVIDER']" class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: { facetName: 'PROVIDER', title: 'PROVIDER' }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/PROVIDER"
+            data-e2e="link-entry-provider"
+            >View by provider</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

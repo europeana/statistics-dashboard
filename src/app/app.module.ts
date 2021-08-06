@@ -25,6 +25,7 @@ import { HeaderComponent } from './header';
 import { GridComponent } from './grid';
 import { GridPaginatorComponent } from './grid-paginator';
 import { GridSummaryComponent } from './grid-summary';
+import { LandingComponent } from './landing/landing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { ResizeComponent } from './resize';
 import { SplashComponent } from './splash/splash.component';
@@ -44,6 +45,7 @@ import { TruncateComponent } from './truncate';
     GridPaginatorComponent,
     GridSummaryComponent,
     HeaderComponent,
+    LandingComponent,
     MapComponent,
     OverviewComponent,
     RenameApiFacetPipe,

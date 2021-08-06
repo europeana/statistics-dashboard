@@ -1,7 +1,10 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { CHO } from '../../test-data/_models/test-models';
 
 export abstract class TestDataServer {
   abstract serverName: string;
+
+  allCHOs: Array<CHO>;
 
   constructor(port = 3000) {
     createServer((request: IncomingMessage, response: ServerResponse): void => {
@@ -9,6 +12,13 @@ export abstract class TestDataServer {
       this.handleRequest(request, response);
     }).listen(port, () => {
       console.log(`test server "${this.serverName}" is listening on ${port}`);
+    });
+  }
+
+  // remove filter-exclusion data
+  clearExclusions(): void {
+    this.allCHOs.forEach((cho: CHO) => {
+      cho.exclusions = [];
     });
   }
 

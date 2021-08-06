@@ -95,8 +95,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   filterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
 
-  useDataServer = true;
   dataServerData: BreakdownResults;
+  useDataServer = environment.useDataServer;
 
   constructor(
     private api: APIService,
@@ -110,11 +110,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.initialiseFilterStates();
   }
 
-  getDataServerDataGeneral(): void {
+  getGeneralResults(): void {
     this.subs.push(
-      this.api.getGeneralData().subscribe((generalResults: GeneralResults) => {
-        this.dataServerData = generalResults as BreakdownResults;
-      })
+      this.api
+        .getGeneralResults()
+        .subscribe((generalResults: GeneralResults) => {
+          console.log('got general');
+          this.dataServerData = generalResults as unknown as BreakdownResults;
+        })
     );
   }
 

@@ -8,18 +8,10 @@ import { DataGenerator } from './data-generator';
 
 new (class extends TestDataServer {
   serverName = 'api-server';
-  allCHOs: Array<CHO>;
 
   constructor() {
     super();
     this.allCHOs = new DataGenerator().generateCHOs(1000);
-  }
-
-  // remove filter-exclusion data
-  clearExclusions(): void {
-    this.allCHOs.forEach((cho: CHO) => {
-      cho.exclusions = [];
-    });
   }
 
   // url parse utility

@@ -1,5 +1,11 @@
 // FILTER / BREAKDOWN REQUEST
 
+export interface BreakdownRequest {
+  filters: {
+    [details: string]: RequestFilter | RequestFilterRange;
+  };
+}
+
 export interface RequestFilterRange {
   from: string;
   to: string;
@@ -10,19 +16,13 @@ export interface RequestFilter {
   values?: Array<string>;
 }
 
-export interface BreakdownRequest {
-  filters: {
-    [details: string]: RequestFilter | RequestFilterRange;
-  };
-}
-
 // RESPONSE
 
 export interface CountPercentageValue {
   count: number;
   percentage: number;
   value: string;
-  results?: BreakdownResult;
+  breakdown?: BreakdownResult;
 }
 
 export interface FilterOption {
@@ -31,14 +31,17 @@ export interface FilterOption {
 }
 
 export interface BreakdownResult {
-  breakdown: Array<CountPercentageValue>;
-  by: string;
+  results: Array<CountPercentageValue>;
+  by?: string;
+}
+
+export interface BreakdownResults {
+  filterOptions: {
+    [details: string]: Array<string>;
+  };
+  results: CountPercentageValue;
 }
 
 export interface GeneralResults {
-  results: Array<BreakdownResult>;
-}
-
-export interface BreakdownResults extends GeneralResults {
-  filterOptions: Array<FilterOption>;
+  allBreakdowns: Array<BreakdownResult>;
 }

@@ -9,6 +9,7 @@ import {
   Facet,
   FacetField,
   FilterOption,
+  GeneralResults,
   IHashStringArray,
   RawFacet,
   RequestFilter
@@ -19,36 +20,41 @@ import { DataGenerator } from './data-generator';
 
 new (class extends TestDataServer {
   serverName = 'statistics-data-server';
-  allCHOs: Array<CHO>;
+  generalShowTop = 8;
 
   constructor() {
     super(3001);
     this.allCHOs = new DataGenerator().generateCHOs(1000);
   }
 
-  // remove filter-exclusion data
-  clearExclusions(): void {
-    this.allCHOs.forEach((cho: CHO) => {
-      cho.exclusions = [];
-    });
-  }
-
-  getDistinctValues(chos: Array<CHO>, filterName: string): Array<string> {
-    return Object.keys(
+  getDistinctValues(
+    chos: Array<CHO>,
+    filterName: string,
+    top?: number
+  ): Array<string> {
+    let res = Object.keys(
       chos.reduce((map: IHashBoolean, cho: CHO) => {
         map[cho[filterName]] = true;
         return map;
       }, {})
     );
+    if (top) {
+      res = res.slice(0, top);
+    }
+    return res;
   }
 
-  asBreakdown(chos: Array<CHO>, filterNames: Array<string>): BreakdownResult {
+  asBreakdown(
+    chos: Array<CHO>,
+    filterNames: Array<string>,
+    top?: number
+  ): BreakdownResult {
     const filterName = filterNames[0];
-    const possibleValues = this.getDistinctValues(chos, filterName);
+    const possibleValues = this.getDistinctValues(chos, filterName, top);
 
     return {
       by: filterName,
-      breakdown: possibleValues.map((val: string) => {
+      results: possibleValues.map((val: string) => {
         const valueCHOs = chos.filter((cho: CHO) => {
           return `${cho[filterName]}` === `${val}`;
         });
@@ -58,7 +64,7 @@ new (class extends TestDataServer {
         );
 
         const nestedBreakdown =
-          filterNames.length > 0
+          filterNames.length > 1
             ? this.asBreakdown(
                 valueCHOs,
                 filterNames.slice(1, filterNames.length)
@@ -69,7 +75,7 @@ new (class extends TestDataServer {
           count: valueCHOs.length,
           percentage: percentage,
           value: val,
-          results: nestedBreakdown
+          breakdown: nestedBreakdown
         };
       })
     };
@@ -97,70 +103,70 @@ new (class extends TestDataServer {
         body += chunk;
       });
       request.on('end', () => {
-        this.sendResponse(response, [JSON.parse(body) as BreakdownRequest]);
+        this.sendResponse(response, JSON.parse(body) as BreakdownRequest);
       });
     } else {
-      this.sendResponse(
-        response,
-        facetNames.map((fName: string) => {
-          const res = { filters: {} };
-          res.filters[fName] = {};
-          return res;
-        }),
-        true
-      );
+      const result: GeneralResults = {
+        allBreakdowns: facetNames.map((fName: string) => {
+          return this.asBreakdown(this.allCHOs, [fName], this.generalShowTop);
+        })
+      };
+      response.end(JSON.stringify(result));
     }
   };
 
+  /** sendResponse
+  /* @param { BreakdownRequest: breakdownRequests }
+  */
   sendResponse(
     response: ServerResponse,
-    breakdownRequests: Array<BreakdownRequest>,
-    general = false
+    breakdownRequest: BreakdownRequest
   ): void {
-    const filteredCHOs = general
-      ? this.allCHOs
-      : this.allCHOs.slice().filter((cho: CHO) => {
-          let res = true;
-          Object.keys(breakdownRequests[0].filters)
-            .filter((fName: string) => {
-              return !['createdDate', 'datasetName'].includes(fName);
-            })
-            .forEach((fName: string) => {
-              const filter = breakdownRequests[0].filters[
-                fName
-              ] as RequestFilter;
-              if (filter.values) {
-                if (!filter.values.includes(encodeURIComponent(cho[fName]))) {
-                  cho.exclusions.push(fName);
-                  res = false;
-                }
-              }
-            });
-          return res;
+    const filteredCHOs = this.allCHOs.slice().filter((cho: CHO) => {
+      let res = true;
+      Object.keys(breakdownRequest.filters)
+        .filter((fName: string) => {
+          return !['createdDate', 'datasetName'].includes(fName);
+        })
+        .forEach((fName: string) => {
+          const filter = breakdownRequest.filters[fName] as RequestFilter;
+          if (filter.values) {
+            if (!filter.values.includes(encodeURIComponent(cho[fName]))) {
+              cho.exclusions.push(fName);
+              res = false;
+            }
+          }
         });
+      return res;
+    });
 
-    const filterOptions = general
-      ? undefined
-      : facetNames.map((fName: string) => {
-          const nonExcluded = this.allCHOs.filter((cho: CHO) => {
-            return (
-              cho.exclusions.length === 0 ||
-              (cho.exclusions.length === 1 && cho.exclusions[0] === fName)
-            );
-          });
-          const possibleValues = this.getDistinctValues(nonExcluded, fName);
-          return {
-            filter: fName,
-            availableOptions: possibleValues
-          };
+    const filterOptions = facetNames.reduce(
+      (result: IHashStringArray, fName: string) => {
+        const nonExcluded = this.allCHOs.filter((cho: CHO) => {
+          return (
+            cho.exclusions.length === 0 ||
+            (cho.exclusions.length === 1 && cho.exclusions[0] === fName)
+          );
         });
+        const possibleValues = this.getDistinctValues(nonExcluded, fName);
+        result[fName] = possibleValues;
+        return result;
+      },
+      {}
+    );
 
     response.end(
       JSON.stringify({
         filterOptions: filterOptions,
-        results: breakdownRequests.map((br: BreakdownRequest) => {
-          return this.asBreakdown(filteredCHOs, Object.keys(br.filters));
-        })
+        results: {
+          value: 'ALL RECORDS',
+          count: filteredCHOs.length,
+          percentage: 100,
+          breakdown: this.asBreakdown(
+            filteredCHOs,
+            Object.keys(breakdownRequest.filters)
+          )
+        }
       } as BreakdownResults)
     );
   }

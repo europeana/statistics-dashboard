@@ -1,4 +1,3 @@
-// TODO: rm
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
 export interface IHashString {
@@ -46,11 +45,6 @@ export interface NameValue {
 
 export interface NameValuePercent extends NameValue {
   percent: number;
-}
-
-export interface IdValue {
-  id: string;
-  value: number;
 }
 
 export interface IHashArrayNameLabel {

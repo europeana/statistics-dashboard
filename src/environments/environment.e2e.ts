@@ -3,10 +3,11 @@
  **/
 
 export const environment = {
+  intervalStatus: 2500,
+  intervalStatusMax: 60000 * 9.5,
   production: false,
   serverAPI: 'http://localhost:3000',
   serverPortal: 'https://www.europeana.eu/en/search',
-  intervalStatus: 2500,
-  intervalStatusMax: 60000 * 9.5,
+  useDataServer: true,
   wskey: 'api2demo'
 };
