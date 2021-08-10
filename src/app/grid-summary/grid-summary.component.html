@@ -16,7 +16,7 @@
     {{ "plural_" + _summaryData.name | renameApiFacetShort }}</span
   >
   <span class="total">{{ _summaryData.fields[0].percent }}%</span>
-  <span class="total">{{ grandTotal | number }}</span>
+  <span class="total" data-e2e="total-records">{{ grandTotal | number }}</span>
 
   <span class="total-title"
     >Top {{ _summaryData.name | renameApiFacetShort }} records count</span
