@@ -158,10 +158,9 @@
 
       <!-- experiment -->
       <div *ngIf="useDataServer">
-        Get current params from data server
-        <br />
-        <br />
-        <a (click)="getDataServerData()">Test Data Server</a>
+        <a (click)="getDataServerData()" data-e2e="tmpLoadServerData"
+          >Test Data Server</a
+        >
         /
         <a (click)="getGeneralResults()">(General)</a>
         <div *ngIf="dataServerData">

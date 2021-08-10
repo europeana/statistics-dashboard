@@ -142,6 +142,15 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       }
     });
 
+    if (!breakdownRequest.filters['contentTier']) {
+      breakdownRequest.filters['contentTier'] = {
+        values: ['1', '2', '3', '4']
+      };
+      if (this.form.value.contentTierZero) {
+        breakdownRequest.filters['contentTier'].values.push('0');
+      }
+    }
+
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
 
@@ -159,18 +168,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       };
     }
 
-    /*
-      TODO:
-      const ct = this.getFormattedContentTierParam();
-    */
-
-    console.log(JSON.stringify(breakdownRequest, null, 4));
+    console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
 
     this.subs.push(
       this.api
         .getBreakdowns(breakdownRequest)
         .subscribe((breakdownResults: BreakdownResults) => {
           this.dataServerData = breakdownResults;
+
+          // override facet data
+          this.postProcessResult();
         })
     );
   }
@@ -367,23 +374,63 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* handles data-driven UI
   */
   postProcessResult(): void {
-    this.selFacetIndex = this.findFacetIndex(
-      this.form.value.facetParameter,
-      this.allProcessedFacetData
-    );
-
-    if (this.selFacetIndex < 0) {
-      console.error('unreadable data');
-      return;
-    }
-
     // initialise filterData and add checkboxes
+    if (
+      this.useDataServer &&
+      this.dataServerData &&
+      this.dataServerData.filterOptions
+    ) {
+      const ops = this.dataServerData.filterOptions;
 
-    this.facetConf.forEach((name: string) => {
-      const filterOps = this.getFilterOptions(name, this.allProcessedFacetData);
-      this.filterData[name] = filterOps;
-      this.addOrUpdateFilterControls(name, filterOps);
-    });
+      this.facetConf.forEach((facetName: string) => {
+        let prefix = '';
+
+        if (['contentTier', 'metadataTier'].includes(facetName)) {
+          prefix = 'Tier ';
+        }
+
+        const safeOps = ops[facetName]
+          .map((op: string) => {
+            return {
+              name: toInputSafeName(op),
+              label: prefix + op
+            };
+          })
+          .filter((option: NameLabel) => {
+            return !(
+              facetName === 'contentTier' &&
+              !this.form.value.contentTierZero &&
+              option.name === '0'
+            );
+          });
+        this.filterData[facetName] = safeOps;
+        this.addOrUpdateFilterControls(facetName, safeOps);
+      });
+    } else {
+      this.selFacetIndex = this.findFacetIndex(
+        this.form.value.facetParameter,
+        this.allProcessedFacetData
+      );
+      if (this.selFacetIndex < 0) {
+        console.error('unreadable data');
+        return;
+      }
+
+      this.facetConf.forEach((name: string) => {
+        let filterOps = this.getFilterOptions(name, this.allProcessedFacetData);
+
+        filterOps = filterOps.filter((option: NameLabel) => {
+          return !(
+            name === 'contentTier' &&
+            !this.form.value.contentTierZero &&
+            option.name === '0'
+          );
+        });
+
+        this.filterData[name] = filterOps;
+        this.addOrUpdateFilterControls(name, filterOps);
+      });
+    }
 
     // set pie and table data
     this.extractSeriesData();

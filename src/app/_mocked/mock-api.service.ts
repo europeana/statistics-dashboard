@@ -432,9 +432,20 @@ export class MockAPIService {
     return of(DataProviderData).pipe(delay(1));
   }
 
-  //getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
-  //return this.http.post<BreakdownResults>(`http://localhost:3001/`, request);
-  //}
+  getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
+    return of({
+      filterOptions: {},
+      results: {
+        value: 'ALL',
+        count: 1000,
+        percentage: 100,
+        breakdown: {
+          by: 'contentTier',
+          results: []
+        }
+      }
+    }).pipe(delay(1));
+  }
 
   getGeneralResults(): Observable<GeneralResults> {
     return of(MockGeneralResults).pipe(delay(1));
