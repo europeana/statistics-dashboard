@@ -18,10 +18,11 @@ import {
   MockAPIData,
   MockAPIService,
   MockAPIServiceErrors,
+  MockBreakdowns,
   MockBarComponent,
   MockGridComponent
 } from '../_mocked';
-import { NameLabel } from '../_models';
+import { BreakdownResults, NameLabel } from '../_models';
 import { APIService } from '../_services';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
@@ -64,7 +65,8 @@ describe('OverviewComponent', () => {
         MockBarComponent,
         MockGridComponent,
         SnapshotsComponent,
-        createMockPipe('renameApiFacet')
+        createMockPipe('renameApiFacet'),
+        createMockPipe('renameRights')
       ],
       providers: [
         {
@@ -85,6 +87,7 @@ describe('OverviewComponent', () => {
   const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
+    component.useDataServer = true;
     component.form.get('facetParameter').setValue('contentTier');
     fixture.detectChanges();
   };
@@ -114,7 +117,7 @@ describe('OverviewComponent', () => {
       tick(1);
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe('COUNTRY');
-      expect(component.allProcessedFacetData).toBeTruthy();
+      expect(component.dataServerData).toBeTruthy();
       component.ngOnDestroy();
     }));
   });
@@ -128,39 +131,52 @@ describe('OverviewComponent', () => {
       b4Each();
     });
 
-    it('should load selectively', fakeAsync(() => {
-      spyOn(api, 'loadAPIData').and.callThrough();
+    it('should load', fakeAsync(() => {
+      spyOn(api, 'getBreakdowns').and.callThrough();
 
       params.next({ facet: 'COUNTRY' });
       tick(1);
       fixture.detectChanges();
-      expect(api.loadAPIData).toHaveBeenCalledTimes(1);
+      expect(api.getBreakdowns).toHaveBeenCalledTimes(1);
 
       params.next({ facet: 'TYPE' });
       tick(1);
       fixture.detectChanges();
-      expect(api.loadAPIData).toHaveBeenCalledTimes(1);
+      expect(api.getBreakdowns).toHaveBeenCalledTimes(2);
 
       queryParams.next({ TYPE: ['SOUND', 'VIDEO'] });
       tick(1);
       fixture.detectChanges();
 
-      expect(api.loadAPIData).toHaveBeenCalledTimes(2);
+      expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
 
       component.ngOnDestroy();
     }));
 
     it('should post process', () => {
-      spyOn(component, 'extractSeriesData');
-      component.allProcessedFacetData = [];
+      spyOn(component, 'extractSeriesServerData');
+      component.dataServerData = {} as unknown as BreakdownResults;
       component.postProcessResult();
-      expect(component.extractSeriesData).not.toHaveBeenCalled();
-
-      component.processResult(Object.assign({}, MockAPIData));
-      expect(component.extractSeriesData).not.toHaveBeenCalled();
+      expect(component.extractSeriesServerData).not.toHaveBeenCalled();
+      component.dataServerData = {
+        filterOptions: {
+          contentTier: [],
+          COUNTRY: [],
+          DATA_PROVIDER: [],
+          metadataTier: [],
+          PROVIDER: [],
+          RIGHTS: [],
+          TYPE: []
+        },
+        results: {
+          breakdown: {
+            results: []
+          }
+        }
+      } as unknown as BreakdownResults;
 
       component.postProcessResult();
-      expect(component.extractSeriesData).toHaveBeenCalled();
+      expect(component.extractSeriesServerData).toHaveBeenCalled();
     });
 
     it('should extract data as a percent', fakeAsync(() => {
@@ -171,26 +187,11 @@ describe('OverviewComponent', () => {
       expect(component.allProcessedFacetData[0].fields[0].percent).toBeTruthy();
     }));
 
-    it('should find the facet index', fakeAsync(() => {
-      component.beginPolling();
-      tick(1);
-      component.facetConf.forEach((facet: string, i: number) => {
-        expect(
-          component.findFacetIndex(facet, component.allProcessedFacetData)
-        ).toEqual(i);
-      });
-      component.ngOnDestroy();
-    }));
-
     it('should get the select options', fakeAsync(() => {
+      expect(component.filterData.length).toBeFalsy(0);
       component.beginPolling();
       tick(1);
-      component.facetConf.forEach((facet: string) => {
-        expect(
-          component.getFilterOptions(facet, component.allProcessedFacetData)
-            .length
-        ).toBeGreaterThan(0);
-      });
+      expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       component.ngOnDestroy();
     }));
 
@@ -413,24 +414,6 @@ describe('OverviewComponent', () => {
       component.form.value.dateTo = dateDetect;
       expect(component.getUrlRow('X').indexOf(dateDetect)).toBeGreaterThan(-1);
     });
-  });
-
-  describe('No data', () => {
-    beforeEach(async(() => {
-      configureTestBed(true);
-    }));
-
-    beforeEach(() => {
-      b4Each();
-    });
-
-    it('should have no result', fakeAsync(() => {
-      expect(component.allProcessedFacetData).toBeFalsy();
-      component.beginPolling();
-      tick(1);
-      expect(component.allProcessedFacetData).toBeFalsy();
-      component.ngOnDestroy();
-    }));
   });
 
   describe('Polling', () => {

@@ -1,7 +1,5 @@
 context('statistics-dashboard', () => {
 
-  const tmpLoad = '[data-e2e=tmpLoadServerData]';
-
   const ctZeroParam = 'content-tier-zero=true';
   const ctZeroFilterParam = 'contentTier';
   const selCtrlCTZero = '[for=ctZero]';
@@ -13,11 +11,6 @@ context('statistics-dashboard', () => {
   const selTotalRecords = '[data-e2e="total-records"]';
 
   describe('content-tier zero', () => {
-
-    // Temporary: this data will already be loaded when we move to the data server
-    tmpB4 = () => {
-      cy.get(tmpLoad).click({force: true});
-    };
 
     it('should enable and disable the control according to the url', () => {
       cy.visit(urlDefault);
@@ -33,7 +26,6 @@ context('statistics-dashboard', () => {
 
     it('should enable and disable the menu item', () => {
       cy.visit(urlDefault);
-      //tmpB4();
 
       cy.get(selFilterLabel).should('have.length', 0);
       cy.get(selFilterOpener).contains('Content Tier').should('have.length', 1);

@@ -24,7 +24,9 @@ import {
 
 import {
   BreakdownRequest,
+  BreakdownResult,
   BreakdownResults,
+  CountPercentageValue,
   Facet,
   FacetField,
   FacetFieldProcessed,
@@ -90,7 +92,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   selFacetIndex = 0;
   allProcessedFacetData: Array<FacetProcessed>;
-  allProcessedTotals: Array<number>;
+  resultTotal: number;
 
   filterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
@@ -115,13 +117,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.api
         .getGeneralResults()
         .subscribe((generalResults: GeneralResults) => {
-          console.log('got general');
           this.dataServerData = generalResults as unknown as BreakdownResults;
         })
     );
   }
 
-  getDataServerData(): void {
+  getDataServerDataRequest(): BreakdownRequest {
     const breakdownRequest: BreakdownRequest = { filters: {} };
 
     breakdownRequest.filters[this.form.value.facetParameter] = {
@@ -167,19 +168,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         values: [`edm_datasetName:${valDatasetName}`]
       };
     }
-
     console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
-
-    this.subs.push(
-      this.api
-        .getBreakdowns(breakdownRequest)
-        .subscribe((breakdownResults: BreakdownResults) => {
-          this.dataServerData = breakdownResults;
-
-          // override facet data
-          this.postProcessResult();
-        })
-    );
+    return breakdownRequest;
   }
 
   /** ngOnInit
@@ -244,18 +234,33 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return this.barChart.getSvgData();
   }
 
-  getSummaryData(): FacetProcessed {
-    const data = this.allProcessedFacetData.filter((facet: FacetProcessed) => {
-      return facet.name === this.form.value.facetParameter;
-    });
+  getSummaryData(): BreakdownResult {
+    if (this.useDataServer) {
+      return this.dataServerData.results.breakdown;
+    } else {
+      const data = this.allProcessedFacetData.filter(
+        (facet: FacetProcessed) => {
+          return facet.name === this.form.value.facetParameter;
+        }
+      );
 
-    if (data.length > 0) {
-      return data[0];
+      if (data.length > 0) {
+        return {
+          results: data[0].fields.map((ffp: FacetFieldProcessed) => {
+            return {
+              count: ffp.count,
+              percentage: ffp.percent,
+              value: ffp.label
+            } as CountPercentageValue;
+          }),
+          by: this.form.value.facetParameter
+        };
+      }
+      return {
+        results: [],
+        by: this.form.value.facetParameter
+      };
     }
-    return {
-      fields: [],
-      name: this.form.value.facetParameter
-    };
   }
 
   /** getUrl
@@ -322,7 +327,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   processResult(rawResult: RawFacet): boolean {
     if (rawResult.facets) {
       this.allProcessedFacetData = new Array(rawResult.facets.length);
-      this.allProcessedTotals = new Array(rawResult.facets.length);
+      this.resultTotal = rawResult.totalResults;
 
       rawResult.facets.forEach((f: Facet) => {
         const runningTotal =
@@ -337,7 +342,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
         const facetIndex = this.facetConf.indexOf(f.name);
 
-        this.allProcessedTotals[facetIndex] = rawResult.totalResults;
         this.allProcessedFacetData[facetIndex] = {
           name: f.name,
           fields: f.fields.map((ff: FacetField) => {
@@ -362,7 +366,25 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.barChart.removeAllSeries();
       this.grid.setRows([]);
       if (this.gridSummary) {
-        this.gridSummary.summaryData = { name: '', fields: [] };
+        this.gridSummary.summaryData = { by: '', results: [] };
+      }
+      return false;
+    }
+  }
+
+  /** processServerResult
+  /* @returns { boolean } - if valid
+  **/
+  processServerResult(results: BreakdownResults): boolean {
+    this.dataServerData = results;
+    if (results.results) {
+      this.resultTotal = results.results.count;
+      return true;
+    } else {
+      this.barChart.removeAllSeries();
+      this.grid.setRows([]);
+      if (this.gridSummary) {
+        this.gridSummary.summaryData = { by: '', results: [] };
       }
       return false;
     }
@@ -375,37 +397,34 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   postProcessResult(): void {
     // initialise filterData and add checkboxes
-    if (
-      this.useDataServer &&
-      this.dataServerData &&
-      this.dataServerData.filterOptions
-    ) {
-      const ops = this.dataServerData.filterOptions;
-
-      this.facetConf.forEach((facetName: string) => {
-        let prefix = '';
-
-        if (['contentTier', 'metadataTier'].includes(facetName)) {
-          prefix = 'Tier ';
-        }
-
-        const safeOps = ops[facetName]
-          .map((op: string) => {
-            return {
-              name: toInputSafeName(op),
-              label: prefix + op
-            };
-          })
-          .filter((option: NameLabel) => {
-            return !(
-              facetName === 'contentTier' &&
-              !this.form.value.contentTierZero &&
-              option.name === '0'
-            );
-          });
-        this.filterData[facetName] = safeOps;
-        this.addOrUpdateFilterControls(facetName, safeOps);
-      });
+    if (this.useDataServer) {
+      if (this.dataServerData && this.dataServerData.filterOptions) {
+        const ops = this.dataServerData.filterOptions;
+        this.facetConf.forEach((facetName: string) => {
+          let prefix = '';
+          if (['contentTier', 'metadataTier'].includes(facetName)) {
+            prefix = 'Tier ';
+          }
+          const safeOps = ops[facetName]
+            .map((op: string) => {
+              return {
+                name: toInputSafeName(op),
+                label: prefix + op
+              };
+            })
+            .filter((option: NameLabel) => {
+              return !(
+                facetName === 'contentTier' &&
+                !this.form.value.contentTierZero &&
+                option.name === '0'
+              );
+            });
+          this.filterData[facetName] = safeOps;
+          this.addOrUpdateFilterControls(facetName, safeOps);
+        });
+        // set pie and table data
+        this.extractSeriesServerData();
+      }
     } else {
       this.selFacetIndex = this.findFacetIndex(
         this.form.value.facetParameter,
@@ -426,37 +445,54 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             option.name === '0'
           );
         });
-
         this.filterData[name] = filterOps;
         this.addOrUpdateFilterControls(name, filterOps);
       });
+      // set pie and table data
+      this.extractSeriesData();
     }
-
-    // set pie and table data
-    this.extractSeriesData();
   }
 
   /** beginPolling
   /* - set up data polling for facet data
   */
   beginPolling(fnCallback?: (refresh?: boolean) => void): void {
-    this.pollRefresh = this.createNewDataPoller(
-      60 * 100000,
-      () => {
-        this.isLoading = true;
-        const url = `${this.getUrl()}&rows=0&profile=facets${this.getFormattedFacetParam()}`;
-        return this.api.loadAPIData(url);
-      },
-      (rawResult: RawFacet) => {
-        this.isLoading = false;
-        if (this.processResult(rawResult)) {
-          this.postProcessResult();
+    if (this.useDataServer) {
+      this.pollRefresh = this.createNewDataPoller(
+        60 * 100000,
+        () => {
+          this.isLoading = true;
+          return this.api.getBreakdowns(this.getDataServerDataRequest());
+        },
+        (breakdownResults: BreakdownResults) => {
+          this.isLoading = false;
+          if (this.processServerResult(breakdownResults)) {
+            this.postProcessResult();
+          }
+          if (fnCallback) {
+            fnCallback();
+          }
         }
-        if (fnCallback) {
-          fnCallback();
+      ).getPollingSubject();
+    } else {
+      this.pollRefresh = this.createNewDataPoller(
+        60 * 100000,
+        () => {
+          this.isLoading = true;
+          const url = `${this.getUrl()}&rows=0&profile=facets${this.getFormattedFacetParam()}`;
+          return this.api.loadAPIData(url);
+        },
+        (rawResult: RawFacet) => {
+          this.isLoading = false;
+          if (this.processResult(rawResult)) {
+            this.postProcessResult();
+          }
+          if (fnCallback) {
+            fnCallback();
+          }
         }
-      }
-    ).getPollingSubject();
+      ).getPollingSubject();
+    }
   }
 
   initialiseFilterStates(): void {
@@ -505,7 +541,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         .map((key: string) => {
           const innerRes = [];
           const values = this.queryParams[key];
-          if (!this.nonFilterQPs.includes(key)) {
+          if (values && !this.nonFilterQPs.includes(key)) {
             values
               .map((s: string) => {
                 return fromInputSafeName(s);
@@ -520,7 +556,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         .filter((x) => x.length > 0)
         .join(' and ');
     }
-
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
       label: label,
@@ -984,13 +1019,46 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       });
   }
 
+  /** extractSeriesServerData
+  /* @param { number } facetIndex - the index of the facet to use
+  */
+  extractSeriesServerData(): void {
+    if (this.barChart) {
+      // force refresh of axes when switching category
+      this.barChart.drawChart();
+    }
+
+    const chartData = this.dataServerData.results.breakdown.results.map(
+      (cpv: CountPercentageValue) => {
+        let formattedName;
+        if (this.form.value.facetParameter === 'RIGHTS') {
+          formattedName = rightsUrlMatch(cpv.value);
+        }
+        return {
+          name: formattedName ? formattedName : cpv.value,
+          value: cpv.count,
+          percent: cpv.percentage
+        };
+      }
+    );
+
+    const filtersApplied = Object.keys(this.queryParams).length > 0;
+
+    // store as hidden unless "all"
+    this.storeSeries(true, !filtersApplied, chartData, this.resultTotal);
+
+    // show other applied
+    this.addAppliedSeriesToChart();
+    this.showAppliedSeriesInTable();
+  }
+
   /** extractSeriesData
   /*
   /* @param { number } facetIndex - the index of the facet to use
   */
   extractSeriesData(facetIndex = this.selFacetIndex): void {
     const facetFields = this.allProcessedFacetData[facetIndex].fields;
-    const seriesTotal = this.allProcessedTotals[facetIndex];
+    const seriesTotal = this.resultTotal;
 
     if (this.barChart) {
       // force refresh of axes when switching category

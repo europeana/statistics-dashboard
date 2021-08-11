@@ -5,37 +5,8 @@ import {
   BreakdownResults,
   GeneralResults,
   IHashString,
-  ProviderDatum,
   RawFacet
 } from '../_models';
-
-const DataProviderData = [
-  {
-    name: 'Aa aaa aaaaa',
-    dataProviders: [
-      { name: 'a1', count: 1 },
-      { name: 'a2', count: 2 },
-      { name: 'a3', count: 3 }
-    ],
-    dataProvidersShowing: true,
-    count: 18787
-  },
-  {
-    name: 'Bb bbb bbbbb',
-    dataProviders: [
-      { name: 'b1', count: 1 },
-      { name: 'b2', count: 2 },
-      { name: 'b3', count: 3 }
-    ],
-    dataProvidersShowing: true,
-    count: 21355
-  },
-  {
-    name: 'Cc ccc ccccc',
-    dataProvidersShowing: false,
-    count: 6529
-  }
-];
 
 export const MockAPIData = {
   facets: [
@@ -409,6 +380,401 @@ export const MockGeneralResults = {
   ]
 } as GeneralResults;
 
+export const MockBreakdowns = {
+  filterOptions: {
+    contentTier: ['0', '1', '2', '3'],
+    COUNTRY: [
+      'Denmark',
+      'Ireland',
+      'Norway',
+      'Finland',
+      'Germany',
+      'Portugal',
+      'Poland',
+      'Italy',
+      'Holy See (Vatican City State)',
+      'Croatia',
+      'Iceland'
+    ],
+    DATA_PROVIDER: [
+      'The Danish Agency for Culture',
+      'University College Cork',
+      'The National Archives of Norway',
+      'National Library of Finland',
+      'Bildarchiv Foto Marburg',
+      'Biblioteca Pública Municipal do Porto',
+      'Wielkopolska Biblioteka Cyfrowa',
+      'Internet Culturale',
+      'Biblioteca Apostolica Vatican',
+      'Muzej za umjetnost i obrt, Zagreb',
+      'National Library of Spain'
+    ],
+    metadataTier: ['B', 'C'],
+    PROVIDER: [
+      'CARARE',
+      'European Commission',
+      'LoCloud',
+      'The European Library',
+      'Museu',
+      'Federacja Bibliotek Cyfrowych',
+      'Linked Heritage',
+      'AthenaPlus'
+    ],
+    RIGHTS: [
+      'https://creativecommons.org/licenses/by-nc-sa/4.0',
+      'https://creativecommons.org/licenses/by-nd/2.5/pl',
+      'https://creativecommons.org/licenses/by-nd/3.0/pl',
+      'https://rightsstatements.org/vocab/CNE/1.0',
+      'https://creativecommons.org/licenses/by/2.0/uk',
+      'https://rightsstatements.org/vocab/InC/1.0',
+      'https://creativecommons.org/licenses/by-nc-sa/3.0',
+      'https://creativecommons.org/licenses/by-sa/3.0/de',
+      'https://creativecommons.org/licenses/by/2.5/pl',
+      'https://rightsstatements.org/vocab/InC-EDU/1.0',
+      'https://creativecommons.org/licenses/by/3.0/pl',
+      'https://creativecommons.org/licenses/by-nc-nd/3.0',
+      'https://creativecommons.org/licenses/by/3.0/de',
+      'https://creativecommons.org/licenses/by-sa',
+      'https://creativecommons.org/licenses/by-sa/3.0/nl',
+      'https://creativecommons.org/licenses/by-nc-sa/3.0/pl',
+      'https://creativecommons.org/licenses/by-nc-sa/3.0/de',
+      'https://creativecommons.org/licenses/by-nc-nd/3.0/pl',
+      'https://creativecommons.org/licenses/by-nc/3.0/nl',
+      'https://creativecommons.org/licenses/by-nc-nd/2.5/pl',
+      'https://creativecommons.org/licenses/by-sa/4.0',
+      'https://creativecommons.org/licenses/by/2.5',
+      'https://creativecommons.org/licenses/by-nd/4.0',
+      'https://creativecommons.org/licenses/by-nc-sa/2.5/pl',
+      'https://creativecommons.org/licenses/by-nc-nd/3.0/de',
+      'https://creativecommons.org/licenses/by-sa/3.0/',
+      'https://creativecommons.org/licenses/by-nc/2.5/se',
+      'https://creativecommons.org/licenses/by-nc-sa/3.0/ie',
+      'https://creativecommons.org/licenses/by/3.0',
+      'https://rightsstatements.org/vocab/NoC-NC/1.0',
+      'https://creativecommons.org/licenses/by-nc-nd',
+      'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de',
+      'https://creativecommons.org/licenses/by-nc-nd/2.5/pt',
+      'https://creativecommons.org/licenses/by-sa/2.5',
+      'https://creativecommons.org/licenses/by-nc/3.0/de',
+      'https://creativecommons.org/licenses/by-nc/2.5/pl',
+      'https://rightsstatements.org/page/InC/1.0',
+      'https://creativecommons.org/licenses/by-nc-sa/2.5/fr',
+      'https://creativecommons.org/licenses/by-nc-nd/4.0',
+      'https://creativecommons.org/licenses/by-nc/3.0/pl',
+      'https://rightsstatements.org/vocab/InC-OW-EU/1.0',
+      'https://creativecommons.org/licenses/by/4.0',
+      'https://creativecommons.org/licenses/by-nc-nd/3.0/gr',
+      'https://creativecommons.org/licenses/by/2.0/',
+      'https://creativecommons.org/licenses/by-nc/4.0',
+      'https://www.europeana.eu/rights/rr-f',
+      'https://creativecommons.org/licenses/by-nd/3.0',
+      'https://creativecommons.org/licenses/by-nc-nd/2.5',
+      'https://creativecommons.org/publicdomain/mark/1.0',
+      'https://creativecommons.org/licenses/by-nc/2.0/at',
+      'https://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca',
+      'https://creativecommons.org/licenses/by-nd/3.0/de',
+      'https://creativecommons.org/licenses/by-sa/3.0/pl',
+      'https://creativecommons.org/licenses/by-nc-sa/2.5',
+      'https://www.europeana.eu/rights/out-of-copyright-non-commercial',
+      'https://creativecommons.org/licenses/by-nc-nd/2.0',
+      'https://creativecommons.org/publicdomain/zero/1.0',
+      'https://creativecommons.org/licenses/by-nc/3.0/pt',
+      'https://creativecommons.org/licenses/by-sa/3.0',
+      'https://creativecommons.org/licenses/by-nc/2.0',
+      'https://creativecommons.org/licenses/by-nc-sa/3.0/es',
+      'https://creativecommons.org/licenses/by-nc-nd/2.5/ch',
+      'https://creativecommons.org/licenses/by-nc/3.0',
+      'https://rightsstatements.org/vocab/NoC-OKLR/1.0'
+    ],
+    TYPE: ['IMAGE', 'SOUND', 'VIDEO']
+  },
+  results: {
+    value: 'ALL RECORDS',
+    count: 11,
+    percentage: 100,
+    breakdown: {
+      by: 'COUNTRY',
+      results: [
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Denmark',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '1'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Ireland',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '1'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Norway',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '1'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Finland',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '2'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Germany',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '1'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Portugal',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '3'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Poland',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '2'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Italy',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '2'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Holy See (Vatican City State)',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '3'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Croatia',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '3'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          count: 1,
+          percentage: 9.09,
+          value: 'Iceland',
+          breakdown: {
+            by: 'RIGHTS',
+            results: [
+              {
+                count: 1,
+                percentage: 100,
+                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                breakdown: {
+                  by: 'contentTier',
+                  results: [
+                    {
+                      count: 1,
+                      percentage: 100,
+                      value: '2'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+} as BreakdownResults;
+
 export class MockAPIService {
   errorMode = false;
 
@@ -428,23 +794,14 @@ export class MockAPIService {
     };
   }
 
-  loadDataProviderData(): Observable<Array<ProviderDatum>> {
-    return of(DataProviderData).pipe(delay(1));
-  }
-
   getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
-    return of({
-      filterOptions: {},
-      results: {
-        value: 'ALL',
-        count: 1000,
-        percentage: 100,
-        breakdown: {
-          by: 'contentTier',
-          results: []
-        }
-      }
-    }).pipe(delay(1));
+    if (this.errorMode) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return of({ filterOptions: {}, results: {} } as BreakdownResults).pipe(
+        delay(1)
+      );
+    }
+    return of(MockBreakdowns).pipe(delay(1));
   }
 
   getGeneralResults(): Observable<GeneralResults> {
