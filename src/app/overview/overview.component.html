@@ -2,7 +2,7 @@
   [formGroup]="form"
   class="dashboard-wrapper"
   [ngClass]="{
-    'loading-modal': isLoading && !allProcessedFacetData
+    'loading-modal': isLoading && !allProcessedFacetData && !dataServerData
   }"
 >
   <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
@@ -57,7 +57,7 @@
 
         <ul class="filters">
           <li>
-            <ng-container *ngIf="allProcessedFacetData">
+            <ng-container *ngIf="allProcessedFacetData || dataServerData">
               <ng-container *ngFor="let filter of facetConf">
                 <app-filter
                   [form]="form"
@@ -156,20 +156,6 @@
         </a>
       </div>
 
-      <!-- experiment -->
-      <div *ngIf="useDataServer">
-        <a (click)="getDataServerData()" data-e2e="tmpLoadServerData"
-          >Test Data Server</a
-        >
-        /
-        <a (click)="getGeneralResults()">(General)</a>
-        <div *ngIf="dataServerData">
-          <h3>Result</h3>
-          <pre>{{ dataServerData | json }}</pre>
-        </div>
-      </div>
-      <!-- end experiment -->
-
       <!-- Filter removal -->
       <div class="rm-filters-outer">
         <div class="rm-filters-scroll">
@@ -250,8 +236,8 @@
           <ng-container>
             <app-grid-summary
               #gridSummary
-              *ngIf="allProcessedFacetData"
-              [grandTotal]="allProcessedTotals[0]"
+              *ngIf="allProcessedFacetData || dataServerData"
+              [grandTotal]="resultTotal"
               [summaryData]="getSummaryData()"
             ></app-grid-summary>
           </ng-container>

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FacetFieldProcessed, FacetProcessed } from '../_models';
+import { BreakdownResult, CountPercentageValue } from '../_models';
 
 @Component({
   selector: 'app-grid-summary',
@@ -7,12 +7,12 @@ import { FacetFieldProcessed, FacetProcessed } from '../_models';
   styleUrls: ['./grid-summary.component.scss']
 })
 export class GridSummaryComponent {
-  _summaryData: FacetProcessed;
+  _summaryData: BreakdownResult;
   @Input() grandTotal: number;
-  @Input() set summaryData(data: FacetProcessed) {
+  @Input() set summaryData(data: BreakdownResult) {
     this._summaryData = Object.assign({}, data);
-    this._summaryData.fields.sort(
-      (a: FacetFieldProcessed, b: FacetFieldProcessed) => {
+    this._summaryData.results.sort(
+      (a: CountPercentageValue, b: CountPercentageValue) => {
         return a.count > b.count ? -1 : b.count > a.count ? 1 : 0;
       }
     );
