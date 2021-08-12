@@ -38,7 +38,8 @@ import {
   IHashNumber,
   NameLabel,
   NameValuePercent,
-  RawFacet
+  RawFacet,
+  RequestFilter
 } from '../_models';
 
 import { APIService } from '../_services';
@@ -143,12 +144,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       }
     });
 
-    if (!breakdownRequest.filters['contentTier']) {
-      breakdownRequest.filters['contentTier'] = {
-        values: ['1', '2', '3', '4']
-      };
+    const ct = breakdownRequest.filters['contentTier'] as RequestFilter;
+    if (!ct.values) {
+      ct.values = ['1', '2', '3', '4'];
       if (this.form.value.contentTierZero) {
-        breakdownRequest.filters['contentTier'].values.push('0');
+        ct.values.push('0');
       }
     }
 
