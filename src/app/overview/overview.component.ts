@@ -144,11 +144,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       }
     });
 
-    const ct = breakdownRequest.filters['contentTier'] as RequestFilter;
-    if (!ct.values) {
-      ct.values = ['1', '2', '3', '4'];
-      if (this.form.value.contentTierZero) {
-        ct.values.push('0');
+    if (!this.form.value.contentTierZero) {
+      let ct = breakdownRequest.filters['contentTier'] as RequestFilter;
+      if (!ct) {
+        breakdownRequest.filters['contentTier'] = {};
+        ct = breakdownRequest.filters['contentTier'] as RequestFilter;
+      }
+      if (!ct.values) {
+        ct.values = ['1', '2', '3', '4'];
       }
     }
 
@@ -238,11 +241,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (this.useDataServer) {
       return this.dataServerData.results.breakdown;
     } else {
-      const data = this.allProcessedFacetData.filter(
-        (facet: FacetProcessed) => {
-          return facet.name === this.form.value.facetParameter;
-        }
-      );
+      const data = this.allProcessedFacetData
+        ? this.allProcessedFacetData.filter((facet: FacetProcessed) => {
+            return facet.name === this.form.value.facetParameter;
+          })
+        : [];
 
       if (data.length > 0) {
         return {
@@ -539,6 +542,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (Object.keys(this.queryParams).length > 0) {
       label = Object.keys(this.queryParams)
         .map((key: string) => {
+          if (key === 'content-tier-zero') {
+            return 'CT-Zero';
+          }
+
           const innerRes = [];
           const values = this.queryParams[key];
           if (values && !this.nonFilterQPs.includes(key)) {
@@ -547,7 +554,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                 return fromInputSafeName(s);
               })
               .forEach((valPart: string) => {
-                innerRes.push(valPart);
+                innerRes.push(this.renameRights.transform(valPart));
               });
             return `${key} (${innerRes.join(' or ')})`;
           }
