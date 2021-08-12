@@ -26,10 +26,10 @@ export class APIService {
   }
 
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
-    return this.http.post<BreakdownResults>(`http://localhost:3001/`, request);
+    return this.http.post<BreakdownResults>(environment.serverAPI, request);
   }
 
   getGeneralResults(): Observable<GeneralResults> {
-    return this.http.get<GeneralResults>(`http://localhost:3001/`);
+    return this.http.get<GeneralResults>(environment.serverAPI);
   }
 }
