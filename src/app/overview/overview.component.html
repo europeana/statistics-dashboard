@@ -266,7 +266,7 @@
         <app-grid
           #grid
           id="grid"
-          title="{{ form.value.facetParameter | renameApiFacet }}"
+          facet="{{ form.value.facetParameter }}"
           [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
         ></app-grid>

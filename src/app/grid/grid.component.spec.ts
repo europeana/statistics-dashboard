@@ -5,6 +5,7 @@ import {
   TestBed,
   tick
 } from '@angular/core/testing';
+import { createMockPipe } from '../_mocked';
 import { PagerInfo, TableRow } from '../_models';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { GridComponent } from '.';
@@ -43,7 +44,11 @@ describe('GridComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [GridComponent, GridPaginatorComponent],
+      declarations: [
+        createMockPipe('renameApiFacet'),
+        GridComponent,
+        GridPaginatorComponent
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });
