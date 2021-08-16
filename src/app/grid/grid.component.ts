@@ -11,7 +11,7 @@ import { GridPaginatorComponent } from '../grid-paginator';
 export class GridComponent {
   @Input() getUrl: (s: string) => string;
   @Input() getUrlRow: (s: string) => string;
-  @Input() title: string;
+  @Input() facet: string;
   @ViewChild('paginator') paginator: GridPaginatorComponent;
 
   filterString = '';
@@ -87,6 +87,13 @@ export class GridComponent {
       }),
       tableRows: this.gridRows
     };
+  }
+
+  getPrefix(): string {
+    if (['contentTier', 'metadataTier'].includes(this.facet)) {
+      return 'Tier ';
+    }
+    return '';
   }
 
   /** getFilteredRows

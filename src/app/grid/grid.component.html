@@ -62,7 +62,9 @@
       ></app-grid-paginator>
     </span>
 
-    <span class="cell-header cell-first-wide"> Records by {{ title }} </span>
+    <span class="cell-header cell-first-wide">
+      Records by {{ facet | renameApiFacet }}
+    </span>
 
     <span
       class="cell-header text-right"
@@ -129,7 +131,9 @@
           data-e2e="grid-row-name"
           [title]="row.name"
         >
-          <app-truncate [text]="row.name | renameRights"></app-truncate>
+          <app-truncate
+            [text]="getPrefix() + row.name | renameRights"
+          ></app-truncate>
         </span>
 
         <span

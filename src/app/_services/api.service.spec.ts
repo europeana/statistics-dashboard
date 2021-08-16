@@ -31,9 +31,7 @@ describe('APIService', () => {
   });
 
   it('should load the breakdowns', () => {
-    // TODO clean up after integration
-    //const baseUrl = `${environment.serverAPI}`;
-    const baseUrl = 'http://localhost:3001/';
+    const baseUrl = `${environment.serverAPI}`;
     const sub = service
       .getBreakdowns({ filters: {} })
       .subscribe((res: BreakdownResults) => {
@@ -45,9 +43,7 @@ describe('APIService', () => {
   });
 
   it('should load the general results', () => {
-    // TODO clean up after integration
-    //const baseUrl = `${environment.serverAPI}`;
-    const baseUrl = 'http://localhost:3001/';
+    const baseUrl = `${environment.serverAPI}`;
     const sub = service.getGeneralResults().subscribe((res: GeneralResults) => {
       expect(res).toBeTruthy();
     });
