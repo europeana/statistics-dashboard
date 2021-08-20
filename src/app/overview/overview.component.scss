@@ -320,7 +320,6 @@ label {
 }
 
 @media (min-width: $bp-xl) {
-  .chart-and-summary,
   .statistics-dashboard {
     flex-direction: row;
   }
@@ -332,5 +331,11 @@ label {
 
   .filter-select {
     width: $width-left-col;
+  }
+}
+
+@media (min-width: $bp-xxl) {
+  .chart-and-summary {
+    flex-direction: row;
   }
 }
