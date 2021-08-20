@@ -10,6 +10,14 @@ export const facetNames = [
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 
+export const externalLinks = {
+  europeana: '//europeana.eu',
+  pro: '//pro.europeana.eu',
+  api: '//api.europeana.eu',
+  tos: 'tos',
+  privacy: 'privacy'
+};
+
 export const ISOCountryCodes = {
   Bangladesh: 'BD',
   Belgium: 'BE',
