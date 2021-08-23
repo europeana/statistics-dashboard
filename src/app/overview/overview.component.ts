@@ -487,7 +487,37 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         () => {
           this.isLoading = true;
           const url = `${this.getUrl()}&rows=0&profile=facets${this.getFormattedFacetParam()}`;
-          return this.api.loadAPIData(url);
+          return this.api.loadAPIData(url).pipe(
+            map((rf: RawFacet) => {
+              if (rf.facets) {
+                if (this.form.value.contentTierZero) {
+                  return rf;
+                } else {
+                  const result = {
+                    totalResults: rf.totalResults,
+                    facets: []
+                  };
+                  rf.facets.forEach((f: Facet) => {
+                    if (f.name === 'contentTier') {
+                      const filteredFields = f.fields.filter(
+                        (ff: FacetField) => {
+                          return ff.label !== '0';
+                        }
+                      );
+                      result.facets.push({
+                        name: f.name,
+                        fields: filteredFields
+                      });
+                    } else {
+                      result.facets.push(f);
+                    }
+                  });
+                  return result;
+                }
+              }
+              return rf;
+            })
+          );
         },
         (rawResult: RawFacet) => {
           this.isLoading = false;
