@@ -13,7 +13,13 @@
 }
 
 .total.label {
-  max-width: 170px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@media (min-width: $bp-xxl) {
+  .total.label {
+    max-width: 170px;
+    width: 170px;
+  }
 }
