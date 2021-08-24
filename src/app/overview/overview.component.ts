@@ -403,6 +403,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (this.useDataServer) {
       if (this.dataServerData && this.dataServerData.filterOptions) {
         const ops = this.dataServerData.filterOptions;
+        const newOps = {};
+
         this.facetConf.forEach((facetName: string) => {
           let prefix = '';
           if (['contentTier', 'metadataTier'].includes(facetName)) {
@@ -422,9 +424,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                 option.name === '0'
               );
             });
-          this.filterData[facetName] = safeOps;
+          newOps[facetName] = safeOps;
           this.addOrUpdateFilterControls(facetName, safeOps);
         });
+        this.filterData = newOps;
+
         // set pie and table data
         this.extractSeriesServerData();
       }
@@ -483,7 +487,37 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         () => {
           this.isLoading = true;
           const url = `${this.getUrl()}&rows=0&profile=facets${this.getFormattedFacetParam()}`;
-          return this.api.loadAPIData(url);
+          return this.api.loadAPIData(url).pipe(
+            map((rf: RawFacet) => {
+              if (rf.facets) {
+                if (this.form.value.contentTierZero) {
+                  return rf;
+                } else {
+                  const result = {
+                    totalResults: rf.totalResults,
+                    facets: []
+                  };
+                  rf.facets.forEach((f: Facet) => {
+                    if (f.name === 'contentTier') {
+                      const filteredFields = f.fields.filter(
+                        (ff: FacetField) => {
+                          return ff.label !== '0';
+                        }
+                      );
+                      result.facets.push({
+                        name: f.name,
+                        fields: filteredFields
+                      });
+                    } else {
+                      result.facets.push(f);
+                    }
+                  });
+                  return result;
+                }
+              }
+              return rf;
+            })
+          );
         },
         (rawResult: RawFacet) => {
           this.isLoading = false;
@@ -563,6 +597,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         .filter((x) => x.length > 0)
         .join(' and ');
     }
+
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
       label: label,
@@ -1030,11 +1065,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { number } facetIndex - the index of the facet to use
   */
   extractSeriesServerData(): void {
-    if (this.barChart) {
-      // force refresh of axes when switching category
-      this.barChart.drawChart();
-    }
-
     const chartData = this.dataServerData.results.breakdown.results.map(
       (cpv: CountPercentageValue) => {
         let formattedName;
@@ -1057,6 +1087,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     // show other applied
     this.addAppliedSeriesToChart();
     this.showAppliedSeriesInTable();
+
+    if (this.barChart) {
+      // force refresh of axes when switching category
+      this.barChart.drawChart();
+    }
   }
 
   /** extractSeriesData
