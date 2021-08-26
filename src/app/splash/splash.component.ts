@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { facetNames } from '../_data';
-import { DataPollingComponent } from '../data-polling';
+import { externalLinks, facetNames } from '../_data';
 import { Facet, FacetField, NameValuePercent, RawFacet } from '../_models';
 import { APIService } from '../_services';
+import { DataPollingComponent } from '../data-polling';
 
 @Component({
   selector: 'app-splash',
@@ -10,6 +10,7 @@ import { APIService } from '../_services';
   styleUrls: ['./splash.component.scss']
 })
 export class SplashComponent extends DataPollingComponent {
+  public externalLinks = externalLinks;
   barColour = '#0771ce';
   facetParam = facetNames
     .map((s: string) => {

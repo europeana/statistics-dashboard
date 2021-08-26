@@ -15,7 +15,15 @@ export const externalLinks = {
   pro: '//pro.europeana.eu',
   api: '//api.europeana.eu',
   tos: 'tos',
-  privacy: 'privacy'
+  privacy: 'privacy',
+  help: {
+    contentTier:
+      'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
+    metadataTier:
+      ' https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
+    provider: 'https://pro.europeana.eu/page/aggregators',
+    rights: 'https://pro.europeana.eu/page/available-rights-statements'
+  }
 };
 
 export const ISOCountryCodes = {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DataPollingComponent } from '../data-polling';
+import { externalLinks } from '../_data';
 import {
   BreakdownResult,
   CountPercentageValue,
@@ -7,6 +7,7 @@ import {
   NameValuePercent
 } from '../_models';
 import { APIService } from '../_services';
+import { DataPollingComponent } from '../data-polling';
 
 @Component({
   selector: 'app-landing',
@@ -14,6 +15,7 @@ import { APIService } from '../_services';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent extends DataPollingComponent {
+  public externalLinks = externalLinks;
   barColour = '#0771ce';
   isLoading = true;
 

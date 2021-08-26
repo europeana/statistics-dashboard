@@ -47,7 +47,7 @@
         <span class="entry-card-header"
           >Explore by content quality<a
             class="info-icon"
-            href="https://pro.europeana.eu/page/edm-documentation"
+            [href]="externalLinks.help.contentTier"
             target="_blank"
             title="Documentation"
           ></a
@@ -78,7 +78,7 @@
         <span class="entry-card-header"
           >Explore by metadata quality<a
             class="info-icon"
-            href="https://pro.europeana.eu/share-your-data/metadata"
+            [href]="externalLinks.help.metadataTier"
             target="_blank"
             title="Documentation"
           ></a
@@ -158,7 +158,7 @@
         <span class="entry-card-header"
           >Explore by rights statement<a
             class="info-icon"
-            href="https://pro.europeana.eu/page/available-rights-statements"
+            [href]="externalLinks.help.rights"
             target="_blank"
             title="Documentation"
           ></a
@@ -203,7 +203,14 @@
         </div>
       </div>
       <div class="entry-card" *ngIf="splashData['PROVIDER']">
-        <span class="entry-card-header">Explore by provider</span>
+        <span class="entry-card-header"
+          >Explore by provider<a
+            class="info-icon"
+            [href]="externalLinks.help.provider"
+            target="_blank"
+            title="Documentation"
+          ></a>
+        </span>
         <div class="entry-card-content">
           <div *ngIf="splashData['PROVIDER']" class="container-h">
             <ng-content
