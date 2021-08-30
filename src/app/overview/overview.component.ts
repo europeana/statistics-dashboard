@@ -33,7 +33,6 @@ import {
   FacetProcessed,
   FilterState,
   FmtTableData,
-  GeneralResults,
   IHashArrayNameLabel,
   IHashNumber,
   NameLabel,
@@ -111,16 +110,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     super();
     this.buildForm();
     this.initialiseFilterStates();
-  }
-
-  getGeneralResults(): void {
-    this.subs.push(
-      this.api
-        .getGeneralResults()
-        .subscribe((generalResults: GeneralResults) => {
-          this.dataServerData = generalResults as unknown as BreakdownResults;
-        })
-    );
   }
 
   getDataServerDataRequest(): BreakdownRequest {

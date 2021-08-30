@@ -1,5 +1,11 @@
 import { ElementRef } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick
+} from '@angular/core/testing';
 import { ExportComponent } from '.';
 
 import { MockExportCSVService } from '../_mocked';
@@ -43,14 +49,17 @@ describe('ExportComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should copy', () => {
+  it('should copy', fakeAsync(() => {
     (component.contentRef.nativeElement as HTMLInputElement).value = 'some-url';
     component.copy();
     fixture.detectChanges();
     expect(
       component.contentRef.nativeElement.classList.contains('copied')
     ).toBeTruthy();
-  });
+    expect(component.copied).toBeTruthy();
+    tick(component.msMsgDisplay);
+    expect(component.copied).toBeFalsy();
+  }));
 
   it('should export CSV', () => {
     spyOn(exportCSV, 'download');
@@ -65,5 +74,17 @@ describe('ExportComponent', () => {
     spyOn(component, 'getChartData').and.callThrough();
     component.export(ExportType.PDF);
     expect(component.getChartData).toHaveBeenCalled();
+  });
+
+  it('should export only known types', () => {
+    spyOn(component, 'getChartData').and.callThrough();
+    component.export('XXX' as unknown as ExportType);
+    expect(component.getChartData).not.toHaveBeenCalled();
+  });
+
+  it('should toggle the active status', () => {
+    expect(component.active).toBeFalsy();
+    component.toggleActive();
+    expect(component.active).toBeTruthy();
   });
 });

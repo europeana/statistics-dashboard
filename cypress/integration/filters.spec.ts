@@ -62,7 +62,7 @@ context('statistics-dashboard', () => {
       cy.get(selFilterRemoveNav).should('have.length', 1);
     });
 
-    it('should search the filters and rememebr the term when re-opened', () => {
+    it('should search the filters and remember the term when re-opened', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selFilterValueLabel).should('have.length', 0);
       cy.get(selFilterOpener).first().click({force: true});
@@ -76,7 +76,7 @@ context('statistics-dashboard', () => {
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
 
-      cy.get(selFiltersHeader).click();
+      cy.get(selFiltersHeader).click({force: true});
       cy.get(selFilterOpener).first().click({force: true});
       cy.get(selSearch).should('have.value', 'Ge');
     });

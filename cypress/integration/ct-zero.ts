@@ -30,12 +30,12 @@ context('statistics-dashboard', () => {
       cy.get(selFilterLabel).should('have.length', 0);
       cy.get(selFilterOpener).contains('Content Tier').should('have.length', 1);
 
-      cy.get(selFilterOpener).contains('Content Tier').click();
+      cy.get(selFilterOpener).contains('Content Tier').click({force: true});
       cy.get(selFilterLabel).contains('Tier 0').should('have.length', 0);
 
-      cy.get(selCtrlCTZero).click();
+      cy.get(selCtrlCTZero).click({force: true});
 
-      cy.get(selFilterOpener).contains('Content Tier').click();
+      cy.get(selFilterOpener).contains('Content Tier').click({force: true});
       cy.get(selFilterLabel).contains('Tier 0').should('have.length', 1);
     });
 
@@ -45,7 +45,7 @@ context('statistics-dashboard', () => {
       cy.get(selTotalRecords).contains('1,000').should('have.length', 1);
       cy.get(selTotalRecords).contains('819').should('have.length', 0);
 
-      cy.get(selCtrlCTZero).click();
+      cy.get(selCtrlCTZero).click({force: true});
 
       cy.get(selTotalRecords).contains('1,000').should('have.length', 0);
       cy.get(selTotalRecords).contains('819').should('have.length', 1);

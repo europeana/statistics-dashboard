@@ -27,7 +27,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should show information links', () => {
-      cy.get(selLinkInfo).should('have.length', 3);
+      cy.get(selLinkInfo).should('have.length', 4);
     });
 
     it('should show a map', () => {
