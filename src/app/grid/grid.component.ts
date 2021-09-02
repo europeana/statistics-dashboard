@@ -102,7 +102,9 @@ export class GridComponent {
   getFilteredRows(): Array<TableRow> {
     const filter = this.filterString;
     return this.unfilteredPageRows.filter(function (tr: TableRow) {
-      return tr.name.toLowerCase().indexOf(filter) !== -1 || !filter;
+      return (
+        tr.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1 || !filter
+      );
     });
   }
 

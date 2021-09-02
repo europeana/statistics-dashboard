@@ -131,6 +131,10 @@ describe('GridComponent', () => {
     component.filterString = 'b';
     component.setRows(testRows.slice(0));
     expect(component.getFilteredRows().length).toEqual(1);
+
+    component.filterString = 'B';
+    component.setRows(testRows.slice(0));
+    expect(component.getFilteredRows().length).toEqual(1);
   });
 
   it('should go to the page', fakeAsync(() => {
