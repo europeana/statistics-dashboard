@@ -122,10 +122,6 @@
                 {{ facet | renameApiFacet }}
               </option>
             </select>
-            <span
-              class="svg-icon-spin"
-              [ngClass]="{ showing: isLoading }"
-            ></span>
           </h3>
         </ng-container>
 
@@ -216,6 +212,12 @@
 
       <!-- Data Area -->
       <div class="data-area">
+        <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
+        <!--
+        <span
+          class="svg-icon-spin"
+        ></span>
+        -->
         <div class="chart-and-summary">
           <div class="chart-wrapper">
             <app-bar-chart
