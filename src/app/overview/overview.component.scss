@@ -221,19 +221,6 @@ label {
   cursor: pointer;
 }
 
-.svg-icon-spin {
-  background-image: svg-url-icon-spinner(#{$stats-blue});
-  display: none;
-  height: 23px;
-  position: absolute;
-  top: 2px;
-  transform: scale(0.7);
-  width: 23px;
-  &.showing {
-    display: inline-block;
-  }
-}
-
 .datatable {
   margin: 1.6em 0;
 }
@@ -299,6 +286,23 @@ label {
   background-color: $white;
   border-radius: $spacing-m;
   padding: 20px 26px;
+  position: relative;
+
+  .load-bar {
+    background: $stats-blue;
+    border-top-left-radius: $spacing-m;
+    border-top-right-radius: $spacing-m;
+    height: 5px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: 0.3s linear width;
+    width: 0%;
+    &.showing {
+      width: 100%;
+      transition: 0s linear width;
+    }
+  }
 }
 
 .facet-param {
