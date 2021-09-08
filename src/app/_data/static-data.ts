@@ -1,11 +1,13 @@
-export const facetNames = [
-  'contentTier',
-  'COUNTRY',
-  'DATA_PROVIDER',
-  'metadataTier',
-  'PROVIDER',
-  'RIGHTS',
-  'TYPE'
+import { DimensionName } from '../_models';
+
+export const facetNames: Array<DimensionName> = [
+  DimensionName.contentTier,
+  DimensionName.COUNTRY,
+  DimensionName.DATA_PROVIDER,
+  DimensionName.metadataTier,
+  DimensionName.PROVIDER,
+  DimensionName.RIGHTS,
+  DimensionName.TYPE
 ];
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];

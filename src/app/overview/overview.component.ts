@@ -6,6 +6,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { facetNames } from '../_data';
+import { DimensionName } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 
 import { environment } from '../../environments/environment';
@@ -134,10 +135,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
 
     if (!this.form.value.contentTierZero) {
-      let ct = breakdownRequest.filters['contentTier'] as RequestFilter;
+      let ct = breakdownRequest.filters[
+        DimensionName.contentTier
+      ] as RequestFilter;
       if (!ct) {
-        breakdownRequest.filters['contentTier'] = {};
-        ct = breakdownRequest.filters['contentTier'] as RequestFilter;
+        breakdownRequest.filters[DimensionName.contentTier] = {};
+        ct = breakdownRequest.filters[
+          DimensionName.contentTier
+        ] as RequestFilter;
       }
       if (!ct.values) {
         ct.values = ['1', '2', '3', '4'];
@@ -394,27 +399,36 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         const ops = this.dataServerData.filterOptions;
         const newOps = {};
 
-        this.facetConf.forEach((facetName: string) => {
+        this.facetConf.forEach((facetName: DimensionName) => {
           let prefix = '';
-          if (['contentTier', 'metadataTier'].includes(facetName)) {
+          if (
+            [DimensionName.contentTier, DimensionName.metadataTier].includes(
+              facetName
+            )
+          ) {
             prefix = 'Tier ';
           }
-          const safeOps = ops[facetName]
-            .map((op: string) => {
-              return {
-                name: toInputSafeName(op),
-                label: prefix + op
-              };
-            })
-            .filter((option: NameLabel) => {
-              return !(
-                facetName === 'contentTier' &&
-                !this.form.value.contentTierZero &&
-                option.name === '0'
-              );
-            });
-          newOps[facetName] = safeOps;
-          this.addOrUpdateFilterControls(facetName, safeOps);
+
+          if (!ops[facetName]) {
+            console.error('Missing dimension data: ' + facetName);
+          } else {
+            const safeOps = ops[facetName]
+              .map((op: string) => {
+                return {
+                  name: toInputSafeName(op),
+                  label: prefix + op
+                };
+              })
+              .filter((option: NameLabel) => {
+                return !(
+                  facetName === DimensionName.contentTier &&
+                  !this.form.value.contentTierZero &&
+                  option.name === '0'
+                );
+              });
+            newOps[facetName] = safeOps;
+            this.addOrUpdateFilterControls(facetName, safeOps);
+          }
         });
         this.filterData = newOps;
 
@@ -431,12 +445,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         return;
       }
 
-      this.facetConf.forEach((name: string) => {
+      this.facetConf.forEach((name: DimensionName) => {
         let filterOps = this.getFilterOptions(name, this.allProcessedFacetData);
 
         filterOps = filterOps.filter((option: NameLabel) => {
           return !(
-            name === 'contentTier' &&
+            name === DimensionName.contentTier &&
             !this.form.value.contentTierZero &&
             option.name === '0'
           );
@@ -487,7 +501,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                     facets: []
                   };
                   rf.facets.forEach((f: Facet) => {
-                    if (f.name === 'contentTier') {
+                    if (f.name === DimensionName.contentTier) {
                       const filteredFields = f.fields.filter(
                         (ff: FacetField) => {
                           return ff.label !== '0';
@@ -749,7 +763,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* returns Array<string> of values for a facet
   */
   getFilterOptions(
-    facetName: string,
+    facetName: DimensionName,
     facetData: Array<FacetProcessed>
   ): Array<NameLabel> {
     const matchIndex = this.findFacetIndex(facetName, facetData);
@@ -757,7 +771,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       let prefix = '';
       let label = ff.label;
 
-      if (['contentTier', 'metadataTier'].includes(facetName)) {
+      if (
+        [DimensionName.contentTier, DimensionName.metadataTier].includes(
+          facetName
+        )
+      ) {
         prefix = 'Tier ';
       } else if ('RIGHTS' === facetName) {
         label = this.renameRights.transform(label);
@@ -775,7 +793,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   getFormattedContentTierParam(): string {
     let res = '';
-    const filterContentTierParam = this.getSetCheckboxValues('contentTier');
+    const filterContentTierParam = this.getSetCheckboxValues(
+      DimensionName.contentTier
+    );
 
     res = (
       filterContentTierParam.length > 0

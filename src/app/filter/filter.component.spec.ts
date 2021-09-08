@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { toInputSafeName } from '../_helpers';
 import { createMockPipe } from '../_mocked';
+import { DimensionName } from '../_models';
 
 import { FilterComponent } from '.';
 
@@ -39,11 +40,17 @@ describe('FilterComponent', () => {
   });
 
   it('should determine if a select option is enabled', () => {
-    expect(component.selectOptionEnabled('contentTier', '0')).toBeFalsy();
+    expect(
+      component.selectOptionEnabled(DimensionName.contentTier, '0')
+    ).toBeFalsy();
     component.form.get('contentTierZero').setValue(true);
-    expect(component.selectOptionEnabled('contentTier', '0')).toBeTruthy();
+    expect(
+      component.selectOptionEnabled(DimensionName.contentTier, '0')
+    ).toBeTruthy();
     component.form.get('contentTierZero').setValue(true);
-    expect(component.selectOptionEnabled('contentTier', '1')).toBeTruthy();
+    expect(
+      component.selectOptionEnabled(DimensionName.contentTier, '1')
+    ).toBeTruthy();
   });
 
   it('should set the filter options', () => {
@@ -62,7 +69,7 @@ describe('FilterComponent', () => {
 
   it('should get the values', () => {
     const createFormControls = (
-      grp: string,
+      grp: DimensionName,
       ops: Array<string>
     ): Array<FormControl> => {
       const fGroup = new FormBuilder().group({});
@@ -78,27 +85,33 @@ describe('FilterComponent', () => {
       return res;
     };
 
-    createFormControls('COUNTRY', ['xxx', 'yyy', 'zzz']);
-    expect(component.getSetCheckboxValues('COUNTRY')).toEqual('xxx, yyy, zzz');
+    createFormControls(DimensionName.COUNTRY, ['xxx', 'yyy', 'zzz']);
+    expect(component.getSetCheckboxValues(DimensionName.COUNTRY)).toEqual(
+      'xxx, yyy, zzz'
+    );
 
-    createFormControls('metadataTier', ['aaa', 'bbb']);
-    expect(component.getSetCheckboxValues('metadataTier')).toEqual('aaa, bbb');
+    createFormControls(DimensionName.metadataTier, ['aaa', 'bbb']);
+    expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
+      'aaa, bbb'
+    );
 
-    component.group = 'metadataTier';
-    expect(component.getSetCheckboxValues('metadataTier')).toEqual(
+    component.group = DimensionName.metadataTier;
+    expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
       'Tier aaa, Tier bbb'
     );
 
-    component.group = 'PROVIDER';
-    createFormControls('PROVIDER', ['Europeana']);
-    expect(component.getSetCheckboxValues('PROVIDER')).toEqual('Europeana');
+    component.group = DimensionName.PROVIDER;
+    createFormControls(DimensionName.PROVIDER, ['Europeana']);
+    expect(component.getSetCheckboxValues(DimensionName.PROVIDER)).toEqual(
+      'Europeana'
+    );
 
-    component.group = 'RIGHTS';
-    createFormControls('RIGHTS', [
+    component.group = DimensionName.RIGHTS;
+    createFormControls(DimensionName.RIGHTS, [
       'xxx',
       toInputSafeName('//creativecommons.org/licenses/by-nc-nd')
     ]);
-    expect(component.getSetCheckboxValues('RIGHTS')).toEqual(
+    expect(component.getSetCheckboxValues(DimensionName.RIGHTS)).toEqual(
       'xxx, CC BY-NC-ND'
     );
   });

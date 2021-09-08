@@ -3,6 +3,7 @@ import { delay } from 'rxjs/operators';
 import {
   BreakdownRequest,
   BreakdownResults,
+  DimensionName,
   GeneralResults,
   IHashString,
   RawFacet
@@ -11,7 +12,7 @@ import {
 export const MockAPIData = {
   facets: [
     {
-      name: 'contentTier',
+      name: DimensionName.contentTier,
       fields: [
         {
           label: '4',
@@ -63,7 +64,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: 'RIGHTS',
+      name: DimensionName.RIGHTS,
       fields: [
         {
           label: 'http://creativecommons.org/licenses/by-nc-nd',
@@ -112,7 +113,7 @@ export const MockAPIData = {
 export const MockGeneralResults = {
   allBreakdowns: [
     {
-      by: 'contentTier',
+      by: DimensionName.contentTier,
       results: [
         {
           count: 181,
@@ -303,7 +304,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: 'RIGHTS',
+      by: DimensionName.RIGHTS,
       results: [
         {
           count: 50,
@@ -500,14 +501,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Denmark',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -525,14 +526,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Ireland',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -550,14 +551,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Norway',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -575,14 +576,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Finland',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -600,14 +601,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Germany',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -625,14 +626,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Portugal',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -650,14 +651,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Poland',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -675,14 +676,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Italy',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -700,14 +701,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Holy See (Vatican City State)',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -725,14 +726,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Croatia',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -750,14 +751,14 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Iceland',
           breakdown: {
-            by: 'RIGHTS',
+            by: DimensionName.RIGHTS,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
                 breakdown: {
-                  by: 'contentTier',
+                  by: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,

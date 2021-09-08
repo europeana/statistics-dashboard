@@ -54,10 +54,11 @@ export class DataGenerator {
       const type = this.types[random % this.types.length];
       const country = getCountry(i % (type.length * type.length));
       const dProvider = getDataProvider(country, i);
+      const contentTier = this.types.indexOf(type);
       return {
         datasetName: `dataset_${i}`,
         date: 0,
-        contentTier: this.types.indexOf(type),
+        contentTier: `${contentTier}`,
         COUNTRY: country.name,
         metadataTier: this.metadataTiers[random % 4],
         PROVIDER: getProvider(dProvider, i).name,

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { getFormValueList, rightsUrlMatch } from '../_helpers';
-import { FilterState, NameLabel } from '../_models';
+import { DimensionName, FilterState, NameLabel } from '../_models';
 
 @Component({
   selector: 'app-filter',
@@ -10,7 +10,7 @@ import { FilterState, NameLabel } from '../_models';
 })
 export class FilterComponent {
   @Input() form: FormGroup;
-  @Input() group: string;
+  @Input() group: DimensionName;
 
   filteredOptions?: Array<NameLabel>;
   _options?: Array<NameLabel>;
@@ -37,13 +37,17 @@ export class FilterComponent {
     });
   }
 
-  getSetCheckboxValues(filterName: string): string {
+  getSetCheckboxValues(filterName: DimensionName): string {
     return getFormValueList(this.form, filterName)
       .map((s: string) => {
         let prefix = '';
-        if (['contentTier', 'metadataTier'].includes(this.group)) {
+        if (
+          [DimensionName.contentTier, DimensionName.metadataTier].includes(
+            this.group
+          )
+        ) {
           prefix = 'Tier ';
-        } else if (this.group === 'RIGHTS') {
+        } else if (this.group === DimensionName.RIGHTS) {
           const swapped = rightsUrlMatch(s);
           s = swapped ? swapped : s;
         }
@@ -62,7 +66,7 @@ export class FilterComponent {
   }
 
   selectOptionEnabled(group: string, val: string): boolean {
-    return val === '0' && group === 'contentTier'
+    return val === '0' && group === DimensionName.contentTier
       ? this.form.value.contentTierZero
       : true;
   }

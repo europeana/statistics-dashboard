@@ -1,7 +1,9 @@
+import { DimensionName } from '../../src/app/_models';
+
 context('statistics-dashboard', () => {
 
   const ctZeroParam = 'content-tier-zero=true';
-  const ctZeroFilterParam = 'contentTier';
+  const ctZeroFilterParam = DimensionName.contentTier;
   const selCtrlCTZero = '[for=ctZero]';
   const selFilterLabel = '.filter-label';
   const selFilterOpener = '.opener-name';

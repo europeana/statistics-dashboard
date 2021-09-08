@@ -1,13 +1,15 @@
+import { DimensionName } from '../../src/app/_models';
+
 export interface CHO {
   datasetName: string;
   date?: number;
-  contentTier: number;
-  COUNTRY: string;
-  metadataTier: string;
-  PROVIDER: string;
-  DATA_PROVIDER: string;
-  TYPE: string;
-  RIGHTS: string;
+  [DimensionName.contentTier]: string;
+  [DimensionName.COUNTRY]: string;
+  [DimensionName.metadataTier]: string;
+  [DimensionName.PROVIDER]: string;
+  [DimensionName.DATA_PROVIDER]: string;
+  [DimensionName.TYPE]: string;
+  [DimensionName.RIGHTS]: string;
   exclusions: Array<string>;
 }
 

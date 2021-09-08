@@ -1,3 +1,13 @@
+export enum DimensionName {
+  contentTier = 'contentTier',
+  COUNTRY = 'COUNTRY',
+  DATA_PROVIDER = 'DATA_PROVIDER',
+  metadataTier = 'metadataTier',
+  PROVIDER = 'PROVIDER',
+  RIGHTS = 'RIGHTS',
+  TYPE = 'TYPE'
+}
+
 export interface FacetField {
   count: number;
   label: string;
@@ -9,7 +19,7 @@ export interface FacetFieldProcessed extends FacetField {
 }
 
 export interface Facet {
-  name: string;
+  name: DimensionName;
   fields: Array<FacetField>;
 }
 
