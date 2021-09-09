@@ -1,3 +1,4 @@
+import { DimensionName } from '../src/app/_models';
 import {
   CHO,
   CountryDescriptor,
@@ -55,18 +56,22 @@ export class DataGenerator {
       const country = getCountry(i % (type.length * type.length));
       const dProvider = getDataProvider(country, i);
       const contentTier = this.types.indexOf(type);
-      return {
+
+      const res = {
         datasetName: `dataset_${i}`,
         date: 0,
-        contentTier: `${contentTier}`,
-        COUNTRY: country.name,
-        metadataTier: this.metadataTiers[random % 4],
-        PROVIDER: getProvider(dProvider, i).name,
-        DATA_PROVIDER: dProvider.name,
-        TYPE: type,
-        RIGHTS: getRights(i * dProvider.name.length),
         exclusions: []
       };
+
+      res[DimensionName.contentTier] = `${contentTier}`;
+      res[DimensionName.country] = country.name;
+      res[DimensionName.metadataTier] = this.metadataTiers[random % 4];
+      res[DimensionName.provider] = getProvider(dProvider, i).name;
+      res[DimensionName.dataProvider] = dProvider.name;
+      res[DimensionName.type] = type;
+      res[DimensionName.rights] = getRights(i * dProvider.name.length);
+
+      return res as CHO;
     });
   };
 }
