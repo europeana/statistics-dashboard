@@ -62,6 +62,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
 
   // Make variables available to template
+  public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
 
@@ -127,7 +128,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       if (!this.nonFilterQPs.includes(key)) {
         values.forEach((valPart: string) => {
           if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
-            sendValues.push(encodeURIComponent(fromInputSafeName(valPart)));
+            sendValues.push(fromInputSafeName(valPart));
           }
         });
         breakdownRequest.filters[key] = { values: sendValues };
@@ -233,7 +234,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   getSummaryData(): BreakdownResult {
     if (this.useDataServer) {
-      return this.dataServerData.results.breakdown;
+      return this.dataServerData.results.breakdowns;
     } else {
       const data = this.allProcessedFacetData
         ? this.allProcessedFacetData.filter((facet: FacetProcessed) => {
@@ -250,12 +251,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
               value: ffp.label
             } as CountPercentageValue;
           }),
-          by: this.form.value.facetParameter
+          breakdownBy: this.form.value.facetParameter
         };
       }
       return {
         results: [],
-        by: this.form.value.facetParameter
+        breakdownBy: this.form.value.facetParameter
       };
     }
   }
@@ -363,7 +364,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.barChart.removeAllSeries();
       this.grid.setRows([]);
       if (this.gridSummary) {
-        this.gridSummary.summaryData = { by: '', results: [] };
+        this.gridSummary.summaryData = { breakdownBy: '', results: [] };
       }
       return false;
     }
@@ -381,7 +382,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.barChart.removeAllSeries();
       this.grid.setRows([]);
       if (this.gridSummary) {
-        this.gridSummary.summaryData = { by: '', results: [] };
+        this.gridSummary.summaryData = { breakdownBy: '', results: [] };
       }
       return false;
     }
@@ -395,10 +396,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   postProcessResult(): void {
     // initialise filterData and add checkboxes
     if (this.useDataServer) {
-      if (this.dataServerData && this.dataServerData.filterOptions) {
-        const ops = this.dataServerData.filterOptions;
+      if (this.dataServerData && this.dataServerData.filteringOptions && true) {
+        const ops = this.dataServerData.filteringOptions;
         const newOps = {};
-
         this.facetConf.forEach((facetName: DimensionName) => {
           let prefix = '';
           if (
@@ -413,6 +413,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             console.error('Missing dimension data: ' + facetName);
           } else {
             const safeOps = ops[facetName]
+              .slice(0, 50)
               .map((op: string) => {
                 return {
                   name: toInputSafeName(op),
@@ -1074,7 +1075,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { number } facetIndex - the index of the facet to use
   */
   extractSeriesServerData(): void {
-    const chartData = this.dataServerData.results.breakdown.results.map(
+    const chartData = this.dataServerData.results.breakdowns.results.map(
       (cpv: CountPercentageValue) => {
         let formattedName;
         if (this.form.value.facetParameter === 'RIGHTS') {

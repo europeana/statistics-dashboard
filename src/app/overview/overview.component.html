@@ -213,20 +213,16 @@
       <!-- Data Area -->
       <div class="data-area">
         <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
-        <!--
-        <span
-          class="svg-icon-spin"
-        ></span>
-        -->
         <div class="chart-and-summary">
           <div class="chart-wrapper">
             <app-bar-chart
               #barChart
               [showPercent]="form.value.showPercent"
               [extraSettings]="
-                ['contentTier', 'metadataTier'].includes(
-                  form.value.facetParameter
-                )
+                [
+                  DimensionName.contentTier,
+                  DimensionName.metadataTier
+                ].includes(form.value.facetParameter)
                   ? barChartSettingsTiers
                   : barChartSettings
               "

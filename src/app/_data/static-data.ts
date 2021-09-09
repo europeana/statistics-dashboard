@@ -2,12 +2,12 @@ import { DimensionName } from '../_models';
 
 export const facetNames: Array<DimensionName> = [
   DimensionName.contentTier,
-  DimensionName.COUNTRY,
-  DimensionName.DATA_PROVIDER,
+  DimensionName.country,
+  DimensionName.dataProvider,
   DimensionName.metadataTier,
-  DimensionName.PROVIDER,
-  DimensionName.RIGHTS,
-  DimensionName.TYPE
+  DimensionName.provider,
+  DimensionName.rights,
+  DimensionName.type
 ];
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];

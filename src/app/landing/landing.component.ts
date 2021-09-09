@@ -3,6 +3,7 @@ import { externalLinks } from '../_data';
 import {
   BreakdownResult,
   CountPercentageValue,
+  DimensionName,
   GeneralResults,
   NameValuePercent
 } from '../_models';
@@ -16,10 +17,12 @@ import { DataPollingComponent } from '../data-polling';
 })
 export class LandingComponent extends DataPollingComponent {
   public externalLinks = externalLinks;
+  public DimensionName = DimensionName;
+
   barColour = '#0771ce';
   isLoading = true;
 
-  splashData: {
+  landingData: {
     [facetName: string]: Array<NameValuePercent>;
   } = {};
 
@@ -46,7 +49,7 @@ export class LandingComponent extends DataPollingComponent {
       (general: GeneralResults) => {
         this.isLoading = false;
         general.allBreakdowns.forEach((br: BreakdownResult) => {
-          this.splashData[br.by] = br.results.map((x) => {
+          this.landingData[br.breakdownBy] = br.results.map((x) => {
             return this.toNameValuePercent(x);
           });
         });

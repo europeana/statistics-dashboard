@@ -47,7 +47,7 @@ export class FilterComponent {
           )
         ) {
           prefix = 'Tier ';
-        } else if (this.group === DimensionName.RIGHTS) {
+        } else if (this.group === DimensionName.rights) {
           const swapped = rightsUrlMatch(s);
           s = swapped ? swapped : s;
         }

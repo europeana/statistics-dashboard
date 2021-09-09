@@ -1,13 +1,13 @@
 <div
   class="fit-to-page"
   [ngClass]="{
-    'loading-modal': isLoading && !splashData['TYPE']
+    'loading-modal': isLoading && !landingData[DimensionName.type]
   }"
 >
-  <ng-template #chartSummary let-facetName="facetName" let-topLabel="topLabel">
+  <ng-template #chartSummary let-dimension="facetName" let-topLabel="topLabel">
     <span
       class="container-h totals"
-      *ngIf="splashData[facetName] && splashData[facetName][0]; let data"
+      *ngIf="landingData[dimension] && landingData[dimension][0]; let data"
     >
       <span class="container-v">
         <span class="total-title bold">Top {{ topLabel }}</span>
@@ -19,31 +19,31 @@
       </span>
       <span class="container-v">
         <span class="total-title">Corresponding percentage</span>
-        <span class="total percent">{{ data.percent }}</span>
+        <span class="total">{{ data.percent | percent }}</span>
       </span>
     </span>
   </ng-template>
 
-  <ng-template #dataRows let-facetName="facetName" let-title="title">
-    <div class="container-v data-rows" *ngIf="splashData[facetName]">
+  <ng-template #dataRows let-dimension="facetName" let-title="title">
+    <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
       <div class="container-h data-rows-title">
         <span>{{ title }}</span>
         <span>RECORDS PROVIDED</span>
       </div>
-      <div
-        *ngFor="let row of splashData[facetName].slice(0, 8)"
-        class="container-h record-list"
-      >
+      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         <app-truncate [text]="row.name | renameRights"></app-truncate>
         <span class="numeric">{{ row.value }}</span>
-        <span class="numeric percent">{{ row.percent }}</span>
+        <span class="numeric">{{ row.percent | percent }}</span>
       </div>
     </div>
   </ng-template>
 
   <div class="container-v">
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="splashData['contentTier']">
+      <div
+        class="entry-card"
+        *ngIf="landingData[DimensionName.contentTier]; let data"
+      >
         <span class="entry-card-header"
           >Explore by content quality<a
             class="info-icon"
@@ -56,15 +56,17 @@
           <ng-content
             *ngTemplateOutlet="
               chartSummary;
-              context: { facetName: 'contentTier', topLabel: 'tier' }
+              context: {
+                facetName: DimensionName.contentTier,
+                topLabel: 'tier'
+              }
             "
           ></ng-content>
           <app-bar-chart
-            *ngIf="splashData['contentTier']"
             [colours]="[barColour]"
             chartId="contentTypeChart"
             [extraSettings]="{ prefixValueAxis: 'Tier' }"
-            [results]="splashData['contentTier']"
+            [results]="data"
           ></app-bar-chart>
           <a
             class="data-link"
@@ -74,7 +76,10 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="splashData['metadataTier']">
+      <div
+        class="entry-card"
+        *ngIf="landingData[DimensionName.metadataTier]; let data"
+      >
         <span class="entry-card-header"
           >Explore by metadata quality<a
             class="info-icon"
@@ -87,15 +92,17 @@
           <ng-content
             *ngTemplateOutlet="
               chartSummary;
-              context: { facetName: 'metadataTier', topLabel: 'tier' }
+              context: {
+                facetName: DimensionName.metadataTier,
+                topLabel: 'tier'
+              }
             "
           ></ng-content>
           <app-bar-chart
-            *ngIf="splashData['metadataTier']"
             [colours]="[barColour]"
             chartId="metadataTierChart"
             [extraSettings]="{ prefixValueAxis: 'Tier' }"
-            [results]="splashData['metadataTier']"
+            [results]="data"
           ></app-bar-chart>
           <a
             class="data-link"
@@ -107,17 +114,20 @@
       </div>
     </div>
 
-    <div class="entry-card double-card" *ngIf="splashData['COUNTRY']">
+    <div
+      class="entry-card double-card"
+      *ngIf="landingData[DimensionName.country]; let data"
+    >
       <span class="entry-card-header">Explore by providing countries</span>
       <div class="entry-card-content">
-        <div *ngIf="splashData['COUNTRY']" class="entry-card-pair">
+        <div class="entry-card-pair">
           <div class="map-container">
-            <app-map-chart [results]="splashData['COUNTRY']"></app-map-chart>
+            <app-map-chart [results]="data"></app-map-chart>
           </div>
           <ng-content
             *ngTemplateOutlet="
               dataRows;
-              context: { facetName: 'COUNTRY', title: 'COUNTRY' }
+              context: { facetName: DimensionName.country, title: 'COUNTRY' }
             "
           ></ng-content>
         </div>
@@ -131,20 +141,19 @@
     </div>
 
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="splashData['TYPE']">
+      <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
         <span class="entry-card-header">Explore by type of content</span>
         <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
               chartSummary;
-              context: { facetName: 'TYPE', topLabel: 'type' }
+              context: { facetName: DimensionName.type, topLabel: 'type' }
             "
           ></ng-content>
           <app-bar-chart
-            *ngIf="splashData['TYPE']"
             [colours]="[barColour]"
             chartId="typeChart"
-            [results]="splashData['TYPE']"
+            [results]="data"
           ></app-bar-chart>
           <a
             class="data-link"
@@ -154,7 +163,7 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="splashData['RIGHTS']">
+      <div class="entry-card" *ngIf="landingData[DimensionName.rights]">
         <span class="entry-card-header"
           >Explore by rights statement<a
             class="info-icon"
@@ -164,11 +173,14 @@
           ></a
         ></span>
         <div class="entry-card-content">
-          <div *ngIf="splashData['RIGHTS']" class="container-h">
+          <div class="container-h">
             <ng-content
               *ngTemplateOutlet="
                 dataRows;
-                context: { facetName: 'RIGHTS', title: 'RIGHTS STATEMENT' }
+                context: {
+                  facetName: DimensionName.rights,
+                  title: 'RIGHTS STATEMENT'
+                }
               "
             ></ng-content>
           </div>
@@ -183,14 +195,17 @@
     </div>
 
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="splashData['DATA_PROVIDER']">
+      <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
         <span class="entry-card-header">Explore by data provider</span>
         <div class="entry-card-content">
-          <div *ngIf="splashData['DATA_PROVIDER']" class="container-h">
+          <div class="container-h">
             <ng-content
               *ngTemplateOutlet="
                 dataRows;
-                context: { facetName: 'DATA_PROVIDER', title: 'DATA PROVIDER' }
+                context: {
+                  facetName: DimensionName.dataProvider,
+                  title: 'DATA PROVIDER'
+                }
               "
             ></ng-content>
           </div>
@@ -202,7 +217,7 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="splashData['PROVIDER']">
+      <div class="entry-card" *ngIf="landingData[DimensionName.provider]">
         <span class="entry-card-header"
           >Explore by provider<a
             class="info-icon"
@@ -212,11 +227,14 @@
           ></a
         ></span>
         <div class="entry-card-content">
-          <div *ngIf="splashData['PROVIDER']" class="container-h">
+          <div class="container-h">
             <ng-content
               *ngTemplateOutlet="
                 dataRows;
-                context: { facetName: 'PROVIDER', title: 'PROVIDER' }
+                context: {
+                  facetName: DimensionName.provider,
+                  title: 'PROVIDER'
+                }
               "
             ></ng-content>
           </div>

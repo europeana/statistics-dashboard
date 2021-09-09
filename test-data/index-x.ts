@@ -53,7 +53,7 @@ new (class extends TestDataServer {
     const possibleValues = this.getDistinctValues(chos, filterName, top);
 
     return {
-      by: filterName,
+      breakdownBy: filterName,
       results: possibleValues.map((val: string) => {
         const valueCHOs = chos.filter((cho: CHO) => {
           return `${cho[filterName]}` === `${val}`;
@@ -75,7 +75,7 @@ new (class extends TestDataServer {
           count: valueCHOs.length,
           percentage: percentage,
           value: val,
-          breakdown: nestedBreakdown
+          breakdowns: nestedBreakdown
         };
       })
     };
@@ -157,12 +157,12 @@ new (class extends TestDataServer {
 
     response.end(
       JSON.stringify({
-        filterOptions: filterOptions,
+        filteringOptions: filterOptions,
         results: {
           value: 'ALL RECORDS',
           count: filteredCHOs.length,
           percentage: 100,
-          breakdown: this.asBreakdown(
+          breakdowns: this.asBreakdown(
             filteredCHOs,
             Object.keys(breakdownRequest.filters)
           )

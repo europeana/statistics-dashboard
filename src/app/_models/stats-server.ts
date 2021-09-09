@@ -22,7 +22,7 @@ export interface CountPercentageValue {
   count: number;
   percentage: number;
   value: string;
-  breakdown?: BreakdownResult;
+  breakdowns?: BreakdownResult;
 }
 
 export interface FilterOption {
@@ -32,11 +32,11 @@ export interface FilterOption {
 
 export interface BreakdownResult {
   results: Array<CountPercentageValue>;
-  by?: string;
+  breakdownBy?: string;
 }
 
 export interface BreakdownResults {
-  filterOptions: {
+  filteringOptions: {
     [details: string]: Array<string>;
   };
   results: CountPercentageValue;

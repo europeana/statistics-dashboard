@@ -25,7 +25,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: 'metadataTier',
+      name: DimensionName.metadataTier,
       fields: [
         {
           label: 'A',
@@ -38,7 +38,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: 'COUNTRY',
+      name: DimensionName.country,
       fields: [
         {
           label: 'France',
@@ -51,7 +51,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: 'TYPE',
+      name: DimensionName.type,
       fields: [
         {
           label: 'Text',
@@ -64,7 +64,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: DimensionName.RIGHTS,
+      name: DimensionName.rights,
       fields: [
         {
           label: 'http://creativecommons.org/licenses/by-nc-nd',
@@ -77,7 +77,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: 'DATA_PROVIDER',
+      name: DimensionName.dataProvider,
       fields: [
         {
           label: 'Data Provider A1',
@@ -94,7 +94,7 @@ export const MockAPIData = {
       ]
     },
     {
-      name: 'PROVIDER',
+      name: DimensionName.provider,
       fields: [
         {
           label: 'Provider A',
@@ -113,7 +113,7 @@ export const MockAPIData = {
 export const MockGeneralResults = {
   allBreakdowns: [
     {
-      by: DimensionName.contentTier,
+      breakdownBy: DimensionName.contentTier,
       results: [
         {
           count: 181,
@@ -143,7 +143,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: 'COUNTRY',
+      breakdownBy: DimensionName.country,
       results: [
         {
           count: 61,
@@ -188,7 +188,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: 'DATA_PROVIDER',
+      breakdownBy: DimensionName.dataProvider,
       results: [
         {
           count: 61,
@@ -234,7 +234,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: 'metadataTier',
+      breakdownBy: DimensionName.metadataTier,
       results: [
         {
           count: 226,
@@ -259,7 +259,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: 'PROVIDER',
+      breakdownBy: DimensionName.provider,
       results: [
         {
           count: 78,
@@ -304,7 +304,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: DimensionName.RIGHTS,
+      breakdownBy: DimensionName.rights,
       results: [
         {
           count: 50,
@@ -349,7 +349,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      by: 'TYPE',
+      breakdownBy: DimensionName.type,
       results: [
         {
           count: 181,
@@ -382,7 +382,7 @@ export const MockGeneralResults = {
 } as GeneralResults;
 
 export const MockBreakdowns = {
-  filterOptions: {
+  filteringOptions: {
     contentTier: ['0', '1', '2', '3'],
     COUNTRY: [
       'Denmark',
@@ -493,22 +493,22 @@ export const MockBreakdowns = {
     value: 'ALL RECORDS',
     count: 11,
     percentage: 100,
-    breakdown: {
-      by: 'COUNTRY',
+    breakdowns: {
+      breakdownBy: DimensionName.country,
       results: [
         {
           count: 1,
           percentage: 9.09,
           value: 'Denmark',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -525,15 +525,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Ireland',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -550,15 +550,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Norway',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -575,15 +575,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Finland',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -600,15 +600,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Germany',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -625,15 +625,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Portugal',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -650,15 +650,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Poland',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -675,15 +675,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Italy',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -700,15 +700,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Holy See (Vatican City State)',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -725,15 +725,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Croatia',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -750,15 +750,15 @@ export const MockBreakdowns = {
           count: 1,
           percentage: 9.09,
           value: 'Iceland',
-          breakdown: {
-            by: DimensionName.RIGHTS,
+          breakdowns: {
+            breakdownBy: DimensionName.rights,
             results: [
               {
                 count: 1,
                 percentage: 100,
                 value: 'https://creativecommons.org/licenses/by/2.0/uk',
-                breakdown: {
-                  by: DimensionName.contentTier,
+                breakdowns: {
+                  breakdownBy: DimensionName.contentTier,
                   results: [
                     {
                       count: 1,
@@ -798,7 +798,7 @@ export class MockAPIService {
   getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return of({ filterOptions: {}, results: {} } as BreakdownResults).pipe(
+      return of({ filteringOptions: {}, results: {} } as BreakdownResults).pipe(
         delay(1)
       );
     }

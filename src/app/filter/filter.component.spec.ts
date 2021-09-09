@@ -85,8 +85,8 @@ describe('FilterComponent', () => {
       return res;
     };
 
-    createFormControls(DimensionName.COUNTRY, ['xxx', 'yyy', 'zzz']);
-    expect(component.getSetCheckboxValues(DimensionName.COUNTRY)).toEqual(
+    createFormControls(DimensionName.country, ['xxx', 'yyy', 'zzz']);
+    expect(component.getSetCheckboxValues(DimensionName.country)).toEqual(
       'xxx, yyy, zzz'
     );
 
@@ -100,18 +100,18 @@ describe('FilterComponent', () => {
       'Tier aaa, Tier bbb'
     );
 
-    component.group = DimensionName.PROVIDER;
-    createFormControls(DimensionName.PROVIDER, ['Europeana']);
-    expect(component.getSetCheckboxValues(DimensionName.PROVIDER)).toEqual(
+    component.group = DimensionName.provider;
+    createFormControls(DimensionName.provider, ['Europeana']);
+    expect(component.getSetCheckboxValues(DimensionName.provider)).toEqual(
       'Europeana'
     );
 
-    component.group = DimensionName.RIGHTS;
-    createFormControls(DimensionName.RIGHTS, [
+    component.group = DimensionName.rights;
+    createFormControls(DimensionName.rights, [
       'xxx',
       toInputSafeName('//creativecommons.org/licenses/by-nc-nd')
     ]);
-    expect(component.getSetCheckboxValues(DimensionName.RIGHTS)).toEqual(
+    expect(component.getSetCheckboxValues(DimensionName.rights)).toEqual(
       'xxx, CC BY-NC-ND'
     );
   });
