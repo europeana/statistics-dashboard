@@ -1,11 +1,11 @@
 export enum DimensionName {
   contentTier = 'contentTier',
-  COUNTRY = 'COUNTRY',
-  DATA_PROVIDER = 'DATA_PROVIDER',
+  country = 'COUNTRY',
+  dataProvider = 'DATA_PROVIDER',
   metadataTier = 'metadataTier',
-  PROVIDER = 'PROVIDER',
-  RIGHTS = 'RIGHTS',
-  TYPE = 'TYPE'
+  provider = 'PROVIDER',
+  rights = 'RIGHTS',
+  type = 'TYPE'
 }
 
 export interface FacetField {

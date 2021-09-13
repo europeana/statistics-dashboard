@@ -4,12 +4,12 @@ export interface CHO {
   datasetName: string;
   date?: number;
   [DimensionName.contentTier]: string;
-  [DimensionName.COUNTRY]: string;
+  [DimensionName.country]: string;
   [DimensionName.metadataTier]: string;
-  [DimensionName.PROVIDER]: string;
-  [DimensionName.DATA_PROVIDER]: string;
-  [DimensionName.TYPE]: string;
-  [DimensionName.RIGHTS]: string;
+  [DimensionName.provider]: string;
+  [DimensionName.dataProvider]: string;
+  [DimensionName.type]: string;
+  [DimensionName.rights]: string;
   exclusions: Array<string>;
 }
 

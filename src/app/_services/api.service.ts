@@ -13,6 +13,9 @@ import { ISOCountryCodes } from '../_data';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
+  suffixGeneral = 'statistics/europeana/general';
+  suffixFiltering = 'statistics/filtering';
+
   constructor(private readonly http: HttpClient) {}
 
   loadISOCountryCodes(): IHashString {
@@ -26,10 +29,15 @@ export class APIService {
   }
 
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
-    return this.http.post<BreakdownResults>(environment.serverAPI, request);
+    return this.http.post<BreakdownResults>(
+      `${environment.serverAPI}${this.suffixFiltering}`,
+      request
+    );
   }
 
   getGeneralResults(): Observable<GeneralResults> {
-    return this.http.get<GeneralResults>(environment.serverAPI);
+    return this.http.get<GeneralResults>(
+      `${environment.serverAPI}${this.suffixGeneral}`
+    );
   }
 }

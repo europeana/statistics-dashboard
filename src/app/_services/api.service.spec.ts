@@ -31,7 +31,7 @@ describe('APIService', () => {
   });
 
   it('should load the breakdowns', () => {
-    const baseUrl = `${environment.serverAPI}`;
+    const baseUrl = `${environment.serverAPI}${service.suffixFiltering}`;
     const sub = service
       .getBreakdowns({ filters: {} })
       .subscribe((res: BreakdownResults) => {
@@ -43,7 +43,7 @@ describe('APIService', () => {
   });
 
   it('should load the general results', () => {
-    const baseUrl = `${environment.serverAPI}`;
+    const baseUrl = `${environment.serverAPI}${service.suffixGeneral}`;
     const sub = service.getGeneralResults().subscribe((res: GeneralResults) => {
       expect(res).toBeTruthy();
     });

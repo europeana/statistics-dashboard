@@ -111,7 +111,7 @@
         <span class="bold black text-right">
           {{ row.count | number }}
         </span>
-        <span class="black text-right"> {{ row.percent }}% </span>
+        <span class="black text-right"> {{ row.percent | percent }} </span>
 
         <ng-content
           *ngTemplateOutlet="linkOut; context: { row: row }"
@@ -162,7 +162,7 @@
         </span>
 
         <span class="text-right" [ngClass]="{ highlight: row.highlight }">
-          {{ row.percent }}%
+          {{ row.percent | percent }}
         </span>
 
         <ng-content

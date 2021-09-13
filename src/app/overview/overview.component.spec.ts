@@ -21,7 +21,7 @@ import {
   MockBarComponent,
   MockGridComponent
 } from '../_mocked';
-import { BreakdownResults, NameLabel } from '../_models';
+import { BreakdownResults, DimensionName, NameLabel } from '../_models';
 import { APIService } from '../_services';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
@@ -87,7 +87,7 @@ describe('OverviewComponent', () => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     component.useDataServer = true;
-    component.form.get('facetParameter').setValue('contentTier');
+    component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
 
@@ -108,14 +108,14 @@ describe('OverviewComponent', () => {
 
     beforeEach(() => {
       b4Each();
-      params.next({ facet: 'COUNTRY' });
+      params.next({ facet: DimensionName.country });
     });
 
     it('should poll on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
-      expect(ctrlFacet.value).toBe('COUNTRY');
+      expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
       component.ngOnDestroy();
     }));
@@ -133,7 +133,7 @@ describe('OverviewComponent', () => {
     it('should load', fakeAsync(() => {
       spyOn(api, 'getBreakdowns').and.callThrough();
 
-      params.next({ facet: 'COUNTRY' });
+      params.next({ facet: DimensionName.country });
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(1);
@@ -158,7 +158,7 @@ describe('OverviewComponent', () => {
       component.postProcessResult();
       expect(component.extractSeriesServerData).not.toHaveBeenCalled();
       component.dataServerData = {
-        filterOptions: {
+        filteringOptions: {
           contentTier: [],
           COUNTRY: [],
           DATA_PROVIDER: [],
@@ -168,7 +168,7 @@ describe('OverviewComponent', () => {
           TYPE: []
         },
         results: {
-          breakdown: {
+          breakdowns: {
             results: []
           }
         }
@@ -313,23 +313,35 @@ describe('OverviewComponent', () => {
     it('should enable the filters', fakeAsync(() => {
       component.beginPolling();
       tick(tickTime);
-      component.filterStates['COUNTRY'].disabled = true;
+      component.filterStates[DimensionName.country].disabled = true;
       component.enableFilters();
-      expect(component.filterStates['COUNTRY'].disabled).toBeFalsy();
+      expect(
+        component.filterStates[DimensionName.country].disabled
+      ).toBeFalsy();
       component.ngOnDestroy();
     }));
 
     it('should clear the filters', () => {
       setFilterValue1('TYPE');
-      expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
+      expect(
+        component.getSetCheckboxValues(DimensionName.type).length
+      ).toBeTruthy();
       component.clearFilter();
-      expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
+      expect(
+        component.getSetCheckboxValues(DimensionName.type).length
+      ).toBeFalsy();
       setFilterValue1('TYPE');
-      expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
+      expect(
+        component.getSetCheckboxValues(DimensionName.type).length
+      ).toBeTruthy();
       component.clearFilter('RIGHTS');
-      expect(component.getSetCheckboxValues('TYPE').length).toBeTruthy();
+      expect(
+        component.getSetCheckboxValues(DimensionName.type).length
+      ).toBeTruthy();
       component.clearFilter('TYPE');
-      expect(component.getSetCheckboxValues('TYPE').length).toBeFalsy();
+      expect(
+        component.getSetCheckboxValues(DimensionName.type).length
+      ).toBeFalsy();
     });
 
     it('should close the filters', fakeAsync(() => {
@@ -372,7 +384,7 @@ describe('OverviewComponent', () => {
 
     beforeEach(() => {
       b4Each();
-      component.form.value.facetParameter = 'contentTier';
+      component.form.value.facetParameter = DimensionName.contentTier;
     });
 
     it('should get the total figure', () => {
@@ -398,7 +410,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should include contentTierZero', () => {
-      const ctZeroDetect = 'contentTier:(0';
+      const ctZeroDetect = `${DimensionName.contentTier}:(0`;
       expect(component.getUrlRow('1').indexOf(ctZeroDetect)).toEqual(-1);
       component.form.value.contentTierZero = true;
       expect(component.getUrlRow('X').indexOf(ctZeroDetect)).toBeGreaterThan(

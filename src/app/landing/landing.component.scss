@@ -95,10 +95,6 @@ app-bar-chart {
   }
 }
 
-.percent::after {
-  content: "%";
-}
-
 .record-list {
   align-items: center;
   border-top: 1px solid $gray-5;
