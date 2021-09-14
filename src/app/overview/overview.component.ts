@@ -463,7 +463,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           );
         });
         this.filterData[name] = filterOps;
-        this.addOrUpdateFilterControls(name, filterOps);
+        this.filterDisplayData({ term: '', dimension: name });
       });
       // set pie and table data
       this.extractSeriesData();
