@@ -299,8 +299,10 @@ label {
     transition: 0.3s linear width;
     width: 0%;
     &.showing {
+      left: 0;
+      right: auto;
       width: 100%;
-      transition: 0s linear width;
+      transition: 0.3s linear width;
     }
   }
 }
