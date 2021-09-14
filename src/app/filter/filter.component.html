@@ -41,6 +41,7 @@
           <li class="checkbox-filter container-h">
             <span class="icon"></span>
             <input
+              #filterTerm
               class="checkbox-filter-input"
               (keyup)="filterOptions($event)"
               formControlName="filter_list_{{ group }}"
@@ -55,7 +56,11 @@
                 <app-checkbox
                   [form]="form"
                   [controlName]="option.name"
-                  [labelText]="option.label | renameRights"
+                  [labelText]="
+                    option.label
+                      | renameRights
+                      | highlightMatch: [filterTerm.value]
+                  "
                   [group]="group"
                   (valueChanged)="changed()"
                 ></app-checkbox>

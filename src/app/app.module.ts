@@ -11,6 +11,7 @@ import { IsScrollableDirective } from './_directives/is-scrollable';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {
+  HighlightMatchPipe,
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
   RenameRightsPipe
@@ -45,6 +46,7 @@ import { TruncateComponent } from './truncate';
     GridPaginatorComponent,
     GridSummaryComponent,
     HeaderComponent,
+    HighlightMatchPipe,
     LandingComponent,
     MapComponent,
     OverviewComponent,
