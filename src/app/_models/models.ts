@@ -55,3 +55,8 @@ export enum ExportType {
   CSV = 'CSV',
   PDF = 'PDF'
 }
+
+export interface FilterInfo {
+  term: string;
+  dimension?: string;
+}

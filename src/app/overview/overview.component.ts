@@ -6,7 +6,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { facetNames } from '../_data';
-import { DimensionName } from '../_models';
+import { DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 
 import { environment } from '../../environments/environment';
@@ -97,6 +97,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   resultTotal: number;
 
   filterData: IHashArrayNameLabel = {};
+  displayedFilterData: IHashArrayNameLabel = {};
   queryParams: Params = {};
 
   dataServerData: BreakdownResults;
@@ -398,7 +399,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (this.useDataServer) {
       if (this.dataServerData && this.dataServerData.filteringOptions && true) {
         const ops = this.dataServerData.filteringOptions;
-        const newOps = {};
+
         this.facetConf.forEach((facetName: DimensionName) => {
           let prefix = '';
           if (
@@ -413,7 +414,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             console.error('Missing dimension data: ' + facetName);
           } else {
             const safeOps = ops[facetName]
-              .slice(0, 50)
+              .filter((op: string) => {
+                return !(
+                  !this.form.value.contentTierZero &&
+                  op === '0' &&
+                  facetName === DimensionName.contentTier
+                );
+              })
               .map((op: string) => {
                 return {
                   name: toInputSafeName(op),
@@ -427,11 +434,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                   option.name === '0'
                 );
               });
-            newOps[facetName] = safeOps;
-            this.addOrUpdateFilterControls(facetName, safeOps);
+            this.filterData[facetName] = safeOps;
+            this.filterDisplayData({ term: '', dimension: facetName });
           }
         });
-        this.filterData = newOps;
 
         // set pie and table data
         this.extractSeriesServerData();
@@ -759,6 +765,26 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
+  /** filterDisplayData
+  /* @param {FilterInfo} filterInfo
+  /* updates this.displayedFilterData
+  /* updates the form object
+  */
+  filterDisplayData(filterInfo: FilterInfo): void {
+    if (!filterInfo.dimension) {
+      filterInfo.dimension = this.form.value.facetParameter;
+    }
+
+    const toDisplay = this.filterData[filterInfo.dimension]
+      .filter((nl: NameLabel) => {
+        return nl.label.toLowerCase().includes(filterInfo.term.toLowerCase());
+      })
+      .slice(0, 50);
+
+    this.addOrUpdateFilterControls(filterInfo.dimension, toDisplay);
+    this.displayedFilterData[filterInfo.dimension] = toDisplay;
+  }
+
   /** getFilterOptions
   /* @param {string} facetName - the name of the facet
   /* returns Array<string> of values for a facet
@@ -1078,7 +1104,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const chartData = this.dataServerData.results.breakdowns.results.map(
       (cpv: CountPercentageValue) => {
         let formattedName;
-        if (this.form.value.facetParameter === 'RIGHTS') {
+        if (this.form.value.facetParameter === DimensionName.rights) {
           formattedName = rightsUrlMatch(cpv.value);
         }
         return {

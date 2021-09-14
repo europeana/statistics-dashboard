@@ -138,7 +138,7 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(1);
 
-      params.next({ facet: 'TYPE' });
+      params.next({ facet: DimensionName.type });
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(2);
@@ -263,10 +263,10 @@ describe('OverviewComponent', () => {
 
     it('should tell if checkbox valueshave been set', () => {
       expect(component.isFilterApplied()).toBeFalsy();
-      expect(component.isFilterApplied('TYPE')).toBeFalsy();
+      expect(component.isFilterApplied(DimensionName.type)).toBeFalsy();
       expect(component.isFilterApplied('FAKE')).toBeFalsy();
-      setFilterValue1('TYPE');
-      expect(component.isFilterApplied('TYPE')).toBeTruthy();
+      setFilterValue1(DimensionName.type);
+      expect(component.isFilterApplied(DimensionName.type)).toBeTruthy();
       expect(component.isFilterApplied()).toBeTruthy();
     });
 
@@ -322,7 +322,7 @@ describe('OverviewComponent', () => {
     }));
 
     it('should clear the filters', () => {
-      setFilterValue1('TYPE');
+      setFilterValue1(DimensionName.type);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
@@ -330,15 +330,15 @@ describe('OverviewComponent', () => {
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeFalsy();
-      setFilterValue1('TYPE');
+      setFilterValue1(DimensionName.type);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
-      component.clearFilter('RIGHTS');
+      component.clearFilter(DimensionName.rights);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
-      component.clearFilter('TYPE');
+      component.clearFilter(DimensionName.type);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeFalsy();
@@ -369,7 +369,7 @@ describe('OverviewComponent', () => {
       checkAllValue(false);
       setAllTrue();
 
-      const exception = 'TYPE';
+      const exception = DimensionName.type;
       checkAllValue(true);
       component.closeFilters(exception);
       expect(component.filterStates[exception].visible).toBeTruthy();

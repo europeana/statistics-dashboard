@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { getFormValueList, rightsUrlMatch } from '../_helpers';
-import { DimensionName, FilterState, NameLabel } from '../_models';
+import { DimensionName, FilterInfo, FilterState, NameLabel } from '../_models';
 
 @Component({
   selector: 'app-filter',
@@ -19,7 +19,7 @@ export class FilterComponent {
     this.filteredOptions = ops;
   }
   @Input() state: FilterState;
-
+  @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
   @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
 
@@ -32,9 +32,7 @@ export class FilterComponent {
       return;
     }
     const term = evt.target.value;
-    this.filteredOptions = this._options.filter((nl: NameLabel) => {
-      return nl.label.toLowerCase().includes(term.toLowerCase());
-    });
+    this.filterTermChanged.emit({ term: term, dimension: this.group });
   }
 
   getSetCheckboxValues(filterName: DimensionName): string {
