@@ -51,23 +51,22 @@ context('statistics-dashboard', () => {
 
     it('should scroll the filter remove options', () => {
       cy.visit(`/data/COUNTRY`);
-      cy.get(selFilterOpener).eq(1).click({force: true});
+      cy.get(selFilterOpener).eq(2).click({force: true});
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selFilterRemoveNav).should('have.length', 0);
 
-      for(let i=0; i<5; i++){
+      for(let i=0; i<4; i++){
         cy.get(selCheckbox).eq(i).click({force: true});
       }
-      cy.get(selFilterRemove).should('have.length', 5);
+      cy.get(selFilterRemove).should('have.length', 4);
       cy.get(selFilterRemoveNav).should('have.length', 1);
     });
 
     it('should search the filters and remember the term when re-opened', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selFilterValueLabel).should('have.length', 0);
-      cy.get(selFilterOpener).first().click({force: true});
+      cy.get(selFilterOpener).eq(1).click({force: true});
       cy.get(selFilterValueLabel).should('have.length.gt', 0);
-
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 1);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
       cy.get(selSearch).should('have.length', 1);
@@ -77,10 +76,11 @@ context('statistics-dashboard', () => {
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
 
       cy.get(selFiltersHeader).click({force: true});
-      cy.get(selFilterOpener).first().click({force: true});
+      cy.get(selFilterOpener).eq(1).click({force: true});
       cy.get(selSearch).should('have.value', 'Ge');
     });
 
+/*
     it('should allow date range definitions', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selDateFrom).should('have.length', 0);
@@ -96,6 +96,6 @@ context('statistics-dashboard', () => {
       cy.get(selDateFrom).clear();
       cy.get(selCloseDateOverride).should('not.be.visible');
     });
-
+*/
   });
 });
