@@ -80,7 +80,6 @@ context('statistics-dashboard', () => {
       cy.get(selSearch).should('have.value', 'Ge');
     });
 
-/*
     it('should allow date range definitions', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selDateFrom).should('have.length', 0);
@@ -96,6 +95,5 @@ context('statistics-dashboard', () => {
       cy.get(selDateFrom).clear();
       cy.get(selCloseDateOverride).should('not.be.visible');
     });
-*/
   });
 });

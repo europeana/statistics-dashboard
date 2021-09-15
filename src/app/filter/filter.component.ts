@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { getFormValueList, rightsUrlMatch } from '../_helpers';
 import { DimensionName, FilterInfo, FilterState, NameLabel } from '../_models';
@@ -22,6 +29,8 @@ export class FilterComponent {
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
   @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
+
+  @ViewChild('filterTerm') filterTerm: ElementRef;
 
   changed(): void {
     this.valueChanged.emit(true);
@@ -61,6 +70,16 @@ export class FilterComponent {
   toggle(): void {
     this.state.visible = !this.state.visible;
     this.visibilityChanged.emit(this.group);
+
+    if (this.state.visible) {
+      const fn = (): void => {
+        const ft = this.filterTerm;
+        if (ft) {
+          ft.nativeElement.focus();
+        }
+      };
+      setTimeout(fn, 1);
+    }
   }
 
   selectOptionEnabled(group: string, val: string): boolean {

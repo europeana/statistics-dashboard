@@ -427,12 +427,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                   label: prefix + op
                 };
               })
-              .filter((option: NameLabel) => {
-                return !(
-                  facetName === DimensionName.contentTier &&
-                  !this.form.value.contentTierZero &&
-                  option.name === '0'
-                );
+              .sort((op1: NameLabel, op2: NameLabel) => {
+                if (op1.label > op2.label) {
+                  return 1;
+                }
+                return -1;
               });
             this.filterData[facetName] = safeOps;
             this.filterDisplayData({ term: '', dimension: facetName });

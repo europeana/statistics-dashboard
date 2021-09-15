@@ -43,7 +43,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should show filter-removal options', () => {
-      const filteredTypes = ['VIDEO', '3D'];
+      const filteredTypes = ['3D', 'VIDEO'];
       const param = `?TYPE=${filteredTypes[0]}&TYPE=${filteredTypes[1]}`;
 
       cy.visit(`/data/COUNTRY${param}`);
@@ -51,7 +51,6 @@ context('statistics-dashboard', () => {
       cy.url().should('contain', filteredTypes[0]);
       cy.url().should('contain', filteredTypes[1]);
       cy.get('.rm-filter').should('have.length', 2);
-
       cy.get('.rm-filter input').first().click({ force: true });
       cy.get('.rm-filter').should('have.length', 1);
       cy.url().should('not.contain', filteredTypes[0]);
