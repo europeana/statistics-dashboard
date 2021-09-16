@@ -80,6 +80,13 @@ context('statistics-dashboard', () => {
       cy.get(selSearch).should('have.value', 'Ge');
     });
 
+    it('should search the filters (diacritics)', () => {
+      cy.visit(`/data/contentTier`);
+      cy.get(selFilterOpener).eq(2).click({force: true});
+      cy.get(selSearch).type('Öst', 1);
+      cy.get(selFilterValueLabel).contains('Österreichische Nationalbibliothek - Austrian National Library').should('have.length', 1);
+    });
+
     it('should allow date range definitions', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selDateFrom).should('have.length', 0);

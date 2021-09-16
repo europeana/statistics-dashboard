@@ -12,6 +12,35 @@ export const facetNames: Array<DimensionName> = [
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 
+export const DiacriticsMap = {
+  A: 'AÁĂẮẶẰẲẴǍÂẤẬẦẨẪÄẠÀẢĀĄÅǺÃÆǼА',
+  B: 'BḄƁʚɞБВ',
+  C: 'CĆČÇĈĊƆʗЦЧ',
+  D: 'DĎḒḌƊḎǲǅĐÐǱǄД',
+  E: 'EÉĔĚÊẾỆỀỂỄËĖẸÈẺĒĘẼƐƏЕЁЭ',
+  F: 'FƑФ',
+  G: 'GǴĞǦĢĜĠḠʛГ',
+  H: 'HḪĤḤĦГ',
+  I: 'IÍĬǏÎÏİỊÌỈĪĮĨĲИ',
+  J: 'JĴ',
+  K: 'KĶḲƘḴК',
+  L: 'LĹȽĽĻḼḶḸḺĿǈŁǇЛ',
+  M: 'MḾṀṂМ',
+  N: 'NŃŇŅṊṄṆǸƝṈǋÑǊН',
+  O: 'OÓŎǑÔỐỘỒỔỖÖỌŐÒỎƠỚỢỜỞỠŌƟǪØǾÕŒɶО',
+  P: 'PÞП',
+  Q: 'Q',
+  R: 'RŔŘŖṘṚṜṞʁРЯ',
+  S: 'SŚŠŞŜȘṠṢẞСšШЩ',
+  T: 'TŤŢṰȚṬṮŦÞÐТ',
+  U: 'UÚŬǓÛÜǗǙǛǕỤŰÙỦƯỨỰỪỬỮŪŲŮŨУЮ',
+  V: 'VВ',
+  W: 'WẂŴẄẀʬВ',
+  X: 'XХ',
+  Y: 'YÝŶŸẎỴỲƳỶȲỸЙЫ',
+  Z: 'ZŹŽŻẒẔƵЖЗЦ'
+};
+
 export const externalLinks = {
   europeana: '//europeana.eu',
   pro: '//pro.europeana.eu',

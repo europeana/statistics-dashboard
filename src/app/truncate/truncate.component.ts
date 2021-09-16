@@ -15,6 +15,7 @@ export class TruncateComponent implements OnInit {
   textRight: string;
 
   @Input() text: string;
+  @Input() highlightText = '';
   @ViewChild('elRefTextLeft') elRefTextLeft: ElementRef;
   @ViewChild('elRefTextRight') elRefTextRight: ElementRef;
 

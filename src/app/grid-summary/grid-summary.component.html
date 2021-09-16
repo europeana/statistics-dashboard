@@ -23,7 +23,7 @@
     >Total records in
     {{ "plural_" + _summaryData.breakdownBy | renameApiFacetShort }}</span
   >
-  <span class="total">{{ _summaryData.results[0].percentage | percent }}</span>
+  <span class="total">{{ _summaryData.results[0].percentage }}%</span>
   <span class="total" data-e2e="total-records">{{ grandTotal | number }}</span>
 
   <span class="total-title"

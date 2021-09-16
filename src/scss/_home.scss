@@ -1,5 +1,9 @@
 @import "variables";
 
+.data-rows .text-outer {
+  font-weight: 600;
+}
+
 .fit-to-page {
   margin: 0;
   @media (min-width: $bp-small-3) {

@@ -6,6 +6,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { facetNames } from '../_data';
+import { appendDiacriticEquivalents } from '../_helpers';
 import { DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 
@@ -65,7 +66,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
-
   public barChartSettings = Object.assign(
     {
       prefixValueAxis: ''
@@ -80,8 +80,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     BarChartCool
   );
 
-  facetConf = facetNames;
-  nonFilterQPs = ['content-tier-zero', 'date-from', 'date-to', 'dataset-name'];
+  readonly MAX_FILTER_OPTIONS = 50;
+  readonly facetConf = facetNames;
+  readonly nonFilterQPs = [
+    'content-tier-zero',
+    'date-from',
+    'date-to',
+    'dataset-name'
+  ];
 
   filterStates: { [key: string]: FilterState } = {};
   contentTiersOptions = Array(5)
@@ -397,10 +403,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   postProcessResult(): void {
     // initialise filterData and add checkboxes
     if (this.useDataServer) {
-      if (this.dataServerData && this.dataServerData.filteringOptions && true) {
+      if (this.dataServerData && this.dataServerData.filteringOptions) {
         const ops = this.dataServerData.filteringOptions;
 
         this.facetConf.forEach((facetName: DimensionName) => {
+          // calculate prefix
           let prefix = '';
           if (
             [DimensionName.contentTier, DimensionName.metadataTier].includes(
@@ -413,6 +420,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           if (!ops[facetName]) {
             console.error('Missing dimension data: ' + facetName);
           } else {
+            // calculate full list of in-memory safe options
             const safeOps = ops[facetName]
               .filter((op: string) => {
                 return !(
@@ -662,6 +670,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.form.value.showPercent,
       reuseColours
     );
+
     const fn = (): void => {
       this.barChart.addSeries(seriesData);
     };
@@ -774,11 +783,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       filterInfo.dimension = this.form.value.facetParameter;
     }
 
+    const reg = new RegExp(appendDiacriticEquivalents(filterInfo.term), 'gi');
     const toDisplay = this.filterData[filterInfo.dimension]
       .filter((nl: NameLabel) => {
-        return nl.label.toLowerCase().includes(filterInfo.term.toLowerCase());
+        if (filterInfo.term) {
+          return reg.exec(nl.label);
+        } else {
+          return true;
+        }
       })
-      .slice(0, 50);
+      .slice(0, this.MAX_FILTER_OPTIONS);
 
     this.addOrUpdateFilterControls(filterInfo.dimension, toDisplay);
     this.displayedFilterData[filterInfo.dimension] = toDisplay;
