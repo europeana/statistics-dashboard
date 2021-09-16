@@ -787,7 +787,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const toDisplay = this.filterData[filterInfo.dimension]
       .filter((nl: NameLabel) => {
         if (filterInfo.term) {
-          return reg.exec(nl.label);
+          return filterInfo.dimension === DimensionName.rights
+            ? reg.exec(this.renameRights.transform(nl.label))
+            : reg.exec(nl.label);
         } else {
           return true;
         }
