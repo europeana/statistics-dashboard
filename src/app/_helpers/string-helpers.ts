@@ -38,13 +38,15 @@ export function appendDiacriticEquivalents(source: string): string {
 }
 
 export function rightsUrlMatch(url: string): string | null {
-  const replaced =
-    RightsStatements[
-      url
-        .replace(/http(s)?:/, '')
-        .split('?')[0]
-        .replace(/[\/]$/, '')
-    ];
+  const trimmed = url
+    .toLowerCase()
+    .trim()
+    .replace(/(h)?ttp(s)?:/i, '')
+    .split('?')[0]
+    .replace(/[\/]$/, '');
+
+  const replaced = RightsStatements[trimmed];
+
   if (replaced) {
     return replaced.split('?')[0].trim();
   }
