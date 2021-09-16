@@ -43,9 +43,20 @@ describe('highlight pipe', () => {
       `${tagOpen}A${tagClose}rchiv der brüderunit${tagOpen}ä${tagClose}t Herrnhut, Germ${tagOpen}a${tagClose}ny`
     );
     expect(
+      pipe.transform('Archiv der brüderunität Herrnhut, Germany', ['At'])
+    ).toBe(`Archiv der brüderunit${tagOpen}ät${tagClose} Herrnhut, Germany`);
+    expect(
       pipe.transform('Archiv der brüderunität Herrnhut, Germany', ['U'])
     ).toBe(
       `Archiv der br${tagOpen}ü${tagClose}der${tagOpen}u${tagClose}nität Herrnh${tagOpen}u${tagClose}t, Germany`
     );
+    expect(
+      pipe.transform('Archives départementales de la Gironde', ['de'])
+    ).toBe(
+      `Archives ${tagOpen}dé${tagClose}partementales ${tagOpen}de${tagClose} la Giron${tagOpen}de${tagClose}`
+    );
+    expect(
+      pipe.transform('Archives départementales de la Gironde', ['dep'])
+    ).toBe(`Archives ${tagOpen}dép${tagClose}artementales de la Gironde`);
   });
 });

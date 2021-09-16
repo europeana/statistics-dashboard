@@ -6,6 +6,7 @@ import {
   tick
 } from '@angular/core/testing';
 import { ResizeComponent } from '../resize';
+import { createMockPipe } from '../_mocked';
 import { TruncateComponent } from './';
 
 describe('TruncateComponent', () => {
@@ -14,7 +15,11 @@ describe('TruncateComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-      declarations: [TruncateComponent, ResizeComponent]
+      declarations: [
+        TruncateComponent,
+        ResizeComponent,
+        createMockPipe('highlightMatch')
+      ]
     }).compileComponents();
   };
 

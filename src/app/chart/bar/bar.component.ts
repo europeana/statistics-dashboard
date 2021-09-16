@@ -38,10 +38,12 @@ interface CustomLegendItem {
 })
 export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
+  readonly maxNumberBars = 50;
+  preferredNumberBars = 8;
+
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
   legendContainer: am4core.Container;
-  preferredNumberBars = 8;
 
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
@@ -220,11 +222,13 @@ export class BarComponent implements AfterViewInit {
 
     csds.forEach((csd: ColourSeriesData) => {
       if (!this.chart.data.length) {
-        this.chart.data = Object.keys(csd.data).map((s: string) => {
-          const res = { name: s };
-          res[csd.seriesName] = csd.data[s];
-          return res;
-        });
+        this.chart.data = Object.keys(csd.data)
+          .slice(0, this.maxNumberBars)
+          .map((s: string) => {
+            const res = { name: s };
+            res[csd.seriesName] = csd.data[s];
+            return res;
+          });
       } else {
         this.chart.data.forEach((cd) => {
           cd[csd.seriesName] = csd.data[cd.name];

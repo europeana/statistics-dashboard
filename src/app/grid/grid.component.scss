@@ -44,6 +44,10 @@ a {
 .cell-name {
   border-right: 1px solid $gray-5;
   font-weight: 600;
+
+  &.highlighting-terms {
+    font-weight: 400;
+  }
 }
 
 .cell-prefix {

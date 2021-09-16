@@ -19,7 +19,7 @@
     "start:ci-data-x": "tsc --project tsconfig.test-data.json && npm run prep-test-data && (node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs)",
     "test": "ng test",
     "test:dev": "ng test --code-coverage",
-    "test:e2e": "tsc --project tsconfig.test-data.json && npm run prep-test-data && ((node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs) & (npm run cypress:ci) ; fuser -k 3000/tcp)"
+    "test:e2e": "tsc --project tsconfig.test-data.json && npm run prep-test-data && ((node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs) & (npm run cypress:ci) ; fuser -k 3001/tcp)"
   },
   "private": true,
   "dependencies": {

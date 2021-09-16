@@ -111,7 +111,7 @@
         <span class="bold black text-right">
           {{ row.count | number }}
         </span>
-        <span class="black text-right"> {{ row.percent | percent }} </span>
+        <span class="black text-right"> {{ row.percent }}% </span>
 
         <ng-content
           *ngTemplateOutlet="linkOut; context: { row: row }"
@@ -127,12 +127,16 @@
 
         <span
           class="cell-name"
-          [ngClass]="{ highlight: row.highlight }"
+          [ngClass]="{
+            highlight: row.highlight,
+            'highlighting-terms': filterString.length > 0
+          }"
           data-e2e="grid-row-name"
           [title]="row.name"
         >
           <app-truncate
             [text]="getPrefix() + row.name | renameRights"
+            [highlightText]="filterString"
           ></app-truncate>
         </span>
 
@@ -162,7 +166,7 @@
         </span>
 
         <span class="text-right" [ngClass]="{ highlight: row.highlight }">
-          {{ row.percent | percent }}
+          {{ row.percent }}%
         </span>
 
         <ng-content

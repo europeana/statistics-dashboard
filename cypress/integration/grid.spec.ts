@@ -49,6 +49,13 @@ context('statistics-dashboard', () => {
       assertRowLength(orCountries, 0);
     });
 
+    it('should filter (diacritics)', () => {
+      cy.visit('/data/DATA_PROVIDER');
+      cy.get(selRowName).should('have.length', 10);
+      cy.get(selFilter).type('õ', force);
+      cy.get(selRowName).should('have.length', 1);
+    });
+
     it('should go to the user-typed page', () => {
       cy.visit('/data/COUNTRY');
       // assumes page of 10 entries
