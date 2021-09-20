@@ -37,6 +37,7 @@ import {
   FmtTableData,
   IHashArrayNameLabel,
   IHashNumber,
+  IHashStringArray,
   NameLabel,
   NameValuePercent,
   RawFacet,
@@ -93,6 +94,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   contentTiersOptions = Array(5)
     .fill(0)
     .map((x, index) => `${x + index}`);
+
+  disabledParams: IHashStringArray;
 
   pollRefresh: Subject<boolean>;
   form: FormGroup;
@@ -203,8 +206,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           })
         )
         .subscribe((combined) => {
+          this.disabledParams = {};
+
           const params = combined.params;
           const queryParams = combined.queryParams;
+
+          if (queryParams[params.facet]) {
+            this.disabledParams[params.facet] = queryParams[params.facet];
+            delete queryParams[params.facet];
+          }
+
           const facetChanged =
             params.facet &&
             params.facet != this.form.controls.facetParameter.value;
@@ -403,8 +414,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   postProcessResult(): void {
     // initialise filterData and add checkboxes
     if (this.useDataServer) {
-      if (this.dataServerData && this.dataServerData.filteringOptions) {
-        const ops = this.dataServerData.filteringOptions;
+      const dsd = this.dataServerData;
+      if (dsd && dsd.filteringOptions) {
+        const ops = dsd.filteringOptions;
 
         this.facetConf.forEach((facetName: DimensionName) => {
           // calculate prefix
@@ -446,8 +458,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           }
         });
 
-        // set pie and table data
-        this.extractSeriesServerData();
+        if (dsd.results && dsd.results.breakdowns) {
+          // set pie and table data
+          this.extractSeriesServerData(dsd.results.breakdowns);
+        }
       }
     } else {
       this.selFacetIndex = this.findFacetIndex(
@@ -784,12 +798,15 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }
 
     const reg = new RegExp(appendDiacriticEquivalents(filterInfo.term), 'gi');
+
     const toDisplay = this.filterData[filterInfo.dimension]
       .filter((nl: NameLabel) => {
         if (filterInfo.term) {
+          // clear regex indexes with empty exec to prevent bug where "ne" fails to match "Netherlands"
+          reg.exec('');
           return filterInfo.dimension === DimensionName.rights
-            ? reg.exec(this.renameRights.transform(nl.label))
-            : reg.exec(nl.label);
+            ? reg.exec(this.renameRights.transform(nl.label).toUpperCase())
+            : reg.exec(nl.label.toUpperCase());
         } else {
           return true;
         }
@@ -1053,7 +1070,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.queryParams = qp;
     }
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
-      queryParams: qp
+      queryParams: Object.assign(qp, this.disabledParams)
     });
   }
 
@@ -1115,20 +1132,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /** extractSeriesServerData
   /* @param { number } facetIndex - the index of the facet to use
   */
-  extractSeriesServerData(): void {
-    const chartData = this.dataServerData.results.breakdowns.results.map(
-      (cpv: CountPercentageValue) => {
-        let formattedName;
-        if (this.form.value.facetParameter === DimensionName.rights) {
-          formattedName = rightsUrlMatch(cpv.value);
-        }
-        return {
-          name: formattedName ? formattedName : cpv.value,
-          value: cpv.count,
-          percent: cpv.percentage
-        };
+  extractSeriesServerData(br: BreakdownResult): void {
+    const chartData = br.results.map((cpv: CountPercentageValue) => {
+      let formattedName;
+      if (this.form.value.facetParameter === DimensionName.rights) {
+        formattedName = rightsUrlMatch(cpv.value);
       }
-    );
+      return {
+        name: formattedName ? formattedName : cpv.value,
+        value: cpv.count,
+        percent: cpv.percentage
+      };
+    });
 
     const filtersApplied = Object.keys(this.queryParams).length > 0;
 
