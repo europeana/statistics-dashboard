@@ -11,10 +11,12 @@ export class GridSummaryComponent {
   @Input() grandTotal: number;
   @Input() set summaryData(data: BreakdownResult) {
     this._summaryData = Object.assign({}, data);
-    this._summaryData.results.sort(
-      (a: CountPercentageValue, b: CountPercentageValue) => {
-        return a.count > b.count ? -1 : b.count > a.count ? 1 : 0;
-      }
-    );
+    if (data) {
+      this._summaryData.results.sort(
+        (a: CountPercentageValue, b: CountPercentageValue) => {
+          return a.count > b.count ? -1 : b.count > a.count ? 1 : 0;
+        }
+      );
+    }
   }
 }
