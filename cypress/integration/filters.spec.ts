@@ -1,9 +1,11 @@
 context('statistics-dashboard', () => {
   describe('filters', () => {
 
+    const force = { force: true };
     const selDateFrom = '[data-e2e="dateFrom"]';
     const selDateTo = '[data-e2e="dateTo"]';
     const selCloseDateOverride = '[data-e2e="close-date-override"]';
+    const selFacetSelect = '.facet-param';
     const selFiltersHeader = '.filters-header';
     const selFilter = `${selFiltersHeader} + .filters .filter`;
     const selFilterOpener = '.filter-opener';
@@ -35,37 +37,48 @@ context('statistics-dashboard', () => {
 
     it('should open and close the filters', () => {
       cy.visit(`/data/COUNTRY`);
-      cy.get(selFilterOpener).first().click({force: true});
+      cy.get(selFilterOpener).first().click(force);
       cy.get(selFilterOpened).should('have.length', 1);
-      cy.get(selFilterOpener).last().click({force: true});
+      cy.get(selFilterOpener).last().click(force);
       cy.get(selFilterOpened).should('have.length', 0);
     });
 
     it('should apply the filters', () => {
       cy.visit(`/data/COUNTRY`);
-      cy.get(selFilterOpener).first().click({force: true});
+      cy.get(selFilterOpener).first().click(force);
       cy.get(selFilterRemove).should('have.length', 0);
-      cy.get(selCheckbox).first().click({force: true});
+      cy.get(selCheckbox).first().click(force);
       cy.get(selFilterRemove).should('have.length', 1);
     });
 
     it('should scroll the filter remove options', () => {
       cy.visit(`/data/COUNTRY`);
-      cy.get(selFilterOpener).eq(2).click({force: true});
+      cy.get(selFilterOpener).eq(2).click(force);
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selFilterRemoveNav).should('have.length', 0);
 
       for(let i=0; i<4; i++){
-        cy.get(selCheckbox).eq(i).click({force: true});
+        cy.get(selCheckbox).eq(i).click(force);
       }
       cy.get(selFilterRemove).should('have.length', 4);
       cy.get(selFilterRemoveNav).should('have.length', 1);
     });
 
+    it('should disable and restore filters', () => {
+      cy.visit(`/data/contentTier`);
+      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterValueLabel).contains('Belgium').click();
+      cy.get(selFilterRemove).should('have.length', 1);
+      cy.get(selFacetSelect).select('Country', force);
+      cy.get(selFilterRemove).should('have.length', 0);
+      cy.get(selFacetSelect).select('Provider', force);
+      cy.get(selFilterRemove).should('have.length', 1);
+    });
+
     it('should search the filters and remember the term when re-opened', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selFilterValueLabel).should('have.length', 0);
-      cy.get(selFilterOpener).eq(1).click({force: true});
+      cy.get(selFilterOpener).eq(1).click(force);
       cy.get(selFilterValueLabel).should('have.length.gt', 0);
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 1);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
@@ -75,23 +88,35 @@ context('statistics-dashboard', () => {
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
 
-      cy.get(selFiltersHeader).click({force: true});
-      cy.get(selFilterOpener).eq(1).click({force: true});
+      cy.get(selFiltersHeader).click(force);
+      cy.get(selFilterOpener).eq(1).click(force);
       cy.get(selSearch).should('have.value', 'Ge');
     });
 
     it('should search the filters (diacritics)', () => {
       cy.visit(`/data/contentTier`);
-      cy.get(selFilterOpener).eq(2).click({force: true});
-      cy.get(selSearch).type('Öst', 1);
+      cy.get(selFilterOpener).eq(2).click(force);
       cy.get(selFilterValueLabel).contains('Österreichische Nationalbibliothek - Austrian National Library').should('have.length', 1);
+
+      cy.get(selSearch).type('oster', 1);
+      cy.get(selFilterValueLabel).should('have.length', 1);
+      cy.get(selSearch).clear();
+      cy.get(selFilterValueLabel).should('have.length', 35);
+      cy.get(selSearch).type('Öster', 1);
+      cy.get(selFilterValueLabel).should('have.length', 1);
+      cy.get(selSearch).clear();
+      cy.get(selSearch).type('Ester', 1);
+      cy.get(selFilterValueLabel).should('have.length', 0);
+      cy.get(selSearch).clear();
+      cy.get(selSearch).type('oster', 1);
+      cy.get(selFilterValueLabel).should('have.length', 1);
     });
 
     it('should allow date range definitions', () => {
       cy.visit(`/data/contentTier`);
       cy.get(selDateFrom).should('have.length', 0);
       cy.get(selDateTo).should('have.length', 0);
-      cy.get(selFilterOpener).last().click({force: true});
+      cy.get(selFilterOpener).last().click(force);
       cy.get(selDateFrom).should('have.length', 1);
 
       const today = new Date().toISOString().split('T')[0];

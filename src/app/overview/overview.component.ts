@@ -6,7 +6,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { facetNames } from '../_data';
-import { appendDiacriticEquivalents } from '../_helpers';
+import { appendDiacriticEquivalents, replaceDiacritics } from '../_helpers';
 import { DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 
@@ -198,7 +198,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                 }
               );
             });
-
             return {
               params: results[0],
               queryParams: qpValArrays
@@ -797,16 +796,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       filterInfo.dimension = this.form.value.facetParameter;
     }
 
-    const reg = new RegExp(appendDiacriticEquivalents(filterInfo.term), 'gi');
-
+    const term = replaceDiacritics(filterInfo.term);
+    const reg = new RegExp(appendDiacriticEquivalents(term), 'gi');
     const toDisplay = this.filterData[filterInfo.dimension]
       .filter((nl: NameLabel) => {
-        if (filterInfo.term) {
+        if (term) {
           // clear regex indexes with empty exec to prevent bug where "ne" fails to match "Netherlands"
           reg.exec('');
           return filterInfo.dimension === DimensionName.rights
-            ? reg.exec(this.renameRights.transform(nl.label).toUpperCase())
-            : reg.exec(nl.label.toUpperCase());
+            ? reg.exec(this.renameRights.transform(nl.label))
+            : reg.exec(nl.label);
         } else {
           return true;
         }
