@@ -1,5 +1,19 @@
 import { DiacriticsMap, RightsStatements } from '../_data';
 
+/** replaceDiacritics
+/* @param {string} source - the source string
+/* - replaces every instance of A-Z with the equivalent diacritics
+*/
+export function replaceDiacritics(source: string): string {
+  Object.keys(DiacriticsMap).forEach((key: string) => {
+    source = source.replace(
+      new RegExp('[' + DiacriticsMap[key] + ']', 'gi'),
+      key
+    );
+  });
+  return source;
+}
+
 /** appendDiacriticEquivalents
 /* @param {string} source - the source string
 /* - replaces every instance of A-Z with the equivalent diacritics, wrapped in square brackets, for use in a Regex
@@ -8,6 +22,7 @@ export function appendDiacriticEquivalents(source: string): string {
   if (source.length === 0) {
     return source;
   }
+
   return source
     .replace(/A/gi, `[${DiacriticsMap.A}]`)
     .replace(/B/gi, `[${DiacriticsMap.B}]`)

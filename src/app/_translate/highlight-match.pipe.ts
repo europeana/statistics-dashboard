@@ -3,7 +3,7 @@
 /* a text / html highlighting facility
 */
 import { Pipe, PipeTransform } from '@angular/core';
-import { appendDiacriticEquivalents } from '../_helpers';
+import { appendDiacriticEquivalents, replaceDiacritics } from '../_helpers';
 
 @Pipe({
   name: 'highlightMatch'
@@ -15,7 +15,8 @@ export class HighlightMatchPipe implements PipeTransform {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   transform(value: string, args?: Array<any>): string {
     if (args && args.length > 0 && args[0].length > 0) {
-      const reg = new RegExp(appendDiacriticEquivalents(args[0]), 'gi');
+      const term = replaceDiacritics(args[0]);
+      const reg = new RegExp(appendDiacriticEquivalents(term), 'gi');
 
       const startIndexes = [0];
       const endIndexes = [];
@@ -25,7 +26,7 @@ export class HighlightMatchPipe implements PipeTransform {
 
       while (match != null) {
         matches.push(match);
-        startIndexes.push(match.index + args[0].length);
+        startIndexes.push(match.index + term.length);
         endIndexes.push(match.index);
         match = reg.exec(value);
       }

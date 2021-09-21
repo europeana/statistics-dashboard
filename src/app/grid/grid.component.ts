@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { colours } from '../_data';
-import { appendDiacriticEquivalents } from '../_helpers';
+import { appendDiacriticEquivalents, replaceDiacritics } from '../_helpers';
 import { FmtTableData, HeaderNameType, PagerInfo, TableRow } from '../_models';
 import { GridPaginatorComponent } from '../grid-paginator';
 
@@ -101,7 +101,7 @@ export class GridComponent {
   /* @returns unfilteredPageRows filtered by filterString
   **/
   getFilteredRows(): Array<TableRow> {
-    const filter = this.filterString;
+    const filter = replaceDiacritics(this.filterString);
     const reg = new RegExp(appendDiacriticEquivalents(filter), 'gi');
     return this.unfilteredPageRows.filter(function (tr: TableRow) {
       return !filter || reg.exec(tr.name);

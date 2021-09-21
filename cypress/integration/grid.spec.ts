@@ -52,8 +52,11 @@ context('statistics-dashboard', () => {
     it('should filter (diacritics)', () => {
       cy.visit('/data/DATA_PROVIDER');
       cy.get(selRowName).should('have.length', 10);
-      cy.get(selFilter).type('õ', force);
+      cy.get(selFilter).type('Sõj', force);
       cy.get(selRowName).should('have.length', 1);
+      cy.get(selFilter).clear();
+      cy.get(selFilter).type('Os', force);
+      cy.get(selRowName).should('have.length', 2);      
     });
 
     it('should go to the user-typed page', () => {

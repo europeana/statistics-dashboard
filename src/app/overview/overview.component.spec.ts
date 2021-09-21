@@ -10,7 +10,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { today } from '../_helpers';
 import {
@@ -21,7 +26,15 @@ import {
   MockBarComponent,
   MockGridComponent
 } from '../_mocked';
-import { BreakdownResults, DimensionName, NameLabel } from '../_models';
+import {
+  BreakdownResults,
+  BreakdownResult,
+  DimensionName,
+  NameLabel,
+  NameValuePercent,
+  RequestFilter,
+  RequestFilterRange
+} from '../_models';
 import { APIService } from '../_services';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
@@ -148,7 +161,6 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
 
       expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
-
       component.ngOnDestroy();
     }));
 
@@ -178,6 +190,48 @@ describe('OverviewComponent', () => {
       expect(component.extractSeriesServerData).toHaveBeenCalled();
     });
 
+    it('should get the chart data', () => {
+      expect(component.getChartData()).toBeTruthy();
+    });
+
+    it('should get the grid data', () => {
+      expect(component.getGridData()).toBeTruthy();
+    });
+
+    it('should extract the series server data', () => {
+      const br: BreakdownResult = {
+        results: [
+          {
+            count: 1,
+            percentage: 1,
+            value: 'The Value'
+          }
+        ]
+      };
+
+      spyOn(component, 'storeSeries').and.callFake(
+        (
+          _: boolean,
+          __: boolean,
+          ___: Array<NameValuePercent>,
+          ____: number
+        ) => {}
+      );
+
+      component.extractSeriesServerData(br);
+      expect(component.storeSeries).toHaveBeenCalled();
+
+      component.form.controls.facetParameter.setValue(DimensionName.rights);
+      component.extractSeriesServerData(br);
+
+      expect(component.storeSeries).toHaveBeenCalledTimes(2);
+
+      component.queryParams = { any: 'thing' };
+      component.extractSeriesServerData(br);
+
+      expect(component.storeSeries).toHaveBeenCalledTimes(3);
+    });
+
     it('should extract data as a percent', fakeAsync(() => {
       const data = Object.assign({}, MockAPIData);
       expect(component.allProcessedFacetData).toBeFalsy();
@@ -198,6 +252,21 @@ describe('OverviewComponent', () => {
       expect(component.getUrl().indexOf('edm_datasetName')).toEqual(-1);
       component.form.get('datasetName').setValue('XXX');
       expect(component.getUrl().indexOf('edm_datasetName')).toBeTruthy();
+    });
+
+    it('should get the url for filters', () => {
+      const countryUrlParamVal = 'Belgium';
+      const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
+
+      expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
+      component.queryParams = { COUNTRY: [countryUrlParamVal] };
+      expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
+
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
+      component.queryParams = { 'content-tier-zero': true };
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
+      component.form.controls.contentTierZero.setValue(true);
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeTruthy();
     });
 
     it('should get the formatted dataset name param', () => {
@@ -230,7 +299,10 @@ describe('OverviewComponent', () => {
         expectZeroToFour
       );
 
-      component.addOrUpdateFilterControls('contentTier', contentTierNameLabels);
+      component.addOrUpdateFilterControls(
+        DimensionName.contentTier,
+        contentTierNameLabels
+      );
       component.form.get('contentTier.0').setValue(true);
 
       expect(component.getFormattedContentTierParam()).toEqual(fmtParamCT('0'));
@@ -377,7 +449,7 @@ describe('OverviewComponent', () => {
     }));
   });
 
-  describe('Url Generation', () => {
+  describe('Request / Url Generation', () => {
     beforeEach(async(() => {
       configureTestBed();
     }));
@@ -385,6 +457,47 @@ describe('OverviewComponent', () => {
     beforeEach(() => {
       b4Each();
       component.form.value.facetParameter = DimensionName.contentTier;
+    });
+
+    it('should get the data server request', () => {
+      const fnGetRequestFilter = (dimension: string): Array<string> | null => {
+        const filter = component.getDataServerDataRequest().filters[
+          dimension
+        ] as RequestFilter;
+        return filter ? filter.values : null;
+      };
+
+      expect(fnGetRequestFilter(DimensionName.contentTier)).toEqual([
+        '1',
+        '2',
+        '3',
+        '4'
+      ]);
+      component.queryParams = { 'content-tier-zero': true };
+      expect(fnGetRequestFilter(DimensionName.contentTier)).toEqual([
+        '1',
+        '2',
+        '3',
+        '4'
+      ]);
+      component.form.controls.contentTierZero.setValue(true);
+      expect(fnGetRequestFilter(DimensionName.contentTier)).toBeFalsy();
+
+      expect(fnGetRequestFilter('datasetName')).toBeFalsy();
+      component.form.controls.datasetName.setValue('xxx');
+      expect(fnGetRequestFilter('datasetName')).toBeTruthy();
+
+      expect(fnGetRequestFilter('createdDate')).toBeFalsy();
+      component.form.controls.dateFrom.setValue(new Date().toISOString());
+      component.form.controls.dateTo.setValue(new Date().toISOString());
+
+      expect(
+        (
+          component.getDataServerDataRequest().filters[
+            'createdDate'
+          ] as RequestFilterRange
+        ).from
+      ).toBeTruthy();
     });
 
     it('should get the total figure', () => {

@@ -1,5 +1,11 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick
+} from '@angular/core/testing';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { toInputSafeName } from '../_helpers';
@@ -129,10 +135,33 @@ describe('FilterComponent', () => {
     expect(component.state.visible).toBeFalsy();
   });
 
-  it('should toggle', () => {
+  it('should toggle', fakeAsync(() => {
+    let hasCalledFocus = false;
     component.state = { disabled: false, visible: true };
     expect(component.state.visible).toBeTruthy();
     component.toggle();
+    tick(1);
     expect(component.state.visible).toBeFalsy();
-  });
+    component.toggle();
+    tick(1);
+    expect(component.state.visible).toBeTruthy();
+
+    component.filterTerm = {
+      nativeElement: {
+        focus: (): void => {
+          hasCalledFocus = true;
+        }
+      }
+    };
+
+    component.toggle();
+    tick(1);
+    expect(component.state.visible).toBeFalsy();
+    expect(hasCalledFocus).toBeFalsy();
+
+    component.toggle();
+    tick(1);
+    expect(component.state.visible).toBeTruthy();
+    expect(hasCalledFocus).toBeTruthy();
+  }));
 });
