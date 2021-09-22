@@ -1,10 +1,4 @@
-import {
-  async,
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
@@ -44,7 +38,7 @@ describe('ListingComponent', () => {
   };
 
   describe('Normal Operations', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureTestBed();
     }));
 

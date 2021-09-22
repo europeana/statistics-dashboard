@@ -2,7 +2,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController
 } from '@angular/common/http/testing';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { environment } from '../../environments/environment';
 import { BreakdownResults, GeneralResults, RawFacet } from '../_models';
 import { APIService } from './';
@@ -11,7 +11,7 @@ describe('APIService', () => {
   let service: APIService;
   let http: HttpTestingController;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [APIService],
       imports: [HttpClientTestingModule]
