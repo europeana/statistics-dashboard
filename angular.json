@@ -27,7 +27,8 @@
               "polylabel",
               "raf",
               "xlsx",
-              "@babel/runtime"
+              "@babel/runtime",
+              "pdfmake"
             ],
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
