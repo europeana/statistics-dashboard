@@ -6,8 +6,7 @@ import {
   BreakdownRequest,
   BreakdownResults,
   GeneralResults,
-  IHashString,
-  RawFacet
+  IHashString
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
 
@@ -20,12 +19,6 @@ export class APIService {
 
   loadISOCountryCodes(): IHashString {
     return ISOCountryCodes;
-  }
-
-  loadAPIData(url: string): Observable<RawFacet> {
-    return this.http.get<RawFacet>(
-      `${environment.serverAPI}${url}&wskey=${environment.wskey}`
-    );
   }
 
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {

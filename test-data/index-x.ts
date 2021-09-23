@@ -6,12 +6,9 @@ import {
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
-  Facet,
-  FacetField,
   FilterOption,
   GeneralResults,
   IHashStringArray,
-  RawFacet,
   RequestFilter
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';

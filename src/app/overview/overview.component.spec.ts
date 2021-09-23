@@ -15,7 +15,6 @@ import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { today } from '../_helpers';
 import {
   createMockPipe,
-  MockAPIData,
   MockAPIService,
   MockAPIServiceErrors,
   MockBarComponent,
@@ -93,7 +92,6 @@ describe('OverviewComponent', () => {
   const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
-    component.useDataServer = true;
     component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
@@ -203,6 +201,7 @@ describe('OverviewComponent', () => {
         ]
       };
 
+      spyOn(component, 'storeSeries');
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();
 
@@ -216,14 +215,6 @@ describe('OverviewComponent', () => {
 
       expect(component.storeSeries).toHaveBeenCalledTimes(3);
     });
-
-    it('should extract data as a percent', fakeAsync(() => {
-      const data = Object.assign({}, MockAPIData);
-      expect(component.allProcessedFacetData).toBeFalsy();
-      component.processResult(data);
-      expect(component.allProcessedFacetData).toBeTruthy();
-      expect(component.allProcessedFacetData[0].fields[0].percent).toBeTruthy();
-    }));
 
     it('should get the select options', fakeAsync(() => {
       expect(component.filterData.length).toBeFalsy(0);

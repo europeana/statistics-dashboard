@@ -2,7 +2,7 @@
   [formGroup]="form"
   class="dashboard-wrapper"
   [ngClass]="{
-    'loading-modal': isLoading && !allProcessedFacetData && !dataServerData
+    'loading-modal': isLoading && !dataServerData
   }"
 >
   <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
@@ -57,7 +57,7 @@
 
         <ul class="filters">
           <li>
-            <ng-container *ngIf="allProcessedFacetData || dataServerData">
+            <ng-container *ngIf="dataServerData">
               <ng-container *ngFor="let filter of facetConf">
                 <app-filter
                   [form]="form"
@@ -232,9 +232,9 @@
           <ng-container>
             <app-grid-summary
               #gridSummary
-              *ngIf="allProcessedFacetData || dataServerData"
+              *ngIf="dataServerData"
               [grandTotal]="resultTotal"
-              [summaryData]="getSummaryData()"
+              [summaryData]="dataServerData.results.breakdowns"
             ></app-grid-summary>
           </ng-container>
         </div>

@@ -5,110 +5,8 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  IHashString,
-  RawFacet
+  IHashString
 } from '../_models';
-
-export const MockAPIData = {
-  facets: [
-    {
-      name: DimensionName.contentTier,
-      fields: [
-        {
-          label: '4',
-          count: 17050500
-        },
-        {
-          label: '1',
-          count: 16916984
-        }
-      ]
-    },
-    {
-      name: DimensionName.metadataTier,
-      fields: [
-        {
-          label: 'A',
-          count: 2
-        },
-        {
-          label: 'B',
-          count: 3
-        }
-      ]
-    },
-    {
-      name: DimensionName.country,
-      fields: [
-        {
-          label: 'France',
-          count: 684
-        },
-        {
-          label: 'Netherlands',
-          count: 3170
-        }
-      ]
-    },
-    {
-      name: DimensionName.type,
-      fields: [
-        {
-          label: 'Text',
-          count: 2
-        },
-        {
-          label: 'Video',
-          count: 3
-        }
-      ]
-    },
-    {
-      name: DimensionName.rights,
-      fields: [
-        {
-          label: 'http://creativecommons.org/licenses/by-nc-nd',
-          count: 684
-        },
-        {
-          label: 'http://that.rights',
-          count: 3170
-        }
-      ]
-    },
-    {
-      name: DimensionName.dataProvider,
-      fields: [
-        {
-          label: 'Data Provider A1',
-          count: 2
-        },
-        {
-          label: 'Data Provider A2',
-          count: 2
-        },
-        {
-          label: 'Data Provider B',
-          count: 3
-        }
-      ]
-    },
-    {
-      name: DimensionName.provider,
-      fields: [
-        {
-          label: 'Provider A',
-          count: 2
-        },
-        {
-          label: 'Provider B',
-          count: 3
-        }
-      ]
-    }
-  ],
-  totalResults: 5
-} as RawFacet;
 
 export const MockGeneralResults = {
   allBreakdowns: [
@@ -778,16 +676,6 @@ export const MockBreakdowns = {
 
 export class MockAPIService {
   errorMode = false;
-
-  loadAPIData(_: string): Observable<RawFacet> {
-    if (this.errorMode) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return of({ items: [], totalResults: 0 } as any as RawFacet).pipe(
-        delay(1)
-      );
-    }
-    return of(MockAPIData).pipe(delay(1));
-  }
 
   loadISOCountryCodes(): IHashString {
     return {

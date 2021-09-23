@@ -8,6 +8,5 @@ export const environment = {
   production: false,
   serverAPI: 'http://localhost:3001/',
   serverPortal: 'https://www.europeana.eu/en/search',
-  useDataServer: true,
   wskey: 'api2demo'
 };
