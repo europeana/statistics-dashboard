@@ -10,12 +10,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { today } from '../_helpers';
 import {
@@ -27,11 +22,10 @@ import {
   MockGridComponent
 } from '../_mocked';
 import {
-  BreakdownResults,
   BreakdownResult,
+  BreakdownResults,
   DimensionName,
   NameLabel,
-  NameValuePercent,
   RequestFilter,
   RequestFilterRange
 } from '../_models';
@@ -208,15 +202,6 @@ describe('OverviewComponent', () => {
           }
         ]
       };
-
-      spyOn(component, 'storeSeries').and.callFake(
-        (
-          _: boolean,
-          __: boolean,
-          ___: Array<NameValuePercent>,
-          ____: number
-        ) => {}
-      );
 
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();

@@ -91,6 +91,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   ];
 
   filterStates: { [key: string]: FilterState } = {};
+  userFilterSearchTerms = facetNames.reduce((map, item: string) => {
+    map[item] = '';
+    return map;
+  }, {});
+
   contentTiersOptions = Array(5)
     .fill(0)
     .map((x, index) => `${x + index}`);
@@ -453,7 +458,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
                 return -1;
               });
             this.filterData[facetName] = safeOps;
-            this.filterDisplayData({ term: '', dimension: facetName });
+
+            const previousTerm = this.userFilterSearchTerms[facetName];
+            this.filterDisplayData({
+              term: previousTerm ? previousTerm : '',
+              dimension: facetName
+            });
           }
         });
 
@@ -788,13 +798,15 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** filterDisplayData
   /* @param {FilterInfo} filterInfo
-  /* updates this.displayedFilterData
-  /* updates the form object
+  /* updates this.displayedFilterData to a filtered and truncated subset for display
+  /* (called on initialisation and in response to a search term changing)
   */
   filterDisplayData(filterInfo: FilterInfo): void {
     if (!filterInfo.dimension) {
       filterInfo.dimension = this.form.value.facetParameter;
     }
+
+    this.userFilterSearchTerms[filterInfo.dimension] = filterInfo.term;
 
     const term = replaceDiacritics(filterInfo.term);
     const reg = new RegExp(appendDiacriticEquivalents(term), 'gi');
