@@ -27,7 +27,7 @@ export class GridComponent {
   summaryRows: Array<TableRow> = [];
 
   sortStates = {
-    count: 0,
+    count: -1,
     percent: 0
   };
 

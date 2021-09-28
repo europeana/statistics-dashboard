@@ -22,8 +22,8 @@ context('statistics-dashboard', () => {
 
       const arCountries = ['Bulgaria', 'Denmark', 'Hungary'];
       const orCountries = ['Norway', 'Portugal'];
-      const arProviders = ['CARARE', 'The European Library'];
-      const orProviders = ['Digital Repository of Ireland', 'RNOD-Portugal'];
+      const arProviders = ['Arts Council Norway', 'CARARE', 'The European Library'];
+      const waProviders  = ['EFG - The European Film Gateway'];
 
       cy.get(selFilter).type('ar', force);
 
@@ -35,13 +35,14 @@ context('statistics-dashboard', () => {
       assertRowLength(orCountries, 1);
 
       cy.get(selFacetSelect).select('Provider', force);
+      assertRowLength(waProviders, 0);
 
-      assertRowLength(arProviders, 0);
-      assertRowLength(orProviders, 1);
+      cy.get(selFilter).clear(force).type('wa', force);
+      assertRowLength(waProviders, 1);
 
       cy.get(selFilter).clear(force).type('ar', force);
       assertRowLength(arProviders, 1);
-      assertRowLength(orProviders, 0);
+      assertRowLength(waProviders, 0);
 
       cy.get(selFacetSelect).select('Country', force);
 
@@ -56,15 +57,15 @@ context('statistics-dashboard', () => {
       cy.get(selRowName).should('have.length', 1);
       cy.get(selFilter).clear();
       cy.get(selFilter).type('Os', force);
-      cy.get(selRowName).should('have.length', 2);      
+      cy.get(selRowName).should('have.length', 2);
     });
 
     it('should go to the user-typed page', () => {
       cy.visit('/data/COUNTRY');
       // assumes page of 10 entries
-      const pageOneCountries = ['Belgium', 'Greece'];
-      const pageTwoCountries = ['Holy See (Vatican City State)', 'Iceland'];
-      const pageThreeCountries = ['Slovenia', 'Hungary'];
+      const pageOneCountries = ['Belgium', 'Holy See (Vatican City State)'];
+      const pageTwoCountries = ['Ireland', 'Netherlands'];
+      const pageThreeCountries = ['Iceland', 'Czech Republic'];
 
       assertRowLength(pageOneCountries, 1);
       assertRowLength(pageTwoCountries, 0);
@@ -74,6 +75,7 @@ context('statistics-dashboard', () => {
 
       assertRowLength(pageOneCountries, 0);
       assertRowLength(pageTwoCountries, 1);
+
       assertRowLength(pageThreeCountries, 0);
 
       cy.get(selInputGoTo).type('3{enter}', force);
@@ -101,6 +103,7 @@ context('statistics-dashboard', () => {
       assertRowLength(['Belgium'], 1);
       assertRowLength(['Czech Republic'], 0);
 
+      cy.get(selColSortCount).click(force);
       cy.get(selColSortCount).click(force);
       assertRowLength(['Belgium'], 0);
       assertRowLength(['Czech Republic'], 1);
