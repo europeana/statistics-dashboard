@@ -5,6 +5,7 @@ import {
   CompareData,
   CompareDataDescriptor,
   HeaderNameType,
+  IHashNumber,
   TableRow
 } from '../_models';
 
@@ -104,8 +105,19 @@ export class SnapshotsComponent {
 
       cd.applied = true;
 
+      const data = percent ? cd.dataPercent : cd.data;
+
+      const sortedKeys = Object.keys(data).sort((a: string, b: string) => {
+        return data[b] - data[a];
+      });
+
+      const sortedData = sortedKeys.reduce((map: IHashNumber, item: string) => {
+        map[item] = data[item];
+        return map;
+      }, {});
+
       const csd: ColourSeriesData = {
-        data: percent ? cd.dataPercent : cd.data,
+        data: sortedData,
         colour: colours[colourIndex],
         seriesName: seriesKey
       };
@@ -133,9 +145,14 @@ export class SnapshotsComponent {
     seriesKeys.forEach((seriesKey: string) => {
       const cd = cds[seriesKey];
 
-      Object.keys(cd.data).forEach((key: string) => {
-        allKeysInAllSeries[key] = true;
-      });
+      Object.keys(cd.data)
+        // sort within each series by data value by default
+        .sort((a: string, b: string) => {
+          return cd.data[b] - cd.data[a];
+        })
+        .forEach((key: string) => {
+          allKeysInAllSeries[key] = true;
+        });
 
       result.push({
         name: 'Total', // name will not be shown in the grid
