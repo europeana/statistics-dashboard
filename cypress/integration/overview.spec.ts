@@ -1,4 +1,5 @@
 import { facetNames } from '../../src/app/_data';
+import { DimensionName } from '../../src/app/_models';
 
 context('statistics-dashboard', () => {
   describe('overview', () => {
@@ -18,7 +19,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should have a working home link', () => {
-      const url = '/data/COUNTRY';
+      const url = `/data/${DimensionName.country}`;
       cy.visit(url);
       cy.get(selLinkHome).should('have.length', 1);
       cy.get(selLinkHome).click({ force: true });
@@ -26,7 +27,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should respond to the CT-Zero option', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       cy.get(selCTZero).should('have.length', 1);
       cy.get(selCTZero).should('not.be.checked');
 
@@ -36,7 +37,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should respond to the CT-Zero url parameter', () => {
-      cy.visit(`/data/COUNTRY?${urlParamCTZero}`);
+      cy.visit(`/data/${DimensionName.country}?${urlParamCTZero}`);
       cy.get(selCTZero).should('be.checked');
       cy.get(selCTZero).click({ force: true });
       cy.url().should('not.contain', urlParamCTZero);
@@ -44,9 +45,9 @@ context('statistics-dashboard', () => {
 
     it('should show filter-removal options', () => {
       const filteredTypes = ['3D', 'VIDEO'];
-      const param = `?TYPE=${filteredTypes[0]}&TYPE=${filteredTypes[1]}`;
+      const param = `?${DimensionName.type}=${filteredTypes[0]}&${DimensionName.type}=${filteredTypes[1]}`;
 
-      cy.visit(`/data/COUNTRY${param}`);
+      cy.visit(`/data/${DimensionName.country}${param}`);
 
       cy.url().should('contain', filteredTypes[0]);
       cy.url().should('contain', filteredTypes[1]);
