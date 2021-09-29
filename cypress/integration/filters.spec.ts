@@ -1,3 +1,5 @@
+import { DimensionName } from '../../src/app/_models';
+
 context('statistics-dashboard', () => {
   describe('filters', () => {
 
@@ -19,24 +21,24 @@ context('statistics-dashboard', () => {
     const selFilterValueLabel = `${selFilter} .filter-label`;
 
     it('should not include filters for the current dimension', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       cy.get(selFilterOpenerName).contains('Country').should('have.length', 0);
       cy.get(selFilterOpenerName).contains('Content Tier').should('have.length', 1);
 
-      cy.visit('/data/contentTier');
+      cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpenerName).contains('Country').should('have.length', 1);
       cy.get(selFilterOpenerName).contains('Content Tier').should('have.length', 0);
     });
 
     it('should show the filters (closed)', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       cy.get(selFilter).should('have.length', 7);
       cy.get(selFilterOpener).should('have.length', 7);
       cy.get(selFilterOpened).should('have.length', 0);
     });
 
     it('should open and close the filters', () => {
-      cy.visit(`/data/COUNTRY`);
+      cy.visit(`/data/${DimensionName.country}`);
       cy.get(selFilterOpener).first().click(force);
       cy.get(selFilterOpened).should('have.length', 1);
       cy.get(selFilterOpener).last().click(force);
@@ -44,7 +46,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should apply the filters', () => {
-      cy.visit(`/data/COUNTRY`);
+      cy.visit(`/data/${DimensionName.country}`);
       cy.get(selFilterOpener).first().click(force);
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selCheckbox).first().click(force);
@@ -52,7 +54,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should scroll the filter remove options', () => {
-      cy.visit(`/data/COUNTRY`);
+      cy.visit(`/data/${DimensionName.country}`);
       cy.get(selFilterOpener).eq(2).click(force);
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selFilterRemoveNav).should('have.length', 0);
@@ -60,12 +62,13 @@ context('statistics-dashboard', () => {
       for(let i=0; i<4; i++){
         cy.get(selCheckbox).eq(i).click(force);
       }
+
       cy.get(selFilterRemove).should('have.length', 4);
       cy.get(selFilterRemoveNav).should('have.length', 1);
     });
 
     it('should disable and restore filters', () => {
-      cy.visit(`/data/contentTier`);
+      cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpener).eq(1).click(force);
       cy.get(selFilterValueLabel).contains('Belgium').click();
       cy.get(selFilterRemove).should('have.length', 1);
@@ -76,7 +79,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should search the filters and remember the term when re-opened', () => {
-      cy.visit(`/data/contentTier`);
+      cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterValueLabel).should('have.length', 0);
       cy.get(selFilterOpener).eq(1).click(force);
       cy.get(selFilterValueLabel).should('have.length.gt', 0);
@@ -94,7 +97,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should search the filters (diacritics)', () => {
-      cy.visit(`/data/contentTier`);
+      cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpener).eq(2).click(force);
       cy.get(selFilterValueLabel).contains('Österreichische Nationalbibliothek - Austrian National Library').should('have.length', 1);
 
@@ -113,7 +116,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should allow date range definitions', () => {
-      cy.visit(`/data/contentTier`);
+      cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selDateFrom).should('have.length', 0);
       cy.get(selDateTo).should('have.length', 0);
       cy.get(selFilterOpener).last().click(force);

@@ -79,10 +79,10 @@
     <span
       class="cell-header text-right"
       [ngClass]="{
-        active: sortStates['percent'] !== 0,
-        descending: sortStates['percent'] === -1
+        active: sortStates['count'] !== 0,
+        descending: sortStates['count'] === -1
       }"
-      ><a (click)="sort('percent')">Percent</a></span
+      ><a (click)="sort('count')">Percent</a></span
     >
 
     <span class="cell-header">View in Europeana</span>

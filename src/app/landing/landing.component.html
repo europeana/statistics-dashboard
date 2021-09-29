@@ -70,7 +70,7 @@
           ></app-bar-chart>
           <a
             class="data-link"
-            routerLink="/data/contentTier"
+            routerLink="/data/{{ DimensionName.contentTier }}"
             data-e2e="link-entry-ct"
             >View by content tier</a
           >
@@ -106,7 +106,7 @@
           ></app-bar-chart>
           <a
             class="data-link"
-            routerLink="/data/metadataTier"
+            routerLink="/data/{{ DimensionName.metadataTier }}"
             data-e2e="link-entry-metadata"
             >View by metadata tier</a
           >
@@ -133,7 +133,7 @@
         </div>
         <a
           class="data-link"
-          routerLink="/data/COUNTRY"
+          routerLink="/data/{{ DimensionName.country }}"
           data-e2e="link-entry-country"
           >View by countries</a
         >
@@ -157,7 +157,7 @@
           ></app-bar-chart>
           <a
             class="data-link"
-            routerLink="/data/TYPE"
+            routerLink="/data/{{ DimensionName.type }}"
             data-e2e="link-entry-type"
             >View by type</a
           >
@@ -186,7 +186,7 @@
           </div>
           <a
             class="data-link"
-            routerLink="/data/RIGHTS"
+            routerLink="/data/{{ DimensionName.rights }}"
             data-e2e="link-entry-rights"
             >View by rights statement</a
           >
@@ -211,7 +211,7 @@
           </div>
           <a
             class="data-link"
-            routerLink="/data/DATA_PROVIDER"
+            routerLink="/data/{{ DimensionName.dataProvider }}"
             data-e2e="link-entry-data-provider"
             >View by data provider</a
           >
@@ -240,7 +240,7 @@
           </div>
           <a
             class="data-link"
-            routerLink="/data/PROVIDER"
+            routerLink="/data/{{ DimensionName.provider }}"
             data-e2e="link-entry-provider"
             >View by provider</a
           >

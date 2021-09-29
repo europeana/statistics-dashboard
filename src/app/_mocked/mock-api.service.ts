@@ -282,7 +282,7 @@ export const MockGeneralResults = {
 export const MockBreakdowns = {
   filteringOptions: {
     contentTier: ['0', '1', '2', '3'],
-    COUNTRY: [
+    country: [
       'Denmark',
       'Ireland',
       'Norway',
@@ -295,7 +295,7 @@ export const MockBreakdowns = {
       'Croatia',
       'Iceland'
     ],
-    DATA_PROVIDER: [
+    dataProvider: [
       'The Danish Agency for Culture',
       'University College Cork',
       'The National Archives of Norway',
@@ -309,7 +309,7 @@ export const MockBreakdowns = {
       'National Library of Spain'
     ],
     metadataTier: ['B', 'C'],
-    PROVIDER: [
+    provider: [
       'CARARE',
       'European Commission',
       'LoCloud',
@@ -319,7 +319,7 @@ export const MockBreakdowns = {
       'Linked Heritage',
       'AthenaPlus'
     ],
-    RIGHTS: [
+    rights: [
       'https://creativecommons.org/licenses/by-nc-sa/4.0',
       'https://creativecommons.org/licenses/by-nd/2.5/pl',
       'https://creativecommons.org/licenses/by-nd/3.0/pl',
@@ -385,7 +385,7 @@ export const MockBreakdowns = {
       'https://creativecommons.org/licenses/by-nc/3.0',
       'https://rightsstatements.org/vocab/NoC-OKLR/1.0'
     ],
-    TYPE: ['IMAGE', 'SOUND', 'VIDEO']
+    type: ['IMAGE', 'SOUND', 'VIDEO']
   },
   results: {
     value: 'ALL RECORDS',

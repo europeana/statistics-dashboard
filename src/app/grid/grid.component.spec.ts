@@ -99,21 +99,20 @@ describe('GridComponent', () => {
 
     expect(rows[0].name).toEqual('B');
 
-    component.sortStates['count'] = 0;
-    component.sortStates['percent'] = -1;
+    component.sortStates['count'] = -1;
     component.autoSort(rows);
 
     expect(rows[0].name).toEqual('B');
   });
 
   it('should bump the sort state', () => {
+    expect(component.sortStates['count']).toEqual(-1);
+    component.bumpSortState('count');
     expect(component.sortStates['count']).toEqual(0);
     component.bumpSortState('count');
     expect(component.sortStates['count']).toEqual(1);
     component.bumpSortState('count');
     expect(component.sortStates['count']).toEqual(-1);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(0);
   });
 
   it('should get the data', () => {

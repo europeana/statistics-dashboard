@@ -1,3 +1,5 @@
+import { DimensionName } from '../../src/app/_models';
+
 context('statistics-dashboard', () => {
   describe('grid', () => {
 
@@ -18,7 +20,7 @@ context('statistics-dashboard', () => {
     };
 
     it('should filter', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
 
       const arCountries = ['Bulgaria', 'Denmark', 'Hungary'];
       const orCountries = ['Norway', 'Portugal'];
@@ -51,7 +53,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should filter (diacritics)', () => {
-      cy.visit('/data/DATA_PROVIDER');
+      cy.visit(`/data/${DimensionName.dataProvider}`);
       cy.get(selRowName).should('have.length', 10);
       cy.get(selFilter).type('Sõj', force);
       cy.get(selRowName).should('have.length', 1);
@@ -61,7 +63,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should go to the user-typed page', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       // assumes page of 10 entries
       const pageOneCountries = ['Belgium', 'Holy See (Vatican City State)'];
       const pageTwoCountries = ['Ireland', 'Netherlands'];
@@ -98,7 +100,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should retain altered order through facet switches', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
 
       assertRowLength(['Belgium'], 1);
       assertRowLength(['Czech Republic'], 0);
@@ -130,7 +132,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should paginate back and forth', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       assertRowLength(['Belgium'], 1);
       assertRowLength(['Ireland'], 0);
 
@@ -146,7 +148,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should set the result size', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       // assumes page of 10 entries
       const inFirst5 = ['Belgium', 'Bulgaria', 'Croatia', 'Austria'];
       const inSecond5 = ['Europe', 'Estonia', 'Germany', 'Greece'];

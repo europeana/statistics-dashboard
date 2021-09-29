@@ -8,11 +8,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 const facetNames: { [key: string]: string } = {
   contentTier: 'Content Tier',
   metadataTier: 'Metadata Tier',
-  COUNTRY: 'Country',
-  TYPE: 'Type',
-  RIGHTS: 'Rights',
-  DATA_PROVIDER: 'Data Provider',
-  PROVIDER: 'Provider'
+  country: 'Country',
+  type: 'Type',
+  rights: 'Rights',
+  dataProvider: 'Data Provider',
+  provider: 'Provider'
 };
 
 @Pipe({

@@ -8,19 +8,19 @@ import { Pipe, PipeTransform } from '@angular/core';
 const facetNames: { [key: string]: string } = {
   contentTier: 'Tier',
   metadataTier: 'Tier',
-  COUNTRY: 'Country',
-  TYPE: 'Type',
-  RIGHTS: 'Rights',
-  DATA_PROVIDER: 'CHI',
-  PROVIDER: 'Provider',
+  country: 'Country',
+  type: 'Type',
+  rights: 'Rights',
+  dataProvider: 'CHI',
+  provider: 'Provider',
 
   plural_contentTier: 'Tiers',
   plural_metadataTier: 'Tiers',
-  plural_COUNTRY: 'Countries',
-  plural_TYPE: 'Types',
-  plural_RIGHTS: 'Rights',
-  plural_DATA_PROVIDER: 'CHIs',
-  plural_PROVIDER: 'Providers'
+  plural_country: 'Countries',
+  plural_type: 'Types',
+  plural_rights: 'Rights',
+  plural_dataProvider: 'CHIs',
+  plural_provider: 'Providers'
 };
 
 @Pipe({

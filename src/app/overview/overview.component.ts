@@ -357,6 +357,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
               };
             })
             .sort((op1: NameLabel, op2: NameLabel) => {
+              // ensure that selected filters appear...
+              const qp = this.queryParams;
+              if (qp && qp[facetName]) {
+                const includes1 = qp[facetName].includes(op1.name);
+                const includes2 = qp[facetName].includes(op2.name);
+                if (includes1 && !includes2) {
+                  return -1;
+                } else if (includes2 && !includes1) {
+                  return 1;
+                }
+              }
+
+              // ...and sort on label
               if (op1.label > op2.label) {
                 return 1;
               }

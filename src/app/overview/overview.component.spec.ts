@@ -44,7 +44,9 @@ describe('OverviewComponent', () => {
   ];
   const tickTime = 1;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
-  const queryParams = new BehaviorSubject({ COUNTRY: 'Italy' } as Params);
+  const tmpParams = {};
+  tmpParams[DimensionName.country] = 'Italy';
+  const queryParams = new BehaviorSubject(tmpParams as Params);
 
   let api: APIService;
 
@@ -54,14 +56,23 @@ describe('OverviewComponent', () => {
         HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
-          { path: 'data/contentTier', component: OverviewComponent },
-          { path: 'data/COUNTRY', component: OverviewComponent },
-          { path: 'data/COUNTRY?TYPE=TEXT', component: OverviewComponent },
           {
-            path: 'data/COUNTRY?TYPE=TEXT&TYPE=VIDEO',
+            path: `data/${DimensionName.contentTier}`,
             component: OverviewComponent
           },
-          { path: 'data/TYPE', component: OverviewComponent }
+          {
+            path: `data/${DimensionName.country}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}&${DimensionName.type}=VIDEO}`,
+            component: OverviewComponent
+          },
+          { path: `data/${DimensionName.type}`, component: OverviewComponent }
         ])
       ],
       declarations: [
@@ -142,16 +153,16 @@ describe('OverviewComponent', () => {
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(1);
-
       params.next({ facet: DimensionName.type });
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(2);
 
-      queryParams.next({ TYPE: ['SOUND', 'VIDEO'] });
+      const nextParams = {};
+      nextParams[DimensionName.type] = ['SOUND', 'VIDEO'];
+      queryParams.next(nextParams);
       tick(1);
       fixture.detectChanges();
-
       expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
       component.ngOnDestroy();
     }));
@@ -164,12 +175,12 @@ describe('OverviewComponent', () => {
       component.dataServerData = {
         filteringOptions: {
           contentTier: [],
-          COUNTRY: [],
-          DATA_PROVIDER: [],
+          country: [],
+          dataProvider: [],
           metadataTier: [],
-          PROVIDER: [],
-          RIGHTS: [],
-          TYPE: []
+          provider: [],
+          rights: [],
+          type: []
         },
         results: {
           breakdowns: {
@@ -235,7 +246,7 @@ describe('OverviewComponent', () => {
       const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
 
       expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
-      component.queryParams = { COUNTRY: [countryUrlParamVal] };
+      component.queryParams = { country: [countryUrlParamVal] };
       expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
 
       expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
