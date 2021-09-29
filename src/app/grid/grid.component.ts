@@ -27,7 +27,8 @@ export class GridComponent {
   summaryRows: Array<TableRow> = [];
 
   sortStates = {
-    count: -1
+    count: -1,
+    name: 0
   };
 
   gridRows: Array<TableRow>;
@@ -53,7 +54,7 @@ export class GridComponent {
   }
 
   autoSort(rows: Array<TableRow>): void {
-    ['count', 'percent'].every((field: string) => {
+    ['count', 'name'].every((field: string) => {
       if (this.sortStates[field] !== 0) {
         this.sortRows(rows, field);
         return false;

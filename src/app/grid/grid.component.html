@@ -62,8 +62,14 @@
       ></app-grid-paginator>
     </span>
 
-    <span class="cell-header cell-first-wide">
-      Records by {{ facet | renameApiFacet }}
+    <span
+      class="cell-header cell-first-wide"
+      [ngClass]="{
+        active: sortStates['name'] !== 0,
+        descending: sortStates['name'] === -1
+      }"
+    >
+      <a (click)="sort('name')">Records by {{ facet | renameApiFacet }}</a>
     </span>
 
     <span
