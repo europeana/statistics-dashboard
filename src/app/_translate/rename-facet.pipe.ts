@@ -4,16 +4,17 @@
 /* supplies human-readable labels for facet names
 */
 import { Pipe, PipeTransform } from '@angular/core';
+import { DimensionName } from '../_models';
 
-const facetNames: { [key: string]: string } = {
-  contentTier: 'Content Tier',
-  metadataTier: 'Metadata Tier',
-  country: 'Country',
-  type: 'Type',
-  rights: 'Rights',
-  dataProvider: 'Data Provider',
-  provider: 'Provider'
-};
+const facetNames: { [key: string]: string } = {};
+
+facetNames[DimensionName.contentTier] = 'Content Tier';
+facetNames[DimensionName.metadataTier] = 'Metadata Tier';
+facetNames[DimensionName.country] = 'Country';
+facetNames[DimensionName.type] = 'Type';
+facetNames[DimensionName.rights] = 'Rights';
+facetNames[DimensionName.dataProvider] = 'Data Provider';
+facetNames[DimensionName.provider] = 'Provider';
 
 @Pipe({
   name: 'renameApiFacet'
