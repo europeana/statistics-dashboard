@@ -65,35 +65,35 @@
     <span
       class="cell-header cell-first-wide"
       [ngClass]="{
-        active: sortStates['name'] !== 0,
-        descending: sortStates['name'] === -1
+        active: sortStates[SortBy.name] !== 0,
+        descending: sortStates[SortBy.name] === -1
       }"
     >
-      <a (click)="sort('name')">Records by {{ facet | renameApiFacet }}</a>
+      <a (click)="sort(SortBy.name)">Records by {{ facet | renameApiFacet }}</a>
     </span>
 
     <span
       class="cell-header text-right"
       data-e2e="grid-sort-count"
       [ngClass]="{
-        active: sortStates['count'] !== 0,
-        descending: sortStates['count'] === -1
+        active: sortStates[SortBy.count] !== 0,
+        descending: sortStates[SortBy.count] === -1
       }"
-      ><a (click)="sort('count')">Count</a></span
+      ><a (click)="sort(SortBy.count)">Count</a></span
     >
 
     <span
       class="cell-header text-right"
       [ngClass]="{
-        active: sortStates['count'] !== 0,
-        descending: sortStates['count'] === -1
+        active: sortStates[SortBy.count] !== 0,
+        descending: sortStates[SortBy.count] === -1
       }"
-      ><a (click)="sort('count')">Percent</a></span
+      ><a (click)="sort(SortBy.count)">Percent</a></span
     >
 
     <span class="cell-header">View in Europeana</span>
 
-    <ng-container *ngIf="pagerInfo">
+    <ng-container *ngIf="pagerInfo && pagerInfo.pageRows">
       <!-- Summary rows -->
       <ng-template #labelTotal><span class="bold">Total</span></ng-template>
 

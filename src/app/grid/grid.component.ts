@@ -1,7 +1,21 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { colours } from '../_data';
-import { appendDiacriticEquivalents, replaceDiacritics } from '../_helpers';
-import { FmtTableData, HeaderNameType, PagerInfo, TableRow } from '../_models';
+import { filterList } from '../_helpers';
+
+import {
+  FmtTableData,
+  HeaderNameType,
+  PagerInfo,
+  PagerInfoExtended,
+  SortBy,
+  TableRow
+} from '../_models';
 import { GridPaginatorComponent } from '../grid-paginator';
 
 @Component({
@@ -13,28 +27,30 @@ export class GridComponent {
   @Input() getUrl: (s: string) => string;
   @Input() getUrlRow: (s: string) => string;
   @Input() facet: string;
+  @Output() refreshData = new EventEmitter<void>();
   @ViewChild('paginator') paginator: GridPaginatorComponent;
 
   filterString = '';
-  maxPageSize = 10;
-  maxPageSizes = [5, 10, 15].map((option: number) => {
+  maxPageSizes = [10, 20, 50].map((option: number) => {
     return { title: `${option}`, value: option };
   });
-
-  pagerInfo: PagerInfo;
-
+  maxPageSize = this.maxPageSizes[0].value;
+  pagerInfo: PagerInfo = {
+    currentPage: 0,
+    pageCount: 0,
+    pageRows: []
+  };
   unfilteredPageRows: Array<TableRow> = [];
   summaryRows: Array<TableRow> = [];
-
   sortStates = {
     count: -1,
     name: 0
   };
-
   gridRows: Array<TableRow>;
   isShowingSeriesInfo = false;
 
   public colours = colours;
+  public SortBy = SortBy;
 
   applyHighlights(rows: Array<TableRow>): void {
     let highlight = false;
@@ -50,16 +66,6 @@ export class GridComponent {
       }
       currName = row.name;
       row.highlight = highlight;
-    });
-  }
-
-  autoSort(rows: Array<TableRow>): void {
-    ['count', 'name'].every((field: string) => {
-      if (this.sortStates[field] !== 0) {
-        this.sortRows(rows, field);
-        return false;
-      }
-      return true;
     });
   }
 
@@ -97,14 +103,28 @@ export class GridComponent {
     return '';
   }
 
-  /** getFilteredRows
-  /* @returns unfilteredPageRows filtered by filterString
-  **/
-  getFilteredRows(): Array<TableRow> {
-    const filter = replaceDiacritics(this.filterString);
-    const reg = new RegExp(appendDiacriticEquivalents(filter), 'gi');
-    return this.unfilteredPageRows.filter(function (tr: TableRow) {
-      return !filter || reg.exec(tr.name);
+  getExtendedPagerInfo(): PagerInfoExtended {
+    const ss = this.sortStates;
+    // the default
+    let sortInfo = {
+      by: SortBy.count,
+      dir: 0
+    };
+
+    Object.keys(ss).forEach((field: SortBy) => {
+      const state = this.sortStates[field];
+      if (state !== 0) {
+        sortInfo = {
+          by: field as SortBy,
+          dir: state
+        };
+      }
+    });
+
+    return Object.assign(this.pagerInfo, {
+      maxPerPage: this.maxPageSize,
+      filterTerm: this.filterString,
+      sort: sortInfo
     });
   }
 
@@ -153,50 +173,19 @@ export class GridComponent {
   }
 
   /** sort
-  /* Template utility: bumps sort state and calls updateRows
+  /* Template utility: bumps sort state and emits refresh event
   /* @param { string : field } - the field to sort on
   **/
   sort(field: string): void {
     this.bumpSortState(field);
-    this.updateRows(field);
-  }
-
-  /** sortRows
-  /* Sort an array of TableRow objects
-  /* @param { Array<TableRow> : rows } - the rows to sort
-  /* @param { string : field } - the field to sort on
-  **/
-  sortRows(rows: Array<TableRow>, field: string): void {
-    rows.sort((rowA: TableRow, rowB: TableRow) => {
-      const sortState = this.sortStates[field];
-      if (sortState === 1) {
-        return rowA[field] > rowB[field]
-          ? 1
-          : rowA[field] === rowB[field]
-          ? 0
-          : -1;
-      } else if (sortState === -1) {
-        return rowA[field] < rowB[field]
-          ? 1
-          : rowA[field] === rowB[field]
-          ? 0
-          : -1;
-      } else {
-        return 0;
-      }
-    });
+    this.refreshData.emit();
   }
 
   /** updateRows
   /* @param { Array<TableRow> : rows }
   **/
-  updateRows(sortField?: string): void {
-    const rows = this.getFilteredRows();
-    if (sortField) {
-      this.sortRows(rows, sortField);
-    } else {
-      this.autoSort(rows);
-    }
+  updateRows(): void {
+    const rows = filterList(this.filterString, this.unfilteredPageRows, 'name');
     this.applyHighlights(rows);
     this.gridRows = rows;
   }

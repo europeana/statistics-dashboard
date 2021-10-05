@@ -265,6 +265,7 @@
           facet="{{ form.value.facetParameter }}"
           [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
+          (refreshData)="showAppliedSeriesInGridAndChart()"
         ></app-grid>
 
         <div class="export-opener-link-wrapper">

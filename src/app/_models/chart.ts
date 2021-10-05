@@ -20,6 +20,7 @@ export interface ChartSettings {
 export interface ColourSeriesData {
   colour: string;
   data: IHashNumber;
+  //data: Map<string, number>;
   seriesName: string;
 }
 
@@ -28,6 +29,7 @@ export interface CompareDataDescriptor {
   applied: boolean;
   current?: boolean;
   data: IHashNumber;
+  dataOrder?: Array<string>;
   dataPercent: IHashNumber;
   label: string;
   name: string;

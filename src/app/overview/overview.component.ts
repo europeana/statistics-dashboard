@@ -4,13 +4,11 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-
 import { environment } from '../../environments/environment';
 import { facetNames } from '../_data';
-import { appendDiacriticEquivalents, replaceDiacritics } from '../_helpers';
+import { filterList } from '../_helpers';
 import { DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
-
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
@@ -484,6 +482,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       name: name,
       label: label,
       data: this.iHashNumberFromNVPs(nvs),
+
+      dataOrder: [],
+
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
       applied: applied,
       pinIndex: 0,
@@ -497,46 +498,58 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { string : seriesKey } - the key of the series to remove
    */
   removeSeries(seriesKey: string): void {
-    this.removeSeriesFromChart(seriesKey);
-    this.showAppliedSeriesInTable();
+    this.snapshots.unapply(seriesKey);
+    this.showAppliedSeriesInGridAndChart();
   }
 
-  /** removeSeriesFromChart
-  /*  Sets series.applied to false and removes it from the chart
-  /* @param { string : seriesKey } - the key of the series to remove
-   */
-  removeSeriesFromChart(seriesKey: string): void {
-    this.barChart.removeSeries(seriesKey);
-    this.snapshots.unapply(seriesKey);
+  showAppliedSeriesInGridAndChart(): void {
+    const seriesKeys = this.snapshots.filteredCDKeys(
+      this.form.value.facetParameter,
+      'applied'
+    );
+
+    const sortInfo = this.grid.getExtendedPagerInfo().sort;
+    this.snapshots.preSort(
+      this.form.value.facetParameter,
+      seriesKeys,
+      sortInfo
+    );
+
+    this.showAppliedSeriesInGrid();
+
+    const fn = (): void => {
+      this.barChart.removeAllSeries();
+      this.addAppliedSeriesToChart();
+      this.barChart.drawChart();
+    };
+    setTimeout(fn, 0);
   }
 
   /** addSeries
   /*  UI control
-  /*  Calls functions to add series data to the bar chart and the table
+  /*  Calls functions to apply daya then redraw the chart and grid
   /* @param { Array<string> : seriesKeys } - the keys of the series to add
    */
   addSeries(seriesKeys: Array<string>): void {
-    this.addSeriesToChart(seriesKeys);
-    this.showAppliedSeriesInTable();
+    this.snapshots.apply(this.form.value.facetParameter, seriesKeys);
+    this.showAppliedSeriesInGridAndChart();
   }
 
   /** addSeriesToChart
   /*  Add series data to the bar chart
   /*  (colours handled by snapshots)
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
-  /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
-  addSeriesToChart(seriesKeys: Array<string>, reuseColours = false): void {
-    seriesKeys = seriesKeys.reverse();
-
-    const seriesData = this.snapshots.applySeries(
-      this.form.value.facetParameter,
-      seriesKeys,
-      this.form.value.showPercent,
-      reuseColours
-    );
-
+  addSeriesToChart(seriesKeys: Array<string>): void {
+    if (!this.grid) {
+      return;
+    }
     const fn = (): void => {
+      const seriesData = this.snapshots.getSeriesDataForChart(
+        this.form.value.facetParameter,
+        seriesKeys,
+        this.form.value.showPercent
+      );
       this.barChart.addSeries(seriesData);
     };
     setTimeout(fn, 0);
@@ -546,10 +559,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /*  adds all compareData entries (where applied = true)
   /* @param { boolean : reuseColours } - optional flag for percentage switch
    */
-  addAppliedSeriesToChart(reuseColours = false): void {
+  addAppliedSeriesToChart(): void {
     this.addSeriesToChart(
-      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied'),
-      reuseColours
+      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
     );
   }
 
@@ -564,7 +576,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.barChart.drawChart();
     }
     this.barChart.removeAllSeries();
-    this.addAppliedSeriesToChart(true);
+    this.addAppliedSeriesToChart();
   }
 
   /** addOrUpdateFilterControls
@@ -639,21 +651,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     this.userFilterSearchTerms[filterInfo.dimension] = filterInfo.term;
 
-    const term = replaceDiacritics(filterInfo.term);
-    const reg = new RegExp(appendDiacriticEquivalents(term), 'gi');
-    const toDisplay = this.filterData[filterInfo.dimension]
-      .filter((nl: NameLabel) => {
-        if (term) {
-          // clear regex indexes with empty exec to prevent bug where "ne" fails to match "Netherlands"
-          reg.exec('');
-          return filterInfo.dimension === DimensionName.rights
-            ? reg.exec(this.renameRights.transform(nl.label))
-            : reg.exec(nl.label);
-        } else {
-          return true;
-        }
-      })
-      .slice(0, this.MAX_FILTER_OPTIONS);
+    const toDisplay = filterList(
+      filterInfo.term,
+      this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
+        return filterInfo.dimension !== DimensionName.rights
+          ? nl
+          : {
+              name: nl.name,
+              label: this.renameRights.transform(nl.label)
+            };
+      }),
+      'label'
+    ).slice(0, this.MAX_FILTER_OPTIONS);
 
     this.addOrUpdateFilterControls(filterInfo.dimension, toDisplay);
     this.displayedFilterData[filterInfo.dimension] = toDisplay;
@@ -962,28 +971,20 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     // store as hidden unless "all"
     this.storeSeries(true, !filtersApplied, chartData, this.resultTotal);
-
-    // show other applied
-    this.addAppliedSeriesToChart();
-    this.showAppliedSeriesInTable();
-
-    if (this.barChart) {
-      // force refresh of axes when switching category
-      this.barChart.drawChart();
-    }
+    this.showAppliedSeriesInGridAndChart();
   }
 
-  /* showAppliedSeriesInTable
+  /* showAppliedSeriesInGrid
   /*
   /* sets table set table rows (combined series)
   */
-  showAppliedSeriesInTable(): void {
+  showAppliedSeriesInGrid(): void {
     const seriesKeys = this.snapshots.filteredCDKeys(
       this.form.value.facetParameter,
       'applied'
     );
 
-    const rows = this.snapshots.getSeriesDataForTable(
+    const rows = this.snapshots.getSeriesDataForGrid(
       this.form.value.facetParameter,
       seriesKeys
     );

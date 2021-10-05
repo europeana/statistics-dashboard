@@ -6,6 +6,8 @@ import {
   CompareDataDescriptor,
   HeaderNameType,
   IHashNumber,
+  SortBy,
+  SortInfo,
   TableRow
 } from '../_models';
 
@@ -22,6 +24,7 @@ export class SnapshotsComponent {
   @Input() set facetName(facetName: string) {
     this._facetName = facetName;
 
+    // unapply all other facets
     Object.keys(this.compareDataAllFacets).forEach((fName: string) => {
       if (fName !== facetName) {
         const cd = this.compareDataAllFacets[fName];
@@ -54,29 +57,49 @@ export class SnapshotsComponent {
     });
   }
 
-  /** getNextAvailableColourIndex
-  /* calculates the next available colour by looking at which have been used
-  /* within the current facet data
-  /* @param { string : facetName } - the active facet
-  /* @returns number
-  */
-  getNextAvailableColourIndex(facetName: string): number {
-    const cd = this.compareDataAllFacets[facetName];
+  preSort(
+    facetName: string,
+    seriesKeys: Array<string>,
+    sortInfo: SortInfo
+  ): void {
+    seriesKeys.forEach((seriesKey: string) => {
+      const cd = this.compareDataAllFacets[facetName][seriesKey];
+      const data = cd.data;
 
-    const usedIndexes = Object.keys(cd)
-      .filter((key: string) => {
-        return cd[key]['applied'];
-      })
-      .map((key: string) => {
-        return cd[key]._colourIndex;
-      });
+      let operandA;
+      let operandB;
+      let sortedKeys: Array<string>;
 
-    const res = new Array(colours.length)
-      .fill(null)
-      .findIndex((_, x: number) => {
-        return !usedIndexes.includes(x);
-      });
-    return res > -1 ? res : 0;
+      const sortByCount = sortInfo.by === SortBy.count;
+
+      if (cd.dataOrder && sortInfo.dir === 0) {
+        sortedKeys = cd.dataOrder;
+      } else {
+        sortedKeys = Object.keys(data).sort((a: string, b: string) => {
+          if (sortByCount) {
+            operandA = data[a];
+            operandB = data[b];
+          } else {
+            operandA = a;
+            operandB = b;
+          }
+          if (sortInfo.dir === 1) {
+            return operandA > operandB ? 1 : operandA === operandB ? 0 : -1;
+          } else if (sortInfo.dir === -1) {
+            return operandA < operandB ? 1 : operandA === operandB ? 0 : -1;
+          } else {
+            return 0;
+          }
+        });
+      }
+
+      const newData = sortedKeys.reduce((map: IHashNumber, item: string) => {
+        map[item] = data[item];
+        return map;
+      }, {});
+
+      cd.data = newData;
+    });
   }
 
   /** applySeries
@@ -87,48 +110,27 @@ export class SnapshotsComponent {
   /* @param { boolean : percent } - percent value switch
   /* @returns Array<ColourSeriesData> converts to data (for chart)
   */
-  applySeries(
+  getSeriesDataForChart(
     facetName: string,
     seriesKeys: Array<string>,
-    percent: boolean,
-    reuseColours = false
+    percent: boolean
   ): Array<ColourSeriesData> {
-    return seriesKeys.map((seriesKey: string) => {
+    return seriesKeys.map((seriesKey: string, keyIndex: number) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
-
-      let colourIndex = cd._colourIndex;
-
-      if (!reuseColours) {
-        colourIndex = this.getNextAvailableColourIndex(facetName);
-        cd._colourIndex = colourIndex;
-      }
-
-      cd.applied = true;
-
       const data = percent ? cd.dataPercent : cd.data;
-
-      const sortedKeys = Object.keys(data).sort((a: string, b: string) => {
-        return data[b] - data[a];
-      });
-
-      const sortedData = sortedKeys.reduce((map: IHashNumber, item: string) => {
-        map[item] = data[item];
-        return map;
-      }, {});
-
       const csd: ColourSeriesData = {
-        data: sortedData,
-        colour: colours[colourIndex],
+        data: data,
+        colour: colours[keyIndex],
         seriesName: seriesKey
       };
       return csd;
     });
   }
 
-  /** getSeriesDataForTable
+  /** getSeriesDataForGrid
   /* converts to grouped / interplated data for table
   **/
-  getSeriesDataForTable(
+  getSeriesDataForGrid(
     facetName: string,
     seriesKeys: Array<string>
   ): Array<TableRow> {
@@ -137,22 +139,18 @@ export class SnapshotsComponent {
     const cds = this.compareDataAllFacets[facetName];
 
     // sort series keys (by pinIndex)
-
     this.getSortKeys(seriesKeys);
 
     // collect all possible category values and assign totals
 
-    seriesKeys.forEach((seriesKey: string) => {
+    seriesKeys.forEach((seriesKey: string, keyIndex: number) => {
       const cd = cds[seriesKey];
 
-      Object.keys(cd.data)
-        // sort within each series by data value by default
-        .sort((a: string, b: string) => {
-          return cd.data[b] - cd.data[a];
-        })
-        .forEach((key: string) => {
-          allKeysInAllSeries[key] = true;
-        });
+      Object.keys(cd.data).forEach((key: string) => {
+        allKeysInAllSeries[key] = true;
+      });
+
+      cd._colourIndex = keyIndex;
 
       result.push({
         name: 'Total', // name will not be shown in the grid
@@ -191,8 +189,12 @@ export class SnapshotsComponent {
   snap(facetName: string, key: string, cdd: CompareDataDescriptor): void {
     const cd = this.compareDataAllFacets[facetName];
     cd[key] = cdd;
+
     cdd.pinIndex = this.pinIndex;
     this.pinIndex++;
+
+    // record the original order
+    cdd.dataOrder = Object.keys(cdd.data).slice(0);
 
     this.filteredCDKeys(facetName, 'applied').forEach((key: string) => {
       cd[key].applied = false;
@@ -246,9 +248,15 @@ export class SnapshotsComponent {
     }
   }
 
+  apply(facetName: string, seriesKeys: Array<string>): void {
+    seriesKeys.forEach((seriesKey: string) => {
+      this.compareDataAllFacets[facetName][seriesKey].applied = true;
+    });
+  }
+
   unapply(seriesKey: string): void {
     const cd = this.compareDataAllFacets[this._facetName][seriesKey];
-    cd._colourIndex = 0;
+    cd._colourIndex = null;
     cd.applied = false;
   }
 }
