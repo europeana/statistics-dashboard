@@ -42,7 +42,3 @@ export interface CompareDataDescriptor {
 export interface CompareData {
   [key: string]: CompareDataDescriptor;
 }
-
-export interface ChartPosition {
-  absoluteIndex: number;
-}

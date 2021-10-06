@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { facetNames } from '../_data';
 import { filterList } from '../_helpers';
-import { ChartPosition, DimensionName, FilterInfo } from '../_models';
+import { DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
@@ -89,7 +89,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return map;
   }, {});
 
-  chartRefresher = new BehaviorSubject(true);
+  chartPosition = 0;
+  chartRefresher = new Subject<boolean>();
 
   contentTiersOptions = Array(5)
     .fill(0)
@@ -186,7 +187,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.chartRefresher
         .pipe(debounceTime(400))
         .subscribe((redraw: boolean) => {
-          this.refreshChart(redraw);
+          this.refreshChart(redraw, 0);
         })
     );
 
@@ -250,9 +251,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return this.barChart.getSvgData();
   }
 
-  chartPositionChanged(position: ChartPosition): void {
-    // TODO: update this.chartPosition
-    console.log('chartPositionChanged(): ' + position.absoluteIndex);
+  /** chartPositionChanged
+  /* @param {number} position - absolute position
+  */
+  chartPositionChanged(absPos: number): void {
+    const newPosition = Math.floor(absPos / this.barChart.maxNumberBars);
+    const scrollDiff = absPos % this.barChart.maxNumberBars;
+
+    if (newPosition != this.chartPosition) {
+      this.chartPosition = newPosition;
+      this.refreshChart(true, scrollDiff);
+    } else {
+      this.barChart.zoomTop(scrollDiff);
+    }
   }
 
   /** getUrl
@@ -552,19 +563,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
     const fn = (): void => {
+      const maxbars = this.barChart.maxNumberBars;
       const seriesData = this.snapshots.getSeriesDataForChart(
         this.form.value.facetParameter,
         seriesKeys,
-        this.form.value.showPercent
+        this.form.value.showPercent,
+        this.chartPosition * maxbars,
+        maxbars
       );
-      // TODO: return the correct position (this.ChartPosition)
-      /*
-      if(seriesData.length > 0){
-        console.log('seriesData to add...' + JSON.stringify(
-          Object.keys(seriesData[0].data).length
-        ))
-      }
-      */
       this.barChart.addSeries(seriesData);
     };
     setTimeout(fn, 0);
@@ -576,13 +582,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /*  re-applies active series
   /* @param { boolean : redrawChart } - flag redraw
    */
-  refreshChart(redrawChart = false): void {
+  refreshChart(redrawChart = false, scrollToTop = 0): void {
     this.barChart.removeAllSeries();
     this.addSeriesToChart(
       this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
     );
     if (redrawChart) {
-      this.barChart.drawChart();
+      this.barChart.drawChart(scrollToTop);
     }
   }
 

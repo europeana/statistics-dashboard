@@ -109,13 +109,16 @@ export class SnapshotsComponent {
   getSeriesDataForChart(
     facetName: string,
     seriesKeys: Array<string>,
-    percent: boolean
+    percent: boolean,
+    offset: number,
+    maxRows: number
   ): Array<ColourSeriesData> {
     return seriesKeys.map((seriesKey: string, keyIndex: number) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       const data = percent ? cd.dataPercent : cd.data;
+      const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
       return {
-        data: cd.orderPreferred.reduce((map: IHashNumber, pref: string) => {
+        data: cdKeys.reduce((map: IHashNumber, pref: string) => {
           map[`${pref} `] = data[pref];
           return map;
         }, {}),

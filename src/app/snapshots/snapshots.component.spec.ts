@@ -165,10 +165,22 @@ describe('SnapshotsComponent', () => {
   it('should get series data for the chart', () => {
     initData();
     expect(
-      component.getSeriesDataForChart(DimensionName.contentTier, [''], false)
+      component.getSeriesDataForChart(
+        DimensionName.contentTier,
+        [''],
+        false,
+        0,
+        50
+      )
     ).toBeTruthy();
     expect(
-      component.getSeriesDataForChart(DimensionName.contentTier, [''], true)
+      component.getSeriesDataForChart(
+        DimensionName.contentTier,
+        [''],
+        true,
+        0,
+        50
+      )
     ).toBeTruthy();
   });
 

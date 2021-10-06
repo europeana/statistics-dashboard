@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { colours } from '../_data';
 import {
-  ChartPosition,
   FmtTableData,
   HeaderNameType,
   PagerInfo,
@@ -27,7 +26,7 @@ export class GridComponent {
   @Input() getUrlRow: (s: string) => string;
   @Input() facet: string;
   @Output() refreshData = new EventEmitter<void>();
-  @Output() chartPositionChanged = new EventEmitter<ChartPosition>();
+  @Output() chartPositionChanged = new EventEmitter<number>();
   @ViewChild('paginator') paginator: GridPaginatorComponent;
 
   filterTerm = '';
@@ -146,9 +145,8 @@ export class GridComponent {
       const doEmit = !!this.pagerInfo;
       this.pagerInfo = pagerInfo;
       if (doEmit) {
-        this.chartPositionChanged.emit({
-          absoluteIndex: 1
-        });
+        const position = pagerInfo.currentPage * this.maxPageSize;
+        this.chartPositionChanged.emit(position);
       }
     };
     setTimeout(fn, 0);
