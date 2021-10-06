@@ -1,11 +1,16 @@
 import { Component } from '@angular/core';
-import { FmtTableData, TableRow } from '../_models';
+import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
 
 @Component({
   selector: 'app-grid',
   template: ''
 })
 export class MockGridComponent {
+  sortInfo: SortInfo = {
+    by: SortBy.name,
+    dir: -1
+  };
+
   calculatePages(_: Array<TableRow>): Array<Array<TableRow>> {
     return [];
   }

@@ -15,10 +15,14 @@ label[for="maxPageSize"] {
 
   &.active {
     font-weight: 600;
-    &::before {
-      content: "⌄";
+    &.ascending,
+    &.descending {
+      &::before {
+        content: "⌄";
+      }
     }
   }
+
   &.descending::before {
     transform: translateY(-2px) rotate(0deg);
   }

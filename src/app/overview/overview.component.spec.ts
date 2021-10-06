@@ -133,6 +133,7 @@ describe('OverviewComponent', () => {
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
+      tick();
       component.ngOnDestroy();
     }));
   });

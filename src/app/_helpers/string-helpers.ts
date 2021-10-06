@@ -67,3 +67,32 @@ export function rightsUrlMatch(url: string): string | null {
   }
   return null;
 }
+
+/** filterList
+/* @returns filterables filtered by filterString
+**/
+export function filterList<T>(
+  filterString: string,
+  filterables: Array<T>,
+  filterProp?: string
+): Array<T> {
+  const filter = replaceDiacritics(filterString);
+  const reg = new RegExp(appendDiacriticEquivalents(filter), 'gi');
+  return filterables.filter((filterable: unknown) => {
+    // clear regex indexes with empty exec to prevent bug where "ne" fails to match "Netherlands"
+    reg.exec('');
+
+    return (
+      !filter ||
+      reg.exec(
+        filterProp
+          ? (
+              filterable as {
+                name: string;
+              }
+            )[filterProp]
+          : (filterable as string)
+      )
+    );
+  });
+}

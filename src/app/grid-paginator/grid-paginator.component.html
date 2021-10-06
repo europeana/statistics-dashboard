@@ -3,7 +3,7 @@
     <a
       class="previous"
       data-e2e="grid-page-prev"
-      (click)="setPage(activePageIndex - 1)"
+      (click)="callSetPage($event, activePageIndex - 1)"
       [ngClass]="{ disabled: !canPrev() }"
     ></a>
   </li>
@@ -17,7 +17,7 @@
     <a
       class="next"
       data-e2e="grid-page-next"
-      (click)="setPage(activePageIndex + 1)"
+      (click)="callSetPage($event, activePageIndex + 1)"
       [ngClass]="{ disabled: !canNext() }"
     ></a>
   </li>

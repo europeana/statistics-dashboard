@@ -18,21 +18,36 @@
     ></span>
   </ng-template>
 
+  <ng-template #cellHeader let-label="label" let-sortBy="sortBy" let-e2e="e2e">
+    <span
+      class="cell-header"
+      data-e2e="grid-sort-count"
+      [ngClass]="{
+        active: sortInfo.by === sortBy,
+        ascending: sortInfo.dir === 1,
+        descending: sortInfo.dir === -1,
+        'text-right': sortBy === SortBy.count,
+        'cell-first-wide': sortBy === SortBy.name
+      }"
+      ><a (click)="sort(sortBy)">{{ label }}</a></span
+    >
+  </ng-template>
+
   <div class="data-grid" [ngClass]="{ 'with-series': isShowingSeriesInfo }">
     <span class="search-control container-h cell-first-wide">
       <span class="search-icon"></span>
       <input
         class="search"
         placeholder="Search..."
-        [(ngModel)]="filterString"
-        (keyup)="updateRows()"
+        [(ngModel)]="filterTerm"
+        (keyup)="updateRows($event)"
       />
     </span>
 
     <span class="navigation-controls container-h">
       <span
         class="conditional-controls container-h"
-        *ngIf="pagerInfo && pagerInfo.pageCount > 1"
+        *ngIf="pagerInfo && pagerInfo.pageCount > 0"
       >
         <label for="maxPageSize">Rows per page:</label>
         <select
@@ -62,38 +77,34 @@
       ></app-grid-paginator>
     </span>
 
-    <span
-      class="cell-header cell-first-wide"
-      [ngClass]="{
-        active: sortStates['name'] !== 0,
-        descending: sortStates['name'] === -1
-      }"
-    >
-      <a (click)="sort('name')">Records by {{ facet | renameApiFacet }}</a>
-    </span>
+    <ng-content
+      *ngTemplateOutlet="
+        cellHeader;
+        context: { label: 'Records by ' + facet, sortBy: SortBy.name }
+      "
+    ></ng-content>
 
-    <span
-      class="cell-header text-right"
-      data-e2e="grid-sort-count"
-      [ngClass]="{
-        active: sortStates['count'] !== 0,
-        descending: sortStates['count'] === -1
-      }"
-      ><a (click)="sort('count')">Count</a></span
-    >
+    <ng-content
+      *ngTemplateOutlet="
+        cellHeader;
+        context: {
+          label: 'Count',
+          sortBy: SortBy.count,
+          e2e: 'grid-sort-count'
+        }
+      "
+    ></ng-content>
 
-    <span
-      class="cell-header text-right"
-      [ngClass]="{
-        active: sortStates['count'] !== 0,
-        descending: sortStates['count'] === -1
-      }"
-      ><a (click)="sort('count')">Percent</a></span
-    >
+    <ng-content
+      *ngTemplateOutlet="
+        cellHeader;
+        context: { label: 'Percent', sortBy: SortBy.count }
+      "
+    ></ng-content>
 
     <span class="cell-header">View in Europeana</span>
 
-    <ng-container *ngIf="pagerInfo">
+    <ng-container>
       <!-- Summary rows -->
       <ng-template #labelTotal><span class="bold">Total</span></ng-template>
 
@@ -126,58 +137,60 @@
 
       <!-- Rows -->
 
-      <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
-        <span [ngClass]="{ highlight: row.highlight }">
-          {{ row.displayIndex }}
-        </span>
+      <ng-container *ngIf="pagerInfo">
+        <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
+          <span [ngClass]="{ highlight: row.highlight }">
+            {{ row.displayIndex }}
+          </span>
 
-        <span
-          class="cell-name"
-          [ngClass]="{
-            highlight: row.highlight,
-            'highlighting-terms': filterString.length > 0
-          }"
-          data-e2e="grid-row-name"
-          [title]="row.name"
-        >
-          <app-truncate
-            [text]="getPrefix() + row.name | renameRights"
-            [highlightText]="filterString"
-          ></app-truncate>
-        </span>
+          <span
+            class="cell-name"
+            [ngClass]="{
+              highlight: row.highlight,
+              'highlighting-terms': filterTerm.length > 0
+            }"
+            data-e2e="grid-row-name"
+            [title]="row.name"
+          >
+            <app-truncate
+              [text]="getPrefix() + row.name | renameRights"
+              [highlightText]="filterTerm"
+            ></app-truncate>
+          </span>
 
-        <span
-          *ngIf="isShowingSeriesInfo"
-          class="cell-series container-h"
-          [ngClass]="{ highlight: row.highlight }"
-        >
-          <ng-content
-            *ngTemplateOutlet="seriesColour; context: { row: row }"
-          ></ng-content>
-          <!-- TODO: do we need this text or is it redundant and unwieldy?
+          <span
+            *ngIf="isShowingSeriesInfo"
+            class="cell-series container-h"
+            [ngClass]="{ highlight: row.highlight }"
+          >
+            <ng-content
+              *ngTemplateOutlet="seriesColour; context: { row: row }"
+            ></ng-content>
+            <!-- TODO: do we need this text or is it redundant and unwieldy?
           <span class="series-info" [title]="row.series">
             {{ row.series }}
           </span>
           -->
-        </span>
+          </span>
 
-        <span
-          class="text-right"
-          [ngClass]="{
-            highlight: row.highlight,
-            bold: row.isTotal
-          }"
-        >
-          {{ row.count | number }}
-        </span>
+          <span
+            class="text-right"
+            [ngClass]="{
+              highlight: row.highlight,
+              bold: row.isTotal
+            }"
+          >
+            {{ row.count | number }}
+          </span>
 
-        <span class="text-right" [ngClass]="{ highlight: row.highlight }">
-          {{ row.percent }}%
-        </span>
+          <span class="text-right" [ngClass]="{ highlight: row.highlight }">
+            {{ row.percent }}%
+          </span>
 
-        <ng-content
-          *ngTemplateOutlet="linkOut; context: { row: row }"
-        ></ng-content>
+          <ng-content
+            *ngTemplateOutlet="linkOut; context: { row: row }"
+          ></ng-content>
+        </ng-container>
       </ng-container>
     </ng-container>
   </div>

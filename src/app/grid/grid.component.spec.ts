@@ -6,7 +6,7 @@ import {
   tick
 } from '@angular/core/testing';
 import { createMockPipe } from '../_mocked';
-import { PagerInfo, TableRow } from '../_models';
+import { DimensionName, PagerInfo, SortBy, TableRow } from '../_models';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { GridComponent } from '.';
 
@@ -80,63 +80,30 @@ describe('GridComponent', () => {
     });
   });
 
-  it('should auto-sort the rows', () => {
-    const rows = testRows.slice(0);
-    expect(rows[0].name).toEqual('A');
-
-    component.sortStates['count'] = 0;
-    component.sortRows(rows, 'count');
-
-    expect(rows[0].name).toEqual('A');
-
-    component.sortStates['count'] = 1;
-    component.autoSort(rows);
-
-    expect(rows[0].name).toEqual('C');
-
-    component.sortStates['count'] = -1;
-    component.autoSort(rows);
-
-    expect(rows[0].name).toEqual('B');
-
-    component.sortStates['count'] = -1;
-    component.autoSort(rows);
-
-    expect(rows[0].name).toEqual('B');
-  });
-
   it('should bump the sort state', () => {
-    expect(component.sortStates['count']).toEqual(-1);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(0);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(1);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(-1);
+    expect(component.sortInfo.dir).toEqual(-1);
+    component.bumpSortState(SortBy.count);
+    expect(component.sortInfo.dir).toEqual(0);
+    component.bumpSortState(SortBy.count);
+    expect(component.sortInfo.dir).toEqual(1);
+    component.bumpSortState(SortBy.count);
+    expect(component.sortInfo.dir).toEqual(-1);
   });
 
   it('should get the data', () => {
     expect(component.getData()).toBeTruthy();
   });
 
-  it('should get the filtered data', () => {
-    expect(component.getFilteredRows().length).toEqual(0);
-    expect(component.summaryRows.length).toEqual(0);
-
-    component.setRows(testRows.slice(0));
-    expect(component.getFilteredRows().length).toEqual(4);
-    expect(component.summaryRows.length).toEqual(1);
-
-    component.filterString = 'b';
-    component.setRows(testRows.slice(0));
-    expect(component.getFilteredRows().length).toEqual(1);
-
-    component.filterString = 'B';
-    component.setRows(testRows.slice(0));
-    expect(component.getFilteredRows().length).toEqual(1);
+  it('should get the prefix', () => {
+    expect(component.getPrefix()).toEqual('');
+    component.facet = DimensionName.contentTier;
+    expect(component.getPrefix()).toEqual('Tier ');
   });
 
   it('should go to the page', fakeAsync(() => {
+    component.getUrlRow = (s: string): string => {
+      return s;
+    };
     component.setRows(testRows.slice(0));
     fixture.detectChanges();
     expect(component.paginator).toBeTruthy();
@@ -163,31 +130,11 @@ describe('GridComponent', () => {
     expect(component.pagerInfo).toBeTruthy();
   }));
 
-  it('should sort the rows', () => {
+  it('should sort', () => {
     spyOn(component, 'bumpSortState');
-    spyOn(component, 'sortRows');
-    component.sort('count');
+    spyOn(component.refreshData, 'emit');
+    component.sort(SortBy.count);
     expect(component.bumpSortState).toHaveBeenCalled();
-    expect(component.sortRows).toHaveBeenCalled();
-  });
-
-  it('should sort the rows', () => {
-    const rows = testRows.slice(0);
-    expect(rows[0].name).toEqual('A');
-
-    component.sortStates['count'] = 0;
-    component.sortRows(rows, 'count');
-
-    expect(rows[0].name).toEqual('A');
-
-    component.sortStates['count'] = 1;
-    component.sortRows(rows, 'count');
-
-    expect(rows[0].name).toEqual('C');
-
-    component.sortStates['count'] = -1;
-    component.sortRows(rows, 'count');
-
-    expect(rows[0].name).toEqual('B');
+    expect(component.refreshData.emit).toHaveBeenCalled();
   });
 });
