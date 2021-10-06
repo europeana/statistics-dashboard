@@ -266,6 +266,7 @@
           [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
           (refreshData)="showAppliedSeriesInGridAndChart()"
+          (chartPositionChanged)="chartPositionChanged($event)"
         ></app-grid>
 
         <div class="export-opener-link-wrapper">

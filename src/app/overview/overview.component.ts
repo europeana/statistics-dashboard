@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { combineLatest, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { facetNames } from '../_data';
 import { filterList } from '../_helpers';
-import { DimensionName, FilterInfo } from '../_models';
+import { ChartPosition, DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
@@ -88,6 +88,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     map[item] = '';
     return map;
   }, {});
+
+  chartRefresher = new BehaviorSubject(true);
 
   contentTiersOptions = Array(5)
     .fill(0)
@@ -181,6 +183,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   ngOnInit(): void {
     this.subs.push(
+      this.chartRefresher
+        .pipe(debounceTime(400))
+        .subscribe((redraw: boolean) => {
+          this.refreshChart(redraw);
+        })
+    );
+
+    this.subs.push(
       combineLatest(this.route.params, this.route.queryParams)
         .pipe(
           map((results) => {
@@ -238,6 +248,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   getChartData(): Promise<string> {
     return this.barChart.getSvgData();
+  }
+
+  chartPositionChanged(position: ChartPosition): void {
+    // TODO: update this.chartPosition
+    console.log('chartPositionChanged(): ' + position.absoluteIndex);
   }
 
   /** getUrl
@@ -482,10 +497,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       name: name,
       label: label,
       data: this.iHashNumberFromNVPs(nvs),
-
-      dataOrder: [],
-
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
+      orderOriginal: [],
+      orderPreferred: [],
       applied: applied,
       pinIndex: 0,
       saved: saved,
@@ -508,21 +522,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       'applied'
     );
 
-    const sortInfo = this.grid.getExtendedPagerInfo().sort;
-    this.snapshots.preSort(
+    const sortInfo = this.grid.sortInfo;
+
+    this.snapshots.preSortAndFilter(
       this.form.value.facetParameter,
       seriesKeys,
-      sortInfo
+      sortInfo,
+      this.grid.filterTerm
     );
 
     this.showAppliedSeriesInGrid();
-
-    const fn = (): void => {
-      this.barChart.removeAllSeries();
-      this.addAppliedSeriesToChart();
-      this.barChart.drawChart();
-    };
-    setTimeout(fn, 0);
+    this.chartRefresher.next(true);
   }
 
   /** addSeries
@@ -541,28 +551,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
-    if (!this.grid) {
-      return;
-    }
     const fn = (): void => {
       const seriesData = this.snapshots.getSeriesDataForChart(
         this.form.value.facetParameter,
         seriesKeys,
         this.form.value.showPercent
       );
+      // TODO: return the correct position (this.ChartPosition)
+      /*
+      if(seriesData.length > 0){
+        console.log('seriesData to add...' + JSON.stringify(
+          Object.keys(seriesData[0].data).length
+        ))
+      }
+      */
       this.barChart.addSeries(seriesData);
     };
     setTimeout(fn, 0);
-  }
-
-  /** addAppliedSeriesToChart
-  /*  adds all compareData entries (where applied = true)
-  /* @param { boolean : reuseColours } - optional flag for percentage switch
-   */
-  addAppliedSeriesToChart(): void {
-    this.addSeriesToChart(
-      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
-    );
   }
 
   /** refreshChart
@@ -572,11 +577,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param { boolean : redrawChart } - flag redraw
    */
   refreshChart(redrawChart = false): void {
+    this.barChart.removeAllSeries();
+    this.addSeriesToChart(
+      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+    );
     if (redrawChart) {
       this.barChart.drawChart();
     }
-    this.barChart.removeAllSeries();
-    this.addAppliedSeriesToChart();
   }
 
   /** addOrUpdateFilterControls

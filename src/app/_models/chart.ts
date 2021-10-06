@@ -29,7 +29,8 @@ export interface CompareDataDescriptor {
   applied: boolean;
   current?: boolean;
   data: IHashNumber;
-  dataOrder?: Array<string>;
+  orderOriginal?: Array<string>;
+  orderPreferred?: Array<string>;
   dataPercent: IHashNumber;
   label: string;
   name: string;
@@ -40,4 +41,8 @@ export interface CompareDataDescriptor {
 
 export interface CompareData {
   [key: string]: CompareDataDescriptor;
+}
+
+export interface ChartPosition {
+  absoluteIndex: number;
 }

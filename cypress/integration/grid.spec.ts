@@ -9,7 +9,7 @@ context('statistics-dashboard', () => {
     const selRowName = '[data-e2e="grid-row-name"]';
     const selPageNext = '[data-e2e="grid-page-next"]';
     const selPagePrev = '[data-e2e="grid-page-prev"]';
-    const selColSortCount = '[data-e2e="grid-sort-count"] a';
+    const selColSortCount = '[data-e2e="grid-sort-count"]:nth-of-type(4) a';
     const selFacetSelect = '.facet-param';
     const selFilter = '.search';
 

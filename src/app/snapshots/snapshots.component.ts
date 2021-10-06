@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { colours, facetNames } from '../_data';
+import { filterList } from '../_helpers';
 import {
   ColourSeriesData,
   CompareData,
@@ -57,10 +58,11 @@ export class SnapshotsComponent {
     });
   }
 
-  preSort(
+  preSortAndFilter(
     facetName: string,
     seriesKeys: Array<string>,
-    sortInfo: SortInfo
+    sortInfo: SortInfo,
+    filterTerm = ''
   ): void {
     seriesKeys.forEach((seriesKey: string) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
@@ -72,39 +74,33 @@ export class SnapshotsComponent {
 
       const sortByCount = sortInfo.by === SortBy.count;
 
-      if (cd.dataOrder && sortInfo.dir === 0) {
-        sortedKeys = cd.dataOrder;
+      if (cd.orderOriginal && sortInfo.dir === 0) {
+        sortedKeys = filterList(filterTerm, cd.orderOriginal);
       } else {
-        sortedKeys = Object.keys(data).sort((a: string, b: string) => {
-          if (sortByCount) {
-            operandA = data[a];
-            operandB = data[b];
-          } else {
-            operandA = a;
-            operandB = b;
+        sortedKeys = filterList(filterTerm, Object.keys(data)).sort(
+          (a: string, b: string) => {
+            if (sortByCount) {
+              operandA = data[a];
+              operandB = data[b];
+            } else {
+              operandA = a;
+              operandB = b;
+            }
+            if (sortInfo.dir === 1) {
+              return operandA > operandB ? 1 : operandA === operandB ? 0 : -1;
+            } else if (sortInfo.dir === -1) {
+              return operandA < operandB ? 1 : operandA === operandB ? 0 : -1;
+            } else {
+              return 0;
+            }
           }
-          if (sortInfo.dir === 1) {
-            return operandA > operandB ? 1 : operandA === operandB ? 0 : -1;
-          } else if (sortInfo.dir === -1) {
-            return operandA < operandB ? 1 : operandA === operandB ? 0 : -1;
-          } else {
-            return 0;
-          }
-        });
+        );
       }
-
-      const newData = sortedKeys.reduce((map: IHashNumber, item: string) => {
-        map[item] = data[item];
-        return map;
-      }, {});
-
-      cd.data = newData;
+      cd.orderPreferred = sortedKeys;
     });
   }
 
-  /** applySeries
-  /* sets "applied" on series with identified by seriesKeys
-  /* assign colour indexes
+  /** getSeriesDataForChart
   /* @param { string : facetName } - the active facet
   /* @param { Array<string> : seriesKeys } - the keys of the series to apply
   /* @param { boolean : percent } - percent value switch
@@ -118,12 +114,14 @@ export class SnapshotsComponent {
     return seriesKeys.map((seriesKey: string, keyIndex: number) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       const data = percent ? cd.dataPercent : cd.data;
-      const csd: ColourSeriesData = {
-        data: data,
+      return {
+        data: cd.orderPreferred.reduce((map: IHashNumber, pref: string) => {
+          map[`${pref} `] = data[pref];
+          return map;
+        }, {}),
         colour: colours[keyIndex],
         seriesName: seriesKey
       };
-      return csd;
     });
   }
 
@@ -134,7 +132,7 @@ export class SnapshotsComponent {
     facetName: string,
     seriesKeys: Array<string>
   ): Array<TableRow> {
-    const allKeysInAllSeries: { [groupName: string]: true } = {};
+    const allPreferred: Array<string> = [];
     const result: Array<TableRow> = [];
     const cds = this.compareDataAllFacets[facetName];
 
@@ -146,8 +144,8 @@ export class SnapshotsComponent {
     seriesKeys.forEach((seriesKey: string, keyIndex: number) => {
       const cd = cds[seriesKey];
 
-      Object.keys(cd.data).forEach((key: string) => {
-        allKeysInAllSeries[key] = true;
+      cd.orderPreferred.forEach((key: string) => {
+        allPreferred.push(key);
       });
 
       cd._colourIndex = keyIndex;
@@ -163,8 +161,7 @@ export class SnapshotsComponent {
     });
 
     // interpolate rows: check all series for category value's groupKey - add row if it has data
-
-    Object.keys(allKeysInAllSeries).forEach((groupKey: string) => {
+    allPreferred.forEach((groupKey: string) => {
       seriesKeys.forEach((seriesKey: string) => {
         const cd = cds[seriesKey];
         const count = cd.data[groupKey];
@@ -194,7 +191,8 @@ export class SnapshotsComponent {
     this.pinIndex++;
 
     // record the original order
-    cdd.dataOrder = Object.keys(cdd.data).slice(0);
+    cdd.orderOriginal = Object.keys(cdd.data).slice(0);
+    cdd.orderPreferred = Object.keys(cdd.data).slice(0);
 
     this.filteredCDKeys(facetName, 'applied').forEach((key: string) => {
       cd[key].applied = false;

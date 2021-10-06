@@ -6,7 +6,7 @@ import {
   tick
 } from '@angular/core/testing';
 import { createMockPipe } from '../_mocked';
-import { DimensionName, PagerInfo, TableRow } from '../_models';
+import { DimensionName, PagerInfo, SortBy, TableRow } from '../_models';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { GridComponent } from '.';
 
@@ -81,21 +81,17 @@ describe('GridComponent', () => {
   });
 
   it('should bump the sort state', () => {
-    expect(component.sortStates['count']).toEqual(-1);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(0);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(1);
-    component.bumpSortState('count');
-    expect(component.sortStates['count']).toEqual(-1);
+    expect(component.sortInfo.dir).toEqual(-1);
+    component.bumpSortState(SortBy.count);
+    expect(component.sortInfo.dir).toEqual(0);
+    component.bumpSortState(SortBy.count);
+    expect(component.sortInfo.dir).toEqual(1);
+    component.bumpSortState(SortBy.count);
+    expect(component.sortInfo.dir).toEqual(-1);
   });
 
   it('should get the data', () => {
     expect(component.getData()).toBeTruthy();
-  });
-
-  it('should get the extended pager info', () => {
-    expect(component.getExtendedPagerInfo()).toBeTruthy();
   });
 
   it('should get the prefix', () => {
@@ -137,7 +133,7 @@ describe('GridComponent', () => {
   it('should sort', () => {
     spyOn(component, 'bumpSortState');
     spyOn(component.refreshData, 'emit');
-    component.sort('count');
+    component.sort(SortBy.count);
     expect(component.bumpSortState).toHaveBeenCalled();
     expect(component.refreshData.emit).toHaveBeenCalled();
   });

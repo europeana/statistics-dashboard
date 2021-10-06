@@ -6,14 +6,13 @@ import {
   ViewChild
 } from '@angular/core';
 import { colours } from '../_data';
-import { filterList } from '../_helpers';
-
 import {
+  ChartPosition,
   FmtTableData,
   HeaderNameType,
   PagerInfo,
-  PagerInfoExtended,
   SortBy,
+  SortInfo,
   TableRow
 } from '../_models';
 import { GridPaginatorComponent } from '../grid-paginator';
@@ -28,26 +27,22 @@ export class GridComponent {
   @Input() getUrlRow: (s: string) => string;
   @Input() facet: string;
   @Output() refreshData = new EventEmitter<void>();
+  @Output() chartPositionChanged = new EventEmitter<ChartPosition>();
   @ViewChild('paginator') paginator: GridPaginatorComponent;
 
-  filterString = '';
+  filterTerm = '';
   maxPageSizes = [10, 20, 50].map((option: number) => {
     return { title: `${option}`, value: option };
   });
   maxPageSize = this.maxPageSizes[0].value;
-  pagerInfo: PagerInfo = {
-    currentPage: 0,
-    pageCount: 0,
-    pageRows: []
-  };
-  unfilteredPageRows: Array<TableRow> = [];
+  pagerInfo: PagerInfo;
   summaryRows: Array<TableRow> = [];
-  sortStates = {
-    count: -1,
-    name: 0
-  };
   gridRows: Array<TableRow>;
   isShowingSeriesInfo = false;
+  sortInfo: SortInfo = {
+    by: SortBy.count,
+    dir: -1
+  };
 
   public colours = colours;
   public SortBy = SortBy;
@@ -70,21 +65,26 @@ export class GridComponent {
   }
 
   /** bumpSortState
-  /* Moves sort state one iteration through (looped) sequence -1, 0, 1
+  /* Moves sortInfo.dir one iteration through (looped) sequence -1, 0, 1
   /* Clears other sort states
   /* @param { string : header }
   **/
-  bumpSortState(header: string): void {
-    const ss = this.sortStates;
-    let val = ss[header];
-    val += 1;
-    if (val > 1) {
-      val = -1;
+  bumpSortState(header: SortBy): void {
+    const isChanged = this.sortInfo.by != header;
+    let val = 1;
+
+    if (!isChanged) {
+      val = this.sortInfo.dir;
+      val += 1;
+      if (val > 1) {
+        val = -1;
+      }
     }
-    Object.keys(ss).forEach((key: string) => {
-      ss[key] = 0;
-    });
-    ss[header] = val;
+
+    this.sortInfo = {
+      by: header,
+      dir: val
+    };
   }
 
   getData(): FmtTableData {
@@ -101,31 +101,6 @@ export class GridComponent {
       return 'Tier ';
     }
     return '';
-  }
-
-  getExtendedPagerInfo(): PagerInfoExtended {
-    const ss = this.sortStates;
-    // the default
-    let sortInfo = {
-      by: SortBy.count,
-      dir: 0
-    };
-
-    Object.keys(ss).forEach((field: SortBy) => {
-      const state = this.sortStates[field];
-      if (state !== 0) {
-        sortInfo = {
-          by: field as SortBy,
-          dir: state
-        };
-      }
-    });
-
-    return Object.assign(this.pagerInfo, {
-      maxPerPage: this.maxPageSize,
-      filterTerm: this.filterString,
-      sort: sortInfo
-    });
   }
 
   /** goToPage
@@ -157,36 +132,43 @@ export class GridComponent {
       }
     });
     this.summaryRows = summaryRows;
-    this.unfilteredPageRows = normalRows;
-    this.updateRows();
+
+    this.applyHighlights(normalRows);
+    this.gridRows = normalRows;
   }
 
   /** setPagerInfo
   /* handle page info from pager when page changes
-  /* @param { Array<TableRow> : rows } - the rows
+  /* @param { PagerInfo : pagerInfo }
   **/
   setPagerInfo(pagerInfo: PagerInfo): void {
     const fn = (): void => {
+      const doEmit = !!this.pagerInfo;
       this.pagerInfo = pagerInfo;
+      if (doEmit) {
+        this.chartPositionChanged.emit({
+          absoluteIndex: 1
+        });
+      }
     };
     setTimeout(fn, 0);
   }
 
   /** sort
   /* Template utility: bumps sort state and emits refresh event
-  /* @param { string : field } - the field to sort on
+  /* @param { SortBy : sortBy } - the field to sort on
   **/
-  sort(field: string): void {
-    this.bumpSortState(field);
+  sort(sortBy: SortBy): void {
+    this.bumpSortState(sortBy);
     this.refreshData.emit();
   }
 
   /** updateRows
-  /* @param { Array<TableRow> : rows }
+  /* @param { KeyboardEvent : e }
   **/
-  updateRows(): void {
-    const rows = filterList(this.filterString, this.unfilteredPageRows, 'name');
-    this.applyHighlights(rows);
-    this.gridRows = rows;
+  updateRows(e: KeyboardEvent): void {
+    if (e.key.length === 1 || ['Backspace', 'Delete'].includes(e.key)) {
+      this.refreshData.emit();
+    }
   }
 }

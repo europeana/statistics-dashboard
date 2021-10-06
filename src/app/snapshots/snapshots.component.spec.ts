@@ -1,10 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  CompareDataDescriptor,
-  DimensionName
-  //SortBy
-} from '../_models';
+import { CompareDataDescriptor, DimensionName, SortBy } from '../_models';
 import { SnapshotsComponent } from '.';
 
 describe('SnapshotsComponent', () => {
@@ -17,6 +13,8 @@ describe('SnapshotsComponent', () => {
     data: { 3: 6040254, 1: 16710922, 2: 11542267, 4: 18293692 },
     dataPercent: { 1: 31.78, 2: 21.95, 3: 11.49, 4: 34.79 },
     applied: true,
+    orderOriginal: [],
+    orderPreferred: [],
     pinIndex: 1,
     saved: true,
     total: 52587135,
@@ -43,6 +41,8 @@ describe('SnapshotsComponent', () => {
       Slovenia: 52.94
     },
     applied: true,
+    orderOriginal: [],
+    orderPreferred: [],
     pinIndex: 2,
     saved: true,
     total: 34,
@@ -55,6 +55,8 @@ describe('SnapshotsComponent', () => {
     data: { CC0: 1, CC1: 1 },
     dataPercent: { CC0: 50, CC1: 50 },
     applied: false,
+    orderOriginal: [],
+    orderPreferred: [],
     pinIndex: 3,
     saved: true,
     total: 2,
@@ -114,46 +116,51 @@ describe('SnapshotsComponent', () => {
     ).toBeTruthy();
   });
 
-  /*
   it('should pre-sort', () => {
     initData();
 
-    component.preSort(DimensionName.contentTier, [''], {
+    component.preSortAndFilter(DimensionName.contentTier, [''], {
       by: SortBy.name,
       dir: -1
     });
 
-    expect(Object.keys(dscContentTier.data)[0].trim()).toEqual('4');
+    expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
 
-    component.preSort(DimensionName.contentTier, [''], {
+    component.preSortAndFilter(DimensionName.contentTier, [''], {
       by: SortBy.name,
       dir: 1
     });
 
-    expect(Object.keys(dscContentTier.data)[0].trim()).toEqual('1');
+    expect(dscContentTier.orderPreferred[0].trim()).toEqual('1');
 
-    component.preSort(DimensionName.contentTier, [''], {
+    component.preSortAndFilter(DimensionName.contentTier, [''], {
       by: SortBy.count,
       dir: 1
     });
 
-    expect(Object.keys(dscContentTier.data)[0].trim()).toEqual('3');
+    expect(dscContentTier.orderPreferred[0].trim()).toEqual('3');
 
-    component.preSort(DimensionName.contentTier, [''], {
+    component.preSortAndFilter(DimensionName.contentTier, [''], {
       by: SortBy.count,
       dir: -1
     });
 
-    expect(Object.keys(dscContentTier.data)[0].trim()).toEqual('4');
-    expect(Object.keys(dscRights.data)[0].trim()).toEqual('CC0');
+    expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
+    expect(dscRights.orderPreferred.length).toBeFalsy();
 
-    component.preSort(DimensionName.rights, [''], {
+    component.preSortAndFilter(DimensionName.rights, [''], {
+      by: SortBy.count,
+      dir: -1
+    });
+
+    expect(dscRights.orderPreferred[0].trim()).toEqual('CC0');
+
+    component.preSortAndFilter(DimensionName.rights, [''], {
       by: SortBy.count,
       dir: 0
     });
-    expect(Object.keys(dscRights.data)[0].trim()).toEqual('CC0');
+    expect(dscRights.orderPreferred.length).toBeFalsy();
   });
-  */
 
   it('should get series data for the chart', () => {
     initData();

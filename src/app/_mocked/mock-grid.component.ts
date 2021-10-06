@@ -1,11 +1,16 @@
 import { Component } from '@angular/core';
-import { FmtTableData, PagerInfoExtended, SortBy, TableRow } from '../_models';
+import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
 
 @Component({
   selector: 'app-grid',
   template: ''
 })
 export class MockGridComponent {
+  sortInfo: SortInfo = {
+    by: SortBy.name,
+    dir: -1
+  };
+
   calculatePages(_: Array<TableRow>): Array<Array<TableRow>> {
     return [];
   }
@@ -22,20 +27,6 @@ export class MockGridComponent {
     return {
       columns: [],
       tableRows: []
-    };
-  }
-
-  getExtendedPagerInfo(): PagerInfoExtended {
-    return {
-      maxPerPage: 0,
-      currentPage: 0,
-      pageCount: 0,
-      pageRows: [],
-      filterTerm: '',
-      sort: {
-        by: SortBy.name,
-        dir: -1
-      }
     };
   }
 

@@ -15,9 +15,3 @@ export interface PagerInfo {
   pageCount: number;
   pageRows: Array<TableRow>;
 }
-
-export interface PagerInfoExtended extends PagerInfo {
-  maxPerPage: number;
-  filterTerm: string;
-  sort?: SortInfo;
-}
