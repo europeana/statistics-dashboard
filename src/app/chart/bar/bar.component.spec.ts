@@ -55,18 +55,10 @@ describe('BarComponent', () => {
         }
       }
     ];
-
-    spyOn(component.categoryAxis, 'zoomToIndexes');
+    const seriesCount = Object.keys(component.allSeries).length;
     component.addSeries(series);
-    expect(component.categoryAxis.zoomToIndexes).not.toHaveBeenCalled();
-    component.preferredNumberBars = 1;
-    component.addSeries([series[0], series[0]]);
-
-    component.allSeries['x'].dispatchImmediately('ready');
-
+    expect(Object.keys(component.allSeries).length).toEqual(seriesCount + 1);
     tick(1);
-
-    expect(component.categoryAxis.zoomToIndexes).toHaveBeenCalled();
   }));
 
   it('should add a series from a result', () => {
@@ -82,15 +74,21 @@ describe('BarComponent', () => {
     expect(component.addSeries).toHaveBeenCalledTimes(2);
   });
 
-  it('should zoom to the top entries', () => {
+  it('should zoom to the top entries', fakeAsync(() => {
+    component._results = testResults;
+    component.addSeriesFromResult();
+
     spyOn(component.categoryAxis, 'zoomToIndexes');
     component.zoomTop();
+    tick(100);
     expect(component.categoryAxis.zoomToIndexes).not.toHaveBeenCalled();
+
     component._results = testResults;
     component.preferredNumberBars = 1;
     component.zoomTop();
+    tick(100);
     expect(component.categoryAxis.zoomToIndexes).toHaveBeenCalled();
-  });
+  }));
 
   it('should get the SVG data', () => {
     expect(component.getSvgData()).toBeTruthy();

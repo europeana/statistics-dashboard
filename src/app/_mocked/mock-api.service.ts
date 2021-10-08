@@ -5,110 +5,8 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  IHashString,
-  RawFacet
+  IHashString
 } from '../_models';
-
-export const MockAPIData = {
-  facets: [
-    {
-      name: DimensionName.contentTier,
-      fields: [
-        {
-          label: '4',
-          count: 17050500
-        },
-        {
-          label: '1',
-          count: 16916984
-        }
-      ]
-    },
-    {
-      name: DimensionName.metadataTier,
-      fields: [
-        {
-          label: 'A',
-          count: 2
-        },
-        {
-          label: 'B',
-          count: 3
-        }
-      ]
-    },
-    {
-      name: DimensionName.country,
-      fields: [
-        {
-          label: 'France',
-          count: 684
-        },
-        {
-          label: 'Netherlands',
-          count: 3170
-        }
-      ]
-    },
-    {
-      name: DimensionName.type,
-      fields: [
-        {
-          label: 'Text',
-          count: 2
-        },
-        {
-          label: 'Video',
-          count: 3
-        }
-      ]
-    },
-    {
-      name: DimensionName.rights,
-      fields: [
-        {
-          label: 'http://creativecommons.org/licenses/by-nc-nd',
-          count: 684
-        },
-        {
-          label: 'http://that.rights',
-          count: 3170
-        }
-      ]
-    },
-    {
-      name: DimensionName.dataProvider,
-      fields: [
-        {
-          label: 'Data Provider A1',
-          count: 2
-        },
-        {
-          label: 'Data Provider A2',
-          count: 2
-        },
-        {
-          label: 'Data Provider B',
-          count: 3
-        }
-      ]
-    },
-    {
-      name: DimensionName.provider,
-      fields: [
-        {
-          label: 'Provider A',
-          count: 2
-        },
-        {
-          label: 'Provider B',
-          count: 3
-        }
-      ]
-    }
-  ],
-  totalResults: 5
-} as RawFacet;
 
 export const MockGeneralResults = {
   allBreakdowns: [
@@ -384,7 +282,7 @@ export const MockGeneralResults = {
 export const MockBreakdowns = {
   filteringOptions: {
     contentTier: ['0', '1', '2', '3'],
-    COUNTRY: [
+    country: [
       'Denmark',
       'Ireland',
       'Norway',
@@ -397,7 +295,7 @@ export const MockBreakdowns = {
       'Croatia',
       'Iceland'
     ],
-    DATA_PROVIDER: [
+    dataProvider: [
       'The Danish Agency for Culture',
       'University College Cork',
       'The National Archives of Norway',
@@ -411,7 +309,7 @@ export const MockBreakdowns = {
       'National Library of Spain'
     ],
     metadataTier: ['B', 'C'],
-    PROVIDER: [
+    provider: [
       'CARARE',
       'European Commission',
       'LoCloud',
@@ -421,7 +319,7 @@ export const MockBreakdowns = {
       'Linked Heritage',
       'AthenaPlus'
     ],
-    RIGHTS: [
+    rights: [
       'https://creativecommons.org/licenses/by-nc-sa/4.0',
       'https://creativecommons.org/licenses/by-nd/2.5/pl',
       'https://creativecommons.org/licenses/by-nd/3.0/pl',
@@ -487,7 +385,7 @@ export const MockBreakdowns = {
       'https://creativecommons.org/licenses/by-nc/3.0',
       'https://rightsstatements.org/vocab/NoC-OKLR/1.0'
     ],
-    TYPE: ['IMAGE', 'SOUND', 'VIDEO']
+    type: ['IMAGE', 'SOUND', 'VIDEO']
   },
   results: {
     value: 'ALL RECORDS',
@@ -778,16 +676,6 @@ export const MockBreakdowns = {
 
 export class MockAPIService {
   errorMode = false;
-
-  loadAPIData(_: string): Observable<RawFacet> {
-    if (this.errorMode) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return of({ items: [], totalResults: 0 } as any as RawFacet).pipe(
-        delay(1)
-      );
-    }
-    return of(MockAPIData).pipe(delay(1));
-  }
 
   loadISOCountryCodes(): IHashString {
     return {

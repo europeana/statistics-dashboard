@@ -9,6 +9,5 @@ export const environment = {
   //serverAPI: 'https://api.europeana.eu/record/v2/search.json',
   serverAPI: 'https://statistics-dashboard-rest-test.eanadev.org/',
   serverPortal: 'https://www.europeana.eu/en/search',
-  useDataServer: true,
   wskey: 'api2demo'
 };

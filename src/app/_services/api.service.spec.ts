@@ -4,7 +4,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { environment } from '../../environments/environment';
-import { BreakdownResults, GeneralResults, RawFacet } from '../_models';
+import { BreakdownResults, GeneralResults } from '../_models';
 import { APIService } from './';
 
 describe('APIService', () => {
@@ -19,16 +19,6 @@ describe('APIService', () => {
     service = TestBed.inject(APIService);
     http = TestBed.inject(HttpTestingController);
   }));
-
-  it('should load the API data', () => {
-    const baseUrl = `${environment.serverAPI}&wskey=${environment.wskey}`;
-    const sub = service.loadAPIData('').subscribe((res: RawFacet) => {
-      expect(res).toBeTruthy();
-    });
-    sub.unsubscribe();
-    http.expectOne(baseUrl);
-    http.verify();
-  });
 
   it('should load the breakdowns', () => {
     const baseUrl = `${environment.serverAPI}${service.suffixFiltering}`;

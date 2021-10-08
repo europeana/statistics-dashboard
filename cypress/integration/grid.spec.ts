@@ -1,3 +1,5 @@
+import { DimensionName } from '../../src/app/_models';
+
 context('statistics-dashboard', () => {
   describe('grid', () => {
 
@@ -7,7 +9,7 @@ context('statistics-dashboard', () => {
     const selRowName = '[data-e2e="grid-row-name"]';
     const selPageNext = '[data-e2e="grid-page-next"]';
     const selPagePrev = '[data-e2e="grid-page-prev"]';
-    const selColSortCount = '[data-e2e="grid-sort-count"] a';
+    const selColSortCount = '[data-e2e="grid-sort-count"]:nth-of-type(4) a';
     const selFacetSelect = '.facet-param';
     const selFilter = '.search';
 
@@ -18,12 +20,12 @@ context('statistics-dashboard', () => {
     };
 
     it('should filter', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
 
       const arCountries = ['Bulgaria', 'Denmark', 'Hungary'];
       const orCountries = ['Norway', 'Portugal'];
-      const arProviders = ['CARARE', 'The European Library'];
-      const orProviders = ['Digital Repository of Ireland', 'RNOD-Portugal'];
+      const arProviders = ['Arts Council Norway', 'CARARE', 'The European Library'];
+      const waProviders  = ['EFG - The European Film Gateway'];
 
       cy.get(selFilter).type('ar', force);
 
@@ -33,15 +35,15 @@ context('statistics-dashboard', () => {
       cy.get(selFilter).clear(force).type('or', force);
       assertRowLength(arCountries, 0);
       assertRowLength(orCountries, 1);
-
       cy.get(selFacetSelect).select('Provider', force);
+      assertRowLength(waProviders, 0);
 
-      assertRowLength(arProviders, 0);
-      assertRowLength(orProviders, 1);
+      cy.get(selFilter).clear(force).type('wa', force);
+      assertRowLength(waProviders, 1);
 
       cy.get(selFilter).clear(force).type('ar', force);
       assertRowLength(arProviders, 1);
-      assertRowLength(orProviders, 0);
+      assertRowLength(waProviders, 0);
 
       cy.get(selFacetSelect).select('Country', force);
 
@@ -50,21 +52,21 @@ context('statistics-dashboard', () => {
     });
 
     it('should filter (diacritics)', () => {
-      cy.visit('/data/DATA_PROVIDER');
+      cy.visit(`/data/${DimensionName.dataProvider}`);
       cy.get(selRowName).should('have.length', 10);
       cy.get(selFilter).type('Sõj', force);
       cy.get(selRowName).should('have.length', 1);
       cy.get(selFilter).clear();
       cy.get(selFilter).type('Os', force);
-      cy.get(selRowName).should('have.length', 2);      
+      cy.get(selRowName).should('have.length', 3);
     });
 
     it('should go to the user-typed page', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       // assumes page of 10 entries
-      const pageOneCountries = ['Belgium', 'Greece'];
-      const pageTwoCountries = ['Holy See (Vatican City State)', 'Iceland'];
-      const pageThreeCountries = ['Slovenia', 'Hungary'];
+      const pageOneCountries = ['Belgium', 'Holy See (Vatican City State)'];
+      const pageTwoCountries = ['Ireland', 'Netherlands'];
+      const pageThreeCountries = ['Iceland', 'Czech Republic'];
 
       assertRowLength(pageOneCountries, 1);
       assertRowLength(pageTwoCountries, 0);
@@ -74,6 +76,7 @@ context('statistics-dashboard', () => {
 
       assertRowLength(pageOneCountries, 0);
       assertRowLength(pageTwoCountries, 1);
+
       assertRowLength(pageThreeCountries, 0);
 
       cy.get(selInputGoTo).type('3{enter}', force);
@@ -96,11 +99,12 @@ context('statistics-dashboard', () => {
     });
 
     it('should retain altered order through facet switches', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
 
       assertRowLength(['Belgium'], 1);
       assertRowLength(['Czech Republic'], 0);
 
+      cy.get(selColSortCount).click(force);
       cy.get(selColSortCount).click(force);
       assertRowLength(['Belgium'], 0);
       assertRowLength(['Czech Republic'], 1);
@@ -127,7 +131,7 @@ context('statistics-dashboard', () => {
     });
 
     it('should paginate back and forth', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       assertRowLength(['Belgium'], 1);
       assertRowLength(['Ireland'], 0);
 
@@ -143,23 +147,23 @@ context('statistics-dashboard', () => {
     });
 
     it('should set the result size', () => {
-      cy.visit('/data/COUNTRY');
+      cy.visit(`/data/${DimensionName.country}`);
       // assumes page of 10 entries
-      const inFirst5 = ['Belgium', 'Bulgaria', 'Croatia', 'Austria'];
-      const inSecond5 = ['Europe', 'Estonia', 'Germany', 'Greece'];
+      const inFirst20 = ['Belgium', 'Bulgaria', 'Croatia', 'Austria'];
+      const inSecond20 = ['Norway', 'Poland'];
 
-      assertRowLength(inFirst5, 1);
-      assertRowLength(inSecond5, 1);
+      assertRowLength(inFirst20, 1);
+      assertRowLength(inSecond20, 0);
 
-      cy.get(selInputPageSize).select('5', force);
+      cy.get(selInputPageSize).select('20', force);
 
-      assertRowLength(inFirst5, 1);
-      assertRowLength(inSecond5, 0);
+      assertRowLength(inFirst20, 1);
+      assertRowLength(inSecond20, 1);
 
       cy.get(selInputPageSize).select('10', force);
 
-      assertRowLength(inFirst5, 1);
-      assertRowLength(inSecond5, 1);
+      assertRowLength(inFirst20, 1);
+      assertRowLength(inSecond20, 0);
     });
 
   });

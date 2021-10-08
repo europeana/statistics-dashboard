@@ -157,7 +157,7 @@
     }
   }
 
-  .COUNTRY {
+  .country {
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-flag($white);
@@ -165,7 +165,7 @@
     }
   }
 
-  .DATA_PROVIDER {
+  .dataProvider {
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-data-provider($white);
@@ -173,7 +173,7 @@
     }
   }
 
-  .PROVIDER {
+  .provider {
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-content-provider($white);
@@ -181,7 +181,7 @@
     }
   }
 
-  .RIGHTS {
+  .rights {
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-rights($white);
@@ -189,7 +189,7 @@
     }
   }
 
-  .TYPE {
+  .type {
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-types($white);
@@ -210,11 +210,11 @@
   background-image: svg-url-icon-content-tier($gray-med);
 }
 
-.filter-icon-COUNTRY {
+.filter-icon-country {
   background-image: svg-url-icon-flag($gray-med);
 }
 
-.filter-icon-DATA_PROVIDER {
+.filter-icon-dataProvider {
   background-image: svg-url-icon-data-provider($gray-med);
 }
 
@@ -226,14 +226,14 @@
   background-image: svg-url-icon-metadata($gray-med);
 }
 
-.filter-icon-PROVIDER {
+.filter-icon-provider {
   background-image: svg-url-icon-content-provider($gray-med);
 }
 
-.filter-icon-RIGHTS {
+.filter-icon-rights {
   background-image: svg-url-icon-rights($gray-med);
 }
 
-.filter-icon-TYPE {
+.filter-icon-type {
   background-image: svg-url-icon-types($gray-med);
 }

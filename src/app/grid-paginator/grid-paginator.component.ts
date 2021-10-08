@@ -62,6 +62,12 @@ export class GridPaginatorComponent {
     return this.activePageIndex > 0;
   }
 
+  callSetPage(e: Event, index: number): false {
+    e.preventDefault();
+    this.setPage(index);
+    return false;
+  }
+
   setPage(index: number): void {
     this.activePageIndex = index;
     this.change.emit({

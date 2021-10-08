@@ -7,7 +7,7 @@ context('statistics-dashboard', () => {
   const selCtrlCTZero = '[for=ctZero]';
   const selFilterLabel = '.filter-label';
   const selFilterOpener = '.opener-name';
-  const urlDefault = '/data/COUNTRY';
+  const urlDefault = `/data/${DimensionName.country}`;
   const urlCTZero = `${urlDefault}?content-tier-zero=true`;
 
   const selTotalRecords = '[data-e2e="total-records"]';

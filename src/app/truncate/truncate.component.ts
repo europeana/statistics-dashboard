@@ -7,12 +7,13 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 })
 export class TruncateComponent implements OnInit {
   applySpace = false;
-  debounceMS = 500;
   maxRecursions = 100;
   omitCount = 0;
   omitStep = 2;
   textLeft: string;
   textRight: string;
+
+  public debounceMS = 500;
 
   @Input() text: string;
   @Input() highlightText = '';

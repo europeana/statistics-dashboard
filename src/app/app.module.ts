@@ -29,7 +29,6 @@ import { GridSummaryComponent } from './grid-summary';
 import { LandingComponent } from './landing/landing.component';
 import { OverviewComponent } from './overview/overview.component';
 import { ResizeComponent } from './resize';
-import { SplashComponent } from './splash/splash.component';
 import { SnapshotsComponent } from './snapshots/snapshots.component';
 import { TruncateComponent } from './truncate';
 
@@ -54,7 +53,6 @@ import { TruncateComponent } from './truncate';
     RenameApiFacetShortPipe,
     RenameRightsPipe,
     ResizeComponent,
-    SplashComponent,
     SnapshotsComponent,
     TruncateComponent,
     IsScrollableDirective

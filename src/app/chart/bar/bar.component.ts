@@ -230,7 +230,7 @@ export class BarComponent implements AfterViewInit {
             return res;
           });
       } else {
-        this.chart.data.forEach((cd) => {
+        this.chart.data.forEach((cd: IHashNumber) => {
           cd[csd.seriesName] = csd.data[cd.name];
         });
       }
@@ -263,13 +263,6 @@ export class BarComponent implements AfterViewInit {
           this.chart.scrollbarY.thumb.background.fill =
             am4core.color('#0a72cc');
           this.chart.scrollbarY.thumb.background.fillOpacity = 0.2;
-
-          this.categoryAxis.zoomToIndexes(
-            0,
-            this.preferredNumberBars,
-            false,
-            true
-          );
         };
         setTimeout(fn, 0);
       });
@@ -309,9 +302,17 @@ export class BarComponent implements AfterViewInit {
     return series;
   }
 
-  zoomTop(): void {
-    if (this._results && this._results.length > this.preferredNumberBars) {
-      this.categoryAxis.zoomToIndexes(1, this.preferredNumberBars, false, true);
+  zoomTop(start = 0): void {
+    if (this.chart.data && this.chart.data.length > this.preferredNumberBars) {
+      const fn = (): void => {
+        this.categoryAxis.zoomToIndexes(
+          start,
+          start + this.preferredNumberBars,
+          false,
+          true
+        );
+      };
+      setTimeout(fn, 100);
     }
   }
 
@@ -325,15 +326,17 @@ export class BarComponent implements AfterViewInit {
   /* - assigns data
   /* - invokes series, legend and settings functions
   */
-  drawChart(): void {
+  drawChart(zoomIndex?: number): void {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
       this.chart = am4core.create(this.chartId, am4charts.XYChart);
       const chart = this.chart;
 
-      this.chart.events.on('ready', () => {
-        this.zoomTop();
-      });
+      if (typeof zoomIndex !== 'undefined') {
+        this.chart.events.on('ready', () => {
+          this.zoomTop(zoomIndex);
+        });
+      }
 
       ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
         (s: string) => {

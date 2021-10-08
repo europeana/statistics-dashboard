@@ -4,28 +4,21 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { today } from '../_helpers';
 import {
   createMockPipe,
-  MockAPIData,
   MockAPIService,
   MockAPIServiceErrors,
   MockBarComponent,
   MockGridComponent
 } from '../_mocked';
 import {
-  BreakdownResults,
   BreakdownResult,
+  BreakdownResults,
   DimensionName,
   NameLabel,
-  NameValuePercent,
   RequestFilter,
   RequestFilterRange
 } from '../_models';
@@ -45,7 +38,9 @@ describe('OverviewComponent', () => {
   ];
   const tickTime = 1;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
-  const queryParams = new BehaviorSubject({ COUNTRY: 'Italy' } as Params);
+  const tmpParams = {};
+  tmpParams[DimensionName.country] = 'Italy';
+  const queryParams = new BehaviorSubject(tmpParams as Params);
 
   let api: APIService;
 
@@ -55,14 +50,23 @@ describe('OverviewComponent', () => {
         HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
-          { path: 'data/contentTier', component: OverviewComponent },
-          { path: 'data/COUNTRY', component: OverviewComponent },
-          { path: 'data/COUNTRY?TYPE=TEXT', component: OverviewComponent },
           {
-            path: 'data/COUNTRY?TYPE=TEXT&TYPE=VIDEO',
+            path: `data/${DimensionName.contentTier}`,
             component: OverviewComponent
           },
-          { path: 'data/TYPE', component: OverviewComponent }
+          {
+            path: `data/${DimensionName.country}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}&${DimensionName.type}=VIDEO}`,
+            component: OverviewComponent
+          },
+          { path: `data/${DimensionName.type}`, component: OverviewComponent }
         ])
       ],
       declarations: [
@@ -93,7 +97,6 @@ describe('OverviewComponent', () => {
   const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
-    component.useDataServer = true;
     component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
@@ -124,6 +127,7 @@ describe('OverviewComponent', () => {
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
+      tick();
       component.ngOnDestroy();
     }));
   });
@@ -144,16 +148,16 @@ describe('OverviewComponent', () => {
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(1);
-
       params.next({ facet: DimensionName.type });
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(2);
 
-      queryParams.next({ TYPE: ['SOUND', 'VIDEO'] });
+      const nextParams = {};
+      nextParams[DimensionName.type] = ['SOUND', 'VIDEO'];
+      queryParams.next(nextParams);
       tick(1);
       fixture.detectChanges();
-
       expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
       component.ngOnDestroy();
     }));
@@ -166,12 +170,12 @@ describe('OverviewComponent', () => {
       component.dataServerData = {
         filteringOptions: {
           contentTier: [],
-          COUNTRY: [],
-          DATA_PROVIDER: [],
+          country: [],
+          dataProvider: [],
           metadataTier: [],
-          PROVIDER: [],
-          RIGHTS: [],
-          TYPE: []
+          provider: [],
+          rights: [],
+          type: []
         },
         results: {
           breakdowns: {
@@ -203,15 +207,7 @@ describe('OverviewComponent', () => {
         ]
       };
 
-      spyOn(component, 'storeSeries').and.callFake(
-        (
-          _: boolean,
-          __: boolean,
-          ___: Array<NameValuePercent>,
-          ____: number
-        ) => {}
-      );
-
+      spyOn(component, 'storeSeries');
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();
 
@@ -225,14 +221,6 @@ describe('OverviewComponent', () => {
 
       expect(component.storeSeries).toHaveBeenCalledTimes(3);
     });
-
-    it('should extract data as a percent', fakeAsync(() => {
-      const data = Object.assign({}, MockAPIData);
-      expect(component.allProcessedFacetData).toBeFalsy();
-      component.processResult(data);
-      expect(component.allProcessedFacetData).toBeTruthy();
-      expect(component.allProcessedFacetData[0].fields[0].percent).toBeTruthy();
-    }));
 
     it('should get the select options', fakeAsync(() => {
       expect(component.filterData.length).toBeFalsy(0);
@@ -253,7 +241,7 @@ describe('OverviewComponent', () => {
       const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
 
       expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
-      component.queryParams = { COUNTRY: [countryUrlParamVal] };
+      component.queryParams = { country: [countryUrlParamVal] };
       expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
 
       expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
@@ -475,13 +463,15 @@ describe('OverviewComponent', () => {
         '4'
       ]);
       component.form.controls.contentTierZero.setValue(true);
+
       expect(fnGetRequestFilter(DimensionName.contentTier)).toBeFalsy();
+      expect(fnGetRequestFilter('datasetId')).toBeFalsy();
 
-      expect(fnGetRequestFilter('datasetName')).toBeFalsy();
       component.form.controls.datasetName.setValue('xxx');
-      expect(fnGetRequestFilter('datasetName')).toBeTruthy();
 
+      expect(component.getDataServerDataRequest().datasetId).toBeTruthy();
       expect(fnGetRequestFilter('createdDate')).toBeFalsy();
+
       component.form.controls.dateFrom.setValue(new Date().toISOString());
       component.form.controls.dateTo.setValue(new Date().toISOString());
 
