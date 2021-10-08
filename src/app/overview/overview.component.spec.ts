@@ -469,13 +469,15 @@ describe('OverviewComponent', () => {
         '4'
       ]);
       component.form.controls.contentTierZero.setValue(true);
+
       expect(fnGetRequestFilter(DimensionName.contentTier)).toBeFalsy();
+      expect(fnGetRequestFilter('datasetId')).toBeFalsy();
 
-      expect(fnGetRequestFilter('datasetName')).toBeFalsy();
       component.form.controls.datasetName.setValue('xxx');
-      expect(fnGetRequestFilter('datasetName')).toBeTruthy();
 
+      expect(component.getDataServerDataRequest().datasetId).toBeTruthy();
       expect(fnGetRequestFilter('createdDate')).toBeFalsy();
+
       component.form.controls.dateFrom.setValue(new Date().toISOString());
       component.form.controls.dateTo.setValue(new Date().toISOString());
 
