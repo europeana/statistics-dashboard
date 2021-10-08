@@ -1,6 +1,7 @@
 // FILTER / BREAKDOWN REQUEST
 
 export interface BreakdownRequest {
+  datasetId?: string;
   filters: {
     [details: string]: RequestFilter | RequestFilterRange;
   };

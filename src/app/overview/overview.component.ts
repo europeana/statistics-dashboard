@@ -171,10 +171,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     const valDatasetName = this.form.value.datasetName;
     if (valDatasetName) {
-      breakdownRequest.filters['datasetName'] = {
-        values: [`edm_datasetName:${valDatasetName}`]
-      };
+      breakdownRequest.datasetId = valDatasetName;
     }
+
     console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
     return breakdownRequest;
   }
