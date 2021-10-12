@@ -265,6 +265,12 @@ describe('OverviewComponent', () => {
       expect(component.getFormattedDateParam().length).toBeTruthy();
     });
 
+    it('should updare the datasetId param', () => {
+      component.form.get('datasetId').setValue('123, 456, 789');
+      component.updateDatasetIdFieldAndPageUrl('123');
+      expect(component.form.value.datasetId).toEqual('456, 789');
+    });
+
     it('should get the formatted content tier param', () => {
       const expectOneToFour = fmtParamCT('1 OR 2 OR 3 OR 4');
       const expectZeroToFour = fmtParamCT('0 OR 1 OR 2 OR 3 OR 4');
