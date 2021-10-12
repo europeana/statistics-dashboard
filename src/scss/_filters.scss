@@ -9,7 +9,6 @@
 }
 
 // Filter Removal
-
 .filters,
 .rm-filters {
   .checkbox {
@@ -18,12 +17,9 @@
 
   .checkbox-labelled {
     align-items: center;
+    cursor: pointer;
     display: flex;
     flex-direction: row;
-  }
-
-  .checkbox-labelled {
-    cursor: pointer;
     margin: 0;
     padding: 0;
     position: relative;
@@ -130,6 +126,10 @@
     }
   }
 
+  .checkbox-labelled:hover {
+    background-color: $offwhite;
+  }
+
   .ct-zero .checkmarked-checkbox {
     &::before {
       background-image: svg-url-icon-eye-disabled($gray-med);
@@ -169,6 +169,14 @@
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-data-provider($white);
+      }
+    }
+  }
+
+  .datasetIds {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-dataset-id($white);
       }
     }
   }

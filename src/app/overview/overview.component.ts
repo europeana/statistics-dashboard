@@ -172,10 +172,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const valDatasetId = this.form.value.datasetId;
     if (valDatasetId) {
       breakdownRequest.filters['datasetId'] = {
-        values:  valDatasetId.indexOf(',') === -1 ? [valDatasetId] : valDatasetId.split(',').map((id: string) => {
-          return id.trim();
-        })
-      }
+        values:
+          valDatasetId.indexOf(',') === -1
+            ? [valDatasetId]
+            : valDatasetId.split(',').map((id: string) => {
+                return id.trim();
+              })
+      };
     }
 
     console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
@@ -219,6 +222,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           const params = combined.params;
           const queryParams = combined.queryParams;
+
+          // checkbox representation of (split) datasetId
+          this.form.addControl('datasetIds', this.fb.group({}));
+
+          const datasetId = queryParams['dataset-id'];
+          if (datasetId) {
+            const datasetIds = this.form.get('datasetIds') as FormGroup;
+            `${datasetId}`.split(',').forEach((part: string) => {
+              datasetIds.addControl(part.trim(), new FormControl(''));
+            });
+          }
 
           if (queryParams[params.facet]) {
             this.disabledParams[params.facet] = queryParams[params.facet];
@@ -901,6 +915,26 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
       queryParams: Object.assign(qp, this.disabledParams)
     });
+  }
+
+  /** updateDatasetIdFieldAndPageUrl
+  /*
+  /* Removes a value-part from the daasetId form value and calls updatePageUrl
+  /* @param { string } datasetId - the value-part to remove
+  */
+  updateDatasetIdFieldAndPageUrl(datasetId: string): void {
+    const oldVal = this.form.value.datasetId;
+    const newVal = oldVal
+      .split(',')
+      .map((val: string) => {
+        return val.trim();
+      })
+      .filter((val: string) => {
+        return val !== datasetId;
+      })
+      .join(', ');
+    this.form.controls.datasetId.setValue(newVal);
+    this.updatePageUrl();
   }
 
   /** triggerLoad

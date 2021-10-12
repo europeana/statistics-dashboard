@@ -190,6 +190,25 @@
                 </ng-container>
               </ng-container>
             </ng-container>
+
+            <ng-container *ngIf="form.value.datasetId">
+              <ng-container *ngFor="let id of form.value.datasetId.split(',')">
+                <ng-container
+                  *ngIf="form.controls['datasetIds'].get(id.trim())"
+                >
+                  <label class="rm-filter">
+                    <app-checkbox
+                      [form]="form"
+                      [controlName]="id.trim()"
+                      group="datasetIds"
+                      [labelText]="id"
+                      (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
+                    ></app-checkbox>
+                    <span class="x"></span>
+                  </label>
+                </ng-container>
+              </ng-container>
+            </ng-container>
           </ul>
         </div>
         <div
