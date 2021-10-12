@@ -58,7 +58,7 @@ export class DataGenerator {
       const contentTier = this.types.indexOf(type);
 
       const res = {
-        datasetName: `dataset_${i}`,
+        datasetId: `dataset_${i}`,
         date: 0,
         exclusions: []
       };

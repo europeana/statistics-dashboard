@@ -80,7 +80,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     'content-tier-zero',
     'date-from',
     'date-to',
-    'dataset-name'
+    'dataset-id'
   ];
 
   filterStates: { [key: string]: FilterState } = {};
@@ -169,9 +169,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       };
     }
 
-    const valDatasetName = this.form.value.datasetName;
-    if (valDatasetName) {
-      breakdownRequest.datasetId = valDatasetName;
+    const valDatasetId = this.form.value.datasetId;
+    if (valDatasetId) {
+      breakdownRequest.filters['datasetId'] = {
+        values:  valDatasetId.indexOf(',') === -1 ? [valDatasetId] : valDatasetId.split(',').map((id: string) => {
+          return id.trim();
+        })
+      }
     }
 
     console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
@@ -235,7 +239,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
-          this.setDatasetNameInputToQueryParam();
+          this.setDatasetIdInputToQueryParam();
 
           this.triggerLoad();
         })
@@ -296,9 +300,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       filterParam = `&qf=${filterParam}`;
     }
 
-    const datasetNameParam = this.getFormattedDatasetNameParam();
+    const datasetIdParam = this.form.value.datasetId;
     const queryParam = `?query=${
-      datasetNameParam.length > 0 ? datasetNameParam : '*'
+      datasetIdParam.length > 0 ? datasetIdParam : '*'
     }`;
 
     const dateParam = this.getFormattedDateParam();
@@ -326,7 +330,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   **/
   processServerResult(results: BreakdownResults): boolean {
     this.dataServerData = results;
-    if (results.results) {
+    if (results.results && results.results.count) {
       this.resultTotal = results.results.count;
       return true;
     } else {
@@ -624,7 +628,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       facetParameter: [],
       contentTierZero: [false],
       showPercent: [false],
-      datasetName: [''],
+      datasetId: [''],
       dateFrom: ['', this.validateDateFrom.bind(this)],
       dateTo: ['', this.validateDateTo.bind(this)]
     });
@@ -712,15 +716,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       .join('');
   }
 
-  /** getFormattedDatasetNameParam
-  /* get an empty string or the prefixed value of form.datasetName
-  /* @returns string
-  */
-  getFormattedDatasetNameParam(): string {
-    const val = this.form.value.datasetName;
-    return val ? `edm_datasetName:${val}` : '';
-  }
-
   /** getFormattedDateParam
   /* get an empty string or the formatted date range
   /* @returns string
@@ -773,13 +768,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
   }
 
-  /** setDatasetNameInputToQueryParam
-  /* updates the form value 'datasetName' to the page query parameter 'dataset-name'
+  /** setDatasetIdInputToQueryParam
+  /* updates the form value 'datasetId' to the page query parameter 'dataset-id'
   */
-  setDatasetNameInputToQueryParam(): void {
-    const param = this.queryParams['dataset-name'];
+  setDatasetIdInputToQueryParam(): void {
+    const param = this.queryParams['dataset-id'];
     if (param) {
-      this.form.controls.datasetName.setValue(param[0]);
+      this.form.controls.datasetId.setValue(param[0]);
     }
   }
 
@@ -883,7 +878,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       }
     });
 
-    const dataset = this.form.value.datasetName;
+    const dataset = this.form.value.datasetId;
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
 
@@ -894,7 +889,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       qp['date-to'] = new Date(valTo).toISOString().split('T')[0];
     }
     if (dataset) {
-      qp['dataset-name'] = dataset;
+      qp['dataset-id'] = dataset;
     }
     if (this.form.value.contentTierZero) {
       qp['content-tier-zero'] = true;

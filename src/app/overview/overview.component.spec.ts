@@ -237,9 +237,9 @@ describe('OverviewComponent', () => {
     }));
 
     it('should get the url for a dataset', () => {
-      expect(component.getUrl().indexOf('edm_datasetName')).toEqual(-1);
-      component.form.get('datasetName').setValue('XXX');
-      expect(component.getUrl().indexOf('edm_datasetName')).toBeTruthy();
+      expect(component.getUrl().indexOf('XXX')).toEqual(-1);
+      component.form.get('datasetId').setValue('XXX');
+      expect(component.getUrl().indexOf('XXX')).toBeTruthy();
     });
 
     it('should get the url for filters', () => {
@@ -255,16 +255,6 @@ describe('OverviewComponent', () => {
       expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
       component.form.controls.contentTierZero.setValue(true);
       expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeTruthy();
-    });
-
-    it('should get the formatted dataset name param', () => {
-      const testVal = 'XXX';
-      expect(component.getFormattedDatasetNameParam().length).toBeFalsy();
-      component.form.get('datasetName').setValue(testVal);
-      expect(component.getFormattedDatasetNameParam().length).toBeTruthy();
-      expect(component.getFormattedDatasetNameParam()).toEqual(
-        `edm_datasetName:${testVal}`
-      );
     });
 
     it('should get the formatted date param', () => {
@@ -473,9 +463,9 @@ describe('OverviewComponent', () => {
       expect(fnGetRequestFilter(DimensionName.contentTier)).toBeFalsy();
       expect(fnGetRequestFilter('datasetId')).toBeFalsy();
 
-      component.form.controls.datasetName.setValue('xxx');
+      component.form.controls.datasetId.setValue('xxx');
 
-      expect(component.getDataServerDataRequest().datasetId).toBeTruthy();
+      expect(fnGetRequestFilter('datasetId')).toBeTruthy();
       expect(fnGetRequestFilter('createdDate')).toBeFalsy();
 
       component.form.controls.dateFrom.setValue(new Date().toISOString());

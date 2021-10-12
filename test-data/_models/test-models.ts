@@ -1,7 +1,7 @@
 import { DimensionName } from '../../src/app/_models';
 
 export interface CHO {
-  datasetName: string;
+  datasetId: string;
   date?: number;
   [DimensionName.contentTier]: string;
   [DimensionName.country]: string;
