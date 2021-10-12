@@ -38,7 +38,7 @@ describe('FilterComponent', () => {
       contentTierZero: [''],
       contentTier: [''],
       showPercent: [false],
-      datasetName: [''],
+      datasetId: [''],
       dateFrom: [''],
       dateTo: ['']
     });
