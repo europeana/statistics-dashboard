@@ -190,9 +190,8 @@
                 </ng-container>
               </ng-container>
             </ng-container>
-
-            <ng-container *ngIf="form.value.datasetId">
-              <ng-container *ngFor="let id of form.value.datasetId.split(',')">
+            <ng-container *ngIf="queryParams['dataset-id']; let datasets">
+              <ng-container *ngFor="let id of datasets.toString().split(',')">
                 <ng-container
                   *ngIf="form.controls['datasetIds'].get(id.trim())"
                 >
@@ -233,8 +232,19 @@
       <!-- Data Area -->
       <div class="data-area">
         <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
+        <div *ngIf="emptyDataset && !isLoading" class="no-data">
+          No results found!
+          <ul>
+            <li *ngIf="queryParams['dataset-id']">
+              try removing the <span class="param">dataset id</span> parameter
+            </li>
+            <li *ngIf="queryParams['date-from'] && queryParams['date-to']">
+              try removing the <span class="param">date</span> parameters
+            </li>
+          </ul>
+        </div>
         <div class="chart-and-summary">
-          <div class="chart-wrapper">
+          <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
             <app-bar-chart
               #barChart
               [showPercent]="form.value.showPercent"
@@ -258,7 +268,7 @@
           </ng-container>
         </div>
 
-        <label style="position: relative; float: right; top: -4px; right: 4px"
+        <label *ngIf="!emptyDataset" class="toggle-percentage"
           >As percentages
           <input
             type="checkbox"
@@ -273,6 +283,7 @@
             [facetName]="form.value.facetParameter"
             (hideItem)="removeSeries($event)"
             (showItems)="addSeries($event)"
+            [isVisible]="!emptyDataset"
           >
           </app-snapshots>
         </ng-container>
@@ -286,9 +297,10 @@
           [getUrlRow]="getUrlRow.bind(this)"
           (refreshData)="showAppliedSeriesInGridAndChart()"
           (chartPositionChanged)="chartPositionChanged($event)"
+          [isVisible]="!emptyDataset"
         ></app-grid>
 
-        <div class="export-opener-link-wrapper">
+        <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
           <a class="export-opener-link" (click)="export.toggleActive()"
             >EXPORT DATA</a
           >

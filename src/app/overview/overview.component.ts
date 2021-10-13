@@ -57,6 +57,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
 
   // Make variables available to template
+  public emptyDataset = true;
   public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
@@ -345,10 +346,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   processServerResult(results: BreakdownResults): boolean {
     this.dataServerData = results;
     if (results.results && results.results.count) {
+      this.emptyDataset = false;
       this.resultTotal = results.results.count;
       return true;
     } else {
       this.barChart.removeAllSeries();
+      this.emptyDataset = true;
       this.grid.setRows([]);
       if (this.gridSummary) {
         this.gridSummary.summaryData = { breakdownBy: '', results: [] };

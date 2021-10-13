@@ -134,6 +134,13 @@ $width-left-col: 200px;
   margin-top: $spacing-m;
 }
 
+.toggle-percentage {
+  float: right;
+  position: relative;
+  right: 4px;
+  top: -4px;
+}
+
 input[type="checkbox"] {
   &:enabled {
     cursor: pointer;
@@ -280,6 +287,13 @@ label {
   height: 300px;
   margin: 0 -$spacing-s;
   max-width: 100%;
+
+  &.hidden {
+    overflow: hidden;
+    margin: 0;
+    transition: height ease-in-out 100ms;
+    height: 0;
+  }
 }
 
 .data-area {
@@ -303,6 +317,19 @@ label {
       right: auto;
       width: 100%;
       transition: 0.3s linear width;
+    }
+  }
+
+  .no-data {
+    font-size: 24px;
+    ul {
+      font-size: 14px;
+      list-style: disc;
+      margin: 12px 0 0 20px;
+
+      .param {
+        font-weight: bold;
+      }
     }
   }
 }

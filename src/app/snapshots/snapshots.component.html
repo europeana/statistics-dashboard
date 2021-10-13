@@ -1,4 +1,4 @@
-<div class="snapshots">
+<div class="snapshots" *ngIf="isVisible">
   <ng-template #comparisonItem let-key="key" let-item="item">
     <ng-container *ngIf="item.current || item.saved">
       <li class="compare-data">
