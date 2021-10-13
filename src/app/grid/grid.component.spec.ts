@@ -106,6 +106,9 @@ describe('GridComponent', () => {
     };
     component.setRows(testRows.slice(0));
     fixture.detectChanges();
+    expect(component.paginator).toBeFalsy();
+    component.isVisible = true;
+    fixture.detectChanges();
     expect(component.paginator).toBeTruthy();
     tick(1);
     spyOn(component.paginator, 'setPage');
@@ -115,7 +118,6 @@ describe('GridComponent', () => {
       target: { value: 'a' }
     } as unknown as KeyboardEvent);
     expect(component.paginator.setPage).not.toHaveBeenCalled();
-
     component.goToPage({ key: '99' } as unknown as KeyboardEvent);
     component.goToPage({
       key: 'Enter',

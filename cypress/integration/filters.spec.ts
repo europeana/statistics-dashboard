@@ -4,9 +4,11 @@ context('statistics-dashboard', () => {
   describe('filters', () => {
 
     const force = { force: true };
+    const selCloseDateOverride = '[data-e2e="close-date-override"]';
+    const selDatasetId = '.dataset-name';
     const selDateFrom = '[data-e2e="dateFrom"]';
     const selDateTo = '[data-e2e="dateTo"]';
-    const selCloseDateOverride = '[data-e2e="close-date-override"]';
+
     const selFacetSelect = '.facet-param';
     const selFiltersHeader = '.filters-header';
     const selFilter = `${selFiltersHeader} + .filters .filter`;
@@ -15,7 +17,7 @@ context('statistics-dashboard', () => {
     const selFilterOpened = `${selFilter} .checkboxes-list`;
     const selFilterRemove = `.rm-filter`;
     const selFilterRemoveNav = `.rm-filter-nav`;
-
+    const selNoData = '.no-data';
     const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
     const selFilterValueLabel = `${selFilter} .filter-label`;
@@ -129,6 +131,27 @@ context('statistics-dashboard', () => {
       cy.get(selCloseDateOverride).should('be.visible');
       cy.get(selDateFrom).clear();
       cy.get(selCloseDateOverride).should('not.be.visible');
+    });
+
+    it('should filter on the dataset id', () => {
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selFilterRemove).should('have.length', 0);
+
+      cy.get(selDatasetId).type('dataset_1{enter}');
+      cy.get(selFilterRemove).should('have.length', 1);
+      cy.get(selDatasetId).type(',dataset_2{enter}');
+      cy.get(selFilterRemove).should('have.length', 2);
+
+      cy.get(selDatasetId).clear();
+      cy.get(selDatasetId).type('{enter}');
+      cy.get(selFilterRemove).should('have.length', 0);
+    });
+
+    it('should report when no results are found', () => {
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selNoData).should('have.length', 0);
+      cy.get(selDatasetId).type('dataset_x{enter}');
+      cy.get(selNoData).should('be.visible');
     });
   });
 });

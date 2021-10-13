@@ -1,4 +1,4 @@
-<div *ngIf="gridRows">
+<div *ngIf="isVisible && gridRows">
   <ng-template #linkOut let-row="row" let-total="row.isTotal">
     <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
       <a

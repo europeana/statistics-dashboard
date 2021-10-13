@@ -37,6 +37,7 @@ export class SnapshotsComponent {
     this.compareData = this.compareDataAllFacets[facetName];
   }
 
+  @Input() isVisible: boolean;
   @Output() hideItem: EventEmitter<string> = new EventEmitter();
   @Output() showItems: EventEmitter<Array<string>> = new EventEmitter();
 
