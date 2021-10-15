@@ -134,13 +134,6 @@ $width-left-col: 200px;
   margin-top: $spacing-m;
 }
 
-.toggle-percentage {
-  float: right;
-  position: relative;
-  right: 4px;
-  top: -4px;
-}
-
 input[type="checkbox"] {
   &:enabled {
     cursor: pointer;

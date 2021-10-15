@@ -11,45 +11,6 @@
 // Filter Removal
 .filters,
 .rm-filters {
-  .checkbox {
-    opacity: 0;
-  }
-
-  .checkbox-labelled {
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    margin: 0;
-    padding: 0;
-    position: relative;
-
-    :first-child {
-      min-width: $width-icon-filter;
-    }
-
-    :last-child {
-      width: 100%;
-    }
-  }
-
-  .checkmarked-checkbox {
-    height: $width-icon-filter;
-    position: relative;
-    width: $width-icon-filter;
-
-    &::before {
-      bottom: 0;
-      background-position: center;
-      background-repeat: no-repeat;
-      content: "";
-      display: block;
-      position: absolute;
-      min-width: $width-icon-filter;
-      height: $width-icon-filter;
-    }
-  }
-
   .padded-left {
     margin-left: $spacing-s;
   }
@@ -61,17 +22,6 @@
       position: relative;
       top: $spacing-xs;
     }
-  }
-
-  .filter-label {
-    font-size: 14px;
-    line-height: $filter-row-height;
-    margin: 0 $spacing-s;
-    white-space: nowrap;
-  }
-
-  .filter-label .term-highlight {
-    font-weight: bold;
   }
 
   .filter-title {
@@ -110,32 +60,6 @@
     padding: $spacing-xs $spacing-s;
     &:not(:last-child) {
       margin-right: 24px;
-    }
-  }
-}
-
-// Icons
-
-.filters {
-  .checkmarked-checkbox {
-    &::before {
-      background-image: svg-url-icon-checkbox("#000");
-    }
-    &.checked::before {
-      background-image: svg-url-icon-checkbox-checked("#000");
-    }
-  }
-
-  .checkbox-labelled:hover {
-    background-color: $offwhite;
-  }
-
-  .ct-zero .checkmarked-checkbox {
-    &::before {
-      background-image: svg-url-icon-eye-disabled($gray-med);
-    }
-    &.checked::before {
-      background-image: svg-url-icon-eye($gray-med);
     }
   }
 }

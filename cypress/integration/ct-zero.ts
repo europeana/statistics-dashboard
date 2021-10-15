@@ -5,7 +5,7 @@ context('statistics-dashboard', () => {
   const ctZeroParam = 'content-tier-zero=true';
   const ctZeroFilterParam = DimensionName.contentTier;
   const selCtrlCTZero = '[for=ctZero]';
-  const selFilterLabel = '.filter-label';
+  const selFilterLabel = '.checkbox-label';
   const selFilterOpener = '.opener-name';
   const urlDefault = `/data/${DimensionName.country}`;
   const urlCTZero = `${urlDefault}?content-tier-zero=true`;
