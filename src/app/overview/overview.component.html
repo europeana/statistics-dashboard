@@ -268,13 +268,13 @@
           </ng-container>
         </div>
 
-        <label *ngIf="!emptyDataset" class="toggle-percentage"
-          >As percentages
-          <input
-            type="checkbox"
-            formControlName="showPercent"
-            (change)="refreshChart()"
-        /></label>
+        <app-checkbox
+          [form]="form"
+          controlName="percent"
+          labelText="As percentages"
+          group="chartFormat"
+          (valueChanged)="refreshChart()"
+        ></app-checkbox>
 
         <!-- SNAPSHOTS -->
         <ng-container>

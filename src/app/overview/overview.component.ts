@@ -587,7 +587,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       const seriesData = this.snapshots.getSeriesDataForChart(
         this.form.value.facetParameter,
         seriesKeys,
-        this.form.value.showPercent,
+        this.form.value['chartFormat']['percent'],
         this.chartPosition * maxbars,
         maxbars
       );
@@ -644,11 +644,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.form = this.fb.group({
       facetParameter: [],
       contentTierZero: [false],
-      showPercent: [false],
       datasetId: [''],
       dateFrom: ['', this.validateDateFrom.bind(this)],
       dateTo: ['', this.validateDateTo.bind(this)]
     });
+
+    this.form.addControl('chartFormat', this.fb.group({}));
+    (this.form.get('chartFormat') as FormGroup).addControl(
+      'percent',
+      new FormControl(false)
+    );
 
     this.facetConf.map((s: string) => {
       this.form.addControl(s, this.fb.group({}));

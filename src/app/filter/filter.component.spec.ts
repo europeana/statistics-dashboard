@@ -37,7 +37,6 @@ describe('FilterComponent', () => {
       facetParameter: [],
       contentTierZero: [''],
       contentTier: [''],
-      showPercent: [false],
       datasetId: [''],
       dateFrom: [''],
       dateTo: ['']

@@ -20,7 +20,7 @@ context('statistics-dashboard', () => {
     const selNoData = '.no-data';
     const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
-    const selFilterValueLabel = `${selFilter} .filter-label`;
+    const selFilterValueLabel = `${selFilter} .checkbox-label`;
 
     it('should not include filters for the current dimension', () => {
       cy.visit(`/data/${DimensionName.country}`);
