@@ -8,7 +8,10 @@ import { ExportCSVService, ExportPDFService } from '../_services';
   styleUrls: ['./export.component.scss']
 })
 export class ExportComponent {
-  @Input() currentUrl = window.location.href;
+  get currentUrl(): string {
+    return window.location.href;
+  }
+
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
   @ViewChild('contentRef') contentRef: ElementRef;
