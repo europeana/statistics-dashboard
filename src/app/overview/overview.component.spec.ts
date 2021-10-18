@@ -249,6 +249,9 @@ describe('OverviewComponent', () => {
       expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
       component.queryParams = { country: [countryUrlParamVal] };
       expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
+      expect(
+        component.getUrl().includes(`COUNTRY:"${countryUrlParamVal}"`)
+      ).toBeTruthy();
 
       expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
       component.queryParams = { 'content-tier-zero': true };

@@ -191,14 +191,12 @@
               </ng-container>
             </ng-container>
             <ng-container *ngIf="queryParams['dataset-id']; let datasets">
-              <ng-container *ngFor="let id of datasets.toString().split(',')">
-                <ng-container
-                  *ngIf="form.controls['datasetIds'].get(id.trim())"
-                >
+              <ng-container *ngFor="let id of fromCSL(datasets.toString())">
+                <ng-container *ngIf="form.controls['datasetIds'].get(id)">
                   <label class="rm-filter">
                     <app-checkbox
                       [form]="form"
-                      [controlName]="id.trim()"
+                      [controlName]="id"
                       group="datasetIds"
                       [labelText]="id"
                       (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
@@ -247,7 +245,7 @@
           <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
             <app-bar-chart
               #barChart
-              [showPercent]="form.value.showPercent"
+              [showPercent]="form.value.chartFormat.percent"
               [extraSettings]="
                 [
                   DimensionName.contentTier,
@@ -268,13 +266,15 @@
           </ng-container>
         </div>
 
-        <app-checkbox
-          [form]="form"
-          controlName="percent"
-          labelText="As percentages"
-          group="chartFormat"
-          (valueChanged)="refreshChart()"
-        ></app-checkbox>
+        <ng-container *ngIf="!emptyDataset">
+          <app-checkbox
+            [form]="form"
+            controlName="percent"
+            labelText="As percentages"
+            group="chartFormat"
+            (valueChanged)="refreshChart()"
+          ></app-checkbox>
+        </ng-container>
 
         <!-- SNAPSHOTS -->
         <ng-container>
