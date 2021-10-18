@@ -6,7 +6,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { facetNames } from '../_data';
-import { filterList } from '../_helpers';
+import { filterList, fromCSL } from '../_helpers';
 import { DimensionName, FilterInfo } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
@@ -57,6 +57,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
 
   // Make variables available to template
+  public fromCSL = fromCSL;
   public emptyDataset = true;
   public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
@@ -291,16 +292,25 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   getUrl(): string {
     // filterParam cannot rely on checkbox values as filters aren't built until the data is initialised
 
+    const portalNames = {};
+    portalNames[DimensionName.country] = 'COUNTRY';
+    portalNames[DimensionName.dataProvider] = 'DATA_PROVIDER';
+    portalNames[DimensionName.provider] = 'PROVIDER';
+    portalNames[DimensionName.rights] = 'RIGHTS';
+    portalNames[DimensionName.type] = 'TYPE';
+
     let filterParam = Object.keys(this.queryParams)
       .map((key: string) => {
         const innerRes = [];
         const values = this.queryParams[key];
-
         if (!this.nonFilterQPs.includes(key)) {
           values.forEach((valPart: string) => {
             if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
+              const portalKey = portalNames[key] ? portalNames[key] : key;
               innerRes.push(
-                `${key}:"${encodeURIComponent(fromInputSafeName(valPart))}"`
+                `${portalKey}:"${encodeURIComponent(
+                  fromInputSafeName(valPart)
+                )}"`
               );
             }
           });

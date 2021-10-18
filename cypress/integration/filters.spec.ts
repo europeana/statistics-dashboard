@@ -21,6 +21,7 @@ context('statistics-dashboard', () => {
     const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
     const selFilterValueLabel = `${selFilter} .checkbox-label`;
+    const selPercentFormat = `.chartFormat.checkbox-labelled`;
 
     it('should not include filters for the current dimension', () => {
       cy.visit(`/data/${DimensionName.country}`);
@@ -149,9 +150,11 @@ context('statistics-dashboard', () => {
 
     it('should report when no results are found', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selPercentFormat).should('be.visible');
       cy.get(selNoData).should('have.length', 0);
       cy.get(selDatasetId).type('dataset_x{enter}');
       cy.get(selNoData).should('be.visible');
+      cy.get(selPercentFormat).should('have.length', 0);
     });
   });
 });

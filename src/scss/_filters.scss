@@ -36,8 +36,14 @@
   }
 }
 
-.filters .info-icon {
-  margin-left: $spacing-s;
+.filters {
+  .checkbox-labelled:not(.chartFormat):hover {
+    background-color: $offwhite;
+  }
+
+  .info-icon {
+    margin-left: $spacing-s;
+  }
 }
 
 .rm-filters-outer {

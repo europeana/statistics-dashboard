@@ -72,10 +72,6 @@
   background-image: svg-url-icon-checkbox-checked($stats-blue);
 }
 
-.checkbox-labelled:not(.chartFormat):hover {
-  background-color: $offwhite;
-}
-
 .ct-zero .checkmarked-checkbox {
   &::before {
     background-image: svg-url-icon-eye-disabled($gray-med);
