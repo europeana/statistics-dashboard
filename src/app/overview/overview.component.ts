@@ -174,12 +174,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const valDatasetId = this.form.value.datasetId;
     if (valDatasetId) {
       breakdownRequest.filters['datasetId'] = {
-        values:
-          valDatasetId.indexOf(',') === -1
-            ? [valDatasetId]
-            : valDatasetId.split(',').map((id: string) => {
-                return id.trim();
-              })
+        values: fromCSL(valDatasetId)
       };
     }
 
@@ -940,18 +935,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* Removes a value-part from the daasetId form value and calls updatePageUrl
   /* @param { string } datasetId - the value-part to remove
   */
-  updateDatasetIdFieldAndPageUrl(datasetId: string): void {
-    const oldVal = this.form.value.datasetId;
-    const newVal = oldVal
-      .split(',')
-      .map((val: string) => {
-        return val.trim();
-      })
-      .filter((val: string) => {
-        return val !== datasetId;
-      })
-      .join(', ');
-    this.form.controls.datasetId.setValue(newVal);
+  updateDatasetIdFieldAndPageUrl(datasetId?: string): void {
+    const ctrl = this.form.controls.datasetId;
+    const cleanVal = fromCSL(ctrl.value).filter((val: string) => {
+      return val !== datasetId;
+    });
+
+    switch (cleanVal.length) {
+      case 0: {
+        ctrl.setValue('');
+      }
+      case 1: {
+        ctrl.setValue(cleanVal[0]);
+      }
+      default: {
+        ctrl.setValue(cleanVal.join(', '));
+      }
+    }
     this.updatePageUrl();
   }
 
