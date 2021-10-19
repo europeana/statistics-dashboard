@@ -119,9 +119,14 @@ export function toInputSafeName(s: string): string {
 /* - splits the string on commas and return the trimmed results
 */
 export function fromCSL(s: string): Array<string> {
-  return s.split(',').map((part: string) => {
-    return part.trim();
-  });
+  return s
+    .split(',')
+    .map((part: string) => {
+      return part.trim();
+    })
+    .filter((s: string) => {
+      return s.length > 0;
+    });
 }
 
 export function getFormValueList(
