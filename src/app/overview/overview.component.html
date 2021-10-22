@@ -172,20 +172,32 @@
                   <ng-container
                     *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
                   >
-                    <label
-                      class="rm-filter"
-                      *ngIf="form.value[filter][option]"
-                      [ngClass]="{ 'dead-facet': deadFacet }"
+                    <ng-container
+                      *ngFor="
+                        let labelText of [
+                          fromInputSafeName(option) | renameRights
+                        ]
+                      "
                     >
-                      <app-checkbox
-                        [form]="form"
-                        [controlName]="option"
-                        [labelText]="fromInputSafeName(option) | renameRights"
-                        [group]="filter"
-                        (valueChanged)="updatePageUrl(deadFacet)"
-                      ></app-checkbox>
-                      <span class="x"></span>
-                    </label>
+                      <label
+                        class="rm-filter"
+                        *ngIf="form.value[filter][option]"
+                        [ngClass]="{ 'dead-facet': deadFacet }"
+                      >
+                        <app-checkbox
+                          [form]="form"
+                          [controlName]="option"
+                          [labelText]="labelText"
+                          [group]="filter"
+                          (valueChanged)="updatePageUrl(deadFacet)"
+                          title="remove filter: {{ labelText }}"
+                        ></app-checkbox>
+                        <span
+                          class="x"
+                          title="remove filter: {{ labelText }}"
+                        ></span>
+                      </label>
+                    </ng-container>
                   </ng-container>
                 </ng-container>
               </ng-container>
@@ -200,8 +212,9 @@
                       group="datasetIds"
                       [labelText]="id"
                       (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
+                      title="remove filter: {{ id }}"
                     ></app-checkbox>
-                    <span class="x"></span>
+                    <span class="x" title="remove filter: {{ id }}"></span>
                   </label>
                 </ng-container>
               </ng-container>
@@ -216,12 +229,14 @@
             class="rm-filter-nav-prev"
             (click)="scrollInfo.back()"
             [ngClass]="{ active: scrollInfo.canScrollBack }"
+            [title]="scrollInfo.canScrollBack ? 'scoll back' : ''"
             >&lsaquo;</a
           >
           <a
             class="rm-filter-nav-next"
             (click)="scrollInfo.fwd()"
             [ngClass]="{ active: scrollInfo.canScrollFwd }"
+            [title]="scrollInfo.canScrollFwd ? 'scoll forward' : ''"
             >&rsaquo;</a
           >
         </div>

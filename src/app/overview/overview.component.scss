@@ -98,27 +98,38 @@ $width-left-col: 200px;
 
 .rm-filter-nav {
   align-items: center;
-  background: linear-gradient(90deg, transparent 0%, $offwhite 50%);
+  background: $offwhite;
   bottom: 0;
   display: flex;
   justify-content: flex-end;
-  pointer-events: none;
+  margin: 0 0 0 2px;
   position: absolute;
   right: 0;
   top: 0;
-  width: 70px;
+  width: 30px;
+
+  &::before {
+    background: linear-gradient(90deg, transparent 0%, $offwhite 100%);
+    content: "";
+    height: 100%;
+    left: -30px;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 30px;
+  }
 }
 
 .rm-filter-nav-next,
 .rm-filter-nav-prev {
   color: $gray-5;
+  cursor: default;
   font-size: 30px;
   transform: translateY(-4px);
   width: 14px;
-
   &.active {
     color: #000;
-    pointer-events: all;
+    cursor: pointer;
   }
 }
 
