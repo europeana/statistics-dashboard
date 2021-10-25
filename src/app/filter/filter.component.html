@@ -30,7 +30,7 @@
   </li>
 
   <ng-template #dates>
-    <li>
+    <li *ngIf="group === 'dates'">
       <app-dates [form]="form" (valueChanged)="changed()"></app-dates>
     </li>
   </ng-template>
