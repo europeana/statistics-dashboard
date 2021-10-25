@@ -16,7 +16,6 @@ context('statistics-dashboard', () => {
     const selFilterOpenerName = `${selFilterOpener} .opener-name`;
     const selFilterOpened = `${selFilter} .checkboxes-list`;
     const selFilterRemove = `.rm-filter`;
-    const selFilterRemoveNav = `.rm-filter-nav`;
     const selNoData = '.no-data';
     const selCheckbox = `${selFilter} .checkbox`;
     const selSearch = `.checkbox-filter-input`;
@@ -54,20 +53,6 @@ context('statistics-dashboard', () => {
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selCheckbox).first().click(force);
       cy.get(selFilterRemove).should('have.length', 1);
-    });
-
-    it('should scroll the filter remove options', () => {
-      cy.visit(`/data/${DimensionName.country}`);
-      cy.get(selFilterOpener).eq(2).click(force);
-      cy.get(selFilterRemove).should('have.length', 0);
-      cy.get(selFilterRemoveNav).should('have.length', 0);
-
-      for(let i=0; i<4; i++){
-        cy.get(selCheckbox).eq(i).click(force);
-      }
-
-      cy.get(selFilterRemove).should('have.length', 4);
-      cy.get(selFilterRemoveNav).should('have.length', 1);
     });
 
     it('should disable and restore filters', () => {

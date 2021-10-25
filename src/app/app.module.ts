@@ -7,7 +7,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClickOutsideModule } from 'ng-click-outside';
 
-import { IsScrollableDirective } from './_directives/is-scrollable';
+import { IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {
