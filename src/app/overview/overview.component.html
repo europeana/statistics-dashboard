@@ -28,7 +28,8 @@
               <span
                 class="checkmarked-checkbox"
                 [ngClass]="{
-                  checked: form.value.contentTierZero
+                  checked: form.value.contentTierZero,
+                  disabled: emptyDataset
                 }"
               >
                 <input
@@ -39,7 +40,13 @@
                   formControlName="contentTierZero"
                 />
               </span>
-              <label class="filter-title padded-left" for="ctZero">
+              <label
+                class="filter-title padded-left"
+                [ngClass]="{
+                  disabled: emptyDataset
+                }"
+                for="ctZero"
+              >
                 {{ form.value.contentTierZero ? "Disable" : "Enable" }}
                 content tier 0
               </label>
@@ -49,6 +56,10 @@
               href="https://pro.europeana.eu/page/edm-documentation"
               target="_blank"
               title="Documentation"
+              [ngClass]="{
+                checked: form.value.contentTierZero,
+                disabled: emptyDataset
+              }"
             ></a>
           </li>
         </ul>
@@ -71,6 +82,7 @@
               </ng-container>
 
               <app-filter
+                [emptyDataset]="emptyDataset"
                 [form]="form"
                 [group]="'dates'"
                 [state]="filterStates['dates']"
@@ -91,6 +103,9 @@
             placeholder="Dataset ID"
             class="dataset-name"
             type="text"
+            [ngClass]="{
+              disabled: emptyDataset && !queryParams['dataset-id']
+            }"
           />
         </li>
       </ul>

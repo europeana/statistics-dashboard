@@ -16,14 +16,21 @@ import { DimensionName, FilterInfo, FilterState, NameLabel } from '../_models';
   styleUrls: ['./filter.component.scss']
 })
 export class FilterComponent {
+  @Input() emptyDataset: boolean;
   @Input() form: FormGroup;
   @Input() group: DimensionName;
 
   filteredOptions?: Array<NameLabel>;
   _options?: Array<NameLabel>;
+  empty = true;
+
   @Input() set options(ops: Array<NameLabel>) {
     this._options = ops;
     this.filteredOptions = ops;
+
+    if (ops && ops.length > 0) {
+      this.empty = false;
+    }
   }
   @Input() state: FilterState;
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
@@ -42,6 +49,18 @@ export class FilterComponent {
     }
     const term = evt.target.value;
     this.filterTermChanged.emit({ term: term, dimension: this.group });
+  }
+
+  isDisabled(): boolean {
+    if ((this.group as string) === 'dates') {
+      if (this.form.value.dateFrom && this.form.value.dateTo) {
+        return false;
+      } else {
+        return this.emptyDataset;
+      }
+    } else {
+      return this.empty;
+    }
   }
 
   getSetCheckboxValues(filterName: DimensionName): string {

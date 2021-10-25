@@ -80,4 +80,12 @@
   &.checked::before {
     background-image: svg-url-icon-eye($gray-med);
   }
+  &.disabled {
+    &::before {
+      background-image: svg-url-icon-eye-disabled($gray-5);
+    }
+    &.checked::before {
+      background-image: svg-url-icon-eye($gray-5);
+    }
+  }
 }

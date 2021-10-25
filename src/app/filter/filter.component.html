@@ -9,7 +9,8 @@
       (click)="toggle()"
       class="filter-opener filter-title"
       [ngClass]="{
-        open: state.visible
+        open: state.visible,
+        disabled: isDisabled()
       }"
     >
       <span class="container-h">

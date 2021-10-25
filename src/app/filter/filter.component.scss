@@ -71,6 +71,10 @@ $total-width: 268px;
       transform: rotate(180deg);
     }
   }
+
+  &.disabled::after {
+    color: $gray-5;
+  }
 }
 
 .opener-name {
