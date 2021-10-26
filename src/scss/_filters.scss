@@ -28,6 +28,8 @@
     color: $gray-faint;
     &.disabled {
       color: $gray-5;
+      cursor: default;
+      pointer-events: none;
     }
   }
 
@@ -69,6 +71,10 @@
     padding: $spacing-xs $spacing-s;
     &:not(:last-child) {
       margin-right: 24px;
+    }
+
+    .checkbox-labelled {
+      cursor: pointer;
     }
   }
 }

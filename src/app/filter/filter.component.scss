@@ -103,3 +103,7 @@ $total-width: 268px;
   top: 0px;
   left: 0;
 }
+
+.filter-title.disabled .selection + .opener-name {
+  color: $gray-5;
+}

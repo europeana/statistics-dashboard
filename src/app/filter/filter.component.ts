@@ -30,6 +30,8 @@ export class FilterComponent {
 
     if (ops && ops.length > 0) {
       this.empty = false;
+    } else {
+      this.empty = true;
     }
   }
   @Input() state: FilterState;

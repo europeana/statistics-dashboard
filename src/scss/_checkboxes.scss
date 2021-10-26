@@ -1,5 +1,9 @@
 @import "_variables";
 
+.checkboxes-list .checkbox-labelled {
+  cursor: pointer;
+}
+
 .checkbox {
   opacity: 0;
 }
@@ -26,7 +30,6 @@
 
 .checkbox-labelled {
   align-items: center;
-  cursor: pointer;
   display: flex;
   flex-direction: row;
   margin: 0;
@@ -81,6 +84,9 @@
     background-image: svg-url-icon-eye($gray-med);
   }
   &.disabled {
+    cursor: default;
+    pointer-events: none;
+
     &::before {
       background-image: svg-url-icon-eye-disabled($gray-5);
     }
