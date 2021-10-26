@@ -1,0 +1,80 @@
+@import "../../scss/functions/_icon_urls";
+@import "../../scss/_variables";
+
+@font-face {
+  font-family: Chevin-Medium;
+  src: url("/assets/fonts/chevin/ChevinMedium.otf") format("opentype");
+}
+
+.header,
+.logo {
+  display: flex;
+  flex-direction: row;
+}
+
+.header {
+  align-items: center;
+  background: $white;
+}
+
+.header-outer {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 12;
+}
+
+.logo {
+  margin-left: 21px;
+
+  .icon {
+    align-self: center;
+    background: svg-url-icon-europeana($white) center no-repeat;
+    height: 48px;
+    transform: translateX(4px);
+    width: 39px;
+    z-index: 1;
+  }
+
+  .icon-wrapper {
+    align-content: center;
+    color: $white;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    width: 73px;
+    background-color: $stats-blue;
+
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+    &::after {
+      border-bottom: 130px solid transparent;
+      border-left: 50px solid $white;
+      content: "";
+      display: block;
+      left: -30px;
+      position: absolute;
+    }
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    font-family: Chevin-Medium;
+    font-size: 25px;
+    line-height: 30px;
+    margin-left: 14px;
+  }
+}
+
+.page-title {
+  background: $offwhite;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 0;
+  padding: 16px;
+  position: sticky;
+  top: 3em;
+}

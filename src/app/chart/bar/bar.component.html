@@ -1,0 +1,49 @@
+<a (click)="toggleCtrls()" *ngIf="settings.configurable">
+  <ng-container *ngIf="!settings.ctrlsOpen"> configure &gt;&gt;</ng-container>
+  <ng-container *ngIf="settings.ctrlsOpen"> close &lt;&lt;</ng-container>
+</a>
+
+<div *ngIf="settings.ctrlsOpen && settings.ctrlsOpen" class="am4-ctrls">
+  <div class="sub-group">
+    <h4>Legend</h4>
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="settings.chartLegend"
+        (change)="drawChart()"
+      />Show</label
+    >
+  </div>
+
+  <div class="sub-group">
+    <h4>Zoom</h4>
+    <a (click)="zoomTop()">zoom to top 5</a>
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="settings.hasScroll"
+        (change)="drawChart()"
+      />Scroll bar</label
+    >
+  </div>
+
+  <div class="sub-group">
+    <h4>Misc</h4>
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="settings.isHorizontal"
+        (change)="drawChart()"
+      />Horizontal</label
+    >
+    <label
+      ><input
+        type="checkbox"
+        [(ngModel)]="settings.showExports"
+        (change)="drawChart()"
+      />Exports</label
+    >
+  </div>
+</div>
+<div id="{{ chartId }}" class="bar-chart"></div>
+<div id="barLegend" [ngClass]="{ offscreen: !settings.chartLegend }"></div>

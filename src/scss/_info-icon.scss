@@ -1,0 +1,24 @@
+@import "functions/_icon_urls";
+@import "_variables";
+
+.info-icon {
+  background-image: svg-url-icon-info(#b7b7b7);
+  background-repeat: no-repeat;
+  height: 12px;
+  margin-left: $spacing-xs;
+  position: relative;
+  width: 12px;
+  &:hover {
+    background-image: svg-url-icon-info($gray-light);
+  }
+
+  // click-target accessibility
+  &::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 32px;
+    left: -8px;
+    top: -4px;
+  }
+}

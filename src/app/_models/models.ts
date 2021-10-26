@@ -1,19 +1,31 @@
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
-export interface MenuState {
+export interface IHashString {
+  [details: string]: string;
+}
+
+export interface IHashNumber {
+  [details: string]: number;
+}
+
+export interface IHashStringArray {
+  [details: string]: Array<string>;
+}
+
+export interface FilterState {
   visible: boolean;
   disabled?: boolean;
 }
 
-export interface FacetField {
-  count: number;
-  label: HeaderNameType;
-}
-
 export interface TableRow {
-  name: HeaderNameType;
-  count: string;
-  percent: string;
+  name: string;
+  count: number;
+  displayIndex?: number;
+  percent: number;
+  colourIndex?: number;
+  highlight?: boolean;
+  series: string;
+  isTotal?: boolean;
 }
 
 export interface FmtTableData {
@@ -21,9 +33,9 @@ export interface FmtTableData {
   tableRows: Array<TableRow>;
 }
 
-export interface Facet {
+export interface NameLabel {
   name: string;
-  fields: Array<FacetField>;
+  label: string;
 }
 
 export interface NameValue {
@@ -31,12 +43,20 @@ export interface NameValue {
   value: number;
 }
 
-export interface RawFacet {
-  facets: Array<Facet>;
-  totalResults: number;
+export interface NameValuePercent extends NameValue {
+  percent: number;
+}
+
+export interface IHashArrayNameLabel {
+  [details: string]: Array<NameLabel>;
 }
 
 export enum ExportType {
   CSV = 'CSV',
-  PDF = 'PDF',
+  PDF = 'PDF'
+}
+
+export interface FilterInfo {
+  term: string;
+  dimension?: string;
 }

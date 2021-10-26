@@ -1,343 +1,326 @@
-<form [formGroup]="form" class="dashboard-wrapper">
-  <ng-template #cbFieldset let-group="group" let-options="options">
-    <li class="dropdown">
-      <a
-        (click)="toggleFilterMenu(group)"
-        class="filter-opener"
-        [ngClass]="{
-          disabled: menuStates[group].disabled,
-          open: menuStates[group].visible
-        }"
-        >{{ group }}
-        <!--{{ group | renameApiFacet }}-->
-      </a>
-      <div *ngIf="menuStates[group].visible" class="dropdown-wrapper">
-        <div class="dropdown-content">
-          <fieldset
-            [formGroupName]="group"
-            class="checkboxes"
-            [ngClass]="group"
-          >
-            <ng-container *ngFor="let option of options">
-              <label>
+<form
+  [formGroup]="form"
+  class="dashboard-wrapper"
+  [ngClass]="{
+    'loading-modal': isLoading && !dataServerData
+  }"
+>
+  <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
+
+  <div class="statistics-dashboard fit-to-page">
+    <!-- Left -->
+
+    <div class="statistics-dashboard-left">
+      <div>
+        <ul class="filters">
+          <li class="container-h">
+            <span class="icon filter-icon-home"> </span>
+            <a
+              class="filter-title padded-left"
+              data-e2e="link-home"
+              routerLink="/"
+              >Home</a
+            >
+          </li>
+
+          <li class="ct-zero container-h">
+            <span [formGroup]="form" class="checkbox-labelled padded-left">
+              <span
+                class="checkmarked-checkbox"
+                [ngClass]="{
+                  checked: form.value.contentTierZero
+                }"
+              >
                 <input
+                  id="ctZero"
+                  class="checkbox"
                   type="checkbox"
-                  [value]="option"
-                  (change)="refresh()"
-                  [formControlName]="fixName(option)"
-                  [attr.disabled]="!selectOptionEnabled(group, option) ? true : null"
+                  (change)="updatePageUrl()"
+                  formControlName="contentTierZero"
                 />
-                {{ option }}
+              </span>
+              <label class="filter-title padded-left" for="ctZero">
+                {{ form.value.contentTierZero ? "Disable" : "Enable" }}
+                content tier 0
               </label>
+            </span>
+            <a
+              class="info-icon"
+              href="https://pro.europeana.eu/page/edm-documentation"
+              target="_blank"
+              title="Documentation"
+            ></a>
+          </li>
+        </ul>
+
+        <h3 class="filters-header">Filters</h3>
+
+        <ul class="filters">
+          <li>
+            <ng-container *ngIf="dataServerData">
+              <ng-container *ngFor="let filter of facetConf">
+                <app-filter
+                  [form]="form"
+                  [group]="filter"
+                  [options]="displayedFilterData[filter]"
+                  [state]="filterStates[filter]"
+                  (visibilityChanged)="closeFilters($event)"
+                  (valueChanged)="updatePageUrl()"
+                  (filterTermChanged)="filterDisplayData($event)"
+                ></app-filter>
+              </ng-container>
+
+              <app-filter
+                [form]="form"
+                [group]="'dates'"
+                [state]="filterStates['dates']"
+                (visibilityChanged)="closeFilters($event)"
+                (valueChanged)="updatePageUrl()"
+              ></app-filter>
             </ng-container>
-          </fieldset>
-        </div>
+          </li>
+        </ul>
       </div>
 
-      <ng-container *ngIf="!menuStates[group].visible">
-        <ng-container *ngIf="getSetValues(group) as setVals">
-          <ng-container *ngIf="setVals.length > 0">
-            <ul class="applied-filter-summary">
-              <li *ngFor="let val of setVals">{{ val }}</li>
-            </ul>
-          </ng-container>
-        </ng-container>
-      </ng-container>
-    </li>
-  </ng-template>
-
-  <div class="metis-dashboard">
-    <div class="metis-dashboard-left">
-      <h3 [title]="getFormattedFilterParam()">Filters</h3>
-
-      <ul class="filters" (clickOutside)="closeFilters()">
-        <ng-container *ngIf="allFacetData">
-          <ng-container *ngFor="let filter of facetConf">
-            <ng-content
-              *ngTemplateOutlet="
-                cbFieldset;
-                context: {
-                  options: getSelectOptions(filter, allFacetData),
-                  group: filter
-                }
-              "
-            ></ng-content>
-          </ng-container>
-        </ng-container>
-      </ul>
-
-      <ul class="filters">
-        <li class="column">
-          <h3 [title]="getFormattedDateParam()">Dataset</h3>
+      <ul class="filters inputs">
+        <li class="container-h dataset-name-wrapper">
+          <span class="icon filter-icon-dataset"></span>
           <input
-            formControlName="datasetName"
-            (keyup.enter)="refresh()"
-            placeholder="Dataset Name"
-            class="datasetName"
-          />
-        </li>
-        <li class="column">
-          <h3 [title]="getFormattedDateParam()">Date From</h3>
-          <input
-            formControlName="dateFrom"
-            #dateFrom
-            [attr.max]="today"
-            type="date"
-            placeholder="{{ 'YYYY-MM-DD' }}"
-            (change)="dateChange(true)"
-          />
-        </li>
-        <li class="column">
-          <h3 [title]="getFormattedDateParam()">Date To</h3>
-          <input
-            formControlName="dateTo"
-            #dateTo
-            [attr.max]="today"
-            type="date"
-            placeholder="{{ 'YYYY-MM-DD' }}"
-            (change)="dateChange(false)"
+            formControlName="datasetId"
+            (keyup.enter)="updateDatasetIdFieldAndPageUrl()"
+            placeholder="Dataset ID"
+            class="dataset-name"
+            type="text"
           />
         </li>
       </ul>
     </div>
 
-    <div class="metis-dashboard-right">
-      <h3 [title]="getFormattedContentTierParam() + getFormattedFacetParam()">
-        Facets
-        <span class="svg-icon-spin" [ngClass]="{ showing: isLoading }"></span>
-      </h3>
+    <!-- Right -->
 
-      <div class="facet-params">
-        <div class="switch-wrapper">
-          <span> CT Zero </span>
-          <label class="switch">
-            <input
-              type="checkbox"
-              formControlName="contentTierZero"
-              (change)="refresh()"
-            />
-            <span class="slider round"></span>
-          </label>
-        </div>
-        <label *ngFor="let facet of facetConf; let i = index">
-          <input
-            type="radio"
-            value="{{ facet }}"
-            formControlName="facetParameter"
-            (change)="switchFacet(facet)"
-          />
-          {{ facet }}
-          <!-- {{ facet | renameApiFacet }} -->
-        </label>
+    <div class="statistics-dashboard-right">
+      <app-export
+        #export
+        [getGridData]="getGridData.bind(this)"
+        [getChartData]="getChartData.bind(this)"
+      ></app-export>
+
+      <!-- Header -->
+
+      <div class="container-h header-bar">
+        <ng-container *ngIf="!form.value.facetParameter">
+          <h3 class="header-data">Select a facet dimension</h3>
+        </ng-container>
+        <ng-container *ngIf="form.value.facetParameter">
+          <h3 class="header-data">
+            <span class="facet-param-text"> Europeana database by </span>
+            <select
+              class="facet-param"
+              formControlName="facetParameter"
+              (change)="switchFacet()"
+            >
+              <option *ngFor="let facet of facetConf" [ngValue]="facet">
+                {{ facet | renameApiFacet }}
+              </option>
+            </select>
+          </h3>
+        </ng-container>
+
+        <ng-container *ngIf="getFormattedDateStrings(); let dates">
+          <span
+            class="container-h date-removal"
+            [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
+          >
+            <a class="container-h when-set" (click)="datesClear()">
+              <span>Custom</span>
+              <span class="x" data-e2e="close-date-override"></span>
+            </a>
+            <span class="when-unset">Whole period</span>
+            <span class="date">
+              {{ dates[0] }}
+            </span>
+            <span class="separator"> - </span>
+            <span class="date">
+              {{ dates[1] }}
+            </span>
+          </span>
+        </ng-container>
+
+        <a (click)="export.toggleActive()" class="export-icon export-opener">
+        </a>
       </div>
 
-      <ngx-datatable
-        *ngIf="showTab && tableData"
-        #dataTable
-        id="dataTable"
-        [rows]="tableData.tableRows"
-        class="material expandable datatable fullscreen"
-        [columnMode]="ColumnMode.flex"
-        [headerHeight]="50"
-        [footerHeight]="60"
-        [rowHeight]="50"
-        [scrollbarV]="true"
-        [limit]="tableDataRowsVisible"
-      >
-        <!-- Mobile row detail -->
-        <ngx-datatable-row-detail [rowHeight]="50">
-          <ng-template
-            let-row="row"
-            let-expanded="expanded"
-            ngx-datatable-row-detail-template
+      <!-- Filter removal -->
+      <div class="rm-filters-outer">
+        <div class="rm-filters-scroll">
+          <ul
+            class="rm-filters"
+            id="scrollInfo"
+            #scrollInfo="scrollInfo"
+            appIsScrollable
           >
-            <div class="mobile-row">
-              <span
-                *ngFor="let col of tableData.columns | slice: 1"
-                class="mobile-row-detail"
-              >
-                {{ row[col] }}</span
-              >
-            </div>
-          </ng-template>
-        </ngx-datatable-row-detail>
+            <app-resize
+              [time]="200"
+              (sizeChanged)="scrollInfo.calc()"
+            ></app-resize>
 
-        <!-- Mobile controls -->
-        <ngx-datatable-column
-          [width]="50"
-          [resizeable]="false"
-          [sortable]="false"
-          [draggable]="false"
-          [canAutoResize]="false"
-        >
-          <ng-template
-            let-row="row"
-            let-expanded="expanded"
-            ngx-datatable-cell-template
-          >
-            <a
-              href="#"
-              [class.datatable-icon-right]="!expanded"
-              [class.datatable-icon-down]="expanded"
-              title="Expand / Collapse Row"
-              (click)="toggleExpandRow(row)"
-              class="desktop-hidden"
-            >
-            </a>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <!-- Col 0 -->
-        <ngx-datatable-column
-          name="{{ tableData.columns[0] | titlecase }}"
-          [flexGrow]="3"
-          [minWidth]="200"
-        >
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <a target="_blank" [href]="getUrlRow(value)">
-              {{ value }}
-            </a>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <!-- Col >= 1 -->
-        <ngx-datatable-column
-          *ngFor="let col of tableData.columns | slice: 1; index as i"
-          name="{{ col | titlecase }}"
-          [flexGrow]="1"
-        >
-          <ng-template
-            let-column="column"
-            let-sort="sortFn"
-            ngx-datatable-header-template
-          >
-            <span class="mobile-hidden">{{ column.name }}</span>
-          </ng-template>
-          <ng-template let-value="value" ngx-datatable-cell-template>
-            <span class="mobile-hidden">{{ value }}</span>
-          </ng-template>
-        </ngx-datatable-column>
-
-        <ngx-datatable-footer *ngIf="true">
-          <ng-template
-            ngx-datatable-footer-template
-            let-rowCount="rowCount"
-            let-pageSize="pageSize"
-            let-selectedCount="selectedCount"
-            let-curPage="curPage"
-            let-offset="offset"
-          >
-            <div class="table-footer">
-              <div class="table-footer-total">
-                <strong>Total</strong>: {{ totalResults }}
-              </div>
-              <a [href]="getUrl(true)" target="_blank">View in portal</a>
-            </div>
-
-            <datatable-pager
-              [pagerLeftArrowIcon]="'datatable-icon-left'"
-              [pagerRightArrowIcon]="'datatable-icon-right'"
-              [pagerPreviousIcon]="'datatable-icon-prev'"
-              [pagerNextIcon]="'datatable-icon-skip'"
-              [page]="curPage"
-              [size]="pageSize"
-              [count]="rowCount"
-              [hidden]="!(rowCount / pageSize > 1)"
-              (change)="dataTable.onFooterPage($event)"
-            >
-            </datatable-pager>
-          </ng-template>
-        </ngx-datatable-footer>
-      </ngx-datatable>
-
-      <ul
-        *ngIf="allFacetData"
-        class="options-wrapper"
-        (clickOutside)="closeDisplayOptions()"
-      >
-        <li class="dropdown">
-          <a
-            (click)="toggleChartOptions()"
-            [ngClass]="{ open: chartOptionsOpen }"
-            ><h3>Charts</h3></a
-          >
-          <div *ngIf="chartOptionsOpen" class="dropdown-wrapper">
-            <div class="dropdown-content">
-              <div class="chart-settings">
-                <label *ngFor="let chartType of chartTypes; let i = index">
-                  <input
-                    type="radio"
-                    value="{{ chartType }}"
-                    (change)="switchChartType()"
-                    formControlName="chartType"
-                  />
-                  {{ chartType }}
-                </label>
-                <label
-                  ><input
-                    type="checkbox"
-                    formControlName="showPercent"
-                    (change)="extractChartData()"
-                  />%</label
+            <ng-container *ngFor="let filter of facetConf">
+              <ng-container *ngIf="filter !== form.value.facetParameter">
+                <ng-container
+                  *ngFor="let option of getSetCheckboxValues(filter)"
                 >
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <li>
-          <a #downloadAnchor></a>
-        </li>
-
-        <li class="dropdown">
-          <a
-            (click)="toggleDownloadOptions()"
-            [ngClass]="{ open: downloadOptionsOpen }"
-            ><h3>Downloads</h3></a
-          >
-          <div *ngIf="downloadOptionsOpen" class="dropdown-wrapper">
-            <ul class="dropdown-content">
-              <li *ngFor="let exportType of exportTypes">
-                <a (click)="export(exportType)">{{ exportType }}</a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-
-      <div *ngIf="chartData" class="chart-wrapper" id="pieChart" #pieChart>
-        <ngx-charts-pie-chart
-          *ngIf="showPie"
-          [scheme]="colorScheme"
-          [results]="chartData"
-          [gradient]="true"
-          [legend]="false"
-          [labels]="true"
-          [doughnut]="false"
+                  <ng-container
+                    *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
+                  >
+                    <ng-container
+                      *ngFor="
+                        let labelText of [
+                          fromInputSafeName(option) | renameRights
+                        ]
+                      "
+                    >
+                      <label
+                        class="rm-filter"
+                        *ngIf="form.value[filter][option]"
+                        [ngClass]="{ 'dead-facet': deadFacet }"
+                      >
+                        <app-checkbox
+                          [form]="form"
+                          [controlName]="option"
+                          [labelText]="labelText"
+                          [group]="filter"
+                          (valueChanged)="updatePageUrl(deadFacet)"
+                          title="remove filter: {{ labelText }}"
+                        ></app-checkbox>
+                        <span
+                          class="x"
+                          title="remove filter: {{ labelText }}"
+                        ></span>
+                      </label>
+                    </ng-container>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="queryParams['dataset-id']; let datasets">
+              <ng-container *ngFor="let id of fromCSL(datasets.toString())">
+                <ng-container *ngIf="form.controls['datasetIds'].get(id)">
+                  <label class="rm-filter">
+                    <app-checkbox
+                      [form]="form"
+                      [controlName]="id"
+                      group="datasetIds"
+                      [labelText]="id"
+                      (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
+                      title="remove filter: {{ id }}"
+                    ></app-checkbox>
+                    <span class="x" title="remove filter: {{ id }}"></span>
+                  </label>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </ul>
+        </div>
+        <div
+          class="rm-filter-nav"
+          *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
         >
-        </ngx-charts-pie-chart>
-
-        <ngx-charts-bar-vertical
-          *ngIf="showBar"
-          [scheme]="colorScheme"
-          [results]="chartData"
-          [gradient]="true"
-          [xAxis]="true"
-          [yAxis]="true"
-          [legend]="false"
-          [showXAxisLabel]="true"
-          [showYAxisLabel]="true"
-        ></ngx-charts-bar-vertical>
-
-        <ngx-charts-gauge
-          *ngIf="showGauge"
-          [scheme]="colorScheme"
-          [results]="chartData"
-          [legend]="false"
-          [legendPosition]="'below'"
-        ></ngx-charts-gauge>
+          <a
+            class="rm-filter-nav-prev"
+            (click)="scrollInfo.back()"
+            [ngClass]="{ active: scrollInfo.canScrollBack }"
+            [title]="scrollInfo.canScrollBack ? 'scroll back' : ''"
+            >&lsaquo;</a
+          >
+          <a
+            class="rm-filter-nav-next"
+            (click)="scrollInfo.fwd()"
+            [ngClass]="{ active: scrollInfo.canScrollFwd }"
+            [title]="scrollInfo.canScrollFwd ? 'scroll forward' : ''"
+            >&rsaquo;</a
+          >
+        </div>
       </div>
-      <img style="display: none" #canvas />
+
+      <!-- Data Area -->
+      <div class="data-area">
+        <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
+        <div *ngIf="emptyDataset && !isLoading" class="no-data">
+          No results found!
+          <ul>
+            <li *ngIf="queryParams['dataset-id']">
+              try removing the <span class="param">dataset id</span> parameter
+            </li>
+            <li *ngIf="queryParams['date-from'] && queryParams['date-to']">
+              try removing the <span class="param">date</span> parameters
+            </li>
+          </ul>
+        </div>
+        <div class="chart-and-summary">
+          <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
+            <app-bar-chart
+              #barChart
+              [showPercent]="form.value.chartFormat.percent"
+              [extraSettings]="
+                [
+                  DimensionName.contentTier,
+                  DimensionName.metadataTier
+                ].includes(form.value.facetParameter)
+                  ? barChartSettingsTiers
+                  : barChartSettings
+              "
+            ></app-bar-chart>
+          </div>
+          <ng-container>
+            <app-grid-summary
+              #gridSummary
+              *ngIf="dataServerData"
+              [grandTotal]="resultTotal"
+              [summaryData]="dataServerData.results.breakdowns"
+            ></app-grid-summary>
+          </ng-container>
+        </div>
+
+        <ng-container *ngIf="!emptyDataset">
+          <app-checkbox
+            [form]="form"
+            controlName="percent"
+            labelText="As percentages"
+            group="chartFormat"
+            (valueChanged)="refreshChart()"
+          ></app-checkbox>
+        </ng-container>
+
+        <!-- SNAPSHOTS -->
+        <ng-container>
+          <app-snapshots
+            #snapshots
+            [facetName]="form.value.facetParameter"
+            (hideItem)="removeSeries($event)"
+            (showItems)="addSeries($event)"
+            [isVisible]="!emptyDataset"
+          >
+          </app-snapshots>
+        </ng-container>
+        <!-- END SNAPSHOTS -->
+
+        <app-grid
+          #grid
+          id="grid"
+          facet="{{ form.value.facetParameter }}"
+          [getUrl]="getUrl.bind(this)"
+          [getUrlRow]="getUrlRow.bind(this)"
+          (refreshData)="showAppliedSeriesInGridAndChart()"
+          (chartPositionChanged)="chartPositionChanged($event)"
+          [isVisible]="!emptyDataset"
+        ></app-grid>
+
+        <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
+          <a class="export-opener-link" (click)="export.toggleActive()"
+            >EXPORT DATA</a
+          >
+        </div>
+      </div>
     </div>
   </div>
 </form>

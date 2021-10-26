@@ -1,0 +1,74 @@
+<ul
+  class="filter"
+  *ngIf="form && group && !state.disabled"
+  [formGroup]="form"
+  (clickOutside)="hide()"
+>
+  <li>
+    <a
+      (click)="toggle()"
+      class="filter-opener filter-title"
+      [ngClass]="{
+        open: state.visible
+      }"
+    >
+      <span class="container-h">
+        <span class="icon filter-icon-{{ group }}"> </span>
+        <span class="opener-name-container">
+          <ng-container *ngIf="getSetCheckboxValues(group) as setVals">
+            <span class="selection">
+              {{ setVals }}
+            </span>
+          </ng-container>
+          <span class="opener-name">
+            {{ group | renameApiFacet }}
+          </span>
+        </span>
+      </span>
+    </a>
+  </li>
+
+  <ng-template #dates>
+    <li>
+      <app-dates [form]="form" (valueChanged)="changed()"></app-dates>
+    </li>
+  </ng-template>
+
+  <ng-container *ngIf="state.visible">
+    <ng-container *ngIf="_options; else dates">
+      <li class="checkboxes">
+        <ul>
+          <li class="checkbox-filter container-h">
+            <span class="icon"></span>
+            <input
+              #filterTerm
+              class="checkbox-filter-input"
+              (keyup)="filterOptions($event)"
+              formControlName="filter_list_{{ group }}"
+              placeholder="Search"
+            />
+          </li>
+        </ul>
+        <ul class="checkboxes-list">
+          <li>
+            <ul *ngFor="let option of filteredOptions">
+              <li>
+                <app-checkbox
+                  [form]="form"
+                  [controlName]="option.name"
+                  [labelText]="
+                    option.label
+                      | renameRights
+                      | highlightMatch: [filterTerm.value]
+                  "
+                  [group]="group"
+                  (valueChanged)="changed()"
+                ></app-checkbox>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ng-container>
+  </ng-container>
+</ul>

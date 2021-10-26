@@ -3,15 +3,6 @@ ul {
   list-style: none;
 }
 
-dl {
-  margin: 0 0 $space;
-  overflow: hidden;
-}
-
-dt {
+.data-grid .term-highlight {
   font-weight: bold;
-}
-
-dd {
-  margin-left: 0;
 }

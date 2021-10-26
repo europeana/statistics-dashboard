@@ -1,0 +1,17 @@
+<label *ngIf="form" [formGroup]="form" class="checkbox-labelled {{ group }}">
+  <span
+    class="checkmarked-checkbox"
+    [ngClass]="{
+      checked: form.value[group][controlName]
+    }"
+    [formGroupName]="group"
+  >
+    <input
+      class="checkbox"
+      type="checkbox"
+      (change)="onChange()"
+      [formControlName]="controlName"
+    />
+  </span>
+  <span class="checkbox-label" [innerHTML]="labelText"> </span>
+</label>

@@ -1,0 +1,18 @@
+.text-left {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-left,
+.text-right {
+  white-space: nowrap;
+}
+
+.text-outer {
+  display: flex;
+  flex-direction: row;
+}
+
+.text-right.with-leading-space {
+  padding-left: 0.4em;
+}

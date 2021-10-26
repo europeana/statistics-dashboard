@@ -1,0 +1,25 @@
+@import "../../scss/_variables";
+
+.summary-grid {
+  column-gap: 4px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-left: 16px;
+  row-gap: 8px;
+
+  > * {
+    white-space: nowrap;
+  }
+}
+
+.total.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: $bp-xxl) {
+  .total.label {
+    max-width: 170px;
+    width: 170px;
+  }
+}

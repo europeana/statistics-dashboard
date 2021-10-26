@@ -1,0 +1,251 @@
+<div
+  class="fit-to-page"
+  [ngClass]="{
+    'loading-modal': isLoading && !landingData[DimensionName.type]
+  }"
+>
+  <ng-template #chartSummary let-dimension="facetName" let-topLabel="topLabel">
+    <span
+      class="container-h totals"
+      *ngIf="landingData[dimension] && landingData[dimension][0]; let data"
+    >
+      <span class="container-v">
+        <span class="total-title bold">Top {{ topLabel }}</span>
+        <span class="total bold">{{ data.name }}</span>
+      </span>
+      <span class="container-v">
+        <span class="total-title">Top {{ topLabel }} records count</span>
+        <span class="total">{{ data.value | number }}</span>
+      </span>
+      <span class="container-v">
+        <span class="total-title">Corresponding percentage</span>
+        <span class="total">{{ data.percent }}%</span>
+      </span>
+    </span>
+  </ng-template>
+
+  <ng-template #dataRows let-dimension="facetName" let-title="title">
+    <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
+      <div class="container-h data-rows-title">
+        <span>{{ title }}</span>
+        <span>RECORDS PROVIDED</span>
+      </div>
+      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+        <app-truncate [text]="row.name | renameRights"></app-truncate>
+        <span class="numeric">{{ row.value | number }}</span>
+        <span class="numeric">{{ row.percent }}%</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="container-v">
+    <div class="entry-card-pair">
+      <div
+        class="entry-card"
+        *ngIf="landingData[DimensionName.contentTier]; let data"
+      >
+        <span class="entry-card-header"
+          >Explore by content quality<a
+            class="info-icon"
+            [href]="externalLinks.help.contentTier"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: {
+                facetName: DimensionName.contentTier,
+                topLabel: 'tier'
+              }
+            "
+          ></ng-content>
+          <app-bar-chart
+            [colours]="[barColour]"
+            chartId="contentTypeChart"
+            [extraSettings]="{ prefixValueAxis: 'Tier' }"
+            [results]="data"
+          ></app-bar-chart>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.contentTier }}"
+            data-e2e="link-entry-ct"
+            >View by content tier</a
+          >
+        </div>
+      </div>
+      <div
+        class="entry-card"
+        *ngIf="landingData[DimensionName.metadataTier]; let data"
+      >
+        <span class="entry-card-header"
+          >Explore by metadata quality<a
+            class="info-icon"
+            [href]="externalLinks.help.metadataTier"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: {
+                facetName: DimensionName.metadataTier,
+                topLabel: 'tier'
+              }
+            "
+          ></ng-content>
+          <app-bar-chart
+            [colours]="[barColour]"
+            chartId="metadataTierChart"
+            [extraSettings]="{ prefixValueAxis: 'Tier' }"
+            [results]="data"
+          ></app-bar-chart>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.metadataTier }}"
+            data-e2e="link-entry-metadata"
+            >View by metadata tier</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="entry-card double-card"
+      *ngIf="landingData[DimensionName.country]; let data"
+    >
+      <span class="entry-card-header">Explore by providing countries</span>
+      <div class="entry-card-content">
+        <div class="entry-card-pair">
+          <div class="map-container">
+            <app-map-chart [results]="data"></app-map-chart>
+          </div>
+          <ng-content
+            *ngTemplateOutlet="
+              dataRows;
+              context: { facetName: DimensionName.country, title: 'COUNTRY' }
+            "
+          ></ng-content>
+        </div>
+        <a
+          class="data-link"
+          routerLink="/data/{{ DimensionName.country }}"
+          data-e2e="link-entry-country"
+          >View by countries</a
+        >
+      </div>
+    </div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
+        <span class="entry-card-header">Explore by type of content</span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              chartSummary;
+              context: { facetName: DimensionName.type, topLabel: 'type' }
+            "
+          ></ng-content>
+          <app-bar-chart
+            [colours]="[barColour]"
+            chartId="typeChart"
+            [results]="data"
+          ></app-bar-chart>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.type }}"
+            data-e2e="link-entry-type"
+            >View by type</a
+          >
+        </div>
+      </div>
+      <div class="entry-card" *ngIf="landingData[DimensionName.rights]">
+        <span class="entry-card-header"
+          >Explore by rights statement<a
+            class="info-icon"
+            [href]="externalLinks.help.rights"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <div class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: {
+                  facetName: DimensionName.rights,
+                  title: 'RIGHTS STATEMENT'
+                }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.rights }}"
+            data-e2e="link-entry-rights"
+            >View by rights statement</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
+        <span class="entry-card-header">Explore by data provider</span>
+        <div class="entry-card-content">
+          <div class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: {
+                  facetName: DimensionName.dataProvider,
+                  title: 'DATA PROVIDER'
+                }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.dataProvider }}"
+            data-e2e="link-entry-data-provider"
+            >View by data provider</a
+          >
+        </div>
+      </div>
+      <div class="entry-card" *ngIf="landingData[DimensionName.provider]">
+        <span class="entry-card-header"
+          >Explore by provider<a
+            class="info-icon"
+            [href]="externalLinks.help.provider"
+            target="_blank"
+            title="Documentation"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <div class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: {
+                  facetName: DimensionName.provider,
+                  title: 'PROVIDER'
+                }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.provider }}"
+            data-e2e="link-entry-provider"
+            >View by provider</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

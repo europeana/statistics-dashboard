@@ -1,0 +1,39 @@
+<ul class="export" [ngClass]="{ active: active }">
+  <li class="container-h">
+    <span class="export-icon"><a #downloadAnchor></a></span
+    ><span class="label-top">SHARE REPORT</span
+    ><a class="x" (click)="toggleActive()"></a>
+  </li>
+  <li class="hr"></li>
+  <li>
+    <span>Share Link</span>
+  </li>
+  <li>
+    <input
+      #contentRef
+      class="copy-source pad-top"
+      readonly="readonly"
+      [ngClass]="{ copied: copied }"
+      value="{{ copied ? '' : currentUrl }}"
+      placeholder="Copied to clipboard!"
+    />
+  </li>
+  <li class="align-right hr">
+    <a class="copy-btn" (click)="copy()" [ngClass]="{ disabled: copied }"
+      >Copy link</a
+    >
+  </li>
+  <li>
+    <span>Export Data</span>
+  </li>
+  <li class="icon-item pad-top">
+    <a class="container-h" (click)="export(ExportType.PDF)"
+      ><span class="icon-pdf"></span>Download PDF</a
+    >
+  </li>
+  <li class="icon-item">
+    <a class="container-h" (click)="export(ExportType.CSV)"
+      ><span class="icon-csv"></span>Download CSV</a
+    >
+  </li>
+</ul>

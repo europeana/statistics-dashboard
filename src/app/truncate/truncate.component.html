@@ -1,0 +1,12 @@
+<span class="text-outer">
+  <app-resize [time]="debounceMS" (sizeChanged)="splitText()"></app-resize>
+  <span class="text-left" #elRefTextLeft
+    ><span [innerHTML]="textLeft | highlightMatch: [highlightText]"></span
+  ></span>
+  <span
+    class="text-right"
+    #elRefTextRight
+    [ngClass]="{ 'with-leading-space': applySpace }"
+    [innerHTML]="textRight | highlightMatch: [highlightText]"
+  ></span>
+</span>

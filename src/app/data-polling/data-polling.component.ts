@@ -13,7 +13,7 @@ import {
   Observable,
   Subject,
   Subscription,
-  timer,
+  timer
 } from 'rxjs';
 import { delayWhen, filter, merge, switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -39,11 +39,12 @@ export interface PollingSubjectAccesor {
 
 @Component({
   selector: 'app-data-polling',
-  template: ``,
+  template: ``
 })
 export class DataPollingComponent
   extends SubscriptionManager
-  implements OnDestroy {
+  implements OnDestroy
+{
   allPollingInfo: Array<DataPollerInfo> = [];
   allRefreshSubs: Array<Subscription> = [];
   pollRateDropped = false;
@@ -171,7 +172,7 @@ export class DataPollingComponent
       subject: loadTrigger,
       wait: this.pollRateDropped ? environment.intervalStatusMax : interval,
       blockIf: (): boolean =>
-        visibilityContextBind !== this.allPollingInfo[infoIndex].pollContext,
+        visibilityContextBind !== this.allPollingInfo[infoIndex].pollContext
     };
   }
 
@@ -201,10 +202,10 @@ export class DataPollingComponent
     );
 
     this.allPollingInfo.push({
-      interval: interval,
+      interval,
       refresher: pollRefresh,
       trigger: loadTrigger,
-      pollContext: 0,
+      pollContext: 0
     });
 
     this.allPollingInfo[pollContextIndex].subscription = loadTrigger
@@ -227,7 +228,7 @@ export class DataPollingComponent
     return {
       getPollingSubject: (): Subject<boolean> => {
         return pollRefresh;
-      },
+      }
     };
   }
 }

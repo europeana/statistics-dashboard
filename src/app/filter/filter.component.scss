@@ -1,0 +1,101 @@
+@import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+
+$total-height: #{$filter-row-height * 5};
+$total-width: 268px;
+
+.checkbox-filter {
+  border-bottom: 1px solid $gray-5;
+  margin: 0 $spacing-s $spacing-xs $spacing-s;
+
+  .icon {
+    background: svg-url-icon-search("#333") center no-repeat;
+    margin-left: 0;
+    top: 0;
+  }
+
+  .checkbox-filter-input {
+    border: 0;
+    box-shadow: none;
+    font-size: 14px;
+    margin-left: $spacing-s;
+    width: 100%;
+  }
+}
+
+.checkboxes {
+  background: $white;
+  border-radius: 0 0 $spacing-s $spacing-s;
+  box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
+  min-width: $total-width;
+  padding-bottom: 16px;
+  position: absolute;
+  z-index: 1;
+}
+
+.checkboxes-list {
+  display: flex;
+  flex-direction: column;
+  margin-left: $spacing-s;
+  max-height: $total-height;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.filter {
+  color: #000;
+  position: relative;
+  width: $total-width;
+}
+
+.filter-opener {
+  display: block;
+  position: relative;
+
+  &::after {
+    color: $gray-med;
+    content: "⌄";
+    font-size: 20px;
+    height: 16px;
+    line-height: 6px;
+    position: absolute;
+    right: $spacing-s;
+    top: 14px;
+  }
+
+  &.open {
+    background-color: $gray-5;
+    color: #000;
+
+    &::after {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.opener-name {
+  margin: 0 $spacing-s;
+  text-transform: capitalize;
+}
+
+.opener-name-container {
+  position: relative;
+  paddin: $spacing-s 20px $spacing-s $spacing-s;
+}
+
+.selection {
+  display: inline-block;
+  margin: 0 30px 0 $spacing-s;
+  position: relative;
+  top: 5px;
+}
+
+.selection + .opener-name {
+  color: $stats-blue;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 8px;
+  position: absolute;
+  top: 0px;
+  left: 0;
+}
