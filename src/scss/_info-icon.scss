@@ -8,6 +8,9 @@
   margin-left: $spacing-xs;
   position: relative;
   width: 12px;
+  &.disabled {
+    background-image: svg-url-icon-info($gray-5);
+  }
   &:hover {
     background-image: svg-url-icon-info($gray-light);
   }

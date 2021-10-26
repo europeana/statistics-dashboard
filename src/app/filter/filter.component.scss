@@ -71,6 +71,10 @@ $total-width: 268px;
       transform: rotate(180deg);
     }
   }
+
+  &.disabled::after {
+    color: $gray-5;
+  }
 }
 
 .opener-name {
@@ -98,4 +102,8 @@ $total-width: 268px;
   position: absolute;
   top: 0px;
   left: 0;
+}
+
+.filter-title.disabled .selection + .opener-name {
+  color: $gray-5;
 }

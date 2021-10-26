@@ -26,6 +26,11 @@
 
   .filter-title {
     color: $gray-faint;
+    &.disabled {
+      color: $gray-5;
+      cursor: default;
+      pointer-events: none;
+    }
   }
 
   .icon {
@@ -66,6 +71,10 @@
     padding: $spacing-xs $spacing-s;
     &:not(:last-child) {
       margin-right: 24px;
+    }
+
+    .checkbox-labelled {
+      cursor: pointer;
     }
   }
 }
@@ -144,34 +153,70 @@
   background-image: svg-url-icon-dataset-id($gray-med);
 }
 
+.disabled .filter-icon-dataset {
+  background-image: svg-url-icon-dataset-id($gray-5);
+}
+
 .filter-icon-contentTier {
   background-image: svg-url-icon-content-tier($gray-med);
+}
+
+.disabled .filter-icon-contentTier {
+  background-image: svg-url-icon-content-tier($gray-5);
 }
 
 .filter-icon-country {
   background-image: svg-url-icon-flag($gray-med);
 }
 
+.disabled .filter-icon-country {
+  background-image: svg-url-icon-flag($gray-5);
+}
+
 .filter-icon-dataProvider {
   background-image: svg-url-icon-data-provider($gray-med);
+}
+
+.disabled .filter-icon-dataProvider {
+  background-image: svg-url-icon-data-provider($gray-5);
 }
 
 .filter-icon-dates {
   background-image: svg-url-icon-calendar($gray-med);
 }
 
+.disabled .filter-icon-dates {
+  background-image: svg-url-icon-calendar($gray-5);
+}
+
 .filter-icon-metadataTier {
   background-image: svg-url-icon-metadata($gray-med);
+}
+
+.disabled .filter-icon-metadataTier {
+  background-image: svg-url-icon-metadata($gray-5);
 }
 
 .filter-icon-provider {
   background-image: svg-url-icon-content-provider($gray-med);
 }
 
+.disabled .filter-icon-provider {
+  background-image: svg-url-icon-content-provider($gray-5);
+}
+
 .filter-icon-rights {
   background-image: svg-url-icon-rights($gray-med);
 }
 
+.disabled .filter-icon-rights {
+  background-image: svg-url-icon-rights($gray-5);
+}
+
 .filter-icon-type {
   background-image: svg-url-icon-types($gray-med);
+}
+
+.disabled .filter-icon-type {
+  background-image: svg-url-icon-types($gray-5);
 }
