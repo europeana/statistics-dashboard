@@ -237,27 +237,43 @@ describe('OverviewComponent', () => {
     }));
 
     it('should get the url for a dataset', () => {
-      expect(component.getUrl().indexOf('XXX')).toEqual(-1);
+      expect(
+        component.getUrl(DimensionName.contentTier).indexOf('XXX')
+      ).toEqual(-1);
       component.form.get('datasetId').setValue('XXX');
-      expect(component.getUrl().indexOf('XXX')).toBeTruthy();
+      expect(
+        component.getUrl(DimensionName.contentTier).indexOf('XXX')
+      ).toBeTruthy();
     });
 
     it('should get the url for filters', () => {
       const countryUrlParamVal = 'Belgium';
       const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
 
-      expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
-      component.queryParams = { country: [countryUrlParamVal] };
-      expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
       expect(
-        component.getUrl().includes(`COUNTRY:"${countryUrlParamVal}"`)
+        component.getUrl(DimensionName.contentTier).includes(countryUrlParamVal)
+      ).toBeFalsy();
+      component.queryParams = { country: [countryUrlParamVal] };
+      expect(
+        component.getUrl(DimensionName.contentTier).includes(countryUrlParamVal)
+      ).toBeTruthy();
+      expect(
+        component
+          .getUrl(DimensionName.contentTier)
+          .includes(`COUNTRY:"${countryUrlParamVal}"`)
       ).toBeTruthy();
 
-      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
+      expect(
+        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
+      ).toBeFalsy();
       component.queryParams = { 'content-tier-zero': true };
-      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
+      expect(
+        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
+      ).toBeFalsy();
       component.form.controls.contentTierZero.setValue(true);
-      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeTruthy();
+      expect(
+        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
+      ).toBeTruthy();
     });
 
     it('should get the formatted date param', () => {
@@ -268,10 +284,20 @@ describe('OverviewComponent', () => {
       expect(component.getFormattedDateParam().length).toBeTruthy();
     });
 
-    it('should updare the datasetId param', () => {
+    it('should update the datasetId param', () => {
       component.form.get('datasetId').setValue('123, 456, 789');
       component.updateDatasetIdFieldAndPageUrl('123');
       expect(component.form.value.datasetId).toEqual('456, 789');
+    });
+
+    it('should get the formatted datasetId param', () => {
+      expect(component.getFormattedDatasetIdParam()).toEqual('*');
+      component.form.get('datasetId').setValue('123, 456, 789');
+      expect(
+        component
+          .getFormattedDatasetIdParam()
+          .indexOf('(123_* OR 456_* OR 789_*)')
+      ).toBeGreaterThan(-1);
     });
 
     it('should get the formatted content tier param', () => {
@@ -490,42 +516,57 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the total figure', () => {
-      expect(component.getUrlRow()).toBeTruthy();
+      expect(component.getUrlRow(DimensionName.contentTier)).toBeTruthy();
     });
 
     it('should include the facet selection', () => {
       [2, 3, 4].forEach((qfVal: number) => {
         const wrongVal = qfVal * 3;
-        expect(component.getUrlRow(`${qfVal}`).indexOf(`${wrongVal}`)).toEqual(
-          -1
-        );
         expect(
-          component.getUrlRow(`${qfVal}`).indexOf(`${qfVal}`)
+          component
+            .getUrlRow(DimensionName.contentTier, `${qfVal}`)
+            .indexOf(`${wrongVal}`)
+        ).toEqual(-1);
+        expect(
+          component
+            .getUrlRow(DimensionName.contentTier, `${qfVal}`)
+            .indexOf(`${qfVal}`)
         ).toBeGreaterThan(-1);
       });
 
       ['video', 'text', '3d', 'audio'].forEach((qfVal: 'string') => {
         const wrongVal = 'hologram';
-        expect(component.getUrlRow(qfVal).indexOf(wrongVal)).toEqual(-1);
-        expect(component.getUrlRow(qfVal).indexOf(qfVal)).toBeGreaterThan(-1);
+        expect(
+          component.getUrlRow(DimensionName.type, qfVal).indexOf(wrongVal)
+        ).toEqual(-1);
+        expect(
+          component.getUrlRow(DimensionName.type, qfVal).indexOf(qfVal)
+        ).toBeGreaterThan(-1);
       });
     });
 
     it('should include contentTierZero', () => {
       const ctZeroDetect = `${DimensionName.contentTier}:(0`;
-      expect(component.getUrlRow('1').indexOf(ctZeroDetect)).toEqual(-1);
+
+      expect(
+        component.getUrlRow(DimensionName.contentTier).indexOf(ctZeroDetect)
+      ).toEqual(-1);
       component.form.value.contentTierZero = true;
-      expect(component.getUrlRow('X').indexOf(ctZeroDetect)).toBeGreaterThan(
-        -1
-      );
+      expect(
+        component.getUrlRow(DimensionName.contentTier).indexOf(ctZeroDetect)
+      ).toBeGreaterThan(-1);
     });
 
     it('should include the date range', () => {
       const dateDetect = new Date().toISOString();
-      expect(component.getUrlRow('X').indexOf(dateDetect)).toEqual(-1);
+      expect(
+        component.getUrlRow(DimensionName.contentTier, '1').indexOf(dateDetect)
+      ).toEqual(-1);
       component.form.value.dateFrom = dateDetect;
       component.form.value.dateTo = dateDetect;
-      expect(component.getUrlRow('X').indexOf(dateDetect)).toBeGreaterThan(-1);
+      expect(
+        component.getUrlRow(DimensionName.contentTier, '1').indexOf(dateDetect)
+      ).toBeGreaterThan(-1);
     });
   });
 

@@ -262,10 +262,19 @@
         <div *ngIf="emptyDataset && !isLoading" class="no-data">
           No results found!
           <ul>
-            <li *ngIf="queryParams['dataset-id']">
+            <li
+              *ngIf="
+                queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
+              "
+            >
               try removing the <span class="param">dataset id</span> parameter
             </li>
-            <li *ngIf="queryParams['date-from'] && queryParams['date-to']">
+            <li
+              *ngIf="
+                queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
+                queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
+              "
+            >
               try removing the <span class="param">date</span> parameters
             </li>
           </ul>
@@ -322,7 +331,6 @@
           #grid
           id="grid"
           facet="{{ form.value.facetParameter }}"
-          [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
           (refreshData)="showAppliedSeriesInGridAndChart()"
           (chartPositionChanged)="chartPositionChanged($event)"
