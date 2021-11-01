@@ -5,9 +5,9 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { facetNames } from '../_data';
+import { facetNames, nonFacetFilters, portalNames } from '../_data';
 import { filterList, fromCSL } from '../_helpers';
-import { DimensionName, FilterInfo } from '../_models';
+import { DimensionName, FilterInfo, NonFacetFilterNames } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
@@ -62,13 +62,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
+  public NonFacetFilterNames = NonFacetFilterNames;
+  public nonFacetFilters = nonFacetFilters;
   public barChartSettings = Object.assign(
     {
       prefixValueAxis: ''
     },
     BarChartCool
   );
-
   public barChartSettingsTiers = Object.assign(
     {
       prefixValueAxis: 'Tier'
@@ -78,12 +79,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   readonly MAX_FILTER_OPTIONS = 50;
   readonly facetConf = facetNames;
-  readonly nonFilterQPs = [
-    'content-tier-zero',
-    'date-from',
-    'date-to',
-    'dataset-id'
-  ];
 
   filterStates: { [key: string]: FilterState } = {};
   userFilterSearchTerms = facetNames.reduce((map, item: string) => {
@@ -136,7 +131,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       const sendValues = [];
       const values = this.queryParams[key];
 
-      if (!this.nonFilterQPs.includes(key)) {
+      if (!Object.values(nonFacetFilters).includes(key)) {
         values.forEach((valPart: string) => {
           if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
             sendValues.push(fromInputSafeName(valPart));
@@ -223,7 +218,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           // checkbox representation of (split) datasetId
           this.form.addControl('datasetIds', this.fb.group({}));
 
-          const datasetId = queryParams['dataset-id'];
+          const datasetId =
+            queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
           if (datasetId) {
             const datasetIds = this.form.get('datasetIds') as FormGroup;
             `${datasetId}`.split(',').forEach((part: string) => {
@@ -284,21 +280,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* returns a url parameter string (for api or the portal) according to the form state
   /* @returns string
   */
-  getUrl(): string {
+  getUrl(facet: string, value?: string): string {
     // filterParam cannot rely on checkbox values as filters aren't built until the data is initialised
 
-    const portalNames = {};
-    portalNames[DimensionName.country] = 'COUNTRY';
-    portalNames[DimensionName.dataProvider] = 'DATA_PROVIDER';
-    portalNames[DimensionName.provider] = 'PROVIDER';
-    portalNames[DimensionName.rights] = 'RIGHTS';
-    portalNames[DimensionName.type] = 'TYPE';
-
+    /*
+      for each page query parameter:
+        - take its (array of) values
+        - filter out non-standard filters (nonFacetFilters)
+        - filter out any dead facets
+        - map the facet name to the corresponding portal name
+        - return joined on the '&qf' string
+    */
     let filterParam = Object.keys(this.queryParams)
       .map((key: string) => {
         const innerRes = [];
         const values = this.queryParams[key];
-        if (!this.nonFilterQPs.includes(key)) {
+
+        if (values && !Object.values(nonFacetFilters).includes(key)) {
           values.forEach((valPart: string) => {
             if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
               const portalKey = portalNames[key] ? portalNames[key] : key;
@@ -316,17 +314,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       .filter((x) => x.length > 0)
       .join('&qf=');
 
+    // Prepend the above with the '&qf' parameter identifier if it isn't empty
     if (filterParam.length > 0) {
       filterParam = `&qf=${filterParam}`;
     }
 
-    const datasetIdParam = this.form.value.datasetId;
-    const queryParam = `?query=${
-      datasetIdParam.length > 0 ? datasetIdParam : '*'
-    }`;
+    const queryParam = `?query=${this.getFormattedDatasetIdParam()}`;
 
     const dateParam = this.getFormattedDateParam();
-    const ct = this.getFormattedContentTierParam();
+    const ct =
+      (facet === DimensionName.contentTier && value) ||
+      this.queryParams[DimensionName.contentTier]
+        ? ''
+        : this.getFormattedContentTierParam();
 
     return `${queryParam}${ct}${filterParam}${dateParam}`;
   }
@@ -335,9 +335,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @param {string} qfVal - the specific item's value for the currently-selected facet
   /* returns the (portal) url for a specific item
   */
-  getUrlRow(qfVal?: string): string {
-    const rootUrl = `${environment.serverPortal}${this.getUrl()}`;
+  getUrlRow(facet: string, qfVal?: string): string {
+    const rootUrl = `${environment.serverPortal}${this.getUrl(facet, qfVal)}`;
     if (!qfVal) {
+      if (facet === DimensionName.contentTier) {
+      }
       return rootUrl;
     }
     return `${rootUrl}&qf=${
@@ -513,7 +515,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           const innerRes = [];
           const values = this.queryParams[key];
-          if (values && !this.nonFilterQPs.includes(key)) {
+
+          if (!Object.values(nonFacetFilters).includes(key)) {
             values
               .map((s: string) => {
                 return fromInputSafeName(s);
@@ -731,6 +734,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return `&qf=contentTier:(${encodeURIComponent(res)})`;
   }
 
+  /** getFormattedDatasetIdParam
+  /* @returns { string } - concatenated datasetId value(s) if present
+  /* @returns { string } - empty string not present
+  */
+  getFormattedDatasetIdParam(): string {
+    const filterDatasetIdParam = this.form.value.datasetId;
+    if (filterDatasetIdParam.length > 0) {
+      const values = fromCSL(filterDatasetIdParam)
+        .map((id: string) => {
+          return `${id}_*`;
+        })
+        .join(' OR ');
+      return `edm_datasetName:(${values})`;
+    }
+    return '*';
+  }
+
   /** getFormattedFacetParam
   /* get a string containing all facet names formatted as a url parameters
   /* @returns string
@@ -789,8 +809,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* updates the form values to the page query parameters for 'dateFrom' (date-from) and 'dateTo' (date-to)
   **/
   setDateInputsToQueryParams(): void {
-    const paramFrom = this.queryParams['date-from'];
-    const paramTo = this.queryParams['date-to'];
+    const paramFrom =
+      this.queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]];
+    const paramTo =
+      this.queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]];
     this.form.controls.dateFrom.setValue(paramFrom ? paramFrom[0] : '');
     this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
   }
@@ -799,7 +821,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* updates the form value 'datasetId' to the page query parameter 'dataset-id'
   */
   setDatasetIdInputToQueryParam(): void {
-    const param = this.queryParams['dataset-id'];
+    const param =
+      this.queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
     if (param) {
       this.form.controls.datasetId.setValue(param[0]);
     }
@@ -910,16 +933,20 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const valTo = this.form.value.dateTo;
 
     if (valFrom) {
-      qp['date-from'] = new Date(valFrom).toISOString().split('T')[0];
+      qp[nonFacetFilters[NonFacetFilterNames.dateFrom]] = new Date(valFrom)
+        .toISOString()
+        .split('T')[0];
     }
     if (valTo) {
-      qp['date-to'] = new Date(valTo).toISOString().split('T')[0];
+      qp[nonFacetFilters[NonFacetFilterNames.dateTo]] = new Date(valTo)
+        .toISOString()
+        .split('T')[0];
     }
     if (dataset) {
-      qp['dataset-id'] = dataset;
+      qp[nonFacetFilters[NonFacetFilterNames.datasetId]] = dataset;
     }
     if (this.form.value.contentTierZero) {
-      qp['content-tier-zero'] = true;
+      qp[nonFacetFilters[NonFacetFilterNames.contentTierZero]] = true;
     }
 
     if (skipLoad) {
