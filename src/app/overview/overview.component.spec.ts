@@ -194,6 +194,15 @@ describe('OverviewComponent', () => {
       expect(component.extractSeriesServerData).toHaveBeenCalled();
     });
 
+    it('should refresh the chart', fakeAsync(() => {
+      component.showAppliedSeriesInGridAndChart();
+      spyOn(component, 'refreshChart');
+      expect(component.refreshChart).not.toHaveBeenCalled();
+      tick(400);
+      expect(component.refreshChart).toHaveBeenCalled();
+      component.ngOnDestroy();
+    }));
+
     it('should get the chart data', () => {
       expect(component.getChartData()).toBeTruthy();
     });
@@ -291,6 +300,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the formatted datasetId param', () => {
+      component.buildForm();
       expect(component.getFormattedDatasetIdParam()).toEqual('*');
       component.form.get('datasetId').setValue('123, 456, 789');
       expect(
