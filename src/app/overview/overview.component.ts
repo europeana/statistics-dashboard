@@ -338,12 +338,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   getUrlRow(facet: string, qfVal?: string): string {
     const rootUrl = `${environment.serverPortal}${this.getUrl(facet, qfVal)}`;
     if (!qfVal) {
-      if (facet === DimensionName.contentTier) {
-      }
       return rootUrl;
     }
     return `${rootUrl}&qf=${
-      this.form.value.facetParameter
+      portalNames[this.form.value.facetParameter]
     }:"${encodeURIComponent(qfVal)}"`;
   }
 

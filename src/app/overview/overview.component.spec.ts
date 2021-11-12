@@ -12,7 +12,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
+import { portalNames } from '../_data';
 import { today } from '../_helpers';
+
 import {
   createMockPipe,
   MockAPIService,
@@ -130,6 +132,7 @@ describe('OverviewComponent', () => {
     it('should poll on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
+      fixture.detectChanges();
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
@@ -197,6 +200,9 @@ describe('OverviewComponent', () => {
     it('should refresh the chart', fakeAsync(() => {
       component.showAppliedSeriesInGridAndChart();
       spyOn(component, 'refreshChart');
+      component.form.controls.facetParameter.setValue(
+        DimensionName.contentTier
+      );
       expect(component.refreshChart).not.toHaveBeenCalled();
       tick(400);
       expect(component.refreshChart).toHaveBeenCalled();
@@ -240,7 +246,7 @@ describe('OverviewComponent', () => {
     it('should get the select options', fakeAsync(() => {
       expect(component.filterData.length).toBeFalsy(0);
       component.beginPolling();
-      tick(1);
+      tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       component.ngOnDestroy();
     }));
@@ -300,7 +306,6 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the formatted datasetId param', () => {
-      component.buildForm();
       expect(component.getFormattedDatasetIdParam()).toEqual('*');
       component.form.get('datasetId').setValue('123, 456, 789');
       expect(
@@ -343,6 +348,8 @@ describe('OverviewComponent', () => {
       const testName = 'test';
       const form = component.form;
 
+      expect(form).toBeTruthy();
+
       contentTierNameLabels.forEach((nl: NameLabel) => {
         expect(form.get(`${testName}.${nl.name}`)).toBeFalsy();
       });
@@ -356,7 +363,7 @@ describe('OverviewComponent', () => {
       });
     });
 
-    it('should tell if checkbox valueshave been set', () => {
+    it('should tell if checkbox values have been set', () => {
       expect(component.isFilterApplied()).toBeFalsy();
       expect(component.isFilterApplied(DimensionName.type)).toBeFalsy();
       expect(component.isFilterApplied('FAKE')).toBeFalsy();
@@ -470,6 +477,24 @@ describe('OverviewComponent', () => {
       expect(component.filterStates[exception].visible).toBeTruthy();
       component.ngOnDestroy();
     }));
+
+    it('should convert the facet names for the portal query', () => {
+      component.form.reset();
+      component.buildForm();
+      fixture.detectChanges();
+      component.form.get('facetParameter').setValue(DimensionName.country);
+      fixture.detectChanges();
+      expect(
+        component
+          .getUrlRow(DimensionName.country, 'Norway')
+          .indexOf(DimensionName.country)
+      ).toEqual(-1);
+      expect(
+        component
+          .getUrlRow(DimensionName.country, 'Norway')
+          .indexOf(portalNames[DimensionName.country])
+      ).toBeGreaterThan(-1);
+    });
   });
 
   describe('Request / Url Generation', () => {
