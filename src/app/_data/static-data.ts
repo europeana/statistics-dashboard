@@ -19,6 +19,9 @@ additionalFilters[NonFacetFilterNames.datasetId] = 'dataset-id';
 export const nonFacetFilters = additionalFilters;
 
 const facetNamesPortal: IHashString = {};
+
+facetNamesPortal[DimensionName.contentTier] = 'contentTier';
+facetNamesPortal[DimensionName.metadataTier] = 'metadataTier';
 facetNamesPortal[DimensionName.country] = 'COUNTRY';
 facetNamesPortal[DimensionName.dataProvider] = 'DATA_PROVIDER';
 facetNamesPortal[DimensionName.provider] = 'PROVIDER';
