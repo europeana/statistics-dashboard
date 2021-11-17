@@ -780,13 +780,14 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getFormattedDateStrings
-  /* gets the date range (set or default) as an arrat of string
+  /* gets the date range (set or default) as a string array
   /* @returns Array<string>
   */
   getFormattedDateStrings(): Array<string> {
     const form = this.form;
-    const valFrom = form.value.dateFrom ? form.value.dateFrom : yearZero;
-    const valTo = form.value.dateTo ? form.value.dateTo : today;
+    const bothPresent = form.value.dateFrom && form.value.dateTo;
+    const valFrom = bothPresent ? form.value.dateFrom : yearZero;
+    const valTo = bothPresent ? form.value.dateTo : today;
     return [valFrom, valTo].map((date: Date) => {
       const parts = new Date(date).toDateString().split(' ').slice(1);
       return [parts.slice(0, 2).join(' '), parts[2]].join(', ');

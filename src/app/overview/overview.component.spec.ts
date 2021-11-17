@@ -297,6 +297,12 @@ describe('OverviewComponent', () => {
       expect(component.getFormattedDateParam().length).toBeFalsy();
       component.form.get('dateTo').setValue(today);
       expect(component.getFormattedDateParam().length).toBeTruthy();
+      component.form.get('dateTo').setValue(null);
+      expect(component.getFormattedDateParam().length).toBeFalsy();
+      component.form.get('dateTo').setValue(today);
+      expect(component.getFormattedDateParam().length).toBeTruthy();
+      component.form.get('dateFrom').setValue(null);
+      expect(component.getFormattedDateParam().length).toBeFalsy();
     });
 
     it('should update the datasetId param', () => {
