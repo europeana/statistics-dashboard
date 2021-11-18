@@ -45,8 +45,8 @@ export class DatesComponent {
 
       const ctrlDateTo = this.form.controls.dateTo;
 
-      // if the dateTo is empty, set it to today
-      if (!ctrlDateTo.value) {
+      // if the dateTo is empty (and if there is a from value) then set it to today
+      if (valFrom && !ctrlDateTo.value) {
         ctrlDateTo.setValue(new Date().toISOString().split('T')[0]);
       }
 
@@ -61,7 +61,7 @@ export class DatesComponent {
       const ctrlDateFrom = this.form.controls.dateFrom;
 
       // if the ctrlDateFrom is empty, set it to yearZero
-      if (!ctrlDateFrom.value) {
+      if (valTo && !ctrlDateFrom.value) {
         ctrlDateFrom.setValue(yearZero);
       }
 
