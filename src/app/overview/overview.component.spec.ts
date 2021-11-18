@@ -554,7 +554,7 @@ describe('OverviewComponent', () => {
       component.form.controls.datasetId.setValue('xxx');
 
       expect(fnGetRequestFilter('datasetId')).toBeTruthy();
-      expect(fnGetRequestFilter('createdDate')).toBeFalsy();
+      expect(fnGetRequestFilter('updatedDate')).toBeFalsy();
 
       component.form.controls.dateFrom.setValue(new Date().toISOString());
       component.form.controls.dateTo.setValue(new Date().toISOString());
@@ -562,7 +562,7 @@ describe('OverviewComponent', () => {
       expect(
         (
           component.getDataServerDataRequest().filters[
-            'createdDate'
+            'updatedDate'
           ] as RequestFilterRange
         ).from
       ).toBeTruthy();

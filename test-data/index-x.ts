@@ -123,7 +123,7 @@ new (class extends TestDataServer {
       let res = true;
       Object.keys(breakdownRequest.filters)
         .filter((fName: string) => {
-          return !['createdDate'].includes(fName);
+          return !['updatedDate'].includes(fName);
         })
         .forEach((fName: string) => {
           const filter = breakdownRequest.filters[fName] as RequestFilter;
