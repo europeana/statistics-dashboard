@@ -749,18 +749,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return '*';
   }
 
-  /** getFormattedFacetParam
-  /* get a string containing all facet names formatted as a url parameters
-  /* @returns string
-  */
-  getFormattedFacetParam(): string {
-    return this.facetConf
-      .map((f) => {
-        return `&facet=${encodeURIComponent(f)}`;
-      })
-      .join('');
-  }
-
   /** getFormattedDateParam
   /* get an empty string or the formatted date range
   /* @returns string
@@ -768,9 +756,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   getFormattedDateParam(): string {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
+
     if (valFrom && valTo) {
+      const valToDate = new Date(valTo);
+      valToDate.setDate(valToDate.getDate() + 1);
       const range = `${new Date(valFrom).toISOString()}+TO+${new Date(
-        valTo
+        valToDate.getTime() - 1
       ).toISOString()}`;
       return `&qf=timestamp_update:${encodeURIComponent(
         '['
@@ -887,6 +878,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.form.controls.dateFrom.setValue('');
     this.form.controls.dateTo.setValue('');
     this.updatePageUrl();
+    this.datesOpen();
+  }
+
+  /** datesOpen
+  /* Opens the date fields after a millisecond pause
+  */
+  datesOpen(): void {
+    const filterStates = this.filterStates;
+    const fn = (): void => {
+      this.filterStates.dates = {
+        visible: true,
+        disabled: false
+      };
+    };
+    setTimeout(fn, 1);
   }
 
   /** enableFilters

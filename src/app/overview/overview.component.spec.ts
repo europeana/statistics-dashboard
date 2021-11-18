@@ -406,16 +406,28 @@ describe('OverviewComponent', () => {
       expect(selected.length).toEqual(1);
     });
 
-    it('should clear the dates', () => {
+    it('should clear the dates', fakeAsync(() => {
+      expect(component.filterStates.dates.visible).toBeFalsy();
       component.form.get('dateFrom').setValue(new Date().toISOString());
       expect(component.form.value.dateFrom).toBeTruthy();
       component.datesClear();
       expect(component.form.value.dateFrom).toBeFalsy();
-
+      tick(1);
+      expect(component.filterStates.dates.visible).toBeTruthy();
       component.form.get('dateTo').setValue(new Date().toISOString());
       expect(component.form.value.dateTo).toBeTruthy();
       component.datesClear();
       expect(component.form.value.dateTo).toBeFalsy();
+      tick(1);
+    }));
+
+    it('should get the formatted date param', () => {
+      expect(component.getFormattedDateParam()).toEqual('');
+      component.form.get('dateFrom').setValue(today.split('T')[0]);
+      component.form.get('dateTo').setValue(today.split('T')[0]);
+      expect(
+        component.getFormattedDateParam().indexOf('T23:59:59')
+      ).toBeGreaterThan(-1);
     });
 
     it('should enable the filters', fakeAsync(() => {
