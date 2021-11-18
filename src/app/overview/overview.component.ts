@@ -160,7 +160,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const valTo = this.form.value.dateTo;
 
     if (valFrom && valTo) {
-      breakdownRequest.filters['createdDate'] = {
+      breakdownRequest.filters['updatedDate'] = {
         from: new Date(valFrom).toISOString().split('T')[0],
         to: new Date(valTo).toISOString().split('T')[0]
       };
