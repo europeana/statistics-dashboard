@@ -237,6 +237,7 @@
         </div>
         <div
           class="rm-filter-nav"
+          [ngClass]="{ active: scrollInfo.canScrollFwd }"
           *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
         >
           <a
