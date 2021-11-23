@@ -31,9 +31,10 @@ import {
   FmtTableData,
   IHashArrayNameLabel,
   IHashNumber,
+  IHashString,
   IHashStringArray,
   NameLabel,
-  NameValuePercent,
+  NamesValuePercent,
   RequestFilter
 } from '../_models';
 
@@ -481,11 +482,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   iHashNumberFromNVPs(
-    src: Array<NameValuePercent>,
+    src: Array<NamesValuePercent>,
     percent = false
   ): IHashNumber {
-    return src.reduce(function (map: IHashNumber, nvp: NameValuePercent) {
+    return src.reduce(function (map: IHashNumber, nvp: NamesValuePercent) {
       map[nvp.name] = percent ? nvp.percent : nvp.value;
+      return map;
+    }, {});
+  }
+
+  originalNamesFromNVPs(src: Array<NamesValuePercent>): IHashString | null {
+    if (this.form.value.facetParameter !== DimensionName.rights) {
+      return null;
+    }
+    return src.reduce(function (map: IHashString, nvp: NamesValuePercent) {
+      map[nvp.name] = nvp.rawName;
       return map;
     }, {});
   }
@@ -497,7 +508,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   storeSeries(
     applied: boolean,
     saved: boolean,
-    nvs: Array<NameValuePercent>,
+    nvs: Array<NamesValuePercent>,
     seriesTotal: number
   ): void {
     const name = this.seriesNameFromUrl();
@@ -535,6 +546,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       label: label,
       data: this.iHashNumberFromNVPs(nvs),
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
+      namesOriginal: this.originalNamesFromNVPs(nvs),
       orderOriginal: [],
       orderPreferred: [],
       applied: applied,
@@ -887,7 +899,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   datesOpen(): void {
     const filterStates = this.filterStates;
     const fn = (): void => {
-      this.filterStates.dates = {
+      filterStates.dates = {
         visible: true,
         disabled: false
       };
@@ -1054,7 +1066,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       return {
         name: formattedName ? formattedName : cpv.value,
         value: cpv.count,
-        percent: cpv.percentage
+        percent: cpv.percentage,
+        rawName: formattedName ? cpv.value : null
       };
     });
 
