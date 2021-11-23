@@ -5,7 +5,7 @@ import {
   CountPercentageValue,
   DimensionName,
   GeneralResults,
-  NameValuePercent
+  NamesValuePercent
 } from '../_models';
 import { APIService } from '../_services';
 import { DataPollingComponent } from '../data-polling';
@@ -23,7 +23,7 @@ export class LandingComponent extends DataPollingComponent {
   isLoading = true;
 
   landingData: {
-    [facetName: string]: Array<NameValuePercent>;
+    [facetName: string]: Array<NamesValuePercent>;
   } = {};
 
   constructor(private api: APIService) {
@@ -31,7 +31,7 @@ export class LandingComponent extends DataPollingComponent {
     this.beginPolling();
   }
 
-  toNameValuePercent(cpv: CountPercentageValue): NameValuePercent {
+  toNameValuePercent(cpv: CountPercentageValue): NamesValuePercent {
     return {
       name: cpv.value,
       value: cpv.count,

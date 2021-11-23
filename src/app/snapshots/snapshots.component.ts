@@ -156,6 +156,7 @@ export class SnapshotsComponent {
 
       result.push({
         name: 'Total', // name will not be shown in the grid
+        nameOriginal: 'Total',
         count: cd.total,
         isTotal: true,
         percent: 100,
@@ -169,10 +170,12 @@ export class SnapshotsComponent {
       seriesKeys.forEach((seriesKey: string) => {
         const cd = cds[seriesKey];
         const count = cd.data[groupKey];
+        const rawNames = cd.namesOriginal ? cd.namesOriginal : {};
 
         if (count) {
           result.push({
             name: groupKey as HeaderNameType,
+            nameOriginal: rawNames[groupKey] ? rawNames[groupKey] : groupKey,
             count: count,
             percent: cd.dataPercent[groupKey],
             colourIndex: cd._colourIndex,

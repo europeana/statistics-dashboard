@@ -22,6 +22,7 @@ describe('ExportCSVService', () => {
       {
         series: 'Series A',
         name: 'Andy' as HeaderNameType,
+        nameOriginal: 'Andy',
         count: 22,
         percent: 50
       }
@@ -30,6 +31,7 @@ describe('ExportCSVService', () => {
       {
         series: 'Series B',
         name: 'MacLean' as HeaderNameType,
+        nameOriginal: 'MacLean',
         count: 22,
         percent: null
       }

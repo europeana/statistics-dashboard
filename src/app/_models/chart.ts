@@ -1,4 +1,4 @@
-import { IHashNumber } from '.';
+import { IHashNumber, IHashString } from '.';
 
 export interface ChartSettings {
   configurable: boolean;
@@ -20,7 +20,6 @@ export interface ChartSettings {
 export interface ColourSeriesData {
   colour: string;
   data: IHashNumber;
-  //data: Map<string, number>;
   seriesName: string;
 }
 
@@ -34,6 +33,7 @@ export interface CompareDataDescriptor {
   dataPercent: IHashNumber;
   label: string;
   name: string;
+  namesOriginal?: IHashString;
   pinIndex: number;
   saved?: boolean;
   total: number;
