@@ -9,7 +9,8 @@
       (click)="toggle()"
       class="filter-opener filter-title"
       [ngClass]="{
-        open: state.visible
+        open: state.visible,
+        disabled: isDisabled()
       }"
     >
       <span class="container-h">
@@ -29,7 +30,7 @@
   </li>
 
   <ng-template #dates>
-    <li>
+    <li *ngIf="group === 'dates'">
       <app-dates [form]="form" (valueChanged)="changed()"></app-dates>
     </li>
   </ng-template>

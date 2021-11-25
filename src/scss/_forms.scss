@@ -45,10 +45,18 @@ input[type="text"] {
     opacity: 1;
   }
 }
-input[type="text"]:focus {
-  @include placeholder {
-    color: $gray-5;
+
+input[type="text"] {
+  &.disabled,
+  &:focus {
+    @include placeholder {
+      color: $gray-5;
+    }
   }
+}
+
+input[type="text"].disabled {
+  pointer-events: none;
 }
 
 button,

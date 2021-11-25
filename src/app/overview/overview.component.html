@@ -28,7 +28,8 @@
               <span
                 class="checkmarked-checkbox"
                 [ngClass]="{
-                  checked: form.value.contentTierZero
+                  checked: form.value.contentTierZero,
+                  disabled: emptyDataset
                 }"
               >
                 <input
@@ -39,7 +40,13 @@
                   formControlName="contentTierZero"
                 />
               </span>
-              <label class="filter-title padded-left" for="ctZero">
+              <label
+                class="filter-title padded-left"
+                [ngClass]="{
+                  disabled: emptyDataset
+                }"
+                for="ctZero"
+              >
                 {{ form.value.contentTierZero ? "Disable" : "Enable" }}
                 content tier 0
               </label>
@@ -49,6 +56,10 @@
               href="https://pro.europeana.eu/page/edm-documentation"
               target="_blank"
               title="Documentation"
+              [ngClass]="{
+                checked: form.value.contentTierZero,
+                disabled: emptyDataset
+              }"
             ></a>
           </li>
         </ul>
@@ -62,15 +73,15 @@
                 <app-filter
                   [form]="form"
                   [group]="filter"
-                  [options]="displayedFilterData[filter]"
+                  [options]="emptyDataset ? [] : displayedFilterData[filter]"
                   [state]="filterStates[filter]"
                   (visibilityChanged)="closeFilters($event)"
                   (valueChanged)="updatePageUrl()"
                   (filterTermChanged)="filterDisplayData($event)"
                 ></app-filter>
               </ng-container>
-
               <app-filter
+                [emptyDataset]="emptyDataset"
                 [form]="form"
                 [group]="'dates'"
                 [state]="filterStates['dates']"
@@ -91,6 +102,9 @@
             placeholder="Dataset ID"
             class="dataset-name"
             type="text"
+            [ngClass]="{
+              disabled: emptyDataset && !queryParams['dataset-id']
+            }"
           />
         </li>
       </ul>
@@ -135,7 +149,7 @@
               <span>Custom</span>
               <span class="x" data-e2e="close-date-override"></span>
             </a>
-            <span class="when-unset">Whole period</span>
+            <a class="when-unset" (click)="datesOpen()">Whole period</a>
             <span class="date">
               {{ dates[0] }}
             </span>
@@ -223,6 +237,7 @@
         </div>
         <div
           class="rm-filter-nav"
+          [ngClass]="{ active: scrollInfo.canScrollFwd }"
           *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
         >
           <a
@@ -248,10 +263,19 @@
         <div *ngIf="emptyDataset && !isLoading" class="no-data">
           No results found!
           <ul>
-            <li *ngIf="queryParams['dataset-id']">
+            <li
+              *ngIf="
+                queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
+              "
+            >
               try removing the <span class="param">dataset id</span> parameter
             </li>
-            <li *ngIf="queryParams['date-from'] && queryParams['date-to']">
+            <li
+              *ngIf="
+                queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
+                queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
+              "
+            >
               try removing the <span class="param">date</span> parameters
             </li>
           </ul>
@@ -308,7 +332,6 @@
           #grid
           id="grid"
           facet="{{ form.value.facetParameter }}"
-          [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
           (refreshData)="showAppliedSeriesInGridAndChart()"
           (chartPositionChanged)="chartPositionChanged($event)"

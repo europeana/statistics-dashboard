@@ -19,6 +19,7 @@ export interface FilterState {
 
 export interface TableRow {
   name: string;
+  nameOriginal: string;
   count: number;
   displayIndex?: number;
   percent: number;
@@ -43,7 +44,8 @@ export interface NameValue {
   value: number;
 }
 
-export interface NameValuePercent extends NameValue {
+export interface NamesValuePercent extends NameValue {
+  rawName?: string;
   percent: number;
 }
 

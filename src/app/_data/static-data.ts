@@ -1,4 +1,4 @@
-import { DimensionName } from '../_models';
+import { DimensionName, IHashString, NonFacetFilterNames } from '../_models';
 
 export const facetNames: Array<DimensionName> = [
   DimensionName.contentTier,
@@ -9,6 +9,26 @@ export const facetNames: Array<DimensionName> = [
   DimensionName.rights,
   DimensionName.type
 ];
+
+const additionalFilters: IHashString = {};
+additionalFilters[NonFacetFilterNames.contentTierZero] = 'content-tier-zero';
+additionalFilters[NonFacetFilterNames.dateFrom] = 'date-from';
+additionalFilters[NonFacetFilterNames.dateTo] = 'date-to';
+additionalFilters[NonFacetFilterNames.datasetId] = 'dataset-id';
+
+export const nonFacetFilters = additionalFilters;
+
+const facetNamesPortal: IHashString = {};
+
+facetNamesPortal[DimensionName.contentTier] = 'contentTier';
+facetNamesPortal[DimensionName.metadataTier] = 'metadataTier';
+facetNamesPortal[DimensionName.country] = 'COUNTRY';
+facetNamesPortal[DimensionName.dataProvider] = 'DATA_PROVIDER';
+facetNamesPortal[DimensionName.provider] = 'PROVIDER';
+facetNamesPortal[DimensionName.rights] = 'RIGHTS';
+facetNamesPortal[DimensionName.type] = 'TYPE';
+
+export const portalNames = facetNamesPortal;
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 

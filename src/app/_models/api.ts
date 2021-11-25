@@ -7,3 +7,10 @@ export enum DimensionName {
   rights = 'rights',
   type = 'type'
 }
+
+export enum NonFacetFilterNames {
+  contentTierZero = 'contentTierZero',
+  dateFrom = 'dateFrom',
+  dateTo = 'dataTo',
+  datasetId = 'datasetId'
+}

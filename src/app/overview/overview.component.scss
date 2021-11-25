@@ -1,6 +1,7 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
+$filter-scroll-w: 30px;
 $width-left-col: 200px;
 
 .chart-and-summary,
@@ -106,17 +107,20 @@ $width-left-col: 200px;
   position: absolute;
   right: 0;
   top: 0;
-  width: 30px;
+  width: $filter-scroll-w;
 
   &::before {
     background: linear-gradient(90deg, transparent 0%, $offwhite 100%);
-    content: "";
     height: 100%;
-    left: -30px;
+    left: -$filter-scroll-w;
     pointer-events: none;
     position: absolute;
     top: 0;
     width: 30px;
+  }
+
+  &.active::before {
+    content: "";
   }
 }
 
@@ -131,6 +135,15 @@ $width-left-col: 200px;
     color: #000;
     cursor: pointer;
   }
+}
+
+.rm-filters-outer {
+  position: relative;
+}
+
+.rm-filters-scroll {
+  overflow: hidden;
+  margin-right: $filter-scroll-w;
 }
 
 .rm-filter-nav-next {
@@ -153,10 +166,6 @@ input[type="checkbox"] {
   &:disabled {
     cursor: default;
   }
-}
-
-input[type="date"]:not(:valid) {
-  border: 1px solid red;
 }
 
 .errors {
