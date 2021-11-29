@@ -12,16 +12,20 @@
   .legend-square {
     display: inline-block;
     margin-right: 6px;
-    opacity: 0;
     pointer-events: none;
     height: 14px;
     width: 14px;
   }
 
+  &:not(.applied) {
+    .legend-square {
+      border: 1px solid $gray-faint;
+    }
+  }
+
   &.applied {
     font-weight: 600;
     .legend-square {
-      opacity: 1;
       pointer-events: all;
     }
   }
