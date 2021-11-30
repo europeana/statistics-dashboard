@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Event, NavigationEnd, Router } from '@angular/router';
 import { SubscriptionManager } from './subscription-manager';
+
+import { ClickService } from './_services';
 
 @Component({
   selector: 'app-root',
@@ -10,9 +12,21 @@ import { SubscriptionManager } from './subscription-manager';
 export class AppComponent extends SubscriptionManager implements OnInit {
   showPageTitle: boolean;
 
-  constructor(private readonly router: Router) {
+  constructor(
+    private readonly clickService: ClickService,
+    private readonly router: Router
+  ) {
     super();
     document.title = 'Statistics Dashboard';
+  }
+
+  /** documentClick
+   * - global document click handler
+   * - push the clicked element to the clickService
+   **/
+  @HostListener('document:click', ['$event'])
+  documentClick(event: { target: HTMLElement }): void {
+    this.clickService.documentClickedTarget.next(event.target);
   }
 
   ngOnInit(): void {

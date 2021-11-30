@@ -2,6 +2,7 @@
   class="filter"
   *ngIf="form && group && !state.disabled"
   [formGroup]="form"
+  appClickAware
   (clickOutside)="hide()"
 >
   <li>
