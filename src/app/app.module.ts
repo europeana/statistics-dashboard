@@ -5,9 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ClickOutsideModule } from 'ng-click-outside';
-
-import { IsScrollableDirective } from './_directives';
+import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {
@@ -37,6 +35,7 @@ import { TruncateComponent } from './truncate';
     AppComponent,
     BarComponent,
     CheckboxComponent,
+    ClickAwareDirective,
     DatesComponent,
     ExportComponent,
     FilterComponent,
@@ -64,8 +63,7 @@ import { TruncateComponent } from './truncate';
     CommonModule,
     FormsModule,
     HttpClientModule,
-    ReactiveFormsModule,
-    ClickOutsideModule
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
