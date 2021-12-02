@@ -1,10 +1,10 @@
-<div *ngIf="gridRows">
+<div *ngIf="isVisible && gridRows">
   <ng-template #linkOut let-row="row" let-total="row.isTotal">
     <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
       <a
         target="_blank"
         class="link-out"
-        [href]="getUrlRow(total ? null : row.name)"
+        [href]="getUrlRow(facet, total ? null : row.nameOriginal)"
       ></a>
     </span>
   </ng-template>

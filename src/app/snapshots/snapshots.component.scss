@@ -11,17 +11,21 @@
 
   .legend-square {
     display: inline-block;
-    margin-right: 4px;
-    opacity: 0;
+    margin-right: 6px;
     pointer-events: none;
-    height: 12px;
-    width: 12px;
+    height: 14px;
+    width: 14px;
+  }
+
+  &:not(.applied) {
+    .legend-square {
+      border: 1px solid $gray-faint;
+    }
   }
 
   &.applied {
     font-weight: 600;
     .legend-square {
-      opacity: 1;
       pointer-events: all;
     }
   }
@@ -46,10 +50,9 @@
 }
 
 .snapshots {
-  margin: $spacing-m 0 $spacing-m 18px;
+  margin: 0 0 $spacing-m 16px;
 
   .comparison-list {
-    border-radius: 8px;
     display: inline-flex;
     flex-direction: column;
   }

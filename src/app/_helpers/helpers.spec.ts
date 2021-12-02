@@ -1,5 +1,6 @@
 import {
   appendDiacriticEquivalents,
+  fromCSL,
   fromInputSafeName,
   replaceDiacritics
 } from '.';
@@ -21,5 +22,11 @@ describe('Helpers', () => {
     expect(replaceDiacritics('A')).toBe('A');
     expect(replaceDiacritics('Á')).toBe('A');
     expect(replaceDiacritics('Ƶ')).toBe('Z');
+  });
+
+  it('should convert comma-separated lists', () => {
+    expect(fromCSL('1, 2, 3').length).toEqual(3);
+    expect(fromCSL('1, 2, 3,').length).toEqual(3);
+    expect(fromCSL('1, 2, 3,,').length).toEqual(3);
   });
 });

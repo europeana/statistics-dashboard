@@ -26,27 +26,48 @@ export class DatesComponent {
   @ViewChild('dateTo') dateTo: ElementRef;
 
   /** dateChange
-    /* Template utility: corrects @min / @max on the element and calls 'updatePageUrl' if valid
+    /* Template utility:
+    /*   corrects @min / @max on the sibling element
+    /*   clears form errors / revalidates
+    /*   sets a default value of the sibling field if unset
+    /*   calls 'updatePageUrl' if valid
     /* @param {boolean} isDateFrom - flag if dateFrom is the caller
     */
   dateChange(isDateFrom: boolean): void {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
     if (isDateFrom) {
+      // update the 'min' of the dateTo element
       this.dateTo.nativeElement.setAttribute(
         'min',
         valFrom ? valFrom : yearZero
       );
 
-      // if the other is already in error, try to fix it
-      if (this.form.controls.dateTo.errors) {
+      const ctrlDateTo = this.form.controls.dateTo;
+
+      // if the dateTo is empty (and if there is a from value) then set it to today
+      if (valFrom && !ctrlDateTo.value) {
+        ctrlDateTo.setValue(new Date().toISOString().split('T')[0]);
+      }
+
+      // if the dateTo is already in error, try to fix it
+      if (ctrlDateTo.errors) {
         this.form.controls.dateTo.updateValueAndValidity();
       }
     } else {
+      // update the 'max' of the dateFrom element
       this.dateFrom.nativeElement.setAttribute('max', valTo ? valTo : today);
-      // if the other is already in error, try to fix it
-      if (this.form.controls.dateFrom.errors) {
-        this.form.controls.dateFrom.updateValueAndValidity();
+
+      const ctrlDateFrom = this.form.controls.dateFrom;
+
+      // if the ctrlDateFrom is empty, set it to yearZero
+      if (valTo && !ctrlDateFrom.value) {
+        ctrlDateFrom.setValue(yearZero);
+      }
+
+      // if the dateFrom is already in error, try to fix it
+      if (ctrlDateFrom.errors) {
+        ctrlDateFrom.updateValueAndValidity();
       }
     }
     if (

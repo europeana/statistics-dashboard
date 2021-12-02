@@ -5,9 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ClickOutsideModule } from 'ng-click-outside';
-
-import { IsScrollableDirective } from './_directives/is-scrollable';
+import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {
@@ -18,7 +16,7 @@ import {
 } from './_translate';
 import { BarComponent, MapComponent } from './chart';
 import { CheckboxComponent } from './checkbox';
-import { DatesComponent } from './dates/dates.component';
+import { DatesComponent } from './dates';
 import { ExportComponent } from './export';
 import { FilterComponent } from './filter';
 import { FooterComponent } from './footer';
@@ -26,10 +24,10 @@ import { HeaderComponent } from './header';
 import { GridComponent } from './grid';
 import { GridPaginatorComponent } from './grid-paginator';
 import { GridSummaryComponent } from './grid-summary';
-import { LandingComponent } from './landing/landing.component';
-import { OverviewComponent } from './overview/overview.component';
+import { LandingComponent } from './landing';
+import { OverviewComponent } from './overview';
 import { ResizeComponent } from './resize';
-import { SnapshotsComponent } from './snapshots/snapshots.component';
+import { SnapshotsComponent } from './snapshots';
 import { TruncateComponent } from './truncate';
 
 @NgModule({
@@ -37,6 +35,7 @@ import { TruncateComponent } from './truncate';
     AppComponent,
     BarComponent,
     CheckboxComponent,
+    ClickAwareDirective,
     DatesComponent,
     ExportComponent,
     FilterComponent,
@@ -64,8 +63,7 @@ import { TruncateComponent } from './truncate';
     CommonModule,
     FormsModule,
     HttpClientModule,
-    ReactiveFormsModule,
-    ClickOutsideModule
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

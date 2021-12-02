@@ -123,12 +123,18 @@ new (class extends TestDataServer {
       let res = true;
       Object.keys(breakdownRequest.filters)
         .filter((fName: string) => {
-          return !['createdDate', 'datasetName'].includes(fName);
+          return !['updatedDate'].includes(fName);
         })
         .forEach((fName: string) => {
           const filter = breakdownRequest.filters[fName] as RequestFilter;
           if (filter.values) {
-            if (!filter.values.includes(encodeURIComponent(cho[fName]))) {
+            if (fName === 'datasetId') {
+              if (!filter.values.includes(cho.datasetId)) {
+                res = false;
+              }
+            } else if (
+              !filter.values.includes(encodeURIComponent(cho[fName]))
+            ) {
               cho.exclusions.push(fName);
               res = false;
             }

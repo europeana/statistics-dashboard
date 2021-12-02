@@ -28,7 +28,8 @@
               <span
                 class="checkmarked-checkbox"
                 [ngClass]="{
-                  checked: form.value.contentTierZero
+                  checked: form.value.contentTierZero,
+                  disabled: emptyDataset
                 }"
               >
                 <input
@@ -39,7 +40,13 @@
                   formControlName="contentTierZero"
                 />
               </span>
-              <label class="filter-title padded-left" for="ctZero">
+              <label
+                class="filter-title padded-left"
+                [ngClass]="{
+                  disabled: emptyDataset
+                }"
+                for="ctZero"
+              >
                 {{ form.value.contentTierZero ? "Disable" : "Enable" }}
                 content tier 0
               </label>
@@ -49,6 +56,10 @@
               href="https://pro.europeana.eu/page/edm-documentation"
               target="_blank"
               title="Documentation"
+              [ngClass]="{
+                checked: form.value.contentTierZero,
+                disabled: emptyDataset
+              }"
             ></a>
           </li>
         </ul>
@@ -62,15 +73,15 @@
                 <app-filter
                   [form]="form"
                   [group]="filter"
-                  [options]="displayedFilterData[filter]"
+                  [options]="emptyDataset ? [] : displayedFilterData[filter]"
                   [state]="filterStates[filter]"
                   (visibilityChanged)="closeFilters($event)"
                   (valueChanged)="updatePageUrl()"
                   (filterTermChanged)="filterDisplayData($event)"
                 ></app-filter>
               </ng-container>
-
               <app-filter
+                [emptyDataset]="emptyDataset"
                 [form]="form"
                 [group]="'dates'"
                 [state]="filterStates['dates']"
@@ -86,11 +97,14 @@
         <li class="container-h dataset-name-wrapper">
           <span class="icon filter-icon-dataset"></span>
           <input
-            formControlName="datasetName"
-            (keyup.enter)="updatePageUrl()"
+            formControlName="datasetId"
+            (keyup.enter)="updateDatasetIdFieldAndPageUrl()"
             placeholder="Dataset ID"
             class="dataset-name"
             type="text"
+            [ngClass]="{
+              disabled: emptyDataset && !queryParams['dataset-id']
+            }"
           />
         </li>
       </ul>
@@ -135,7 +149,7 @@
               <span>Custom</span>
               <span class="x" data-e2e="close-date-override"></span>
             </a>
-            <span class="when-unset">Whole period</span>
+            <a class="when-unset" (click)="datesOpen()">Whole period</a>
             <span class="date">
               {{ dates[0] }}
             </span>
@@ -172,21 +186,50 @@
                   <ng-container
                     *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
                   >
-                    <label
-                      class="rm-filter"
-                      *ngIf="form.value[filter][option]"
-                      [ngClass]="{ 'dead-facet': deadFacet }"
+                    <ng-container
+                      *ngFor="
+                        let labelText of [
+                          fromInputSafeName(option) | renameRights
+                        ]
+                      "
                     >
-                      <app-checkbox
-                        [form]="form"
-                        [controlName]="option"
-                        [labelText]="fromInputSafeName(option) | renameRights"
-                        [group]="filter"
-                        (valueChanged)="updatePageUrl(deadFacet)"
-                      ></app-checkbox>
-                      <span class="x"></span>
-                    </label>
+                      <label
+                        class="rm-filter"
+                        *ngIf="form.value[filter][option]"
+                        [ngClass]="{ 'dead-facet': deadFacet }"
+                      >
+                        <app-checkbox
+                          [form]="form"
+                          [controlName]="option"
+                          [labelText]="labelText"
+                          [group]="filter"
+                          (valueChanged)="updatePageUrl(deadFacet)"
+                          title="remove filter: {{ labelText }}"
+                        ></app-checkbox>
+                        <span
+                          class="x"
+                          title="remove filter: {{ labelText }}"
+                        ></span>
+                      </label>
+                    </ng-container>
                   </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="queryParams['dataset-id']; let datasets">
+              <ng-container *ngFor="let id of fromCSL(datasets.toString())">
+                <ng-container *ngIf="form.controls['datasetIds'].get(id)">
+                  <label class="rm-filter">
+                    <app-checkbox
+                      [form]="form"
+                      [controlName]="id"
+                      group="datasetIds"
+                      [labelText]="id"
+                      (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
+                      title="remove filter: {{ id }}"
+                    ></app-checkbox>
+                    <span class="x" title="remove filter: {{ id }}"></span>
+                  </label>
                 </ng-container>
               </ng-container>
             </ng-container>
@@ -194,18 +237,21 @@
         </div>
         <div
           class="rm-filter-nav"
+          [ngClass]="{ active: scrollInfo.canScrollFwd }"
           *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
         >
           <a
             class="rm-filter-nav-prev"
             (click)="scrollInfo.back()"
             [ngClass]="{ active: scrollInfo.canScrollBack }"
+            [title]="scrollInfo.canScrollBack ? 'scroll back' : ''"
             >&lsaquo;</a
           >
           <a
             class="rm-filter-nav-next"
             (click)="scrollInfo.fwd()"
             [ngClass]="{ active: scrollInfo.canScrollFwd }"
+            [title]="scrollInfo.canScrollFwd ? 'scroll forward' : ''"
             >&rsaquo;</a
           >
         </div>
@@ -214,11 +260,31 @@
       <!-- Data Area -->
       <div class="data-area">
         <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
+        <div *ngIf="emptyDataset && !isLoading" class="no-data">
+          No results found!
+          <ul>
+            <li
+              *ngIf="
+                queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
+              "
+            >
+              try removing the <span class="param">dataset id</span> parameter
+            </li>
+            <li
+              *ngIf="
+                queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
+                queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
+              "
+            >
+              try removing the <span class="param">date</span> parameters
+            </li>
+          </ul>
+        </div>
         <div class="chart-and-summary">
-          <div class="chart-wrapper">
+          <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
             <app-bar-chart
               #barChart
-              [showPercent]="form.value.showPercent"
+              [showPercent]="form.value.chartFormat.percent"
               [extraSettings]="
                 [
                   DimensionName.contentTier,
@@ -239,13 +305,15 @@
           </ng-container>
         </div>
 
-        <label style="position: relative; float: right; top: -4px; right: 4px"
-          >As percentages
-          <input
-            type="checkbox"
-            formControlName="showPercent"
-            (change)="refreshChart()"
-        /></label>
+        <ng-container *ngIf="!emptyDataset">
+          <app-checkbox
+            [form]="form"
+            controlName="percent"
+            labelText="As percentages"
+            group="chartFormat"
+            (valueChanged)="refreshChart()"
+          ></app-checkbox>
+        </ng-container>
 
         <!-- SNAPSHOTS -->
         <ng-container>
@@ -254,6 +322,7 @@
             [facetName]="form.value.facetParameter"
             (hideItem)="removeSeries($event)"
             (showItems)="addSeries($event)"
+            [isVisible]="!emptyDataset"
           >
           </app-snapshots>
         </ng-container>
@@ -263,13 +332,13 @@
           #grid
           id="grid"
           facet="{{ form.value.facetParameter }}"
-          [getUrl]="getUrl.bind(this)"
           [getUrlRow]="getUrlRow.bind(this)"
           (refreshData)="showAppliedSeriesInGridAndChart()"
           (chartPositionChanged)="chartPositionChanged($event)"
+          [isVisible]="!emptyDataset"
         ></app-grid>
 
-        <div class="export-opener-link-wrapper">
+        <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
           <a class="export-opener-link" (click)="export.toggleActive()"
             >EXPORT DATA</a
           >

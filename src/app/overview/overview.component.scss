@@ -1,6 +1,7 @@
 @import "../../scss/_variables";
 @import "../../scss/functions/_icon_urls";
 
+$filter-scroll-w: 30px;
 $width-left-col: 200px;
 
 .chart-and-summary,
@@ -98,28 +99,51 @@ $width-left-col: 200px;
 
 .rm-filter-nav {
   align-items: center;
-  background: linear-gradient(90deg, transparent 0%, $offwhite 50%);
+  background: $offwhite;
   bottom: 0;
   display: flex;
   justify-content: flex-end;
-  pointer-events: none;
+  margin: 0 0 0 2px;
   position: absolute;
   right: 0;
   top: 0;
-  width: 70px;
+  width: $filter-scroll-w;
+
+  &::before {
+    background: linear-gradient(90deg, transparent 0%, $offwhite 100%);
+    height: 100%;
+    left: -$filter-scroll-w;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 30px;
+  }
+
+  &.active::before {
+    content: "";
+  }
 }
 
 .rm-filter-nav-next,
 .rm-filter-nav-prev {
   color: $gray-5;
+  cursor: default;
   font-size: 30px;
   transform: translateY(-4px);
   width: 14px;
-
   &.active {
     color: #000;
-    pointer-events: all;
+    cursor: pointer;
   }
+}
+
+.rm-filters-outer {
+  position: relative;
+}
+
+.rm-filters-scroll {
+  overflow: hidden;
+  margin-right: $filter-scroll-w;
 }
 
 .rm-filter-nav-next {
@@ -142,10 +166,6 @@ input[type="checkbox"] {
   &:disabled {
     cursor: default;
   }
-}
-
-input[type="date"]:not(:valid) {
-  border: 1px solid red;
 }
 
 .errors {
@@ -280,6 +300,13 @@ label {
   height: 300px;
   margin: 0 -$spacing-s;
   max-width: 100%;
+
+  &.hidden {
+    overflow: hidden;
+    margin: 0;
+    transition: height ease-in-out 100ms;
+    height: 0;
+  }
 }
 
 .data-area {
@@ -303,6 +330,19 @@ label {
       right: auto;
       width: 100%;
       transition: 0.3s linear width;
+    }
+  }
+
+  .no-data {
+    font-size: 24px;
+    ul {
+      font-size: 14px;
+      list-style: disc;
+      margin: 12px 0 0 20px;
+
+      .param {
+        font-weight: bold;
+      }
     }
   }
 }

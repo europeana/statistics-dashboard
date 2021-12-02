@@ -1,0 +1,97 @@
+@import "_variables";
+
+.checkboxes-list .checkbox-labelled {
+  cursor: pointer;
+}
+
+.checkbox {
+  opacity: 0;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  line-height: $filter-row-height;
+  margin: 0 $spacing-s;
+  white-space: nowrap;
+
+  .term-highlight {
+    font-weight: bold;
+  }
+}
+
+.chartFormat.checkbox-labelled {
+  margin-left: 14px;
+  .checkbox-label {
+    color: $gray-faint;
+    font-weight: 600;
+    margin: 0 4px;
+  }
+}
+
+.checkbox-labelled {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  :first-child {
+    min-width: $width-icon-filter;
+  }
+
+  :last-child {
+    cursor: pointer;
+    width: 100%;
+  }
+}
+
+.checkmarked-checkbox {
+  height: $width-icon-filter;
+  position: relative;
+  width: $width-icon-filter;
+
+  &::before {
+    bottom: 0;
+    background-image: svg-url-icon-checkbox("#000");
+    background-position: center;
+    background-repeat: no-repeat;
+    content: "";
+    display: block;
+    position: absolute;
+    min-width: $width-icon-filter;
+    height: $width-icon-filter;
+  }
+
+  &.checked::before {
+    background-image: svg-url-icon-checkbox-checked("#000");
+  }
+}
+
+.chartFormat .checkmarked-checkbox::before {
+  background-image: svg-url-icon-checkbox($stats-blue);
+}
+
+.chartFormat .checkmarked-checkbox.checked::before {
+  background-image: svg-url-icon-checkbox-checked($stats-blue);
+}
+
+.ct-zero .checkmarked-checkbox {
+  &::before {
+    background-image: svg-url-icon-eye-disabled($gray-med);
+  }
+  &.checked::before {
+    background-image: svg-url-icon-eye($gray-med);
+  }
+  &.disabled {
+    cursor: default;
+    pointer-events: none;
+
+    &::before {
+      background-image: svg-url-icon-eye-disabled($gray-5);
+    }
+    &.checked::before {
+      background-image: svg-url-icon-eye($gray-5);
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { CheckboxComponent } from './checkbox.component';
+import { CheckboxComponent } from '.';
 
 describe('CheckboxComponent', () => {
   let component: CheckboxComponent;

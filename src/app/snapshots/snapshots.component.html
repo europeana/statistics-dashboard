@@ -1,4 +1,4 @@
-<div class="snapshots">
+<div class="snapshots" *ngIf="isVisible">
   <ng-template #comparisonItem let-key="key" let-item="item">
     <ng-container *ngIf="item.current || item.saved">
       <li class="compare-data">
@@ -9,7 +9,9 @@
           ><span
             class="legend-square"
             [ngStyle]="{
-              'background-color': colours[item._colourIndex]
+              'background-color': item.applied
+                ? colours[item._colourIndex]
+                : '#fff'
             }"
           ></span>
           <span class="editable" contenteditable spellcheck="false">{{

@@ -32,7 +32,7 @@ describe('ExportComponent', () => {
 
     component.getChartData = (): Promise<string> => {
       return new Promise((resolve) => {
-        resolve('image-data');
+        resolve(null);
       });
     };
 

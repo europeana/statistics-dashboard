@@ -6,7 +6,7 @@ import { MockAPIService, MockAPIServiceErrors } from '../_mocked';
 
 import { APIService } from '../_services';
 
-import { LandingComponent } from './';
+import { LandingComponent } from '.';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;

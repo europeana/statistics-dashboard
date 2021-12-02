@@ -1,25 +1,28 @@
-import { Directive, ElementRef } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef } from '@angular/core';
 
 @Directive({
   selector: '[appIsScrollable]',
   exportAs: 'scrollInfo'
 })
-export class IsScrollableDirective {
-  private changes: MutationObserver;
-
+export class IsScrollableDirective implements AfterViewInit {
   canScrollBack = false;
   canScrollFwd = false;
 
   constructor(private elementRef: ElementRef) {
     const element = this.elementRef.nativeElement;
 
-    this.changes = new MutationObserver((_: MutationRecord[]) => {
+    new MutationObserver((_: MutationRecord[]) => {
       this.calc();
-    });
-
-    this.changes.observe(element, {
+    }).observe(element, {
       childList: true
     });
+  }
+
+  ngAfterViewInit(): void {
+    const fn = (): void => {
+      this.calc();
+    };
+    setTimeout(fn, 0);
   }
 
   /** calc

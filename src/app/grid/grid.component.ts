@@ -22,9 +22,9 @@ import { GridPaginatorComponent } from '../grid-paginator';
   styleUrls: ['./grid.component.scss']
 })
 export class GridComponent {
-  @Input() getUrl: (s: string) => string;
   @Input() getUrlRow: (s: string) => string;
   @Input() facet: string;
+  @Input() isVisible: boolean;
   @Output() refreshData = new EventEmitter<void>();
   @Output() chartPositionChanged = new EventEmitter<number>();
   @ViewChild('paginator') paginator: GridPaginatorComponent;

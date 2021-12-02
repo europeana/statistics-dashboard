@@ -9,51 +9,8 @@
 }
 
 // Filter Removal
-
 .filters,
 .rm-filters {
-  .checkbox {
-    opacity: 0;
-  }
-
-  .checkbox-labelled {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-  }
-
-  .checkbox-labelled {
-    cursor: pointer;
-    margin: 0;
-    padding: 0;
-    position: relative;
-
-    :first-child {
-      min-width: $width-icon-filter;
-    }
-
-    :last-child {
-      width: 100%;
-    }
-  }
-
-  .checkmarked-checkbox {
-    height: $width-icon-filter;
-    position: relative;
-    width: $width-icon-filter;
-
-    &::before {
-      bottom: 0;
-      background-position: center;
-      background-repeat: no-repeat;
-      content: "";
-      display: block;
-      position: absolute;
-      min-width: $width-icon-filter;
-      height: $width-icon-filter;
-    }
-  }
-
   .padded-left {
     margin-left: $spacing-s;
   }
@@ -67,19 +24,13 @@
     }
   }
 
-  .filter-label {
-    font-size: 14px;
-    line-height: $filter-row-height;
-    margin: 0 $spacing-s;
-    white-space: nowrap;
-  }
-
-  .filter-label .term-highlight {
-    font-weight: bold;
-  }
-
   .filter-title {
     color: $gray-faint;
+    &.disabled {
+      color: $gray-5;
+      cursor: default;
+      pointer-events: none;
+    }
   }
 
   .icon {
@@ -90,16 +41,14 @@
   }
 }
 
-.filters .info-icon {
-  margin-left: $spacing-s;
-}
+.filters {
+  .checkbox-labelled:not(.chartFormat):hover {
+    background-color: $offwhite;
+  }
 
-.rm-filters-outer {
-  position: relative;
-}
-
-.rm-filters-scroll {
-  overflow: hidden;
+  .info-icon {
+    margin-left: $spacing-s;
+  }
 }
 
 .rm-filters {
@@ -115,27 +64,9 @@
     &:not(:last-child) {
       margin-right: 24px;
     }
-  }
-}
 
-// Icons
-
-.filters {
-  .checkmarked-checkbox {
-    &::before {
-      background-image: svg-url-icon-checkbox("#000");
-    }
-    &.checked::before {
-      background-image: svg-url-icon-checkbox-checked("#000");
-    }
-  }
-
-  .ct-zero .checkmarked-checkbox {
-    &::before {
-      background-image: svg-url-icon-eye-disabled($gray-med);
-    }
-    &.checked::before {
-      background-image: svg-url-icon-eye($gray-med);
+    .checkbox-labelled {
+      cursor: pointer;
     }
   }
 }
@@ -173,6 +104,14 @@
     }
   }
 
+  .datasetIds {
+    .checkmarked-checkbox {
+      &::before {
+        background-image: svg-url-icon-dataset-id($white);
+      }
+    }
+  }
+
   .provider {
     .checkmarked-checkbox {
       &::before {
@@ -206,34 +145,70 @@
   background-image: svg-url-icon-dataset-id($gray-med);
 }
 
+.disabled .filter-icon-dataset {
+  background-image: svg-url-icon-dataset-id($gray-5);
+}
+
 .filter-icon-contentTier {
   background-image: svg-url-icon-content-tier($gray-med);
+}
+
+.disabled .filter-icon-contentTier {
+  background-image: svg-url-icon-content-tier($gray-5);
 }
 
 .filter-icon-country {
   background-image: svg-url-icon-flag($gray-med);
 }
 
+.disabled .filter-icon-country {
+  background-image: svg-url-icon-flag($gray-5);
+}
+
 .filter-icon-dataProvider {
   background-image: svg-url-icon-data-provider($gray-med);
+}
+
+.disabled .filter-icon-dataProvider {
+  background-image: svg-url-icon-data-provider($gray-5);
 }
 
 .filter-icon-dates {
   background-image: svg-url-icon-calendar($gray-med);
 }
 
+.disabled .filter-icon-dates {
+  background-image: svg-url-icon-calendar($gray-5);
+}
+
 .filter-icon-metadataTier {
   background-image: svg-url-icon-metadata($gray-med);
+}
+
+.disabled .filter-icon-metadataTier {
+  background-image: svg-url-icon-metadata($gray-5);
 }
 
 .filter-icon-provider {
   background-image: svg-url-icon-content-provider($gray-med);
 }
 
+.disabled .filter-icon-provider {
+  background-image: svg-url-icon-content-provider($gray-5);
+}
+
 .filter-icon-rights {
   background-image: svg-url-icon-rights($gray-med);
 }
 
+.disabled .filter-icon-rights {
+  background-image: svg-url-icon-rights($gray-5);
+}
+
 .filter-icon-type {
   background-image: svg-url-icon-types($gray-med);
+}
+
+.disabled .filter-icon-type {
+  background-image: svg-url-icon-types($gray-5);
 }

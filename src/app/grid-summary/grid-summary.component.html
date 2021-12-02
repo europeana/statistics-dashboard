@@ -1,4 +1,7 @@
-<div class="summary-grid totals" *ngIf="_summaryData && _summaryData.results">
+<div
+  class="summary-grid totals"
+  *ngIf="_summaryData && _summaryData.results && _summaryData.results[0]"
+>
   <span class="total-title"
     >Top {{ _summaryData.breakdownBy | renameApiFacetShort }}</span
   >

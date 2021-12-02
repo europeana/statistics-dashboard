@@ -31,12 +31,35 @@ describe('FilterComponent', () => {
       facetParameter: [],
       contentTierZero: [''],
       contentTier: [''],
-      showPercent: [false],
-      datasetName: [''],
+      datasetId: [''],
       dateFrom: [''],
       dateTo: ['']
     });
     fixture.detectChanges();
+  });
+
+  it('should enable when options are added', () => {
+    expect(component.isDisabled()).toBeTruthy();
+    component.options = [
+      {
+        name: 'name',
+        label: 'label'
+      }
+    ];
+    expect(component.isDisabled()).toBeFalsy();
+  });
+
+  it('should not disable the date if a range has been specified', () => {
+    component.emptyDataset = true;
+    component.group = 'dates' as DimensionName;
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.form.get('dateFrom').setValue(new Date().toISOString());
+    component.form.get('dateTo').setValue(new Date().toISOString());
+    expect(component.isDisabled()).toBeFalsy();
+
+    component.form.get('dateFrom').setValue(null);
+    expect(component.isDisabled()).toBeTruthy();
   });
 
   it('should determine if a select option is enabled', () => {
