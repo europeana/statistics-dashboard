@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  async,
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -120,7 +114,7 @@ describe('OverviewComponent', () => {
   };
 
   describe('Route Parameter', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureTestBed(false);
     }));
 
@@ -142,7 +136,7 @@ describe('OverviewComponent', () => {
   });
 
   describe('Normal Operations', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureTestBed();
     }));
 
@@ -516,7 +510,7 @@ describe('OverviewComponent', () => {
   });
 
   describe('Request / Url Generation', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureTestBed();
     }));
 
@@ -624,7 +618,7 @@ describe('OverviewComponent', () => {
   });
 
   describe('Polling', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
       configureTestBed();
     }));
 

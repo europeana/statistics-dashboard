@@ -1,12 +1,12 @@
 import { ElementRef } from '@angular/core';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { TableRow } from '../_models';
 import { ExportPDFService } from './';
 
 describe('ExportPDFService', () => {
   let service: ExportPDFService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [ExportPDFService]
     }).compileComponents();
