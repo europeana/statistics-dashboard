@@ -380,7 +380,7 @@ export const RightsStatements = {
   '//creativecommons.org/licenses/by-nc-sa/3.0/lu': 'CC BY-NC-SA 3.0 LU',
   '//creativecommons.org/licenses/by-nc-sa/3.0/pl': 'CC BY-NC-SA 3.0 PL',
   '//creativecommons.org/licenses/by-nc-sa/4.0': 'CC BY-NC-SA 4.0',
-  '//creativecommons.org/licenses/by-nc-sa/4.0/deed.de': 'CC BY-NC-SA 4.0',
+  '//creativecommons.org/licenses/by-nc-sa/4.0/deed.de': 'CC BY-NC-SA 4.0 (deed.de)',
 
   '//creativecommons.org/licenses/by-nd/2.0/es': 'CC BY-ND 2.0 ES',
   '//creativecommons.org/licenses/by-nd/2.5/pl': 'CC BY-ND 2.5 PL',
