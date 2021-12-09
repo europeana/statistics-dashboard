@@ -20,7 +20,6 @@ export class ClickAwareDirective extends SubscriptionManager {
     private elementRef: ElementRef
   ) {
     super();
-    console.log('c aware');
     this.subs.push(
       this.clickService.documentClickedTarget.subscribe(
         (target: HTMLElement) => {

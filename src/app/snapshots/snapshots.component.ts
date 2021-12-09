@@ -114,7 +114,7 @@ export class SnapshotsComponent {
     offset: number,
     maxRows: number
   ): Array<ColourSeriesData> {
-    return seriesKeys.map((seriesKey: string, keyIndex: number) => {
+    return this.getSortKeys(seriesKeys).map((seriesKey: string, keyIndex: number) => {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       const data = percent ? cd.dataPercent : cd.data;
       const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
