@@ -10,16 +10,18 @@ describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        RouterTestingModule.withRoutes([
-          { path: './data', component: AppComponent }
-        ])
-      ]
-    });
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          HttpClientTestingModule,
+          RouterTestingModule.withRoutes([
+            { path: './data', component: AppComponent }
+          ])
+        ]
+      });
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);

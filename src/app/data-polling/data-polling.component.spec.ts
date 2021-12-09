@@ -1,5 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync
+} from '@angular/core/testing';
 import { Observable, of, throwError } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -20,12 +26,16 @@ describe('DataPollingComponent', () => {
   let fnPoll: <T>() => Observable<T>;
   let fnError: (err: HttpErrorResponse) => HttpErrorResponse | false;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [RouterModule.forRoot([], { relativeLinkResolution: 'legacy' })],
-      declarations: [DataPollingComponent]
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          RouterModule.forRoot([], { relativeLinkResolution: 'legacy' })
+        ],
+        declarations: [DataPollingComponent]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DataPollingComponent);

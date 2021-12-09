@@ -1,5 +1,11 @@
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync
+} from '@angular/core/testing';
 import { ExportComponent } from '.';
 
 import { MockExportCSVService } from '../_mocked';
@@ -11,13 +17,17 @@ describe('ExportComponent', () => {
   let fixture: ComponentFixture<ExportComponent>;
   let exportCSV: ExportCSVService;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ExportComponent],
-      providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
-    }).compileComponents();
-    exportCSV = TestBed.inject(ExportCSVService);
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [ExportComponent],
+        providers: [
+          { provide: ExportCSVService, useClass: MockExportCSVService }
+        ]
+      }).compileComponents();
+      exportCSV = TestBed.inject(ExportCSVService);
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExportComponent);

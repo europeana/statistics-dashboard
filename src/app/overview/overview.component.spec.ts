@@ -1,5 +1,11 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync
+} from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -114,9 +120,11 @@ describe('OverviewComponent', () => {
   };
 
   describe('Route Parameter', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed(false);
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed(false);
+      })
+    );
 
     beforeEach(() => {
       b4Each();
@@ -136,9 +144,11 @@ describe('OverviewComponent', () => {
   });
 
   describe('Normal Operations', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed();
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed();
+      })
+    );
 
     beforeEach(() => {
       b4Each();
@@ -221,6 +231,7 @@ describe('OverviewComponent', () => {
           }
         ]
       };
+      component.queryParams = { any: ['thing'] };
 
       spyOn(component, 'storeSeries');
       component.extractSeriesServerData(br);
@@ -231,9 +242,7 @@ describe('OverviewComponent', () => {
 
       expect(component.storeSeries).toHaveBeenCalledTimes(2);
 
-      component.queryParams = { any: 'thing' };
       component.extractSeriesServerData(br);
-
       expect(component.storeSeries).toHaveBeenCalledTimes(3);
     });
 
@@ -510,9 +519,11 @@ describe('OverviewComponent', () => {
   });
 
   describe('Request / Url Generation', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed();
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed();
+      })
+    );
 
     beforeEach(() => {
       b4Each();
@@ -618,9 +629,11 @@ describe('OverviewComponent', () => {
   });
 
   describe('Polling', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed();
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed();
+      })
+    );
 
     beforeEach(() => {
       b4Each();

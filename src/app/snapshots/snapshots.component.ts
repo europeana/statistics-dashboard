@@ -114,19 +114,22 @@ export class SnapshotsComponent {
     offset: number,
     maxRows: number
   ): Array<ColourSeriesData> {
-    return seriesKeys.map((seriesKey: string, keyIndex: number) => {
-      const cd = this.compareDataAllFacets[facetName][seriesKey];
-      const data = percent ? cd.dataPercent : cd.data;
-      const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
-      return {
-        data: cdKeys.reduce((map: IHashNumber, pref: string) => {
-          map[`${pref} `] = data[pref];
-          return map;
-        }, {}),
-        colour: colours[keyIndex],
-        seriesName: seriesKey
-      };
-    });
+    // sort series keys (by pinIndex)
+    return this.getSortKeys(seriesKeys).map(
+      (seriesKey: string, keyIndex: number) => {
+        const cd = this.compareDataAllFacets[facetName][seriesKey];
+        const data = percent ? cd.dataPercent : cd.data;
+        const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
+        return {
+          data: cdKeys.reduce((map: IHashNumber, pref: string) => {
+            map[`${pref} `] = data[pref];
+            return map;
+          }, {}),
+          colour: colours[keyIndex],
+          seriesName: seriesKey
+        };
+      }
+    );
   }
 
   /** getSeriesDataForGrid
@@ -153,7 +156,6 @@ export class SnapshotsComponent {
       });
 
       cd._colourIndex = keyIndex;
-
       result.push({
         name: 'Total', // name will not be shown in the grid
         nameOriginal: 'Total',
@@ -161,7 +163,8 @@ export class SnapshotsComponent {
         isTotal: true,
         percent: 100,
         colourIndex: cd._colourIndex,
-        series: cd.label
+        series: cd.label,
+        portalUrl: cd.portalUrls['summary']
       });
     });
 
@@ -179,7 +182,8 @@ export class SnapshotsComponent {
             count: count,
             percent: cd.dataPercent[groupKey],
             colourIndex: cd._colourIndex,
-            series: cd.label
+            series: cd.label,
+            portalUrl: cd.portalUrls[groupKey]
           });
         }
       });

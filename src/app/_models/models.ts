@@ -27,6 +27,7 @@ export interface TableRow {
   highlight?: boolean;
   series: string;
   isTotal?: boolean;
+  portalUrl: string;
 }
 
 export interface FmtTableData {

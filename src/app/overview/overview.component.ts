@@ -491,6 +491,20 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }, {});
   }
 
+  portalUrlsFromNVPs(
+    facet: string,
+    src: Array<NamesValuePercent>
+  ): IHashString {
+    const result = src.reduce((map: IHashString, nvp: NamesValuePercent) => {
+      const x = this.getUrlRow(facet, nvp.name);
+      map[nvp.name] = x;
+      return map;
+    }, {});
+
+    result['summary'] = this.getUrlRow(facet);
+    return result;
+  }
+
   originalNamesFromNVPs(src: Array<NamesValuePercent>): IHashString | null {
     if (this.form.value.facetParameter !== DimensionName.rights) {
       return null;
@@ -549,6 +563,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       namesOriginal: this.originalNamesFromNVPs(nvs),
       orderOriginal: [],
       orderPreferred: [],
+      portalUrls: this.portalUrlsFromNVPs(this.form.value.facetParameter, nvs),
       applied: applied,
       pinIndex: 0,
       saved: saved,

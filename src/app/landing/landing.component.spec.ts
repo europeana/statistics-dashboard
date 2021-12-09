@@ -25,9 +25,11 @@ describe('LandingComponent', () => {
     }).compileComponents();
   };
 
-  beforeEach(waitForAsync(() => {
-    configureTestBed();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      configureTestBed();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LandingComponent);

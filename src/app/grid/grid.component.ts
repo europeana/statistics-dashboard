@@ -22,7 +22,6 @@ import { GridPaginatorComponent } from '../grid-paginator';
   styleUrls: ['./grid.component.scss']
 })
 export class GridComponent {
-  @Input() getUrlRow: (s: string) => string;
   @Input() facet: string;
   @Input() isVisible: boolean;
   @Output() refreshData = new EventEmitter<void>();

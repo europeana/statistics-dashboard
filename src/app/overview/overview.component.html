@@ -332,7 +332,6 @@
           #grid
           id="grid"
           facet="{{ form.value.facetParameter }}"
-          [getUrlRow]="getUrlRow.bind(this)"
           (refreshData)="showAppliedSeriesInGridAndChart()"
           (chartPositionChanged)="chartPositionChanged($event)"
           [isVisible]="!emptyDataset"

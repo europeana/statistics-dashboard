@@ -11,14 +11,16 @@ describe('APIService', () => {
   let service: APIService;
   let http: HttpTestingController;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      providers: [APIService],
-      imports: [HttpClientTestingModule]
-    }).compileComponents();
-    service = TestBed.inject(APIService);
-    http = TestBed.inject(HttpTestingController);
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        providers: [APIService],
+        imports: [HttpClientTestingModule]
+      }).compileComponents();
+      service = TestBed.inject(APIService);
+      http = TestBed.inject(HttpTestingController);
+    })
+  );
 
   it('should load the breakdowns', () => {
     const baseUrl = `${environment.serverAPI}${service.suffixFiltering}`;

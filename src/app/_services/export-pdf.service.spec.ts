@@ -6,12 +6,14 @@ import { ExportPDFService } from './';
 describe('ExportPDFService', () => {
   let service: ExportPDFService;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      providers: [ExportPDFService]
-    }).compileComponents();
-    service = TestBed.inject(ExportPDFService);
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        providers: [ExportPDFService]
+      }).compileComponents();
+      service = TestBed.inject(ExportPDFService);
+    })
+  );
 
   it('should get the image url', () => {
     const e1 = document.createElement('div');
