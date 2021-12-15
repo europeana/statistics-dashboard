@@ -16,6 +16,7 @@ describe('SnapshotsComponent', () => {
     orderOriginal: [],
     orderPreferred: [],
     pinIndex: 1,
+    portalUrls: {},
     saved: true,
     total: 52587135,
     current: true
@@ -44,6 +45,7 @@ describe('SnapshotsComponent', () => {
     orderOriginal: [],
     orderPreferred: [],
     pinIndex: 2,
+    portalUrls: {},
     saved: true,
     total: 34,
     current: true
@@ -58,6 +60,7 @@ describe('SnapshotsComponent', () => {
     orderOriginal: [],
     orderPreferred: [],
     pinIndex: 3,
+    portalUrls: {},
     saved: true,
     total: 2,
     current: true

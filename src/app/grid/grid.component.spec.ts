@@ -101,9 +101,6 @@ describe('GridComponent', () => {
   });
 
   it('should go to the page', fakeAsync(() => {
-    component.getUrlRow = (s: string): string => {
-      return s;
-    };
     component.setRows(testRows.slice(0));
     fixture.detectChanges();
     expect(component.paginator).toBeFalsy();

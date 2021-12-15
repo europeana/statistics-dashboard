@@ -10,13 +10,15 @@ describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [MapComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [{ provide: APIService, useClass: MockAPIService }]
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [MapComponent],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+        providers: [{ provide: APIService, useClass: MockAPIService }]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);

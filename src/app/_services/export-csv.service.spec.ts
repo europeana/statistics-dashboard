@@ -5,12 +5,14 @@ import { ExportCSVService } from './';
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      providers: [ExportCSVService]
-    }).compileComponents();
-    service = TestBed.inject(ExportCSVService);
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        providers: [ExportCSVService]
+      }).compileComponents();
+      service = TestBed.inject(ExportCSVService);
+    })
+  );
 
   it('should convert', () => {
     const testHeaders = ['series', 'name', 'count', 'percent'].map(
@@ -24,7 +26,8 @@ describe('ExportCSVService', () => {
         name: 'Andy' as HeaderNameType,
         nameOriginal: 'Andy',
         count: 22,
-        percent: 50
+        percent: 50,
+        portalUrl: ''
       }
     ];
     const testData2 = [
@@ -33,7 +36,8 @@ describe('ExportCSVService', () => {
         name: 'MacLean' as HeaderNameType,
         nameOriginal: 'MacLean',
         count: 22,
-        percent: null
+        percent: null,
+        portalUrl: ''
       }
     ];
     expect(service.csvFromTableRows(testHeaders, testData1)).toEqual(
