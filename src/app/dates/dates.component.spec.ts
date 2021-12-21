@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { validateDateGeneric } from '../_helpers';
@@ -33,21 +33,26 @@ describe('DatesComponent', () => {
         }
       ]
     });
+
     fixture.detectChanges();
+
+    component.rangePicker = {
+      open: () => {}
+    } as any as ElementRef;
   });
 
   it('should handle the to-date change', () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
+    expect(component.dateFrom.nativeElement.getAttribute('max')).not.toEqual(
       component.today
     );
 
     component.form.value.dateTo = yesterday.toISOString();
     component.dateChange(false);
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      yesterday.toISOString()
+      yesterday.toISOString().split('T')[0]
     );
 
     component.form.value.dateTo = null;
@@ -85,6 +90,7 @@ describe('DatesComponent', () => {
 
     spyOn(component.form.controls.dateTo, 'updateValueAndValidity');
     component.dateChange(true);
+
     expect(
       component.form.controls.dateTo.updateValueAndValidity
     ).toHaveBeenCalled();
@@ -178,14 +184,12 @@ describe('DatesComponent', () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      component.today
-    );
+    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(null);
 
     component.form.value.dateTo = yesterday.toISOString();
     component.dateChange(false);
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      yesterday.toISOString()
+      yesterday.toISOString().split('T')[0]
     );
 
     component.form.value.dateTo = null;

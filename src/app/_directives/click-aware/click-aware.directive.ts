@@ -1,4 +1,10 @@
-import { Directive, ElementRef, EventEmitter, Output } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
 import { SubscriptionManager } from '../../subscription-manager';
 import { ClickService } from '../../_services';
 
@@ -8,6 +14,7 @@ import { ClickService } from '../../_services';
 })
 export class ClickAwareDirective extends SubscriptionManager {
   @Output() clickOutside: EventEmitter<void> = new EventEmitter();
+  @Input() includeClicksOnClass: string;
 
   isClickedInside = false;
 
@@ -39,6 +46,22 @@ export class ClickAwareDirective extends SubscriptionManager {
     clickTarget: HTMLElement
   ): void {
     this.isClickedInside = nativeElement.contains(clickTarget);
+
+    if (!this.isClickedInside && this.includeClicksOnClass) {
+      let node = clickTarget.parentNode;
+      while (node) {
+        const classList = (node as any as HTMLElement).classList;
+        if (classList) {
+          classList.forEach((className: string) => {
+            if (className === this.includeClicksOnClass) {
+              this.isClickedInside = true;
+            }
+          });
+        }
+        node = node.parentNode as any as HTMLElement;
+      }
+    }
+
     if (!this.isClickedInside) {
       this.clickOutside.emit();
     }

@@ -12,6 +12,7 @@ import { ClickAwareDirective } from '.';
         <br />
         <br />
         <br />
+        <span class="dead-inner-element">CHILD</span>
       </div>
       <div
         class="live-zone"
@@ -63,9 +64,6 @@ describe('ClickAwareDirective', () => {
 
   it('should call the "documentClickListener" method when clicked', () => {
     const onClickMock = spyOn(component, 'clicked').and.callThrough();
-    fixture.debugElement
-      .query(By.css('.dead-zone'))
-      .triggerEventHandler('click', null);
 
     deadElement.nativeElement.click();
     expect(onClickMock).not.toHaveBeenCalled();
@@ -88,6 +86,30 @@ describe('ClickAwareDirective', () => {
     clickInfo.documentClickListener(
       liveElement.nativeElement,
       innerElement.nativeElement
+    );
+    expect(clickInfo.isClickedInside).toBeTruthy();
+  });
+
+  it('should detect clicks in the "includeClicksOnClass" element', () => {
+    const clickInfo = component.clickInfo;
+
+    expect(clickInfo.isClickedInside).toBeFalsy();
+
+    const deadElementInner = fixture.debugElement.query(
+      By.css('.dead-zone .dead-inner-element')
+    );
+
+    clickInfo.documentClickListener(
+      liveElement.nativeElement,
+      deadElementInner.nativeElement
+    );
+    expect(clickInfo.isClickedInside).toBeFalsy();
+
+    clickInfo.includeClicksOnClass = 'cmp';
+
+    clickInfo.documentClickListener(
+      liveElement.nativeElement,
+      deadElementInner.nativeElement
     );
     expect(clickInfo.isClickedInside).toBeTruthy();
   });

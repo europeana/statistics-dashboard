@@ -1,9 +1,27 @@
 import { FormControl } from '@angular/forms';
 
 export const today = new Date().toISOString().split('T')[0];
+
 export const yearZero = new Date(Date.parse('20 Nov 2008 12:00:00 GMT'))
   .toISOString()
   .split('T')[0];
+
+/** dateToUCT
+/* @param {Date} localDate
+/* @returns creates a UCT date from a local date, adjusted by the local date's offset
+*/
+export function dateToUCT(localDate: Date): Date {
+  const dateUTC = new Date(localDate.toISOString());
+  return new Date(dateUTC.getTime() - localDate.getTimezoneOffset() * 60000);
+}
+
+/** getDateAsISOString
+/* @param {Date} localDate
+/* - returns 'yyyy-mm-dd'
+*/
+export function getDateAsISOString(localDate: Date): string {
+  return dateToUCT(localDate).toISOString().split('T')[0];
+}
 
 /** validateDateGeneric
 /* @param {FormControl} control - the field to validate
@@ -19,21 +37,24 @@ export function validateDateGeneric(
   let isTooLate = false;
   if (val) {
     const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
-    const dateVal = new Date(val);
+    const dateVal = dateToUCT(new Date(val));
+
     if (dateVal < new Date(yearZero)) {
-      console.log('less than year zero(' + yearZero + '): ' + dateVal);
       isTooEarly = true;
-    } else if (dateVal > new Date(today)) {
+    } else if (dateVal > dateToUCT(new Date(today))) {
       isTooLate = true;
-    } else if (control.parent.value[otherField].length > 0) {
-      const dateOtherVal = new Date(control.parent.value[otherField]);
-      if (otherField === 'dateFrom') {
-        if (dateVal < dateOtherVal) {
-          console.log('less than year otjer(' + dateOtherVal + '): ' + dateVal);
-          isTooEarly = true;
+    } else {
+      const otherValue = control.parent.value[otherField];
+      if (otherValue && otherValue.length > 0) {
+        const dateOtherVal = new Date(otherValue);
+
+        if (otherField === 'dateFrom') {
+          if (dateVal < new Date(otherValue)) {
+            isTooEarly = true;
+          }
+        } else if (dateVal > dateToUCT(new Date(otherValue))) {
+          isTooLate = true;
         }
-      } else if (dateVal > dateOtherVal) {
-        isTooLate = true;
       }
     }
   }

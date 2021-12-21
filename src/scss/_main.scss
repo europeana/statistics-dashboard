@@ -4,7 +4,7 @@
 @import "home";
 @import "filters";
 @import "info-icon";
-
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 body,
 html {
   scroll-behavior: smooth;
@@ -24,13 +24,6 @@ body {
   -webkit-text-size-adjust: 100%;
   word-break: normal;
   word-wrap: break-word;
-}
-
-input[type="date"],
-input[type="text"] {
-  margin-top: 5px;
-  padding: 5px;
-  width: 11em;
 }
 
 .am4-ctrls {

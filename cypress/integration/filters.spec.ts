@@ -115,7 +115,7 @@ context('statistics-dashboard', () => {
       cy.get(selDateTo).type(today);
 
       cy.get(selCloseDateOverride).should('be.visible');
-      cy.get(selDateFrom).clear();
+      cy.get(selDateFrom).clear(force);
       cy.get(selCloseDateOverride).should('not.be.visible');
     });
 
