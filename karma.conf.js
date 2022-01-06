@@ -16,16 +16,19 @@ module.exports = function (config) {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     coverageReporter: {
-      type : 'html',
-      dir : 'coverage/'
+      type : "lcov",
+      dir : "coverage/"
     },
     preprocessors: {
-      'src/app/**/*.ts': ['coverage']
+      "src/app/**/*.ts": ["coverage"]
     },
-    reporters: ['progress', 'kjhtml', 'coverage'],
+    reporters: ["progress", "kjhtml", "coverage"],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
+    browserConsoleLogOptions: {
+      level: "log"
+    },
     autoWatch: true,
     browsers: ["ChromeHeadless"],
     singleRun: true,

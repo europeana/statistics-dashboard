@@ -7,7 +7,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { today, yearZero, getDateAsISOString } from '../_helpers';
+import { getDateAsISOString, today, yearZero } from '../_helpers';
 
 @Component({
   selector: 'app-dates',
@@ -37,9 +37,6 @@ export class DatesComponent {
     const valFrom = this.form.value.dateFrom;
     const valTo = this.form.value.dateTo;
 
-    const ctrlDateTo = this.form.controls.dateTo;
-    const ctrlDateFrom = this.form.controls.dateFrom;
-
     this.dateTo.nativeElement.setAttribute(
       'min',
       getDateAsISOString(new Date(valFrom ? valFrom : yearZero))
@@ -50,7 +47,7 @@ export class DatesComponent {
     );
 
     this.form.controls.dateTo.updateValueAndValidity();
-    ctrlDateFrom.updateValueAndValidity();
+    this.form.controls.dateFrom.updateValueAndValidity();
 
     if (
       !this.form.controls.dateFrom.errors &&
@@ -63,7 +60,7 @@ export class DatesComponent {
       }
     }
 
-    (this.rangePicker as any as { open: () => void }).open();
+    (this.rangePicker as unknown as { open: () => void }).open();
   }
 
   changed(): void {

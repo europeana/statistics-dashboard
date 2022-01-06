@@ -6,7 +6,7 @@ import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { facetNames, nonFacetFilters, portalNames } from '../_data';
-import { filterList, getDateAsISOString, fromCSL } from '../_helpers';
+import { filterList, fromCSL, getDateAsISOString } from '../_helpers';
 import { DimensionName, FilterInfo, NonFacetFilterNames } from '../_models';
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
@@ -965,8 +965,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const valTo = this.form.value.dateTo;
 
     if (valFrom) {
-      qp[nonFacetFilters[NonFacetFilterNames.dateFrom]] =
-        getDateAsISOString(new Date(valFrom));
+      qp[nonFacetFilters[NonFacetFilterNames.dateFrom]] = getDateAsISOString(
+        new Date(valFrom)
+      );
     }
     if (valTo) {
       qp[nonFacetFilters[NonFacetFilterNames.dateTo]] = getDateAsISOString(

@@ -7,9 +7,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   DateAdapter,
-  MatNativeDateModule,
   MAT_DATE_FORMATS,
   MAT_DATE_LOCALE,
+  MatNativeDateModule,
   NativeDateAdapter
 } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -48,6 +48,7 @@ class AppDateAdapter extends NativeDateAdapter {
     return date.toDateString();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parse(value: any): Date | null {
     if (typeof value === 'string' && value.indexOf('/') > -1) {
       const str = value.split('/');

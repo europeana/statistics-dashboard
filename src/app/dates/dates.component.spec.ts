@@ -37,8 +37,10 @@ describe('DatesComponent', () => {
     fixture.detectChanges();
 
     component.rangePicker = {
-      open: () => {}
-    } as any as ElementRef;
+      open: () => {
+        console.log('open mock range picker');
+      }
+    } as unknown as ElementRef;
   });
 
   it('should handle the to-date change', () => {
@@ -50,13 +52,13 @@ describe('DatesComponent', () => {
     );
 
     component.form.value.dateTo = yesterday.toISOString();
-    component.dateChange(false);
+    component.dateChange();
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
       yesterday.toISOString().split('T')[0]
     );
 
     component.form.value.dateTo = null;
-    component.dateChange(false);
+    component.dateChange();
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
       component.today
     );
@@ -66,14 +68,14 @@ describe('DatesComponent', () => {
     expect(component.dateTo.nativeElement.getAttribute('min')).toBeFalsy();
 
     component.form.value.dateFrom = component.today;
-    component.dateChange(true);
+    component.dateChange();
     expect(component.dateTo.nativeElement.getAttribute('min')).toBeTruthy();
     expect(component.dateTo.nativeElement.getAttribute('min')).not.toEqual(
       component.yearZero
     );
 
     component.form.value.dateFrom = null;
-    component.dateChange(true);
+    component.dateChange();
     expect(component.dateTo.nativeElement.getAttribute('min')).toEqual(
       component.yearZero
     );
@@ -89,7 +91,7 @@ describe('DatesComponent', () => {
     expect(component.form.controls.dateTo.errors).toBeTruthy();
 
     spyOn(component.form.controls.dateTo, 'updateValueAndValidity');
-    component.dateChange(true);
+    component.dateChange();
 
     expect(
       component.form.controls.dateTo.updateValueAndValidity
@@ -103,7 +105,7 @@ describe('DatesComponent', () => {
     expect(component.form.controls.dateFrom.errors).toBeTruthy();
 
     spyOn(component.form.controls.dateFrom, 'updateValueAndValidity');
-    component.dateChange(false);
+    component.dateChange();
     expect(
       component.form.controls.dateFrom.updateValueAndValidity
     ).toHaveBeenCalled();
@@ -187,13 +189,13 @@ describe('DatesComponent', () => {
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(null);
 
     component.form.value.dateTo = yesterday.toISOString();
-    component.dateChange(false);
+    component.dateChange();
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
       yesterday.toISOString().split('T')[0]
     );
 
     component.form.value.dateTo = null;
-    component.dateChange(false);
+    component.dateChange();
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
       component.today
     );

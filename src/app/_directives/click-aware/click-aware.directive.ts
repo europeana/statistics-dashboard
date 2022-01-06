@@ -23,8 +23,8 @@ export class ClickAwareDirective extends SubscriptionManager {
    *  subscribe to the global document click host listener via the clickService
    */
   constructor(
-    private clickService: ClickService,
-    private elementRef: ElementRef
+    private readonly clickService: ClickService,
+    private readonly elementRef: ElementRef
   ) {
     super();
     this.subs.push(
@@ -50,7 +50,7 @@ export class ClickAwareDirective extends SubscriptionManager {
     if (!this.isClickedInside && this.includeClicksOnClass) {
       let node = clickTarget.parentNode;
       while (node) {
-        const classList = (node as any as HTMLElement).classList;
+        const classList = (node as unknown as HTMLElement).classList;
         if (classList) {
           classList.forEach((className: string) => {
             if (className === this.includeClicksOnClass) {
@@ -58,7 +58,7 @@ export class ClickAwareDirective extends SubscriptionManager {
             }
           });
         }
-        node = node.parentNode as any as HTMLElement;
+        node = node.parentNode as unknown as HTMLElement;
       }
     }
 
