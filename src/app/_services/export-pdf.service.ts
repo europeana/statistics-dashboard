@@ -14,7 +14,13 @@ export class ExportPDFService {
     return rowIndex % 2 === 0 ? '#CCCCCC' : null;
   }
 
-  download(tableData: FmtTableData, imgUrlData: string): void {
+  download(
+    tableData: FmtTableData = {
+      columns: ['name', 'count'],
+      tableRows: [{ name: '', count: 0 } as unknown as TableRow]
+    },
+    imgUrlData = ''
+  ): void {
     const layout = {
       content: [
         { text: 'Tables', style: 'header' },
@@ -60,15 +66,12 @@ export class ExportPDFService {
         }
       }
     };
-    try {
-      pdfMake.createPdf(layout).download();
-    } catch (error) {
-      console.log(error);
-    }
+    const pdfDocGenerator = pdfMake.createPdf(layout);
+    pdfDocGenerator.download();
   }
 
   getChartAsImageUrl(canvas: ElementRef, source: ElementRef): Promise<string> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       html2canvas(source.nativeElement)
         .then((canvasHTML: HTMLCanvasElement) => {
           canvas.nativeElement.src = canvasHTML.toDataURL('image/png');
@@ -76,6 +79,7 @@ export class ExportPDFService {
         })
         .catch((error: string) => {
           console.log(error);
+          reject(error);
         });
     });
   }
