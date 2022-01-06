@@ -16,8 +16,8 @@ module.exports = function (config) {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     coverageReporter: {
-      type : "lcov",
-      dir : "coverage/"
+      type: "lcov",
+      dir: "coverage/"
     },
     preprocessors: {
       "src/app/**/*.ts": ["coverage"]
