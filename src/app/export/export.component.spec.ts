@@ -65,6 +65,7 @@ describe('ExportComponent', () => {
     expect(component.copied).toBeFalsy();
   }));
 
+  /*
   it('should export CSV', () => {
     spyOn(exportCSV, 'download');
     const elDownload = document.createElement('a');
@@ -79,6 +80,7 @@ describe('ExportComponent', () => {
     component.export(ExportType.PDF);
     expect(component.getChartData).toHaveBeenCalled();
   });
+  */
 
   it('should export only known types', () => {
     spyOn(component, 'getChartData').and.callThrough();
