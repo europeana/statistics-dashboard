@@ -74,7 +74,6 @@ export class TruncateComponent implements OnInit {
         this.omitCount = Math.max(this.omitCount - this.omitStep, 0);
         this.splitText(this.maxRecursions);
       }
-      return;
     } else {
       const wLeft =
         this.elRefTextLeft.nativeElement.getBoundingClientRect().width;

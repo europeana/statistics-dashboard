@@ -114,25 +114,25 @@ export class MapComponent {
 
       // Set up heat legend
       if (this.hasLegend) {
-        const heatLegend = chart.createChild(am4maps.HeatLegend);
-        heatLegend.id = 'mapLegend';
-        heatLegend.series = polygonSeries;
-        heatLegend.align = 'left';
-        heatLegend.valign = 'bottom';
-        heatLegend.width = am4core.percent(35);
-        heatLegend.marginRight = am4core.percent(4);
-        heatLegend.background.fill = am4core.color('#000');
-        heatLegend.background.fillOpacity = 0.05;
-        heatLegend.padding(5, 5, 5, 5);
+        const legend = chart.createChild(am4maps.HeatLegend);
+        legend.id = 'mapLegend';
+        legend.series = polygonSeries;
+        legend.align = 'left';
+        legend.valign = 'bottom';
+        legend.width = am4core.percent(35);
+        legend.marginRight = am4core.percent(4);
+        legend.background.fill = am4core.color('#000');
+        legend.background.fillOpacity = 0.05;
+        legend.padding(5, 5, 5, 5);
         // Set up custom heat map legend labels using axis ranges
-        const minRange = heatLegend.valueAxis.axisRanges.create();
+        const minRange = legend.valueAxis.axisRanges.create();
         minRange.label.horizontalCenter = 'left';
 
-        const maxRange = heatLegend.valueAxis.axisRanges.create();
+        const maxRange = legend.valueAxis.axisRanges.create();
         maxRange.label.horizontalCenter = 'right';
 
         // Blank out internal heat legend value axis labels
-        heatLegend.valueAxis.renderer.labels.template.adapter.add(
+        legend.valueAxis.renderer.labels.template.adapter.add(
           'text',
           function (_: string) {
             return '';
@@ -142,15 +142,15 @@ export class MapComponent {
         // Update heat legend value labels
         polygonSeries.events.on('datavalidated', function (ev) {
           const heatLegend = ev.target.map.getKey('mapLegend');
-          const min = heatLegend.series.dataItem.values.value.low;
-          const minRange = heatLegend.valueAxis.axisRanges.getIndex(0);
-          minRange.value = min;
-          minRange.label.text = '' + heatLegend.numberFormatter.format(min);
+          const hlMin = heatLegend.series.dataItem.values.value.low;
+          const hlMinRange = heatLegend.valueAxis.axisRanges.getIndex(0);
+          hlMinRange.value = hlMin;
+          hlMinRange.label.text = '' + heatLegend.numberFormatter.format(hlMin);
 
-          const max = heatLegend.series.dataItem.values.value.high;
-          const maxRange = heatLegend.valueAxis.axisRanges.getIndex(1);
-          maxRange.value = max;
-          maxRange.label.text = '' + heatLegend.numberFormatter.format(max);
+          const hlMax = heatLegend.series.dataItem.values.value.high;
+          const hlMaxRange = heatLegend.valueAxis.axisRanges.getIndex(1);
+          hlMaxRange.value = hlMax;
+          hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
         });
       }
 
@@ -175,12 +175,12 @@ export class MapComponent {
 
   zoomToCountries(zoomTo = ['IS', 'TR', 'ES', 'NO']): void {
     this.browserOnly((): void => {
-      // Init extrems
+      // Init extremes
       let north, south, west, east;
 
       // Find extreme coordinates for all pre-zoom countries
-      for (let i = 0; i < zoomTo.length; i++) {
-        const country = this.polygonSeries.getPolygonById(zoomTo[i]);
+      zoomTo.forEach((countryId: string) => {
+        const country = this.polygonSeries.getPolygonById(countryId);
         if (north == undefined || country.north > north) {
           north = country.north;
         }
@@ -193,11 +193,10 @@ export class MapComponent {
         if (east == undefined || country.east > east) {
           east = country.east;
         }
+      });
 
-        country.isActive = true;
-        // Pre-zoom
-        this.chart.zoomToRectangle(north, east, south, west, 1, true);
-      }
+      // Pre-zoom
+      this.chart.zoomToRectangle(north, east, south, west, 1, true);
     });
   }
 }

@@ -8,7 +8,7 @@ import {
 } from '@angular/core/testing';
 import { ExportComponent } from '.';
 
-import { MockExportCSVService } from '../_mocked';
+import { MockExportCSVService, MockExportPDFService } from '../_mocked';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService } from '../_services';
 
@@ -75,7 +75,11 @@ describe('ExportComponent', () => {
   });
 
   it('should export PDF', () => {
-    spyOn(component, 'getChartData').and.callThrough();
+    spyOn(component, 'getChartData').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve(MockExportPDFService.imgDataURL);
+      }) as Promise<string>;
+    });
     component.export(ExportType.PDF);
     expect(component.getChartData).toHaveBeenCalled();
   });

@@ -88,12 +88,19 @@ export class SnapshotsComponent {
               operandB = b;
             }
             if (sortInfo.dir === 1) {
-              return operandA > operandB ? 1 : operandA === operandB ? 0 : -1;
+              if (operandA > operandB) {
+                return 1;
+              } else if (operandB > operandA) {
+                return -1;
+              }
             } else if (sortInfo.dir === -1) {
-              return operandA < operandB ? 1 : operandA === operandB ? 0 : -1;
-            } else {
-              return 0;
+              if (operandA < operandB) {
+                return 1;
+              } else if (operandA > operandB) {
+                return -1;
+              }
             }
+            return 0;
           }
         );
       }
@@ -205,12 +212,12 @@ export class SnapshotsComponent {
     cdd.orderOriginal = Object.keys(cdd.data).slice(0);
     cdd.orderPreferred = Object.keys(cdd.data).slice(0);
 
-    this.filteredCDKeys(facetName, 'applied').forEach((key: string) => {
-      cd[key].applied = false;
+    this.filteredCDKeys(facetName, 'applied').forEach((appliedKey: string) => {
+      cd[appliedKey].applied = false;
     });
 
-    this.filteredCDKeys(facetName, 'current').forEach((key: string) => {
-      cd[key].current = false;
+    this.filteredCDKeys(facetName, 'current').forEach((currentKey: string) => {
+      cd[currentKey].current = false;
     });
 
     cdd.applied = true;

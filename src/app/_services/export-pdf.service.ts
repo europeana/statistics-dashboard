@@ -14,13 +14,7 @@ export class ExportPDFService {
     return rowIndex % 2 === 0 ? '#CCCCCC' : null;
   }
 
-  download(
-    tableData: FmtTableData = {
-      columns: ['name', 'count'],
-      tableRows: [{ name: '', count: 0 } as unknown as TableRow]
-    },
-    imgUrlData = ''
-  ): void {
+  download(tableData: FmtTableData, imgUrlData: string): void {
     const layout = {
       content: [
         { text: 'Tables', style: 'header' },
@@ -34,7 +28,7 @@ export class ExportPDFService {
             body: [
               tableData.columns.slice(1).map((s: string) => {
                 return {
-                  text: s,
+                  text: `${s}`,
                   style: 'tableHeader',
                   alignment: 'center'
                 };
@@ -42,7 +36,7 @@ export class ExportPDFService {
               ...tableData.tableRows.map((tr: TableRow) => {
                 const result = [];
                 tableData.columns.slice(1).forEach((s: string) => {
-                  result.push(tr[s]);
+                  result.push(tr[`${s}`]);
                 });
                 return result;
               })
