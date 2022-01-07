@@ -49,10 +49,10 @@ export function validateDateGeneric(
         const dateOtherVal = new Date(otherValue);
 
         if (otherField === 'dateFrom') {
-          if (dateVal < new Date(otherValue)) {
+          if (dateVal < dateOtherVal) {
             isTooEarly = true;
           }
-        } else if (dateVal > dateToUCT(new Date(otherValue))) {
+        } else if (dateVal > dateToUCT(dateOtherVal)) {
           isTooLate = true;
         }
       }

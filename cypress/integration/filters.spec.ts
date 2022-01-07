@@ -110,7 +110,7 @@ context('statistics-dashboard', () => {
       cy.get(selFilterOpener).last().click(force);
       cy.get(selDateFrom).should('have.length', 1);
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
       cy.get(selDateFrom).type(today);
       cy.get(selDateTo).type(today);
 
