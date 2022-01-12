@@ -1,41 +1,39 @@
 <div class="snapshots" *ngIf="isVisible">
   <ng-template #comparisonItem let-key="key" let-item="item">
     <ng-container *ngIf="item.current || item.saved">
-      <li class="compare-data">
-        <a
-          (click)="toggle(key, item.current)"
-          class="compare-data-link"
-          [ngClass]="{ applied: item.applied, current: item.current }"
-          ><span
-            class="legend-square"
-            [ngStyle]="{
-              'background-color': item.applied
-                ? colours[item._colourIndex]
-                : '#fff'
-            }"
-          ></span>
-          <span class="editable" contenteditable spellcheck="false">{{
-            item.label
-          }}</span>
-        </a>
+      <a
+        (click)="toggle(key, item.current)"
+        class="compare-data-link"
+        [ngClass]="{ applied: item.applied, current: item.current }"
+        ><span
+          class="legend-square"
+          [ngStyle]="{
+            'background-color': item.applied
+              ? colours[item._colourIndex]
+              : '#fff'
+          }"
+        ></span>
+        <span class="editable" contenteditable spellcheck="false">{{
+          item.label
+        }}</span>
+      </a>
 
-        <a
-          (click)="toggleSaved(key, item.current)"
-          class="save"
-          [ngClass]="{ saved: item.saved }"
-        ></a>
-      </li>
+      <a
+        (click)="toggleSaved(key, item.current)"
+        class="save"
+        [ngClass]="{ saved: item.saved }"
+      ></a>
     </ng-container>
   </ng-template>
 
   <ul class="comparison-list">
-    <ng-container *ngFor="let key of getSortKeys()">
+    <li class="compare-data" *ngFor="let key of getSortKeys()">
       <ng-content
         *ngTemplateOutlet="
           comparisonItem;
           context: { key: key, item: compareData[key] }
         "
       ></ng-content>
-    </ng-container>
+    </li>
   </ul>
 </div>

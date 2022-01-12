@@ -235,7 +235,7 @@ export class BarComponent implements AfterViewInit {
         });
       }
 
-      anySeries = this.createSeries([csd.colour], csd.seriesName);
+      anySeries = this.createSeries(csd.colour, csd.seriesName);
       this.addLegend(anySeries);
       this.allSeries[csd.seriesName] = anySeries;
     });
@@ -251,7 +251,6 @@ export class BarComponent implements AfterViewInit {
             grip.icon.disabled = true;
             grip.background.fill = am4core.color('#0a72cc');
             grip.background.fillOpacity = 0.8;
-            //grip.background.disabled = true;
           };
           this.chart.scrollbarY = new am4core.Scrollbar();
           customiseGrip(this.chart.scrollbarY.startGrip);
@@ -272,20 +271,17 @@ export class BarComponent implements AfterViewInit {
   }
 
   /** createSeries
-  /* - instantiates series class
-  /* - build colour model
-  */
-  createSeries(
-    colours: Array<string>,
-    valueField = 'value'
-  ): am4charts.ColumnSeries {
+   * - instantiates and returns a series
+   *
+   * @param { string : colour } the series legend / bar colour
+   * @param { string : valueField } the field to read
+   */
+  createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
     const series = this.chart.series.push(new am4charts.ColumnSeries());
     const labelSuffix = this.showPercent ? '%' : '';
 
     series.columns.template.events.once('inited', function (event) {
-      event.target.fill = am4core.color(
-        colours[event.target.dataItem.index % colours.length]
-      );
+      event.target.fill = am4core.color(colour);
     });
 
     if (this.settings.isHorizontal) {
@@ -321,11 +317,75 @@ export class BarComponent implements AfterViewInit {
     return this.chart.exporting.getImage('png');
   }
 
+  /** applyPadding
+   * - applies padding settings to the chart
+   */
+  applyPadding(): void {
+    ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
+      (s: string) => {
+        if (!isNaN(this.settings[s])) {
+          this.chart[s] = this.settings[s];
+        }
+      }
+    );
+  }
+
+  /** applyRendererDefaults
+   * - applies settings to category / value axis renderers
+   */
+  applyRendererDefaults(): void {
+    // force show all labels
+    this.categoryAxis.renderer.minGridDistance = 30;
+
+    // disable grid lines
+    this.categoryAxis.renderer.grid.template.disabled = true;
+    this.valueAxis.renderer.grid.template.disabled = true;
+
+    // axis / tick styling
+    this.categoryAxis.renderer.ticks.template.disabled = false;
+    this.categoryAxis.renderer.ticks.template.strokeOpacity = 1;
+    this.categoryAxis.renderer.ticks.template.stroke = am4core.color('#CCC');
+    this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
+    this.categoryAxis.renderer.ticks.template.length = 9;
+
+    // labels
+    this.categoryAxis.renderer.labels.template.maxWidth =
+      this.settings.maxLabelWidth;
+    this.categoryAxis.renderer.labels.template.truncate =
+      this.settings.labelTruncate;
+    this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
+
+    this.categoryAxis.renderer.labels.template.fontSize = 10;
+    this.categoryAxis.renderer.labels.template.fontWeight = '600';
+    this.categoryAxis.renderer.labels.template.marginRight = 9;
+    this.categoryAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
+    this.valueAxis.renderer.labels.template.fontSize = 12;
+    this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
+
+    this.categoryAxis.renderer.labels.template.adapter.add(
+      'text',
+      (label: string) => {
+        let prefix = '';
+        if (this.settings.prefixValueAxis) {
+          prefix = `${this.settings.prefixValueAxis} `;
+        }
+        return `${prefix}${label}`;
+      }
+    );
+
+    this.valueAxis.renderer.labels.template.adapter.add(
+      'text',
+      (label: string) => {
+        return `${label}${this.showPercent ? '%' : ''}`;
+      }
+    );
+  }
+
   /** drawChart
-  /* - instantiates chart and axes according to rotation
-  /* - assigns data
-  /* - invokes series, legend and settings functions
-  */
+   * - instantiates chart and axes according to rotation
+   * - assigns data
+   * - invokes series, legend and settings functions
+   */
   drawChart(zoomIndex?: number): void {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
@@ -338,13 +398,7 @@ export class BarComponent implements AfterViewInit {
         });
       }
 
-      ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
-        (s: string) => {
-          if (!isNaN(this.settings[s])) {
-            chart[s] = this.settings[s];
-          }
-        }
-      );
+      this.applyPadding();
 
       // Create axes
       this.categoryAxis = new am4charts.CategoryAxis();
@@ -376,53 +430,7 @@ export class BarComponent implements AfterViewInit {
         this.categoryAxis.renderer.labels.template.rotation = 270;
       }
 
-      // force show all labels
-      this.categoryAxis.renderer.minGridDistance = 30;
-
-      // disable grid lines
-      this.categoryAxis.renderer.grid.template.disabled = true;
-      this.valueAxis.renderer.grid.template.disabled = true;
-
-      // axis / tick styling
-      this.categoryAxis.renderer.ticks.template.disabled = false;
-      this.categoryAxis.renderer.ticks.template.strokeOpacity = 1;
-      this.categoryAxis.renderer.ticks.template.stroke = am4core.color('#CCC');
-      this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
-      this.categoryAxis.renderer.ticks.template.length = 9;
-
-      // labels
-      this.categoryAxis.renderer.labels.template.maxWidth =
-        this.settings.maxLabelWidth;
-      this.categoryAxis.renderer.labels.template.truncate =
-        this.settings.labelTruncate;
-      this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
-
-      this.categoryAxis.renderer.labels.template.fontSize = 10;
-      this.categoryAxis.renderer.labels.template.fontWeight = '600';
-      this.categoryAxis.renderer.labels.template.marginRight = 9;
-      this.categoryAxis.renderer.labels.template.fill =
-        am4core.color('#4D4D4D');
-      this.valueAxis.renderer.labels.template.fontSize = 12;
-      this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
-
-      this.categoryAxis.renderer.labels.template.adapter.add(
-        'text',
-        (label: string) => {
-          let prefix = '';
-          if (this.settings.prefixValueAxis) {
-            prefix = `${this.settings.prefixValueAxis} `;
-          }
-          return `${prefix}${label}`;
-        }
-      );
-
-      this.valueAxis.renderer.labels.template.adapter.add(
-        'text',
-        (label: string) => {
-          return `${label}${this.showPercent ? '%' : ''}`;
-        }
-      );
-
+      this.applyRendererDefaults();
       this.addLegend();
     });
 

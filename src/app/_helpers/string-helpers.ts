@@ -124,8 +124,8 @@ export function fromCSL(s: string): Array<string> {
     .map((part: string) => {
       return part.trim();
     })
-    .filter((s: string) => {
-      return s.length > 0;
+    .filter((part: string) => {
+      return part.length > 0;
     });
 }
 
@@ -134,12 +134,11 @@ export function getFormValueList(
   field: string
 ): Array<string> {
   const vals = form.value[field];
-  const res = vals
+  return vals
     ? Object.keys(vals)
         .filter((key: string) => {
           return vals[key];
         })
         .map(fromInputSafeName)
     : [];
-  return res;
 }

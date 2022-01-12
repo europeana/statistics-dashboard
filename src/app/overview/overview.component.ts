@@ -6,27 +6,29 @@ import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { facetNames, nonFacetFilters, portalNames } from '../_data';
-import { filterList, fromCSL, getDateAsISOString } from '../_helpers';
-import { DimensionName, FilterInfo, NonFacetFilterNames } from '../_models';
-import { RenameRightsPipe } from '../_translate';
-import { BarChartCool } from '../chart/chart-defaults';
-import { BarComponent } from '../chart';
-import { SnapshotsComponent } from '../snapshots';
-
 import {
+  filterList,
+  fromCSL,
   fromInputSafeName,
+  getDateAsISOString,
   rightsUrlMatch,
   today,
   toInputSafeName,
   validateDateGeneric,
   yearZero
 } from '../_helpers';
+import { RenameRightsPipe } from '../_translate';
+import { BarChartCool } from '../chart/chart-defaults';
+import { BarComponent } from '../chart';
+import { SnapshotsComponent } from '../snapshots';
 
 import {
   BreakdownRequest,
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
+  DimensionName,
+  FilterInfo,
   FilterState,
   FmtTableData,
   IHashArrayNameLabel,
@@ -35,6 +37,7 @@ import {
   IHashStringArray,
   NameLabel,
   NamesValuePercent,
+  NonFacetFilterNames,
   RequestFilter
 } from '../_models';
 
@@ -82,9 +85,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   readonly facetConf = facetNames;
 
   filterStates: { [key: string]: FilterState } = {};
-  userFilterSearchTerms = facetNames.reduce((map, item: string) => {
-    map[item] = '';
-    return map;
+  userFilterSearchTerms = facetNames.reduce((newMap, item: string) => {
+    newMap[item] = '';
+    return newMap;
   }, {});
 
   chartPosition = 0;
@@ -485,9 +488,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     src: Array<NamesValuePercent>,
     percent = false
   ): IHashNumber {
-    return src.reduce(function (map: IHashNumber, nvp: NamesValuePercent) {
-      map[nvp.name] = percent ? nvp.percent : nvp.value;
-      return map;
+    return src.reduce(function (newMap: IHashNumber, nvp: NamesValuePercent) {
+      newMap[nvp.name] = percent ? nvp.percent : nvp.value;
+      return newMap;
     }, {});
   }
 
@@ -495,10 +498,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     facet: string,
     src: Array<NamesValuePercent>
   ): IHashString {
-    const result = src.reduce((map: IHashString, nvp: NamesValuePercent) => {
+    const result = src.reduce((newMap: IHashString, nvp: NamesValuePercent) => {
       const x = this.getUrlRow(facet, nvp.name);
-      map[nvp.name] = x;
-      return map;
+      newMap[nvp.name] = x;
+      return newMap;
     }, {});
 
     result['summary'] = this.getUrlRow(facet);
@@ -509,9 +512,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (this.form.value.facetParameter !== DimensionName.rights) {
       return null;
     }
-    return src.reduce(function (map: IHashString, nvp: NamesValuePercent) {
-      map[nvp.name] = nvp.rawName;
-      return map;
+    return src.reduce(function (newMap: IHashString, nvp: NamesValuePercent) {
+      newMap[nvp.name] = nvp.rawName;
+      return newMap;
     }, {});
   }
 
@@ -688,7 +691,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       new FormControl(false)
     );
 
-    this.facetConf.map((s: string) => {
+    this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));
       this.form.addControl(`filter_list_${s}`, new FormControl(''));
     });
@@ -744,19 +747,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns { string } - contentTierZero value if filterContentTier values not present
   */
   getFormattedContentTierParam(): string {
-    let res = '';
     const filterContentTierParam = this.getSetCheckboxValues(
       DimensionName.contentTier
     );
+    let res: Array<string> = [];
 
-    res = (
-      filterContentTierParam.length > 0
-        ? filterContentTierParam
-        : this.form.value.contentTierZero
-        ? this.contentTiersOptions
-        : this.contentTiersOptions.slice(1)
-    ).join(' OR ');
-    return `&qf=contentTier:(${encodeURIComponent(res)})`;
+    if (filterContentTierParam.length > 0) {
+      res = filterContentTierParam;
+    } else {
+      if (this.form.value.contentTierZero) {
+        res = this.contentTiersOptions;
+      } else {
+        res = this.contentTiersOptions.slice(1);
+      }
+    }
+    return `&qf=contentTier:(${encodeURIComponent(res.join(' OR '))})`;
   }
 
   /** getFormattedDatasetIdParam
@@ -1004,9 +1009,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     switch (cleanVal.length) {
       case 0: {
         ctrl.setValue('');
+        break;
       }
       case 1: {
         ctrl.setValue(cleanVal[0]);
+        break;
       }
       default: {
         ctrl.setValue(cleanVal.join(', '));
