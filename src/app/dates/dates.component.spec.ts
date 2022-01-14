@@ -1,6 +1,11 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  ReactiveFormsModule,
+  ValidationErrors
+} from '@angular/forms';
 import { validateDateGeneric } from '../_helpers';
 import { DatesComponent } from '.';
 
@@ -22,13 +27,13 @@ describe('DatesComponent', () => {
     component.form = new FormBuilder().group({
       dateFrom: [
         '',
-        (control): { [key: string]: boolean } | null => {
+        (control): ValidationErrors | null => {
           return validateDateGeneric(control, 'dateFrom');
         }
       ],
       dateTo: [
         '',
-        (control): { [key: string]: boolean } | null => {
+        (control): ValidationErrors | null => {
           return validateDateGeneric(control, 'dateTo');
         }
       ]

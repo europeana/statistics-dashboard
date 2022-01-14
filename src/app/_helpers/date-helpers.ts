@@ -23,10 +23,46 @@ export function getDateAsISOString(localDate: Date): string {
   return dateToUCT(localDate).toISOString().split('T')[0];
 }
 
+/** setErrorIfEarly
+/* sets 'isTooEarly' on 'errors' if date1 is earlier than date2
+/* @param {Date} date1 - a date to compare
+/* @param {Date} date2 - a date to compare
+/* @param {ValidationErrors} errors - an errors object to write to
+/* @returns boolean
+*/
+function setErrorIfEarly(
+  date1: Date,
+  date2: Date,
+  errors: ValidationErrors
+): boolean {
+  if (date1 < date2) {
+    errors.isTooEarly = true;
+  }
+  return errors.isTooEarly;
+}
+
+/** setErrorIfLate
+/* sets 'isTooLate' on errors if date1 is later than date2
+/* @param {Date} date1 - a date to compare
+/* @param {Date} date2 - a date to compare
+/* @param {ValidationErrors} errors - an errors object to write to
+/* @returns boolean
+*/
+function setErrorIfLate(
+  date1: Date,
+  date2: Date,
+  errors: ValidationErrors
+): boolean {
+  if (date1 > date2) {
+    errors.isTooLate = true;
+  }
+  return errors.isTooLate;
+}
+
 /** validateDateGeneric
 /* @param {FormControl} control - the field to validate
 /* @param {string} fieldName - the field name
-/* - returns an errors object map
+/* - returns a ValidationErrors object or null
 */
 export function validateDateGeneric(
   control: FormControl,
@@ -38,27 +74,24 @@ export function validateDateGeneric(
   }
 
   const res: ValidationErrors = {};
-  const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
   const dateVal = dateToUCT(new Date(val));
 
-  const checkEarly = (date1, date2): void => {
-    if (date1 < date2) {
-      res.isTooEarly = true;
-    }
-  };
+  if (setErrorIfEarly(dateVal, new Date(yearZero), res)) {
+    return res;
+  }
+  if (setErrorIfLate(dateVal, dateToUCT(new Date(today)), res)) {
+    return res;
+  }
 
-  checkEarly(dateVal, new Date(yearZero));
-  if (dateVal > dateToUCT(new Date(today))) {
-    res.isTooLate = true;
-  } else {
-    const otherValue = control.parent.value[otherField];
-    if (otherValue && otherValue.length > 0) {
-      const dateOtherVal = new Date(otherValue);
-      if (otherField === 'dateFrom') {
-        checkEarly(dateVal, dateOtherVal);
-      } else if (dateVal > dateToUCT(dateOtherVal)) {
-        res.isTooLate = true;
-      }
+  const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
+  const otherValue = control.parent.value[otherField];
+
+  if (otherValue && otherValue.length > 0) {
+    const dateOtherVal = new Date(otherValue);
+    if (otherField === 'dateFrom') {
+      setErrorIfEarly(dateVal, dateOtherVal, res);
+    } else {
+      setErrorIfLate(dateVal, dateToUCT(dateOtherVal), res);
     }
   }
   return Object.keys(res).length > 0 ? res : null;
