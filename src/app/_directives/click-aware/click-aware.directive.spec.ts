@@ -90,7 +90,7 @@ describe('ClickAwareDirective', () => {
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 
-  it('should detect clicks in the "includeClicksOnClass" element', () => {
+  it('should detect clicks on ancestor elements with specific classes', () => {
     const clickInfo = component.clickInfo;
 
     expect(clickInfo.isClickedInside).toBeFalsy();
@@ -105,7 +105,7 @@ describe('ClickAwareDirective', () => {
     );
     expect(clickInfo.isClickedInside).toBeFalsy();
 
-    clickInfo.includeClicksOnClass = 'cmp';
+    clickInfo.includeClicksOnClasses = ['cmp'];
 
     clickInfo.documentClickListener(
       liveElement.nativeElement,

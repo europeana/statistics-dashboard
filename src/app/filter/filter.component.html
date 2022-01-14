@@ -3,8 +3,10 @@
   *ngIf="form && group && !state.disabled"
   [formGroup]="form"
   appClickAware
-  [includeClicksOnClass]="
-    group + '' === 'dates' ? 'mat-datepicker-content' : ''
+  [includeClicksOnClasses]="
+    group + '' === 'dates'
+      ? ['mat-calendar-body', 'mat-datepicker-content']
+      : []
   "
   (clickOutside)="hide()"
 >
