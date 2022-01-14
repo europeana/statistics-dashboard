@@ -14,7 +14,7 @@ import { ClickService } from '../../_services';
 })
 export class ClickAwareDirective extends SubscriptionManager {
   @Output() clickOutside: EventEmitter<void> = new EventEmitter();
-  @Input() includeClicksOnClass: string;
+  @Input() includeClicksOnClasses: Array<string>;
 
   isClickedInside = false;
 
@@ -47,13 +47,13 @@ export class ClickAwareDirective extends SubscriptionManager {
   ): void {
     this.isClickedInside = nativeElement.contains(clickTarget);
 
-    if (!this.isClickedInside && this.includeClicksOnClass) {
+    if (!this.isClickedInside && this.includeClicksOnClasses) {
       let node = clickTarget.parentNode;
       while (node) {
         const classList = (node as unknown as HTMLElement).classList;
         if (classList) {
-          classList.forEach((className: string) => {
-            if (className === this.includeClicksOnClass) {
+          this.includeClicksOnClasses.forEach((includedClass: string) => {
+            if (classList.contains(includedClass)) {
               this.isClickedInside = true;
             }
           });

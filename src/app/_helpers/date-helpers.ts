@@ -1,4 +1,4 @@
-import { FormControl } from '@angular/forms';
+import { FormControl, ValidationErrors } from '@angular/forms';
 
 export const today = new Date().toISOString().split('T')[0];
 
@@ -31,36 +31,35 @@ export function getDateAsISOString(localDate: Date): string {
 export function validateDateGeneric(
   control: FormControl,
   fieldName: string
-): { [key: string]: boolean } | null {
+): ValidationErrors | null {
   const val = control.value || null;
-  let isTooEarly = false;
-  let isTooLate = false;
-  if (val) {
-    const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
-    const dateVal = dateToUCT(new Date(val));
+  if (!val) {
+    return null;
+  }
 
-    if (dateVal < new Date(yearZero)) {
-      isTooEarly = true;
-    } else if (dateVal > dateToUCT(new Date(today))) {
-      isTooLate = true;
-    } else {
-      const otherValue = control.parent.value[otherField];
-      if (otherValue && otherValue.length > 0) {
-        const dateOtherVal = new Date(otherValue);
+  const res: ValidationErrors = {};
+  const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
+  const dateVal = dateToUCT(new Date(val));
 
-        if (otherField === 'dateFrom') {
-          if (dateVal < dateOtherVal) {
-            isTooEarly = true;
-          }
-        } else if (dateVal > dateToUCT(dateOtherVal)) {
-          isTooLate = true;
-        }
+  const checkEarly = (date1, date2): void => {
+    if (date1 < date2) {
+      res.isTooEarly = true;
+    }
+  };
+
+  checkEarly(dateVal, new Date(yearZero));
+  if (dateVal > dateToUCT(new Date(today))) {
+    res.isTooLate = true;
+  } else {
+    const otherValue = control.parent.value[otherField];
+    if (otherValue && otherValue.length > 0) {
+      const dateOtherVal = new Date(otherValue);
+      if (otherField === 'dateFrom') {
+        checkEarly(dateVal, dateOtherVal);
+      } else if (dateVal > dateToUCT(dateOtherVal)) {
+        res.isTooLate = true;
       }
     }
   }
-  return isTooEarly
-    ? { isTooEarly: isTooEarly }
-    : isTooLate
-    ? { isTooLate: isTooLate }
-    : null;
+  return Object.keys(res).length > 0 ? res : null;
 }
