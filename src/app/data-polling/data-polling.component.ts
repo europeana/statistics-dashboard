@@ -10,12 +10,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import {
   BehaviorSubject,
+  merge,
   Observable,
   Subject,
   Subscription,
   timer
 } from 'rxjs';
-import { delayWhen, filter, merge, switchMap, tap } from 'rxjs/operators';
+
+import { delayWhen, filter, switchMap, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { SubscriptionManager } from '../subscription-manager/subscription.manager';
 
@@ -208,9 +210,11 @@ export class DataPollingComponent
       pollContext: 0
     });
 
-    this.allPollingInfo[pollContextIndex].subscription = loadTrigger
+    this.allPollingInfo[pollContextIndex].subscription = merge(
+      loadTrigger,
+      pollRefresh
+    )
       .pipe(
-        merge(pollRefresh), // user events come into the stream here
         switchMap(() => {
           return fnServiceCall();
         }),
