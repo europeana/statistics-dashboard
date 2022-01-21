@@ -29,22 +29,30 @@ export class GridPaginatorComponent {
   totalPageCount: number;
   totalRows: number;
 
+  /**
+   * calculatePages
+   * generates page structure (stored as this.ranges) and returns row data
+   * @param {Array<TableRow>} rows - the rows to paginate
+   * @returns Array<Array<TableRow>>
+   **/
   calculatePages(rows: Array<TableRow>): Array<Array<TableRow>> {
-    const ranges = ([] = Array.from(
+    // create loose range sructure, i.e. [[0,10],[10,20],[20,30]]
+    const ranges = Array.from(
       {
         length: Math.ceil(rows.length / this._maxPageSize)
       },
       (v, i: number) => {
         const lowerIndex = i * this._maxPageSize;
-        const upperIndex = i * this._maxPageSize + this._maxPageSize;
+        const upperIndex = lowerIndex + this._maxPageSize;
         return [lowerIndex, upperIndex];
       }
-    ));
+    );
 
     const pages = ranges.map((range: Array<number>) => {
       return rows.slice(range[0], range[1]);
     });
 
+    // store precise range structure, i.e. [[1,10],[11,20],[21,25]]
     this.ranges = ranges.map((range: Array<number>) => {
       return [range[0] + 1, Math.min(range[1], rows.length)];
     });

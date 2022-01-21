@@ -194,7 +194,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     );
 
     this.subs.push(
-      combineLatest(this.route.params, this.route.queryParams)
+      combineLatest([this.route.params, this.route.queryParams])
         .pipe(
           map((results) => {
             const qp = results[1];
@@ -281,12 +281,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getUrl
+  /* @param {false} omitCTParam - flag to omit the content tier param
   /* returns a url parameter string (for api or the portal) according to the form state
   /* @returns string
   */
-  getUrl(facet: string, value?: string): string {
+  getUrl(omitCTParam = false): string {
     // filterParam cannot rely on checkbox values as filters aren't built until the data is initialised
-
     /*
       for each page query parameter:
         - take its (array of) values
@@ -327,11 +327,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     const dateParam = this.getFormattedDateParam();
     const ct =
-      (facet === DimensionName.contentTier && value) ||
-      this.queryParams[DimensionName.contentTier]
+      omitCTParam || this.queryParams[DimensionName.contentTier]
         ? ''
         : this.getFormattedContentTierParam();
-
     return `${queryParam}${ct}${filterParam}${dateParam}`;
   }
 
@@ -340,7 +338,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* returns the (portal) url for a specific item
   */
   getUrlRow(facet: string, qfVal?: string): string {
-    const rootUrl = `${environment.serverPortal}${this.getUrl(facet, qfVal)}`;
+    const rootUrl = `${environment.serverPortal}${this.getUrl(
+      facet === DimensionName.contentTier && !!qfVal
+    )}`;
     if (!qfVal) {
       return rootUrl;
     }
@@ -379,8 +379,24 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const dsd = this.dataServerData;
     if (dsd && dsd.filteringOptions) {
       const ops = dsd.filteringOptions;
+      this.buildFilters(ops);
 
-      this.facetConf.forEach((facetName: DimensionName) => {
+      if (dsd.results && dsd.results.breakdowns) {
+        // set pie and table data
+        this.extractSeriesServerData(dsd.results.breakdowns);
+      }
+    }
+  }
+
+  /** buildFilters
+   * @param { IHashStringArray : ops } - the filter data
+   **/
+  buildFilters(ops: IHashStringArray): void {
+    this.facetConf
+      .filter((facetName: DimensionName) => {
+        return !!ops[facetName];
+      })
+      .forEach((facetName: DimensionName) => {
         // calculate prefix
         let prefix = '';
         if (
@@ -391,58 +407,48 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           prefix = 'Tier ';
         }
 
-        if (!ops[facetName]) {
-          console.error('Missing dimension data: ' + facetName);
-        } else {
-          // calculate full list of in-memory safe options
-          const safeOps = ops[facetName]
-            .filter((op: string) => {
-              return !(
-                !this.form.value.contentTierZero &&
-                op === '0' &&
-                facetName === DimensionName.contentTier
-              );
-            })
-            .map((op: string) => {
-              return {
-                name: toInputSafeName(op),
-                label: prefix + op
-              };
-            })
-            .sort((op1: NameLabel, op2: NameLabel) => {
-              // ensure that selected filters appear...
-              const qp = this.queryParams;
-              if (qp && qp[facetName]) {
-                const includes1 = qp[facetName].includes(op1.name);
-                const includes2 = qp[facetName].includes(op2.name);
-                if (includes1 && !includes2) {
-                  return -1;
-                } else if (includes2 && !includes1) {
-                  return 1;
-                }
-              }
-
-              // ...and sort on label
-              if (op1.label > op2.label) {
+        // calculate full list of in-memory safe options
+        const safeOps = ops[facetName]
+          .filter((op: string) => {
+            return !(
+              !this.form.value.contentTierZero &&
+              op === '0' &&
+              facetName === DimensionName.contentTier
+            );
+          })
+          .map((op: string) => {
+            return {
+              name: toInputSafeName(op),
+              label: prefix + op
+            };
+          })
+          .sort((op1: NameLabel, op2: NameLabel) => {
+            // ensure that selected filters appear...
+            const qp = this.queryParams;
+            if (qp && qp[facetName]) {
+              const includes1 = qp[facetName].includes(op1.name);
+              const includes2 = qp[facetName].includes(op2.name);
+              if (includes1 && !includes2) {
+                return -1;
+              } else if (includes2 && !includes1) {
                 return 1;
               }
-              return -1;
-            });
-          this.filterData[facetName] = safeOps;
+            }
 
-          const previousTerm = this.userFilterSearchTerms[facetName];
-          this.filterDisplayData({
-            term: previousTerm ? previousTerm : '',
-            dimension: facetName
+            // ...and sort on label
+            if (op1.label > op2.label) {
+              return 1;
+            }
+            return -1;
           });
-        }
-      });
+        this.filterData[facetName] = safeOps;
 
-      if (dsd.results && dsd.results.breakdowns) {
-        // set pie and table data
-        this.extractSeriesServerData(dsd.results.breakdowns);
-      }
-    }
+        const previousTerm = this.userFilterSearchTerms[facetName];
+        this.filterDisplayData({
+          term: previousTerm ? previousTerm : '',
+          dimension: facetName
+        });
+      });
   }
 
   /** beginPolling

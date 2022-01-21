@@ -255,43 +255,27 @@ describe('OverviewComponent', () => {
     }));
 
     it('should get the url for a dataset', () => {
-      expect(
-        component.getUrl(DimensionName.contentTier).indexOf('XXX')
-      ).toEqual(-1);
+      expect(component.getUrl().indexOf('XXX')).toEqual(-1);
       component.form.get('datasetId').setValue('XXX');
-      expect(
-        component.getUrl(DimensionName.contentTier).indexOf('XXX')
-      ).toBeTruthy();
+      expect(component.getUrl().indexOf('XXX')).toBeTruthy();
     });
 
     it('should get the url for filters', () => {
       const countryUrlParamVal = 'Belgium';
       const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
 
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(countryUrlParamVal)
-      ).toBeFalsy();
+      expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
       component.queryParams = { country: [countryUrlParamVal] };
+      expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
       expect(
-        component.getUrl(DimensionName.contentTier).includes(countryUrlParamVal)
-      ).toBeTruthy();
-      expect(
-        component
-          .getUrl(DimensionName.contentTier)
-          .includes(`COUNTRY:"${countryUrlParamVal}"`)
+        component.getUrl().includes(`COUNTRY:"${countryUrlParamVal}"`)
       ).toBeTruthy();
 
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
-      ).toBeFalsy();
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
       component.queryParams = { 'content-tier-zero': true };
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
-      ).toBeFalsy();
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
       component.form.controls.contentTierZero.setValue(true);
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
-      ).toBeTruthy();
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeTruthy();
     });
 
     it('should get the formatted date param', () => {

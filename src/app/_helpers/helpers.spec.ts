@@ -1,11 +1,18 @@
 import {
   appendDiacriticEquivalents,
+  filterList,
   fromCSL,
   fromInputSafeName,
   replaceDiacritics
 } from '.';
 
 describe('Helpers', () => {
+  it('should filter lists', () => {
+    const list = ['a', 'c', 'b'];
+    expect(filterList('term', list)).toEqual([]);
+    expect(filterList('', list)).toEqual(list);
+  });
+
   it('should decode input-safe names', () => {
     expect(fromInputSafeName('Hello_____World')).toEqual('Hello.World');
     expect(fromInputSafeName('_____')).toEqual('.');

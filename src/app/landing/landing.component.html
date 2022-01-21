@@ -31,7 +31,10 @@
         <span>RECORDS PROVIDED</span>
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
-        <app-truncate [text]="row.name | renameRights"></app-truncate>
+        <app-truncate
+          class="app-truncate"
+          [text]="row.name | renameRights"
+        ></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
@@ -63,6 +66,7 @@
             "
           ></ng-content>
           <app-bar-chart
+            class="app-bar-chart"
             [colours]="[barColour]"
             chartId="contentTypeChart"
             [extraSettings]="{ prefixValueAxis: 'Tier' }"

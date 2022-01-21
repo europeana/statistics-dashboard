@@ -7,11 +7,11 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
-app-truncate {
+.app-truncate {
   overflow: hidden;
 }
 
-app-bar-chart {
+.app-bar-chart {
   height: 100%;
 }
 

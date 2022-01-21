@@ -59,6 +59,49 @@ export class SnapshotsComponent {
     });
   }
 
+  /** sortDataList
+   *  ...
+   **/
+  sortDataList(
+    data: IHashNumber,
+    list: Array<string>,
+    sortInfo: SortInfo
+  ): void {
+    let operandA;
+    let operandB;
+    const sortByCount = sortInfo.by === SortBy.count;
+
+    list.sort((a: string, b: string) => {
+      if (sortByCount) {
+        operandA = data[a];
+        operandB = data[b];
+      } else {
+        operandA = a;
+        operandB = b;
+      }
+      if (sortInfo.dir === 1) {
+        if (operandA > operandB) {
+          return 1;
+        } else if (operandB > operandA) {
+          return -1;
+        }
+      } else if (sortInfo.dir === -1) {
+        if (operandA < operandB) {
+          return 1;
+        } else if (operandA > operandB) {
+          return -1;
+        }
+      }
+      return 0;
+    });
+  }
+
+  /** preSortAndFilter
+   *  filters the ColourSeriesData.data lists referenced by an array of series keys
+   *  according to the specified filter term, and sorts (or unsorts) the result
+   *  according to either the default order or the specified sort field and order,
+   *  assigning the sorted-key reference to each ColourSeriesData.orderPreferred variable
+   **/
   preSortAndFilter(
     facetName: string,
     seriesKeys: Array<string>,
@@ -69,51 +112,24 @@ export class SnapshotsComponent {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       const data = cd.data;
 
-      let operandA;
-      let operandB;
       let sortedKeys: Array<string>;
-
-      const sortByCount = sortInfo.by === SortBy.count;
 
       if (cd.orderOriginal && sortInfo.dir === 0) {
         sortedKeys = filterList(filterTerm, cd.orderOriginal);
       } else {
-        sortedKeys = filterList(filterTerm, Object.keys(data)).sort(
-          (a: string, b: string) => {
-            if (sortByCount) {
-              operandA = data[a];
-              operandB = data[b];
-            } else {
-              operandA = a;
-              operandB = b;
-            }
-            if (sortInfo.dir === 1) {
-              if (operandA > operandB) {
-                return 1;
-              } else if (operandB > operandA) {
-                return -1;
-              }
-            } else if (sortInfo.dir === -1) {
-              if (operandA < operandB) {
-                return 1;
-              } else if (operandA > operandB) {
-                return -1;
-              }
-            }
-            return 0;
-          }
-        );
+        sortedKeys = filterList(filterTerm, Object.keys(data));
+        this.sortDataList(data, sortedKeys, sortInfo);
       }
       cd.orderPreferred = sortedKeys;
     });
   }
 
   /** getSeriesDataForChart
-  /* @param { string : facetName } - the active facet
-  /* @param { Array<string> : seriesKeys } - the keys of the series to apply
-  /* @param { boolean : percent } - percent value switch
-  /* @returns Array<ColourSeriesData> converts to data (for chart)
-  */
+   * @param { string : facetName } - the active facet
+   * @param { Array<string> : seriesKeys } - the keys of the series to apply
+   * @param { boolean : percent } - percent value switch
+   * @returns Array<ColourSeriesData> converts to data (for chart)
+   */
   getSeriesDataForChart(
     facetName: string,
     seriesKeys: Array<string>,
@@ -140,8 +156,8 @@ export class SnapshotsComponent {
   }
 
   /** getSeriesDataForGrid
-  /* converts to grouped / interplated data for table
-  **/
+   * converts to grouped / interplated data for table
+   **/
   getSeriesDataForGrid(
     facetName: string,
     seriesKeys: Array<string>

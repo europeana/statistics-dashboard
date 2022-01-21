@@ -14,7 +14,12 @@ export class GridSummaryComponent {
     if (data) {
       this._summaryData.results.sort(
         (a: CountPercentageValue, b: CountPercentageValue) => {
-          return a.count > b.count ? -1 : b.count > a.count ? 1 : 0;
+          if (a.count > b.count) {
+            return -1;
+          } else if (b.count > a.count) {
+            return 1;
+          }
+          return 0;
         }
       );
     }
