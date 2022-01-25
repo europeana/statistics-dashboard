@@ -22,7 +22,10 @@ export class ExportComponent {
   copied = false;
   msMsgDisplay = 2000;
 
-  constructor(private csv: ExportCSVService, private pdf: ExportPDFService) {}
+  constructor(
+    private readonly csv: ExportCSVService,
+    private readonly pdf: ExportPDFService
+  ) {}
 
   copy(): void {
     const element = this.contentRef.nativeElement;

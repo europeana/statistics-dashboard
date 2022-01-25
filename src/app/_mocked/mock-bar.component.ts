@@ -7,6 +7,8 @@ import { ColourSeriesData } from '../_models';
   template: ''
 })
 export class MockBarComponent {
+  readonly maxNumberBars = 50;
+
   constructor() {
     console.log('create mock bar');
   }

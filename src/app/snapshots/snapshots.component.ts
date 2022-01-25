@@ -6,7 +6,7 @@ import {
   CompareData,
   CompareDataDescriptor,
   HeaderNameType,
-  IHashNumber,
+  IHash,
   SortBy,
   SortInfo,
   TableRow
@@ -63,7 +63,7 @@ export class SnapshotsComponent {
    *  ...
    **/
   sortDataList(
-    data: IHashNumber,
+    data: IHash<number>,
     list: Array<string>,
     sortInfo: SortInfo
   ): void {
@@ -144,7 +144,7 @@ export class SnapshotsComponent {
         const data = percent ? cd.dataPercent : cd.data;
         const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
         return {
-          data: cdKeys.reduce((map: IHashNumber, pref: string) => {
+          data: cdKeys.reduce((map: IHash<number>, pref: string) => {
             map[`${pref} `] = data[pref];
             return map;
           }, {}),

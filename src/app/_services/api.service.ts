@@ -6,7 +6,7 @@ import {
   BreakdownRequest,
   BreakdownResults,
   GeneralResults,
-  IHashString
+  IHash
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
 
@@ -17,7 +17,7 @@ export class APIService {
 
   constructor(private readonly http: HttpClient) {}
 
-  loadISOCountryCodes(): IHashString {
+  loadISOCountryCodes(): IHash<string> {
     return ISOCountryCodes;
   }
 

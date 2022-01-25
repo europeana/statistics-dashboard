@@ -40,8 +40,13 @@ import { TruncateComponent } from './truncate';
 import { getDateAsISOString } from './_helpers';
 
 class AppDateAdapter extends NativeDateAdapter {
+  public static preferredFormat = 'DD/MM/YYYY';
+
   format(date: Date, displayFormat: Object): string {
-    if (displayFormat === 'input' || displayFormat === 'DD/MM/YYYY') {
+    if (
+      displayFormat === 'input' ||
+      displayFormat === AppDateAdapter.preferredFormat
+    ) {
       return getDateAsISOString(date).split('-').reverse().join('/');
     }
     return date.toDateString();
@@ -104,11 +109,11 @@ class AppDateAdapter extends NativeDateAdapter {
       provide: MAT_DATE_FORMATS,
       useValue: {
         parse: {
-          dateInput: 'DD/MM/YYYY'
+          dateInput: AppDateAdapter.preferredFormat
         },
-        dateInput: 'DD/MM/YYYY',
+        dateInput: AppDateAdapter.preferredFormat,
         display: {
-          dateInput: 'DD/MM/YYYY',
+          dateInput: AppDateAdapter.preferredFormat,
           monthYearLabel: 'MM YYYY',
           dateA11yLabel: 'MM',
           monthYearA11yLabel: 'MMMM YYYY'

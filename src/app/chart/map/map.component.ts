@@ -8,7 +8,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
 
 import { APIService } from '../../_services';
-import { IHashString, NameValue } from '../../_models';
+import { IHash, NameValue } from '../../_models';
 
 @Component({
   selector: 'app-map-chart',
@@ -19,7 +19,7 @@ export class MapComponent {
   _results: Array<NameValue>;
   chart: am4maps.MapChart;
   polygonSeries: am4maps.MapPolygonSeries;
-  countryCodes: IHashString;
+  countryCodes: IHash<string>;
 
   // controls
   hasLegend = true;
@@ -31,9 +31,9 @@ export class MapComponent {
   }
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId,
-    private zone: NgZone,
-    private api: APIService
+    @Inject(PLATFORM_ID) private readonly platformId,
+    private readonly zone: NgZone,
+    private readonly api: APIService
   ) {
     this.countryCodes = api.loadISOCountryCodes();
     am4core.options.autoDispose = true;
@@ -181,16 +181,16 @@ export class MapComponent {
       // Find extreme coordinates for all pre-zoom countries
       zoomTo.forEach((countryId: string) => {
         const country = this.polygonSeries.getPolygonById(countryId);
-        if (north == undefined || country.north > north) {
+        if (!north || country.north > north) {
           north = country.north;
         }
-        if (south == undefined || country.south < south) {
+        if (!south || country.south < south) {
           south = country.south;
         }
-        if (west == undefined || country.west < west) {
+        if (!west || country.west < west) {
           west = country.west;
         }
-        if (east == undefined || country.east > east) {
+        if (!east || country.east > east) {
           east = country.east;
         }
       });

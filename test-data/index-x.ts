@@ -8,7 +8,7 @@ import {
   CountPercentageValue,
   FilterOption,
   GeneralResults,
-  IHashStringArray,
+  IHashArray,
   RequestFilter
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
@@ -144,7 +144,7 @@ new (class extends TestDataServer {
     });
 
     const filterOptions = facetNames.reduce(
-      (result: IHashStringArray, fName: string) => {
+      (result: IHashArray<string>, fName: string) => {
         const nonExcluded = this.allCHOs.filter((cho: CHO) => {
           return (
             cho.exclusions.length === 0 ||

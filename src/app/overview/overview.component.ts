@@ -20,8 +20,7 @@ import {
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
-import { SnapshotsComponent } from '../snapshots';
-
+import { DataPollingComponent } from '../data-polling';
 import {
   BreakdownRequest,
   BreakdownResult,
@@ -31,18 +30,17 @@ import {
   FilterInfo,
   FilterState,
   FmtTableData,
-  IHashArrayNameLabel,
-  IHashNumber,
-  IHashString,
-  IHashStringArray,
+  IHash,
+  IHashArray,
   NameLabel,
+  NameLabelValid,
   NamesValuePercent,
   NonFacetFilterNames,
   RequestFilter
 } from '../_models';
 
 import { APIService } from '../_services';
-import { DataPollingComponent } from '../data-polling';
+import { SnapshotsComponent } from '../snapshots';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 import { GridSummaryComponent } from '../grid-summary';
@@ -97,7 +95,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .fill(0)
     .map((x, index) => `${x + index}`);
 
-  disabledParams: IHashStringArray;
+  disabledParams: IHashArray<string>;
 
   pollRefresh: Subject<boolean>;
   form: FormGroup;
@@ -106,15 +104,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   selFacetIndex = 0;
   resultTotal: number;
 
-  filterData: IHashArrayNameLabel = {};
-  displayedFilterData: IHashArrayNameLabel = {};
+  filterData: IHashArray<NameLabelValid> = {};
+  displayedFilterData: IHashArray<NameLabelValid> = {};
+
   queryParams: Params = {};
+  queryParamsRaw: Params = {};
 
   dataServerData: BreakdownResults;
 
   constructor(
-    private api: APIService,
-    private fb: FormBuilder,
+    private readonly api: APIService,
+    private readonly fb: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly renameRights: RenameRightsPipe
@@ -132,16 +132,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     };
 
     Object.keys(this.queryParams).forEach((key: string) => {
-      const sendValues = [];
-      const values = this.queryParams[key];
-
       if (!Object.values(nonFacetFilters).includes(key)) {
-        values.forEach((valPart: string) => {
-          if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
-            sendValues.push(fromInputSafeName(valPart));
-          }
-        });
-        breakdownRequest.filters[key] = { values: sendValues };
+        breakdownRequest.filters[key] = { values: this.queryParamsRaw[key] };
       }
     });
 
@@ -200,13 +192,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             const qp = results[1];
             const qpValArrays = {};
 
-            Object.keys(qp).forEach((s: string) => {
-              qpValArrays[s] = (Array.isArray(qp[s]) ? qp[s] : [qp[s]]).map(
-                (qpVal: string) => {
-                  return toInputSafeName(qpVal);
-                }
-              );
+            Object.keys(qp).forEach((paramName: string) => {
+              this.queryParamsRaw[paramName] = [];
+              qpValArrays[paramName] = (
+                Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+              ).map((qpVal: string) => {
+                this.queryParamsRaw[paramName].push(qpVal);
+                return toInputSafeName(qpVal);
+              });
             });
+
             return {
               params: results[0],
               queryParams: qpValArrays
@@ -238,7 +233,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           const facetChanged =
             params.facet &&
-            params.facet != this.form.controls.facetParameter.value;
+            params.facet !== this.form.controls.facetParameter.value;
 
           if (facetChanged) {
             this.form.controls.facetParameter.setValue(params.facet);
@@ -271,8 +266,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   chartPositionChanged(absPos: number): void {
     const newPosition = Math.floor(absPos / this.barChart.maxNumberBars);
     const scrollDiff = absPos % this.barChart.maxNumberBars;
-
-    if (newPosition != this.chartPosition) {
+    if (newPosition !== this.chartPosition) {
       this.chartPosition = newPosition;
       this.refreshChart(true, scrollDiff);
     } else {
@@ -302,14 +296,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
         if (values && !Object.values(nonFacetFilters).includes(key)) {
           values.forEach((valPart: string) => {
-            if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
-              const portalKey = portalNames[key] ? portalNames[key] : key;
-              innerRes.push(
-                `${portalKey}:"${encodeURIComponent(
-                  fromInputSafeName(valPart)
-                )}"`
-              );
-            }
+            const portalKey = portalNames[key] ? portalNames[key] : key;
+            innerRes.push(
+              `${portalKey}:"${encodeURIComponent(fromInputSafeName(valPart))}"`
+            );
           });
           return innerRes.join('&qf=');
         }
@@ -378,9 +368,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     // initialise filterData and add checkboxes
     const dsd = this.dataServerData;
     if (dsd && dsd.filteringOptions) {
-      const ops = dsd.filteringOptions;
-      this.buildFilters(ops);
-
+      this.buildFilters(dsd.filteringOptions);
       if (dsd.results && dsd.results.breakdowns) {
         // set pie and table data
         this.extractSeriesServerData(dsd.results.breakdowns);
@@ -388,10 +376,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }
   }
 
+  formatNLV(prefix: string, name: string, valid: boolean): NameLabelValid {
+    return {
+      name: toInputSafeName(name),
+      label: prefix + name,
+      valid: valid
+    };
+  }
+
   /** buildFilters
-   * @param { IHashStringArray : ops } - the filter data
+   * maintains this.filterData sorted data and invokes this.filterDisplayData()
+   * @param { IHashArray<string> : ops } - the filter data
    **/
-  buildFilters(ops: IHashStringArray): void {
+  buildFilters(ops: IHashArray<string>): void {
     this.facetConf
       .filter((facetName: DimensionName) => {
         return !!ops[facetName];
@@ -407,8 +404,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           prefix = 'Tier ';
         }
 
+        // calculate filter options from the data and query params
+        const opsFromData = ops[facetName];
+        const opsFromQP: Array<NameLabelValid> = [];
+        const qpVals = this.queryParams[facetName];
+
+        if (qpVals) {
+          this.queryParamsRaw[facetName].forEach((val: string) => {
+            if (!opsFromData.includes(val)) {
+              opsFromQP.push(this.formatNLV(prefix, val, false));
+            }
+          });
+        }
+
         // calculate full list of in-memory safe options
-        const safeOps = ops[facetName]
+        const allSortedOps = opsFromData
           .filter((op: string) => {
             return !(
               !this.form.value.contentTierZero &&
@@ -417,33 +427,30 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             );
           })
           .map((op: string) => {
-            return {
-              name: toInputSafeName(op),
-              label: prefix + op
-            };
+            return this.formatNLV(prefix, op, true);
           })
-          .sort((op1: NameLabel, op2: NameLabel) => {
-            // ensure that selected filters appear...
-            const qp = this.queryParams;
-            if (qp && qp[facetName]) {
-              const includes1 = qp[facetName].includes(op1.name);
-              const includes2 = qp[facetName].includes(op2.name);
-              if (includes1 && !includes2) {
-                return -1;
-              } else if (includes2 && !includes1) {
-                return 1;
-              }
-            }
+          .concat(opsFromQP);
 
-            // ...and sort on label
-            if (op1.label > op2.label) {
+        allSortedOps.sort((op1: NameLabel, op2: NameLabel) => {
+          // ensure that selected filters appear...
+          const qp = this.queryParams;
+          if (qp && qp[facetName]) {
+            const includes1 = qp[facetName].includes(op1.name);
+            const includes2 = qp[facetName].includes(op2.name);
+            if (includes1 && !includes2) {
+              return -1;
+            } else if (includes2 && !includes1) {
               return 1;
             }
-            return -1;
-          });
-        this.filterData[facetName] = safeOps;
+          }
+          // ...and sort on label
+          return op1.label.localeCompare(op2.label);
+        });
+
+        this.filterData[facetName] = allSortedOps;
 
         const previousTerm = this.userFilterSearchTerms[facetName];
+
         this.filterDisplayData({
           term: previousTerm ? previousTerm : '',
           dimension: facetName
@@ -465,6 +472,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         this.isLoading = false;
         if (this.processServerResult(breakdownResults)) {
           this.postProcessResult();
+        } else {
+          // build filter data using param data to allow removal of any blocking filters
+          this.buildFilters(this.queryParamsRaw);
         }
         if (fnCallback) {
           fnCallback();
@@ -493,8 +503,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   iHashNumberFromNVPs(
     src: Array<NamesValuePercent>,
     percent = false
-  ): IHashNumber {
-    return src.reduce(function (newMap: IHashNumber, nvp: NamesValuePercent) {
+  ): IHash<number> {
+    return src.reduce(function (newMap: IHash<number>, nvp: NamesValuePercent) {
       newMap[nvp.name] = percent ? nvp.percent : nvp.value;
       return newMap;
     }, {});
@@ -503,22 +513,24 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   portalUrlsFromNVPs(
     facet: string,
     src: Array<NamesValuePercent>
-  ): IHashString {
-    const result = src.reduce((newMap: IHashString, nvp: NamesValuePercent) => {
-      const x = this.getUrlRow(facet, nvp.name);
-      newMap[nvp.name] = x;
-      return newMap;
-    }, {});
-
+  ): IHash<string> {
+    const result = src.reduce(
+      (newMap: IHash<string>, nvp: NamesValuePercent) => {
+        const x = this.getUrlRow(facet, nvp.name);
+        newMap[nvp.name] = x;
+        return newMap;
+      },
+      {}
+    );
     result['summary'] = this.getUrlRow(facet);
     return result;
   }
 
-  originalNamesFromNVPs(src: Array<NamesValuePercent>): IHashString | null {
+  originalNamesFromNVPs(src: Array<NamesValuePercent>): IHash<string> | null {
     if (this.form.value.facetParameter !== DimensionName.rights) {
       return null;
     }
-    return src.reduce(function (newMap: IHashString, nvp: NamesValuePercent) {
+    return src.reduce(function (newMap: IHash<string>, nvp: NamesValuePercent) {
       newMap[nvp.name] = nvp.rawName;
       return newMap;
     }, {});
@@ -546,16 +558,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           }
 
           const innerRes = [];
-          const values = this.queryParams[key];
-
           if (!Object.values(nonFacetFilters).includes(key)) {
-            values
-              .map((s: string) => {
-                return fromInputSafeName(s);
-              })
-              .forEach((valPart: string) => {
-                innerRes.push(this.renameRights.transform(valPart));
-              });
+            this.queryParamsRaw[key].forEach((valPart: string) => {
+              innerRes.push(this.renameRights.transform(valPart));
+            });
             return `${key} (${innerRes.join(' or ')})`;
           }
           return '';
@@ -664,7 +670,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   addOrUpdateFilterControls(name: string, options: Array<NameLabel>): void {
     const checkboxes = this.form.get(name) as FormGroup;
-
     options.forEach((option: NameLabel) => {
       const fName = option.name;
       const ctrl = this.form.get(`${name}.${fName}`);
@@ -720,10 +725,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** filterDisplayData
-  /* @param {FilterInfo} filterInfo
-  /* updates this.displayedFilterData to a filtered and truncated subset for display
-  /* (called on initialisation and in response to a search term changing)
-  */
+   * - updates displayedFilterData to a filtered and truncated subset for display
+   * - ensures form controls exist for all data
+   *
+   * @param {FilterInfo} filterInfo
+   */
   filterDisplayData(filterInfo: FilterInfo): void {
     if (!filterInfo.dimension) {
       filterInfo.dimension = this.form.value.facetParameter;
@@ -735,10 +741,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       filterInfo.term,
       this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
         return filterInfo.dimension !== DimensionName.rights
-          ? nl
+          ? Object.assign({ valid: true }, nl)
           : {
               name: nl.name,
-              label: this.renameRights.transform(nl.label)
+              label: this.renameRights.transform(nl.label),
+              valid: true
             };
       }),
       'label'
@@ -881,9 +888,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** getSetCheckboxValues
   /*
-  /* gets the values of the set values in a filter
+  /* gets the options set in the form
   /*
-  /* @param { string? } filterName - the filter to return
+  /* @param { string } filterName - the relevant filter
   /* @returns Array<string>
   */
   getSetCheckboxValues(filterName: string): Array<string> {
@@ -895,18 +902,22 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       : [];
   }
 
-  /** isDeadFacet
-  /* Detect if a facet value is present in the filterData
-  /* @returns boolean
+  /** getRemoveFilterCheckboxData
+  /*
+  /* gets displayedFilterData[] filtered according to options set in the form
+  /*
+  /* @param { string } filterName - the filter to return
+  /* @returns Array<NameLabelValid>
   */
-  isDeadFacet(filterName: string, filterValue: string): boolean {
-    if (Object.keys(this.filterData).length === 0) {
-      return false;
+  getRemoveFilterCheckboxData(filterName: string): Array<NameLabelValid> {
+    const dfData = this.filterData[filterName];
+    if (!dfData) {
+      return [];
     }
-    const res = this.filterData[filterName].findIndex((nl: NameLabel) => {
-      return nl.name === filterValue;
+    const checkedVals = this.getSetCheckboxValues(filterName);
+    return dfData.filter((nlv: NameLabelValid) => {
+      return checkedVals.includes(nlv.name);
     });
-    return res === -1;
   }
 
   /** datesClear
@@ -962,10 +973,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     this.getEnabledFilterNames().forEach((filterName: string) => {
       const filterVals = this.getSetCheckboxValues(filterName).map(
-        (s: string) => {
-          return fromInputSafeName(s);
+        (filterVal: string) => {
+          return fromInputSafeName(filterVal);
         }
       );
+
       if (filterVals.length > 0) {
         qp[filterName] = filterVals;
       }
@@ -1075,11 +1087,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   closeFilters(exempt = ''): void {
     Object.keys(this.filterStates)
-      .filter((s: string) => {
-        return s !== exempt;
+      .filter((state: string) => {
+        return state !== exempt;
       })
-      .forEach((s: string) => {
-        this.filterStates[s].visible = false;
+      .forEach((state: string) => {
+        this.filterStates[state].visible = false;
       });
   }
 
