@@ -3,14 +3,38 @@ import {
   filterList,
   fromCSL,
   fromInputSafeName,
+  invalidRegexes,
   replaceDiacritics
 } from '.';
 
 describe('Helpers', () => {
-  it('should filter lists', () => {
-    const list = ['a', 'c', 'b'];
-    expect(filterList('term', list)).toEqual([]);
+  it('should filter lists (primitives)', () => {
+    const list = ['aaa', 'bbb', 'ccc'];
+
     expect(filterList('', list)).toEqual(list);
+    expect(filterList('term', list)).toEqual([]);
+
+    ['a', 'b', 'c'].forEach((s: string, i: number) => {
+      expect(filterList(s, list)).toEqual([list[i]]);
+    });
+  });
+
+  it('should filter lists (objects)', () => {
+    const list = [{ name: 'aaa' }, { name: 'bbb' }, { name: 'ccc' }];
+
+    expect(filterList('', list, 'name')).toEqual(list);
+    expect(filterList('term', list, 'name')).toEqual([]);
+
+    ['a', 'b', 'c'].forEach((s: string, i: number) => {
+      expect(filterList(s, list, 'name')).toEqual([list[i]]);
+    });
+  });
+
+  it('should ignore invalid regexes when filtering lists', () => {
+    const list = ['aaa', 'bbb', 'ccc'];
+    invalidRegexes.forEach((term: string) => {
+      expect(filterList(term, list)).toEqual([]);
+    });
   });
 
   it('should decode input-safe names', () => {

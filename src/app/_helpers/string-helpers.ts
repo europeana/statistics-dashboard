@@ -1,16 +1,15 @@
 import { FormGroup } from '@angular/forms';
 import { DiacriticsMap, RightsStatements } from '../_data';
 
+export const invalidRegexes = ['^', '$'];
+
 /** replaceDiacritics
 /* @param {string} source - the source string
 /* - replaces every instance of A-Z with the equivalent diacritics
 */
 export function replaceDiacritics(source: string): string {
   Object.keys(DiacriticsMap).forEach((key: string) => {
-    source = source.replace(
-      new RegExp('[' + DiacriticsMap[key] + ']', 'gi'),
-      key
-    );
+    source = source.replace(new RegExp(`[${DiacriticsMap[key]}]`, 'gi'), key);
   });
   return source;
 }
@@ -77,6 +76,10 @@ export function filterList<T>(
   filterables: Array<T>,
   filterProp?: string
 ): Array<T> {
+  if (invalidRegexes.includes(filterString)) {
+    return [];
+  }
+
   const filter = replaceDiacritics(filterString);
   const reg = new RegExp(appendDiacriticEquivalents(filter), 'gi');
   return filterables.filter((filterable: unknown) => {
