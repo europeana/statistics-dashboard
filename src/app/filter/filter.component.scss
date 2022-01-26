@@ -103,6 +103,13 @@ $total-width: 268px;
   left: 0;
 }
 
-.filter-title.disabled .selection + .opener-name {
-  color: $gray-5;
+.filter-title.disabled {
+  .selection + .opener-name {
+    color: $gray-5;
+  }
+  &.open {
+    .selection + .opener-name {
+      color: $gray-med;
+    }
+  }
 }

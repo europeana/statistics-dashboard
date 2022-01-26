@@ -4,12 +4,12 @@ export interface IHashString {
   [details: string]: string;
 }
 
-export interface IHashNumber {
-  [details: string]: number;
+export interface IHash<T> {
+  [details: string]: T;
 }
 
-export interface IHashStringArray {
-  [details: string]: Array<string>;
+export interface IHashArray<T> {
+  [details: string]: Array<T>;
 }
 
 export interface FilterState {
@@ -40,6 +40,10 @@ export interface NameLabel {
   label: string;
 }
 
+export interface NameLabelValid extends NameLabel {
+  valid: boolean;
+}
+
 export interface NameValue {
   name: string;
   value: number;
@@ -48,10 +52,6 @@ export interface NameValue {
 export interface NamesValuePercent extends NameValue {
   rawName?: string;
   percent: number;
-}
-
-export interface IHashArrayNameLabel {
-  [details: string]: Array<NameLabel>;
 }
 
 export enum ExportType {

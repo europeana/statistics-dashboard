@@ -5,7 +5,7 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  IHashString
+  IHash
 } from '../_models';
 
 export const MockGeneralResults = {
@@ -677,7 +677,7 @@ export const MockBreakdowns = {
 export class MockAPIService {
   errorMode = false;
 
-  loadISOCountryCodes(): IHashString {
+  loadISOCountryCodes(): IHash<string> {
     return {
       Belgium: 'BE'
     };

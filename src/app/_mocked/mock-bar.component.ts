@@ -7,13 +7,11 @@ import { ColourSeriesData } from '../_models';
   template: ''
 })
 export class MockBarComponent {
-  constructor() {
-    console.log('create mock bar');
-  }
+  readonly maxNumberBars = 50;
 
-  browserOnly(_: () => void): void {
-    console.log('MockBarComponent.browserOnly');
-  }
+  constructor() {}
+
+  browserOnly(_: () => void): void {}
 
   ngAfterViewInit(): void {
     console.log('MockBarComponent.ngAfterViewInit');

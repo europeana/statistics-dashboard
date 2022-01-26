@@ -12,7 +12,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
-import { portalNames } from '../_data';
+import { nonFacetFilters, portalNames } from '../_data';
 import { today } from '../_helpers';
 
 import {
@@ -20,6 +20,7 @@ import {
   MockAPIService,
   MockAPIServiceErrors,
   MockBarComponent,
+  MockBreakdowns,
   MockGridComponent
 } from '../_mocked';
 import {
@@ -27,6 +28,7 @@ import {
   BreakdownResults,
   DimensionName,
   NameLabel,
+  NonFacetFilterNames,
   RequestFilter,
   RequestFilterRange
 } from '../_models';
@@ -175,28 +177,20 @@ describe('OverviewComponent', () => {
       component.ngOnDestroy();
     }));
 
+    it('should process the server result', () => {
+      const dataServerData = { results: {} } as unknown as BreakdownResults;
+      expect(component.emptyDataset).toBeTruthy();
+      expect(component.processServerResult(dataServerData)).toBeFalsy();
+      expect(component.processServerResult(MockBreakdowns)).toBeTruthy();
+      expect(component.emptyDataset).toBeFalsy();
+    });
+
     it('should post process', () => {
       spyOn(component, 'extractSeriesServerData');
-      component.dataServerData = {} as unknown as BreakdownResults;
+      component.dataServerData = { results: {} } as unknown as BreakdownResults;
       component.postProcessResult();
       expect(component.extractSeriesServerData).not.toHaveBeenCalled();
-      component.dataServerData = {
-        filteringOptions: {
-          contentTier: [],
-          country: [],
-          dataProvider: [],
-          metadataTier: [],
-          provider: [],
-          rights: [],
-          type: []
-        },
-        results: {
-          breakdowns: {
-            results: []
-          }
-        }
-      } as unknown as BreakdownResults;
-
+      component.dataServerData = MockBreakdowns;
       component.postProcessResult();
       expect(component.extractSeriesServerData).toHaveBeenCalled();
     });
@@ -215,6 +209,15 @@ describe('OverviewComponent', () => {
 
     it('should get the chart data', () => {
       expect(component.getChartData()).toBeTruthy();
+    });
+
+    it('should track changes in the chart position', () => {
+      expect(component.chartPosition).toEqual(0);
+      spyOn(component.barChart, 'zoomTop');
+      component.chartPositionChanged(component.barChart.maxNumberBars);
+      expect(component.barChart.zoomTop).not.toHaveBeenCalled();
+      component.chartPositionChanged(component.barChart.maxNumberBars);
+      expect(component.barChart.zoomTop).toHaveBeenCalled();
     });
 
     it('should get the grid data', () => {
@@ -245,6 +248,28 @@ describe('OverviewComponent', () => {
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalledTimes(3);
     });
+
+    it('should build the filters', () => {
+      expect(Object.keys(component.filterData).length).toBeFalsy();
+      const ops = {};
+      ops[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+
+      component.buildFilters(ops);
+      expect(Object.keys(component.filterData).length).toBeTruthy();
+    });
+
+    it('should build the filters (from the query parameters)', fakeAsync(() => {
+      expect(Object.keys(component.filterData).length).toBeFalsy();
+      const ops = {};
+      const nextParams = {};
+      nextParams[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+      queryParams.next(nextParams);
+      tick(1);
+      fixture.detectChanges();
+      component.buildFilters(ops);
+      expect(Object.keys(component.filterData).length).toBeTruthy();
+      component.ngOnDestroy();
+    }));
 
     it('should get the select options', fakeAsync(() => {
       expect(component.filterData.length).toBeFalsy(0);
@@ -291,6 +316,27 @@ describe('OverviewComponent', () => {
       component.form.get('dateFrom').setValue(null);
       expect(component.getFormattedDateParam().length).toBeFalsy();
     });
+
+    it('should read the datasetId param', fakeAsync(() => {
+      component.beginPolling();
+      tick(tickTime);
+
+      expect(component.form.value.datasetId.length).toBeFalsy();
+
+      const nextParams = {};
+      nextParams[nonFacetFilters[NonFacetFilterNames.datasetId]] = '123';
+
+      queryParams.next(nextParams);
+      tick(tickTime);
+      fixture.detectChanges();
+
+      expect(component.form.value.datasetId.length).toBeTruthy();
+      expect(component.form.value.datasetId).toEqual('123');
+
+      queryParams.next({});
+      tick(1);
+      component.ngOnDestroy();
+    }));
 
     it('should update the datasetId param', () => {
       component.form.get('datasetId').setValue('123, 456, 789');

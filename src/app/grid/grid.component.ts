@@ -68,7 +68,7 @@ export class GridComponent {
   /* @param { string : header }
   **/
   bumpSortState(header: SortBy): void {
-    const isChanged = this.sortInfo.by != header;
+    const isChanged = this.sortInfo.by !== header;
     let val = 1;
 
     if (!isChanged) {

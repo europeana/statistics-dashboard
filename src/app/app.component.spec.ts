@@ -63,7 +63,7 @@ describe('AppComponent', () => {
     el.nativeElement.click();
     tick(1);
     expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
-    component.documentClick({ target: {} as any as HTMLElement });
+    component.documentClick({ target: {} as unknown as HTMLElement });
     expect(clicks.documentClickedTarget.next).toHaveBeenCalledTimes(2);
   }));
 });

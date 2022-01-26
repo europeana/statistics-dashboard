@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { CheckboxComponent } from '.';
 
 describe('CheckboxComponent', () => {
@@ -19,6 +19,7 @@ describe('CheckboxComponent', () => {
     fixture = TestBed.createComponent(CheckboxComponent);
     component = fixture.componentInstance;
     expect(component).toBeTruthy();
+    fixture.debugElement.injector.get(NG_VALUE_ACCESSOR);
     fixture.detectChanges();
   });
 

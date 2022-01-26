@@ -1,4 +1,4 @@
-import { IHashNumber, IHashString } from '.';
+import { IHash } from '.';
 
 export interface ChartSettings {
   configurable: boolean;
@@ -19,7 +19,7 @@ export interface ChartSettings {
 
 export interface ColourSeriesData {
   colour: string;
-  data: IHashNumber;
+  data: IHash<number>;
   seriesName: string;
 }
 
@@ -27,14 +27,14 @@ export interface CompareDataDescriptor {
   _colourIndex?: number;
   applied: boolean;
   current?: boolean;
-  data: IHashNumber;
+  data: IHash<number>;
   orderOriginal?: Array<string>;
   orderPreferred?: Array<string>;
-  dataPercent: IHashNumber;
+  dataPercent: IHash<number>;
   label: string;
   name: string;
-  namesOriginal?: IHashString;
-  portalUrls: IHashString;
+  namesOriginal?: IHash<string>;
+  portalUrls: IHash<string>;
   pinIndex: number;
   saved?: boolean;
   total: number;

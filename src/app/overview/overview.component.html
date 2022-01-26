@@ -181,38 +181,25 @@
             <ng-container *ngFor="let filter of facetConf">
               <ng-container *ngIf="filter !== form.value.facetParameter">
                 <ng-container
-                  *ngFor="let option of getSetCheckboxValues(filter)"
+                  *ngFor="let option of getRemoveFilterCheckboxData(filter)"
                 >
-                  <ng-container
-                    *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
+                  <label
+                    class="rm-filter"
+                    [ngClass]="{ 'dead-facet': !option.valid }"
                   >
-                    <ng-container
-                      *ngFor="
-                        let labelText of [
-                          fromInputSafeName(option) | renameRights
-                        ]
-                      "
-                    >
-                      <label
-                        class="rm-filter"
-                        *ngIf="form.value[filter][option]"
-                        [ngClass]="{ 'dead-facet': deadFacet }"
-                      >
-                        <app-checkbox
-                          [form]="form"
-                          [controlName]="option"
-                          [labelText]="labelText"
-                          [group]="filter"
-                          (valueChanged)="updatePageUrl(deadFacet)"
-                          title="remove filter: {{ labelText }}"
-                        ></app-checkbox>
-                        <span
-                          class="x"
-                          title="remove filter: {{ labelText }}"
-                        ></span>
-                      </label>
-                    </ng-container>
-                  </ng-container>
+                    <app-checkbox
+                      [form]="form"
+                      [controlName]="option.name"
+                      [labelText]="option.label | renameRights"
+                      [group]="filter"
+                      (valueChanged)="updatePageUrl(option.valid)"
+                      title="remove filter: {{ option.label }}"
+                    ></app-checkbox>
+                    <span
+                      class="x"
+                      title="remove filter: {{ option.label }}"
+                    ></span>
+                  </label>
                 </ng-container>
               </ng-container>
             </ng-container>

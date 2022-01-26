@@ -26,7 +26,7 @@ export class LandingComponent extends DataPollingComponent {
     [facetName: string]: Array<NamesValuePercent>;
   } = {};
 
-  constructor(private api: APIService) {
+  constructor(private readonly api: APIService) {
     super();
     this.beginPolling();
   }

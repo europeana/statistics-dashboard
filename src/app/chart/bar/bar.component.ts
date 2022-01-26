@@ -17,7 +17,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import {
   ChartSettings,
   ColourSeriesData,
-  IHashNumber,
+  IHash,
   NameValue
 } from '../../_models';
 
@@ -61,7 +61,10 @@ export class BarComponent implements AfterViewInit {
     this.settings = Object.assign(this.settings, extraSettings);
   }
 
-  constructor(@Inject(PLATFORM_ID) private platformId, private zone: NgZone) {
+  constructor(
+    @Inject(PLATFORM_ID) private readonly platformId,
+    private readonly zone: NgZone
+  ) {
     this.browserOnly(() => {
       am4core.options.autoDispose = true;
     });
@@ -92,7 +95,7 @@ export class BarComponent implements AfterViewInit {
       this.addSeries([
         {
           data: this._results.reduce(function (
-            map: IHashNumber,
+            map: IHash<number>,
             nv: NameValue
           ) {
             map[nv.name] = nv.value;
@@ -230,7 +233,7 @@ export class BarComponent implements AfterViewInit {
             return res;
           });
       } else {
-        this.chart.data.forEach((cd: IHashNumber) => {
+        this.chart.data.forEach((cd: IHash<number>) => {
           cd[csd.seriesName] = csd.data[cd.name];
         });
       }
