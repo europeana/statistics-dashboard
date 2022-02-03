@@ -170,46 +170,76 @@ describe('SnapshotsComponent', () => {
   it('should pre-sort', () => {
     initData();
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.name,
-      dir: -1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.name,
+        dir: -1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.name,
-      dir: 1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.name,
+        dir: 1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('1');
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.count,
-      dir: 1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.count,
+        dir: 1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('3');
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.count,
-      dir: -1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.count,
+        dir: -1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
     expect(dscRights.orderPreferred.length).toBeFalsy();
 
-    component.preSortAndFilter(DimensionName.rights, [''], {
-      by: SortBy.count,
-      dir: -1
-    });
+    component.preSortAndFilter(
+      DimensionName.rights,
+      [''],
+      {
+        by: SortBy.count,
+        dir: -1
+      },
+      ''
+    );
 
     expect(dscRights.orderPreferred[0].trim()).toEqual('CC0');
 
-    component.preSortAndFilter(DimensionName.rights, [''], {
-      by: SortBy.count,
-      dir: 0
-    });
+    component.preSortAndFilter(
+      DimensionName.rights,
+      [''],
+      {
+        by: SortBy.count,
+        dir: 0
+      },
+      ''
+    );
     expect(dscRights.orderPreferred.length).toBeFalsy();
   });
 

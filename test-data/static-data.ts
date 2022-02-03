@@ -5,11 +5,11 @@ export const STATIC_PROVIDERS = [
   },
   {
     id: 1,
-    name: 'The European Library'
+    name: '^The European Library'
   },
   {
     id: 2,
-    name: 'LoCloud'
+    name: 'Lo^Cloud$'
   },
   {
     id: 3,
@@ -17,15 +17,17 @@ export const STATIC_PROVIDERS = [
   },
   {
     id: 4,
-    name: 'Swedish Open Cultural Heritage | K-samsök'
+    name: '$wedish Open Cultural Heritage | K-samsök'
   },
+
   {
     id: 5,
-    name: 'AthenaPlus'
+    name: '$AthenaPlu$'
   },
+
   {
     id: 6,
-    name: 'Hispana'
+    name: 'Hi$pana'
   },
   {
     id: 7,
