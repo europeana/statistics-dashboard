@@ -127,7 +127,6 @@ export function filterList<T>(
   }
 
   let filter = sanitiseSearchTerm(filterString);
-  console.log(filter + ' ' + filter.length + ' ' + filterString);
   if (filter.length === 0) {
     if (['^', '$'].includes(filterString)) {
       filter = `\\${filterString}`;
