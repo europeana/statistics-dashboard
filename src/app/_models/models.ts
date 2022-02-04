@@ -1,3 +1,18 @@
+export enum ExportType {
+  CSV = 'CSV',
+  PDF = 'PDF'
+}
+
+export interface FilterInfo {
+  term: string;
+  dimension?: string;
+}
+
+export interface FilterState {
+  visible: boolean;
+  disabled?: boolean;
+}
+
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
 export interface IHashString {
@@ -10,11 +25,6 @@ export interface IHash<T> {
 
 export interface IHashArray<T> {
   [details: string]: Array<T>;
-}
-
-export interface FilterState {
-  visible: boolean;
-  disabled?: boolean;
 }
 
 export interface TableRow {
@@ -52,14 +62,4 @@ export interface NameValue {
 export interface NamesValuePercent extends NameValue {
   rawName?: string;
   percent: number;
-}
-
-export enum ExportType {
-  CSV = 'CSV',
-  PDF = 'PDF'
-}
-
-export interface FilterInfo {
-  term: string;
-  dimension?: string;
 }

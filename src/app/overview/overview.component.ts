@@ -601,12 +601,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       'applied'
     );
 
-    const sortInfo = this.grid.sortInfo;
-
     this.snapshots.preSortAndFilter(
       this.form.value.facetParameter,
       seriesKeys,
-      sortInfo,
+      this.grid.sortInfo,
       this.grid.filterTerm
     );
 
@@ -734,7 +732,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (!filterInfo.dimension) {
       filterInfo.dimension = this.form.value.facetParameter;
     }
-
     this.userFilterSearchTerms[filterInfo.dimension] = filterInfo.term;
 
     const toDisplay = filterList(

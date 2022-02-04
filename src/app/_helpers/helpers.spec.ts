@@ -3,7 +3,6 @@ import {
   filterList,
   fromCSL,
   fromInputSafeName,
-  invalidRegexes,
   replaceDiacritics
 } from '.';
 
@@ -30,13 +29,6 @@ describe('Helpers', () => {
     });
   });
 
-  it('should ignore invalid regexes when filtering lists', () => {
-    const list = ['aaa', 'bbb', 'ccc'];
-    invalidRegexes.forEach((term: string) => {
-      expect(filterList(term, list)).toEqual([]);
-    });
-  });
-
   it('should decode input-safe names', () => {
     expect(fromInputSafeName('Hello_____World')).toEqual('Hello.World');
     expect(fromInputSafeName('_____')).toEqual('.');
@@ -59,5 +51,32 @@ describe('Helpers', () => {
     expect(fromCSL('1, 2, 3').length).toEqual(3);
     expect(fromCSL('1, 2, 3,').length).toEqual(3);
     expect(fromCSL('1, 2, 3,,').length).toEqual(3);
+  });
+
+  it('should filter lists (regex matches)', () => {
+    const list = [
+      'Austria',
+      'Bosnia',
+      'Indiana',
+      '^Denmark$',
+      '$lovenia',
+      'Trie$te'
+    ];
+
+    expect(filterList('ia', list).length).toEqual(4);
+    expect(filterList('ia$', list).length).toEqual(3);
+    expect(filterList('tr', list).length).toEqual(2);
+    expect(filterList('^tr', list).length).toEqual(1);
+
+    expect(filterList('Denmark', list).length).toEqual(1);
+    expect(filterList('^Denmark$', list).length).toEqual(1);
+
+    expect(filterList('^', list).length).toEqual(1);
+    expect(filterList('^A', list).length).toEqual(1);
+    expect(filterList('^Z', list).length).toEqual(0);
+    expect(filterList('$', list).length).toEqual(3);
+    expect(filterList('ia$', list).length).toEqual(3);
+    expect(filterList('a$', list).length).toEqual(4);
+    expect(filterList('$l', list).length).toEqual(1);
   });
 });
