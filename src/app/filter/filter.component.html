@@ -42,7 +42,7 @@
   </ng-template>
 
   <ng-container *ngIf="state.visible">
-    <ng-container *ngIf="_options; else dates">
+    <ng-container *ngIf="options; else dates">
       <li class="checkboxes">
         <ul>
           <li class="checkbox-filter container-h">
@@ -58,7 +58,7 @@
         </ul>
         <ul class="checkboxes-list">
           <li>
-            <ul *ngFor="let option of filteredOptions">
+            <ul *ngFor="let option of options">
               <li>
                 <app-checkbox
                   [form]="form"

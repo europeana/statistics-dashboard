@@ -20,19 +20,26 @@ export class FilterComponent {
   @Input() form: FormGroup;
   @Input() group: DimensionName;
 
-  filteredOptions?: Array<NameLabel>;
   _options?: Array<NameLabel>;
   empty = true;
+  emptyData = true;
+  term = '';
 
+  get options(): Array<NameLabel> {
+    return this._options;
+  }
   @Input() set options(ops: Array<NameLabel>) {
-    this._options = ops;
-    this.filteredOptions = ops;
-
-    if (ops && ops.length > 0) {
+    if (ops.length > 0) {
+      // if there's data (with no filter) then capture that fact.
+      if (!this.term || this.term.length === 0) {
+        this.emptyData = false;
+      }
       this.empty = false;
     } else {
       this.empty = true;
+      this.emptyData = true;
     }
+    this._options = ops;
   }
   @Input() state: FilterState;
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
@@ -46,13 +53,19 @@ export class FilterComponent {
   }
 
   filterOptions(evt: { target: { value: string } }): void {
-    if (!this._options) {
+    if (!this.options) {
       return;
     }
-    const term = evt.target.value;
-    this.filterTermChanged.emit({ term: term, dimension: this.group });
+    this.term = evt.target.value;
+    this.filterTermChanged.emit({
+      term: this.term,
+      dimension: this.group
+    });
   }
 
+  /** isDisabled
+  /* disabling is conditional for dates
+  */
   isDisabled(): boolean {
     if ((this.group as string) === 'dates') {
       if (this.form.value.dateFrom && this.form.value.dateTo) {
@@ -61,10 +74,22 @@ export class FilterComponent {
         return this.emptyDataset;
       }
     } else {
+      // consider there to be data (and allow the user to open) if the term is blocking
+      if (
+        this.empty &&
+        !this.emptyData &&
+        this.term.length > 0 &&
+        !this.state.visible
+      ) {
+        return false;
+      }
       return this.empty;
     }
   }
 
+  /** getSetCheckboxValues
+  /* @param {DimensionName} filterName - the form value key
+  */
   getSetCheckboxValues(filterName: DimensionName): string {
     return getFormValueList(this.form, filterName)
       .map((s: string) => {

@@ -18,6 +18,13 @@ describe('FilterComponent', () => {
   let component: FilterComponent;
   let fixture: ComponentFixture<FilterComponent>;
 
+  const dataOptions = [
+    {
+      name: 'name',
+      label: 'label'
+    }
+  ];
+
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
@@ -48,13 +55,28 @@ describe('FilterComponent', () => {
 
   it('should enable when options are added', () => {
     expect(component.isDisabled()).toBeTruthy();
-    component.options = [
-      {
-        name: 'name',
-        label: 'label'
-      }
-    ];
+    component.options = [];
+    expect(component.isDisabled()).toBeTruthy();
+    component.options = dataOptions;
     expect(component.isDisabled()).toBeFalsy();
+  });
+
+  it('should track when the filter is empty and the data is empty', () => {
+    expect(component.empty).toBeTruthy();
+    expect(component.emptyData).toBeTruthy();
+    component.options = [];
+    expect(component.empty).toBeTruthy();
+    expect(component.emptyData).toBeTruthy();
+
+    component.term = '';
+    component.options = dataOptions;
+    expect(component.empty).toBeFalsy();
+    expect(component.emptyData).toBeFalsy();
+
+    component.term = 'xxx';
+    component.options = dataOptions;
+    expect(component.empty).toBeFalsy();
+    expect(component.emptyData).toBeFalsy();
   });
 
   it('should not disable the date if a range has been specified', () => {
@@ -68,6 +90,30 @@ describe('FilterComponent', () => {
 
     component.form.get('dateFrom').setValue(null);
     expect(component.isDisabled()).toBeTruthy();
+  });
+
+  it('should not disable the on the basis of a filter', () => {
+    component.state = {
+      visible: true,
+      disabled: false
+    };
+
+    component.empty = false;
+    component.emptyData = false;
+    expect(component.isDisabled()).toBeFalsy();
+
+    component.empty = true;
+    component.emptyData = true;
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.emptyData = false;
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.term = 'xxx';
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.state.visible = false;
+    expect(component.isDisabled()).toBeFalsy();
   });
 
   it('should determine if a select option is enabled', () => {
@@ -90,12 +136,12 @@ describe('FilterComponent', () => {
         value: 'option_1'
       }
     };
-    expect(component.filteredOptions).toBeFalsy();
+    expect(component.options).toBeFalsy();
     component.filterOptions(evt);
-    expect(component.filteredOptions).toBeFalsy();
+    expect(component.options).toBeFalsy();
     component.options = [{ name: 'option_1', label: 'option_1' }];
     component.filterOptions(evt);
-    expect(component.filteredOptions.length).toEqual(1);
+    expect(component.options.length).toEqual(1);
   });
 
   it('should get the values', () => {
