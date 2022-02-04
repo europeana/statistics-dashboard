@@ -24,7 +24,7 @@ context('statistics-dashboard', () => {
 
       const arCountries = ['Bulgaria', 'Denmark', 'Hungary'];
       const orCountries = ['Norway', 'Portugal'];
-      const arProviders = ['Arts Council Norway', 'CARARE', 'The European Library'];
+      const arProviders = ['Arts Council Norway', 'CARARE', '^The European Library'];
       const waProviders  = ['EFG - The European Film Gateway'];
 
       cy.get(selFilter).type('ar', force);
