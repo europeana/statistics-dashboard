@@ -37,7 +37,6 @@ export class FilterComponent {
       this.empty = false;
     } else {
       this.empty = true;
-      this.emptyData = true;
     }
     this._options = ops;
   }
