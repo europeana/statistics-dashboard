@@ -27,6 +27,11 @@
     <span>Export Data</span>
   </li>
   <li class="icon-item pad-top">
+    <a class="container-h" (click)="export(ExportType.PNG)"
+      ><span class="icon-png"></span>Download PNG</a
+    >
+  </li>
+  <li class="icon-item pad-top">
     <a class="container-h" (click)="export(ExportType.PDF)"
       ><span class="icon-pdf"></span>Download PDF</a
     >

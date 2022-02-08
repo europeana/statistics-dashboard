@@ -1,6 +1,7 @@
 export enum ExportType {
   CSV = 'CSV',
-  PDF = 'PDF'
+  PDF = 'PDF',
+  PNG = 'PNG'
 }
 
 export interface FilterInfo {

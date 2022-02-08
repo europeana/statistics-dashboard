@@ -29,6 +29,9 @@ export class MapComponent {
     this.updateData();
     am4core.options.autoDispose = true;
   }
+  get results(): Array<NameValue> {
+    return this._results;
+  }
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId,
@@ -53,11 +56,11 @@ export class MapComponent {
       if (!this.chart) {
         return;
       }
-      if (!this._results) {
+      if (!this.results) {
         return;
       }
 
-      this.polygonSeries.data = this._results.map((nv: NameValue) => {
+      this.polygonSeries.data = this.results.map((nv: NameValue) => {
         return {
           id: this.countryCodes[nv.name],
           name: nv.name,

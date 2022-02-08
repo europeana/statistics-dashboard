@@ -84,6 +84,16 @@ describe('ExportComponent', () => {
     expect(component.getChartData).toHaveBeenCalled();
   });
 
+  it('should export PNG', () => {
+    spyOn(component, 'getChartData').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve(MockExportPDFService.imgDataURL);
+      }) as Promise<string>;
+    });
+    component.export(ExportType.PNG);
+    expect(component.getChartData).toHaveBeenCalled();
+  });
+
   it('should export only known types', () => {
     spyOn(component, 'getChartData').and.callThrough();
     component.export('XXX' as unknown as ExportType);
