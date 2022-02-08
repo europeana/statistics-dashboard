@@ -52,6 +52,16 @@ export class ExportComponent {
       this.getChartData().then((imgUrl: string) => {
         this.pdf.download(gridData, imgUrl);
       });
+    } else if (type === ExportType.PNG) {
+      this.getChartData().then((imgUrl: string) => {
+        const anchor = document.createElement('a');
+        anchor.href = imgUrl;
+        anchor.target = '_blank';
+        anchor.download = 'image.png';
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+      });
     }
   }
 

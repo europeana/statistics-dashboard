@@ -57,8 +57,14 @@ export class BarComponent implements AfterViewInit {
     // empty setter forces it to be ready before AfterViewInit
     this._results = results;
   }
+  get results(): Array<NameValue> {
+    return this._results;
+  }
   @Input() set extraSettings(extraSettings: ChartSettings) {
     this.settings = Object.assign(this.settings, extraSettings);
+  }
+  get extraSettings(): ChartSettings {
+    return this.settings;
   }
 
   constructor(
@@ -91,10 +97,10 @@ export class BarComponent implements AfterViewInit {
   }
 
   addSeriesFromResult(): void {
-    if (this._results) {
+    if (this.results) {
       this.addSeries([
         {
-          data: this._results.reduce(function (
+          data: this.results.reduce(function (
             map: IHash<number>,
             nv: NameValue
           ) {
