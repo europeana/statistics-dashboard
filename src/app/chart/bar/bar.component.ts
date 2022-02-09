@@ -323,7 +323,10 @@ export class BarComponent implements AfterViewInit {
 
   getSvgData(): Promise<string> {
     this.chart.exporting.useWebFonts = false;
-    return this.chart.exporting.getImage('png');
+    return this.chart.exporting.getImage('png', {
+      minHeight: 1000,
+      minWidth: 1000
+    });
   }
 
   /** applyPadding
