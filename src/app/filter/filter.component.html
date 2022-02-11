@@ -42,7 +42,7 @@
   </ng-template>
 
   <ng-container *ngIf="state.visible">
-    <ng-container *ngIf="options; else dates">
+    <ng-container *ngIf="optionSet; else dates">
       <li class="checkboxes">
         <ul>
           <li class="checkbox-filter container-h">
@@ -52,13 +52,13 @@
               class="checkbox-filter-input"
               (keyup)="filterOptions($event)"
               formControlName="filter_list_{{ group }}"
-              placeholder="Search"
+              placeholder="Search ({{ totalAvailable }})"
             />
           </li>
         </ul>
         <ul class="checkboxes-list">
           <li>
-            <ul *ngFor="let option of options">
+            <ul *ngFor="let option of optionSet.options">
               <li>
                 <app-checkbox
                   [form]="form"
@@ -73,6 +73,9 @@
                 ></app-checkbox>
               </li>
             </ul>
+          </li>
+          <li class="load-more-item" [ngClass]="{ hidden: !optionSet.hasMore }">
+            <a (click)="loadMore()">load more...</a>
           </li>
         </ul>
       </li>

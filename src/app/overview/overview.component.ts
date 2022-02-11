@@ -28,6 +28,7 @@ import {
   CountPercentageValue,
   DimensionName,
   FilterInfo,
+  FilterOptionSet,
   FilterState,
   FmtTableData,
   IHash,
@@ -84,8 +85,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   filterStates: { [key: string]: FilterState } = {};
   userFilterSearchTerms = facetNames.reduce((newMap, item: string) => {
-    newMap[item] = '';
-    return newMap;
+    newMap[item] = {
+      dimension: item,
+      term: ''
+    };
+    return newMap as FilterInfo;
   }, {});
 
   chartPosition = 0;
@@ -105,7 +109,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   resultTotal: number;
 
   filterData: IHashArray<NameLabelValid> = {};
-  displayedFilterData: IHashArray<NameLabelValid> = {};
+  displayedFilterData: IHash<FilterOptionSet> = {};
 
   queryParams: Params = {};
   queryParamsRaw: Params = {};
@@ -448,13 +452,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         });
 
         this.filterData[facetName] = allSortedOps;
-
-        const previousTerm = this.userFilterSearchTerms[facetName];
-
-        this.filterDisplayData({
-          term: previousTerm ? previousTerm : '',
-          dimension: facetName
-        });
+        this.filterDisplayData(this.userFilterSearchTerms[facetName]);
       });
   }
 
@@ -723,7 +721,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** filterDisplayData
-   * - updates displayedFilterData to a filtered and truncated subset for display
+   * - updates displayedFilterData to a filtered and (then) truncated subset for display
    * - ensures form controls exist for all data
    *
    * @param {FilterInfo} filterInfo
@@ -732,11 +730,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     if (!filterInfo.dimension) {
       filterInfo.dimension = this.form.value.facetParameter;
     }
-    this.userFilterSearchTerms[filterInfo.dimension] = filterInfo.term;
+    this.userFilterSearchTerms[filterInfo.dimension] = filterInfo;
 
-    const toDisplay = filterList(
+    const multiplier = filterInfo.upToPage ? filterInfo.upToPage : 1;
+    const possibleToDisplay = filterList(
       filterInfo.term,
       this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
+        // TODO: this mapping should happen after the slice!
         return filterInfo.dimension !== DimensionName.rights
           ? Object.assign({ valid: true }, nl)
           : {
@@ -746,10 +746,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             };
       }),
       'label'
-    ).slice(0, this.MAX_FILTER_OPTIONS);
+    );
+    const toDisplay = possibleToDisplay.slice(
+      0,
+      multiplier * this.MAX_FILTER_OPTIONS
+    );
 
     this.addOrUpdateFilterControls(filterInfo.dimension, toDisplay);
-    this.displayedFilterData[filterInfo.dimension] = toDisplay;
+    this.displayedFilterData[filterInfo.dimension] = {
+      options: toDisplay,
+      hasMore: possibleToDisplay.length > toDisplay.length
+    };
   }
 
   /** getFormattedContentTierParam
@@ -883,6 +890,18 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
+  /** filterKeysLength
+  /* Template utility
+  /* @param { string } filterName - the filter data to check
+  /* @returns number
+  */
+  filterKeysLength(filterName: string): number {
+    if (this.filterData && this.filterData[filterName]) {
+      return Object.keys(this.filterData[filterName]).length;
+    }
+    return 0;
+  }
+
   /** getSetCheckboxValues
   /*
   /* gets the options set in the form
@@ -964,8 +983,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** updatePageUrl
   /* Navigate to url according to form state
+  /* @param {false} skipload
   */
-  updatePageUrl(skipLoad?: boolean): void {
+  updatePageUrl(skipLoad = false): void {
     const qp = {};
 
     this.getEnabledFilterNames().forEach((filterName: string) => {

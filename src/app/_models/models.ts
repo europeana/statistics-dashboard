@@ -7,11 +7,17 @@ export enum ExportType {
 export interface FilterInfo {
   term: string;
   dimension?: string;
+  upToPage?: number;
 }
 
 export interface FilterState {
   visible: boolean;
   disabled?: boolean;
+}
+
+export interface FilterOptionSet {
+  options: Array<NameLabel>;
+  hasMore?: boolean;
 }
 
 export type HeaderNameType = 'name' | 'count' | 'percent';

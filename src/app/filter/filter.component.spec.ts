@@ -18,12 +18,17 @@ describe('FilterComponent', () => {
   let component: FilterComponent;
   let fixture: ComponentFixture<FilterComponent>;
 
-  const dataOptions = [
-    {
-      name: 'name',
-      label: 'label'
-    }
-  ];
+  const dataOptions = {
+    hasMore: false,
+    options: [
+      {
+        name: 'name',
+        label: 'label'
+      }
+    ]
+  };
+
+  const emptyOptions = { options: [], hasMore: false };
 
   beforeEach(
     waitForAsync(() => {
@@ -55,26 +60,26 @@ describe('FilterComponent', () => {
 
   it('should enable when options are added', () => {
     expect(component.isDisabled()).toBeTruthy();
-    component.options = [];
+    component.optionSet = emptyOptions;
     expect(component.isDisabled()).toBeTruthy();
-    component.options = dataOptions;
+    component.optionSet = dataOptions;
     expect(component.isDisabled()).toBeFalsy();
   });
 
   it('should track when the filter is empty and the data is empty', () => {
     expect(component.empty).toBeTruthy();
     expect(component.emptyData).toBeTruthy();
-    component.options = [];
+    component.optionSet = emptyOptions;
     expect(component.empty).toBeTruthy();
     expect(component.emptyData).toBeTruthy();
 
     component.term = '';
-    component.options = dataOptions;
+    component.optionSet = dataOptions;
     expect(component.empty).toBeFalsy();
     expect(component.emptyData).toBeFalsy();
 
     component.term = 'xxx';
-    component.options = dataOptions;
+    component.optionSet = dataOptions;
     expect(component.empty).toBeFalsy();
     expect(component.emptyData).toBeFalsy();
   });
@@ -132,16 +137,28 @@ describe('FilterComponent', () => {
 
   it('should set the filter options', () => {
     const evt = {
+      key: '1',
       target: {
         value: 'option_1'
       }
     };
-    expect(component.options).toBeFalsy();
+    expect(component.optionSet).toBeFalsy();
     component.filterOptions(evt);
-    expect(component.options).toBeFalsy();
-    component.options = [{ name: 'option_1', label: 'option_1' }];
+    expect(component.optionSet).toBeFalsy();
+
+    component.optionSet = {
+      options: [{ name: 'option_1', label: 'option_1' }]
+    };
     component.filterOptions(evt);
-    expect(component.options.length).toEqual(1);
+    expect(component.optionSet.options.length).toEqual(1);
+
+    spyOn(component, 'hide');
+    component.filterOptions(evt);
+    expect(component.hide).not.toHaveBeenCalled();
+
+    evt.key = 'Escape';
+    component.filterOptions(evt);
+    expect(component.hide).toHaveBeenCalled();
   });
 
   it('should get the values', () => {
@@ -235,4 +252,15 @@ describe('FilterComponent', () => {
     expect(component.state.visible).toBeTruthy();
     expect(hasCalledFocus).toBeTruthy();
   }));
+
+  it('should load more', () => {
+    spyOn(component.filterTermChanged, 'emit');
+
+    expect(component.pagesVisible).toEqual(1);
+
+    component.loadMore();
+
+    expect(component.filterTermChanged.emit).toHaveBeenCalled();
+    expect(component.pagesVisible).toEqual(2);
+  });
 });
