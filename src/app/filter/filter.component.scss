@@ -4,6 +4,27 @@
 $total-height: #{$filter-row-height * 5};
 $total-width: 268px;
 
+.load-more-item {
+  // hide 'load-more' link with css instead of an *ngIf to prevent final click triggering a clickOutside
+  &.hidden {
+    display: none;
+  }
+
+  a {
+    color: #000;
+    display: inline-block;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
+    padding-left: $spacing-xs;
+    transform: translateY(8px);
+
+    &:hover {
+      color: #000;
+    }
+  }
+}
+
 .checkbox-filter {
   border-bottom: 1px solid $gray-5;
   margin: 0 $spacing-s $spacing-xs $spacing-s;

@@ -73,7 +73,10 @@
                 <app-filter
                   [form]="form"
                   [group]="filter"
-                  [options]="emptyDataset ? [] : displayedFilterData[filter]"
+                  [optionSet]="
+                    emptyDataset ? { options: [] } : displayedFilterData[filter]
+                  "
+                  [totalAvailable]="filterKeysLength(filter)"
                   [state]="filterStates[filter]"
                   (visibilityChanged)="closeFilters($event)"
                   (valueChanged)="updatePageUrl()"

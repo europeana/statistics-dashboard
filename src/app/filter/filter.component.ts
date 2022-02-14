@@ -8,7 +8,12 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { getFormValueList, rightsUrlMatch } from '../_helpers';
-import { DimensionName, FilterInfo, FilterState, NameLabel } from '../_models';
+import {
+  DimensionName,
+  FilterInfo,
+  FilterOptionSet,
+  FilterState
+} from '../_models';
 
 @Component({
   selector: 'app-filter',
@@ -19,16 +24,19 @@ export class FilterComponent {
   @Input() emptyDataset: boolean;
   @Input() form: FormGroup;
   @Input() group: DimensionName;
+  @Input() totalAvailable: number;
 
-  _options?: Array<NameLabel>;
+  _optionSet?: FilterOptionSet;
   empty = true;
   emptyData = true;
   term = '';
+  pagesVisible = 1;
 
-  get options(): Array<NameLabel> {
-    return this._options;
+  get optionSet(): FilterOptionSet {
+    return this._optionSet;
   }
-  @Input() set options(ops: Array<NameLabel>) {
+  @Input() set optionSet(optionSet: FilterOptionSet) {
+    const ops = optionSet.options;
     if (ops.length > 0) {
       // if there's data (with no filter) then capture that fact.
       if (!this.term || this.term.length === 0) {
@@ -38,7 +46,7 @@ export class FilterComponent {
     } else {
       this.empty = true;
     }
-    this._options = ops;
+    this._optionSet = optionSet;
   }
   @Input() state: FilterState;
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
@@ -51,9 +59,12 @@ export class FilterComponent {
     this.valueChanged.emit(true);
   }
 
-  filterOptions(evt: { target: { value: string } }): void {
-    if (!this.options) {
+  filterOptions(evt: { key: string; target: { value: string } }): void {
+    if (!this.optionSet) {
       return;
+    }
+    if (evt.key === 'Escape') {
+      this.hide();
     }
     this.term = evt.target.value;
     this.filterTermChanged.emit({
@@ -127,9 +138,28 @@ export class FilterComponent {
     }
   }
 
+  /** selectOptionEnabled
+   * @param { string  } group - the formGroup
+   * @param { string  } val - the form value
+   * @returns boolean
+   */
   selectOptionEnabled(group: string, val: string): boolean {
     return val === '0' && group === DimensionName.contentTier
       ? this.form.value.contentTierZero
       : true;
+  }
+
+  /** loadMore
+   *  function invoked by clicking on the "load more" link.
+   * @param { string : filterName } - the filter data to check
+   * @returns number
+   */
+  loadMore(): void {
+    this.pagesVisible++;
+    this.filterTermChanged.emit({
+      term: this.term,
+      dimension: this.group,
+      upToPage: this.pagesVisible
+    });
   }
 }

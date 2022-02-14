@@ -34,7 +34,7 @@
       <span class="search-icon"></span>
       <input
         class="search"
-        placeholder="Search..."
+        placeholder="Search ({{ gridRows.length }} entries)"
         [(ngModel)]="filterTerm"
         (keyup)="updateRows($event)"
       />

@@ -105,11 +105,9 @@ context('statistics-dashboard', () => {
       cy.get(selFilterOpener).eq(5).click(force);
       cy.get(selFilterValueLabel).contains('3D').should('have.length', 1);
 
-      // (country menu is still "disabled")
-      cy.get(selFilterOpenerDisabled).should('have.length', 1);
-
       // re-open the country menu and remove the filter
       cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterOpenerDisabled).should('have.length', 1);
       cy.get(selSearch).clear();
 
       // Country menu enabled - the user wasn't locked-out because of their filter
