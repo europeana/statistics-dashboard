@@ -11,10 +11,17 @@ $total-width: 268px;
   }
 
   a {
+    color: #000;
+    display: inline-block;
     font-size: 14px;
+    font-style: italic;
+    font-weight: bold;
     padding-left: $spacing-xs;
     transform: translateY(8px);
-    display: inline-block;
+
+    &:hover {
+      color: #000;
+    }
   }
 }
 

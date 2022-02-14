@@ -52,7 +52,7 @@
               class="checkbox-filter-input"
               (keyup)="filterOptions($event)"
               formControlName="filter_list_{{ group }}"
-              placeholder="Search ({{ totalAvailable }})"
+              placeholder="Search ({{ totalAvailable }} entries)"
             />
           </li>
         </ul>
@@ -75,7 +75,7 @@
             </ul>
           </li>
           <li class="load-more-item" [ngClass]="{ hidden: !optionSet.hasMore }">
-            <a (click)="loadMore()">load more...</a>
+            <a (click)="loadMore()">view more...</a>
           </li>
         </ul>
       </li>
