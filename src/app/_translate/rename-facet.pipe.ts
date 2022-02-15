@@ -11,10 +11,12 @@ const facetNames: { [key: string]: string } = {};
 facetNames[DimensionName.contentTier] = 'Content Tier';
 facetNames[DimensionName.metadataTier] = 'Metadata Tier';
 facetNames[DimensionName.country] = 'Country';
-facetNames[DimensionName.type] = 'Type';
-facetNames[DimensionName.rights] = 'Rights';
+facetNames[DimensionName.type] = 'Media Type';
+facetNames[DimensionName.rights] = 'Right Statements';
 facetNames[DimensionName.dataProvider] = 'Data Provider';
 facetNames[DimensionName.provider] = 'Provider';
+
+facetNames['dates'] = 'Last Updated';
 
 @Pipe({
   name: 'renameApiFacet'
