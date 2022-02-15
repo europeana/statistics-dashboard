@@ -114,6 +114,27 @@ context('statistics-dashboard', () => {
       cy.get(selFilterOpenerDisabled).should('have.length', 0);
     });
 
+    it('should load more', () => {
+      const selLoadMore = '.load-more-item a';
+
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selLoadMore)
+        .should('have.length', 0);
+      cy.get(selFilterOpener).eq(4).click(force);
+
+      cy.get(selCheckbox).should('have.length', 50);
+      cy.get(selLoadMore)
+        .filter(':visible')
+        .should('have.length', 1);
+
+      cy.get(selLoadMore).click();
+
+      cy.get(selCheckbox).should('have.length.gt', 50);
+      cy.get(selLoadMore)
+        .filter(':visible')
+        .should('have.length', 0);
+    });
+
     it('should search the filters and remember the term when re-opened', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterValueLabel).should('have.length', 0);
