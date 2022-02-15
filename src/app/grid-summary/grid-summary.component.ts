@@ -9,6 +9,10 @@ import { BreakdownResult, CountPercentageValue } from '../_models';
 export class GridSummaryComponent {
   _summaryData: BreakdownResult;
   @Input() grandTotal: number;
+
+  get summaryData(): BreakdownResult {
+    return this._summaryData;
+  }
   @Input() set summaryData(data: BreakdownResult) {
     this._summaryData = Object.assign({}, data);
     if (data) {
