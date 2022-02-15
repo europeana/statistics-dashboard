@@ -133,7 +133,7 @@ describe('OverviewComponent', () => {
       params.next({ facet: DimensionName.country });
     });
 
-    it('should poll on initialisation', fakeAsync(() => {
+    it('should load on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
       fixture.detectChanges();
@@ -273,7 +273,7 @@ describe('OverviewComponent', () => {
 
     it('should get the select options', fakeAsync(() => {
       expect(component.filterData.length).toBeFalsy(0);
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       component.ngOnDestroy();
@@ -318,7 +318,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should read the datasetId param', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
 
       expect(component.form.value.datasetId.length).toBeFalsy();
@@ -464,7 +464,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should enable the filters', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       component.filterStates[DimensionName.country].disabled = true;
       component.enableFilters();
@@ -498,7 +498,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should close the filters', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       const setAllTrue = (): void => {
         Object.keys(component.filterStates).forEach((s: string) => {
@@ -671,7 +671,7 @@ describe('OverviewComponent', () => {
 
     it('should invoke the provided callback', fakeAsync(() => {
       const spy = jasmine.createSpy();
-      component.beginPolling(spy);
+      component.loadData(spy);
       tick(tickTime);
       expect(spy).toHaveBeenCalled();
       component.ngOnDestroy();

@@ -8,14 +8,14 @@ import {
   NamesValuePercent
 } from '../_models';
 import { APIService } from '../_services';
-import { DataPollingComponent } from '../data-polling';
+import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']
 })
-export class LandingComponent extends DataPollingComponent {
+export class LandingComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
 
@@ -28,7 +28,7 @@ export class LandingComponent extends DataPollingComponent {
 
   constructor(private readonly api: APIService) {
     super();
-    this.beginPolling();
+    this.loadData();
   }
 
   toNameValuePercent(cpv: CountPercentageValue): NamesValuePercent {
@@ -39,21 +39,20 @@ export class LandingComponent extends DataPollingComponent {
     };
   }
 
-  beginPolling(): void {
-    this.createNewDataPoller(
-      60 * 100000,
-      () => {
-        this.isLoading = true;
-        return this.api.getGeneralResults();
-      },
-      (general: GeneralResults) => {
+  /** loadData
+  /* - loads the general breakdown data
+  */
+  loadData(): void {
+    this.isLoading = true;
+    this.subs.push(
+      this.api.getGeneralResults().subscribe((general: GeneralResults) => {
         this.isLoading = false;
         general.allBreakdowns.forEach((br: BreakdownResult) => {
           this.landingData[br.breakdownBy] = br.results.map((x) => {
             return this.toNameValuePercent(x);
           });
         });
-      }
+      })
     );
   }
 }

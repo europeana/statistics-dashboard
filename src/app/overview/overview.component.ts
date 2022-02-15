@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
@@ -20,7 +19,7 @@ import {
 import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
-import { DataPollingComponent } from '../data-polling';
+import { SubscriptionManager } from '../subscription-manager';
 import {
   BreakdownRequest,
   BreakdownResult,
@@ -52,7 +51,7 @@ import { GridSummaryComponent } from '../grid-summary';
   styleUrls: ['./overview.component.scss'],
   providers: [RenameRightsPipe]
 })
-export class OverviewComponent extends DataPollingComponent implements OnInit {
+export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridSummary') gridSummary: GridSummaryComponent;
   @ViewChild('export') export: ExportComponent;
@@ -100,8 +99,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .map((x, index) => `${x + index}`);
 
   disabledParams: IHashArray<string>;
-
-  pollRefresh: Subject<boolean>;
   form: FormGroup;
   isLoading = false;
 
@@ -250,8 +247,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetIdInputToQueryParam();
-
-          this.triggerLoad();
+          this.loadData((): void => {
+            this.updateFilterAvailability();
+          });
         })
     );
   }
@@ -456,29 +454,26 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       });
   }
 
-  /** beginPolling
-  /* - set up data polling for facet data
+  /** loadData
+  /* - loads the facet data
   */
-  beginPolling(fnCallback?: (refresh?: boolean) => void): void {
-    this.pollRefresh = this.createNewDataPoller(
-      60 * 100000,
-      () => {
-        this.isLoading = true;
-        return this.api.getBreakdowns(this.getDataServerDataRequest());
-      },
-      (breakdownResults: BreakdownResults) => {
-        this.isLoading = false;
-        if (this.processServerResult(breakdownResults)) {
-          this.postProcessResult();
-        } else {
-          // build filter data using param data to allow removal of any blocking filters
-          this.buildFilters(this.queryParamsRaw);
-        }
-        if (fnCallback) {
-          fnCallback();
-        }
-      }
-    ).getPollingSubject();
+  loadData(fnCallback?: (refresh?: boolean) => void): void {
+    this.subs.push(
+      this.api
+        .getBreakdowns(this.getDataServerDataRequest())
+        .subscribe((breakdownResults: BreakdownResults) => {
+          this.isLoading = false;
+          if (this.processServerResult(breakdownResults)) {
+            this.postProcessResult();
+          } else {
+            // build filter data using param data to allow removal of any blocking filters
+            this.buildFilters(this.queryParamsRaw);
+          }
+          if (fnCallback) {
+            fnCallback();
+          }
+        })
+    );
   }
 
   initialiseFilterStates(): void {
@@ -1055,24 +1050,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       }
     }
     this.updatePageUrl();
-  }
-
-  /** triggerLoad
-  /* invokes beginPolling or triggers a data refresh
-  /* calls updateFilterAvailability once data is loaded
-  **/
-  triggerLoad(): void {
-    const onDataReady = (refresh = false): void => {
-      this.updateFilterAvailability();
-      if (refresh) {
-        this.pollRefresh.next(true);
-      }
-    };
-    if (!this.pollRefresh) {
-      this.beginPolling(onDataReady);
-    } else {
-      onDataReady(true);
-    }
   }
 
   /** switchFacet
