@@ -100,7 +100,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   disabledParams: IHashArray<string>;
   form: FormGroup;
-  isLoading = false;
+  isLoading = true;
 
   selFacetIndex = 0;
   resultTotal: number;
