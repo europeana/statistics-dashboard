@@ -1,36 +1,34 @@
 <div
   class="summary-grid totals"
-  *ngIf="_summaryData && _summaryData.results && _summaryData.results[0]"
+  *ngIf="summaryData && summaryData.results && summaryData.results[0]"
 >
   <span class="total-title"
-    >Top {{ _summaryData.breakdownBy | renameApiFacetShort }}</span
+    >Top {{ summaryData.breakdownBy | renameApiFacetShort }}</span
   >
   <span class="total-title"
-    >Total
-    {{ "plural_" + _summaryData.breakdownBy | renameApiFacetShort }}</span
+    >Total {{ "plural_" + summaryData.breakdownBy | renameApiFacetShort }}</span
   >
 
   <span class="total label">{{
-    _summaryData.results[0].value | renameRights
+    summaryData.results[0].value | renameRights
   }}</span>
 
-  <span class="total">{{ _summaryData.results.length }}</span>
+  <span class="total">{{ summaryData.results.length }}</span>
 
   <span class="total-title"
-    >Top {{ _summaryData.breakdownBy | renameApiFacetShort }} percentage</span
+    >Top {{ summaryData.breakdownBy | renameApiFacetShort }} percentage</span
   >
   <span class="total-title"
     >Total records in
-    {{ "plural_" + _summaryData.breakdownBy | renameApiFacetShort }}</span
+    {{ "plural_" + summaryData.breakdownBy | renameApiFacetShort }}</span
   >
-  <span class="total">{{ _summaryData.results[0].percentage }}%</span>
+  <span class="total">{{ summaryData.results[0].percentage }}%</span>
   <span class="total" data-e2e="total-records">{{ grandTotal | number }}</span>
 
   <span class="total-title"
-    >Top {{ _summaryData.breakdownBy | renameApiFacetShort }} records
-    count</span
+    >Top {{ summaryData.breakdownBy | renameApiFacetShort }} records count</span
   >
   <span></span>
-  <span class="total">{{ _summaryData.results[0].count | number }}</span>
+  <span class="total">{{ summaryData.results[0].count | number }}</span>
   <span></span>
 </div>
