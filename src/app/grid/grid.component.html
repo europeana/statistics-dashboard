@@ -76,7 +76,10 @@
     <ng-content
       *ngTemplateOutlet="
         cellHeader;
-        context: { label: 'Records by ' + facet, sortBy: SortBy.name }
+        context: {
+          label: 'Records by ' + (facet | renameApiFacet),
+          sortBy: SortBy.name
+        }
       "
     ></ng-content>
 
