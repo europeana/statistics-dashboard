@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
@@ -57,6 +58,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('export') export: ExportComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
+  @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
 
   // Make variables available to template
   public fromCSL = fromCSL;
@@ -118,7 +120,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     private readonly fb: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly renameRights: RenameRightsPipe
+    private readonly renameRights: RenameRightsPipe,
+    private readonly dialog: MatDialog
   ) {
     super();
     this.buildForm();
@@ -603,6 +606,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
     this.showAppliedSeriesInGrid();
     this.chartRefresher.next(true);
+  }
+
+  showDateDisclaimer(): void {
+    this.dialog.open(this.dialogRef);
   }
 
   /** addSeries
