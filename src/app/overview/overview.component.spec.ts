@@ -41,9 +41,11 @@ describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
 
-  const dialog = { open: (): void => {
-    // mock open function
-  }};
+  const dialog = {
+    open: (): void => {
+      // mock open function
+    }
+  };
 
   const contentTierNameLabels = [
     { name: '0', label: '0' },
