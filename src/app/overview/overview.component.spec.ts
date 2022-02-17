@@ -41,6 +41,8 @@ describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
 
+  const dialog = { open: () => {} };
+
   const contentTierNameLabels = [
     { name: '0', label: '0' },
     { name: '1', label: '1' },
@@ -100,7 +102,7 @@ describe('OverviewComponent', () => {
         },
         {
           provide: MatDialog,
-          useValue: { open: () => {} }
+          useValue: dialog
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -181,6 +183,12 @@ describe('OverviewComponent', () => {
       expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
       component.ngOnDestroy();
     }));
+
+    it('should show the date disclaimer', () => {
+      spyOn(dialog, 'open');
+      component.showDateDisclaimer();
+      expect(dialog.open).toHaveBeenCalled();
+    });
 
     it('should process the server result', () => {
       const dataServerData = { results: {} } as unknown as BreakdownResults;
