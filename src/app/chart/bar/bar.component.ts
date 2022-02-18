@@ -132,13 +132,13 @@ export class BarComponent implements AfterViewInit {
     return Math.ceil(num / 10) * 10;
   }
 
-  /** addAxisBreak
+  /** addAxisBreakIfNecessary
   /* Adds an axis break if necessary
   /*
   /* @param { number } seriesMin - the smallest value in the series
   /* @param { number } seriesMax - the largest value in the series
   */
-  addAxisBreak(seriesMin: number, seriesMax: number): void {
+  addAxisBreakIfNecessary(seriesMin: number, seriesMax: number): void {
     const scale = seriesMax / seriesMin;
     const targetRatio = 20;
 
@@ -320,7 +320,7 @@ export class BarComponent implements AfterViewInit {
     }
 
     if (!this.isZoomable()) {
-      this.addAxisBreak(
+      this.addAxisBreakIfNecessary(
         Math.min.apply(Math, seriesVals),
         Math.max.apply(Math, seriesVals)
       );
