@@ -22,6 +22,9 @@ export class SnapshotsComponent {
 
   _facetName: string;
 
+  get facetName(): string {
+    return this._facetName;
+  }
   @Input() set facetName(facetName: string) {
     this._facetName = facetName;
 
@@ -241,7 +244,7 @@ export class SnapshotsComponent {
   }
 
   getSortKeys(keys?: Array<string>): Array<string> {
-    const cd = this.compareDataAllFacets[this._facetName];
+    const cd = this.compareDataAllFacets[this.facetName];
 
     if (!keys) {
       keys = Object.keys(cd);
@@ -255,7 +258,7 @@ export class SnapshotsComponent {
   }
 
   toggleSaved(key: string, current = false): void {
-    const cd = this.compareDataAllFacets[this._facetName][key];
+    const cd = this.compareDataAllFacets[this.facetName][key];
     cd.saved = !cd.saved;
 
     if (!cd.saved) {
@@ -272,7 +275,7 @@ export class SnapshotsComponent {
     if (current) {
       return;
     }
-    const cd = this.compareDataAllFacets[this._facetName][key];
+    const cd = this.compareDataAllFacets[this.facetName][key];
     if (cd.applied) {
       this.hideItem.emit(key);
     } else {
@@ -287,7 +290,7 @@ export class SnapshotsComponent {
   }
 
   unapply(seriesKey: string): void {
-    const cd = this.compareDataAllFacets[this._facetName][seriesKey];
+    const cd = this.compareDataAllFacets[this.facetName][seriesKey];
     cd._colourIndex = null;
     cd.applied = false;
   }

@@ -40,6 +40,7 @@ export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
   readonly maxNumberBars = 50;
   preferredNumberBars = 8;
+  maxBarSizeRelativeRatio = 20;
 
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
@@ -120,6 +121,45 @@ export class BarComponent implements AfterViewInit {
   */
   toggleCtrls(): void {
     this.settings.ctrlsOpen = !this.settings.ctrlsOpen;
+  }
+
+  /** roundUpNumber
+  /* Rounds up the number
+  /*
+  /* @param { number } num - the number to round
+  /* @returns number
+  */
+  roundUpNumber(num: number): number {
+    return Math.ceil(num / 10) * 10;
+  }
+
+  /** addAxisBreak
+  /* Adds an axis break
+  /*
+  /* @param { number } seriesMin - the smallest value in the series
+  /* @param { number } seriesMax - the largest value in the series
+  */
+  addAxisBreak(seriesMin: number, seriesMax: number): void {
+    const diff = seriesMax - seriesMin;
+    const chunkToRemove = diff - this.maxBarSizeRelativeRatio * seriesMin;
+    this.valueAxis.min = 0;
+    this.valueAxis.max = this.roundUpNumber(seriesMax);
+    this.valueAxis.strictMinMax = true;
+
+    const axisBreak = this.valueAxis.axisBreaks.create();
+    axisBreak.startValue = (seriesMax - chunkToRemove) / 2;
+    axisBreak.endValue = seriesMax - axisBreak.startValue;
+
+    var d = (axisBreak.endValue - axisBreak.startValue) / diff;
+    axisBreak.breakSize = (0.075 * (1 - d)) / d; // 0.075 means that the break will take 7.5% of the total value axis height
+
+    // make break expand on hover
+    var hoverState = axisBreak.states.create('hover');
+    hoverState.properties.breakSize = 1;
+    hoverState.properties.opacity = 0.1;
+    hoverState.transitionDuration = 1500;
+
+    axisBreak.defaultState.transitionDuration = 1000;
   }
 
   /** addLegend
@@ -224,10 +264,11 @@ export class BarComponent implements AfterViewInit {
   /* adds series data to the chart data
   /* adds series object to the chart / the allSeries track-map
   /*
-  /* @param { Array<ColourSeriesData> : csds } series info
+  /* @param { Array<ColourSeriesData> } csds - series info
    */
   addSeries(csds: Array<ColourSeriesData>): void {
     let anySeries;
+    let seriesVals = [];
 
     csds.forEach((csd: ColourSeriesData) => {
       if (!this.chart.data.length) {
@@ -236,10 +277,12 @@ export class BarComponent implements AfterViewInit {
           .map((s: string) => {
             const res = { name: s };
             res[csd.seriesName] = csd.data[s];
+            seriesVals.push(csd.data[s]);
             return res;
           });
       } else {
         this.chart.data.forEach((cd: IHash<number>) => {
+          seriesVals.push(csd.data[cd.name]);
           cd[csd.seriesName] = csd.data[cd.name];
         });
       }
@@ -249,11 +292,7 @@ export class BarComponent implements AfterViewInit {
       this.allSeries[csd.seriesName] = anySeries;
     });
 
-    if (
-      anySeries &&
-      this.settings.hasScroll &&
-      this.chart.data.length > this.preferredNumberBars
-    ) {
+    if (anySeries && this.settings.hasScroll && this.isZoomable()) {
       anySeries.events.on('ready', (): void => {
         const fn = (): void => {
           const customiseGrip = (grip): void => {
@@ -276,14 +315,22 @@ export class BarComponent implements AfterViewInit {
       });
     }
 
+    if (!this.isZoomable()) {
+      const seriesMin = Math.min.apply(Math, seriesVals);
+      const seriesMax = Math.max.apply(Math, seriesVals);
+      const scale = seriesMax / seriesMin;
+      if (scale > this.maxBarSizeRelativeRatio) {
+        this.addAxisBreak(seriesMin, seriesMax);
+      }
+    }
     this.chart.invalidateData();
   }
 
   /** createSeries
    * - instantiates and returns a series
    *
-   * @param { string : colour } the series legend / bar colour
-   * @param { string : valueField } the field to read
+   * @param { string } colour - the series legend / bar colour
+   * @param { string } valueField - the field to read
    */
   createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
     const series = this.chart.series.push(new am4charts.ColumnSeries());
@@ -307,8 +354,12 @@ export class BarComponent implements AfterViewInit {
     return series;
   }
 
+  isZoomable(): boolean {
+    return this.chart.data && this.chart.data.length > this.preferredNumberBars;
+  }
+
   zoomTop(start = 0): void {
-    if (this.chart.data && this.chart.data.length > this.preferredNumberBars) {
+    if (this.isZoomable()) {
       const fn = (): void => {
         this.categoryAxis.zoomToIndexes(
           start,

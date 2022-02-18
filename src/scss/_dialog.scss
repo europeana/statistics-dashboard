@@ -1,0 +1,19 @@
+@import "variables";
+
+.dialog-content {
+  justify-content: center;
+
+  button {
+    margin-top: $spacing-l;
+    padding: 8px;
+  }
+
+  .warn-icon {
+    background-image: svg-url-icon-warning($stats-blue);
+    background-position: center;
+    display: block;
+    height: 12px;
+    margin-right: $spacing-xs;
+    width: 14px;
+  }
+}

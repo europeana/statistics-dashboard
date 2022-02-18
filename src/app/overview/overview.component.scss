@@ -357,6 +357,23 @@ label {
   margin-right: auto;
 }
 
+.date.warn {
+  color: $gray-med;
+  position: relative;
+  &:hover {
+    color: transparent;
+    &::before {
+      background-color: #fff;
+      background: svg-url-icon-warning($stats-blue) 0px 0px / 10px no-repeat;
+      content: "";
+      display: inline-block;
+      height: 10px;
+      position: absolute;
+      width: 14px;
+    }
+  }
+}
+
 @media (min-width: $bp-xl) {
   .statistics-dashboard {
     flex-direction: row;

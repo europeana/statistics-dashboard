@@ -11,6 +11,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
 import { today } from '../_helpers';
@@ -39,6 +40,12 @@ import { OverviewComponent } from './overview.component';
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
+
+  const dialog = {
+    open: (): void => {
+      // mock open function
+    }
+  };
 
   const contentTierNameLabels = [
     { name: '0', label: '0' },
@@ -96,6 +103,10 @@ describe('OverviewComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: { params: params, queryParams: queryParams }
+        },
+        {
+          provide: MatDialog,
+          useValue: dialog
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -133,7 +144,7 @@ describe('OverviewComponent', () => {
       params.next({ facet: DimensionName.country });
     });
 
-    it('should poll on initialisation', fakeAsync(() => {
+    it('should load on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
       fixture.detectChanges();
@@ -176,6 +187,12 @@ describe('OverviewComponent', () => {
       expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
       component.ngOnDestroy();
     }));
+
+    it('should show the date disclaimer', () => {
+      spyOn(dialog, 'open');
+      component.showDateDisclaimer();
+      expect(dialog.open).toHaveBeenCalled();
+    });
 
     it('should process the server result', () => {
       const dataServerData = { results: {} } as unknown as BreakdownResults;
@@ -273,7 +290,7 @@ describe('OverviewComponent', () => {
 
     it('should get the select options', fakeAsync(() => {
       expect(component.filterData.length).toBeFalsy(0);
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       component.ngOnDestroy();
@@ -318,7 +335,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should read the datasetId param', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
 
       expect(component.form.value.datasetId.length).toBeFalsy();
@@ -464,7 +481,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should enable the filters', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       component.filterStates[DimensionName.country].disabled = true;
       component.enableFilters();
@@ -498,7 +515,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should close the filters', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       const setAllTrue = (): void => {
         Object.keys(component.filterStates).forEach((s: string) => {
@@ -671,7 +688,7 @@ describe('OverviewComponent', () => {
 
     it('should invoke the provided callback', fakeAsync(() => {
       const spy = jasmine.createSpy();
-      component.beginPolling(spy);
+      component.loadData(spy);
       tick(tickTime);
       expect(spy).toHaveBeenCalled();
       component.ngOnDestroy();

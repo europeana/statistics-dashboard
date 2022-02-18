@@ -136,4 +136,12 @@ describe('GridComponent', () => {
     expect(component.bumpSortState).toHaveBeenCalled();
     expect(component.refreshData.emit).toHaveBeenCalled();
   });
+
+  it('should update the rows', () => {
+    spyOn(component.refreshData, 'emit');
+    component.updateRows({ key: '' } as unknown as KeyboardEvent);
+    expect(component.refreshData.emit).not.toHaveBeenCalled();
+    component.updateRows({ key: '1' } as unknown as KeyboardEvent);
+    expect(component.refreshData.emit).toHaveBeenCalled();
+  });
 });

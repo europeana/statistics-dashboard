@@ -11,6 +11,7 @@ import {
   MatNativeDateModule,
   NativeDateAdapter
 } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
@@ -98,6 +99,7 @@ class AppDateAdapter extends NativeDateAdapter {
     FormsModule,
     HttpClientModule,
     MatDatepickerModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatNativeDateModule,
     ReactiveFormsModule
