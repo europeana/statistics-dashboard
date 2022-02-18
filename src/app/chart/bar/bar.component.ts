@@ -122,8 +122,21 @@ export class BarComponent implements AfterViewInit {
     this.settings.ctrlsOpen = !this.settings.ctrlsOpen;
   }
 
+  /** roundUpNumber
+  /* Rounds up the number
+  /*
+  /* @param { number } num - the number to round
+  /* @returns number
+  */
+  roundUpNumber(num: number): number {
+    return Math.ceil(num / 10) * 10;
+  }
+
   /** addAxisBreak
   /* Adds an axis break if necessary
+  /*
+  /* @param { number } seriesMin - the smallest value in the series
+  /* @param { number } seriesMax - the largest value in the series
   */
   addAxisBreak(seriesMin: number, seriesMax: number): void {
     const scale = seriesMax / seriesMin;
@@ -132,10 +145,8 @@ export class BarComponent implements AfterViewInit {
     if (scale > targetRatio) {
       const diff = seriesMax - seriesMin;
       const chunkToRemove = diff - targetRatio * seriesMin;
-      const roundingGranularity = 100;
       this.valueAxis.min = 0;
-      this.valueAxis.max =
-        Math.ceil(seriesMax / roundingGranularity) * roundingGranularity;
+      this.valueAxis.max = this.roundUpNumber(seriesMax);
       this.valueAxis.strictMinMax = true;
 
       const axisBreak = this.valueAxis.axisBreaks.create();
@@ -257,7 +268,7 @@ export class BarComponent implements AfterViewInit {
   /* adds series data to the chart data
   /* adds series object to the chart / the allSeries track-map
   /*
-  /* @param { Array<ColourSeriesData> : csds } series info
+  /* @param { Array<ColourSeriesData> } csds - series info
    */
   addSeries(csds: Array<ColourSeriesData>): void {
     let anySeries;
@@ -270,9 +281,7 @@ export class BarComponent implements AfterViewInit {
           .map((s: string) => {
             const res = { name: s };
             res[csd.seriesName] = csd.data[s];
-
             seriesVals.push(csd.data[s]);
-
             return res;
           });
       } else {
@@ -322,8 +331,8 @@ export class BarComponent implements AfterViewInit {
   /** createSeries
    * - instantiates and returns a series
    *
-   * @param { string : colour } the series legend / bar colour
-   * @param { string : valueField } the field to read
+   * @param { string } colour - the series legend / bar colour
+   * @param { string } valueField - the field to read
    */
   createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
     const series = this.chart.series.push(new am4charts.ColumnSeries());
