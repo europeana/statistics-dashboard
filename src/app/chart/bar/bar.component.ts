@@ -40,6 +40,7 @@ export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
   readonly maxNumberBars = 50;
   preferredNumberBars = 8;
+  maxBarSizeRelativeRatio = 20;
 
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
@@ -132,38 +133,33 @@ export class BarComponent implements AfterViewInit {
     return Math.ceil(num / 10) * 10;
   }
 
-  /** addAxisBreakIfNecessary
-  /* Adds an axis break if necessary
+  /** addAxisBreak
+  /* Adds an axis break
   /*
   /* @param { number } seriesMin - the smallest value in the series
   /* @param { number } seriesMax - the largest value in the series
   */
-  addAxisBreakIfNecessary(seriesMin: number, seriesMax: number): void {
-    const scale = seriesMax / seriesMin;
-    const targetRatio = 20;
+  addAxisBreak(seriesMin: number, seriesMax: number): void {
+    const diff = seriesMax - seriesMin;
+    const chunkToRemove = diff - this.maxBarSizeRelativeRatio * seriesMin;
+    this.valueAxis.min = 0;
+    this.valueAxis.max = this.roundUpNumber(seriesMax);
+    this.valueAxis.strictMinMax = true;
 
-    if (scale > targetRatio) {
-      const diff = seriesMax - seriesMin;
-      const chunkToRemove = diff - targetRatio * seriesMin;
-      this.valueAxis.min = 0;
-      this.valueAxis.max = this.roundUpNumber(seriesMax);
-      this.valueAxis.strictMinMax = true;
+    const axisBreak = this.valueAxis.axisBreaks.create();
+    axisBreak.startValue = (seriesMax - chunkToRemove) / 2;
+    axisBreak.endValue = seriesMax - axisBreak.startValue;
 
-      const axisBreak = this.valueAxis.axisBreaks.create();
-      axisBreak.startValue = (seriesMax - chunkToRemove) / 2;
-      axisBreak.endValue = seriesMax - axisBreak.startValue;
+    var d = (axisBreak.endValue - axisBreak.startValue) / diff;
+    axisBreak.breakSize = (0.075 * (1 - d)) / d; // 0.075 means that the break will take 7.5% of the total value axis height
 
-      var d = (axisBreak.endValue - axisBreak.startValue) / diff;
-      axisBreak.breakSize = (0.075 * (1 - d)) / d; // 0.075 means that the break will take 7.5% of the total value axis height
+    // make break expand on hover
+    var hoverState = axisBreak.states.create('hover');
+    hoverState.properties.breakSize = 1;
+    hoverState.properties.opacity = 0.1;
+    hoverState.transitionDuration = 1500;
 
-      // make break expand on hover
-      var hoverState = axisBreak.states.create('hover');
-      hoverState.properties.breakSize = 1;
-      hoverState.properties.opacity = 0.1;
-      hoverState.transitionDuration = 1500;
-
-      axisBreak.defaultState.transitionDuration = 1000;
-    }
+    axisBreak.defaultState.transitionDuration = 1000;
   }
 
   /** addLegend
@@ -320,10 +316,12 @@ export class BarComponent implements AfterViewInit {
     }
 
     if (!this.isZoomable()) {
-      this.addAxisBreakIfNecessary(
-        Math.min.apply(Math, seriesVals),
-        Math.max.apply(Math, seriesVals)
-      );
+      const seriesMin = Math.min.apply(Math, seriesVals);
+      const seriesMax = Math.max.apply(Math, seriesVals);
+      const scale = seriesMax / seriesMin;
+      if (scale > this.maxBarSizeRelativeRatio) {
+        this.addAxisBreak(seriesMin, seriesMax);
+      }
     }
     this.chart.invalidateData();
   }

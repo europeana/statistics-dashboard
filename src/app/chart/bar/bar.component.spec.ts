@@ -86,7 +86,7 @@ describe('BarComponent', () => {
 
   it('should add an axis break', () => {
     expect(component.valueAxis.axisBreaks.length).toEqual(0);
-    component.addAxisBreakIfNecessary(0, 100);
+    component.addAxisBreak(0, 100);
     expect(component.valueAxis.axisBreaks.length).toBeGreaterThan(0);
   });
 
