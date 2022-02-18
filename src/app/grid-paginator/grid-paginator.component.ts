@@ -7,11 +7,16 @@ import { PagerInfo, TableRow } from '../_models';
   styleUrls: ['./grid-paginator.component.scss']
 })
 export class GridPaginatorComponent {
+  get rows(): Array<TableRow> {
+    return this.rows;
+  }
   @Input() set rows(rows: Array<TableRow>) {
     this.pages = this.calculatePages(rows);
     this.setPage(0);
   }
-
+  get maxPageSize(): number {
+    return this._maxPageSize;
+  }
   @Input() set maxPageSize(maxPageSize: number) {
     this._maxPageSize = maxPageSize;
     if (this.pages) {
@@ -39,11 +44,11 @@ export class GridPaginatorComponent {
     // create loose range sructure, i.e. [[0,10],[10,20],[20,30]]
     const ranges = Array.from(
       {
-        length: Math.ceil(rows.length / this._maxPageSize)
+        length: Math.ceil(rows.length / this.maxPageSize)
       },
       (v, i: number) => {
-        const lowerIndex = i * this._maxPageSize;
-        const upperIndex = lowerIndex + this._maxPageSize;
+        const lowerIndex = i * this.maxPageSize;
+        const upperIndex = lowerIndex + this.maxPageSize;
         return [lowerIndex, upperIndex];
       }
     );

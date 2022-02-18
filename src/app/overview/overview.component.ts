@@ -738,7 +738,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     const possibleToDisplay = filterList(
       filterInfo.term,
       this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
-        // TODO: this mapping should happen after the slice!
         return filterInfo.dimension !== DimensionName.rights
           ? Object.assign({ valid: true }, nl)
           : {
