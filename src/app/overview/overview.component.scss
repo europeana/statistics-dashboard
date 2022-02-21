@@ -363,7 +363,6 @@ label {
   &:hover {
     color: transparent;
     &::before {
-      background-color: #fff;
       background: svg-url-icon-warning($stats-blue) 0px 0px / 10px no-repeat;
       content: "";
       display: inline-block;

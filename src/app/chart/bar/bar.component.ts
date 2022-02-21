@@ -150,11 +150,11 @@ export class BarComponent implements AfterViewInit {
     axisBreak.startValue = (seriesMax - chunkToRemove) / 2;
     axisBreak.endValue = seriesMax - axisBreak.startValue;
 
-    var d = (axisBreak.endValue - axisBreak.startValue) / diff;
+    const d = (axisBreak.endValue - axisBreak.startValue) / diff;
     axisBreak.breakSize = (0.075 * (1 - d)) / d; // 0.075 means that the break will take 7.5% of the total value axis height
 
     // make break expand on hover
-    var hoverState = axisBreak.states.create('hover');
+    const hoverState = axisBreak.states.create('hover');
     hoverState.properties.breakSize = 1;
     hoverState.properties.opacity = 0.1;
     hoverState.transitionDuration = 1500;
@@ -268,7 +268,7 @@ export class BarComponent implements AfterViewInit {
    */
   addSeries(csds: Array<ColourSeriesData>): void {
     let anySeries;
-    let seriesVals = [];
+    const seriesVals = [];
 
     csds.forEach((csd: ColourSeriesData) => {
       if (!this.chart.data.length) {
@@ -316,8 +316,8 @@ export class BarComponent implements AfterViewInit {
     }
 
     if (!this.isZoomable()) {
-      const seriesMin = Math.min.apply(Math, seriesVals);
-      const seriesMax = Math.max.apply(Math, seriesVals);
+      const seriesMin = Math.min(...seriesVals);
+      const seriesMax = Math.max(...seriesVals);
       const scale = seriesMax / seriesMin;
       if (scale > this.maxBarSizeRelativeRatio) {
         this.addAxisBreak(seriesMin, seriesMax);
