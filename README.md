@@ -60,6 +60,12 @@ To run the cypress tests in development (watch mode), start the dev server in on
 
     npm run cypress
 
+### Accessibility tests (development)
+
+To run the accessibility tests:
+
+    npm run test:accessibility
+
 ## Deploy
 
 We use jenkins to deploy. Make sure you can access [https://jenkins.eanadev.org/](https://jenkins.eanadev.org/) and use the following jobs:

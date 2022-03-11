@@ -62,6 +62,7 @@ export const DiacriticsMap = {
 };
 
 export const externalLinks = {
+  ctZero: 'https://pro.europeana.eu/page/edm-documentation',
   europeana: '//www.europeana.eu',
   pro: '//pro.europeana.eu',
   api: '//api.europeana.eu',
@@ -71,7 +72,7 @@ export const externalLinks = {
     contentTier:
       'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
     metadataTier:
-      ' https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
+      'https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
     provider: 'https://pro.europeana.eu/page/aggregators',
     rights: 'https://pro.europeana.eu/page/available-rights-statements'
   }
