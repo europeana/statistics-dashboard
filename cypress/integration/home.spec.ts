@@ -1,4 +1,4 @@
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
   describe('home', () => {
 
     beforeEach(() => {

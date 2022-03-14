@@ -1,7 +1,7 @@
 import { facetNames } from '../../src/app/_data';
 import { DimensionName } from '../../src/app/_models';
 
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
   describe('overview', () => {
 
     const selLinkHomeHeader = '[data-e2e=link-home-header]';

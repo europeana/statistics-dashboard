@@ -1,6 +1,6 @@
 import { DimensionName } from '../../src/app/_models';
 
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
 
   const force = { force : true };
   const selExports = '.export.active';

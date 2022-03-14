@@ -1,7 +1,12 @@
 <div *ngIf="isVisible && gridRows">
   <ng-template #linkOut let-row="row" let-total="row.isTotal">
     <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
-      <a target="_blank" class="link-out" [href]="row.portalUrl"></a>
+      <a
+        [attr.aria-label]="'View ' + row.name + ' in Europeana'"
+        target="_blank"
+        class="link-out"
+        [href]="row.portalUrl"
+      ></a>
     </span>
   </ng-template>
 

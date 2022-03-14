@@ -8,7 +8,9 @@
     "clean": "rm -rf coverage && rm -rf dist",
     "cypress": "cypress open",
     "cypress:ci": "run-p --race start:ci cypress:run",
-    "cypress:run": "sleep 10 && cypress run",
+    "cypress:ci-accessibility": "run-p --race start:ci cypress:run-accessibility",
+    "cypress:run": "sleep 10 && cypress run --config '{\"ignoreTestFiles\": \"**/a11y.spec.ts\"}'",
+    "cypress:run-accessibility": "sleep 10 && cypress run --config '{\"testFiles\": \"**/a11y.spec.ts\"}'",
     "dist": "ng build --build-optimizer=false --progress=false --configuration production && cp src/static/manifest.yml src/static/Staticfile src/static/nginx.conf dist",
     "lint": "eslint --ext .js,.ts src/app --fix",
     "lint:ci": "eslint --ext .ts src/app",
@@ -21,7 +23,8 @@
     "template-check": "ng build --progress=false --output-path=tmp/template-check --aot",
     "test": "npm run prettier:ci && npm run lint:ci && npm run build && npm run template-check && npm run test:e2e",
     "test:dev": "ng test --code-coverage",
-    "test:e2e": "tsc --project tsconfig.test-data.json && npm run prep-test-data && ((node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs) & (npm run cypress:ci) ; fuser -k 3001/tcp)"
+    "test:e2e": "tsc --project tsconfig.test-data.json && npm run prep-test-data && ((node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs) & (npm run cypress:ci) ; fuser -k 3001/tcp)",
+    "test:accessibility": "tsc --project tsconfig.test-data.json && npm run prep-test-data && ((node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs) & (npm run cypress:ci-accessibility) ; fuser -k 3001/tcp)"
   },
   "private": true,
   "dependencies": {
@@ -54,8 +57,10 @@
     "@typescript-eslint/eslint-plugin-tslint": "^4.31.2",
     "@typescript-eslint/parser": "^4.31.2",
     "@typescript-eslint/types": "^4.31.2",
+    "axe-core": "^4.4.1",
     "codelyzer": "^6.0.0",
-    "cypress": "^7.7.0",
+    "cypress": "^9.5.1",
+    "cypress-axe": "^0.14.0",
     "eslint": "^7.32.0",
     "eslint-plugin-rxjs": "^2.1.7",
     "jasmine": "^3.9.0",

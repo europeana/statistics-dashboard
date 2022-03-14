@@ -1,6 +1,6 @@
 import { DimensionName } from '../../src/app/_models';
 
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
   describe('filter removal', () => {
     const force = { force: true };
     const selFilterRemove = '.rm-filter';
