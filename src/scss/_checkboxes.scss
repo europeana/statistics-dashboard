@@ -79,6 +79,9 @@
 .ct-zero .checkmarked-checkbox {
   &::before {
     background-image: svg-url-icon-eye-disabled($gray-med);
+    bottom: -2px;
+    height: 19px;
+    min-width: 20px;
   }
   &.checked::before {
     background-image: svg-url-icon-eye($gray-med);
