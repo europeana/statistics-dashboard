@@ -24,6 +24,7 @@ import {
 } from './_translate';
 import { BarComponent, MapComponent } from './chart';
 import { CheckboxComponent } from './checkbox';
+import { CTZeroControlComponent } from './ct-zero-control';
 import { DatesComponent } from './dates';
 import { ExportComponent } from './export';
 import { FilterComponent } from './filter';
@@ -71,6 +72,7 @@ class AppDateAdapter extends NativeDateAdapter {
     AppComponent,
     BarComponent,
     CheckboxComponent,
+    CTZeroControlComponent,
     ClickAwareDirective,
     DatesComponent,
     ExportComponent,

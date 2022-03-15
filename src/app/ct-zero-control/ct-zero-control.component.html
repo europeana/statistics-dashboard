@@ -1,0 +1,39 @@
+<span class="ct-zero container-h">
+  <span [formGroup]="form" class="checkbox-labelled">
+    <span
+      class="checkmarked-checkbox"
+      [ngClass]="{
+        checked: form.value.contentTierZero,
+        disabled: disabled
+      }"
+    >
+      <input
+        id="ctZero"
+        class="checkbox"
+        type="checkbox"
+        (change)="valueChanged()"
+        formControlName="contentTierZero"
+      />
+    </span>
+    <label
+      class="filter-title"
+      [ngClass]="{
+        disabled: disabled
+      }"
+      for="ctZero"
+    >
+      {{ form.value.contentTierZero ? "Disable" : "Enable" }}
+      content tier 0
+    </label>
+  </span>
+  <a
+    class="info-icon"
+    [href]="externalLinks.ctZero"
+    target="_blank"
+    title="Documentation"
+    [ngClass]="{
+      checked: form.value.contentTierZero,
+      disabled: disabled
+    }"
+  ></a>
+</span>
