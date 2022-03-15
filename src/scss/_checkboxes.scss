@@ -76,25 +76,27 @@
   background-image: svg-url-icon-checkbox-checked($stats-blue);
 }
 
-.ct-zero .checkmarked-checkbox {
-  &::before {
-    background-image: svg-url-icon-eye-disabled($gray-med);
-    bottom: -2px;
-    height: 19px;
-    min-width: 20px;
-  }
-  &.checked::before {
-    background-image: svg-url-icon-eye($gray-med);
-  }
-  &.disabled {
-    cursor: default;
-    pointer-events: none;
-
+.ct-zero {
+  margin-left: $spacing-s;
+  .checkmarked-checkbox {
     &::before {
-      background-image: svg-url-icon-eye-disabled($gray-5);
+      background-image: svg-url-icon-eye-disabled($gray-med);
+      bottom: -2px;
+      height: 19px;
+      min-width: 20px;
     }
     &.checked::before {
-      background-image: svg-url-icon-eye($gray-5);
+      background-image: svg-url-icon-eye($gray-med);
+    }
+    &.disabled {
+      cursor: default;
+      pointer-events: none;
+      &::before {
+        background-image: svg-url-icon-eye-disabled($gray-5);
+      }
+      &.checked::before {
+        background-image: svg-url-icon-eye($gray-5);
+      }
     }
   }
 }
