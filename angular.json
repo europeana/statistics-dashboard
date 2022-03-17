@@ -13,6 +13,19 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-GB",
+        "locales": {
+          "en": {
+            "translation": "src/locale/messages.en-GB.xlf",
+            "baseHref": ""
+          },
+          "it": {
+            "translation": "src/locale/messages.it.xlf",
+            "baseHref": ""
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -71,6 +84,11 @@
                 }
               ]
             },
+            "it": {
+              "localize": ["it"],
+              "outputPath": "dist/it/",
+              "i18nMissingTranslation": "error"
+            },
             "e2e": {
               "fileReplacements": [
                 {
@@ -90,6 +108,9 @@
           "configurations": {
             "production": {
               "browserTarget": "statistics-dashboard:build:production"
+            },
+            "it": {
+              "browserTarget": "statistics-dashboard:build:it"
             },
             "e2e": {
               "browserTarget": "statistics-dashboard:build:e2e"
