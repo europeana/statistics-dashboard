@@ -13,7 +13,7 @@
     "cypress:run": "sleep 10 && cypress run --config '{\"ignoreTestFiles\": \"**/a11y.spec.ts\"}'",
     "cypress:run-accessibility": "sleep 10 && cypress run --config '{\"testFiles\": \"**/a11y.spec.ts\"}'",
     "dist": "ng build --build-optimizer=false --progress=false --configuration production && cp src/static/manifest.yml src/static/Staticfile src/static/nginx.conf dist",
-    "dist-localised": "ng build --build-optimizer=false --progress=false --configuration production --localize=true  && cp src/static/manifest.yml src/static/Staticfile src/static/nginx.conf dist",
+    "dist-localised": "ng build --build-optimizer=false --progress=false --configuration production --localize=true  && cp src/static/manifest.yml dist",
     "i18n:extract": "ng extract-i18n --output-path src/locale --out-file messages.en-GB.xlf",
     "lint": "eslint --ext .js,.ts src/app --fix",
     "lint:ci": "eslint --ext .ts src/app",
