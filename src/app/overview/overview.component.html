@@ -40,8 +40,12 @@
               ></app-ct-zero-control>
             </li>
           </ul>
-          <h3 class="filters-header">Filters</h3>
-
+          <h3
+            class="filters-header"
+            i18n="Filters header|Heading text for filters@@filtersHeader"
+          >
+            Filters
+          </h3>
           <ul class="filters">
             <li>
               <ng-container *ngIf="dataServerData">
@@ -131,7 +135,13 @@
                 <span>Custom</span>
                 <span class="x" data-e2e="close-date-override"></span>
               </a>
-              <a class="when-unset" (click)="datesOpen()">Whole period</a>
+              <a
+                class="when-unset"
+                (click)="datesOpen()"
+                i18n="
+                  Period Summary|Summary for applied date filters@@periodSummary"
+                >Whole period</a
+              >
               <span class="date">
                 {{ dates[0] }}
               </span>
