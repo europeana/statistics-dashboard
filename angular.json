@@ -84,11 +84,6 @@
                 }
               ]
             },
-            "it": {
-              "localize": ["it"],
-              "outputPath": "dist/it/",
-              "i18nMissingTranslation": "error"
-            },
             "e2e": {
               "fileReplacements": [
                 {
@@ -108,9 +103,6 @@
           "configurations": {
             "production": {
               "browserTarget": "statistics-dashboard:build:production"
-            },
-            "it": {
-              "browserTarget": "statistics-dashboard:build:it"
             },
             "e2e": {
               "browserTarget": "statistics-dashboard:build:e2e"

@@ -4,7 +4,6 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:it": "ng serve --configuration=it",
     "build": "ng build",
     "clean": "rm -rf coverage && rm -rf dist",
     "cypress": "cypress open",
