@@ -6,8 +6,7 @@ import { LandingComponent } from './landing/landing.component';
 const routes: Routes = [
   {
     path: 'data/:facet',
-    component: OverviewComponent,
-    pathMatch: 'full'
+    component: OverviewComponent
   },
   {
     path: '',
