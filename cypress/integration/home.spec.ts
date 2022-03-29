@@ -6,7 +6,7 @@ context('Statistics Dashboard', () => {
     });
 
     const selHeader = '.header';
-    const selHeaderTitle = `${selHeader} + .page-title`;
+    const selHeaderTitle = `${selHeader} + .page-title-wrapper`;
     const selLinkHeader = '[data-e2e=link-home-header]';
     const selLinkDataContentTier = '[data-e2e=link-entry-ct]';
     const selLinkDataMetadata = '[data-e2e=link-entry-metadata]';

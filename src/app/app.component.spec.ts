@@ -7,16 +7,21 @@ import {
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
-import { NavigationEnd } from '@angular/router';
+import { ActivatedRoute, Params, RouterEvent } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { RouterEvent } from '@angular/router';
-import { ClickService } from './_services';
+import { BehaviorSubject } from 'rxjs';
+import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
+import { MockAPIService } from './_mocked';
 
 describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let clicks: ClickService;
+  const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
+  const tmpParams = {};
+  tmpParams['content-tier-zero'] = false;
+  const queryParams = new BehaviorSubject(tmpParams as Params);
 
   beforeEach(
     waitForAsync(() => {
@@ -26,8 +31,18 @@ describe('AppComponent', () => {
           RouterTestingModule.withRoutes([
             { path: './data', component: AppComponent }
           ])
+        ],
+        providers: [
+          {
+            provide: ActivatedRoute,
+            useValue: { params: params, queryParams: queryParams }
+          },
+          {
+            provide: APIService,
+            useClass: MockAPIService //errorMode ? MockAPIServiceErrors : MockAPIService
+          }
         ]
-      });
+      }).compileComponents();
     })
   );
 
@@ -40,21 +55,6 @@ describe('AppComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should detect data urls', () => {
-    component.handleRouterEvent(
-      new NavigationEnd(1, '/data', '/data') as RouterEvent
-    );
-    expect(component.showPageTitle).toBeFalsy();
-
-    component.handleRouterEvent(
-      new NavigationEnd(1, '/xxx', '/xxx') as RouterEvent
-    );
-    expect(component.showPageTitle).toBeTruthy();
-
-    component.handleRouterEvent({} as unknown as RouterEvent);
-    expect(component.showPageTitle).toBeTruthy();
   });
 
   it('should listen for document clicks', fakeAsync(() => {

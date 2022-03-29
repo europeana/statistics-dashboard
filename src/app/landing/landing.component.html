@@ -1,5 +1,6 @@
 <main
-  class="fit-to-page"
+  class="fit-to-page landing-page"
+  *ngIf="landingData"
   [ngClass]="{
     'loading-modal': isLoading && !landingData[DimensionName.type]
   }"
@@ -40,7 +41,6 @@
       </div>
     </div>
   </ng-template>
-
   <div class="container-v">
     <div class="entry-card-pair">
       <div

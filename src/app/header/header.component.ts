@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -7,4 +8,5 @@ import { Component, Input } from '@angular/core';
 })
 export class HeaderComponent {
   @Input() showPageTitle = false;
+  @Input() form?: FormGroup;
 }

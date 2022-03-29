@@ -12,7 +12,7 @@ context('Statistics Dashboard Accessibility', () => {
     // cy.injectAxe is currently broken. https://github.com/component-driven/cypress-axe/issues/82
     // (so use custom injection logic)
 
-    cy.readFile('../../node_modules/axe-core/axe.min.js').then((source) => {
+    cy.readFile('node_modules/axe-core/axe.min.js').then((source) => {
       return cy.window({ log: false }).then((window) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (window as any).eval(source);
@@ -25,6 +25,11 @@ context('Statistics Dashboard Accessibility', () => {
   });
 
   describe('Landing Page', () => {
+
+    beforeEach(() => {
+      cy.visit('/');
+      injectAxe();
+    });
 
     it('Has an accessible header', () => {
       checkZone('header');
@@ -39,13 +44,16 @@ context('Statistics Dashboard Accessibility', () => {
     });
 
     it('Has no detectable a11y violations ()', () => {
-      cy.visit('/');
-      injectAxe();
       cy.checkA11y();
     })
   });
 
   describe('Data Page', () => {
+
+    beforeEach(() => {
+      cy.visit(`/data/contentTier`);
+      injectAxe();
+    });
 
     it('Has an accessible header', () => {
       checkZone('header');
@@ -60,8 +68,6 @@ context('Statistics Dashboard Accessibility', () => {
     });
 
     it('Has no detectable a11y violations', () => {
-      cy.visit(`/data/contentTier`);
-      injectAxe();
       cy.checkA11y();
     })
 

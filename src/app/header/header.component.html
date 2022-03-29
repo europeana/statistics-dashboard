@@ -10,7 +10,11 @@
       </span>
     </a>
   </div>
-  <h1 *ngIf="showPageTitle" class="fit-to-page page-title">
-    Europeana complete dataset
-  </h1>
+  <div *ngIf="showPageTitle" class="fit-to-page page-title-wrapper">
+    <h1 class="page-title">Europeana complete dataset</h1>
+    <app-ct-zero-control
+      *ngIf="form"
+      [form]="form"
+    ></app-ct-zero-control>
+  </div>
 </header>
