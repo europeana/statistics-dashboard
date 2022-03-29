@@ -188,6 +188,24 @@ describe('OverviewComponent', () => {
       component.ngOnDestroy();
     }));
 
+    it('should calculate the portal urls', () => {
+      const rootUrl =
+        'https://www.europeana.eu/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)';
+      const data = [{ name: 'name', value: 1, percent: 1, rawName: 'rawName' }];
+
+      component.form.value.facetParameter = DimensionName.rights;
+      fixture.detectChanges();
+
+      const res1 = component.portalUrlsFromNVPs(DimensionName.rights, data);
+      expect(res1.name).toEqual(`${rootUrl}&qf=RIGHTS:\"rawName\"`);
+
+      component.form.value.facetParameter = DimensionName.type;
+      fixture.detectChanges();
+
+      const res2 = component.portalUrlsFromNVPs(DimensionName.type, data);
+      expect(res2.name).toEqual(`${rootUrl}&qf=TYPE:\"name\"`);
+    });
+
     it('should show the date disclaimer', () => {
       spyOn(dialog, 'open');
       component.showDateDisclaimer();

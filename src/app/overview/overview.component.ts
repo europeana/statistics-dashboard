@@ -512,8 +512,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   ): IHash<string> {
     const result = src.reduce(
       (newMap: IHash<string>, nvp: NamesValuePercent) => {
-        const x = this.getUrlRow(facet, nvp.name);
-        newMap[nvp.name] = x;
+        const name = facet === DimensionName.rights ? nvp.rawName : nvp.name;
+        const url = this.getUrlRow(facet, name);
+        newMap[nvp.name] = url;
         return newMap;
       },
       {}
