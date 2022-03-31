@@ -1,3 +1,7 @@
-<app-header [showPageTitle]="showPageTitle" [form]="ctZeroForm"></app-header>
+<app-header
+  [showPageTitle]="showPageTitle"
+  [form]="formCTZero"
+  [includeCTZero]="lastSetContentTierZeroValue"
+></app-header>
 <router-outlet (activate)="onOutletLoaded($event)"></router-outlet>
 <app-footer></app-footer>

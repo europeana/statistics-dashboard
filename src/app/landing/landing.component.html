@@ -1,10 +1,11 @@
 <main
   class="fit-to-page landing-page"
-  *ngIf="landingData"
   [ngClass]="{
-    'loading-modal': isLoading && !landingData[DimensionName.type]
+    'loading-modal': isLoading
   }"
 >
+  <app-resize (sizeChanged)="refreshCharts()"></app-resize>
+
   <ng-template #chartSummary let-dimension="facetName" let-topLabel="topLabel">
     <span
       class="container-h totals"
@@ -75,6 +76,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-ct"
             >View by content tier</a
           >
@@ -111,6 +113,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.metadataTier }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-metadata"
             >View by metadata tier</a
           >
@@ -138,6 +141,7 @@
         <a
           class="data-link"
           routerLink="/data/{{ DimensionName.country }}"
+          [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
           data-e2e="link-entry-country"
           >View by countries</a
         >
@@ -162,6 +166,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-type"
             >View by type</a
           >
@@ -191,6 +196,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.rights }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-rights"
             >View by rights statement</a
           >
@@ -216,6 +222,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.dataProvider }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-data-provider"
             >View by data provider</a
           >
@@ -245,6 +252,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.provider }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-provider"
             >View by provider</a
           >

@@ -1,6 +1,11 @@
 <header class="header-outer">
   <div class="header">
-    <a class="logo" data-e2e="link-home-header" routerLink="/">
+    <a
+      class="logo"
+      data-e2e="link-home-header"
+      routerLink="/"
+      [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+    >
       <span class="icon-wrapper">
         <span class="icon"></span>
       </span>
@@ -10,11 +15,9 @@
       </span>
     </a>
   </div>
+
   <div *ngIf="showPageTitle" class="fit-to-page page-title-wrapper">
     <h1 class="page-title">Europeana complete dataset</h1>
-    <app-ct-zero-control
-      *ngIf="form"
-      [form]="form"
-    ></app-ct-zero-control>
+    <app-ct-zero-control *ngIf="form" [form]="form"></app-ct-zero-control>
   </div>
 </header>

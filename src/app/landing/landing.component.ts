@@ -1,11 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { externalLinks } from '../_data';
-import {
-  BreakdownResult,
-  CountPercentageValue,
-  DimensionName,
-  GeneralResultsFormatted
-} from '../_models';
+import { BarComponent } from '../chart';
+import { DimensionName, GeneralResultsFormatted } from '../_models';
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
@@ -15,8 +11,33 @@ export class LandingComponent {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
 
-  barColour = '#0771ce';
-  isLoading = true;
+  // Used to parameterise links to the data page
+  @Input() includeCTZero = false;
 
-  @Input() landingData: GeneralResultsFormatted;
+  // Used to re-draw bar-charts
+  @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
+
+  barColour = '#0771ce';
+  isLoading: boolean;
+  _landingData: GeneralResultsFormatted = {};
+
+  @Input() set landingData(results: GeneralResultsFormatted) {
+    this._landingData = results;
+    this.refreshCharts();
+  }
+  get landingData(): GeneralResultsFormatted {
+    return this._landingData;
+  }
+
+  refreshCharts(): void {
+    if (this.barCharts) {
+      // Top tier records count
+      setTimeout(() => {
+        this.barCharts.toArray().forEach((bc) => {
+          bc.removeAllSeries();
+          bc.ngAfterViewInit();
+        });
+      }, 1);
+    }
+  }
 }

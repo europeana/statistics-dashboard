@@ -90,7 +90,7 @@ export class BarComponent implements AfterViewInit {
   }
 
   /** ngAfterViewInit
-  /* Event hook: calls drawChart and generates a series for the decalarative use case
+  /* Event hook: calls drawChart and generates a series for the declarative use case
   */
   ngAfterViewInit(): void {
     this.drawChart();

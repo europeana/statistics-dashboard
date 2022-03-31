@@ -7,6 +7,7 @@ import { FormGroup } from '@angular/forms';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  @Input() showPageTitle = false;
   @Input() form?: FormGroup;
+  @Input() includeCTZero: boolean;
+  @Input() showPageTitle = false;
 }
