@@ -69,7 +69,22 @@ $card-header-height: $card-header-pixels-line-height +
   font-weight: 600;
   line-height: $card-header-pixels-line-height;
   margin-bottom: $card-header-pixels-margin-bottom;
+  position: relative;
   text-transform: uppercase;
+
+  .info-icon {
+    &::after {
+      background-image: svg-url-icon-spinner(#{$gray-light});
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      opacity: 0;
+      left: 0;
+      top: -50%;
+      transition: opacity $transition-duration ease-in-out;
+    }
+  }
 }
 
 .entry-card-pair {
@@ -81,6 +96,19 @@ $card-header-height: $card-header-pixels-line-height +
 
     .entry-card {
       width: 50%;
+    }
+  }
+}
+
+.loading .entry-card-header {
+  a.info-icon {
+    &::after {
+      left: 18px;
+    }
+  }
+  .info-icon {
+    &::after {
+      opacity: 1;
     }
   }
 }

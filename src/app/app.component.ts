@@ -68,6 +68,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     this.clickService.documentClickedTarget.next(event.target);
   }
 
+  /** getCtrlCTZero
+   * - convenience function
+   * @returns the contentTierZero input as a FormControl
+   **/
+  getCtrlCTZero(): FormControl {
+    return this.formCTZero.get('contentTierZero') as FormControl;
+  }
+
   /** loadLandingData
   /* - loads the general breakdown data
   /* - sets data on landingComponentRef
@@ -114,9 +122,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     this.location.subscribe((state: PopStateEvent) => {
       if (this.landingComponentRef) {
         // capture "back" and "forward" events / sync with form data
-        const ctrlCTZero = this.formCTZero.get(
-          'contentTierZero'
-        ) as FormControl;
+        const ctrlCTZero = this.getCtrlCTZero();
         this.lastSetContentTierZeroValue =
           `${state.url}`.indexOf('content-tier-zero=true') > -1;
 
@@ -130,16 +136,19 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   /** onOutletLoaded
   /* - invoked when router component loads
-  /* - i.e. when the user switches from landing to data page (or vice versa)
-  /* - if it's the first arrival on the landing page it
-  /*    - assigns landingComponentRef (since @Input() is unavailable in router-outlet)
-  /*    - sets landingComponentRef.includeCTZero to current value
-  /*    - sets showPageTitle to true
-  /*    - builds the form
-  /*    - loads the landing data
-  /* - otherwise
-  /*    - if the form data is stale, triggers a data reload
-  /*    - otherwise sets landingComponentRef.landingData to current data
+  /*    - handles component data binding (since @Input() is unavailable in router-outlet)
+  /*    - sets showPageTitle
+  /* - if it's the landing page (first visit):
+  /*      - builds the form
+  /*      - loads the landing data
+  /*    - sets landingComponentRef data
+  /*    - and if it's the first arrival it:
+  /* - (subsequent vist)
+  /*    - reassigns existing landing data to landingComponentRef unless stale
+  /*    - triggers data reload if form data is stale
+  /* - (OverviewComponent)
+  /*    - unassigns landingComponentRef
+  /*
   /* @param { LandingComponent | OverviewComponent: component } - route component
   */
   onOutletLoaded(component: LandingComponent | OverviewComponent): void {
@@ -152,9 +161,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         this.buildForm();
         this.loadLandingData(this.formCTZero.value.contentTierZero);
       } else {
-        const ctrlCTZero = this.formCTZero.get(
-          'contentTierZero'
-        ) as FormControl;
+        const ctrlCTZero = this.getCtrlCTZero();
         if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
           this.skipLocationUpdate = true;
           ctrlCTZero.setValue(this.lastSetContentTierZeroValue);

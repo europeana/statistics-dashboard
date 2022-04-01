@@ -29,6 +29,10 @@ export class LandingComponent {
     return this._landingData;
   }
 
+  hasData(): boolean {
+    return Object.keys(this.landingData).length > 0;
+  }
+
   refreshCharts(): void {
     if (this.barCharts) {
       // Top tier records count

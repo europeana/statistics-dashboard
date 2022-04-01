@@ -1,7 +1,8 @@
 <main
   class="fit-to-page landing-page"
   [ngClass]="{
-    'loading-modal': isLoading
+    'loading-modal': isLoading && !hasData(),
+    loading: isLoading && hasData()
   }"
 >
   <app-resize (sizeChanged)="refreshCharts()"></app-resize>
@@ -125,7 +126,9 @@
       class="entry-card double-card"
       *ngIf="landingData[DimensionName.country]; let data"
     >
-      <span class="entry-card-header">Explore by providing countries</span>
+      <span class="entry-card-header"
+        >Explore by providing countries<span class="info-icon"></span
+      ></span>
       <div class="entry-card-content">
         <div class="entry-card-pair">
           <div class="map-container">
@@ -150,7 +153,9 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
-        <span class="entry-card-header">Explore by type of content</span>
+        <span class="entry-card-header"
+          >Explore by type of content<span class="info-icon"></span
+        ></span>
         <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
@@ -206,7 +211,9 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
-        <span class="entry-card-header">Explore by data provider</span>
+        <span class="entry-card-header"
+          >Explore by data provider<span class="info-icon"></span
+        ></span>
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content
