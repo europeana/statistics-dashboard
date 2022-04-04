@@ -1,6 +1,6 @@
 // FILTER / BREAKDOWN REQUEST
 
-import { IHashArray } from './';
+import { IHashArray, NamesValuePercent } from './';
 
 export interface BreakdownRequest {
   datasetId?: string;
@@ -45,4 +45,8 @@ export interface BreakdownResults {
 
 export interface GeneralResults {
   allBreakdowns: Array<BreakdownResult>;
+}
+
+export interface GeneralResultsFormatted {
+  [facetName: string]: Array<NamesValuePercent>;
 }

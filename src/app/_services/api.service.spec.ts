@@ -44,6 +44,19 @@ describe('APIService', () => {
     http.verify();
   });
 
+  it('should load the general results with content-tier-zero', () => {
+    const ctZeroParam = '?content-tier-zero=true';
+    const baseUrl = `${environment.serverAPI}${service.suffixGeneral}${ctZeroParam}`;
+    const sub = service
+      .getGeneralResults(true)
+      .subscribe((res: GeneralResults) => {
+        expect(res).toBeTruthy();
+      });
+    sub.unsubscribe();
+    http.expectOne(baseUrl);
+    http.verify();
+  });
+
   it('should load the ISO country codes', () => {
     expect(service.loadISOCountryCodes()).toBeTruthy();
   });

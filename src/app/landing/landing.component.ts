@@ -1,58 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { externalLinks } from '../_data';
-import {
-  BreakdownResult,
-  CountPercentageValue,
-  DimensionName,
-  GeneralResults,
-  NamesValuePercent
-} from '../_models';
-import { APIService } from '../_services';
-import { SubscriptionManager } from '../subscription-manager';
-
+import { BarComponent } from '../chart';
+import { DimensionName, GeneralResultsFormatted } from '../_models';
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']
 })
-export class LandingComponent extends SubscriptionManager {
+export class LandingComponent {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
 
+  // Used to parameterise links to the data page
+  @Input() includeCTZero = false;
+
+  // Used to re-draw bar-charts
+  @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
+
   barColour = '#0771ce';
-  isLoading = true;
+  isLoading: boolean;
+  _landingData: GeneralResultsFormatted = {};
 
-  landingData: {
-    [facetName: string]: Array<NamesValuePercent>;
-  } = {};
-
-  constructor(private readonly api: APIService) {
-    super();
-    this.loadData();
+  @Input() set landingData(results: GeneralResultsFormatted) {
+    this._landingData = results;
+    this.refreshCharts();
+  }
+  get landingData(): GeneralResultsFormatted {
+    return this._landingData;
   }
 
-  toNameValuePercent(cpv: CountPercentageValue): NamesValuePercent {
-    return {
-      name: cpv.value,
-      value: cpv.count,
-      percent: cpv.percentage
-    };
+  hasData(): boolean {
+    return Object.keys(this.landingData).length > 0;
   }
 
-  /** loadData
-  /* - loads the general breakdown data
-  */
-  loadData(): void {
-    this.isLoading = true;
-    this.subs.push(
-      this.api.getGeneralResults().subscribe((general: GeneralResults) => {
-        this.isLoading = false;
-        general.allBreakdowns.forEach((br: BreakdownResult) => {
-          this.landingData[br.breakdownBy] = br.results.map((x) => {
-            return this.toNameValuePercent(x);
-          });
+  refreshCharts(): void {
+    if (this.barCharts) {
+      // Top tier records count
+      setTimeout(() => {
+        this.barCharts.toArray().forEach((bc) => {
+          bc.removeAllSeries();
+          bc.ngAfterViewInit();
         });
-      })
-    );
+      }, 1);
+    }
   }
 }

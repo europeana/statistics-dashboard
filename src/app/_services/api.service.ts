@@ -28,9 +28,10 @@ export class APIService {
     );
   }
 
-  getGeneralResults(): Observable<GeneralResults> {
+  getGeneralResults(includeCTZero = false): Observable<GeneralResults> {
     return this.http.get<GeneralResults>(
-      `${environment.serverAPI}${this.suffixGeneral}`
+      `${environment.serverAPI}${this.suffixGeneral}`,
+      { params: includeCTZero ? { 'content-tier-zero': true } : {} }
     );
   }
 }

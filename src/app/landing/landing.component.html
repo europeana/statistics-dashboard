@@ -1,9 +1,12 @@
 <main
-  class="fit-to-page"
+  class="fit-to-page landing-page"
   [ngClass]="{
-    'loading-modal': isLoading && !landingData[DimensionName.type]
+    'loading-modal': isLoading && !hasData(),
+    loading: isLoading && hasData()
   }"
 >
+  <app-resize (sizeChanged)="refreshCharts()"></app-resize>
+
   <ng-template #chartSummary let-dimension="facetName" let-topLabel="topLabel">
     <span
       class="container-h totals"
@@ -40,7 +43,6 @@
       </div>
     </div>
   </ng-template>
-
   <div class="container-v">
     <div class="entry-card-pair">
       <div
@@ -75,6 +77,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-ct"
             >View by content tier</a
           >
@@ -111,6 +114,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.metadataTier }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-metadata"
             >View by metadata tier</a
           >
@@ -122,7 +126,9 @@
       class="entry-card double-card"
       *ngIf="landingData[DimensionName.country]; let data"
     >
-      <span class="entry-card-header">Explore by providing countries</span>
+      <span class="entry-card-header"
+        >Explore by providing countries<span class="info-icon"></span
+      ></span>
       <div class="entry-card-content">
         <div class="entry-card-pair">
           <div class="map-container">
@@ -138,6 +144,7 @@
         <a
           class="data-link"
           routerLink="/data/{{ DimensionName.country }}"
+          [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
           data-e2e="link-entry-country"
           >View by countries</a
         >
@@ -146,7 +153,9 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
-        <span class="entry-card-header">Explore by type of content</span>
+        <span class="entry-card-header"
+          >Explore by type of content<span class="info-icon"></span
+        ></span>
         <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
@@ -162,6 +171,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-type"
             >View by type</a
           >
@@ -191,6 +201,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.rights }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-rights"
             >View by rights statement</a
           >
@@ -200,7 +211,9 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
-        <span class="entry-card-header">Explore by data provider</span>
+        <span class="entry-card-header"
+          >Explore by data provider<span class="info-icon"></span
+        ></span>
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content
@@ -216,6 +229,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.dataProvider }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-data-provider"
             >View by data provider</a
           >
@@ -245,6 +259,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.provider }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-provider"
             >View by provider</a
           >
