@@ -85,6 +85,11 @@ $card-header-height: $card-header-pixels-line-height +
       transition: opacity $transition-duration ease-in-out;
     }
   }
+  a.info-icon {
+    &::after {
+      left: 18px;
+    }
+  }
 }
 
 .entry-card-pair {
@@ -101,11 +106,6 @@ $card-header-height: $card-header-pixels-line-height +
 }
 
 .loading .entry-card-header {
-  a.info-icon {
-    &::after {
-      left: 18px;
-    }
-  }
   .info-icon {
     &::after {
       opacity: 1;
