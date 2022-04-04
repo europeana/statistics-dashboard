@@ -2,11 +2,43 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en-GB" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="3865953224881501138" datatype="html">
+        <source>EDM Documentation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <note priority="1" from="description">{Content Tier Tooltip}</note>
+      </trans-unit>
+      <trans-unit id="5939361412399232860" datatype="html">
+        <source>Tier Documentation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <note priority="1" from="description">{Metadata Tooltip}</note>
+      </trans-unit>
+      <trans-unit id="3989458097290099074" datatype="html">
+        <source>Provider Documentation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+        <note priority="1" from="description">{Provider Tooltip}</note>
+      </trans-unit>
+      <trans-unit id="7205479893678673476" datatype="html">
+        <source>Rights Documentation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+        <note priority="1" from="description">{Rights Tooltip}</note>
+      </trans-unit>
       <trans-unit id="filtersHeader" datatype="html">
-        <source>Filters</source>
+        <source> Filters </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">46,48</context>
         </context-group>
         <note priority="1" from="description">Heading text for filters</note>
         <note priority="1" from="meaning">Filters header</note>
@@ -15,7 +47,7 @@
         <source>Whole period</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <note priority="1" from="description">Summary for applied date filters</note>
         <note priority="1" from="meaning">Period Summary</note>

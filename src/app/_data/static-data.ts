@@ -69,12 +69,22 @@ export const externalLinks = {
   tos: '//www.europeana.eu/rights/terms-of-use',
   privacy: '//www.europeana.eu/rights/privacy-policy',
   help: {
-    contentTier:
-      'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
-    metadataTier:
-      'https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
-    provider: 'https://pro.europeana.eu/page/aggregators',
-    rights: 'https://pro.europeana.eu/page/available-rights-statements'
+    contentTier: {
+      href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
+      description: $localize`:{Content Tier Tooltip}:EDM Documentation`
+    },
+    metadataTier: {
+      href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
+      description: $localize`:{Metadata Tooltip}:Tier Documentation`
+    },
+    provider: {
+      href: 'https://pro.europeana.eu/page/aggregators',
+      description: $localize`:{Provider Tooltip}:Provider Documentation`
+    },
+    rights: {
+      href: 'https://pro.europeana.eu/page/available-rights-statements',
+      description: $localize`:{Rights Tooltip}:Rights Documentation`
+    }
   }
 };
 

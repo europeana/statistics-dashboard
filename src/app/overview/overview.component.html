@@ -123,14 +123,15 @@
                   {{ facet | renameApiFacet }}
                 </option>
               </select>
+
               <ng-container
-                *ngIf="externalLinks.help[form.value.facetParameter]; let href"
+                *ngIf="externalLinks.help[form.value.facetParameter]; let help"
               >
                 <a
                   class="info-icon"
-                  [href]="href"
+                  [href]="help.href"
                   target="_blank"
-                  title="TODO"
+                  [title]="help.description"
                 ></a>
               </ng-container>
             </h1>
