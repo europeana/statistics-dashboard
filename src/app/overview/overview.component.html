@@ -123,6 +123,16 @@
                   {{ facet | renameApiFacet }}
                 </option>
               </select>
+              <ng-container
+                *ngIf="externalLinks.help[form.value.facetParameter]; let href"
+              >
+                <a
+                  class="info-icon"
+                  [href]="href"
+                  target="_blank"
+                  title="TODO"
+                ></a>
+              </ng-container>
             </h1>
           </ng-container>
 
@@ -242,6 +252,8 @@
         <!-- Data Area -->
         <div class="data-area">
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
+
+          <!-- NO-DATA FALLBACK -->
           <div *ngIf="emptyDataset && !isLoading" class="no-data">
             No results found!
             <ul>
@@ -262,6 +274,7 @@
               </li>
             </ul>
           </div>
+          <!-- CHART AND SUMMARY -->
           <div class="chart-and-summary">
             <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
               <app-bar-chart
@@ -287,6 +300,7 @@
             </ng-container>
           </div>
 
+          <!-- PERCENT SWITCH -->
           <ng-container *ngIf="!emptyDataset">
             <app-checkbox
               [form]="form"
@@ -308,8 +322,8 @@
             >
             </app-snapshots>
           </ng-container>
-          <!-- END SNAPSHOTS -->
 
+          <!-- GRID -->
           <app-grid
             #grid
             id="grid"
@@ -319,6 +333,7 @@
             [isVisible]="!emptyDataset"
           ></app-grid>
 
+          <!-- EXPORT LINK -->
           <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
             <a class="export-opener-link" (click)="export.toggleActive()"
               >EXPORT DATA</a

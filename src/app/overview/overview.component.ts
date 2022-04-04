@@ -5,7 +5,12 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { facetNames, nonFacetFilters, portalNames } from '../_data';
+import {
+  externalLinks,
+  facetNames,
+  nonFacetFilters,
+  portalNames
+} from '../_data';
 import {
   filterList,
   fromCSL,
@@ -63,6 +68,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   // Make variables available to template
   public fromCSL = fromCSL;
   public emptyDataset = true;
+  public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
