@@ -52,9 +52,9 @@
         <span class="entry-card-header"
           >Explore by content quality<a
             class="info-icon"
-            [href]="externalLinks.help.contentTier"
+            [href]="externalLinks.help.contentTier.href"
             target="_blank"
-            title="EDM Documentation"
+            [title]="externalLinks.help.contentTier.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -90,9 +90,9 @@
         <span class="entry-card-header"
           >Explore by metadata quality<a
             class="info-icon"
-            [href]="externalLinks.help.metadataTier"
+            [href]="externalLinks.help.metadataTier.href"
             target="_blank"
-            title="Tier Documentation"
+            [title]="externalLinks.help.metadataTier.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -181,9 +181,9 @@
         <span class="entry-card-header"
           >Explore by rights statement<a
             class="info-icon"
-            [href]="externalLinks.help.rights"
+            [href]="externalLinks.help.rights.href"
             target="_blank"
-            title="Rights Documentation"
+            [title]="externalLinks.help.rights.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -239,9 +239,9 @@
         <span class="entry-card-header"
           >Explore by provider<a
             class="info-icon"
-            [href]="externalLinks.help.provider"
+            [href]="externalLinks.help.provider.href"
             target="_blank"
-            title="Provider Documentation"
+            [title]="externalLinks.help.provider.description"
           ></a
         ></span>
         <div class="entry-card-content">
