@@ -231,15 +231,15 @@
   }
 }
 
-.filter-icon-rights {
+.filter-icon-rightsCategory {
   background-image: svg-url-icon-rights($gray-med);
 }
 
 .disabled {
-  .filter-icon-rights {
+  .filter-icon-rightsCategory {
     background-image: svg-url-icon-rights($gray-5);
   }
-  &.open .filter-icon-rights {
+  &.open .filter-icon-rightsCategory {
     background-image: svg-url-icon-rights($grey-3);
   }
 }

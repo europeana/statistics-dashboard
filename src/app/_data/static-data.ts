@@ -6,7 +6,7 @@ export const facetNames: Array<DimensionName> = [
   DimensionName.country,
   DimensionName.dataProvider,
   DimensionName.provider,
-  DimensionName.rights,
+  DimensionName.rightsCategory,
   DimensionName.type
 ];
 
@@ -25,7 +25,7 @@ facetNamesPortal[DimensionName.metadataTier] = 'metadataTier';
 facetNamesPortal[DimensionName.country] = 'COUNTRY';
 facetNamesPortal[DimensionName.dataProvider] = 'DATA_PROVIDER';
 facetNamesPortal[DimensionName.provider] = 'PROVIDER';
-facetNamesPortal[DimensionName.rights] = 'RIGHTS';
+facetNamesPortal[DimensionName.rightsCategory] = 'RIGHTS';
 facetNamesPortal[DimensionName.type] = 'TYPE';
 
 export const portalNames = facetNamesPortal;

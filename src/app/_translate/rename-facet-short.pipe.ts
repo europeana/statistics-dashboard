@@ -13,7 +13,7 @@ facetNames[DimensionName.contentTier] = 'Tier';
 facetNames[DimensionName.metadataTier] = 'Tier';
 facetNames[DimensionName.country] = 'Country';
 facetNames[DimensionName.type] = 'Media Type';
-facetNames[DimensionName.rights] = 'Right Statements';
+facetNames[DimensionName.rightsCategory] = 'Rights Category';
 facetNames[DimensionName.dataProvider] = 'CHI';
 facetNames[DimensionName.provider] = 'Provider';
 
@@ -21,7 +21,7 @@ facetNames[`plural_${DimensionName.contentTier}`] = 'Tiers';
 facetNames[`plural_${DimensionName.metadataTier}`] = 'Tiers';
 facetNames[`plural_${DimensionName.country}`] = 'Countries';
 facetNames[`plural_${DimensionName.type}`] = 'Types';
-facetNames[`plural_${DimensionName.rights}`] = 'Right Statements';
+facetNames[`plural_${DimensionName.rightsCategory}`] = 'Rights Category';
 facetNames[`plural_${DimensionName.dataProvider}`] = 'CHIs';
 facetNames[`plural_${DimensionName.provider}`] = 'Providers';
 

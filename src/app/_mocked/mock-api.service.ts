@@ -202,7 +202,7 @@ export const MockGeneralResults = {
       ]
     },
     {
-      breakdownBy: DimensionName.rights,
+      breakdownBy: DimensionName.rightsCategory,
       results: [
         {
           count: 50,
@@ -399,7 +399,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Denmark',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -424,7 +424,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Ireland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -449,7 +449,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Norway',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -474,7 +474,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Finland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -499,7 +499,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Germany',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -524,7 +524,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Portugal',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -549,7 +549,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Poland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -574,7 +574,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Italy',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -599,7 +599,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Holy See (Vatican City State)',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -624,7 +624,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Croatia',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
@@ -649,7 +649,7 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Iceland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,

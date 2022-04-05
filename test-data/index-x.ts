@@ -13,6 +13,7 @@ import {
   RequestFilter
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
+import { STATIC_RIGHTS } from './static-data';
 import { CHO, IHashBoolean } from './_models/test-models';
 import { DataGenerator } from './data-generator';
 
@@ -117,22 +118,34 @@ new (class extends TestDataServer {
     } else {
       const route = request.url as string;
       const params = url.parse(route, true).query;
-      const ctZero = params['content-tier-zero'] === 'true';
 
-      let resultCHOs = this.allCHOs;
+      if (params['rightsCategory']) {
+        const regExp = new RegExp(params['rightsCategory'] as string, 'gi');
+        response.end(
+          JSON.stringify(
+            STATIC_RIGHTS.filter((url: string) => {
+              return regExp.exec(url);
+            })
+          )
+        );
+      } else {
+        const ctZero = params['content-tier-zero'] === 'true';
 
-      if (!ctZero) {
-        resultCHOs = resultCHOs.filter((cho: CHO) => {
-          return cho[DimensionName.contentTier] !== '0';
-        });
+        let resultCHOs = this.allCHOs;
+
+        if (!ctZero) {
+          resultCHOs = resultCHOs.filter((cho: CHO) => {
+            return cho[DimensionName.contentTier] !== '0';
+          });
+        }
+
+        const result: GeneralResults = {
+          allBreakdowns: facetNames.map((fName: string) => {
+            return this.asBreakdown(resultCHOs, [fName], this.generalShowTop);
+          })
+        };
+        response.end(JSON.stringify(result));
       }
-
-      const result: GeneralResults = {
-        allBreakdowns: facetNames.map((fName: string) => {
-          return this.asBreakdown(resultCHOs, [fName], this.generalShowTop);
-        })
-      };
-      response.end(JSON.stringify(result));
     }
   };
 

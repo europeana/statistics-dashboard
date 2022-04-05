@@ -518,7 +518,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   ): IHash<string> {
     const result = src.reduce(
       (newMap: IHash<string>, nvp: NamesValuePercent) => {
-        const name = facet === DimensionName.rights ? nvp.rawName : nvp.name;
+        const name =
+          facet === DimensionName.rightsCategory ? nvp.rawName : nvp.name;
         const url = this.getUrlRow(facet, name);
         newMap[nvp.name] = url;
         return newMap;
@@ -530,7 +531,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   }
 
   originalNamesFromNVPs(src: Array<NamesValuePercent>): IHash<string> | null {
-    if (this.form.value.facetParameter !== DimensionName.rights) {
+    if (this.form.value.facetParameter !== DimensionName.rightsCategory) {
       return null;
     }
     return src.reduce(function (newMap: IHash<string>, nvp: NamesValuePercent) {
@@ -745,7 +746,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     const possibleToDisplay = filterList(
       filterInfo.term,
       this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
-        return filterInfo.dimension !== DimensionName.rights
+        return filterInfo.dimension !== DimensionName.rightsCategory
           ? Object.assign({ valid: true }, nl)
           : {
               name: nl.name,
@@ -1108,7 +1109,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   extractSeriesServerData(br: BreakdownResult): void {
     const chartData = br.results.map((cpv: CountPercentageValue) => {
       let formattedName;
-      if (this.form.value.facetParameter === DimensionName.rights) {
+      if (this.form.value.facetParameter === DimensionName.rightsCategory) {
         formattedName = rightsUrlMatch(cpv.value);
       }
       return {

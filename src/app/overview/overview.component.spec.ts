@@ -193,10 +193,13 @@ describe('OverviewComponent', () => {
         'https://www.europeana.eu/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)';
       const data = [{ name: 'name', value: 1, percent: 1, rawName: 'rawName' }];
 
-      component.form.value.facetParameter = DimensionName.rights;
+      component.form.value.facetParameter = DimensionName.rightsCategory;
       fixture.detectChanges();
 
-      const res1 = component.portalUrlsFromNVPs(DimensionName.rights, data);
+      const res1 = component.portalUrlsFromNVPs(
+        DimensionName.rightsCategory,
+        data
+      );
       expect(res1.name).toEqual(`${rootUrl}&qf=RIGHTS:\"rawName\"`);
 
       component.form.value.facetParameter = DimensionName.type;
@@ -275,7 +278,9 @@ describe('OverviewComponent', () => {
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();
 
-      component.form.controls.facetParameter.setValue(DimensionName.rights);
+      component.form.controls.facetParameter.setValue(
+        DimensionName.rightsCategory
+      );
       component.extractSeriesServerData(br);
 
       expect(component.storeSeries).toHaveBeenCalledTimes(2);
@@ -290,6 +295,7 @@ describe('OverviewComponent', () => {
       ops[DimensionName.country] = ['Scotland', 'Yugoslavia'];
 
       component.buildFilters(ops);
+      fixture.detectChanges();
       expect(Object.keys(component.filterData).length).toBeTruthy();
     });
 
@@ -522,7 +528,7 @@ describe('OverviewComponent', () => {
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
-      component.clearFilter(DimensionName.rights);
+      component.clearFilter(DimensionName.rightsCategory);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();

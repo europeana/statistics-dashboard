@@ -110,7 +110,7 @@ export class FilterComponent {
           )
         ) {
           prefix = 'Tier ';
-        } else if (this.group === DimensionName.rights) {
+        } else if (this.group === DimensionName.rightsCategory) {
           const swapped = rightsUrlMatch(s);
           s = swapped ? swapped : s;
         }

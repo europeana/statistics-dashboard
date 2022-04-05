@@ -200,14 +200,14 @@ describe('FilterComponent', () => {
       'Europeana'
     );
 
-    component.group = DimensionName.rights;
-    createFormControls(DimensionName.rights, [
+    component.group = DimensionName.rightsCategory;
+    createFormControls(DimensionName.rightsCategory, [
       'xxx',
       toInputSafeName('//creativecommons.org/licenses/by-nc-nd')
     ]);
-    expect(component.getSetCheckboxValues(DimensionName.rights)).toEqual(
-      'xxx, CC BY-NC-ND'
-    );
+    expect(
+      component.getSetCheckboxValues(DimensionName.rightsCategory)
+    ).toEqual('xxx, CC BY-NC-ND');
   });
 
   it('should signal changes', () => {

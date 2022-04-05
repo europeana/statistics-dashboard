@@ -545,39 +545,43 @@ export const STATIC_DATA_PROVIDERS = [
 export const STATIC_COUNTRIES = [
   {
     name: 'Austria',
-    dataProviders: [3]
+    dataProviders: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
   },
   {
     name: 'Belgium',
-    dataProviders: [5]
+    dataProviders: [5, 15, 16, 17, 18, 19]
   },
   {
     name: 'Bulgaria',
-    dataProviders: [50]
+    dataProviders: [50, 20, 21, 22, 23, 24, 25, 26, 27, 28]
   },
   {
     name: 'Croatia',
-    dataProviders: [51]
+    dataProviders: [39, 40, 41, 42, 43, 51]
   },
   {
     name: 'Cyprus',
-    dataProviders: [52]
+    dataProviders: [44, 45, 46, 47, 48, 49, 50, 51, 52]
   },
   {
     name: 'Czech Republic',
-    dataProviders: [38]
+    dataProviders: [38, 39, 40, 41, 42, 43]
   },
   {
     name: 'Denmark',
-    dataProviders: [20, 30, 36, 43]
+    dataProviders: [
+      20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
+    ]
   },
   {
     name: 'Estonia',
-    dataProviders: [28]
+    dataProviders: [
+      37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 28, 29, 30, 31, 32, 33, 34
+    ]
   },
   {
     name: 'Europe',
-    dataProviders: [24]
+    dataProviders: [37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 24, 22, 19, 18]
   },
   {
     name: 'Finland',
@@ -585,7 +589,7 @@ export const STATIC_COUNTRIES = [
   },
   {
     name: 'France',
-    dataProviders: [2, 9, 21, 22, 47]
+    dataProviders: [2, 9, 21, 22, 47, 18, 42]
   },
   {
     name: 'Germany',
@@ -593,7 +597,7 @@ export const STATIC_COUNTRIES = [
   },
   {
     name: 'Greece',
-    dataProviders: [53]
+    dataProviders: [53, 18, 42]
   },
   {
     name: 'Holy See (Vatican City State)',
@@ -601,11 +605,11 @@ export const STATIC_COUNTRIES = [
   },
   {
     name: 'Hungary',
-    dataProviders: [55]
+    dataProviders: [55, 21, 31]
   },
   {
     name: 'Iceland',
-    dataProviders: [13]
+    dataProviders: [13, 27]
   },
   {
     name: 'Ireland',
@@ -681,6 +685,26 @@ export const STATIC_COUNTRIES = [
   }
 ];
 
+export const STATIC_RIGHTS_CATEGORIES = [
+  '/CNE',
+  '/InC-EDU',
+  '/InC-OW-EU',
+  '/InC',
+  '/licenses/by-nc-nd',
+  '/licenses/by-nc-sa',
+  '/licenses/by-nc',
+  '/licenses/by-nd',
+  '/licenses/by-sa',
+  '/licenses/by',
+  '/NoC-NC',
+  '/NoC-OKLR',
+  '/publicdomain/mark',
+  '/publicdomain/zero',
+  '/rights/out-of-copyright-non-commercial',
+  '/rights/rr-f',
+  '/rights/unknown'
+];
+
 export const STATIC_RIGHTS = [
   'https://creativecommons.org/licenses/by-nc-nd',
   'https://creativecommons.org/licenses/by-nc-nd/2.0',
@@ -691,7 +715,6 @@ export const STATIC_RIGHTS = [
   'https://creativecommons.org/licenses/by-nc-nd/3.0',
   'https://creativecommons.org/licenses/by-nc-nd/3.0/de',
   'https://creativecommons.org/licenses/by-nc-nd/3.0/pl',
-  'https://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca',
   'https://creativecommons.org/licenses/by-nc-nd/3.0/gr',
   'https://creativecommons.org/licenses/by-nc-nd/4.0',
   'https://creativecommons.org/licenses/by-nc-sa/2.5',
@@ -745,5 +768,6 @@ export const STATIC_RIGHTS = [
   'https://rightsstatements.org/vocab/NoC-NC/1.0',
   'https://rightsstatements.org/vocab/NoC-OKLR/1.0',
   'https://www.europeana.eu/rights/out-of-copyright-non-commercial',
-  'https://www.europeana.eu/rights/rr-f'
+  'https://www.europeana.eu/rights/rr-f',
+  'https://www.europeana.eu/rights/unknown'
 ];
