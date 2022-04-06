@@ -36,8 +36,7 @@ export class FilterComponent {
     return this._optionSet;
   }
   @Input() set optionSet(optionSet: FilterOptionSet) {
-    const ops = optionSet.options;
-    if (ops.length > 0) {
+    if (optionSet && optionSet.options.length > 0) {
       // if there's data (with no filter) then capture that fact.
       if (!this.term || this.term.length === 0) {
         this.emptyData = false;

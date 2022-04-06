@@ -360,12 +360,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       this.resultTotal = results.results.count;
       return true;
     } else {
-      this.barChart.removeAllSeries();
-      this.emptyDataset = true;
-      this.grid.setRows([]);
-      if (this.gridSummary) {
-        this.gridSummary.summaryData = { breakdownBy: '', results: [] };
-      }
+      this.clearData();
       return false;
     }
   }
@@ -383,6 +378,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       if (dsd.results && dsd.results.breakdowns) {
         // set pie and table data
         this.extractSeriesServerData(dsd.results.breakdowns);
+      } else {
+        this.clearData();
       }
     }
   }
@@ -1061,6 +1058,19 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.postProcessResult();
     this.updateFilterAvailability();
     this.updatePageUrl();
+  }
+
+  /** clearData
+  /*
+  /* clears the chart and grid data
+  */
+  clearData(): void {
+    this.barChart.removeAllSeries();
+    this.emptyDataset = true;
+    this.grid.setRows([]);
+    if (this.gridSummary) {
+      this.gridSummary.summaryData = { breakdownBy: '', results: [] };
+    }
   }
 
   /** clearFilter
