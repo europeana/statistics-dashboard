@@ -13,7 +13,6 @@ import {
   RequestFilter
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
-import { STATIC_RIGHTS } from './static-data';
 import { CHO, IHashBoolean } from './_models/test-models';
 import { DataGenerator } from './data-generator';
 
@@ -118,15 +117,16 @@ new (class extends TestDataServer {
     } else {
       const route = request.url as string;
       const params = url.parse(route, true).query;
+      const cat = `${params['rightsCategory']}`;
 
-      if (params['rightsCategory']) {
-        const regExp = new RegExp(params['rightsCategory'] as string, 'gi');
+      if (cat) {
+        const result = encodeURIComponent(cat.replace(/ /g, '-'));
         response.end(
-          JSON.stringify(
-            STATIC_RIGHTS.filter((url: string) => {
-              return regExp.exec(url);
-            })
-          )
+          JSON.stringify([
+            `http://${result}/1.0`,
+            `http://${result}/1.5`,
+            `http://${result}/2.0`
+          ])
         );
       } else {
         const ctZero = params['content-tier-zero'] === 'true';

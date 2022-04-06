@@ -92,8 +92,7 @@ describe('OverviewComponent', () => {
         MockBarComponent,
         MockGridComponent,
         SnapshotsComponent,
-        createMockPipe('renameApiFacet'),
-        createMockPipe('renameRights')
+        createMockPipe('renameApiFacet')
       ],
       providers: [
         {

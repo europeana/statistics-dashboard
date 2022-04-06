@@ -16,13 +16,11 @@ import {
   fromCSL,
   fromInputSafeName,
   getDateAsISOString,
-  rightsUrlMatch,
   today,
   toInputSafeName,
   validateDateGeneric,
   yearZero
 } from '../_helpers';
-import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
 import { SubscriptionManager } from '../subscription-manager';
@@ -54,8 +52,7 @@ import { GridSummaryComponent } from '../grid-summary';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.scss'],
-  providers: [RenameRightsPipe]
+  styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('grid') grid: GridComponent;
@@ -126,7 +123,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     private readonly fb: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly renameRights: RenameRightsPipe,
     private readonly dialog: MatDialog
   ) {
     super();
@@ -549,7 +545,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           const innerRes = [];
           if (!Object.values(nonFacetFilters).includes(key)) {
             this.queryParamsRaw[key].forEach((valPart: string) => {
-              innerRes.push(this.renameRights.transform(valPart));
+              innerRes.push(valPart);
             });
             return `${key} (${innerRes.join(' or ')})`;
           }
@@ -729,15 +725,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     const multiplier = filterInfo.upToPage ? filterInfo.upToPage : 1;
     const possibleToDisplay = filterList(
       filterInfo.term,
-      this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
-        return filterInfo.dimension !== DimensionName.rightsCategory
-          ? Object.assign({ valid: true }, nl)
-          : {
-              name: nl.name,
-              label: this.renameRights.transform(nl.label),
-              valid: true
-            };
-      }),
+      this.filterData[filterInfo.dimension],
       'label'
     );
     const toDisplay = possibleToDisplay.slice(
@@ -1105,15 +1093,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   extractSeriesServerData(br: BreakdownResult): void {
     const chartData = br.results.map((cpv: CountPercentageValue) => {
-      let formattedName;
-      if (this.form.value.facetParameter === DimensionName.rightsCategory) {
-        formattedName = rightsUrlMatch(cpv.value);
-      }
       return {
-        name: formattedName ? formattedName : cpv.value,
+        name: cpv.value,
         value: cpv.count,
-        percent: cpv.percentage,
-        rawName: formattedName ? cpv.value : null
+        percent: cpv.percentage
       };
     });
 

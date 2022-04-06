@@ -34,11 +34,7 @@ describe('FilterComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [ReactiveFormsModule],
-        declarations: [
-          FilterComponent,
-          createMockPipe('renameApiFacet'),
-          createMockPipe('renameRights')
-        ],
+        declarations: [FilterComponent, createMockPipe('renameApiFacet')],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       }).compileComponents();
     })
@@ -203,11 +199,11 @@ describe('FilterComponent', () => {
     component.group = DimensionName.rightsCategory;
     createFormControls(DimensionName.rightsCategory, [
       'xxx',
-      toInputSafeName('//creativecommons.org/licenses/by-nc-nd')
+      toInputSafeName('CC BY-ND')
     ]);
     expect(
       component.getSetCheckboxValues(DimensionName.rightsCategory)
-    ).toEqual('xxx, CC BY-NC-ND');
+    ).toEqual('xxx, CC BY-ND');
   });
 
   it('should signal changes', () => {

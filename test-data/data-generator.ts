@@ -10,7 +10,7 @@ import {
   STATIC_COUNTRIES,
   STATIC_DATA_PROVIDERS,
   STATIC_PROVIDERS,
-  STATIC_RIGHTS_CATEGORIES
+  STATIC_RIGHTS_CATEGORY_VALUES
 } from './static-data';
 
 export class DataGenerator {
@@ -43,8 +43,8 @@ export class DataGenerator {
     };
 
     const getRightCategory = (i: number) => {
-      const index = i % STATIC_RIGHTS_CATEGORIES.length;
-      return STATIC_RIGHTS_CATEGORIES[index];
+      const index = i % STATIC_RIGHTS_CATEGORY_VALUES.length;
+      return STATIC_RIGHTS_CATEGORY_VALUES[index];
     };
 
     return Array.from(Array(totalCHO).keys()).map((i: number) => {

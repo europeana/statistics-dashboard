@@ -7,7 +7,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { getFormValueList, rightsUrlMatch } from '../_helpers';
+import { getFormValueList } from '../_helpers';
 import {
   DimensionName,
   FilterInfo,
@@ -97,6 +97,7 @@ export class FilterComponent {
   }
 
   /** getSetCheckboxValues
+  /* Template utility for selection string
   /* @param {DimensionName} filterName - the form value key
   */
   getSetCheckboxValues(filterName: DimensionName): string {
@@ -109,9 +110,6 @@ export class FilterComponent {
           )
         ) {
           prefix = 'Tier ';
-        } else if (this.group === DimensionName.rightsCategory) {
-          const swapped = rightsUrlMatch(s);
-          s = swapped ? swapped : s;
         }
         return prefix + s;
       })

@@ -9,9 +9,7 @@
     >Total {{ "plural_" + summaryData.breakdownBy | renameApiFacetShort }}</span
   >
 
-  <span class="total label">{{
-    summaryData.results[0].value | renameRights
-  }}</span>
+  <span class="total label">{{ summaryData.results[0].value }}</span>
 
   <span class="total">{{ summaryData.results.length }}</span>
 
