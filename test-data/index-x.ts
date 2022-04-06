@@ -169,9 +169,7 @@ new (class extends TestDataServer {
               if (!filter.values.includes(cho.datasetId)) {
                 res = false;
               }
-            } else if (
-              !filter.values.includes(encodeURIComponent(cho[fName]))
-            ) {
+            } else if (!filter.values.includes(cho[fName])) {
               cho.exclusions.push(fName);
               res = false;
             }

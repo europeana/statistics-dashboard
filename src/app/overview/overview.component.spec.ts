@@ -189,9 +189,11 @@ describe('OverviewComponent', () => {
     }));
 
     it('should calculate the portal urls', () => {
+      queryParams.next({});
+
       const rootUrl =
         'https://www.europeana.eu/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)';
-      const data = [{ name: 'name', value: 1, percent: 1, rawName: 'rawName' }];
+      const data = [{ name: 'name', value: 1, percent: 1 }];
 
       component.form.value.facetParameter = DimensionName.rightsCategory;
       fixture.detectChanges();
@@ -200,7 +202,7 @@ describe('OverviewComponent', () => {
         DimensionName.rightsCategory,
         data
       );
-      expect(res1.name).toEqual(`${rootUrl}&qf=RIGHTS:\"rawName\"`);
+      expect(res1.name).toEqual(`${rootUrl}&qf=RIGHTS:\"name\"`);
 
       component.form.value.facetParameter = DimensionName.type;
       fixture.detectChanges();

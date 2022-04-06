@@ -518,9 +518,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   ): IHash<string> {
     const result = src.reduce(
       (newMap: IHash<string>, nvp: NamesValuePercent) => {
-        const name =
-          facet === DimensionName.rightsCategory ? nvp.rawName : nvp.name;
-        const url = this.getUrlRow(facet, name);
+        const url = this.getUrlRow(facet, nvp.name);
         newMap[nvp.name] = url;
         return newMap;
       },
@@ -528,16 +526,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     );
     result['summary'] = this.getUrlRow(facet);
     return result;
-  }
-
-  originalNamesFromNVPs(src: Array<NamesValuePercent>): IHash<string> | null {
-    if (this.form.value.facetParameter !== DimensionName.rightsCategory) {
-      return null;
-    }
-    return src.reduce(function (newMap: IHash<string>, nvp: NamesValuePercent) {
-      newMap[nvp.name] = nvp.rawName;
-      return newMap;
-    }, {});
   }
 
   /** storeSeries
@@ -579,7 +567,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       label: label,
       data: this.iHashNumberFromNVPs(nvs),
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
-      namesOriginal: this.originalNamesFromNVPs(nvs),
       orderOriginal: [],
       orderPreferred: [],
       portalUrls: this.portalUrlsFromNVPs(this.form.value.facetParameter, nvs),

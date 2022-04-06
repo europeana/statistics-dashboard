@@ -36,7 +36,6 @@ export interface IHashArray<T> {
 
 export interface TableRow {
   name: string;
-  nameOriginal: string;
   count: number;
   displayIndex?: number;
   percent: number;
@@ -67,6 +66,5 @@ export interface NameValue {
 }
 
 export interface NamesValuePercent extends NameValue {
-  rawName?: string;
   percent: number;
 }
