@@ -11,6 +11,7 @@ describe('Helpers', () => {
     const list = ['aaa', 'bbb', 'ccc'];
 
     expect(filterList('', list)).toEqual(list);
+    expect(filterList('.', list)).toEqual([]);
     expect(filterList('term', list)).toEqual([]);
 
     ['a', 'b', 'c'].forEach((s: string, i: number) => {
@@ -35,6 +36,7 @@ describe('Helpers', () => {
   });
 
   it('should append diacritics', () => {
+    expect(appendDiacriticEquivalents('')).toBe('');
     expect(appendDiacriticEquivalents('A')).toBe(
       '[AÁĂẮẶẰẲẴǍÂẤẬẦẨẪÄẠÀẢĀĄÅǺÃÆǼА]'
     );

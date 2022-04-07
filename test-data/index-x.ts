@@ -117,10 +117,10 @@ new (class extends TestDataServer {
     } else {
       const route = request.url as string;
       const params = url.parse(route, true).query;
-      const cat = `${params['rightsCategory']}`;
+      const cat = params['rightsCategory'];
 
       if (cat) {
-        const result = encodeURIComponent(cat.replace(/ /g, '-'));
+        const result = encodeURIComponent(`${cat}`.replace(/ /g, '-'));
         response.end(
           JSON.stringify([
             `http://${result}/1.0`,

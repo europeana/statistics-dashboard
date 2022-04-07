@@ -5,7 +5,8 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  IHash
+  IHash,
+  RequestFilter
 } from '../_models';
 
 const rightsCategories = [
@@ -634,18 +635,26 @@ export class MockAPIService {
     };
   }
 
-  getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
+  getBreakdowns(br: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return of({ filteringOptions: {}, results: {} } as BreakdownResults).pipe(
         delay(1)
       );
+    } else if (br.filters.datasetId) {
+      const datasetFilter = br.filters.datasetId as RequestFilter;
+      if (datasetFilter.values[0] === 'EMPTY') {
+        return of({} as unknown as BreakdownResults).pipe(delay(1));
+      }
     }
     return of(MockBreakdowns).pipe(delay(1));
   }
 
   getGeneralResults(): Observable<GeneralResults> {
     return of(MockGeneralResults).pipe(delay(1));
+  }
+
+  getRightsCategoryUrls(rightsCategory: string): Observable<Array<string>> {
+    return of([`${rightsCategory}/1.0`, `${rightsCategory}/2.0`]);
   }
 }
 

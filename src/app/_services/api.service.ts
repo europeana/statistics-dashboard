@@ -14,6 +14,7 @@ import { ISOCountryCodes } from '../_data';
 export class APIService {
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
+  suffixRightsUrls = 'statistics/rights/urls';
 
   constructor(private readonly http: HttpClient) {}
 
@@ -32,6 +33,13 @@ export class APIService {
     return this.http.get<GeneralResults>(
       `${environment.serverAPI}${this.suffixGeneral}`,
       { params: includeCTZero ? { 'content-tier-zero': true } : {} }
+    );
+  }
+
+  getRightsCategoryUrls(rightsCategory: string): Observable<Array<string>> {
+    return this.http.get<Array<string>>(
+      `${environment.serverAPI}${this.suffixRightsUrls}`,
+      { params: { rightsCategory } }
     );
   }
 }

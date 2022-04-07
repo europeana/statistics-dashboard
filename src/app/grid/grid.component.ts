@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { colours } from '../_data';
 import {
+  DimensionName,
   FmtTableData,
   HeaderNameType,
   PagerInfo,
@@ -14,15 +15,17 @@ import {
   SortInfo,
   TableRow
 } from '../_models';
+import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
+import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
   selector: 'app-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss']
 })
-export class GridComponent {
-  @Input() facet: string;
+export class GridComponent extends SubscriptionManager {
+  @Input() facet: DimensionName;
   @Input() isVisible: boolean;
   @Output() refreshData = new EventEmitter<void>();
   @Output() chartPositionChanged = new EventEmitter<number>();
@@ -45,6 +48,39 @@ export class GridComponent {
   public colours = colours;
   public SortBy = SortBy;
 
+  constructor(private readonly api: APIService) {
+    super();
+  }
+
+  /** clickLinkOut
+  /* overrides link handling for rightsCategory facet by appending url parameters and opening the tab directly
+  /*
+  /* @param { TableRow } row - the clicked row
+  /* @returns { boolean } true unless facet is rightsCategory
+  */
+  clickLinkOut(row: TableRow): boolean {
+    if (this.facet !== DimensionName.rightsCategory) {
+      return true;
+    }
+    this.subs.push(
+      this.api
+        .getRightsCategoryUrls(row.name)
+        .subscribe((urls: Array<string>) => {
+          const rightsParams = urls
+            .map((url: string) => {
+              return `&qf=RIGHTS:\"${url}\"`;
+            })
+            .join('');
+          // timeout and 2-stage location setting needed to avoid popup-blocker
+          setTimeout(() => {
+            const newWin = window.open('', '_blank');
+            newWin.location.href = row.portalUrl + rightsParams;
+          }, 0);
+        })
+    );
+    return false;
+  }
+
   applyHighlights(rows: Array<TableRow>): void {
     let highlight = false;
     let currName = '';
@@ -65,7 +101,7 @@ export class GridComponent {
   /** bumpSortState
   /* Moves sortInfo.dir one iteration through (looped) sequence -1, 0, 1
   /* Clears other sort states
-  /* @param { string : header }
+  /* @param { string } header
   **/
   bumpSortState(header: SortBy): void {
     const isChanged = this.sortInfo.by !== header;
@@ -102,7 +138,7 @@ export class GridComponent {
   }
 
   /** goToPage
-  /* @param { KeyboardEvent : event }
+  /* @param { KeyboardEvent } event
   **/
   goToPage(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
@@ -118,6 +154,7 @@ export class GridComponent {
 
   /** setRows
   /* called from parent when data changes
+  /* @param { Array<TableRow> } rows
   **/
   setRows(rows: Array<TableRow>): void {
     const normalRows = [];
@@ -137,7 +174,7 @@ export class GridComponent {
 
   /** setPagerInfo
   /* handle page info from pager when page changes
-  /* @param { PagerInfo : pagerInfo }
+  /* @param { PagerInfo } pagerInfo
   **/
   setPagerInfo(pagerInfo: PagerInfo): void {
     const fn = (): void => {
@@ -153,7 +190,7 @@ export class GridComponent {
 
   /** sort
   /* Template utility: bumps sort state and emits refresh event
-  /* @param { SortBy : sortBy } - the field to sort on
+  /* @param { SortBy } sortBy - the field to sort on
   **/
   sort(sortBy: SortBy): void {
     this.bumpSortState(sortBy);
@@ -161,7 +198,7 @@ export class GridComponent {
   }
 
   /** updateRows
-  /* @param { KeyboardEvent : e }
+  /* @param { KeyboardEvent } e
   **/
   updateRows(e: KeyboardEvent): void {
     if (e.key.length === 1 || ['Backspace', 'Delete'].includes(e.key)) {

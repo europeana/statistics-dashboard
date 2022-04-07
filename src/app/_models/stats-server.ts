@@ -3,7 +3,6 @@
 import { IHashArray, NamesValuePercent } from './';
 
 export interface BreakdownRequest {
-  datasetId?: string;
   filters: {
     [details: string]: RequestFilter | RequestFilterRange;
   };

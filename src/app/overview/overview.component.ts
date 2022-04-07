@@ -169,6 +169,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     }
 
     const valDatasetId = this.form.value.datasetId;
+
     if (valDatasetId) {
       breakdownRequest.filters['datasetId'] = {
         values: fromCSL(valDatasetId)
@@ -341,9 +342,11 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     if (!qfVal) {
       return rootUrl;
     }
-    return `${rootUrl}&qf=${
-      portalNames[this.form.value.facetParameter]
-    }:"${encodeURIComponent(qfVal)}"`;
+    if (facet === DimensionName.rightsCategory) {
+      // the rest of the rights url is decoded when the link is clicked
+      return rootUrl;
+    }
+    return `${rootUrl}&qf=${portalNames[facet]}:"${encodeURIComponent(qfVal)}"`;
   }
 
   /** processServerResult
