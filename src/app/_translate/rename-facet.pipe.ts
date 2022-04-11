@@ -12,7 +12,7 @@ facetNames[DimensionName.contentTier] = 'Content Tier';
 facetNames[DimensionName.metadataTier] = 'Metadata Tier';
 facetNames[DimensionName.country] = 'Country';
 facetNames[DimensionName.type] = 'Media Type';
-facetNames[DimensionName.rights] = 'Right Statements';
+facetNames[DimensionName.rightsCategory] = 'Rights Category';
 facetNames[DimensionName.dataProvider] = 'Data Provider';
 facetNames[DimensionName.provider] = 'Provider';
 

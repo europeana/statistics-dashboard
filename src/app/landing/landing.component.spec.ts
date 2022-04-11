@@ -35,6 +35,12 @@ describe('LandingComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should have data', () => {
+    expect(component.hasData()).toBeFalsy();
+    component.landingData = { contentTier: [] };
+    expect(component.hasData()).toBeTruthy();
+  });
+
   it('should refresh the charts when the data changes', () => {
     spyOn(component, 'refreshCharts');
     component.landingData = { contentTier: [] };

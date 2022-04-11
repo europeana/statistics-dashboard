@@ -7,7 +7,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { getFormValueList, rightsUrlMatch } from '../_helpers';
+import { getFormValueList } from '../_helpers';
 import {
   DimensionName,
   FilterInfo,
@@ -36,8 +36,7 @@ export class FilterComponent {
     return this._optionSet;
   }
   @Input() set optionSet(optionSet: FilterOptionSet) {
-    const ops = optionSet.options;
-    if (ops.length > 0) {
+    if (optionSet && optionSet.options.length > 0) {
       // if there's data (with no filter) then capture that fact.
       if (!this.term || this.term.length === 0) {
         this.emptyData = false;
@@ -98,6 +97,7 @@ export class FilterComponent {
   }
 
   /** getSetCheckboxValues
+  /* Template utility for selection string
   /* @param {DimensionName} filterName - the form value key
   */
   getSetCheckboxValues(filterName: DimensionName): string {
@@ -110,9 +110,6 @@ export class FilterComponent {
           )
         ) {
           prefix = 'Tier ';
-        } else if (this.group === DimensionName.rights) {
-          const swapped = rightsUrlMatch(s);
-          s = swapped ? swapped : s;
         }
         return prefix + s;
       })

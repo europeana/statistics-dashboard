@@ -196,7 +196,7 @@
                       <app-checkbox
                         [form]="form"
                         [controlName]="option.name"
-                        [labelText]="option.label | renameRights"
+                        [labelText]="option.label"
                         [group]="filter"
                         (valueChanged)="updatePageUrl(option.valid)"
                         title="remove filter: {{ option.label }}"

@@ -1,5 +1,5 @@
 import { FormGroup } from '@angular/forms';
-import { DiacriticsMap, RightsStatements } from '../_data';
+import { DiacriticsMap } from '../_data';
 
 const sanitationRegex = /[.*+?^${}()|[\]\\]/g;
 const sanitationReplace = '\\$&';
@@ -51,22 +51,6 @@ export function appendDiacriticEquivalents(source: string): string {
     .replace(/X/gi, `[${DiacriticsMap.X}]`)
     .replace(/Y/gi, `[${DiacriticsMap.Y}]`)
     .replace(/Z/gi, `[${DiacriticsMap.Z}]`);
-}
-
-export function rightsUrlMatch(url: string): string | null {
-  const trimmed = url
-    .toLowerCase()
-    .trim()
-    .replace(/(h)?ttp(s)?:/i, '')
-    .split('?')[0]
-    .replace(/[\/]$/, '');
-
-  const replaced = RightsStatements[trimmed];
-
-  if (replaced) {
-    return replaced.split('?')[0].trim();
-  }
-  return null;
 }
 
 /** sanitiseSearchTerm

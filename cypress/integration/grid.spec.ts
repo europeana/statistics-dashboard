@@ -111,8 +111,8 @@ context('Statistics Dashboard', () => {
 
       cy.get(selFacetSelect).select('Data Provider', force);
 
-      assertRowLength(['National Library of Finland'], 1);
-      assertRowLength(['Meise Botanic Garden'], 0);
+      assertRowLength(['Riksantikvarieämbetet'], 1);
+      assertRowLength(['Wielkopolska Biblioteka Cyfrowa'], 0);
 
       cy.get(selFacetSelect).select('Country', force);
 
@@ -126,8 +126,8 @@ context('Statistics Dashboard', () => {
 
       cy.get(selFacetSelect).select('Data Provider', force);
 
-      assertRowLength(['National Library of Finland'], 0);
-      assertRowLength(['Meise Botanic Garden'], 1);
+      assertRowLength(['Riksantikvarieämbetet'], 0);
+      assertRowLength(['Wielkopolska Biblioteka Cyfrowa'], 1);
     });
 
     it('should paginate back and forth', () => {

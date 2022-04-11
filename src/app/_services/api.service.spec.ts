@@ -60,4 +60,8 @@ describe('APIService', () => {
   it('should load the ISO country codes', () => {
     expect(service.loadISOCountryCodes()).toBeTruthy();
   });
+
+  it('should load the rightsCategory urls', () => {
+    expect(service.getRightsCategoryUrls('CC0')).toBeTruthy();
+  });
 });

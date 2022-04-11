@@ -64,9 +64,7 @@
                   [form]="form"
                   [controlName]="option.name"
                   [labelText]="
-                    option.label
-                      | renameRights
-                      | highlightMatch: [filterTerm.value]
+                    option.label | highlightMatch: [filterTerm.value]
                   "
                   [group]="group"
                   (valueChanged)="changed()"

@@ -10,7 +10,7 @@ import {
   STATIC_COUNTRIES,
   STATIC_DATA_PROVIDERS,
   STATIC_PROVIDERS,
-  STATIC_RIGHTS
+  STATIC_RIGHTS_CATEGORY_VALUES
 } from './static-data';
 
 export class DataGenerator {
@@ -19,10 +19,7 @@ export class DataGenerator {
 
   generateCHOs = (totalCHO: number): Array<CHO> => {
     const getCountry = (i: number): CountryDescriptor => {
-      const pool = STATIC_COUNTRIES.filter((descriptor: CountryDescriptor) => {
-        return descriptor.dataProviders.length > 0;
-      });
-      return pool[i % pool.length];
+      return STATIC_COUNTRIES[i % STATIC_COUNTRIES.length];
     };
 
     const getProvider = (
@@ -45,15 +42,16 @@ export class DataGenerator {
       });
     };
 
-    const getRights = (i: number) => {
-      const index = i % STATIC_RIGHTS.length;
-      return STATIC_RIGHTS[index];
+    const getRightCategory = (i: number) => {
+      const index = i % STATIC_RIGHTS_CATEGORY_VALUES.length;
+      return STATIC_RIGHTS_CATEGORY_VALUES[index];
     };
 
     return Array.from(Array(totalCHO).keys()).map((i: number) => {
       const random = i % 9 == 0 ? (i % 7 == 0 ? (i % 5 == 0 ? 0 : 1) : 2) : i;
       const type = this.types[random % this.types.length];
       const country = getCountry(i % (type.length * type.length));
+
       const dProvider = getDataProvider(country, i);
       const contentTier = this.types.indexOf(type);
 
@@ -69,7 +67,9 @@ export class DataGenerator {
       res[DimensionName.provider] = getProvider(dProvider, i).name;
       res[DimensionName.dataProvider] = dProvider.name;
       res[DimensionName.type] = type;
-      res[DimensionName.rights] = getRights(i * dProvider.name.length);
+      res[DimensionName.rightsCategory] = getRightCategory(
+        i * dProvider.name.length
+      );
 
       return res as CHO;
     });

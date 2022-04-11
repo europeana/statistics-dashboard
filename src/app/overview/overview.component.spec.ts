@@ -92,8 +92,7 @@ describe('OverviewComponent', () => {
         MockBarComponent,
         MockGridComponent,
         SnapshotsComponent,
-        createMockPipe('renameApiFacet'),
-        createMockPipe('renameRights')
+        createMockPipe('renameApiFacet')
       ],
       providers: [
         {
@@ -189,15 +188,20 @@ describe('OverviewComponent', () => {
     }));
 
     it('should calculate the portal urls', () => {
+      queryParams.next({});
+
       const rootUrl =
         'https://www.europeana.eu/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)';
-      const data = [{ name: 'name', value: 1, percent: 1, rawName: 'rawName' }];
+      const data = [{ name: 'name', value: 1, percent: 1 }];
 
-      component.form.value.facetParameter = DimensionName.rights;
+      component.form.value.facetParameter = DimensionName.rightsCategory;
       fixture.detectChanges();
 
-      const res1 = component.portalUrlsFromNVPs(DimensionName.rights, data);
-      expect(res1.name).toEqual(`${rootUrl}&qf=RIGHTS:\"rawName\"`);
+      const res1 = component.portalUrlsFromNVPs(
+        DimensionName.rightsCategory,
+        data
+      );
+      expect(res1.name).toEqual(`${rootUrl}`);
 
       component.form.value.facetParameter = DimensionName.type;
       fixture.detectChanges();
@@ -228,6 +232,11 @@ describe('OverviewComponent', () => {
       component.dataServerData = MockBreakdowns;
       component.postProcessResult();
       expect(component.extractSeriesServerData).toHaveBeenCalled();
+
+      component.dataServerData = Object.assign({}, MockBreakdowns);
+      delete component.dataServerData.results;
+      component.postProcessResult();
+      expect(component.extractSeriesServerData).toHaveBeenCalledTimes(1);
     });
 
     it('should refresh the chart', fakeAsync(() => {
@@ -275,7 +284,9 @@ describe('OverviewComponent', () => {
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();
 
-      component.form.controls.facetParameter.setValue(DimensionName.rights);
+      component.form.controls.facetParameter.setValue(
+        DimensionName.rightsCategory
+      );
       component.extractSeriesServerData(br);
 
       expect(component.storeSeries).toHaveBeenCalledTimes(2);
@@ -290,6 +301,7 @@ describe('OverviewComponent', () => {
       ops[DimensionName.country] = ['Scotland', 'Yugoslavia'];
 
       component.buildFilters(ops);
+      fixture.detectChanges();
       expect(Object.keys(component.filterData).length).toBeTruthy();
     });
 
@@ -303,6 +315,25 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
       component.buildFilters(ops);
       expect(Object.keys(component.filterData).length).toBeTruthy();
+      component.ngOnDestroy();
+    }));
+
+    it('should load the data', fakeAsync(() => {
+      spyOn(component, 'postProcessResult');
+      component.form.controls.datasetId.setValue('1');
+      fixture.detectChanges();
+      component.loadData();
+      tick(tickTime);
+
+      expect(component.postProcessResult).toHaveBeenCalled();
+
+      component.form.controls.datasetId.setValue('EMPTY');
+      fixture.detectChanges();
+      component.loadData();
+      tick(tickTime);
+
+      expect(component.postProcessResult).toHaveBeenCalledTimes(1);
+
       component.ngOnDestroy();
     }));
 
@@ -522,7 +553,7 @@ describe('OverviewComponent', () => {
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
-      component.clearFilter(DimensionName.rights);
+      component.clearFilter(DimensionName.rightsCategory);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
@@ -580,6 +611,16 @@ describe('OverviewComponent', () => {
           .getUrlRow(DimensionName.country, 'Norway')
           .indexOf(portalNames[DimensionName.country])
       ).toBeGreaterThan(-1);
+    });
+
+    it('should remove the series', () => {
+      spyOn(component.snapshots, 'unapply').and.callFake(() => false);
+      spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
+        () => false
+      );
+      component.removeSeries('');
+      expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
+      expect(component.snapshots.unapply).toHaveBeenCalled();
     });
   });
 

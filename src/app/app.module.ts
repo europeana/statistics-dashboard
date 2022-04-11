@@ -19,8 +19,7 @@ import { AppComponent } from './app.component';
 import {
   HighlightMatchPipe,
   RenameApiFacetPipe,
-  RenameApiFacetShortPipe,
-  RenameRightsPipe
+  RenameApiFacetShortPipe
 } from './_translate';
 import { BarComponent, MapComponent } from './chart';
 import { CheckboxComponent } from './checkbox';
@@ -88,7 +87,6 @@ class AppDateAdapter extends NativeDateAdapter {
     OverviewComponent,
     RenameApiFacetPipe,
     RenameApiFacetShortPipe,
-    RenameRightsPipe,
     ResizeComponent,
     SnapshotsComponent,
     TruncateComponent,

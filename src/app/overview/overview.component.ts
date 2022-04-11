@@ -16,13 +16,11 @@ import {
   fromCSL,
   fromInputSafeName,
   getDateAsISOString,
-  rightsUrlMatch,
   today,
   toInputSafeName,
   validateDateGeneric,
   yearZero
 } from '../_helpers';
-import { RenameRightsPipe } from '../_translate';
 import { BarChartCool } from '../chart/chart-defaults';
 import { BarComponent } from '../chart';
 import { SubscriptionManager } from '../subscription-manager';
@@ -54,8 +52,7 @@ import { GridSummaryComponent } from '../grid-summary';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.scss'],
-  providers: [RenameRightsPipe]
+  styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('grid') grid: GridComponent;
@@ -126,7 +123,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     private readonly fb: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly renameRights: RenameRightsPipe,
     private readonly dialog: MatDialog
   ) {
     super();
@@ -173,6 +169,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     }
 
     const valDatasetId = this.form.value.datasetId;
+
     if (valDatasetId) {
       breakdownRequest.filters['datasetId'] = {
         values: fromCSL(valDatasetId)
@@ -345,9 +342,11 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     if (!qfVal) {
       return rootUrl;
     }
-    return `${rootUrl}&qf=${
-      portalNames[this.form.value.facetParameter]
-    }:"${encodeURIComponent(qfVal)}"`;
+    if (facet === DimensionName.rightsCategory) {
+      // the rest of the rights url is decoded when the link is clicked
+      return rootUrl;
+    }
+    return `${rootUrl}&qf=${portalNames[facet]}:"${encodeURIComponent(qfVal)}"`;
   }
 
   /** processServerResult
@@ -360,12 +359,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       this.resultTotal = results.results.count;
       return true;
     } else {
-      this.barChart.removeAllSeries();
-      this.emptyDataset = true;
-      this.grid.setRows([]);
-      if (this.gridSummary) {
-        this.gridSummary.summaryData = { breakdownBy: '', results: [] };
-      }
+      this.clearData();
       return false;
     }
   }
@@ -383,6 +377,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       if (dsd.results && dsd.results.breakdowns) {
         // set pie and table data
         this.extractSeriesServerData(dsd.results.breakdowns);
+      } else {
+        this.clearData();
       }
     }
   }
@@ -518,8 +514,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   ): IHash<string> {
     const result = src.reduce(
       (newMap: IHash<string>, nvp: NamesValuePercent) => {
-        const name = facet === DimensionName.rights ? nvp.rawName : nvp.name;
-        const url = this.getUrlRow(facet, name);
+        const url = this.getUrlRow(facet, nvp.name);
         newMap[nvp.name] = url;
         return newMap;
       },
@@ -527,16 +522,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     );
     result['summary'] = this.getUrlRow(facet);
     return result;
-  }
-
-  originalNamesFromNVPs(src: Array<NamesValuePercent>): IHash<string> | null {
-    if (this.form.value.facetParameter !== DimensionName.rights) {
-      return null;
-    }
-    return src.reduce(function (newMap: IHash<string>, nvp: NamesValuePercent) {
-      newMap[nvp.name] = nvp.rawName;
-      return newMap;
-    }, {});
   }
 
   /** storeSeries
@@ -563,7 +548,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           const innerRes = [];
           if (!Object.values(nonFacetFilters).includes(key)) {
             this.queryParamsRaw[key].forEach((valPart: string) => {
-              innerRes.push(this.renameRights.transform(valPart));
+              innerRes.push(valPart);
             });
             return `${key} (${innerRes.join(' or ')})`;
           }
@@ -578,7 +563,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       label: label,
       data: this.iHashNumberFromNVPs(nvs),
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
-      namesOriginal: this.originalNamesFromNVPs(nvs),
       orderOriginal: [],
       orderPreferred: [],
       portalUrls: this.portalUrlsFromNVPs(this.form.value.facetParameter, nvs),
@@ -744,15 +728,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     const multiplier = filterInfo.upToPage ? filterInfo.upToPage : 1;
     const possibleToDisplay = filterList(
       filterInfo.term,
-      this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
-        return filterInfo.dimension !== DimensionName.rights
-          ? Object.assign({ valid: true }, nl)
-          : {
-              name: nl.name,
-              label: this.renameRights.transform(nl.label),
-              valid: true
-            };
-      }),
+      this.filterData[filterInfo.dimension],
       'label'
     );
     const toDisplay = possibleToDisplay.slice(
@@ -1075,6 +1051,19 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.updatePageUrl();
   }
 
+  /** clearData
+  /*
+  /* clears the chart and grid data
+  */
+  clearData(): void {
+    this.barChart.removeAllSeries();
+    this.emptyDataset = true;
+    this.grid.setRows([]);
+    if (this.gridSummary) {
+      this.gridSummary.summaryData = { breakdownBy: '', results: [] };
+    }
+  }
+
   /** clearFilter
   /*
   /* clears the form values for a single filter or all filters
@@ -1107,15 +1096,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   extractSeriesServerData(br: BreakdownResult): void {
     const chartData = br.results.map((cpv: CountPercentageValue) => {
-      let formattedName;
-      if (this.form.value.facetParameter === DimensionName.rights) {
-        formattedName = rightsUrlMatch(cpv.value);
-      }
       return {
-        name: formattedName ? formattedName : cpv.value,
+        name: cpv.value,
         value: cpv.count,
-        percent: cpv.percentage,
-        rawName: formattedName ? cpv.value : null
+        percent: cpv.percentage
       };
     });
 

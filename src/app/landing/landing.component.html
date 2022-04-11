@@ -34,10 +34,7 @@
         <span>RECORDS PROVIDED</span>
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
-        <app-truncate
-          class="app-truncate"
-          [text]="row.name | renameRights"
-        ></app-truncate>
+        <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
@@ -177,9 +174,9 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="landingData[DimensionName.rights]">
+      <div class="entry-card" *ngIf="landingData[DimensionName.rightsCategory]">
         <span class="entry-card-header"
-          >Explore by rights statement<a
+          >Explore by rights category<a
             class="info-icon"
             [href]="externalLinks.help.rights.href"
             target="_blank"
@@ -192,18 +189,18 @@
               *ngTemplateOutlet="
                 dataRows;
                 context: {
-                  facetName: DimensionName.rights,
-                  title: 'RIGHTS STATEMENT'
+                  facetName: DimensionName.rightsCategory,
+                  title: 'RIGHTS CATEGORY'
                 }
               "
             ></ng-content>
           </div>
           <a
             class="data-link"
-            routerLink="/data/{{ DimensionName.rights }}"
+            routerLink="/data/{{ DimensionName.rightsCategory }}"
             [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-rights"
-            >View by rights statement</a
+            >View by rights category</a
           >
         </div>
       </div>

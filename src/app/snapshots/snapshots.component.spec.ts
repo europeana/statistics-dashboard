@@ -73,7 +73,7 @@ describe('SnapshotsComponent', () => {
       countryLuxembourg: dscContentTierQueried
     };
 
-    cds[DimensionName.rights] = {
+    cds[DimensionName.rightsCategory] = {
       '': dscRights
     };
     component.facetName = DimensionName.contentTier;
@@ -220,7 +220,7 @@ describe('SnapshotsComponent', () => {
     expect(dscRights.orderPreferred.length).toBeFalsy();
 
     component.preSortAndFilter(
-      DimensionName.rights,
+      DimensionName.rightsCategory,
       [''],
       {
         by: SortBy.count,
@@ -232,7 +232,7 @@ describe('SnapshotsComponent', () => {
     expect(dscRights.orderPreferred[0].trim()).toEqual('CC0');
 
     component.preSortAndFilter(
-      DimensionName.rights,
+      DimensionName.rightsCategory,
       [''],
       {
         by: SortBy.count,

@@ -6,6 +6,7 @@
         target="_blank"
         class="link-out"
         [href]="row.portalUrl"
+        (click)="clickLinkOut(row)"
       ></a>
     </span>
   </ng-template>
@@ -157,7 +158,7 @@
             [title]="row.name"
           >
             <app-truncate
-              [text]="getPrefix() + row.name | renameRights"
+              [text]="getPrefix() + row.name"
               [highlightText]="filterTerm"
             ></app-truncate>
           </span>

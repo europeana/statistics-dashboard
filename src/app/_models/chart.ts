@@ -33,7 +33,6 @@ export interface CompareDataDescriptor {
   dataPercent: IHash<number>;
   label: string;
   name: string;
-  namesOriginal?: IHash<string>;
   portalUrls: IHash<string>;
   pinIndex: number;
   saved?: boolean;

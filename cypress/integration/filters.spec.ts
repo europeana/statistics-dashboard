@@ -120,7 +120,7 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selLoadMore)
         .should('have.length', 0);
-      cy.get(selFilterOpener).eq(4).click(force);
+      cy.get(selFilterOpener).eq(2).click(force);
 
       cy.get(selCheckbox).should('have.length', 50);
       cy.get(selLoadMore)
@@ -190,11 +190,11 @@ context('Statistics Dashboard', () => {
     it('should search the filters (regex literals)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpener).eq(3).click(force);
-      cy.get(selCheckbox).should('have.length', 34);
+      cy.get(selCheckbox).should('have.length', 38);
       cy.get(selSearch).type('^', 1);
       cy.get(selCheckbox).should('have.length', 2);
       cy.get(selSearch).clear();
-      cy.get(selCheckbox).should('have.length', 34);
+      cy.get(selCheckbox).should('have.length', 38);
       cy.get(selSearch).type('$', 1);
     });
 
@@ -206,7 +206,7 @@ context('Statistics Dashboard', () => {
       cy.get(selSearch).type('oster', 1);
       cy.get(selFilterValueLabel).should('have.length', 1);
       cy.get(selSearch).clear();
-      cy.get(selFilterValueLabel).should('have.length', 35);
+      cy.get(selFilterValueLabel).should('have.length', 50);
       cy.get(selSearch).type('Öster', 1);
       cy.get(selFilterValueLabel).should('have.length', 1);
       cy.get(selSearch).clear();
