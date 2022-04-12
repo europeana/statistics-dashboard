@@ -58,10 +58,16 @@ export class GridComponent extends SubscriptionManager {
   /* @param { TableRow } row - the clicked row
   /* @returns { boolean } true unless facet is rightsCategory
   */
-  clickLinkOut(row: TableRow): boolean {
-    if (this.facet !== DimensionName.rightsCategory) {
+  loadFullLink(row: TableRow, clickLinkOut = false): boolean {
+    if (
+      row.hrefRewritten ||
+      row.isTotal ||
+      this.facet !== DimensionName.rightsCategory
+    ) {
+      // the clicked link includes the qf parameters it needs, so default browser handling
       return true;
     }
+
     this.subs.push(
       this.api
         .getRightsCategoryUrls(row.name)
@@ -71,14 +77,20 @@ export class GridComponent extends SubscriptionManager {
               return `&qf=RIGHTS:\"${url}\"`;
             })
             .join('');
-          // timeout and 2-stage location setting needed to avoid popup-blocker
-          setTimeout(() => {
-            const newWin = window.open('', '_blank');
-            newWin.location.href = row.portalUrl + rightsParams;
-          }, 0);
+
+          row.portalUrl = row.portalUrl + rightsParams;
+          row.hrefRewritten = true;
+
+          if (clickLinkOut) {
+            // timeout and 2-stage location setting needed to avoid popup-blocker
+            setTimeout(() => {
+              const newWin = window.open('', '_blank');
+              newWin.location.href = row.portalUrl;
+            }, 0);
+          }
         })
     );
-    return false;
+    return !clickLinkOut;
   }
 
   applyHighlights(rows: Array<TableRow>): void {
