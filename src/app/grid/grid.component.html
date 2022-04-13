@@ -6,7 +6,9 @@
         target="_blank"
         class="link-out"
         [href]="row.portalUrl"
-        (click)="clickLinkOut(row)"
+        (mouseenter)="loadFullLink(row)"
+        (contextmenu)="loadFullLink(row)"
+        (click)="loadFullLink(row, true)"
       ></a>
     </span>
   </ng-template>

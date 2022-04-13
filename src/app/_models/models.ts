@@ -44,6 +44,7 @@ export interface TableRow {
   series: string;
   isTotal?: boolean;
   portalUrl: string;
+  hrefRewritten?: boolean;
 }
 
 export interface FmtTableData {

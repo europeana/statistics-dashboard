@@ -115,17 +115,24 @@ describe('GridComponent', () => {
       count: 1,
       percent: 1
     } as TableRow;
-    component.clickLinkOut(mockTableRow);
+    component.loadFullLink(mockTableRow);
     tick();
 
     expect(api.getRightsCategoryUrls).not.toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
 
     component.facet = DimensionName.rightsCategory;
-    component.clickLinkOut(mockTableRow);
+    component.loadFullLink(mockTableRow);
     tick();
 
     expect(api.getRightsCategoryUrls).toHaveBeenCalled();
+    expect(window.open).not.toHaveBeenCalled();
+
+    mockTableRow.hrefRewritten = false;
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
     expect(window.open).toHaveBeenCalled();
   }));
 
