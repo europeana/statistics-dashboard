@@ -8,15 +8,22 @@ import { DimensionName } from '../_models';
 
 const facetNames: { [key: string]: string } = {};
 
-facetNames[DimensionName.contentTier] = 'Content Tier';
-facetNames[DimensionName.metadataTier] = 'Metadata Tier';
-facetNames[DimensionName.country] = 'Country';
-facetNames[DimensionName.type] = 'Media Type';
-facetNames[DimensionName.rightsCategory] = 'Rights Category';
-facetNames[DimensionName.dataProvider] = 'Data Provider';
-facetNames[DimensionName.provider] = 'Provider';
-
-facetNames['dates'] = 'Last Updated';
+facetNames[
+  DimensionName.contentTier
+] = $localize`:@@facetNameContentTier:Content Tier`;
+facetNames[
+  DimensionName.metadataTier
+] = $localize`:@@facetNameMetadataTier:Metadata Tier`;
+facetNames[DimensionName.country] = $localize`:@@facetNameCountry:Country`;
+facetNames[DimensionName.type] = $localize`:@@facetNameMediaType:Media Type`;
+facetNames[
+  DimensionName.rightsCategory
+] = $localize`:@@facetNameRights:Rights Category`;
+facetNames[
+  DimensionName.dataProvider
+] = $localize`:@@facetNameDataProvider:Data Provider`;
+facetNames[DimensionName.provider] = $localize`:@@facetNameProvider:Provider`;
+facetNames['dates'] = $localize`:@@facetNameDates:Last Updated`;
 
 @Pipe({
   name: 'renameApiFacet'

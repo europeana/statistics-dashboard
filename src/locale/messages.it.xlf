@@ -2,57 +2,158 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en-US" datatype="plaintext" original="ng2.template">
     <body>
-      <trans-unit id="3865953224881501138" datatype="html">
+      <trans-unit id="tooltipHelpContentTier" datatype="html">
         <source>Documentazione EDM</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">74</context>
-        </context-group>
-        <note priority="1" from="description">{Content Tier Tooltip}</note>
       </trans-unit>
-      <trans-unit id="5939361412399232860" datatype="html">
+      <trans-unit id="tooltipHelpMetadataTier" datatype="html">
         <source>Documentazione Tier</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">78</context>
-        </context-group>
-        <note priority="1" from="description">{Metadata Tooltip}</note>
       </trans-unit>
-      <trans-unit id="3989458097290099074" datatype="html">
+      <trans-unit id="tooltipHelpProvider" datatype="html">
         <source>Documentazione delle Istituzioni</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">82</context>
-        </context-group>
-        <note priority="1" from="description">{Provider Tooltip}</note>
       </trans-unit>
-      <trans-unit id="7205479893678673476" datatype="html">
+      <trans-unit id="tooltipHelpRights" datatype="html">
         <source>Documentazione sulla dichiarazione dei diritti</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">86</context>
-        </context-group>
-        <note priority="1" from="description">{Rights Tooltip}</note>
+      </trans-unit>
+
+      <trans-unit id="facetNameContentTier" datatype="html">
+        <source>Livello di Contenuto</source>
+      </trans-unit>
+      <trans-unit id="facetNameMetadataTier" datatype="html">
+        <source>Livello di Metadati</source>
+      </trans-unit>
+      <trans-unit id="facetNameCountry" datatype="html">
+        <source>Paese</source>
+      </trans-unit>
+      <trans-unit id="facetNameMediaType" datatype="html">
+        <source>Tipo di Media</source>
+      </trans-unit>
+      <trans-unit id="facetNameRights" datatype="html">
+        <source>Categoria di diritti</source>
+      </trans-unit>
+      <trans-unit id="facetNameDataProvider" datatype="html">
+        <source>Istituzione</source>
+      </trans-unit>
+      <trans-unit id="facetNameProvider" datatype="html">
+        <source>Aggregatore</source>
+      </trans-unit>
+      <trans-unit id="facetNameDates" datatype="html">
+        <source>Ultimo aggiornamento</source>
+      </trans-unit>
+      <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
+        <source>attivare il livello di contenuto 0</source>
+      </trans-unit>
+      <trans-unit id="ctrlLabelDisableCTZero" datatype="html">
+        <source>disattivare il livello di contenuto 0</source>
+      </trans-unit>
+      <trans-unit id="footerLegalText1" datatype="html">
+        <source>Europeana è un'iniziativa dell'Unione Europea, finanziata dal'meccanismo "Connecting Europe" e i Stati membri dell'Unione europea.  I servizi di Europeana, incluso questo sito, sono gestiti da un consorzio guidato dalla Fondazione Europeana nell'ambito di un contratto di servizio con la Commissione Europea.</source>
+      </trans-unit>
+      <trans-unit id="footerLegalText2" datatype="html">
+        <source>La Commissione Europea non garantisce l'accuratezza delle informazioni e non si assume alcuna responsabilità in relazione alle informazioni su questo sito web. Né la Commissione Europea, né qualsiasi persona che agisce per conto della Commissione Europea, è responsabile per l'accuratezza o l'uso delle informazioni su questo sito.</source>
+      </trans-unit>
+      <trans-unit id="landingPageTitle" datatype="html">
+        <source>Europeana dataset completo</source>
+      </trans-unit>
+      <trans-unit id="landingChartSummaryPrefix" datatype="html">
+        <source>Primo <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort | lowercase }}"/> </source>
+      </trans-unit>
+      <trans-unit id="landingChartSummaryCount" datatype="html">
+        <source>Primo <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort }}"/> conteggio record</source>
+      </trans-unit>
+      <trans-unit id="landingChartSummaryPercentage" datatype="html">
+        <source>Percentuale corrispondente</source>
+      </trans-unit>
+      <trans-unit id="landingDataHeader" datatype="html">
+        <source>RECORD FORNITI</source>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleEDM" datatype="html">
+        <source>Esplora per qualità dei contenuti<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+            class=&quot;info-icon&quot;
+            [href]=&quot;externalLinks.help.contentTier.href&quot;
+            target=&quot;_blank&quot;
+            [title]=&quot;externalLinks.help.contentTier.description&quot;
+          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+        &gt;"/></source>
+        <note priority="1" from="description">landing section title edm</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkEDM" datatype="html">
+        <source>Visualizza per livello di contenuto</source>
+        <note priority="1" from="description">landing section link edm</note>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleMetadata" datatype="html">
+        <source>Esplora per qualità dei metadati<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+            class=&quot;info-icon&quot;
+            [href]=&quot;externalLinks.help.metadataTier.href&quot;
+            target=&quot;_blank&quot;
+            [title]=&quot;externalLinks.help.metadataTier.description&quot;
+          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+        &gt;"/></source>
+        <note priority="1" from="description">landing section title metadata</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkMetadata" datatype="html">
+        <source>Visualizza per livello di metadati</source>
+        <note priority="1" from="description">landing section link metadata</note>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleCountries" datatype="html">
+        <source>Esplora fornendo paesi<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
+      &gt;"/></source>
+        <note priority="1" from="description">landing section title countries</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkCountries" datatype="html">
+        <source>Visualizza per paesi</source>
+        <note priority="1" from="description">landing section link countries</note>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleType" datatype="html">
+        <source>Esplora per tipo di media<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
+        &gt;"/></source>
+        <note priority="1" from="description">landing section title type</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkType" datatype="html">
+        <source>Visualizza per tipo di media</source>
+        <note priority="1" from="description">landing section link type</note>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleRights" datatype="html">
+        <source>Esplora per categoria di diritti<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+            class=&quot;info-icon&quot;
+            [href]=&quot;externalLinks.help.rights.href&quot;
+            target=&quot;_blank&quot;
+            [title]=&quot;externalLinks.help.rights.description&quot;
+          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+        &gt;"/></source>
+        <note priority="1" from="description">landing section title rights</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkRights" datatype="html">
+        <source>Visualizza per categoria di diritti</source>
+        <note priority="1" from="description">landing section link rights</note>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleDataProvider" datatype="html">
+        <source>Esplora per istituzione<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
+        &gt;"/></source>
+        <note priority="1" from="description">landing section title data provider</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkDataProvider" datatype="html">
+        <source>Visualizza per istituzione</source>
+        <note priority="1" from="description">landing section link data provider</note>
+      </trans-unit>
+      <trans-unit id="landingSectionTitleProvider" datatype="html">
+        <source>Esplora per aggregatore<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
+            class=&quot;info-icon&quot;
+            [href]=&quot;externalLinks.help.provider.href&quot;
+            target=&quot;_blank&quot;
+            [title]=&quot;externalLinks.help.provider.description&quot;
+          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
+        &gt;"/></source>
+        <note priority="1" from="description">landing section title provider</note>
+      </trans-unit>
+      <trans-unit id="landingSectionLinkProvider" datatype="html">
+        <source>Visualizza per aggregatore </source>
+        <note priority="1" from="description">landing section link provider</note>
       </trans-unit>
       <trans-unit id="filtersHeader" datatype="html">
-        <source>Filters</source>
-        <target>Filtri</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">43</context>
-        </context-group>
-        <note priority="1" from="description">Heading text for filters</note>
-        <note priority="1" from="meaning">Filters header</note>
+        <source>Filtri</source>
       </trans-unit>
       <trans-unit id="periodSummary" datatype="html">
-        <source>Whole period</source>
-        <target>Periodo intero</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">133</context>
-        </context-group>
-        <note priority="1" from="description">Summary for applied date filters</note>
-        <note priority="1" from="meaning">Period Summary</note>
+        <source>Periodo intero</source>
       </trans-unit>
     </body>
   </file>

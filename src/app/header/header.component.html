@@ -17,7 +17,9 @@
   </div>
 
   <div *ngIf="showPageTitle" class="fit-to-page page-title-wrapper">
-    <h1 class="page-title">Europeana complete dataset</h1>
+    <h1 class="page-title" i18n="landing page title@@landingPageTitle">
+      Europeana complete dataset
+    </h1>
     <app-ct-zero-control *ngIf="form" [form]="form"></app-ct-zero-control>
   </div>
 </header>

@@ -22,8 +22,18 @@
       }"
       for="ctZero"
     >
-      {{ form.value.contentTierZero ? "Disable" : "Enable" }}
-      content tier 0
+      <ng-template
+        #enableCTZero
+        i18n="control label enable content tier zero@@ctrlLabelEnableCTZero"
+      >
+        Enable content tier 0
+      </ng-template>
+      <ng-container
+        *ngIf="form.value.contentTierZero; else enableCTZero"
+        i18n="control label disable content tier zero@@ctrlLabelDisableCTZero"
+      >
+        Disable content tier 0
+      </ng-container>
     </label>
   </span>
   <a
