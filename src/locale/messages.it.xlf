@@ -6,7 +6,7 @@
         <source>Documentazione EDM</source>
       </trans-unit>
       <trans-unit id="tooltipHelpMetadataTier" datatype="html">
-        <source>Documentazione Tier</source>
+        <source>Documentazione livello di metadati</source>
       </trans-unit>
       <trans-unit id="tooltipHelpProvider" datatype="html">
         <source>Documentazione delle Istituzioni</source>
@@ -40,10 +40,31 @@
         <source>Ultimo aggiornamento</source>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
-        <source>attivare il livello di contenuto 0</source>
+        <source>attivare contenuto livello 0</source>
       </trans-unit>
       <trans-unit id="ctrlLabelDisableCTZero" datatype="html">
-        <source>disattivare il livello di contenuto 0</source>
+        <source>disattivare contenuto livello 0</source>
+      </trans-unit>
+      <trans-unit id="documentationLinkCTZero" datatype="html">
+        <source>Documentazione</source>
+      </trans-unit>
+      <trans-unit id="footerLinkTextEuropeanaWebsite" datatype="html">
+        <source>Europeana Sito Web</source>
+      </trans-unit>
+      <trans-unit id="footerLinkTextEuropeanaPro" datatype="html">
+        <source>Europeana Professionale</source>
+      </trans-unit>
+      <trans-unit id="footerLinkTextAPI" datatype="html">
+        <source>Europeana API</source>
+      </trans-unit>
+      <trans-unit id="footerLinkTextTOS" datatype="html">
+        <source>Termini di Servizio</source>
+      </trans-unit>
+      <trans-unit id="footerLinkTextPrivacy" datatype="html">
+        <source>Norme sulla privacy</source>
+      </trans-unit>
+      <trans-unit id="footerEUFlagText" datatype="html">
+        <source>Cofinanziato dal Connecting Europe Facility dell'European Unione</source>
       </trans-unit>
       <trans-unit id="footerLegalText1" datatype="html">
         <source>Europeana è un'iniziativa dell'Unione Europea, finanziata dal'meccanismo "Connecting Europe" e i Stati membri dell'Unione europea.  I servizi di Europeana, incluso questo sito, sono gestiti da un consorzio guidato dalla Fondazione Europeana nell'ambito di un contratto di servizio con la Commissione Europea.</source>
@@ -143,15 +164,18 @@
             [title]=&quot;externalLinks.help.provider.description&quot;
           &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
         &gt;"/></source>
-        <note priority="1" from="description">landing section title provider</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkProvider" datatype="html">
         <source>Visualizza per aggregatore </source>
-        <note priority="1" from="description">landing section link provider</note>
       </trans-unit>
       <trans-unit id="filtersHeader" datatype="html">
         <source>Filtri</source>
       </trans-unit>
+
+      <trans-unit id="facetSelection" datatype="html">
+        <source> Database di Europeana per </source>
+      </trans-unit>
+
       <trans-unit id="periodSummary" datatype="html">
         <source>Periodo intero</source>
       </trans-unit>

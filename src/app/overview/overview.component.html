@@ -112,7 +112,12 @@
           </ng-container>
           <ng-container *ngIf="form.value.facetParameter">
             <h1 class="header-data">
-              <span class="facet-param-text"> Europeana database by </span>
+              <span
+                class="facet-param-text"
+                i18n="Facet selection@@facetSelection"
+              >
+                Europeana database by
+              </span>
               <select
                 class="facet-param"
                 formControlName="facetParameter"

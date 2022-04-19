@@ -102,21 +102,77 @@
         </context-group>
         <note priority="1" from="description">control label disable content tier zero</note>
       </trans-unit>
+      <trans-unit id="documentationLinkCTZero" datatype="html">
+        <source>Documentation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/ct-zero-control/ct-zero-control.component.html</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <note priority="1" from="description">Documentation</note>
+      </trans-unit>
+      <trans-unit id="footerLinkTextEuropeanaWebsite" datatype="html">
+        <source>Europeana Website</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
+      <trans-unit id="footerLinkTextEuropeanaPro" datatype="html">
+        <source>Europeana Professional</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
+      <trans-unit id="footerLinkTextAPI" datatype="html">
+        <source>Europeana API</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
+      <trans-unit id="footerLinkTextTOS" datatype="html">
+        <source>Terms of Service</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
+      <trans-unit id="footerLinkTextPrivacy" datatype="html">
+        <source>Privacy Policy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
+      <trans-unit id="footerEUFlagText" datatype="html">
+        <source>Co-financed by the Connecting Europe Facility of the European Union</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+        <note priority="1" from="description">Footer flag text 1</note>
+      </trans-unit>
       <trans-unit id="footerLegalText1" datatype="html">
         <source> Europeana is an initiative of the European Union, financed by the European Union&apos;s Connecting Europe Facility and European Union Member States. The Europeana services, including this website, are operated by a consortium led by the Europeana Foundation under a service contract with the European Commission. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">32,38</context>
+          <context context-type="linenumber">58,64</context>
         </context-group>
-        <note priority="1" from="description">footer legal text 1</note>
+        <note priority="1" from="description">Footer legal text 1</note>
       </trans-unit>
       <trans-unit id="footerLegalText2" datatype="html">
         <source> The European Commission does not guarantee the accuracy of the information and accepts no responsibility or liability whatsoever with regard to the information on this website. Neither the European Commission, nor any person acting on the European Commission&apos;s behalf, is responsible or liable for the accuracy or use of the information on this website. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">39,45</context>
+          <context context-type="linenumber">65,71</context>
         </context-group>
-        <note priority="1" from="description">footer legal text 2</note>
+        <note priority="1" from="description">Footer legal text 2</note>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source> Europeana complete dataset </source>
@@ -168,7 +224,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">69,75</context>
+          <context context-type="linenumber">70,76</context>
         </context-group>
         <note priority="1" from="description">landing section title edm</note>
       </trans-unit>
@@ -176,7 +232,7 @@
         <source>View by content tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">99</context>
         </context-group>
         <note priority="1" from="description">landing section link edm</note>
       </trans-unit>
@@ -190,7 +246,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">109,115</context>
+          <context context-type="linenumber">110,116</context>
         </context-group>
         <note priority="1" from="description">landing section title metadata</note>
       </trans-unit>
@@ -198,7 +254,7 @@
         <source>View by metadata tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">137</context>
+          <context context-type="linenumber">138</context>
         </context-group>
         <note priority="1" from="description">landing section link metadata</note>
       </trans-unit>
@@ -207,7 +263,7 @@
       &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">150,151</context>
+          <context context-type="linenumber">151,152</context>
         </context-group>
         <note priority="1" from="description">landing section title countries</note>
       </trans-unit>
@@ -215,7 +271,7 @@
         <source>View by countries</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">171</context>
         </context-group>
         <note priority="1" from="description">landing section link countries</note>
       </trans-unit>
@@ -224,7 +280,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">180,181</context>
+          <context context-type="linenumber">181,182</context>
         </context-group>
         <note priority="1" from="description">landing section title type</note>
       </trans-unit>
@@ -232,7 +288,7 @@
         <source>View by type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">200</context>
+          <context context-type="linenumber">201</context>
         </context-group>
         <note priority="1" from="description">landing section link type</note>
       </trans-unit>
@@ -246,7 +302,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">208,214</context>
+          <context context-type="linenumber">209,215</context>
         </context-group>
         <note priority="1" from="description">landing section title rights</note>
       </trans-unit>
@@ -254,7 +310,7 @@
         <source>View by rights category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">232</context>
+          <context context-type="linenumber">233</context>
         </context-group>
         <note priority="1" from="description">landing section link rights</note>
       </trans-unit>
@@ -263,7 +319,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">244,245</context>
+          <context context-type="linenumber">245,246</context>
         </context-group>
         <note priority="1" from="description">landing section title data provider</note>
       </trans-unit>
@@ -271,7 +327,7 @@
         <source>View by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">264</context>
+          <context context-type="linenumber">265</context>
         </context-group>
         <note priority="1" from="description">landing section link data provider</note>
       </trans-unit>
@@ -285,7 +341,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">272,278</context>
+          <context context-type="linenumber">273,279</context>
         </context-group>
         <note priority="1" from="description">landing section title provider</note>
       </trans-unit>
@@ -293,7 +349,7 @@
         <source>View by provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">296</context>
+          <context context-type="linenumber">297</context>
         </context-group>
         <note priority="1" from="description">landing section link provider</note>
       </trans-unit>
@@ -306,11 +362,19 @@
         <note priority="1" from="description">Heading text for filters</note>
         <note priority="1" from="meaning">Filters header</note>
       </trans-unit>
+      <trans-unit id="facetSelection" datatype="html">
+        <source> Europeana database by </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">118,120</context>
+        </context-group>
+        <note priority="1" from="description">Facet selection</note>
+      </trans-unit>
       <trans-unit id="periodSummary" datatype="html">
         <source>Whole period</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <note priority="1" from="description">Summary for applied date filters</note>
         <note priority="1" from="meaning">Period Summary</note>
