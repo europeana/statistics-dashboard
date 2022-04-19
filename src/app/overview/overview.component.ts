@@ -175,8 +175,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         values: fromCSL(valDatasetId)
       };
     }
-
-    console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
     return breakdownRequest;
   }
 
