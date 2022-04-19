@@ -2,6 +2,7 @@ import { Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { externalLinks } from '../_data';
 import { BarComponent } from '../chart';
 import { DimensionName, GeneralResultsFormatted } from '../_models';
+
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
