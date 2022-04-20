@@ -30,6 +30,104 @@
           <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="facetNameShortContentTier" datatype="html">
+        <source>Tier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortMetadataTier" datatype="html">
+        <source>Tier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortCountry" datatype="html">
+        <source>Country</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortType" datatype="html">
+        <source>Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortRightsCategory" datatype="html">
+        <source>Rights Category</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortDataProvider" datatype="html">
+        <source>CHI</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortProvider" datatype="html">
+        <source>Provider</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralContentTier" datatype="html">
+        <source>Tiers</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralMetadataTier" datatype="html">
+        <source>Tiers</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralCountry" datatype="html">
+        <source>Countries</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralType" datatype="html">
+        <source>Types</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralRightsCategory" datatype="html">
+        <source>Rights Category</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralDataProvider" datatype="html">
+        <source>CHIs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralProvider" datatype="html">
+        <source>Providers</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="facetNameContentTier" datatype="html">
         <source>Content Tier</source>
         <context-group purpose="location">
@@ -110,6 +208,126 @@
         </context-group>
         <note priority="1" from="description">Documentation</note>
       </trans-unit>
+      <trans-unit id="labelDateRange" datatype="html">
+        <source>Select a date range</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">Label Date Range</note>
+      </trans-unit>
+      <trans-unit id="labelDateRangeStart" datatype="html">
+        <source>Start date</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">Label Date Range Start</note>
+      </trans-unit>
+      <trans-unit id="labelDateRangeEnd" datatype="html">
+        <source>End date</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <note priority="1" from="description">Label Date Range End</note>
+      </trans-unit>
+      <trans-unit id="errorDateRangeEarlyStart" datatype="html">
+        <source> The start date is too early </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">45,47</context>
+        </context-group>
+        <note priority="1" from="description">Error date-range early start </note>
+      </trans-unit>
+      <trans-unit id="errorDateRangeEarlyEnd" datatype="html">
+        <source> The end date is too early </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">53,55</context>
+        </context-group>
+        <note priority="1" from="description">Error date-range early start </note>
+      </trans-unit>
+      <trans-unit id="errorDateRangeLateStart" datatype="html">
+        <source> The start date is too late </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">61,63</context>
+        </context-group>
+        <note priority="1" from="description">Error date-range late start </note>
+      </trans-unit>
+      <trans-unit id="errorDateRangeLateEnd" datatype="html">
+        <source> The end date is too late </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/dates/dates.component.html</context>
+          <context context-type="linenumber">67,69</context>
+        </context-group>
+        <note priority="1" from="description">Error date-range late end </note>
+      </trans-unit>
+      <trans-unit id="exportReportHeader" datatype="html">
+        <source>Share Report</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">Share Report Header</note>
+      </trans-unit>
+      <trans-unit id="exportReportLinkTitle" datatype="html">
+        <source>Share Link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">Share Link Title</note>
+      </trans-unit>
+      <trans-unit id="exportReportLinkCopiedMessage" datatype="html">
+        <source>Copied to clipboard!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <note priority="1" from="description">Copied message</note>
+      </trans-unit>
+      <trans-unit id="exportReportLinkCopyButton" datatype="html">
+        <source>Copy link</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <note priority="1" from="description">Copy Link Button</note>
+      </trans-unit>
+      <trans-unit id="exportReportDataTitle" datatype="html">
+        <source>Export Data</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <note priority="1" from="description">Share Data Title</note>
+      </trans-unit>
+      <trans-unit id="exportReportDownloadPNG" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-png&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Download PNG</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <note priority="1" from="description">Download PNG</note>
+      </trans-unit>
+      <trans-unit id="exportReportDownloadPDF" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-pdf&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Download PDF</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <note priority="1" from="description">Download PDF</note>
+      </trans-unit>
+      <trans-unit id="exportReportDownloadCSV" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-csv&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Download CSV</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/export/export.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+        <note priority="1" from="description">Download CSV</note>
+      </trans-unit>
       <trans-unit id="footerLinkTextEuropeanaWebsite" datatype="html">
         <source>Europeana Website</source>
         <context-group purpose="location">
@@ -173,6 +391,73 @@
           <context context-type="linenumber">65,71</context>
         </context-group>
         <note priority="1" from="description">Footer legal text 2</note>
+      </trans-unit>
+      <trans-unit id="gridPaginatorOf" datatype="html">
+        <source>of</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid-paginator/grid-paginator.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <note priority="1" from="description">Pagination of </note>
+      </trans-unit>
+      <trans-unit id="summaryTop" datatype="html">
+        <source>Top</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="summaryTopTotal" datatype="html">
+        <source>Total <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="summaryTopPercentage" datatype="html">
+        <source>Top <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/> percentage</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="summaryTotalRecords" datatype="html">
+        <source>Total records in <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
+          <context context-type="linenumber">21,22</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="summaryTopRecordsCount" datatype="html">
+        <source>Top <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/> records count</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gridSearchPlaceholder" datatype="html">
+        <source>Search (<x id="INTERPOLATION" equiv-text="{{ gridRows.length }}"/> entries)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <note priority="1" from="description">Search grid rows input</note>
+      </trans-unit>
+      <trans-unit id="gridRowsPerPage" datatype="html">
+        <source>Rows per page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <note priority="1" from="description">Rows per page</note>
+      </trans-unit>
+      <trans-unit id="gridGoToPage" datatype="html">
+        <source>Go to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.html</context>
+          <context context-type="linenumber">69</context>
+        </context-group>
+        <note priority="1" from="description">Got to page</note>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source> Europeana complete dataset </source>
@@ -353,20 +638,44 @@
         </context-group>
         <note priority="1" from="description">landing section link provider</note>
       </trans-unit>
+      <trans-unit id="warnDataNotLive" datatype="html">
+        <source>The data is not live and may be a few days old</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">Warning data recency</note>
+      </trans-unit>
+      <trans-unit id="labelLinkHome" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <note priority="1" from="description">Home Link</note>
+      </trans-unit>
       <trans-unit id="filtersHeader" datatype="html">
         <source> Filters </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">46,48</context>
+          <context context-type="linenumber">55,57</context>
         </context-group>
         <note priority="1" from="description">Heading text for filters</note>
         <note priority="1" from="meaning">Filters header</note>
+      </trans-unit>
+      <trans-unit id="inputPlaceholderFilterDatasetId" datatype="html">
+        <source>Dataset ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">97</context>
+        </context-group>
+        <note priority="1" from="description">Dataset ID</note>
       </trans-unit>
       <trans-unit id="facetSelection" datatype="html">
         <source> Europeana database by </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">118,120</context>
+          <context context-type="linenumber">128,130</context>
         </context-group>
         <note priority="1" from="description">Facet selection</note>
       </trans-unit>
@@ -374,10 +683,57 @@
         <source>Whole period</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <note priority="1" from="description">Summary for applied date filters</note>
         <note priority="1" from="meaning">Period Summary</note>
+      </trans-unit>
+      <trans-unit id="warnNoResults" datatype="html">
+        <source>No results found!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">274</context>
+        </context-group>
+        <note priority="1" from="description">Warn no results</note>
+      </trans-unit>
+      <trans-unit id="warnNoResultsDatasetId" datatype="html">
+        <source> try removing the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>dataset id<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> parameter </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">281,283</context>
+        </context-group>
+        <note priority="1" from="description">No results detail dataset id</note>
+      </trans-unit>
+      <trans-unit id="warnNoResultsDate" datatype="html">
+        <source> try removing the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>date<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> parameters </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">290,292</context>
+        </context-group>
+        <note priority="1" from="description">No results detail date</note>
+      </trans-unit>
+      <trans-unit id="percentSwitchLabel" datatype="html">
+        <source>As percentages</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">327</context>
+        </context-group>
+        <note priority="1" from="description">As percentages</note>
+      </trans-unit>
+      <trans-unit id="exportReportOpenerLink" datatype="html">
+        <source>Export data</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.html</context>
+          <context context-type="linenumber">361</context>
+        </context-group>
+        <note priority="1" from="description">Share Report Opener</note>
+      </trans-unit>
+      <trans-unit id="barChartAxisPrefixTier" datatype="html">
+        <source>Tier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
       </trans-unit>
     </body>
   </file>

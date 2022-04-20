@@ -163,6 +163,9 @@ a {
   justify-content: flex-end;
   .conditional-controls {
     margin-right: auto;
+    [for]::after {
+      content: ":";
+    }
   }
 }
 

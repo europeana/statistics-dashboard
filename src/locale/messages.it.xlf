@@ -14,6 +14,49 @@
       <trans-unit id="tooltipHelpRights" datatype="html">
         <source>Documentazione sulla dichiarazione dei diritti</source>
       </trans-unit>
+      <trans-unit id="facetNameShortContentTier" datatype="html">
+        <source>Livello</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortMetadataTier" datatype="html">
+        <source>Livello</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortCountry" datatype="html">
+        <source>Paese</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortType" datatype="html">
+        <source>Tipo</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortRightsCategory" datatype="html">
+        <source>Diritti</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortDataProvider" datatype="html">
+        <source>Istituzione</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortProvider" datatype="html">
+        <source>Aggregatore</source>
+      </trans-unit>
+
+      <trans-unit id="facetNameShortPluralContentTier" datatype="html">
+        <source>Livelli</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralMetadataTier" datatype="html">
+        <source>Livelli</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralCountry" datatype="html">
+        <source>Paesi</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralType" datatype="html">
+        <source>Tipi</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralRightsCategory" datatype="html">
+        <source>Diritti</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralDataProvider" datatype="html">
+        <source>Istituzioni</source>
+      </trans-unit>
+      <trans-unit id="facetNameShortPluralProvider" datatype="html">
+        <source>Aggregatori</source>
+      </trans-unit>
 
       <trans-unit id="facetNameContentTier" datatype="html">
         <source>Livello di Contenuto</source>
@@ -48,6 +91,51 @@
       <trans-unit id="documentationLinkCTZero" datatype="html">
         <source>Documentazione</source>
       </trans-unit>
+      <trans-unit id="labelDateRange" datatype="html">
+        <source>Seleziona un intervallo</source>
+      </trans-unit>
+      <trans-unit id="labelDateRangeStart" datatype="html">
+        <source>Data iniziale</source>
+      </trans-unit>
+      <trans-unit id="labelDateRangeEnd" datatype="html">
+        <source>Data di fine</source>
+      </trans-unit>
+      <trans-unit id="errorDateRangeEarlyStart" datatype="html">
+        <source>La data iniziale è troppo presto</source>
+      </trans-unit>
+      <trans-unit id="errorDateRangeEarlyEnd" datatype="html">
+        <source>La data di fine è troppo presto</source>
+      </trans-unit>
+      <trans-unit id="errorDateRangeLateStart" datatype="html">
+        <source>La data iniziale è troppo tardi</source>
+      </trans-unit>
+      <trans-unit id="errorDateRangeLateEnd" datatype="html">
+        <source>La data di fine è troppo tardi</source>
+      </trans-unit>
+      <trans-unit id="exportReportHeader" datatype="html">
+        <source>Condividi il Rapporto</source>
+      </trans-unit>
+      <trans-unit id="exportReportLinkCopiedMessage" datatype="html">
+        <source>Copiato negli appunti!</source>
+      </trans-unit>
+      <trans-unit id="exportReportLinkTitle" datatype="html">
+        <source>Condividi Link</source>
+      </trans-unit>
+      <trans-unit id="exportReportLinkCopyButton" datatype="html">
+        <source>Copia Link</source>
+      </trans-unit>
+      <trans-unit id="exportReportDataTitle" datatype="html">
+        <source>Esporta Dati</source>
+      </trans-unit>
+      <trans-unit id="exportReportDownloadPNG" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-png&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Scarica PNG</source>
+      </trans-unit>
+      <trans-unit id="exportReportDownloadPDF" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-pdf&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Scarica PDF</source>
+      </trans-unit>
+      <trans-unit id="exportReportDownloadCSV" datatype="html">
+        <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-csv&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Scarica CSV</source>
+      </trans-unit>
       <trans-unit id="footerLinkTextEuropeanaWebsite" datatype="html">
         <source>Europeana Sito Web</source>
       </trans-unit>
@@ -71,6 +159,33 @@
       </trans-unit>
       <trans-unit id="footerLegalText2" datatype="html">
         <source>La Commissione Europea non garantisce l'accuratezza delle informazioni e non si assume alcuna responsabilità in relazione alle informazioni su questo sito web. Né la Commissione Europea, né qualsiasi persona che agisce per conto della Commissione Europea, è responsabile per l'accuratezza o l'uso delle informazioni su questo sito.</source>
+      </trans-unit>
+      <trans-unit id="gridPaginatorOf" datatype="html">
+        <source>di</source>
+      </trans-unit>
+      <trans-unit id="summaryTop" datatype="html">
+        <source>Primo</source>
+      </trans-unit>
+      <trans-unit id="summaryTopTotal" datatype="html">
+        <source>Totale <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+      </trans-unit>
+      <trans-unit id="summaryTopPercentage" datatype="html">
+        <source>Percentuale Primo <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+      </trans-unit>
+      <trans-unit id="summaryTotalRecords" datatype="html">
+        <source>Record Totali Dentro <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+      </trans-unit>
+      <trans-unit id="summaryTopRecordsCount" datatype="html">
+        <source>Record Conteggio del Primo <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+      </trans-unit>
+      <trans-unit id="gridSearchPlaceholder" datatype="html">
+        <source>Cerca (<x id="INTERPOLATION" equiv-text="{{ gridRows.length }}"/> righe)</source>
+      </trans-unit>
+      <trans-unit id="gridRowsPerPage" datatype="html">
+        <source>Righe per pagina</source>
+      </trans-unit>
+      <trans-unit id="gridGoToPage" datatype="html">
+        <source>Vai a</source>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source>Europeana dataset completo</source>
@@ -168,16 +283,41 @@
       <trans-unit id="landingSectionLinkProvider" datatype="html">
         <source>Visualizza per aggregatore </source>
       </trans-unit>
+      <trans-unit id="warnDataNotLive" datatype="html">
+        <source>I dati non sono corrente e potrebbero essere vecchi di qualche giorno</source>
+      </trans-unit>
+      <trans-unit id="labelLinkHome" datatype="html">
+        <source>Pagina Iniziale</source>
+      </trans-unit>
       <trans-unit id="filtersHeader" datatype="html">
         <source>Filtri</source>
       </trans-unit>
-
+      <trans-unit id="inputPlaceholderFilterDatasetId" datatype="html">
+        <source>ID Dataset</source>
+      </trans-unit>
       <trans-unit id="facetSelection" datatype="html">
         <source> Database di Europeana per </source>
       </trans-unit>
-
       <trans-unit id="periodSummary" datatype="html">
         <source>Periodo intero</source>
+      </trans-unit>
+      <trans-unit id="warnNoResults" datatype="html">
+        <source>Nessun risultato trovato!</source>
+      </trans-unit>
+      <trans-unit id="warnNoResultsDatasetId" datatype="html">
+        <source>prova a rimuovere il parametro  <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>ID Dataset<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+      </trans-unit>
+      <trans-unit id="warnNoResultsDate" datatype="html">
+        <source>prova a rimuovere i parametri della <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>data<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
+      </trans-unit>
+      <trans-unit id="percentSwitchLabel" datatype="html">
+        <source>Come percentuali</source>
+      </trans-unit>
+      <trans-unit id="exportReportOpenerLink" datatype="html">
+        <source>Esporta dati</source>
+      </trans-unit>
+      <trans-unit id="barChartAxisPrefixTier" datatype="html">
+        <source>Livello</source>
       </trans-unit>
     </body>
   </file>

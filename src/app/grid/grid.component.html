@@ -42,6 +42,7 @@
       <span class="search-icon"></span>
       <input
         class="search"
+        i18n-placeholder="Search grid rows input@@gridSearchPlaceholder"
         placeholder="Search ({{ gridRows.length }} entries)"
         [(ngModel)]="filterTerm"
         (keyup)="updateRows($event)"
@@ -53,7 +54,9 @@
         class="conditional-controls container-h"
         *ngIf="pagerInfo && pagerInfo.pageCount > 0"
       >
-        <label for="maxPageSize">Rows per page:</label>
+        <label for="maxPageSize" i18n="Rows per page@@gridRowsPerPage"
+          >Rows per page</label
+        >
         <select
           id="maxPageSize"
           class="max-page-size"
@@ -63,7 +66,7 @@
             {{ mps.title }}
           </option>
         </select>
-        <label for="goTo">Go to:</label>
+        <label for="goTo" i18n="Got to page@@gridGoToPage">Go to</label>
         <input
           id="goTo"
           pattern="[0-9]+"

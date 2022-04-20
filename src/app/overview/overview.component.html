@@ -11,7 +11,7 @@
     <ng-template #dialogRef>
       <div class="container-h dialog-content">
         <span class="warn-icon"></span>
-        <span class="warning"
+        <span class="warning" i18n="Warning data recency@@warnDataNotLive"
           >The data is not live and may be a few days old</span
         >
       </div>
@@ -28,7 +28,16 @@
           <ul class="filters">
             <li class="container-h">
               <span class="icon filter-icon-home"> </span>
-              <a class="filter-title" data-e2e="link-home" routerLink="/"
+              <a
+                class="filter-title"
+                data-e2e="link-home"
+                i18n="Home Link@@labelLinkHome"
+                routerLink="/"
+                [queryParams]="
+                  form.value.contentTierZero
+                    ? { 'content-tier-zero': true }
+                    : {}
+                "
                 >Home</a
               >
             </li>
@@ -84,6 +93,7 @@
             <input
               formControlName="datasetId"
               (keyup.enter)="updateDatasetIdFieldAndPageUrl()"
+              i18n-placeholder="Dataset ID@@inputPlaceholderFilterDatasetId"
               placeholder="Dataset ID"
               class="dataset-name"
               type="text"
@@ -142,7 +152,7 @@
             </h1>
           </ng-container>
 
-          <ng-container *ngIf="getFormattedDateStrings(); let dates">
+          <ng-container *ngIf="getAppliedDateRange(); let dates">
             <span
               class="container-h date-removal"
               [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
@@ -159,11 +169,11 @@
                 >Whole period</a
               >
               <span class="date">
-                {{ dates[0] }}
+                {{ dates[0] | date: "MMM d, y" }}
               </span>
               <span class="separator"> - </span>
               <span class="date">
-                {{ dates[1] }}
+                {{ dates[1] | date: "MMM d, y" }}
               </span>
               <a class="date warn" (click)="showDateDisclaimer()"> * </a>
             </span>
@@ -261,12 +271,13 @@
 
           <!-- NO-DATA FALLBACK -->
           <div *ngIf="emptyDataset && !isLoading" class="no-data">
-            No results found!
+            <span i18n="Warn no results@@warnNoResults">No results found!</span>
             <ul>
               <li
                 *ngIf="
                   queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
                 "
+                i18n="No results detail dataset id@@warnNoResultsDatasetId"
               >
                 try removing the <span class="param">dataset id</span> parameter
               </li>
@@ -275,6 +286,7 @@
                   queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
                   queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
                 "
+                i18n="No results detail date@@warnNoResultsDate"
               >
                 try removing the <span class="param">date</span> parameters
               </li>
@@ -311,6 +323,7 @@
             <app-checkbox
               [form]="form"
               controlName="percent"
+              i18n-labelText="As percentages@@percentSwitchLabel"
               labelText="As percentages"
               group="chartFormat"
               (valueChanged)="refreshChart()"
@@ -341,8 +354,11 @@
 
           <!-- EXPORT LINK -->
           <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
-            <a class="export-opener-link" (click)="export.toggleActive()"
-              >EXPORT DATA</a
+            <a
+              class="export-opener-link"
+              (click)="export.toggleActive()"
+              i18n="Share Report Opener@@exportReportOpenerLink"
+              >Export data</a
             >
           </div>
         </div>

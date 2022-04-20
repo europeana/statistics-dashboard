@@ -79,7 +79,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   );
   public barChartSettingsTiers = Object.assign(
     {
-      prefixValueAxis: 'Tier'
+      prefixValueAxis: $localize`:@@barChartAxisPrefixTier:Tier`
     },
     BarChartCool
   );
@@ -801,19 +801,16 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     return '';
   }
 
-  /** getFormattedDateStrings
-  /* gets the date range (set or default) as a string array
-  /* @returns Array<string>
+  /** getAppliedDateRange
+  /* gets the date range (set or default)
+  /* @returns Array<Date>
   */
-  getFormattedDateStrings(): Array<string> {
+  getAppliedDateRange(): Array<string> {
     const form = this.form;
     const bothPresent = form.value.dateFrom && form.value.dateTo;
     const valFrom = bothPresent ? form.value.dateFrom : yearZero;
     const valTo = bothPresent ? form.value.dateTo : today;
-    return [valFrom, valTo].map((date: Date) => {
-      const parts = new Date(date).toDateString().split(' ').slice(1);
-      return [parts.slice(0, 2).join(' '), parts[2]].join(', ');
-    });
+    return [valFrom, valTo];
   }
 
   /** setCTZeroInputToQueryParam
@@ -969,7 +966,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   updatePageUrl(skipLoad = false): void {
     const qp = {};
-
     this.getEnabledFilterNames().forEach((filterName: string) => {
       const filterVals = this.getSetCheckboxValues(filterName).map(
         (filterVal: string) => {

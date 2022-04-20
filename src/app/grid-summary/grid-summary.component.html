@@ -3,9 +3,10 @@
   *ngIf="summaryData && summaryData.results && summaryData.results[0]"
 >
   <span class="total-title"
-    >Top {{ summaryData.breakdownBy | renameApiFacetShort }}</span
+    ><span i18n="@@summaryTop">Top</span>
+    {{ summaryData.breakdownBy | renameApiFacetShort }}</span
   >
-  <span class="total-title"
+  <span class="total-title" i18n="@@summaryTopTotal"
     >Total {{ "plural_" + summaryData.breakdownBy | renameApiFacetShort }}</span
   >
 
@@ -13,17 +14,17 @@
 
   <span class="total">{{ summaryData.results.length }}</span>
 
-  <span class="total-title"
+  <span class="total-title" i18n="@@summaryTopPercentage"
     >Top {{ summaryData.breakdownBy | renameApiFacetShort }} percentage</span
   >
-  <span class="total-title"
+  <span class="total-title" i18n="@@summaryTotalRecords"
     >Total records in
     {{ "plural_" + summaryData.breakdownBy | renameApiFacetShort }}</span
   >
   <span class="total">{{ summaryData.results[0].percentage }}%</span>
   <span class="total" data-e2e="total-records">{{ grandTotal | number }}</span>
 
-  <span class="total-title"
+  <span class="total-title" i18n="@@summaryTopRecordsCount"
     >Top {{ summaryData.breakdownBy | renameApiFacetShort }} records count</span
   >
   <span></span>

@@ -1,6 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TableRow } from '../_models';
 import { GridPaginatorComponent } from '.';
 
@@ -90,6 +89,7 @@ describe('GridPaginatorComponent', () => {
     component.maxPageSize = 2;
     expect(component.setPage).toHaveBeenCalled();
     expect(component.calculatePages).toHaveBeenCalled();
+    expect(component.rows).toBeTruthy();
   });
 
   it('should set the page', () => {
