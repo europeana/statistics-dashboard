@@ -653,8 +653,10 @@ export class MockAPIService {
     return of(MockGeneralResults).pipe(delay(1));
   }
 
-  getRightsCategoryUrls(rightsCategory: string): Observable<Array<string>> {
-    return of([`${rightsCategory}/1.0`, `${rightsCategory}/2.0`]);
+  getRightsCategoryUrls(
+    rightsCategories: Array<string>
+  ): Observable<Array<string>> {
+    return of([`${rightsCategories[0]}/1.0`, `${rightsCategories[0]}/2.0`]);
   }
 }
 

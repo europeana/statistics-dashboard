@@ -36,10 +36,12 @@ export class APIService {
     );
   }
 
-  getRightsCategoryUrls(rightsCategory: string): Observable<Array<string>> {
+  getRightsCategoryUrls(
+    rightsCategories: Array<string>
+  ): Observable<Array<string>> {
     return this.http.get<Array<string>>(
       `${environment.serverAPI}${this.suffixRightsUrls}`,
-      { params: { rightsCategory } }
+      { params: { rightsCategories } }
     );
   }
 }

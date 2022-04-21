@@ -19,28 +19,43 @@ describe('GridComponent', () => {
     {
       name: 'A',
       count: 1,
-      percent: 2
+      percent: 2,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'B',
       count: 2,
-      percent: 2
+      percent: 2,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'B',
       count: 3,
       percent: 1,
-      isTotal: true
+      isTotal: true,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'C',
       count: 0,
-      percent: 1
+      percent: 1,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'D',
       count: 2,
-      percent: 1
+      percent: 1,
+      portalUrlInfo: {
+        href: ''
+      }
     }
   ] as Array<TableRow>;
 
@@ -111,9 +126,11 @@ describe('GridComponent', () => {
 
     const mockTableRow = {
       name: 'test',
-      portalUrl: 'http://www.europeana.eu?query=*',
       count: 1,
-      percent: 1
+      percent: 1,
+      portalUrlInfo: {
+        href: 'http://www.europeana.eu?query=*'
+      }
     } as TableRow;
     component.loadFullLink(mockTableRow);
     tick();
@@ -128,7 +145,7 @@ describe('GridComponent', () => {
     expect(api.getRightsCategoryUrls).toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
 
-    mockTableRow.hrefRewritten = false;
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
     component.loadFullLink(mockTableRow, true);
     tick();
 

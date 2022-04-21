@@ -1,7 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Inject, LOCALE_ID, NgModule } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
@@ -39,6 +39,7 @@ import { TruncateComponent } from './truncate';
 
 import { getDateAsISOString } from './_helpers';
 
+@Injectable()
 class AppDateAdapter extends NativeDateAdapter {
   public static preferredFormat = 'DD/MM/YYYY';
 
