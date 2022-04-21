@@ -88,7 +88,7 @@
       *ngTemplateOutlet="
         cellHeader;
         context: {
-          label: 'Records by ' + (facet | renameApiFacet),
+          label: colHeaders[0] + ' ' + (facet | renameApiFacet),
           sortBy: SortBy.name
         }
       "
@@ -98,7 +98,7 @@
       *ngTemplateOutlet="
         cellHeader;
         context: {
-          label: 'Count',
+          label: colHeaders[1],
           sortBy: SortBy.count,
           e2e: 'grid-sort-count'
         }
@@ -108,11 +108,11 @@
     <ng-content
       *ngTemplateOutlet="
         cellHeader;
-        context: { label: 'Percent', sortBy: SortBy.count }
+        context: { label: colHeaders[2], sortBy: SortBy.count }
       "
     ></ng-content>
 
-    <span class="cell-header">View in Europeana</span>
+    <span class="cell-header">{{ colHeaders[3] }}</span>
 
     <ng-container>
       <!-- Summary rows -->

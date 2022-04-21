@@ -2,60 +2,116 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
   <file source-language="en-GB" datatype="plaintext" original="ng2.template">
     <body>
+      <trans-unit id="facetNameContentTier" datatype="html">
+        <source>Content Tier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameMetadataTier" datatype="html">
+        <source>Metadata Tier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameCountry" datatype="html">
+        <source>Country</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameMediaType" datatype="html">
+        <source>Media Type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameRights" datatype="html">
+        <source>Rights Category</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameDataProvider" datatype="html">
+        <source>Data Provider</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameProvider" datatype="html">
+        <source>Provider</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="facetNameDates" datatype="html">
+        <source>Last Updated</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="tooltipHelpContentTier" datatype="html">
         <source>EDM Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpMetadataTier" datatype="html">
         <source>Tier Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpProvider" datatype="html">
         <source>Provider Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpRights" datatype="html">
         <source>Rights Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortContentTier" datatype="html">
         <source>Tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortMetadataTier" datatype="html">
         <source>Tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortCountry" datatype="html">
         <source>Country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortType" datatype="html">
         <source>Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortRightsCategory" datatype="html">
@@ -69,119 +125,63 @@
         <source>CHI</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortProvider" datatype="html">
         <source>Provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralContentTier" datatype="html">
         <source>Tiers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralMetadataTier" datatype="html">
         <source>Tiers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralCountry" datatype="html">
         <source>Countries</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralType" datatype="html">
         <source>Types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralRightsCategory" datatype="html">
         <source>Rights Category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralDataProvider" datatype="html">
         <source>CHIs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortPluralProvider" datatype="html">
         <source>Providers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
-          <context context-type="linenumber">54</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameContentTier" datatype="html">
-        <source>Content Tier</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameMetadataTier" datatype="html">
-        <source>Metadata Tier</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameCountry" datatype="html">
-        <source>Country</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameMediaType" datatype="html">
-        <source>Media Type</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameRights" datatype="html">
-        <source>Rights Category</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">21</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameDataProvider" datatype="html">
-        <source>Data Provider</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">24</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameProvider" datatype="html">
-        <source>Provider</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">25</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="facetNameDates" datatype="html">
-        <source>Last Updated</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_translate/rename-facet.pipe.ts</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
@@ -328,6 +328,13 @@
         </context-group>
         <note priority="1" from="description">Download CSV</note>
       </trans-unit>
+      <trans-unit id="filterSearchItemsPlaceholder" datatype="html">
+        <source>Search (<x id="INTERPOLATION" equiv-text="{{ totalAvailable }}"/> entries)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/filter/filter.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="footerLinkTextEuropeanaWebsite" datatype="html">
         <source>Europeana Website</source>
         <context-group purpose="location">
@@ -458,6 +465,34 @@
           <context context-type="linenumber">69</context>
         </context-group>
         <note priority="1" from="description">Got to page</note>
+      </trans-unit>
+      <trans-unit id="gridColHeaderPrefix" datatype="html">
+        <source>Records by</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gridColHeaderCount" datatype="html">
+        <source>Count</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gridColHeaderPercent" datatype="html">
+        <source>Percent</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gridColHeaderView" datatype="html">
+        <source>View in Europeana</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source> Europeana complete dataset </source>
@@ -732,7 +767,35 @@
         <source>Tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="snapshotTitleAll" datatype="html">
+        <source>All (<x id="PH" equiv-text="friendlyName"/>)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">538</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="snapshotTitleCTZero" datatype="html">
+        <source>CT-Zero</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">545</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="snapshotTitleOr" datatype="html">
+        <source> or </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">556</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="snapshotTitleAnd" datatype="html">
+        <source> and </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">562</context>
         </context-group>
       </trans-unit>
     </body>

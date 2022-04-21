@@ -9,7 +9,8 @@ import {
   externalLinks,
   facetNames,
   nonFacetFilters,
-  portalNames
+  portalNames,
+  portalNamesFriendly
 } from '../_data';
 import {
   filterList,
@@ -532,15 +533,15 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     nvs: Array<NamesValuePercent>,
     seriesTotal: number
   ): void {
-    const name = this.seriesNameFromUrl();
-    let label = `All (${this.form.value.facetParameter})`;
+    const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
+    let label = $localize`:@@snapshotTitleAll:All (${friendlyName})`;
 
     // Generate human-readable label
     if (Object.keys(this.queryParams).length > 0) {
       label = Object.keys(this.queryParams)
         .map((key: string) => {
           if (key === 'content-tier-zero') {
-            return 'CT-Zero';
+            return $localize`:@@snapshotTitleCTZero:CT-Zero`;
           }
 
           const innerRes = [];
@@ -548,13 +549,18 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             this.queryParamsRaw[key].forEach((valPart: string) => {
               innerRes.push(valPart);
             });
-            return `${key} (${innerRes.join(' or ')})`;
+
+            const friendlyKey = portalNamesFriendly[key];
+            return `${friendlyKey} (${innerRes.join(
+              $localize`:@@snapshotTitleOr: or `
+            )})`;
           }
           return '';
         })
         .filter((x) => x.length > 0)
-        .join(' and ');
+        .join($localize`:@@snapshotTitleAnd: and `);
     }
+    const name = this.seriesNameFromUrl();
 
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,

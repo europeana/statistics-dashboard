@@ -35,7 +35,6 @@
       <trans-unit id="facetNameShortProvider" datatype="html">
         <source>Aggregatore</source>
       </trans-unit>
-
       <trans-unit id="facetNameShortPluralContentTier" datatype="html">
         <source>Livelli</source>
       </trans-unit>
@@ -80,13 +79,13 @@
         <source>Aggregatore</source>
       </trans-unit>
       <trans-unit id="facetNameDates" datatype="html">
-        <source>Ultimo aggiornamento</source>
+        <source>Ultimo Aggiornamento</source>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
-        <source>attivare contenuto livello 0</source>
+        <source>Attivare contenuto livello 0</source>
       </trans-unit>
       <trans-unit id="ctrlLabelDisableCTZero" datatype="html">
-        <source>disattivare contenuto livello 0</source>
+        <source>Disattivare contenuto livello 0</source>
       </trans-unit>
       <trans-unit id="documentationLinkCTZero" datatype="html">
         <source>Documentazione</source>
@@ -135,6 +134,9 @@
       </trans-unit>
       <trans-unit id="exportReportDownloadCSV" datatype="html">
         <source><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;icon-csv&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/>Scarica CSV</source>
+      </trans-unit>
+      <trans-unit id="filterSearchItemsPlaceholder" datatype="html">
+        <source>Cerca (<x id="INTERPOLATION" equiv-text="{{ totalAvailable }}"/> disponibili)</source>
       </trans-unit>
       <trans-unit id="footerLinkTextEuropeanaWebsite" datatype="html">
         <source>Europeana Sito Web</source>
@@ -186,6 +188,18 @@
       </trans-unit>
       <trans-unit id="gridGoToPage" datatype="html">
         <source>Vai a</source>
+      </trans-unit>
+      <trans-unit id="gridColHeaderPrefix" datatype="html">
+        <source>Record per</source>
+      </trans-unit>
+      <trans-unit id="gridColHeaderCount" datatype="html">
+        <source>Conteggio</source>
+      </trans-unit>
+      <trans-unit id="gridColHeaderPercent" datatype="html">
+        <source>Percento</source>
+      </trans-unit>
+      <trans-unit id="gridColHeaderView" datatype="html">
+        <source>Visualizza in Europeana</source>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source>Europeana dataset completo</source>
@@ -318,6 +332,18 @@
       </trans-unit>
       <trans-unit id="barChartAxisPrefixTier" datatype="html">
         <source>Livello</source>
+      </trans-unit>
+      <trans-unit id="snapshotTitleAll" datatype="html">
+        <source>Tutti (<x id="PH" equiv-text="this.form.value.facetParameter"/>)</source>
+      </trans-unit>
+      <trans-unit id="snapshotTitleCTZero" datatype="html">
+        <source>Livello-0</source>
+      </trans-unit>
+      <trans-unit id="snapshotTitleOr" datatype="html">
+        <source> o </source>
+      </trans-unit>
+      <trans-unit id="snapshotTitleAnd" datatype="html">
+        <source> e </source>
       </trans-unit>
     </body>
   </file>

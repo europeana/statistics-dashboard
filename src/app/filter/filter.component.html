@@ -52,6 +52,7 @@
               class="checkbox-filter-input"
               (keyup)="filterOptions($event)"
               formControlName="filter_list_{{ group }}"
+              i18n-placeholder="@@filterSearchItemsPlaceholder"
               placeholder="Search ({{ totalAvailable }} entries)"
             />
           </li>

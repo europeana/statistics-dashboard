@@ -30,6 +30,32 @@ facetNamesPortal[DimensionName.type] = 'TYPE';
 
 export const portalNames = facetNamesPortal;
 
+const facetNamesFriendly: IHash<string> = {};
+facetNamesFriendly[
+  DimensionName.contentTier
+] = $localize`:@@facetNameContentTier:Content Tier`;
+facetNamesFriendly[
+  DimensionName.metadataTier
+] = $localize`:@@facetNameMetadataTier:Metadata Tier`;
+facetNamesFriendly[
+  DimensionName.country
+] = $localize`:@@facetNameCountry:Country`;
+facetNamesFriendly[
+  DimensionName.type
+] = $localize`:@@facetNameMediaType:Media Type`;
+facetNamesFriendly[
+  DimensionName.rightsCategory
+] = $localize`:@@facetNameRights:Rights Category`;
+facetNamesFriendly[
+  DimensionName.dataProvider
+] = $localize`:@@facetNameDataProvider:Data Provider`;
+facetNamesFriendly[
+  DimensionName.provider
+] = $localize`:@@facetNameProvider:Provider`;
+facetNamesFriendly['dates'] = $localize`:@@facetNameDates:Last Updated`;
+
+export const portalNamesFriendly = facetNamesFriendly;
+
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 
 export const DiacriticsMap = {
