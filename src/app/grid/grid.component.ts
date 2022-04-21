@@ -26,6 +26,7 @@ import { SubscriptionManager } from '../subscription-manager';
 })
 export class GridComponent extends SubscriptionManager {
   @Input() facet: DimensionName;
+  @Input() tierPrefix: string;
   @Input() isVisible: boolean;
   @Output() refreshData = new EventEmitter<void>();
   @Output() chartPositionChanged = new EventEmitter<number>();
@@ -47,6 +48,12 @@ export class GridComponent extends SubscriptionManager {
 
   public colours = colours;
   public SortBy = SortBy;
+  public colHeaders = [
+    $localize`:@@gridColHeaderPrefix:Records by`,
+    $localize`:@@gridColHeaderCount:Count`,
+    $localize`:@@gridColHeaderPercent:Percent`,
+    $localize`:@@gridColHeaderView:View in Europeana`
+  ];
 
   constructor(private readonly api: APIService) {
     super();
@@ -144,7 +151,7 @@ export class GridComponent extends SubscriptionManager {
 
   getPrefix(): string {
     if (['contentTier', 'metadataTier'].includes(this.facet)) {
-      return 'Tier ';
+      return this.tierPrefix;
     }
     return '';
   }

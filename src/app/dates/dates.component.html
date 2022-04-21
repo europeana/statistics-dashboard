@@ -1,7 +1,9 @@
 <ul class="dates" [formGroup]="form">
   <li>
     <mat-form-field class="shrinking-mat-form-field" appearance="outline">
-      <mat-label>Select a date range</mat-label>
+      <mat-label i18n="Label Date Range@@labelDateRange"
+        >Select a date range</mat-label
+      >
       <mat-date-range-input
         [formGroup]="form"
         [rangePicker]="rangePicker"
@@ -11,6 +13,7 @@
         <input
           matStartDate
           placeholder="Start date"
+          i18n-placeholder="Label Date Range Start@@labelDateRangeStart"
           formControlName="dateFrom"
           (dateChange)="dateChange()"
           data-e2e="dateFrom"
@@ -19,6 +22,7 @@
         <input
           matEndDate
           placeholder="End date"
+          i18n-placeholder="Label Date Range End@@labelDateRangeEnd"
           formControlName="dateTo"
           (dateChange)="dateChange()"
           data-e2e="dateTo"
@@ -37,6 +41,7 @@
         *ngIf="
           form.get('dateFrom').errors && form.get('dateFrom').errors.isTooEarly
         "
+        i18n="Error date-range early start @@errorDateRangeEarlyStart"
       >
         The start date is too early
       </li>
@@ -44,6 +49,7 @@
         *ngIf="
           form.get('dateTo').errors && form.get('dateTo').errors.isTooEarly
         "
+        i18n="Error date-range early start @@errorDateRangeEarlyEnd"
       >
         The end date is too early
       </li>
@@ -51,11 +57,13 @@
         *ngIf="
           form.get('dateFrom').errors && form.get('dateFrom').errors.isTooLate
         "
+        i18n="Error date-range late start @@errorDateRangeLateStart"
       >
         The start date is too late
       </li>
       <li
         *ngIf="form.get('dateTo').errors && form.get('dateTo').errors.isTooLate"
+        i18n="Error date-range late end @@errorDateRangeLateEnd"
       >
         The end date is too late
       </li>

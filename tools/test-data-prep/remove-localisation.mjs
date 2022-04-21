@@ -37,7 +37,7 @@ if (dir.length === 0) {
       if (err) {
         return console.log(err);
       }
-      var result = data.replace(/\$localize\s?`:{(.)*}:/g, '`');
+      var result = data.replace(/\$localize\s?`:(.)*:/g, '`');
 
       fs.writeFile(file, result, 'utf8', function (err) {
         if (err) return console.log(err);

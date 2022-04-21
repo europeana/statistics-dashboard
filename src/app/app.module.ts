@@ -1,13 +1,12 @@
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import { Inject, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   DateAdapter,
   MAT_DATE_FORMATS,
-  MAT_DATE_LOCALE,
   MatNativeDateModule,
   NativeDateAdapter
 } from '@angular/material/core';
@@ -43,16 +42,24 @@ import { getDateAsISOString } from './_helpers';
 class AppDateAdapter extends NativeDateAdapter {
   public static preferredFormat = 'DD/MM/YYYY';
 
+  // used to display dates closed and open
   format(date: Date, displayFormat: Object): string {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    };
     if (
       displayFormat === 'input' ||
       displayFormat === AppDateAdapter.preferredFormat
     ) {
       return getDateAsISOString(date).split('-').reverse().join('/');
     }
-    return date.toDateString();
+    return date.toLocaleDateString(this.locale, options);
   }
 
+  // Used when user types date into input
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parse(value: any): Date | null {
     if (typeof value === 'string' && value.indexOf('/') > -1) {
@@ -105,7 +112,6 @@ class AppDateAdapter extends NativeDateAdapter {
     ReactiveFormsModule
   ],
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
     { provide: DateAdapter, useClass: AppDateAdapter },
     {
       provide: MAT_DATE_FORMATS,
@@ -125,4 +131,11 @@ class AppDateAdapter extends NativeDateAdapter {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    @Inject(LOCALE_ID) private locale: string,
+    private dateAdapter: DateAdapter<unknown>
+  ) {
+    this.dateAdapter.setLocale(locale);
+  }
+}

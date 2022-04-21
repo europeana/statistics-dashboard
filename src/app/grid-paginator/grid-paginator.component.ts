@@ -7,11 +7,14 @@ import { PagerInfo, TableRow } from '../_models';
   styleUrls: ['./grid-paginator.component.scss']
 })
 export class GridPaginatorComponent {
+  _rows: Array<TableRow>;
+
   get rows(): Array<TableRow> {
-    return this.rows;
+    return this._rows;
   }
   @Input() set rows(rows: Array<TableRow>) {
-    this.pages = this.calculatePages(rows);
+    this._rows = rows;
+    this.pages = this.calculatePages(this._rows);
     this.setPage(0);
   }
   get maxPageSize(): number {

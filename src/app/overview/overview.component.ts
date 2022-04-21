@@ -9,7 +9,8 @@ import {
   externalLinks,
   facetNames,
   nonFacetFilters,
-  portalNames
+  portalNames,
+  portalNamesFriendly
 } from '../_data';
 import {
   filterList,
@@ -71,6 +72,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public fromInputSafeName = fromInputSafeName;
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
+  public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
   public barChartSettings = Object.assign(
     {
       prefixValueAxis: ''
@@ -79,7 +81,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   );
   public barChartSettingsTiers = Object.assign(
     {
-      prefixValueAxis: 'Tier'
+      prefixValueAxis: this.tierPrefix
     },
     BarChartCool
   );
@@ -175,8 +177,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         values: fromCSL(valDatasetId)
       };
     }
-
-    console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
     return breakdownRequest;
   }
 
@@ -284,7 +284,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   /** getUrl
   /* @param {false} omitCTParam - flag to omit the content tier param
+
+
+
   /* returns a url parameter string (for api or the portal) according to the form state
+  /* returns a url parameter string according to the form state
+
+
+
   /* @returns string
   */
   getUrl(omitCTParam = false): string {
@@ -408,7 +415,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             facetName
           )
         ) {
-          prefix = 'Tier ';
+          prefix = this.tierPrefix;
         }
 
         // calculate filter options from the data and query params
@@ -508,6 +515,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     }, {});
   }
 
+  /** portalUrlsFromNVPs
+  /* Generates portal urls from form info and result data
+  /* @param { string : facet } - the current facet
+  /* @param { Array<NamesValuePercent> : src } - the data to convert
+  /* @returns IHash<string> - (map { [name]: url })
+  /*
+  **/
   portalUrlsFromNVPs(
     facet: string,
     src: Array<NamesValuePercent>
@@ -534,15 +548,15 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     nvs: Array<NamesValuePercent>,
     seriesTotal: number
   ): void {
-    const name = this.seriesNameFromUrl();
-    let label = `All (${this.form.value.facetParameter})`;
+    const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
+    let label = $localize`:@@snapshotTitleAll:All (${friendlyName})`;
 
     // Generate human-readable label
     if (Object.keys(this.queryParams).length > 0) {
       label = Object.keys(this.queryParams)
         .map((key: string) => {
           if (key === 'content-tier-zero') {
-            return 'CT-Zero';
+            return $localize`:@@snapshotTitleCTZero:CT-Zero`;
           }
 
           const innerRes = [];
@@ -550,13 +564,18 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             this.queryParamsRaw[key].forEach((valPart: string) => {
               innerRes.push(valPart);
             });
-            return `${key} (${innerRes.join(' or ')})`;
+
+            const friendlyKey = portalNamesFriendly[key];
+            return `${friendlyKey} (${innerRes.join(
+              $localize`:@@snapshotTitleOr: or `
+            )})`;
           }
           return '';
         })
         .filter((x) => x.length > 0)
-        .join(' and ');
+        .join($localize`:@@snapshotTitleAnd: and `);
     }
+    const name = this.seriesNameFromUrl();
 
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
@@ -803,19 +822,16 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     return '';
   }
 
-  /** getFormattedDateStrings
-  /* gets the date range (set or default) as a string array
-  /* @returns Array<string>
+  /** getAppliedDateRange
+  /* gets the date range (set or default)
+  /* @returns Array<Date>
   */
-  getFormattedDateStrings(): Array<string> {
+  getAppliedDateRange(): Array<string> {
     const form = this.form;
     const bothPresent = form.value.dateFrom && form.value.dateTo;
     const valFrom = bothPresent ? form.value.dateFrom : yearZero;
     const valTo = bothPresent ? form.value.dateTo : today;
-    return [valFrom, valTo].map((date: Date) => {
-      const parts = new Date(date).toDateString().split(' ').slice(1);
-      return [parts.slice(0, 2).join(' '), parts[2]].join(', ');
-    });
+    return [valFrom, valTo];
   }
 
   /** setCTZeroInputToQueryParam
@@ -971,7 +987,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   updatePageUrl(skipLoad = false): void {
     const qp = {};
-
     this.getEnabledFilterNames().forEach((filterName: string) => {
       const filterVals = this.getSetCheckboxValues(filterName).map(
         (filterVal: string) => {

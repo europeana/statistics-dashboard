@@ -30,6 +30,32 @@ facetNamesPortal[DimensionName.type] = 'TYPE';
 
 export const portalNames = facetNamesPortal;
 
+const facetNamesFriendly: IHash<string> = {};
+facetNamesFriendly[
+  DimensionName.contentTier
+] = $localize`:@@facetNameContentTier:Content Tier`;
+facetNamesFriendly[
+  DimensionName.metadataTier
+] = $localize`:@@facetNameMetadataTier:Metadata Tier`;
+facetNamesFriendly[
+  DimensionName.country
+] = $localize`:@@facetNameCountry:Country`;
+facetNamesFriendly[
+  DimensionName.type
+] = $localize`:@@facetNameMediaType:Media Type`;
+facetNamesFriendly[
+  DimensionName.rightsCategory
+] = $localize`:@@facetNameRights:Rights Category`;
+facetNamesFriendly[
+  DimensionName.dataProvider
+] = $localize`:@@facetNameDataProvider:Data Provider`;
+facetNamesFriendly[
+  DimensionName.provider
+] = $localize`:@@facetNameProvider:Provider`;
+facetNamesFriendly['dates'] = $localize`:@@facetNameDates:Last Updated`;
+
+export const portalNamesFriendly = facetNamesFriendly;
+
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 
 export const DiacriticsMap = {
@@ -71,19 +97,19 @@ export const externalLinks = {
   help: {
     contentTier: {
       href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
-      description: $localize`:{Content Tier Tooltip}:EDM Documentation`
+      description: $localize`:@@tooltipHelpContentTier:EDM Documentation`
     },
     metadataTier: {
       href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
-      description: $localize`:{Metadata Tooltip}:Tier Documentation`
+      description: $localize`:@@tooltipHelpMetadataTier:Tier Documentation`
     },
     provider: {
       href: 'https://pro.europeana.eu/page/aggregators',
-      description: $localize`:{Provider Tooltip}:Provider Documentation`
+      description: $localize`:@@tooltipHelpProvider:Provider Documentation`
     },
     rights: {
       href: 'https://pro.europeana.eu/page/available-rights-statements',
-      description: $localize`:{Rights Tooltip}:Rights Documentation`
+      description: $localize`:@@tooltipHelpRights:Rights Documentation`
     }
   }
 };
