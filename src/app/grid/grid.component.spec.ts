@@ -141,9 +141,11 @@ describe('GridComponent', () => {
   });
 
   it('should get the prefix', () => {
+    const tierPrefix = 'Tier Prefix ';
+    component.tierPrefix = tierPrefix;
     expect(component.getPrefix()).toEqual('');
     component.facet = DimensionName.contentTier;
-    expect(component.getPrefix()).toEqual('Tier ');
+    expect(component.getPrefix()).toEqual(tierPrefix);
   });
 
   it('should go to the page', fakeAsync(() => {

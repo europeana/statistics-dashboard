@@ -180,6 +180,8 @@ describe('FilterComponent', () => {
       'xxx, yyy, zzz'
     );
 
+    component.tierPrefix = 'Tier ';
+
     createFormControls(DimensionName.metadataTier, ['aaa', 'bbb']);
     expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
       'aaa, bbb'
