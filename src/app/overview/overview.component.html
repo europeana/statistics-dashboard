@@ -67,6 +67,7 @@
                         ? { options: [] }
                         : displayedFilterData[filter]
                     "
+                    [tierPrefix]="tierPrefix"
                     [totalAvailable]="filterKeysLength(filter)"
                     [state]="filterStates[filter]"
                     (visibilityChanged)="closeFilters($event)"
@@ -346,6 +347,7 @@
           <app-grid
             #grid
             id="grid"
+            [tierPrefix]="tierPrefix"
             facet="{{ form.value.facetParameter }}"
             (refreshData)="showAppliedSeriesInGridAndChart()"
             (chartPositionChanged)="chartPositionChanged($event)"

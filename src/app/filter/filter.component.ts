@@ -48,6 +48,7 @@ export class FilterComponent {
     this._optionSet = optionSet;
   }
   @Input() state: FilterState;
+  @Input() tierPrefix: string;
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
   @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
@@ -109,7 +110,7 @@ export class FilterComponent {
             this.group
           )
         ) {
-          prefix = 'Tier ';
+          prefix = this.tierPrefix;
         }
         return prefix + s;
       })

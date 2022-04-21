@@ -20,70 +20,70 @@
         <source>Country</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameMediaType" datatype="html">
         <source>Media Type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameRights" datatype="html">
         <source>Rights Category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameDataProvider" datatype="html">
         <source>Data Provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameProvider" datatype="html">
         <source>Provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameDates" datatype="html">
         <source>Last Updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpContentTier" datatype="html">
         <source>EDM Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpMetadataTier" datatype="html">
         <source>Tier Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">98</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpProvider" datatype="html">
         <source>Provider Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">102</context>
+          <context context-type="linenumber">108</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpRights" datatype="html">
         <source>Rights Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">112</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortContentTier" datatype="html">
@@ -470,28 +470,28 @@
         <source>Records by</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="gridColHeaderCount" datatype="html">
         <source>Count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">53</context>
         </context-group>
       </trans-unit>
       <trans-unit id="gridColHeaderPercent" datatype="html">
         <source>Percent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="gridColHeaderView" datatype="html">
         <source>View in Europeana</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
@@ -702,7 +702,7 @@
         <source>Dataset ID</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">98</context>
         </context-group>
         <note priority="1" from="description">Dataset ID</note>
       </trans-unit>
@@ -710,7 +710,7 @@
         <source> Europeana database by </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">128,130</context>
+          <context context-type="linenumber">129,131</context>
         </context-group>
         <note priority="1" from="description">Facet selection</note>
       </trans-unit>
@@ -718,7 +718,7 @@
         <source>Whole period</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">169</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <note priority="1" from="description">Summary for applied date filters</note>
         <note priority="1" from="meaning">Period Summary</note>
@@ -727,7 +727,7 @@
         <source>No results found!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">274</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <note priority="1" from="description">Warn no results</note>
       </trans-unit>
@@ -735,7 +735,7 @@
         <source> try removing the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>dataset id<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> parameter </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">281,283</context>
+          <context context-type="linenumber">282,284</context>
         </context-group>
         <note priority="1" from="description">No results detail dataset id</note>
       </trans-unit>
@@ -743,7 +743,7 @@
         <source> try removing the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>date<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> parameters </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">290,292</context>
+          <context context-type="linenumber">291,293</context>
         </context-group>
         <note priority="1" from="description">No results detail date</note>
       </trans-unit>
@@ -751,7 +751,7 @@
         <source>As percentages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <note priority="1" from="description">As percentages</note>
       </trans-unit>
@@ -759,43 +759,43 @@
         <source>Export data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">363</context>
         </context-group>
         <note priority="1" from="description">Share Report Opener</note>
       </trans-unit>
-      <trans-unit id="barChartAxisPrefixTier" datatype="html">
-        <source>Tier</source>
+      <trans-unit id="tierPrefix" datatype="html">
+        <source>Tier </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleAll" datatype="html">
         <source>All (<x id="PH" equiv-text="friendlyName"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">538</context>
+          <context context-type="linenumber">557</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleCTZero" datatype="html">
         <source>CT-Zero</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">545</context>
+          <context context-type="linenumber">564</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleOr" datatype="html">
         <source> or </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">556</context>
+          <context context-type="linenumber">575</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleAnd" datatype="html">
         <source> and </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">562</context>
+          <context context-type="linenumber">581</context>
         </context-group>
       </trans-unit>
     </body>

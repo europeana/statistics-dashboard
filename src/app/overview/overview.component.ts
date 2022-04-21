@@ -72,6 +72,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public fromInputSafeName = fromInputSafeName;
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
+  public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
   public barChartSettings = Object.assign(
     {
       prefixValueAxis: ''
@@ -80,7 +81,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   );
   public barChartSettingsTiers = Object.assign(
     {
-      prefixValueAxis: $localize`:@@barChartAxisPrefixTier:Tier`
+      prefixValueAxis: this.tierPrefix
     },
     BarChartCool
   );
@@ -283,7 +284,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   /** getUrl
   /* @param {false} omitCTParam - flag to omit the content tier param
+
+
+
   /* returns a url parameter string (for api or the portal) according to the form state
+  /* returns a url parameter string according to the form state
+
+
+
   /* @returns string
   */
   getUrl(omitCTParam = false): string {
@@ -407,7 +415,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             facetName
           )
         ) {
-          prefix = 'Tier ';
+          prefix = this.tierPrefix;
         }
 
         // calculate filter options from the data and query params
@@ -507,6 +515,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     }, {});
   }
 
+  /** portalUrlsFromNVPs
+  /* Generates portal urls from form info and result data
+  /* @param { string : facet } - the current facet
+  /* @param { Array<NamesValuePercent> : src } - the data to convert
+  /* @returns IHash<string> - (map { [name]: url })
+  /*
+  **/
   portalUrlsFromNVPs(
     facet: string,
     src: Array<NamesValuePercent>

@@ -330,8 +330,8 @@
       <trans-unit id="exportReportOpenerLink" datatype="html">
         <source>Esporta dati</source>
       </trans-unit>
-      <trans-unit id="barChartAxisPrefixTier" datatype="html">
-        <source>Livello</source>
+      <trans-unit id="tierPrefix" datatype="html">
+        <source>Livello </source>
       </trans-unit>
       <trans-unit id="snapshotTitleAll" datatype="html">
         <source>Tutti (<x id="PH" equiv-text="this.form.value.facetParameter"/>)</source>
