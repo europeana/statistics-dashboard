@@ -135,6 +135,8 @@ describe('GridComponent', () => {
     component.loadFullLink(mockTableRow);
     tick();
 
+    // test urls for rightsCategory facet
+
     expect(api.getRightsCategoryUrls).not.toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
 
@@ -151,6 +153,25 @@ describe('GridComponent', () => {
 
     expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
     expect(window.open).toHaveBeenCalled();
+    expect(mockTableRow.portalUrlInfo.hrefRewritten).toBeTruthy();
+
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
+    expect(window.open).toHaveBeenCalledTimes(1);
+
+    // test urls for rightsCategory filters
+
+    component.facet = DimensionName.contentTier;
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+    mockTableRow.portalUrlInfo.rightsFilters = ['CC0'];
+
+    component.loadFullLink(mockTableRow, false);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(window.open).toHaveBeenCalledTimes(1);
   }));
 
   it('should get the data', () => {
