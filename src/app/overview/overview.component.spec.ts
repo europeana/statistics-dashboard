@@ -14,7 +14,7 @@ import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
-import { today } from '../_helpers';
+import { today, yearZero } from '../_helpers';
 
 import {
   createMockPipe,
@@ -240,14 +240,26 @@ describe('OverviewComponent', () => {
     });
 
     it('should refresh the chart', fakeAsync(() => {
-      component.showAppliedSeriesInGridAndChart();
+      spyOn(component.barChart, 'drawChart');
+
+      component.refreshChart();
+      component.refreshChart(true);
+      component.refreshChart(false);
+      component.refreshChart(true, 1);
+      component.refreshChart(false, 1);
+
+      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+
+      // test invocation
       spyOn(component, 'refreshChart');
+
+      component.showAppliedSeriesInGridAndChart();
       component.form.controls.facetParameter.setValue(
         DimensionName.contentTier
       );
-      expect(component.refreshChart).not.toHaveBeenCalled();
+      fixture.detectChanges();
       tick(400);
-      expect(component.refreshChart).toHaveBeenCalled();
+      expect(component.refreshChart).toHaveBeenCalledWith(true, 0);
       component.ngOnDestroy();
     }));
 
@@ -264,9 +276,87 @@ describe('OverviewComponent', () => {
       expect(component.barChart.zoomTop).toHaveBeenCalled();
     });
 
+    it('should get the applied date range', () => {
+      let range = component.getAppliedDateRange();
+
+      expect(range[0]).toEqual(yearZero);
+      expect(range[1]).toEqual(today);
+
+      component.form.get('dateTo').setValue(today);
+      component.form.get('dateFrom').setValue(today);
+
+      range = component.getAppliedDateRange();
+
+      expect(range[0]).toEqual(today);
+      expect(range[1]).toEqual(today);
+    });
+
     it('should get the grid data', () => {
       expect(component.getGridData()).toBeTruthy();
     });
+
+    it('should generate the series label', fakeAsync(() => {
+      queryParams.next({});
+      tick(1);
+      fixture.detectChanges();
+
+      let generatedLabel;
+      component.form.controls.facetParameter.setValue(
+        DimensionName.contentTier
+      );
+      generatedLabel = component.generateSeriesLabel();
+      expect(generatedLabel).toEqual('All (Content Tier)');
+
+      component.form.controls.facetParameter.setValue(
+        DimensionName.rightsCategory
+      );
+      generatedLabel = component.generateSeriesLabel();
+      expect(generatedLabel).toEqual('All (Rights Category)');
+
+      const nextParams = {};
+      nextParams[DimensionName.country] = ['Denmark', 'Iceland'];
+      queryParams.next(nextParams);
+
+      tick(10);
+      fixture.detectChanges();
+
+      generatedLabel = component.generateSeriesLabel();
+      expect(generatedLabel.indexOf('Denmark')).toBeGreaterThan(-1);
+
+      nextParams['date-to'] = [today];
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
+
+      nextParams['date-from'] = [yearZero];
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      expect(component.generateSeriesLabel().indexOf('Period')).toBeGreaterThan(
+        -1
+      );
+
+      nextParams['date-to'] = [];
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
+      expect(
+        component.generateSeriesLabel().indexOf('content-tier-zero')
+      ).toEqual(-1);
+      nextParams['content-tier-zero'] = 'true';
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      queryParams.next({});
+      tick(10);
+      component.ngOnDestroy();
+    }));
 
     it('should extract the series server data', () => {
       const br: BreakdownResult = {
@@ -338,6 +428,7 @@ describe('OverviewComponent', () => {
     }));
 
     it('should get the select options', fakeAsync(() => {
+      fixture.detectChanges();
       expect(component.filterData.length).toBeFalsy(0);
       component.loadData();
       tick(tickTime);
@@ -345,11 +436,39 @@ describe('OverviewComponent', () => {
       component.ngOnDestroy();
     }));
 
-    it('should get the url for a dataset', () => {
+    it('should get the url for a dataset', fakeAsync(() => {
       expect(component.getUrl().indexOf('XXX')).toEqual(-1);
       component.form.get('datasetId').setValue('XXX');
-      expect(component.getUrl().indexOf('XXX')).toBeTruthy();
-    });
+      expect(component.getUrl().indexOf('XXX')).toBeGreaterThan(-1);
+      component.form.get('datasetId').setValue('');
+
+      queryParams.next({});
+      tick(10);
+      fixture.detectChanges();
+
+      const qp = {};
+      qp[DimensionName.rightsCategory] = ['CC0'];
+      qp[DimensionName.country] = ['Italy'];
+
+      queryParams.next(qp);
+      tick(10);
+      fixture.detectChanges();
+
+      const url = component.getUrl();
+
+      expect(url.indexOf('CC0')).toEqual(-1);
+      expect(url.indexOf('Italy')).toBeGreaterThan(-1);
+
+      queryParams.next({ xxx: '10-11-12' });
+      fixture.detectChanges();
+      tick(1);
+      expect(component.getUrl().indexOf('Italy')).toEqual(-1);
+
+      queryParams.next({});
+      fixture.detectChanges();
+      tick(1);
+      component.ngOnDestroy();
+    }));
 
     it('should get the url for filters', () => {
       const countryUrlParamVal = 'Belgium';
@@ -613,6 +732,16 @@ describe('OverviewComponent', () => {
       ).toBeGreaterThan(-1);
     });
 
+    it('should add the series', () => {
+      spyOn(component.snapshots, 'apply').and.callFake(() => false);
+      spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
+        () => false
+      );
+      component.addSeries(['series-key']);
+      expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
+      expect(component.snapshots.apply).toHaveBeenCalled();
+    });
+
     it('should remove the series', () => {
       spyOn(component.snapshots, 'unapply').and.callFake(() => false);
       spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
@@ -634,6 +763,7 @@ describe('OverviewComponent', () => {
     beforeEach(() => {
       b4Each();
       component.form.value.facetParameter = DimensionName.contentTier;
+      fixture.detectChanges();
     });
 
     it('should get the data server request', () => {

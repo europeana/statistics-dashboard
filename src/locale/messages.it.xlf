@@ -339,6 +339,12 @@
       <trans-unit id="snapshotTitleCTZero" datatype="html">
         <source>Livello-0</source>
       </trans-unit>
+      <trans-unit id="snapshotTitlePeriod" datatype="html">
+        <source>Periodo</source>
+      </trans-unit>
+      <trans-unit id="snapshotTitleDatasetId" datatype="html">
+        <source>ID Dataset</source>
+      </trans-unit>
       <trans-unit id="snapshotTitleOr" datatype="html">
         <source> o </source>
       </trans-unit>

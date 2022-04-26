@@ -166,6 +166,7 @@ new (class extends TestDataServer {
           const filter = breakdownRequest.filters[fName] as RequestFilter;
           if (filter.values) {
             if (fName === 'datasetId') {
+              res = true;
               if (!filter.values.includes(cho.datasetId)) {
                 res = false;
               }
