@@ -284,14 +284,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   /** getUrl
   /* @param {false} omitCTParam - flag to omit the content tier param
-
-
-
   /* returns a url parameter string (for api or the portal) according to the form state
   /* returns a url parameter string according to the form state
-
-
-
   /* @returns string
   */
   getUrl(omitCTParam = false): string {
@@ -308,6 +302,11 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       .map((key: string) => {
         const innerRes = [];
         const values = this.queryParams[key];
+
+        // skip rights parameters
+        if (key === DimensionName.rightsCategory) {
+          return '';
+        }
 
         if (values && !Object.values(nonFacetFilters).includes(key)) {
           values.forEach((valPart: string) => {
@@ -575,7 +574,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         .filter((x) => x.length > 0)
         .join($localize`:@@snapshotTitleAnd: and `);
     }
+
     const name = this.seriesNameFromUrl();
+    const rightsInfo = this.form.value.rightsCategory;
+    const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
+      return rightsInfo[key];
+    });
 
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
@@ -585,6 +589,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       orderOriginal: [],
       orderPreferred: [],
       portalUrls: this.portalUrlsFromNVPs(this.form.value.facetParameter, nvs),
+      rightsFilters: rightsFilters,
       applied: applied,
       pinIndex: 0,
       saved: saved,

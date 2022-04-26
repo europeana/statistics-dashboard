@@ -62,6 +62,6 @@ describe('APIService', () => {
   });
 
   it('should load the rightsCategory urls', () => {
-    expect(service.getRightsCategoryUrls('CC0')).toBeTruthy();
+    expect(service.getRightsCategoryUrls(['CC0'])).toBeTruthy();
   });
 });

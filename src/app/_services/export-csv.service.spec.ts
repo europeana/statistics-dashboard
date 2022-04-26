@@ -26,7 +26,9 @@ describe('ExportCSVService', () => {
         name: 'Andy' as HeaderNameType,
         count: 22,
         percent: 50,
-        portalUrl: ''
+        portalUrlInfo: {
+          href: ''
+        }
       }
     ];
     const testData2 = [
@@ -35,7 +37,9 @@ describe('ExportCSVService', () => {
         name: 'MacLean' as HeaderNameType,
         count: 22,
         percent: null,
-        portalUrl: ''
+        portalUrlInfo: {
+          href: ''
+        }
       }
     ];
     expect(service.csvFromTableRows(testHeaders, testData1)).toEqual(

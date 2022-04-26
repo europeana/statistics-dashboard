@@ -19,28 +19,43 @@ describe('GridComponent', () => {
     {
       name: 'A',
       count: 1,
-      percent: 2
+      percent: 2,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'B',
       count: 2,
-      percent: 2
+      percent: 2,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'B',
       count: 3,
       percent: 1,
-      isTotal: true
+      isTotal: true,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'C',
       count: 0,
-      percent: 1
+      percent: 1,
+      portalUrlInfo: {
+        href: ''
+      }
     },
     {
       name: 'D',
       count: 2,
-      percent: 1
+      percent: 1,
+      portalUrlInfo: {
+        href: ''
+      }
     }
   ] as Array<TableRow>;
 
@@ -111,12 +126,16 @@ describe('GridComponent', () => {
 
     const mockTableRow = {
       name: 'test',
-      portalUrl: 'http://www.europeana.eu?query=*',
       count: 1,
-      percent: 1
+      percent: 1,
+      portalUrlInfo: {
+        href: 'http://www.europeana.eu?query=*'
+      }
     } as TableRow;
     component.loadFullLink(mockTableRow);
     tick();
+
+    // test urls for rightsCategory facet
 
     expect(api.getRightsCategoryUrls).not.toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
@@ -128,12 +147,31 @@ describe('GridComponent', () => {
     expect(api.getRightsCategoryUrls).toHaveBeenCalled();
     expect(window.open).not.toHaveBeenCalled();
 
-    mockTableRow.hrefRewritten = false;
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
     component.loadFullLink(mockTableRow, true);
     tick();
 
     expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
     expect(window.open).toHaveBeenCalled();
+    expect(mockTableRow.portalUrlInfo.hrefRewritten).toBeTruthy();
+
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
+    expect(window.open).toHaveBeenCalledTimes(1);
+
+    // test urls for rightsCategory filters
+
+    component.facet = DimensionName.contentTier;
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+    mockTableRow.portalUrlInfo.rightsFilters = ['CC0'];
+
+    component.loadFullLink(mockTableRow, false);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(window.open).toHaveBeenCalledTimes(1);
   }));
 
   it('should get the data', () => {

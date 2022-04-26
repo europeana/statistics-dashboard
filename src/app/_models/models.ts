@@ -34,6 +34,12 @@ export interface IHashArray<T> {
   [details: string]: Array<T>;
 }
 
+interface PortalUrlInfo {
+  href: string;
+  hrefRewritten?: boolean;
+  rightsFilters?: Array<string>;
+}
+
 export interface TableRow {
   name: string;
   count: number;
@@ -43,8 +49,7 @@ export interface TableRow {
   highlight?: boolean;
   series: string;
   isTotal?: boolean;
-  portalUrl: string;
-  hrefRewritten?: boolean;
+  portalUrlInfo: PortalUrlInfo;
 }
 
 export interface FmtTableData {

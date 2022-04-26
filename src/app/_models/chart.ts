@@ -34,6 +34,7 @@ export interface CompareDataDescriptor {
   label: string;
   name: string;
   portalUrls: IHash<string>;
+  rightsFilters?: Array<string>;
   pinIndex: number;
   saved?: boolean;
   total: number;

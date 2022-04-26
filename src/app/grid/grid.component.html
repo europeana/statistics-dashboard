@@ -5,7 +5,7 @@
         [attr.aria-label]="'View ' + row.name + ' in Europeana'"
         target="_blank"
         class="link-out"
-        [href]="row.portalUrl"
+        [href]="row.portalUrlInfo.href"
         (mouseenter)="loadFullLink(row)"
         (contextmenu)="loadFullLink(row)"
         (click)="loadFullLink(row, true)"

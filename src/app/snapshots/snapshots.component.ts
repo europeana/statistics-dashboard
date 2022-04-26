@@ -189,7 +189,10 @@ export class SnapshotsComponent {
         percent: 100,
         colourIndex: cd._colourIndex,
         series: cd.label,
-        portalUrl: cd.portalUrls['summary']
+        portalUrlInfo: {
+          href: cd.portalUrls['summary'],
+          rightsFilters: cd.rightsFilters
+        }
       });
     });
 
@@ -206,7 +209,10 @@ export class SnapshotsComponent {
             percent: cd.dataPercent[groupKey],
             colourIndex: cd._colourIndex,
             series: cd.label,
-            portalUrl: cd.portalUrls[groupKey]
+            portalUrlInfo: {
+              href: cd.portalUrls[groupKey],
+              rightsFilters: cd.rightsFilters
+            }
           });
         }
       });

@@ -59,25 +59,20 @@ export class GridComponent extends SubscriptionManager {
     super();
   }
 
-  /** clickLinkOut
-  /* overrides link handling for rightsCategory facet by appending url parameters and opening the tab directly
+  /** loadLinkInformation
+  /* loads url parameters and appends them to row.portalUrlInfo.href (optionally opens that link)
   /*
-  /* @param { TableRow } row - the clicked row
-  /* @returns { boolean } true unless facet is rightsCategory
+  /* @param { TableRow } row - the object to modify
+  /* @param { Array<string> } rightsGroups - the groups to load the urls from
   */
-  loadFullLink(row: TableRow, clickLinkOut = false): boolean {
-    if (
-      row.hrefRewritten ||
-      row.isTotal ||
-      this.facet !== DimensionName.rightsCategory
-    ) {
-      // the clicked link includes the qf parameters it needs, so default browser handling
-      return true;
-    }
-
+  loadLinkInformation(
+    row: TableRow,
+    rightsGroups: Array<string>,
+    followLink
+  ): void {
     this.subs.push(
       this.api
-        .getRightsCategoryUrls(row.name)
+        .getRightsCategoryUrls(rightsGroups)
         .subscribe((urls: Array<string>) => {
           const rightsParams = urls
             .map((url: string) => {
@@ -85,18 +80,46 @@ export class GridComponent extends SubscriptionManager {
             })
             .join('');
 
-          row.portalUrl = row.portalUrl + rightsParams;
-          row.hrefRewritten = true;
+          row.portalUrlInfo.href = row.portalUrlInfo.href + rightsParams;
+          row.portalUrlInfo.hrefRewritten = true;
 
-          if (clickLinkOut) {
+          if (followLink) {
             // timeout and 2-stage location setting needed to avoid popup-blocker
             setTimeout(() => {
               const newWin = window.open('', '_blank');
-              newWin.location.href = row.portalUrl;
+              newWin.location.href = row.portalUrlInfo.href;
             }, 0);
           }
         })
     );
+  }
+
+  /** loadFullLink
+  /* click / right click / hover handler
+  /* determines if the url needs augmented, updates if it so
+  /*
+  /* @param { TableRow } row - the clicked row
+  /* @returns { boolean } true unless facet is rightsCategory
+  */
+  loadFullLink(row: TableRow, clickLinkOut = false): boolean {
+    if (row.portalUrlInfo.hrefRewritten) {
+      return true;
+    } else if (row.isTotal || this.facet !== DimensionName.rightsCategory) {
+      if (
+        row.portalUrlInfo.rightsFilters &&
+        row.portalUrlInfo.rightsFilters.length > 0
+      ) {
+        this.loadLinkInformation(
+          row,
+          row.portalUrlInfo.rightsFilters,
+          clickLinkOut
+        );
+      }
+      // the clicked link includes the qf parameters it needs, so default browser handling
+      return !clickLinkOut;
+    }
+
+    this.loadLinkInformation(row, [row.name], clickLinkOut);
     return !clickLinkOut;
   }
 
