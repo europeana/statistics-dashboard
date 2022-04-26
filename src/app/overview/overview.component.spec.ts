@@ -338,6 +338,7 @@ describe('OverviewComponent', () => {
     }));
 
     it('should get the select options', fakeAsync(() => {
+      fixture.detectChanges();
       expect(component.filterData.length).toBeFalsy(0);
       component.loadData();
       tick(tickTime);

@@ -161,6 +161,13 @@ describe('GridComponent', () => {
     expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
     expect(window.open).toHaveBeenCalledTimes(1);
 
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(window.open).toHaveBeenCalledTimes(2);
+
     // test urls for rightsCategory filters
 
     component.facet = DimensionName.contentTier;
@@ -170,8 +177,29 @@ describe('GridComponent', () => {
     component.loadFullLink(mockTableRow, false);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
-    expect(window.open).toHaveBeenCalledTimes(1);
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(4);
+    expect(window.open).toHaveBeenCalledTimes(2);
+
+    // test normal links work correctly (normal behaviour - doesn't invoke open)
+
+    component.facet = DimensionName.country;
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+    delete mockTableRow.portalUrlInfo.rightsFilters;
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(window.open).toHaveBeenCalledTimes(2);
+
+    // another test of the rightsCategory filter
+
+    mockTableRow.portalUrlInfo.rightsFilters = ['In Copyright'];
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(5);
+    expect(window.open).toHaveBeenCalledTimes(3);
   }));
 
   it('should get the data', () => {

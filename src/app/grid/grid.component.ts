@@ -104,23 +104,26 @@ export class GridComponent extends SubscriptionManager {
   loadFullLink(row: TableRow, clickLinkOut = false): boolean {
     if (row.portalUrlInfo.hrefRewritten) {
       return true;
-    } else if (row.isTotal || this.facet !== DimensionName.rightsCategory) {
-      if (
-        row.portalUrlInfo.rightsFilters &&
-        row.portalUrlInfo.rightsFilters.length > 0
-      ) {
-        this.loadLinkInformation(
-          row,
-          row.portalUrlInfo.rightsFilters,
-          clickLinkOut
-        );
+    }
+    if (this.facet === DimensionName.rightsCategory) {
+      if (row.isTotal) {
+        return true;
+      } else {
+        this.loadLinkInformation(row, [row.name], clickLinkOut);
+        return !clickLinkOut;
       }
-      // the clicked link includes the qf parameters it needs, so default browser handling
+    } else if (
+      row.portalUrlInfo.rightsFilters &&
+      row.portalUrlInfo.rightsFilters.length > 0
+    ) {
+      this.loadLinkInformation(
+        row,
+        row.portalUrlInfo.rightsFilters,
+        clickLinkOut
+      );
       return !clickLinkOut;
     }
-
-    this.loadLinkInformation(row, [row.name], clickLinkOut);
-    return !clickLinkOut;
+    return true;
   }
 
   applyHighlights(rows: Array<TableRow>): void {
