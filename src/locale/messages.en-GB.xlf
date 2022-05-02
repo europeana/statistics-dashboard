@@ -767,35 +767,49 @@
         <source>Tier </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleAll" datatype="html">
         <source>All (<x id="PH" equiv-text="friendlyName"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">557</context>
+          <context context-type="linenumber">541</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="snapshotTitleOr" datatype="html">
+        <source>or</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">544</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="snapshotTitleAnd" datatype="html">
+        <source>and</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
+          <context context-type="linenumber">545</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleCTZero" datatype="html">
         <source>CT-Zero</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">564</context>
+          <context context-type="linenumber">553</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="snapshotTitleOr" datatype="html">
-        <source> or </source>
+      <trans-unit id="snapshotTitlePeriod" datatype="html">
+        <source>Period</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">575</context>
+          <context context-type="linenumber">563</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="snapshotTitleAnd" datatype="html">
-        <source> and </source>
+      <trans-unit id="snapshotTitleDatasetId" datatype="html">
+        <source>Dataset Id</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">581</context>
+          <context context-type="linenumber">577</context>
         </context-group>
       </trans-unit>
     </body>

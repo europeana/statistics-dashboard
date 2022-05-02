@@ -1,4 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -108,6 +109,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   disabledParams: IHashArray<string>;
   form: FormGroup;
   isLoading = true;
+  locale = 'en-GB';
 
   selFacetIndex = 0;
   resultTotal: number;
@@ -497,13 +499,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.filterStates.dates = { visible: false, disabled: false };
   }
 
-  seriesNameFromUrl(): string {
-    return JSON.stringify(this.queryParams).replace(
-      /[:\".,\s\(\)\[\]\{\}]/g,
-      ''
-    );
-  }
-
   iHashNumberFromNVPs(
     src: Array<NamesValuePercent>,
     percent = false
@@ -537,6 +532,60 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     return result;
   }
 
+  /** generateSeriesLabel
+  /* Generates a human readable label for the current series
+  **/
+  generateSeriesLabel(): string {
+    if (Object.keys(this.queryParams).length === 0) {
+      const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
+      return $localize`:@@snapshotTitleAll:All (${friendlyName})`;
+    }
+
+    const snapshotTitleOr = $localize`:@@snapshotTitleOr:or`;
+    const snapshotTitleAnd = $localize`:@@snapshotTitleAnd:and`;
+
+    return Object.keys(this.queryParams)
+      .map((key: string) => {
+        const values = this.queryParamsRaw[key];
+        if (values.length === 0) {
+          return '';
+        } else if (key === 'content-tier-zero') {
+          return $localize`:@@snapshotTitleCTZero:CT-Zero`;
+        } else if (key === 'date-from') {
+          // return both dates, formatted and localised
+          const dateToValues = this.queryParamsRaw['date-to'];
+          if (dateToValues.length === 0) {
+            return '';
+          }
+          const fmt = 'MMM d, y';
+          const label = $localize`:@@snapshotTitlePeriod:Period`;
+          const dateFrom = formatDate(new Date(values[0]), fmt, this.locale);
+          const dateTo = formatDate(
+            new Date(dateToValues[0]),
+            fmt,
+            this.locale
+          );
+          return `${label} (${dateFrom} - ${dateTo})`;
+        } else if (key === 'date-to') {
+          // this is handled together with "date-from"
+          return '';
+        } else if (key === 'dataset-id') {
+          const label = $localize`:@@snapshotTitleDatasetId:Dataset Id`;
+          return `${label} (${values[0]})`;
+        } else {
+          const innerRes = [];
+          this.queryParamsRaw[key].forEach((valPart: string) => {
+            innerRes.push(valPart);
+          });
+          const friendlyKey = portalNamesFriendly[key];
+          const joinedVals = innerRes.join(` ${snapshotTitleOr} `);
+          return `${friendlyKey} (${joinedVals})`;
+        }
+      })
+      .filter((x) => x.length > 0)
+      .join(` ${snapshotTitleAnd} `);
+  }
+
   /** storeSeries
   /*
   /*  Store series data
@@ -547,35 +596,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     nvs: Array<NamesValuePercent>,
     seriesTotal: number
   ): void {
-    const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
-    let label = $localize`:@@snapshotTitleAll:All (${friendlyName})`;
-
-    // Generate human-readable label
-    if (Object.keys(this.queryParams).length > 0) {
-      label = Object.keys(this.queryParams)
-        .map((key: string) => {
-          if (key === 'content-tier-zero') {
-            return $localize`:@@snapshotTitleCTZero:CT-Zero`;
-          }
-
-          const innerRes = [];
-          if (!Object.values(nonFacetFilters).includes(key)) {
-            this.queryParamsRaw[key].forEach((valPart: string) => {
-              innerRes.push(valPart);
-            });
-
-            const friendlyKey = portalNamesFriendly[key];
-            return `${friendlyKey} (${innerRes.join(
-              $localize`:@@snapshotTitleOr: or `
-            )})`;
-          }
-          return '';
-        })
-        .filter((x) => x.length > 0)
-        .join($localize`:@@snapshotTitleAnd: and `);
-    }
-
-    const name = this.seriesNameFromUrl();
+    const name = JSON.stringify(this.queryParams).replace(
+      /[:\".,\s\(\)\[\]\{\}]/g,
+      ''
+    );
     const rightsInfo = this.form.value.rightsCategory;
     const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
       return rightsInfo[key];
@@ -583,7 +607,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
-      label: label,
+      label: this.generateSeriesLabel(),
       data: this.iHashNumberFromNVPs(nvs),
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
       orderOriginal: [],

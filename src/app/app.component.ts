@@ -1,5 +1,11 @@
 import { Location, PopStateEvent } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Inject,
+  LOCALE_ID,
+  OnInit
+} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SubscriptionManager } from './subscription-manager';
@@ -30,7 +36,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     private readonly clickService: ClickService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly location: Location
+    private readonly location: Location,
+    @Inject(LOCALE_ID) private readonly locale: string
   ) {
     super();
     document.title = 'Statistics Dashboard';
@@ -170,6 +177,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         }
       }
     } else {
+      component.locale = this.locale;
       this.landingComponentRef = undefined;
       this.showPageTitle = false;
     }
