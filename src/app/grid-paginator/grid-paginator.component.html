@@ -10,7 +10,8 @@
 
   <li class="range" *ngIf="ranges[this.activePageIndex]">
     {{ ranges[this.activePageIndex][0] }} -
-    {{ ranges[this.activePageIndex][1] }} of {{ totalRows }}
+    {{ ranges[this.activePageIndex][1] }}
+    <span i18n="Pagination of @@gridPaginatorOf">of</span> {{ totalRows }}
   </li>
 
   <li>

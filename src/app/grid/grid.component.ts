@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { colours } from '../_data';
 import {
+  DimensionName,
   FmtTableData,
   HeaderNameType,
   PagerInfo,
@@ -14,16 +15,18 @@ import {
   SortInfo,
   TableRow
 } from '../_models';
+import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
+import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
   selector: 'app-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss']
 })
-export class GridComponent {
-  @Input() getUrlRow: (s: string) => string;
-  @Input() facet: string;
+export class GridComponent extends SubscriptionManager {
+  @Input() facet: DimensionName;
+  @Input() tierPrefix: string;
   @Input() isVisible: boolean;
   @Output() refreshData = new EventEmitter<void>();
   @Output() chartPositionChanged = new EventEmitter<number>();
@@ -45,6 +48,83 @@ export class GridComponent {
 
   public colours = colours;
   public SortBy = SortBy;
+  public colHeaders = [
+    $localize`:@@gridColHeaderPrefix:Records by`,
+    $localize`:@@gridColHeaderCount:Count`,
+    $localize`:@@gridColHeaderPercent:Percent`,
+    $localize`:@@gridColHeaderView:View in Europeana`
+  ];
+
+  constructor(private readonly api: APIService) {
+    super();
+  }
+
+  /** loadLinkInformation
+  /* loads url parameters and appends them to row.portalUrlInfo.href (optionally opens that link)
+  /*
+  /* @param { TableRow } row - the object to modify
+  /* @param { Array<string> } rightsGroups - the groups to load the urls from
+  */
+  loadLinkInformation(
+    row: TableRow,
+    rightsGroups: Array<string>,
+    followLink
+  ): void {
+    this.subs.push(
+      this.api
+        .getRightsCategoryUrls(rightsGroups)
+        .subscribe((urls: Array<string>) => {
+          const rightsParams = urls
+            .map((url: string) => {
+              return `&qf=RIGHTS:\"${url}\"`;
+            })
+            .join('');
+
+          row.portalUrlInfo.href = row.portalUrlInfo.href + rightsParams;
+          row.portalUrlInfo.hrefRewritten = true;
+
+          if (followLink) {
+            // timeout and 2-stage location setting needed to avoid popup-blocker
+            setTimeout(() => {
+              const newWin = window.open('', '_blank');
+              newWin.location.href = row.portalUrlInfo.href;
+            }, 0);
+          }
+        })
+    );
+  }
+
+  /** loadFullLink
+  /* click / right click / hover handler
+  /* determines if the url needs augmented, updates if it so
+  /*
+  /* @param { TableRow } row - the clicked row
+  /* @returns { boolean } true unless facet is rightsCategory
+  */
+  loadFullLink(row: TableRow, clickLinkOut = false): boolean {
+    if (row.portalUrlInfo.hrefRewritten) {
+      return true;
+    }
+    if (this.facet === DimensionName.rightsCategory) {
+      if (row.isTotal) {
+        return true;
+      } else {
+        this.loadLinkInformation(row, [row.name], clickLinkOut);
+        return !clickLinkOut;
+      }
+    } else if (
+      row.portalUrlInfo.rightsFilters &&
+      row.portalUrlInfo.rightsFilters.length > 0
+    ) {
+      this.loadLinkInformation(
+        row,
+        row.portalUrlInfo.rightsFilters,
+        clickLinkOut
+      );
+      return !clickLinkOut;
+    }
+    return true;
+  }
 
   applyHighlights(rows: Array<TableRow>): void {
     let highlight = false;
@@ -66,10 +146,10 @@ export class GridComponent {
   /** bumpSortState
   /* Moves sortInfo.dir one iteration through (looped) sequence -1, 0, 1
   /* Clears other sort states
-  /* @param { string : header }
+  /* @param { string } header
   **/
   bumpSortState(header: SortBy): void {
-    const isChanged = this.sortInfo.by != header;
+    const isChanged = this.sortInfo.by !== header;
     let val = 1;
 
     if (!isChanged) {
@@ -97,13 +177,13 @@ export class GridComponent {
 
   getPrefix(): string {
     if (['contentTier', 'metadataTier'].includes(this.facet)) {
-      return 'Tier ';
+      return this.tierPrefix;
     }
     return '';
   }
 
   /** goToPage
-  /* @param { KeyboardEvent : event }
+  /* @param { KeyboardEvent } event
   **/
   goToPage(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
@@ -119,6 +199,7 @@ export class GridComponent {
 
   /** setRows
   /* called from parent when data changes
+  /* @param { Array<TableRow> } rows
   **/
   setRows(rows: Array<TableRow>): void {
     const normalRows = [];
@@ -138,7 +219,7 @@ export class GridComponent {
 
   /** setPagerInfo
   /* handle page info from pager when page changes
-  /* @param { PagerInfo : pagerInfo }
+  /* @param { PagerInfo } pagerInfo
   **/
   setPagerInfo(pagerInfo: PagerInfo): void {
     const fn = (): void => {
@@ -154,7 +235,7 @@ export class GridComponent {
 
   /** sort
   /* Template utility: bumps sort state and emits refresh event
-  /* @param { SortBy : sortBy } - the field to sort on
+  /* @param { SortBy } sortBy - the field to sort on
   **/
   sort(sortBy: SortBy): void {
     this.bumpSortState(sortBy);
@@ -162,7 +243,7 @@ export class GridComponent {
   }
 
   /** updateRows
-  /* @param { KeyboardEvent : e }
+  /* @param { KeyboardEvent } e
   **/
   updateRows(e: KeyboardEvent): void {
     if (e.key.length === 1 || ['Backspace', 'Delete'].includes(e.key)) {

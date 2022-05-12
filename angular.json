@@ -13,6 +13,19 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-GB",
+        "locales": {
+          "en": {
+            "translation": "src/locale/messages.en-GB.xlf",
+            "baseHref": "/en/"
+          },
+          "it": {
+            "translation": "src/locale/messages.it.xlf",
+            "baseHref": "/it/"
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -27,12 +40,21 @@
               "polylabel",
               "raf",
               "xlsx",
-              "@babel/runtime"
+              "@babel/runtime",
+              "pdfmake"
             ],
-            "aot": true,
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.scss"],
-            "scripts": []
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles.scss"
+            ],
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -70,7 +92,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -98,9 +121,12 @@
             "main": "src/test.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "karmaConfig": "karma.conf.cjs",
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles.scss"
+            ],
             "scripts": [],
             "codeCoverageExclude": ["src/app/_mocked/*.ts"]
           }

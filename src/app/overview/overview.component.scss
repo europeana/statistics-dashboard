@@ -10,10 +10,6 @@ $width-left-col: 200px;
   flex-direction: column-reverse;
 }
 
-.ct-zero-label {
-  margin-left: $spacing-s;
-}
-
 .date-removal {
   color: $gray-med;
   margin-right: $spacing-s;
@@ -71,6 +67,13 @@ $width-left-col: 200px;
 
   .x {
     transform: scale(0.5);
+  }
+}
+
+.filter-icon-home {
+  margin-left: $spacing-s;
+  & + .filter-title {
+    margin-left: $spacing-s;
   }
 }
 
@@ -169,7 +172,7 @@ input[type="checkbox"] {
 }
 
 .errors {
-  color: red;
+  color: $eu-red;
 }
 
 .dataset-name {
@@ -196,14 +199,6 @@ input[type="checkbox"] {
   }
 }
 
-app-overview {
-  width: 100%;
-}
-
-datatable-scroller {
-  width: 100% !important;
-}
-
 .export-opener {
   display: inline-block;
   height: 18px;
@@ -216,6 +211,7 @@ datatable-scroller {
   .export-opener-link {
     color: $stats-blue;
     font-size: 14px;
+    text-transform: uppercase;
   }
 }
 
@@ -362,7 +358,25 @@ label {
 
 .header-data {
   color: $near-black;
+  font-size: 18px;
+  font-weight: 600;
   margin-right: auto;
+}
+
+.date.warn {
+  color: $gray-med;
+  position: relative;
+  &:hover {
+    color: transparent;
+    &::before {
+      background: svg-url-icon-warning($stats-blue) 0px 0px / 10px no-repeat;
+      content: "";
+      display: inline-block;
+      height: 10px;
+      position: absolute;
+      width: 14px;
+    }
+  }
 }
 
 @media (min-width: $bp-xl) {

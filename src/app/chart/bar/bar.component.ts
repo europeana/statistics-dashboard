@@ -17,7 +17,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import {
   ChartSettings,
   ColourSeriesData,
-  IHashNumber,
+  IHash,
   NameValue
 } from '../../_models';
 
@@ -40,6 +40,7 @@ export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
   readonly maxNumberBars = 50;
   preferredNumberBars = 8;
+  maxBarSizeRelativeRatio = 20;
 
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
@@ -57,11 +58,20 @@ export class BarComponent implements AfterViewInit {
     // empty setter forces it to be ready before AfterViewInit
     this._results = results;
   }
+  get results(): Array<NameValue> {
+    return this._results;
+  }
   @Input() set extraSettings(extraSettings: ChartSettings) {
     this.settings = Object.assign(this.settings, extraSettings);
   }
+  get extraSettings(): ChartSettings {
+    return this.settings;
+  }
 
-  constructor(@Inject(PLATFORM_ID) private platformId, private zone: NgZone) {
+  constructor(
+    @Inject(PLATFORM_ID) private readonly platformId,
+    private readonly zone: NgZone
+  ) {
     this.browserOnly(() => {
       am4core.options.autoDispose = true;
     });
@@ -80,7 +90,7 @@ export class BarComponent implements AfterViewInit {
   }
 
   /** ngAfterViewInit
-  /* Event hook: calls drawChart and generates a series for the decalarative use case
+  /* Event hook: calls drawChart and generates a series for the declarative use case
   */
   ngAfterViewInit(): void {
     this.drawChart();
@@ -88,11 +98,11 @@ export class BarComponent implements AfterViewInit {
   }
 
   addSeriesFromResult(): void {
-    if (this._results) {
+    if (this.results) {
       this.addSeries([
         {
-          data: this._results.reduce(function (
-            map: IHashNumber,
+          data: this.results.reduce(function (
+            map: IHash<number>,
             nv: NameValue
           ) {
             map[nv.name] = nv.value;
@@ -111,6 +121,45 @@ export class BarComponent implements AfterViewInit {
   */
   toggleCtrls(): void {
     this.settings.ctrlsOpen = !this.settings.ctrlsOpen;
+  }
+
+  /** roundUpNumber
+  /* Rounds up the number
+  /*
+  /* @param { number } num - the number to round
+  /* @returns number
+  */
+  roundUpNumber(num: number): number {
+    return Math.ceil(num / 10) * 10;
+  }
+
+  /** addAxisBreak
+  /* Adds an axis break
+  /*
+  /* @param { number } seriesMin - the smallest value in the series
+  /* @param { number } seriesMax - the largest value in the series
+  */
+  addAxisBreak(seriesMin: number, seriesMax: number): void {
+    const diff = seriesMax - seriesMin;
+    const chunkToRemove = diff - this.maxBarSizeRelativeRatio * seriesMin;
+    this.valueAxis.min = 0;
+    this.valueAxis.max = this.roundUpNumber(seriesMax);
+    this.valueAxis.strictMinMax = true;
+
+    const axisBreak = this.valueAxis.axisBreaks.create();
+    axisBreak.startValue = (seriesMax - chunkToRemove) / 2;
+    axisBreak.endValue = seriesMax - axisBreak.startValue;
+
+    const d = (axisBreak.endValue - axisBreak.startValue) / diff;
+    axisBreak.breakSize = (0.075 * (1 - d)) / d; // 0.075 means that the break will take 7.5% of the total value axis height
+
+    // make break expand on hover
+    const hoverState = axisBreak.states.create('hover');
+    hoverState.properties.breakSize = 1;
+    hoverState.properties.opacity = 0.1;
+    hoverState.transitionDuration = 1500;
+
+    axisBreak.defaultState.transitionDuration = 1000;
   }
 
   /** addLegend
@@ -215,10 +264,11 @@ export class BarComponent implements AfterViewInit {
   /* adds series data to the chart data
   /* adds series object to the chart / the allSeries track-map
   /*
-  /* @param { Array<ColourSeriesData> : csds } series info
+  /* @param { Array<ColourSeriesData> } csds - series info
    */
   addSeries(csds: Array<ColourSeriesData>): void {
     let anySeries;
+    const seriesVals = [];
 
     csds.forEach((csd: ColourSeriesData) => {
       if (!this.chart.data.length) {
@@ -227,31 +277,28 @@ export class BarComponent implements AfterViewInit {
           .map((s: string) => {
             const res = { name: s };
             res[csd.seriesName] = csd.data[s];
+            seriesVals.push(csd.data[s]);
             return res;
           });
       } else {
-        this.chart.data.forEach((cd: IHashNumber) => {
+        this.chart.data.forEach((cd: IHash<number>) => {
+          seriesVals.push(csd.data[cd.name]);
           cd[csd.seriesName] = csd.data[cd.name];
         });
       }
 
-      anySeries = this.createSeries([csd.colour], csd.seriesName);
+      anySeries = this.createSeries(csd.colour, csd.seriesName);
       this.addLegend(anySeries);
       this.allSeries[csd.seriesName] = anySeries;
     });
 
-    if (
-      anySeries &&
-      this.settings.hasScroll &&
-      this.chart.data.length > this.preferredNumberBars
-    ) {
+    if (anySeries && this.settings.hasScroll && this.isZoomable()) {
       anySeries.events.on('ready', (): void => {
         const fn = (): void => {
           const customiseGrip = (grip): void => {
             grip.icon.disabled = true;
             grip.background.fill = am4core.color('#0a72cc');
             grip.background.fillOpacity = 0.8;
-            //grip.background.disabled = true;
           };
           this.chart.scrollbarY = new am4core.Scrollbar();
           customiseGrip(this.chart.scrollbarY.startGrip);
@@ -268,24 +315,29 @@ export class BarComponent implements AfterViewInit {
       });
     }
 
+    if (!this.isZoomable()) {
+      const seriesMin = Math.min(...seriesVals);
+      const seriesMax = Math.max(...seriesVals);
+      const scale = seriesMax / seriesMin;
+      if (scale > this.maxBarSizeRelativeRatio) {
+        this.addAxisBreak(seriesMin, seriesMax);
+      }
+    }
     this.chart.invalidateData();
   }
 
   /** createSeries
-  /* - instantiates series class
-  /* - build colour model
-  */
-  createSeries(
-    colours: Array<string>,
-    valueField = 'value'
-  ): am4charts.ColumnSeries {
+   * - instantiates and returns a series
+   *
+   * @param { string } colour - the series legend / bar colour
+   * @param { string } valueField - the field to read
+   */
+  createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
     const series = this.chart.series.push(new am4charts.ColumnSeries());
     const labelSuffix = this.showPercent ? '%' : '';
 
     series.columns.template.events.once('inited', function (event) {
-      event.target.fill = am4core.color(
-        colours[event.target.dataItem.index % colours.length]
-      );
+      event.target.fill = am4core.color(colour);
     });
 
     if (this.settings.isHorizontal) {
@@ -302,8 +354,12 @@ export class BarComponent implements AfterViewInit {
     return series;
   }
 
+  isZoomable(): boolean {
+    return this.chart.data && this.chart.data.length > this.preferredNumberBars;
+  }
+
   zoomTop(start = 0): void {
-    if (this.chart.data && this.chart.data.length > this.preferredNumberBars) {
+    if (this.isZoomable()) {
       const fn = (): void => {
         this.categoryAxis.zoomToIndexes(
           start,
@@ -318,14 +374,81 @@ export class BarComponent implements AfterViewInit {
 
   getSvgData(): Promise<string> {
     this.chart.exporting.useWebFonts = false;
-    return this.chart.exporting.getImage('png');
+    return this.chart.exporting.getImage('png', {
+      minHeight: 1000,
+      minWidth: 1000
+    });
+  }
+
+  /** applyPadding
+   * - applies padding settings to the chart
+   */
+  applyPadding(): void {
+    ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
+      (s: string) => {
+        if (!isNaN(this.settings[s])) {
+          this.chart[s] = this.settings[s];
+        }
+      }
+    );
+  }
+
+  /** applyRendererDefaults
+   * - applies settings to category / value axis renderers
+   */
+  applyRendererDefaults(): void {
+    // force show all labels
+    this.categoryAxis.renderer.minGridDistance = 30;
+
+    // disable grid lines
+    this.categoryAxis.renderer.grid.template.disabled = true;
+    this.valueAxis.renderer.grid.template.disabled = true;
+
+    // axis / tick styling
+    this.categoryAxis.renderer.ticks.template.disabled = false;
+    this.categoryAxis.renderer.ticks.template.strokeOpacity = 1;
+    this.categoryAxis.renderer.ticks.template.stroke = am4core.color('#CCC');
+    this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
+    this.categoryAxis.renderer.ticks.template.length = 9;
+
+    // labels
+    this.categoryAxis.renderer.labels.template.maxWidth =
+      this.settings.maxLabelWidth;
+    this.categoryAxis.renderer.labels.template.truncate =
+      this.settings.labelTruncate;
+    this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
+
+    this.categoryAxis.renderer.labels.template.fontSize = 10;
+    this.categoryAxis.renderer.labels.template.fontWeight = '600';
+    this.categoryAxis.renderer.labels.template.marginRight = 9;
+    this.categoryAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
+    this.valueAxis.renderer.labels.template.fontSize = 12;
+    this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
+
+    this.categoryAxis.renderer.labels.template.adapter.add(
+      'text',
+      (label: string) => {
+        let prefix = '';
+        if (this.settings.prefixValueAxis) {
+          prefix = `${this.settings.prefixValueAxis} `;
+        }
+        return `${prefix}${label}`;
+      }
+    );
+
+    this.valueAxis.renderer.labels.template.adapter.add(
+      'text',
+      (label: string) => {
+        return `${label}${this.showPercent ? '%' : ''}`;
+      }
+    );
   }
 
   /** drawChart
-  /* - instantiates chart and axes according to rotation
-  /* - assigns data
-  /* - invokes series, legend and settings functions
-  */
+   * - instantiates chart and axes according to rotation
+   * - assigns data
+   * - invokes series, legend and settings functions
+   */
   drawChart(zoomIndex?: number): void {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
@@ -338,13 +461,7 @@ export class BarComponent implements AfterViewInit {
         });
       }
 
-      ['paddingBottom', 'paddingLeft', 'paddingRight', 'paddingTop'].forEach(
-        (s: string) => {
-          if (!isNaN(this.settings[s])) {
-            chart[s] = this.settings[s];
-          }
-        }
-      );
+      this.applyPadding();
 
       // Create axes
       this.categoryAxis = new am4charts.CategoryAxis();
@@ -376,53 +493,7 @@ export class BarComponent implements AfterViewInit {
         this.categoryAxis.renderer.labels.template.rotation = 270;
       }
 
-      // force show all labels
-      this.categoryAxis.renderer.minGridDistance = 30;
-
-      // disable grid lines
-      this.categoryAxis.renderer.grid.template.disabled = true;
-      this.valueAxis.renderer.grid.template.disabled = true;
-
-      // axis / tick styling
-      this.categoryAxis.renderer.ticks.template.disabled = false;
-      this.categoryAxis.renderer.ticks.template.strokeOpacity = 1;
-      this.categoryAxis.renderer.ticks.template.stroke = am4core.color('#CCC');
-      this.categoryAxis.renderer.ticks.template.strokeWidth = 1;
-      this.categoryAxis.renderer.ticks.template.length = 9;
-
-      // labels
-      this.categoryAxis.renderer.labels.template.maxWidth =
-        this.settings.maxLabelWidth;
-      this.categoryAxis.renderer.labels.template.truncate =
-        this.settings.labelTruncate;
-      this.categoryAxis.renderer.labels.template.wrap = this.settings.labelWrap;
-
-      this.categoryAxis.renderer.labels.template.fontSize = 10;
-      this.categoryAxis.renderer.labels.template.fontWeight = '600';
-      this.categoryAxis.renderer.labels.template.marginRight = 9;
-      this.categoryAxis.renderer.labels.template.fill =
-        am4core.color('#4D4D4D');
-      this.valueAxis.renderer.labels.template.fontSize = 12;
-      this.valueAxis.renderer.labels.template.fill = am4core.color('#4D4D4D');
-
-      this.categoryAxis.renderer.labels.template.adapter.add(
-        'text',
-        (label: string) => {
-          let prefix = '';
-          if (this.settings.prefixValueAxis) {
-            prefix = `${this.settings.prefixValueAxis} `;
-          }
-          return `${prefix}${label}`;
-        }
-      );
-
-      this.valueAxis.renderer.labels.template.adapter.add(
-        'text',
-        (label: string) => {
-          return `${label}${this.showPercent ? '%' : ''}`;
-        }
-      );
-
+      this.applyRendererDefaults();
       this.addLegend();
     });
 

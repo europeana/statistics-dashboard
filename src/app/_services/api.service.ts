@@ -6,7 +6,7 @@ import {
   BreakdownRequest,
   BreakdownResults,
   GeneralResults,
-  IHashString
+  IHash
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
 
@@ -14,10 +14,11 @@ import { ISOCountryCodes } from '../_data';
 export class APIService {
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
+  suffixRightsUrls = 'statistics/rights/urls';
 
   constructor(private readonly http: HttpClient) {}
 
-  loadISOCountryCodes(): IHashString {
+  loadISOCountryCodes(): IHash<string> {
     return ISOCountryCodes;
   }
 
@@ -28,9 +29,19 @@ export class APIService {
     );
   }
 
-  getGeneralResults(): Observable<GeneralResults> {
+  getGeneralResults(includeCTZero = false): Observable<GeneralResults> {
     return this.http.get<GeneralResults>(
-      `${environment.serverAPI}${this.suffixGeneral}`
+      `${environment.serverAPI}${this.suffixGeneral}`,
+      { params: includeCTZero ? { 'content-tier-zero': true } : {} }
+    );
+  }
+
+  getRightsCategoryUrls(
+    rightsCategories: Array<string>
+  ): Observable<Array<string>> {
+    return this.http.get<Array<string>>(
+      `${environment.serverAPI}${this.suffixRightsUrls}`,
+      { params: { rightsCategories } }
     );
   }
 }

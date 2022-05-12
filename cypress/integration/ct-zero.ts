@@ -1,6 +1,6 @@
 import { DimensionName } from '../../src/app/_models';
 
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
 
   const ctZeroParam = 'content-tier-zero=true';
   const ctZeroFilterParam = DimensionName.contentTier;

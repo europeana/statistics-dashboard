@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { APIService } from '../../_services';
 import { MockAPIService } from '../../_mocked';
@@ -10,13 +10,15 @@ describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [MapComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [{ provide: APIService, useClass: MockAPIService }]
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [MapComponent],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+        providers: [{ provide: APIService, useClass: MockAPIService }]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);

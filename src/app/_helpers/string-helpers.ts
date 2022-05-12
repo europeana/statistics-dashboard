@@ -1,5 +1,8 @@
 import { FormGroup } from '@angular/forms';
-import { DiacriticsMap, RightsStatements } from '../_data';
+import { DiacriticsMap } from '../_data';
+
+const sanitationRegex = /[.*+?^${}()|[\]\\]/g;
+const sanitationReplace = '\\$&';
 
 /** replaceDiacritics
 /* @param {string} source - the source string
@@ -7,10 +10,7 @@ import { DiacriticsMap, RightsStatements } from '../_data';
 */
 export function replaceDiacritics(source: string): string {
   Object.keys(DiacriticsMap).forEach((key: string) => {
-    source = source.replace(
-      new RegExp('[' + DiacriticsMap[key] + ']', 'gi'),
-      key
-    );
+    source = source.replace(new RegExp(`[${DiacriticsMap[key]}]`, 'gi'), key);
   });
   return source;
 }
@@ -53,47 +53,81 @@ export function appendDiacriticEquivalents(source: string): string {
     .replace(/Z/gi, `[${DiacriticsMap.Z}]`);
 }
 
-export function rightsUrlMatch(url: string): string | null {
-  const trimmed = url
-    .toLowerCase()
-    .trim()
-    .replace(/(h)?ttp(s)?:/i, '')
-    .split('?')[0]
-    .replace(/[\/]$/, '');
-
-  const replaced = RightsStatements[trimmed];
-
-  if (replaced) {
-    return replaced.split('?')[0].trim();
+/** sanitiseSearchTerm
+ * incorporates diaritics, escapes regex operators / qualifiers and
+ * (conditionally) applies start/end modifiers
+ *
+ * @param {string} filterString - filter information
+ * @returns the string converted to a regex-safe string
+ **/
+export function sanitiseSearchTerm(filterString: string): string {
+  if (
+    filterString.length === 0 ||
+    filterString.replace(sanitationRegex, '').length === 0
+  ) {
+    return '';
   }
-  return null;
+
+  const modifierStart = filterString.indexOf('^') === 0;
+  const modifierEnd = filterString.indexOf('$') === filterString.length - 1;
+
+  if (modifierStart) {
+    filterString = filterString.slice(1);
+  }
+  if (modifierEnd) {
+    filterString = filterString.slice(0, -1);
+  }
+
+  let filter = appendDiacriticEquivalents(
+    replaceDiacritics(filterString.replace(sanitationRegex, sanitationReplace))
+  );
+
+  if (modifierStart && modifierEnd) {
+    filter = `^${filter}$|\\^${filter}$|^${filter}\\$|\\^${filter}\\$`;
+  } else if (modifierStart) {
+    filter = `^${filter}|\\^${filter}`;
+  } else if (modifierEnd) {
+    filter = `${filter}$|${filter}\\$`;
+  }
+
+  return filter;
 }
 
 /** filterList
-/* @returns filterables filtered by filterString
-**/
+ *
+ * @param {string} filterString - filter information
+ * @param {Array<T>} filterables - the array to filter
+ * @param {string?} filterProp - the object property to filter on
+ *
+ * @returns filterables filtered by filterString
+ **/
 export function filterList<T>(
   filterString: string,
   filterables: Array<T>,
   filterProp?: string
 ): Array<T> {
-  const filter = replaceDiacritics(filterString);
-  const reg = new RegExp(appendDiacriticEquivalents(filter), 'gi');
-  return filterables.filter((filterable: unknown) => {
+  if (filterString.length === 0) {
+    return filterables;
+  }
+
+  let filter = sanitiseSearchTerm(filterString);
+  if (filter.length === 0) {
+    if (['^', '$'].includes(filterString)) {
+      filter = `\\${filterString}`;
+    } else {
+      return [];
+    }
+  }
+
+  const reg = new RegExp(filter, 'gi');
+
+  return filterables.filter((filterable: T) => {
     // clear regex indexes with empty exec to prevent bug where "ne" fails to match "Netherlands"
     reg.exec('');
 
+    // filter on the object property or the object
     return (
-      !filter ||
-      reg.exec(
-        filterProp
-          ? (
-              filterable as {
-                name: string;
-              }
-            )[filterProp]
-          : (filterable as string)
-      )
+      !filter || reg.exec(filterProp ? filterable[filterProp] : filterable)
     );
   });
 }
@@ -124,8 +158,8 @@ export function fromCSL(s: string): Array<string> {
     .map((part: string) => {
       return part.trim();
     })
-    .filter((s: string) => {
-      return s.length > 0;
+    .filter((part: string) => {
+      return part.length > 0;
     });
 }
 
@@ -134,12 +168,11 @@ export function getFormValueList(
   field: string
 ): Array<string> {
   const vals = form.value[field];
-  const res = vals
+  return vals
     ? Object.keys(vals)
         .filter((key: string) => {
           return vals[key];
         })
         .map(fromInputSafeName)
     : [];
-  return res;
 }

@@ -15,63 +15,66 @@ export class ExportPDFService {
   }
 
   download(tableData: FmtTableData, imgUrlData: string): void {
-    pdfMake
-      .createPdf({
-        content: [
-          { text: 'Tables', style: 'header' },
-          {
-            image: imgUrlData,
-            width: 300,
-            alignment: 'center'
+    const layout = {
+      content: [
+        { text: 'Tables', style: 'header' },
+        {
+          image: imgUrlData,
+          width: 300,
+          alignment: 'center'
+        },
+        {
+          table: {
+            body: [
+              tableData.columns.slice(1).map((s: string) => {
+                return {
+                  text: `${s}`,
+                  style: 'tableHeader',
+                  alignment: 'center'
+                };
+              }),
+              ...tableData.tableRows.map((tr: TableRow) => {
+                const result = [];
+                tableData.columns.slice(1).forEach((s: string) => {
+                  result.push(tr[`${s}`]);
+                });
+                return result;
+              })
+            ],
+            margin: [0, 30]
           },
-          {
-            table: {
-              body: [
-                tableData.columns.slice(1).map((s: string) => {
-                  return {
-                    text: s,
-                    style: 'tableHeader',
-                    alignment: 'center'
-                  };
-                }),
-                ...tableData.tableRows.map((tr: TableRow) => {
-                  const result = [];
-                  tableData.columns.slice(1).forEach((s: string) => {
-                    result.push(tr[s]);
-                  });
-                  return result;
-                })
-              ],
-              margin: [0, 30]
-            },
-            layout: {
-              fillColor: this.getFillColour
-            }
-          }
-        ],
-        styles: {
-          header: {
-            fontSize: 18,
-            bold: true
-          },
-          tableHeader: {
-            bold: true,
-            fontSize: 12,
-            color: 'black'
+          layout: {
+            fillColor: this.getFillColour
           }
         }
-      })
-      .download();
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'black'
+        }
+      }
+    };
+    const pdfDocGenerator = pdfMake.createPdf(layout);
+    pdfDocGenerator.download();
   }
 
   getChartAsImageUrl(canvas: ElementRef, source: ElementRef): Promise<string> {
-    return new Promise((resolve) => {
-      html2canvas(source.nativeElement).then(
-        (canvasHTML: HTMLCanvasElement) => {
+    return new Promise((resolve, reject) => {
+      html2canvas(source.nativeElement)
+        .then((canvasHTML: HTMLCanvasElement) => {
           canvas.nativeElement.src = canvasHTML.toDataURL('image/png');
           resolve(canvas.nativeElement.src);
-        }
-      );
+        })
+        .catch((error: string) => {
+          console.log(error);
+          reject(error);
+        });
     });
   }
 }

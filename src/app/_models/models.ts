@@ -1,15 +1,13 @@
-export type HeaderNameType = 'name' | 'count' | 'percent';
-
-export interface IHashString {
-  [details: string]: string;
+export enum ExportType {
+  CSV = 'CSV',
+  PDF = 'PDF',
+  PNG = 'PNG'
 }
 
-export interface IHashNumber {
-  [details: string]: number;
-}
-
-export interface IHashStringArray {
-  [details: string]: Array<string>;
+export interface FilterInfo {
+  term: string;
+  dimension?: string;
+  upToPage?: number;
 }
 
 export interface FilterState {
@@ -17,9 +15,33 @@ export interface FilterState {
   disabled?: boolean;
 }
 
+export interface FilterOptionSet {
+  options: Array<NameLabel>;
+  hasMore?: boolean;
+}
+
+export type HeaderNameType = 'name' | 'count' | 'percent';
+
+export interface IHashString {
+  [details: string]: string;
+}
+
+export interface IHash<T> {
+  [details: string]: T;
+}
+
+export interface IHashArray<T> {
+  [details: string]: Array<T>;
+}
+
+interface PortalUrlInfo {
+  href: string;
+  hrefRewritten?: boolean;
+  rightsFilters?: Array<string>;
+}
+
 export interface TableRow {
   name: string;
-  nameOriginal: string;
   count: number;
   displayIndex?: number;
   percent: number;
@@ -27,6 +49,7 @@ export interface TableRow {
   highlight?: boolean;
   series: string;
   isTotal?: boolean;
+  portalUrlInfo: PortalUrlInfo;
 }
 
 export interface FmtTableData {
@@ -39,26 +62,15 @@ export interface NameLabel {
   label: string;
 }
 
+export interface NameLabelValid extends NameLabel {
+  valid: boolean;
+}
+
 export interface NameValue {
   name: string;
   value: number;
 }
 
 export interface NamesValuePercent extends NameValue {
-  rawName?: string;
   percent: number;
-}
-
-export interface IHashArrayNameLabel {
-  [details: string]: Array<NameLabel>;
-}
-
-export enum ExportType {
-  CSV = 'CSV',
-  PDF = 'PDF'
-}
-
-export interface FilterInfo {
-  term: string;
-  dimension?: string;
 }

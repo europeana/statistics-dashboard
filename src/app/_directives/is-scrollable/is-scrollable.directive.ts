@@ -8,7 +8,7 @@ export class IsScrollableDirective implements AfterViewInit {
   canScrollBack = false;
   canScrollFwd = false;
 
-  constructor(private elementRef: ElementRef) {
+  constructor(private readonly elementRef: ElementRef) {
     const element = this.elementRef.nativeElement;
 
     new MutationObserver((_: MutationRecord[]) => {

@@ -1,9 +1,9 @@
 import {
-  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick
+  tick,
+  waitForAsync
 } from '@angular/core/testing';
 import { ResizeComponent } from '../resize';
 import { createMockPipe } from '../_mocked';
@@ -23,9 +23,11 @@ describe('TruncateComponent', () => {
     }).compileComponents();
   };
 
-  beforeEach(async(() => {
-    configureTestBed();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      configureTestBed();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TruncateComponent);

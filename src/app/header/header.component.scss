@@ -62,19 +62,23 @@
   .text {
     display: flex;
     flex-direction: column;
-    font-family: Chevin-Medium;
+    font-family: Chevin-Medium, serif;
     font-size: 25px;
     line-height: 30px;
     margin-left: 14px;
   }
 }
 
-.page-title {
+.page-title-wrapper {
   background: $offwhite;
-  font-size: 24px;
-  font-weight: 600;
   margin-bottom: 0;
   padding: 16px;
   position: sticky;
   top: 3em;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: $spacing-xs;
 }

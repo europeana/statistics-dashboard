@@ -1,6 +1,6 @@
 import { DimensionName } from '../../src/app/_models';
 
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
   describe('grid', () => {
 
     const force = { force : true };
@@ -24,7 +24,7 @@ context('statistics-dashboard', () => {
 
       const arCountries = ['Bulgaria', 'Denmark', 'Hungary'];
       const orCountries = ['Norway', 'Portugal'];
-      const arProviders = ['Arts Council Norway', 'CARARE', 'The European Library'];
+      const arProviders = ['Arts Council Norway', 'CARARE', '^The European Library'];
       const waProviders  = ['EFG - The European Film Gateway'];
 
       cy.get(selFilter).type('ar', force);
@@ -111,8 +111,8 @@ context('statistics-dashboard', () => {
 
       cy.get(selFacetSelect).select('Data Provider', force);
 
-      assertRowLength(['National Library of Finland'], 1);
-      assertRowLength(['Meise Botanic Garden'], 0);
+      assertRowLength(['Riksantikvarieämbetet'], 1);
+      assertRowLength(['Wielkopolska Biblioteka Cyfrowa'], 0);
 
       cy.get(selFacetSelect).select('Country', force);
 
@@ -126,8 +126,8 @@ context('statistics-dashboard', () => {
 
       cy.get(selFacetSelect).select('Data Provider', force);
 
-      assertRowLength(['National Library of Finland'], 0);
-      assertRowLength(['Meise Botanic Garden'], 1);
+      assertRowLength(['Riksantikvarieämbetet'], 0);
+      assertRowLength(['Wielkopolska Biblioteka Cyfrowa'], 1);
     });
 
     it('should paginate back and forth', () => {

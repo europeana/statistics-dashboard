@@ -16,6 +16,7 @@ describe('SnapshotsComponent', () => {
     orderOriginal: [],
     orderPreferred: [],
     pinIndex: 1,
+    portalUrls: {},
     saved: true,
     total: 52587135,
     current: true
@@ -44,6 +45,7 @@ describe('SnapshotsComponent', () => {
     orderOriginal: [],
     orderPreferred: [],
     pinIndex: 2,
+    portalUrls: {},
     saved: true,
     total: 34,
     current: true
@@ -58,6 +60,7 @@ describe('SnapshotsComponent', () => {
     orderOriginal: [],
     orderPreferred: [],
     pinIndex: 3,
+    portalUrls: {},
     saved: true,
     total: 2,
     current: true
@@ -70,7 +73,7 @@ describe('SnapshotsComponent', () => {
       countryLuxembourg: dscContentTierQueried
     };
 
-    cds[DimensionName.rights] = {
+    cds[DimensionName.rightsCategory] = {
       '': dscRights
     };
     component.facetName = DimensionName.contentTier;
@@ -116,49 +119,127 @@ describe('SnapshotsComponent', () => {
     ).toBeTruthy();
   });
 
+  it('should sort the data lists', () => {
+    const data = {
+      a: 100,
+      b: 11,
+      c: 1.1,
+      d: 2,
+      e: 3,
+      f: 3.2,
+      g: 2,
+      h: 0
+    };
+
+    let list = Object.keys(data);
+    component.sortDataList(data, list, {
+      by: SortBy.count,
+      dir: 1
+    });
+    expect(list[0]).toEqual('h');
+
+    list = Object.keys(data);
+    component.sortDataList(data, list, {
+      by: SortBy.count,
+      dir: -1
+    });
+    expect(list[0]).toEqual('a');
+
+    list = Object.keys(data);
+    component.sortDataList(data, list, {
+      by: SortBy.name,
+      dir: 1
+    });
+    expect(list[0]).toEqual('a');
+
+    list = Object.keys(data);
+    component.sortDataList(data, list, {
+      by: SortBy.name,
+      dir: -1
+    });
+    expect(list[0]).toEqual('h');
+
+    list = Object.keys(data);
+    component.sortDataList(data, Object.keys(data), {
+      by: SortBy.name,
+      dir: 0
+    });
+    expect(list[0]).toEqual('a');
+  });
+
   it('should pre-sort', () => {
     initData();
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.name,
-      dir: -1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.name,
+        dir: -1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.name,
-      dir: 1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.name,
+        dir: 1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('1');
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.count,
-      dir: 1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.count,
+        dir: 1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('3');
 
-    component.preSortAndFilter(DimensionName.contentTier, [''], {
-      by: SortBy.count,
-      dir: -1
-    });
+    component.preSortAndFilter(
+      DimensionName.contentTier,
+      [''],
+      {
+        by: SortBy.count,
+        dir: -1
+      },
+      ''
+    );
 
     expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
     expect(dscRights.orderPreferred.length).toBeFalsy();
 
-    component.preSortAndFilter(DimensionName.rights, [''], {
-      by: SortBy.count,
-      dir: -1
-    });
+    component.preSortAndFilter(
+      DimensionName.rightsCategory,
+      [''],
+      {
+        by: SortBy.count,
+        dir: -1
+      },
+      ''
+    );
 
     expect(dscRights.orderPreferred[0].trim()).toEqual('CC0');
 
-    component.preSortAndFilter(DimensionName.rights, [''], {
-      by: SortBy.count,
-      dir: 0
-    });
+    component.preSortAndFilter(
+      DimensionName.rightsCategory,
+      [''],
+      {
+        by: SortBy.count,
+        dir: 0
+      },
+      ''
+    );
     expect(dscRights.orderPreferred.length).toBeFalsy();
   });
 

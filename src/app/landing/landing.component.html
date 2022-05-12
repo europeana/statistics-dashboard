@@ -1,37 +1,57 @@
-<div
-  class="fit-to-page"
+<main
+  class="fit-to-page landing-page"
   [ngClass]="{
-    'loading-modal': isLoading && !landingData[DimensionName.type]
+    'loading-modal': isLoading && !hasData(),
+    loading: isLoading && hasData()
   }"
 >
-  <ng-template #chartSummary let-dimension="facetName" let-topLabel="topLabel">
+  <app-resize (sizeChanged)="refreshCharts()"></app-resize>
+
+  <ng-template #chartSummary let-dimension="facetName">
     <span
       class="container-h totals"
       *ngIf="landingData[dimension] && landingData[dimension][0]; let data"
     >
       <span class="container-v">
-        <span class="total-title bold">Top {{ topLabel }}</span>
+        <span
+          class="total-title bold"
+          i18n="landing chart summary prefix@@landingChartSummaryPrefix"
+          >Top
+          {{ dimension | renameApiFacetShort | lowercase }}
+        </span>
         <span class="total bold">{{ data.name }}</span>
       </span>
       <span class="container-v">
-        <span class="total-title">Top {{ topLabel }} records count</span>
+        <span
+          class="total-title"
+          i18n="landing chart summary prefix@@landingChartSummaryCount"
+        >
+          Top {{ dimension | renameApiFacetShort | lowercase }} records
+          count</span
+        >
         <span class="total">{{ data.value | number }}</span>
       </span>
       <span class="container-v">
-        <span class="total-title">Corresponding percentage</span>
+        <span
+          class="total-title"
+          i18n="landing chart summary percentage@@landingChartSummaryPercentage"
+          >Corresponding percentage</span
+        >
         <span class="total">{{ data.percent }}%</span>
       </span>
     </span>
   </ng-template>
 
-  <ng-template #dataRows let-dimension="facetName" let-title="title">
+  <ng-template #dataRows let-dimension="facetName">
     <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
       <div class="container-h data-rows-title">
-        <span>{{ title }}</span>
-        <span>RECORDS PROVIDED</span>
+        <span>{{ dimension | renameApiFacet | uppercase }}</span>
+        <span i18n="landing data header@@landingDataHeader"
+          >RECORDS PROVIDED</span
+        >
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
-        <app-truncate [text]="row.name | renameRights"></app-truncate>
+        <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
@@ -44,12 +64,14 @@
         class="entry-card"
         *ngIf="landingData[DimensionName.contentTier]; let data"
       >
-        <span class="entry-card-header"
+        <span
+          class="entry-card-header"
+          i18n="landing section title edm@@landingSectionTitleEDM"
           >Explore by content quality<a
             class="info-icon"
-            [href]="externalLinks.help.contentTier"
+            [href]="externalLinks.help.contentTier.href"
             target="_blank"
-            title="Documentation"
+            [title]="externalLinks.help.contentTier.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -57,12 +79,12 @@
             *ngTemplateOutlet="
               chartSummary;
               context: {
-                facetName: DimensionName.contentTier,
-                topLabel: 'tier'
+                facetName: DimensionName.contentTier
               }
             "
           ></ng-content>
           <app-bar-chart
+            class="app-bar-chart"
             [colours]="[barColour]"
             chartId="contentTypeChart"
             [extraSettings]="{ prefixValueAxis: 'Tier' }"
@@ -71,7 +93,9 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-ct"
+            i18n="landing section link edm@@landingSectionLinkEDM"
             >View by content tier</a
           >
         </div>
@@ -80,12 +104,14 @@
         class="entry-card"
         *ngIf="landingData[DimensionName.metadataTier]; let data"
       >
-        <span class="entry-card-header"
+        <span
+          class="entry-card-header"
+          i18n="landing section title metadata@@landingSectionTitleMetadata"
           >Explore by metadata quality<a
             class="info-icon"
-            [href]="externalLinks.help.metadataTier"
+            [href]="externalLinks.help.metadataTier.href"
             target="_blank"
-            title="Documentation"
+            [title]="externalLinks.help.metadataTier.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -93,8 +119,7 @@
             *ngTemplateOutlet="
               chartSummary;
               context: {
-                facetName: DimensionName.metadataTier,
-                topLabel: 'tier'
+                facetName: DimensionName.metadataTier
               }
             "
           ></ng-content>
@@ -107,7 +132,9 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.metadataTier }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-metadata"
+            i18n="landing section link metadata@@landingSectionLinkMetadata"
             >View by metadata tier</a
           >
         </div>
@@ -118,7 +145,11 @@
       class="entry-card double-card"
       *ngIf="landingData[DimensionName.country]; let data"
     >
-      <span class="entry-card-header">Explore by providing countries</span>
+      <span
+        class="entry-card-header"
+        i18n="landing section title countries@@landingSectionTitleCountries"
+        >Explore by providing countries<span class="info-icon"></span
+      ></span>
       <div class="entry-card-content">
         <div class="entry-card-pair">
           <div class="map-container">
@@ -127,14 +158,16 @@
           <ng-content
             *ngTemplateOutlet="
               dataRows;
-              context: { facetName: DimensionName.country, title: 'COUNTRY' }
+              context: { facetName: DimensionName.country }
             "
           ></ng-content>
         </div>
         <a
           class="data-link"
           routerLink="/data/{{ DimensionName.country }}"
+          [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
           data-e2e="link-entry-country"
+          i18n="landing section link countries@@landingSectionLinkCountries"
           >View by countries</a
         >
       </div>
@@ -142,7 +175,11 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
-        <span class="entry-card-header">Explore by type of content</span>
+        <span
+          class="entry-card-header"
+          i18n="landing section title type@@landingSectionTitleType"
+          >Explore by type of content<span class="info-icon"></span
+        ></span>
         <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
@@ -158,18 +195,22 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-type"
+            i18n="landing section link type@@landingSectionLinkType"
             >View by type</a
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="landingData[DimensionName.rights]">
-        <span class="entry-card-header"
-          >Explore by rights statement<a
+      <div class="entry-card" *ngIf="landingData[DimensionName.rightsCategory]">
+        <span
+          class="entry-card-header"
+          i18n="landing section title rights@@landingSectionTitleRights"
+          >Explore by rights category<a
             class="info-icon"
-            [href]="externalLinks.help.rights"
+            [href]="externalLinks.help.rights.href"
             target="_blank"
-            title="Documentation"
+            [title]="externalLinks.help.rights.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -178,17 +219,18 @@
               *ngTemplateOutlet="
                 dataRows;
                 context: {
-                  facetName: DimensionName.rights,
-                  title: 'RIGHTS STATEMENT'
+                  facetName: DimensionName.rightsCategory
                 }
               "
             ></ng-content>
           </div>
           <a
             class="data-link"
-            routerLink="/data/{{ DimensionName.rights }}"
+            routerLink="/data/{{ DimensionName.rightsCategory }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-rights"
-            >View by rights statement</a
+            i18n="landing section link rights@@landingSectionLinkRights"
+            >View by rights category</a
           >
         </div>
       </div>
@@ -196,15 +238,19 @@
 
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
-        <span class="entry-card-header">Explore by data provider</span>
+        <span
+          class="entry-card-header"
+          i18n="
+            landing section title data provider@@landingSectionTitleDataProvider"
+          >Explore by data provider<span class="info-icon"></span
+        ></span>
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content
               *ngTemplateOutlet="
                 dataRows;
                 context: {
-                  facetName: DimensionName.dataProvider,
-                  title: 'DATA PROVIDER'
+                  facetName: DimensionName.dataProvider
                 }
               "
             ></ng-content>
@@ -212,18 +258,23 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.dataProvider }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-data-provider"
+            i18n="
+              landing section link data provider@@landingSectionLinkDataProvider"
             >View by data provider</a
           >
         </div>
       </div>
       <div class="entry-card" *ngIf="landingData[DimensionName.provider]">
-        <span class="entry-card-header"
+        <span
+          class="entry-card-header"
+          i18n="landing section title provider@@landingSectionTitleProvider"
           >Explore by provider<a
             class="info-icon"
-            [href]="externalLinks.help.provider"
+            [href]="externalLinks.help.provider.href"
             target="_blank"
-            title="Documentation"
+            [title]="externalLinks.help.provider.description"
           ></a
         ></span>
         <div class="entry-card-content">
@@ -232,8 +283,7 @@
               *ngTemplateOutlet="
                 dataRows;
                 context: {
-                  facetName: DimensionName.provider,
-                  title: 'PROVIDER'
+                  facetName: DimensionName.provider
                 }
               "
             ></ng-content>
@@ -241,11 +291,13 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.provider }}"
+            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-provider"
+            i18n="landing section link provider@@landingSectionLinkProvider"
             >View by provider</a
           >
         </div>
       </div>
     </div>
   </div>
-</div>
+</main>

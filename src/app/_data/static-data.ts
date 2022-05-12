@@ -1,4 +1,4 @@
-import { DimensionName, IHashString, NonFacetFilterNames } from '../_models';
+import { DimensionName, IHash, NonFacetFilterNames } from '../_models';
 
 export const facetNames: Array<DimensionName> = [
   DimensionName.contentTier,
@@ -6,11 +6,11 @@ export const facetNames: Array<DimensionName> = [
   DimensionName.country,
   DimensionName.dataProvider,
   DimensionName.provider,
-  DimensionName.rights,
+  DimensionName.rightsCategory,
   DimensionName.type
 ];
 
-const additionalFilters: IHashString = {};
+const additionalFilters: IHash<string> = {};
 additionalFilters[NonFacetFilterNames.contentTierZero] = 'content-tier-zero';
 additionalFilters[NonFacetFilterNames.dateFrom] = 'date-from';
 additionalFilters[NonFacetFilterNames.dateTo] = 'date-to';
@@ -18,17 +18,43 @@ additionalFilters[NonFacetFilterNames.datasetId] = 'dataset-id';
 
 export const nonFacetFilters = additionalFilters;
 
-const facetNamesPortal: IHashString = {};
+const facetNamesPortal: IHash<string> = {};
 
 facetNamesPortal[DimensionName.contentTier] = 'contentTier';
 facetNamesPortal[DimensionName.metadataTier] = 'metadataTier';
 facetNamesPortal[DimensionName.country] = 'COUNTRY';
 facetNamesPortal[DimensionName.dataProvider] = 'DATA_PROVIDER';
 facetNamesPortal[DimensionName.provider] = 'PROVIDER';
-facetNamesPortal[DimensionName.rights] = 'RIGHTS';
+facetNamesPortal[DimensionName.rightsCategory] = 'RIGHTS';
 facetNamesPortal[DimensionName.type] = 'TYPE';
 
 export const portalNames = facetNamesPortal;
+
+const facetNamesFriendly: IHash<string> = {};
+facetNamesFriendly[
+  DimensionName.contentTier
+] = $localize`:@@facetNameContentTier:Content Tier`;
+facetNamesFriendly[
+  DimensionName.metadataTier
+] = $localize`:@@facetNameMetadataTier:Metadata Tier`;
+facetNamesFriendly[
+  DimensionName.country
+] = $localize`:@@facetNameCountry:Country`;
+facetNamesFriendly[
+  DimensionName.type
+] = $localize`:@@facetNameMediaType:Media Type`;
+facetNamesFriendly[
+  DimensionName.rightsCategory
+] = $localize`:@@facetNameRights:Rights Category`;
+facetNamesFriendly[
+  DimensionName.dataProvider
+] = $localize`:@@facetNameDataProvider:Data Provider`;
+facetNamesFriendly[
+  DimensionName.provider
+] = $localize`:@@facetNameProvider:Provider`;
+facetNamesFriendly['dates'] = $localize`:@@facetNameDates:Last Updated`;
+
+export const portalNamesFriendly = facetNamesFriendly;
 
 export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 
@@ -62,18 +88,29 @@ export const DiacriticsMap = {
 };
 
 export const externalLinks = {
-  europeana: '//europeana.eu',
+  ctZero: 'https://pro.europeana.eu/page/edm-documentation',
+  europeana: '//www.europeana.eu',
   pro: '//pro.europeana.eu',
   api: '//api.europeana.eu',
-  tos: 'tos',
-  privacy: 'privacy',
+  tos: '//www.europeana.eu/rights/terms-of-use',
+  privacy: '//www.europeana.eu/rights/privacy-policy',
   help: {
-    contentTier:
-      'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
-    metadataTier:
-      ' https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
-    provider: 'https://pro.europeana.eu/page/aggregators',
-    rights: 'https://pro.europeana.eu/page/available-rights-statements'
+    contentTier: {
+      href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
+      description: $localize`:@@tooltipHelpContentTier:EDM Documentation`
+    },
+    metadataTier: {
+      href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/1969979393/Recommendations+for+metadata+Tier+A-C',
+      description: $localize`:@@tooltipHelpMetadataTier:Tier Documentation`
+    },
+    provider: {
+      href: 'https://pro.europeana.eu/page/aggregators',
+      description: $localize`:@@tooltipHelpProvider:Provider Documentation`
+    },
+    rights: {
+      href: 'https://pro.europeana.eu/page/available-rights-statements',
+      description: $localize`:@@tooltipHelpRights:Rights Documentation`
+    }
   }
 };
 
@@ -328,95 +365,4 @@ export const ISOCountryCodes = {
   Ukraine: 'UA',
   Qatar: 'QA',
   Mozambique: 'MZ'
-};
-
-export const RightsStatements = {
-  '//creativecommons.org/licenses/by/2.0': 'CC BY 2.0',
-  '//creativecommons.org/licenses/by/2.0/uk': 'CC BY 2.0 UK',
-  '//creativecommons.org/licenses/by/2.5': 'CC BY 2.5',
-  '//creativecommons.org/licenses/by/2.5/pl': 'CC BY 2.5 PL',
-  '//creativecommons.org/licenses/by/3.0': 'CC BY 3.0',
-  '//creativecommons.org/licenses/by/3.0/pl': 'CC BY 3.0 PL',
-  '//creativecommons.org/licenses/by/3.0/de': 'CC BY 3.0 DE',
-  '//creativecommons.org/licenses/by/4.0': 'CC BY 4.0',
-
-  '//creativecommons.org/licenses/by-nc/2.0': 'CC BY-NC 2.0',
-  '//creativecommons.org/licenses/by-nc/2.0/at': 'CC BY-NC 2.0 AT',
-  '//creativecommons.org/licenses/by-nc/2.5/pl': 'CC BY-NC 2.5 PL',
-  '//creativecommons.org/licenses/by-nc/2.5/se': 'CC BY-NC 2.5 SE',
-  '//creativecommons.org/licenses/by-nc/3.0': 'CC BY-NC 3.0',
-  '//creativecommons.org/licenses/by-nc/3.0/de': 'CC BY-NC 3.0 DE',
-  '//creativecommons.org/licenses/by-nc/3.0/nl': 'CC BY-NC 3.0 NL',
-  '//creativecommons.org/licenses/by-nc/3.0/pl': 'CC BY-NC 3.0 PL',
-  '//creativecommons.org/licenses/by-nc/3.0/pt': 'CC BY-NC 3.0 PT',
-  '//creativecommons.org/licenses/by-nc/2.5': 'CC BY-NC 2.5',
-  '//creativecommons.org/licenses/by-nc/4.0': 'cc by-nc 4.0',
-
-  '//creativecommons.org/licenses/by-nc-nd': 'CC BY-NC-ND',
-  '//creativecommons.org/licenses/by-nc-nd/2.0': 'CC BY-NC-ND 2.0',
-  '//creativecommons.org/licenses/by-nc-nd/2.0/es': 'CC BY-NC-ND 2.0 ES',
-  '//creativecommons.org/licenses/by-nc-nd/2.5': 'CC BY-NC-ND 2.5',
-  '//creativecommons.org/licenses/by-nc-nd/2.5/ch': 'CC BY-NC-ND 2.5 CH',
-  '//creativecommons.org/licenses/by-nc-nd/2.5/mt': 'CC BY-NC-ND 2.5 MT',
-  '//creativecommons.org/licenses/by-nc-nd/2.5/pl': 'CC BY-NC-ND 2.5 PL',
-  '//creativecommons.org/licenses/by-nc-nd/2.5/pt': 'CC BY-NC-ND 2.5 PT',
-  '//creativecommons.org/licenses/by-nc-nd/3.0': 'CC BY-NC-ND 3.0',
-  '//creativecommons.org/licenses/by-nc-nd/3.0/de': 'CC BY-NC-ND 3.0 DE',
-  '//creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca':
-    'CC BY-NC-ND 3.0 ES',
-  '//creativecommons.org/licenses/by-nc-nd/3.0/gr': 'CC BY-NC-ND 3.0 GR',
-  '//creativecommons.org/licenses/by-nc-nd/3.0/nl': 'CC BY-NC-ND 3.0 NL',
-  '//creativecommons.org/licenses/by-nc-nd/3.0/pl': 'CC BY-NC-ND 3.0 PL',
-  '//creativecommons.org/licenses/by-nc-nd/4.0': 'CC BY-NC-ND 4.0',
-
-  '//creativecommons.org/licenses/by-nc-sa/2.0/fr': 'CC BY-NC-SA 2.0 FR',
-  '//creativecommons.org/licenses/by-nc-sa/2.5': 'CC BY-NC-SA 2.5',
-  '//creativecommons.org/licenses/by-nc-sa/2.5/fr': 'CC BY-NC-SA 2.5 FR',
-  '//creativecommons.org/licenses/by-nc-sa/2.5/pl': 'CC BY-NC-SA 2.5 PL',
-  '//creativecommons.org/licenses/by-nc-sa/3.0': 'CC BY-NC-SA 3.0',
-  '//creativecommons.org/licenses/by-nc-sa/3.0/de': 'CC BY-NC-SA 3.0 DE',
-  '//creativecommons.org/licenses/by-nc-sa/3.0/es': 'CC BY-NC-SA 3.0 ES',
-  '//creativecommons.org/licenses/by-nc-sa/3.0/ie': 'CC BY-NC-SA 3.0 IE',
-  '//creativecommons.org/licenses/by-nc-sa/3.0/lu': 'CC BY-NC-SA 3.0 LU',
-  '//creativecommons.org/licenses/by-nc-sa/3.0/pl': 'CC BY-NC-SA 3.0 PL',
-  '//creativecommons.org/licenses/by-nc-sa/4.0': 'CC BY-NC-SA 4.0',
-  '//creativecommons.org/licenses/by-nc-sa/4.0/deed.de': 'CC BY-NC-SA 4.0',
-
-  '//creativecommons.org/licenses/by-nd/2.0/es': 'CC BY-ND 2.0 ES',
-  '//creativecommons.org/licenses/by-nd/2.5/pl': 'CC BY-ND 2.5 PL',
-  '//creativecommons.org/licenses/by-nd/2.5': 'CC BY-ND 2.5',
-  '//creativecommons.org/licenses/by-nd/3.0': 'CC BY-ND 3.0',
-  '//creativecommons.org/licenses/by-nd/3.0/de': 'CC BY-ND 3.0 DE',
-  '//creativecommons.org/licenses/by-nd/3.0/pl': 'CC BY-ND 3.0 PL',
-  '//creativecommons.org/licenses/by-nd/4.0': 'CC BY-ND 4.0',
-  '//creativecommons.org/licenses/by-sa': 'CC BY-SA',
-  '//creativecommons.org/licenses/by-sa/2.0': 'CC BY-SA 2.0',
-  '//creativecommons.org/licenses/by-sa/2.5': 'CC BY-SA 2.5',
-  '//creativecommons.org/licenses/by-sa/2.5/se': 'CC BY-SA 2.5 SE',
-  '//creativecommons.org/licenses/by-sa/3.0': 'CC BY-SA 3.0',
-  '//creativecommons.org/licenses/by-sa/3.0/us': 'CC BY-SA 3.0 US',
-  '//creativecommons.org/licenses/by-sa/3.0/de': 'CC BY-SA 3.0 DE',
-  '//creativecommons.org/licenses/by-sa/3.0/nl': 'CC BY-SA 3.0 NL',
-  '//creativecommons.org/licenses/by-sa/3.0/pl': 'CC BY-SA 3.0 PL',
-  '//creativecommons.org/licenses/by-sa/4.0': 'CC BY-SA 4.0',
-
-  '//www.europeana.eu/rights/unknown': 'Unknown Copyright Status',
-  '//www.europeana.eu/rights/orphan-work-eu.html': 'Orphan Work',
-  '//www.europeana.eu/rights/out-of-copyright-non-commercial':
-    '(Europeana out of Copyright)',
-  '//www.europeana.eu/rights/rr-f': 'rights reserved - free access',
-  '//www.legislation.gov.uk/ukpga/1988/48/section/57':
-    'OGL (1988 / 48 / Section 57)',
-  '//www.legislation.gov.uk/ukpga/1988/48/section/75':
-    'OGL (1988 / 48 / Section 75)',
-  '//rightsstatements.org/page/inc/1.0': 'In Copyright',
-  '//creativecommons.org/publicdomain/mark/1.0': 'No Copyright',
-  '//creativecommons.org/publicdomain/zero/1.0': 'CC0 1.0 Universal',
-  '//rightsstatements.org/vocab/cne/1.0': 'Copyright Not Evaluated',
-  '//rightsstatements.org/vocab/inc-edu/1.0': 'Educational Use Permitted',
-  '//rightsstatements.org/vocab/inc-ow-eu/1.0': 'In Copyright - EU Orphan Work',
-  '//rightsstatements.org/vocab/inc/1.0': 'In Copyright',
-  '//rightsstatements.org/vocab/noc-nc/1.0': 'Non-commercial Use Only',
-  '//rightsstatements.org/vocab/noc-oklr/1.0': 'Other Known Legal Restrictions',
-  '//rightsstatements.org/page/und/1.0': 'Copyright Undetermined'
 };

@@ -2,9 +2,13 @@
   <ng-template #linkOut let-row="row" let-total="row.isTotal">
     <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
       <a
+        [attr.aria-label]="'View ' + row.name + ' in Europeana'"
         target="_blank"
         class="link-out"
-        [href]="getUrlRow(facet, total ? null : row.nameOriginal)"
+        [href]="row.portalUrlInfo.href"
+        (mouseenter)="loadFullLink(row)"
+        (contextmenu)="loadFullLink(row)"
+        (click)="loadFullLink(row, true)"
       ></a>
     </span>
   </ng-template>
@@ -38,7 +42,8 @@
       <span class="search-icon"></span>
       <input
         class="search"
-        placeholder="Search..."
+        i18n-placeholder="Search grid rows input@@gridSearchPlaceholder"
+        placeholder="Search ({{ gridRows.length }} entries)"
         [(ngModel)]="filterTerm"
         (keyup)="updateRows($event)"
       />
@@ -49,7 +54,9 @@
         class="conditional-controls container-h"
         *ngIf="pagerInfo && pagerInfo.pageCount > 0"
       >
-        <label for="maxPageSize">Rows per page:</label>
+        <label for="maxPageSize" i18n="Rows per page@@gridRowsPerPage"
+          >Rows per page</label
+        >
         <select
           id="maxPageSize"
           class="max-page-size"
@@ -59,7 +66,7 @@
             {{ mps.title }}
           </option>
         </select>
-        <label for="goTo">Go to:</label>
+        <label for="goTo" i18n="Got to page@@gridGoToPage">Go to</label>
         <input
           id="goTo"
           pattern="[0-9]+"
@@ -80,7 +87,10 @@
     <ng-content
       *ngTemplateOutlet="
         cellHeader;
-        context: { label: 'Records by ' + facet, sortBy: SortBy.name }
+        context: {
+          label: colHeaders[0] + ' ' + (facet | renameApiFacet),
+          sortBy: SortBy.name
+        }
       "
     ></ng-content>
 
@@ -88,7 +98,7 @@
       *ngTemplateOutlet="
         cellHeader;
         context: {
-          label: 'Count',
+          label: colHeaders[1],
           sortBy: SortBy.count,
           e2e: 'grid-sort-count'
         }
@@ -98,11 +108,11 @@
     <ng-content
       *ngTemplateOutlet="
         cellHeader;
-        context: { label: 'Percent', sortBy: SortBy.count }
+        context: { label: colHeaders[2], sortBy: SortBy.count }
       "
     ></ng-content>
 
-    <span class="cell-header">View in Europeana</span>
+    <span class="cell-header">{{ colHeaders[3] }}</span>
 
     <ng-container>
       <!-- Summary rows -->
@@ -153,7 +163,7 @@
             [title]="row.name"
           >
             <app-truncate
-              [text]="getPrefix() + row.name | renameRights"
+              [text]="getPrefix() + row.name"
               [highlightText]="filterTerm"
             ></app-truncate>
           </span>
@@ -166,11 +176,6 @@
             <ng-content
               *ngTemplateOutlet="seriesColour; context: { row: row }"
             ></ng-content>
-            <!-- TODO: do we need this text or is it redundant and unwieldy?
-          <span class="series-info" [title]="row.series">
-            {{ row.series }}
-          </span>
-          -->
           </span>
 
           <span

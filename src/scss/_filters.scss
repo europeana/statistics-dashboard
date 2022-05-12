@@ -11,10 +11,6 @@
 // Filter Removal
 .filters,
 .rm-filters {
-  .padded-left {
-    margin-left: $spacing-s;
-  }
-
   .container-h {
     padding: $spacing-s 0;
     .icon {
@@ -120,7 +116,7 @@
     }
   }
 
-  .rights {
+  .rightsCategory {
     .checkmarked-checkbox {
       &::before {
         background-image: svg-url-icon-rights($white);
@@ -137,6 +133,8 @@
   }
 }
 
+// Icons
+
 .filter-icon-home {
   background-image: svg-url-icon-home($gray-med);
 }
@@ -145,70 +143,130 @@
   background-image: svg-url-icon-dataset-id($gray-med);
 }
 
-.disabled .filter-icon-dataset {
-  background-image: svg-url-icon-dataset-id($gray-5);
+.disabled {
+  .filter-icon-dataset {
+    background-image: svg-url-icon-dataset-id($gray-5);
+  }
+
+  &.open .filter-icon-dataset {
+    background-image: svg-url-icon-dataset-id($grey-3);
+  }
 }
 
 .filter-icon-contentTier {
   background-image: svg-url-icon-content-tier($gray-med);
 }
 
-.disabled .filter-icon-contentTier {
-  background-image: svg-url-icon-content-tier($gray-5);
+.disabled {
+  .filter-icon-contentTier {
+    background-image: svg-url-icon-content-tier($gray-5);
+  }
+  &.open .filter-icon-contentTier {
+    background-image: svg-url-icon-content-tier($grey-3);
+  }
 }
 
 .filter-icon-country {
   background-image: svg-url-icon-flag($gray-med);
 }
 
-.disabled .filter-icon-country {
-  background-image: svg-url-icon-flag($gray-5);
+.disabled {
+  .filter-icon-country {
+    background-image: svg-url-icon-flag($gray-5);
+  }
+  &.open .filter-icon-country {
+    background-image: svg-url-icon-flag($grey-3);
+  }
 }
 
 .filter-icon-dataProvider {
   background-image: svg-url-icon-data-provider($gray-med);
 }
 
-.disabled .filter-icon-dataProvider {
-  background-image: svg-url-icon-data-provider($gray-5);
+.disabled {
+  .filter-icon-dataProvider {
+    background-image: svg-url-icon-data-provider($gray-5);
+  }
+  &.open .filter-icon-dataProvider {
+    background-image: svg-url-icon-data-provider($grey-3);
+  }
 }
 
 .filter-icon-dates {
   background-image: svg-url-icon-calendar($gray-med);
 }
 
-.disabled .filter-icon-dates {
-  background-image: svg-url-icon-calendar($gray-5);
+.disabled {
+  .filter-icon-dates {
+    background-image: svg-url-icon-calendar($gray-5);
+  }
+  &.open .filter-icon-dates {
+    background-image: svg-url-icon-calendar($grey-3);
+  }
 }
 
 .filter-icon-metadataTier {
   background-image: svg-url-icon-metadata($gray-med);
 }
 
-.disabled .filter-icon-metadataTier {
-  background-image: svg-url-icon-metadata($gray-5);
+.disabled {
+  .filter-icon-metadataTier {
+    background-image: svg-url-icon-metadata($gray-5);
+  }
+  &.open .filter-icon-metadataTier {
+    background-image: svg-url-icon-metadata($grey-3);
+  }
 }
 
 .filter-icon-provider {
   background-image: svg-url-icon-content-provider($gray-med);
 }
 
-.disabled .filter-icon-provider {
-  background-image: svg-url-icon-content-provider($gray-5);
+.disabled {
+  .filter-icon-provider {
+    background-image: svg-url-icon-content-provider($gray-5);
+  }
+  &.open .filter-icon-provider {
+    background-image: svg-url-icon-content-provider($grey-3);
+  }
 }
 
-.filter-icon-rights {
+.filter-icon-rightsCategory {
   background-image: svg-url-icon-rights($gray-med);
 }
 
-.disabled .filter-icon-rights {
-  background-image: svg-url-icon-rights($gray-5);
+.disabled {
+  .filter-icon-rightsCategory {
+    background-image: svg-url-icon-rights($gray-5);
+  }
+  &.open .filter-icon-rightsCategory {
+    background-image: svg-url-icon-rights($grey-3);
+  }
 }
 
 .filter-icon-type {
   background-image: svg-url-icon-types($gray-med);
 }
 
-.disabled .filter-icon-type {
-  background-image: svg-url-icon-types($gray-5);
+.disabled {
+  .filter-icon-type {
+    background-image: svg-url-icon-types($gray-5);
+  }
+  &.open .filter-icon-type {
+    background-image: svg-url-icon-types($grey-3);
+  }
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline,
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: $gray-med;
+}
+
+.mat-form-field-appearance-outline.mat-form-field-invalid
+  .mat-form-field-outline {
+  color: $eu-red;
+}
+
+.mat-form-field-wrapper {
+  padding-bottom: 4px;
 }

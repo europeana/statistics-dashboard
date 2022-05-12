@@ -75,30 +75,31 @@
   + .icon-item {
     margin-top: 22px;
   }
-
-  &:hover {
+  a {
+    color: $gray-med;
+  }
+  a:hover {
+    color: $offwhite;
     .icon-csv {
       background-image: svg-url-icon-csv($offwhite);
     }
     .icon-pdf {
       background-image: svg-url-icon-pdf($offwhite);
     }
+    .icon-png {
+      background-image: svg-url-icon-media-image($offwhite);
+    }
   }
-  &:active {
+  a:active {
+    color: $stats-blue;
     .icon-csv {
       background-image: svg-url-icon-csv($stats-blue);
     }
     .icon-pdf {
       background-image: svg-url-icon-pdf($stats-blue);
     }
-  }
-  a {
-    color: $gray-med;
-    &:hover {
-      color: $offwhite;
-    }
-    &:active {
-      color: $stats-blue;
+    .icon-png {
+      background-image: svg-url-icon-media-image($stats-blue);
     }
   }
 }
@@ -110,7 +111,8 @@
 }
 
 .icon-csv,
-.icon-pdf {
+.icon-pdf,
+.icon-png {
   background-repeat: no-repeat;
   background-position: center;
   height: 24px;
@@ -129,9 +131,16 @@
   margin: 0 4px;
 }
 
+.icon-png {
+  background-image: svg-url-icon-media-image(#000);
+  background-size: 18px 18px;
+  margin: 0 3px;
+}
+
 .label-top {
   font-size: 24px;
   line-height: 24px;
+  text-transform: uppercase;
 }
 
 .pad-top {

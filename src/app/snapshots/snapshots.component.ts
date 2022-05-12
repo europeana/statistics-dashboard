@@ -6,7 +6,7 @@ import {
   CompareData,
   CompareDataDescriptor,
   HeaderNameType,
-  IHashNumber,
+  IHash,
   SortBy,
   SortInfo,
   TableRow
@@ -22,6 +22,9 @@ export class SnapshotsComponent {
 
   _facetName: string;
 
+  get facetName(): string {
+    return this._facetName;
+  }
   @Input() set facetName(facetName: string) {
     this._facetName = facetName;
 
@@ -59,6 +62,49 @@ export class SnapshotsComponent {
     });
   }
 
+  /** sortDataList
+   *  ...
+   **/
+  sortDataList(
+    data: IHash<number>,
+    list: Array<string>,
+    sortInfo: SortInfo
+  ): void {
+    let operandA;
+    let operandB;
+    const sortByCount = sortInfo.by === SortBy.count;
+
+    list.sort((a: string, b: string) => {
+      if (sortByCount) {
+        operandA = data[a];
+        operandB = data[b];
+      } else {
+        operandA = a;
+        operandB = b;
+      }
+      if (sortInfo.dir === 1) {
+        if (operandA > operandB) {
+          return 1;
+        } else if (operandB > operandA) {
+          return -1;
+        }
+      } else if (sortInfo.dir === -1) {
+        if (operandA < operandB) {
+          return 1;
+        } else if (operandA > operandB) {
+          return -1;
+        }
+      }
+      return 0;
+    });
+  }
+
+  /** preSortAndFilter
+   *  filters the ColourSeriesData.data lists referenced by an array of series keys
+   *  according to the specified filter term, and sorts (or unsorts) the result
+   *  according to either the default order or the specified sort field and order,
+   *  assigning the sorted-key reference to each ColourSeriesData.orderPreferred variable
+   **/
   preSortAndFilter(
     facetName: string,
     seriesKeys: Array<string>,
@@ -69,44 +115,24 @@ export class SnapshotsComponent {
       const cd = this.compareDataAllFacets[facetName][seriesKey];
       const data = cd.data;
 
-      let operandA;
-      let operandB;
       let sortedKeys: Array<string>;
-
-      const sortByCount = sortInfo.by === SortBy.count;
 
       if (cd.orderOriginal && sortInfo.dir === 0) {
         sortedKeys = filterList(filterTerm, cd.orderOriginal);
       } else {
-        sortedKeys = filterList(filterTerm, Object.keys(data)).sort(
-          (a: string, b: string) => {
-            if (sortByCount) {
-              operandA = data[a];
-              operandB = data[b];
-            } else {
-              operandA = a;
-              operandB = b;
-            }
-            if (sortInfo.dir === 1) {
-              return operandA > operandB ? 1 : operandA === operandB ? 0 : -1;
-            } else if (sortInfo.dir === -1) {
-              return operandA < operandB ? 1 : operandA === operandB ? 0 : -1;
-            } else {
-              return 0;
-            }
-          }
-        );
+        sortedKeys = filterList(filterTerm, Object.keys(data));
+        this.sortDataList(data, sortedKeys, sortInfo);
       }
       cd.orderPreferred = sortedKeys;
     });
   }
 
   /** getSeriesDataForChart
-  /* @param { string : facetName } - the active facet
-  /* @param { Array<string> : seriesKeys } - the keys of the series to apply
-  /* @param { boolean : percent } - percent value switch
-  /* @returns Array<ColourSeriesData> converts to data (for chart)
-  */
+   * @param { string : facetName } - the active facet
+   * @param { Array<string> : seriesKeys } - the keys of the series to apply
+   * @param { boolean : percent } - percent value switch
+   * @returns Array<ColourSeriesData> converts to data (for chart)
+   */
   getSeriesDataForChart(
     facetName: string,
     seriesKeys: Array<string>,
@@ -114,24 +140,27 @@ export class SnapshotsComponent {
     offset: number,
     maxRows: number
   ): Array<ColourSeriesData> {
-    return seriesKeys.map((seriesKey: string, keyIndex: number) => {
-      const cd = this.compareDataAllFacets[facetName][seriesKey];
-      const data = percent ? cd.dataPercent : cd.data;
-      const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
-      return {
-        data: cdKeys.reduce((map: IHashNumber, pref: string) => {
-          map[`${pref} `] = data[pref];
-          return map;
-        }, {}),
-        colour: colours[keyIndex],
-        seriesName: seriesKey
-      };
-    });
+    // sort series keys (by pinIndex)
+    return this.getSortKeys(seriesKeys).map(
+      (seriesKey: string, keyIndex: number) => {
+        const cd = this.compareDataAllFacets[facetName][seriesKey];
+        const data = percent ? cd.dataPercent : cd.data;
+        const cdKeys = cd.orderPreferred.slice(offset, offset + maxRows);
+        return {
+          data: cdKeys.reduce((map: IHash<number>, pref: string) => {
+            map[`${pref} `] = data[pref];
+            return map;
+          }, {}),
+          colour: colours[keyIndex],
+          seriesName: seriesKey
+        };
+      }
+    );
   }
 
   /** getSeriesDataForGrid
-  /* converts to grouped / interplated data for table
-  **/
+   * converts to grouped / interplated data for table
+   **/
   getSeriesDataForGrid(
     facetName: string,
     seriesKeys: Array<string>
@@ -153,15 +182,17 @@ export class SnapshotsComponent {
       });
 
       cd._colourIndex = keyIndex;
-
       result.push({
         name: 'Total', // name will not be shown in the grid
-        nameOriginal: 'Total',
         count: cd.total,
         isTotal: true,
         percent: 100,
         colourIndex: cd._colourIndex,
-        series: cd.label
+        series: cd.label,
+        portalUrlInfo: {
+          href: cd.portalUrls['summary'],
+          rightsFilters: cd.rightsFilters
+        }
       });
     });
 
@@ -170,16 +201,18 @@ export class SnapshotsComponent {
       seriesKeys.forEach((seriesKey: string) => {
         const cd = cds[seriesKey];
         const count = cd.data[groupKey];
-        const rawNames = cd.namesOriginal ? cd.namesOriginal : {};
 
         if (count) {
           result.push({
             name: groupKey as HeaderNameType,
-            nameOriginal: rawNames[groupKey] ? rawNames[groupKey] : groupKey,
             count: count,
             percent: cd.dataPercent[groupKey],
             colourIndex: cd._colourIndex,
-            series: cd.label
+            series: cd.label,
+            portalUrlInfo: {
+              href: cd.portalUrls[groupKey],
+              rightsFilters: cd.rightsFilters
+            }
           });
         }
       });
@@ -201,12 +234,12 @@ export class SnapshotsComponent {
     cdd.orderOriginal = Object.keys(cdd.data).slice(0);
     cdd.orderPreferred = Object.keys(cdd.data).slice(0);
 
-    this.filteredCDKeys(facetName, 'applied').forEach((key: string) => {
-      cd[key].applied = false;
+    this.filteredCDKeys(facetName, 'applied').forEach((appliedKey: string) => {
+      cd[appliedKey].applied = false;
     });
 
-    this.filteredCDKeys(facetName, 'current').forEach((key: string) => {
-      cd[key].current = false;
+    this.filteredCDKeys(facetName, 'current').forEach((currentKey: string) => {
+      cd[currentKey].current = false;
     });
 
     cdd.applied = true;
@@ -214,7 +247,7 @@ export class SnapshotsComponent {
   }
 
   getSortKeys(keys?: Array<string>): Array<string> {
-    const cd = this.compareDataAllFacets[this._facetName];
+    const cd = this.compareDataAllFacets[this.facetName];
 
     if (!keys) {
       keys = Object.keys(cd);
@@ -228,7 +261,7 @@ export class SnapshotsComponent {
   }
 
   toggleSaved(key: string, current = false): void {
-    const cd = this.compareDataAllFacets[this._facetName][key];
+    const cd = this.compareDataAllFacets[this.facetName][key];
     cd.saved = !cd.saved;
 
     if (!cd.saved) {
@@ -245,7 +278,7 @@ export class SnapshotsComponent {
     if (current) {
       return;
     }
-    const cd = this.compareDataAllFacets[this._facetName][key];
+    const cd = this.compareDataAllFacets[this.facetName][key];
     if (cd.applied) {
       this.hideItem.emit(key);
     } else {
@@ -260,7 +293,7 @@ export class SnapshotsComponent {
   }
 
   unapply(seriesKey: string): void {
-    const cd = this.compareDataAllFacets[this._facetName][seriesKey];
+    const cd = this.compareDataAllFacets[this.facetName][seriesKey];
     cd._colourIndex = null;
     cd.applied = false;
   }

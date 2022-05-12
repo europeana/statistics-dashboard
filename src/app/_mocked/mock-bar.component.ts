@@ -7,40 +7,38 @@ import { ColourSeriesData } from '../_models';
   template: ''
 })
 export class MockBarComponent {
-  constructor() {
-    console.log('create mock bar');
-  }
+  readonly maxNumberBars = 50;
 
   browserOnly(_: () => void): void {
-    console.log('MockBarComponent.browserOnly');
+    // mock browserOnly
   }
 
   ngAfterViewInit(): void {
-    console.log('MockBarComponent.ngAfterViewInit');
+    // mock ngAfterViewInit
   }
 
   addSeriesFromResult(): void {
-    console.log('MockBarComponent.addSeriesFromResult');
+    // mock addSeriesFromResult
   }
 
   toggleCtrls(): void {
-    console.log('MockBarComponent.toggleCtrls');
+    // mock toggleCtrls
   }
 
   addLegend(_: am4charts.ColumnSeries): void {
-    console.log('MockBarComponent.addLegend');
+    // mock addLegend
   }
 
   removeSeries(_: string): void {
-    console.log('MockBarComponent.removeSeries');
+    // mock removeSeries
   }
 
   removeAllSeries(): void {
-    console.log('MockBarComponent.removeAllSeries');
+    // mock removeAllSeries
   }
 
   addSeries(_: Array<ColourSeriesData>): void {
-    console.log('MockBarComponent.addSeries');
+    // mock addSeries
   }
 
   createSeries(_: Array<string>, __ = 'value'): am4charts.ColumnSeries {
@@ -48,7 +46,7 @@ export class MockBarComponent {
   }
 
   zoomTop(): void {
-    console.log('MockBarComponent.zoomTop');
+    // mock zoomTop
   }
 
   getSvgData(): Promise<string> {
@@ -58,6 +56,6 @@ export class MockBarComponent {
   }
 
   drawChart(): void {
-    console.log('MockBarComponent.drawChart');
+    // mock drawChart
   }
 }

@@ -1,14 +1,14 @@
 import { ElementRef } from '@angular/core';
 import {
-  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick
+  tick,
+  waitForAsync
 } from '@angular/core/testing';
 import { ExportComponent } from '.';
 
-import { MockExportCSVService } from '../_mocked';
+import { MockExportCSVService, MockExportPDFService } from '../_mocked';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService } from '../_services';
 
@@ -17,13 +17,17 @@ describe('ExportComponent', () => {
   let fixture: ComponentFixture<ExportComponent>;
   let exportCSV: ExportCSVService;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ExportComponent],
-      providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
-    }).compileComponents();
-    exportCSV = TestBed.inject(ExportCSVService);
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [ExportComponent],
+        providers: [
+          { provide: ExportCSVService, useClass: MockExportCSVService }
+        ]
+      }).compileComponents();
+      exportCSV = TestBed.inject(ExportCSVService);
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExportComponent);
@@ -38,7 +42,7 @@ describe('ExportComponent', () => {
 
     component.getChartData = (): Promise<string> => {
       return new Promise((resolve) => {
-        resolve('image-data');
+        resolve(null);
       });
     };
 
@@ -71,8 +75,22 @@ describe('ExportComponent', () => {
   });
 
   it('should export PDF', () => {
-    spyOn(component, 'getChartData').and.callThrough();
+    spyOn(component, 'getChartData').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve(MockExportPDFService.imgDataURL);
+      }) as Promise<string>;
+    });
     component.export(ExportType.PDF);
+    expect(component.getChartData).toHaveBeenCalled();
+  });
+
+  it('should export PNG', () => {
+    spyOn(component, 'getChartData').and.callFake(() => {
+      return new Promise((resolve) => {
+        resolve(MockExportPDFService.imgDataURL);
+      }) as Promise<string>;
+    });
+    component.export(ExportType.PNG);
     expect(component.getChartData).toHaveBeenCalled();
   });
 

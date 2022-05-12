@@ -6,26 +6,35 @@ module.exports = function (config) {
     basePath: "",
     frameworks: ["jasmine", "@angular-devkit/build-angular"],
     plugins: [
-      require("karma-coverage"),
-      require("karma-jasmine"),
-      require("karma-chrome-launcher"),
-      require("karma-jasmine-html-reporter"),
-      require("@angular-devkit/build-angular/plugins/karma")
+      'karma-coverage',
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-jasmine-html-reporter',
+      '@angular-devkit/build-angular/plugins/karma'
     ],
     client: {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     coverageReporter: {
-      type : 'html',
-      dir : 'coverage/'
+      type: "lcov",
+      dir: "coverage/"
+    },
+    angularCli: {
+      environment: 'dev'
+    },
+    mime: {
+      'text/x-typescript': ['ts', 'tsx']
     },
     preprocessors: {
-      'src/app/**/*.ts': ['coverage']
+      "src/app/**/*.ts": ["coverage"]
     },
-    reporters: ['progress', 'kjhtml', 'coverage'],
+    reporters: ["progress", "kjhtml", "coverage"],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
+    browserConsoleLogOptions: {
+      level: "log"
+    },
     autoWatch: true,
     browsers: ["ChromeHeadless"],
     singleRun: true,

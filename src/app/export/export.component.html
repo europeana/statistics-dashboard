@@ -1,12 +1,13 @@
 <ul class="export" [ngClass]="{ active: active }">
   <li class="container-h">
     <span class="export-icon"><a #downloadAnchor></a></span
-    ><span class="label-top">SHARE REPORT</span
+    ><span class="label-top" i18n="Share Report Header@@exportReportHeader"
+      >Share Report</span
     ><a class="x" (click)="toggleActive()"></a>
   </li>
   <li class="hr"></li>
   <li>
-    <span>Share Link</span>
+    <span i18n="Share Link Title@@exportReportLinkTitle">Share Link</span>
   </li>
   <li>
     <input
@@ -15,24 +16,43 @@
       readonly="readonly"
       [ngClass]="{ copied: copied }"
       value="{{ copied ? '' : currentUrl }}"
+      i18n-placeholder="Copied message@@exportReportLinkCopiedMessage"
       placeholder="Copied to clipboard!"
     />
   </li>
   <li class="align-right hr">
-    <a class="copy-btn" (click)="copy()" [ngClass]="{ disabled: copied }"
+    <a
+      class="copy-btn"
+      (click)="copy()"
+      [ngClass]="{ disabled: copied }"
+      i18n="Copy Link Button@@exportReportLinkCopyButton"
       >Copy link</a
     >
   </li>
   <li>
-    <span>Export Data</span>
+    <span i18n="Share Data Title@@exportReportDataTitle">Export Data</span>
   </li>
   <li class="icon-item pad-top">
-    <a class="container-h" (click)="export(ExportType.PDF)"
+    <a
+      class="container-h"
+      (click)="export(ExportType.PNG)"
+      i18n="Download PNG@@exportReportDownloadPNG"
+      ><span class="icon-png"></span>Download PNG</a
+    >
+  </li>
+  <li class="icon-item pad-top">
+    <a
+      class="container-h"
+      (click)="export(ExportType.PDF)"
+      i18n="Download PDF@@exportReportDownloadPDF"
       ><span class="icon-pdf"></span>Download PDF</a
     >
   </li>
   <li class="icon-item">
-    <a class="container-h" (click)="export(ExportType.CSV)"
+    <a
+      class="container-h"
+      (click)="export(ExportType.CSV)"
+      i18n="Download CSV@@exportReportDownloadCSV"
       ><span class="icon-csv"></span>Download CSV</a
     >
   </li>

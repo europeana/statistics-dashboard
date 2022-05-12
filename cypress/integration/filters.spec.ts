@@ -1,6 +1,6 @@
 import { DimensionName } from '../../src/app/_models';
 
-context('statistics-dashboard', () => {
+context('Statistics Dashboard', () => {
   describe('filters', () => {
 
     const force = { force: true };
@@ -13,6 +13,7 @@ context('statistics-dashboard', () => {
     const selFiltersHeader = '.filters-header';
     const selFilter = `${selFiltersHeader} + .filters .filter`;
     const selFilterOpener = '.filter-opener';
+    const selFilterOpenerDisabled = `${selFilterOpener}.disabled`;
     const selFilterOpenerName = `${selFilterOpener} .opener-name`;
     const selFilterOpened = `${selFilter} .checkboxes-list`;
     const selFilterRemove = `.rm-filter`;
@@ -55,15 +56,83 @@ context('statistics-dashboard', () => {
       cy.get(selFilterRemove).should('have.length', 1);
     });
 
-    it('should disable and restore filters', () => {
+    it('should apply and remove filters', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
+
+      // apply filter on country Belgium
       cy.get(selFilterOpener).eq(1).click(force);
       cy.get(selFilterValueLabel).contains('Belgium').click();
       cy.get(selFilterRemove).should('have.length', 1);
+
       cy.get(selFacetSelect).select('Country', force);
       cy.get(selFilterRemove).should('have.length', 0);
       cy.get(selFacetSelect).select('Provider', force);
       cy.get(selFilterRemove).should('have.length', 1);
+    });
+
+    it('should disable and re-enable filters when data isn\'t present', () => {
+      cy.visit(`/data/${DimensionName.contentTier}?type=4D`);
+      cy.get(selFilterOpenerDisabled).should('have.length', 7);
+
+      // try to open...
+      cy.get(selFilterOpener).eq(1).click(force);
+      // ...but nothing shows
+      cy.get(selCheckbox).should('have.length', 0);
+
+      cy.get(selFilterRemove).click(force);
+      cy.get(selFilterOpenerDisabled).should('have.length', 0);
+
+      // Remove the blocking filter...
+      cy.get(selCheckbox).should('have.length', 0);
+
+      // ...and things will show
+      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selCheckbox).should('have.length.gt', 0);
+    });
+
+    it('should allow filters disabled by search terms to be reopened', () => {
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selFilterOpener).eq(1).click(force);
+
+      // search for inexistent country 'xxx'
+      cy.get(selCheckbox).should('have.length.gt', 0);
+      cy.get(selFilterOpenerDisabled).should('have.length', 0);
+      cy.get(selSearch).type('xxx', 1);
+      cy.get(selCheckbox).should('have.length', 0);
+      cy.get(selFilterOpenerDisabled).should('have.length', 1);
+
+      // open the types menu (closes the country menu)
+      cy.get(selFilterOpener).eq(5).click(force);
+      cy.get(selFilterValueLabel).contains('3D').should('have.length', 1);
+
+      // re-open the country menu and remove the filter
+      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterOpenerDisabled).should('have.length', 1);
+      cy.get(selSearch).clear();
+
+      // Country menu enabled - the user wasn't locked-out because of their filter
+      cy.get(selFilterOpenerDisabled).should('have.length', 0);
+    });
+
+    it('should load more', () => {
+      const selLoadMore = '.load-more-item a';
+
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selLoadMore)
+        .should('have.length', 0);
+      cy.get(selFilterOpener).eq(2).click(force);
+
+      cy.get(selCheckbox).should('have.length', 50);
+      cy.get(selLoadMore)
+        .filter(':visible')
+        .should('have.length', 1);
+
+      cy.get(selLoadMore).click();
+
+      cy.get(selCheckbox).should('have.length.gt', 50);
+      cy.get(selLoadMore)
+        .filter(':visible')
+        .should('have.length', 0);
     });
 
     it('should search the filters and remember the term when re-opened', () => {
@@ -84,6 +153,51 @@ context('statistics-dashboard', () => {
       cy.get(selSearch).should('have.value', 'Ge');
     });
 
+    it('should search the filters (regex start)', () => {
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selCheckbox).should('have.length', 25);
+      cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 1);
+
+      cy.get(selSearch).type('a', 1);
+      cy.get(selCheckbox).should('have.length', 20);
+      cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 0);
+      cy.get(selFilterValueLabel).contains('Croatia').should('have.length', 1);
+
+      cy.get(selSearch).clear().type('^a', 1);
+      cy.get(selCheckbox).should('have.length', 1);
+      cy.get(selFilterValueLabel).contains('Croatia').should('have.length', 0);
+      cy.get(selFilterValueLabel).contains('Austria').should('have.length', 1);
+    });
+
+    it('should search the filters (regex end)', () => {
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selCheckbox).should('have.length', 25);
+      cy.get(selFilterValueLabel).contains('Austria').should('have.length', 1);
+
+      cy.get(selSearch).type('e', 1);
+      cy.get(selCheckbox).should('have.length', 13);
+      cy.get(selFilterValueLabel).contains('Austria').should('have.length', 0);
+      cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 1);
+
+      cy.get(selSearch).clear().type('e$', 1);
+      cy.get(selCheckbox).should('have.length', 3);
+      cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
+      cy.get(selFilterValueLabel).contains('France').should('have.length', 1);
+    });
+
+    it('should search the filters (regex literals)', () => {
+      cy.visit(`/data/${DimensionName.contentTier}`);
+      cy.get(selFilterOpener).eq(3).click(force);
+      cy.get(selCheckbox).should('have.length', 38);
+      cy.get(selSearch).type('^', 1);
+      cy.get(selCheckbox).should('have.length', 2);
+      cy.get(selSearch).clear();
+      cy.get(selCheckbox).should('have.length', 38);
+      cy.get(selSearch).type('$', 1);
+    });
+
     it('should search the filters (diacritics)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpener).eq(2).click(force);
@@ -92,7 +206,7 @@ context('statistics-dashboard', () => {
       cy.get(selSearch).type('oster', 1);
       cy.get(selFilterValueLabel).should('have.length', 1);
       cy.get(selSearch).clear();
-      cy.get(selFilterValueLabel).should('have.length', 35);
+      cy.get(selFilterValueLabel).should('have.length', 50);
       cy.get(selSearch).type('Öster', 1);
       cy.get(selFilterValueLabel).should('have.length', 1);
       cy.get(selSearch).clear();
@@ -110,12 +224,12 @@ context('statistics-dashboard', () => {
       cy.get(selFilterOpener).last().click(force);
       cy.get(selDateFrom).should('have.length', 1);
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
       cy.get(selDateFrom).type(today);
       cy.get(selDateTo).type(today);
 
       cy.get(selCloseDateOverride).should('be.visible');
-      cy.get(selDateFrom).clear();
+      cy.get(selDateFrom).clear(force);
       cy.get(selCloseDateOverride).should('not.be.visible');
     });
 

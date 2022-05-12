@@ -1,349 +1,370 @@
-<form
-  [formGroup]="form"
-  class="dashboard-wrapper"
-  [ngClass]="{
-    'loading-modal': isLoading && !dataServerData
-  }"
->
-  <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
+<main>
+  <form
+    [formGroup]="form"
+    class="dashboard-wrapper"
+    [ngClass]="{
+      'loading-modal': isLoading && !dataServerData
+    }"
+  >
+    <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
 
-  <div class="statistics-dashboard fit-to-page">
-    <!-- Left -->
+    <ng-template #dialogRef>
+      <div class="container-h dialog-content">
+        <span class="warn-icon"></span>
+        <span class="warning" i18n="Warning data recency@@warnDataNotLive"
+          >The data is not live and may be a few days old</span
+        >
+      </div>
+      <div class="container-h dialog-content">
+        <button mat-button mat-dialog-close>Close</button>
+      </div>
+    </ng-template>
 
-    <div class="statistics-dashboard-left">
-      <div>
-        <ul class="filters">
-          <li class="container-h">
-            <span class="icon filter-icon-home"> </span>
-            <a
-              class="filter-title padded-left"
-              data-e2e="link-home"
-              routerLink="/"
-              >Home</a
-            >
-          </li>
+    <div class="statistics-dashboard fit-to-page">
+      <!-- Left -->
 
-          <li class="ct-zero container-h">
-            <span [formGroup]="form" class="checkbox-labelled padded-left">
-              <span
-                class="checkmarked-checkbox"
-                [ngClass]="{
-                  checked: form.value.contentTierZero,
-                  disabled: emptyDataset
-                }"
+      <div class="statistics-dashboard-left">
+        <div>
+          <ul class="filters">
+            <li class="container-h">
+              <span class="icon filter-icon-home"> </span>
+              <a
+                class="filter-title"
+                data-e2e="link-home"
+                i18n="Home Link@@labelLinkHome"
+                routerLink="/"
+                [queryParams]="
+                  form.value.contentTierZero
+                    ? { 'content-tier-zero': true }
+                    : {}
+                "
+                >Home</a
               >
-                <input
-                  id="ctZero"
-                  class="checkbox"
-                  type="checkbox"
-                  (change)="updatePageUrl()"
-                  formControlName="contentTierZero"
-                />
-              </span>
-              <label
-                class="filter-title padded-left"
-                [ngClass]="{
-                  disabled: emptyDataset
-                }"
-                for="ctZero"
-              >
-                {{ form.value.contentTierZero ? "Disable" : "Enable" }}
-                content tier 0
-              </label>
-            </span>
-            <a
-              class="info-icon"
-              href="https://pro.europeana.eu/page/edm-documentation"
-              target="_blank"
-              title="Documentation"
-              [ngClass]="{
-                checked: form.value.contentTierZero,
-                disabled: emptyDataset
-              }"
-            ></a>
-          </li>
-        </ul>
-
-        <h3 class="filters-header">Filters</h3>
-
-        <ul class="filters">
-          <li>
-            <ng-container *ngIf="dataServerData">
-              <ng-container *ngFor="let filter of facetConf">
+            </li>
+            <li>
+              <app-ct-zero-control
+                [form]="form"
+                [disabled]="emptyDataset"
+                (onChange)="updatePageUrl()"
+              ></app-ct-zero-control>
+            </li>
+          </ul>
+          <h3
+            class="filters-header"
+            i18n="Filters header|Heading text for filters@@filtersHeader"
+          >
+            Filters
+          </h3>
+          <ul class="filters">
+            <li>
+              <ng-container *ngIf="dataServerData">
+                <ng-container *ngFor="let filter of facetConf">
+                  <app-filter
+                    [form]="form"
+                    [group]="filter"
+                    [optionSet]="
+                      emptyDataset
+                        ? { options: [] }
+                        : displayedFilterData[filter]
+                    "
+                    [tierPrefix]="tierPrefix"
+                    [totalAvailable]="filterKeysLength(filter)"
+                    [state]="filterStates[filter]"
+                    (visibilityChanged)="closeFilters($event)"
+                    (valueChanged)="updatePageUrl()"
+                    (filterTermChanged)="filterDisplayData($event)"
+                  ></app-filter>
+                </ng-container>
                 <app-filter
+                  [emptyDataset]="emptyDataset"
                   [form]="form"
-                  [group]="filter"
-                  [options]="emptyDataset ? [] : displayedFilterData[filter]"
-                  [state]="filterStates[filter]"
+                  [group]="'dates'"
+                  [state]="filterStates['dates']"
                   (visibilityChanged)="closeFilters($event)"
                   (valueChanged)="updatePageUrl()"
-                  (filterTermChanged)="filterDisplayData($event)"
                 ></app-filter>
               </ng-container>
-              <app-filter
-                [emptyDataset]="emptyDataset"
-                [form]="form"
-                [group]="'dates'"
-                [state]="filterStates['dates']"
-                (visibilityChanged)="closeFilters($event)"
-                (valueChanged)="updatePageUrl()"
-              ></app-filter>
-            </ng-container>
+            </li>
+          </ul>
+        </div>
+
+        <ul class="filters inputs">
+          <li class="container-h dataset-name-wrapper">
+            <span class="icon filter-icon-dataset"></span>
+            <input
+              formControlName="datasetId"
+              (keyup.enter)="updateDatasetIdFieldAndPageUrl()"
+              i18n-placeholder="Dataset ID@@inputPlaceholderFilterDatasetId"
+              placeholder="Dataset ID"
+              class="dataset-name"
+              type="text"
+              [ngClass]="{
+                disabled: emptyDataset && !queryParams['dataset-id']
+              }"
+            />
           </li>
         </ul>
       </div>
 
-      <ul class="filters inputs">
-        <li class="container-h dataset-name-wrapper">
-          <span class="icon filter-icon-dataset"></span>
-          <input
-            formControlName="datasetId"
-            (keyup.enter)="updateDatasetIdFieldAndPageUrl()"
-            placeholder="Dataset ID"
-            class="dataset-name"
-            type="text"
-            [ngClass]="{
-              disabled: emptyDataset && !queryParams['dataset-id']
-            }"
-          />
-        </li>
-      </ul>
-    </div>
+      <!-- Right -->
 
-    <!-- Right -->
+      <div class="statistics-dashboard-right">
+        <app-export
+          #export
+          [getGridData]="getGridData.bind(this)"
+          [getChartData]="getChartData.bind(this)"
+        ></app-export>
 
-    <div class="statistics-dashboard-right">
-      <app-export
-        #export
-        [getGridData]="getGridData.bind(this)"
-        [getChartData]="getChartData.bind(this)"
-      ></app-export>
+        <!-- Header -->
 
-      <!-- Header -->
+        <div class="container-h header-bar">
+          <ng-container *ngIf="!form.value.facetParameter">
+            <h3 class="header-data">Select a facet dimension</h3>
+          </ng-container>
+          <ng-container *ngIf="form.value.facetParameter">
+            <h1 class="header-data">
+              <span
+                class="facet-param-text"
+                i18n="Facet selection@@facetSelection"
+              >
+                Europeana database by
+              </span>
+              <select
+                class="facet-param"
+                formControlName="facetParameter"
+                (change)="switchFacet()"
+                aria-label="Data dimension selection"
+              >
+                <option *ngFor="let facet of facetConf" [ngValue]="facet">
+                  {{ facet | renameApiFacet }}
+                </option>
+              </select>
 
-      <div class="container-h header-bar">
-        <ng-container *ngIf="!form.value.facetParameter">
-          <h3 class="header-data">Select a facet dimension</h3>
-        </ng-container>
-        <ng-container *ngIf="form.value.facetParameter">
-          <h3 class="header-data">
-            <span class="facet-param-text"> Europeana database by </span>
-            <select
-              class="facet-param"
-              formControlName="facetParameter"
-              (change)="switchFacet()"
+              <ng-container
+                *ngIf="externalLinks.help[form.value.facetParameter]; let help"
+              >
+                <a
+                  class="info-icon"
+                  [href]="help.href"
+                  target="_blank"
+                  [title]="help.description"
+                ></a>
+              </ng-container>
+            </h1>
+          </ng-container>
+
+          <ng-container *ngIf="getAppliedDateRange(); let dates">
+            <span
+              class="container-h date-removal"
+              [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
             >
-              <option *ngFor="let facet of facetConf" [ngValue]="facet">
-                {{ facet | renameApiFacet }}
-              </option>
-            </select>
-          </h3>
-        </ng-container>
-
-        <ng-container *ngIf="getFormattedDateStrings(); let dates">
-          <span
-            class="container-h date-removal"
-            [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
-          >
-            <a class="container-h when-set" (click)="datesClear()">
-              <span>Custom</span>
-              <span class="x" data-e2e="close-date-override"></span>
-            </a>
-            <a class="when-unset" (click)="datesOpen()">Whole period</a>
-            <span class="date">
-              {{ dates[0] }}
+              <a class="container-h when-set" (click)="datesClear()">
+                <span>Custom</span>
+                <span class="x" data-e2e="close-date-override"></span>
+              </a>
+              <a
+                class="when-unset"
+                (click)="datesOpen()"
+                i18n="
+                  Period Summary|Summary for applied date filters@@periodSummary"
+                >Whole period</a
+              >
+              <span class="date">
+                {{ dates[0] | date: "MMM d, y" }}
+              </span>
+              <span class="separator"> - </span>
+              <span class="date">
+                {{ dates[1] | date: "MMM d, y" }}
+              </span>
+              <a class="date warn" (click)="showDateDisclaimer()"> * </a>
             </span>
-            <span class="separator"> - </span>
-            <span class="date">
-              {{ dates[1] }}
-            </span>
-          </span>
-        </ng-container>
+          </ng-container>
 
-        <a (click)="export.toggleActive()" class="export-icon export-opener">
-        </a>
-      </div>
+          <a (click)="export.toggleActive()" class="export-icon export-opener">
+          </a>
+        </div>
 
-      <!-- Filter removal -->
-      <div class="rm-filters-outer">
-        <div class="rm-filters-scroll">
-          <ul
-            class="rm-filters"
-            id="scrollInfo"
-            #scrollInfo="scrollInfo"
-            appIsScrollable
-          >
-            <app-resize
-              [time]="200"
-              (sizeChanged)="scrollInfo.calc()"
-            ></app-resize>
+        <!-- Filter removal -->
+        <div class="rm-filters-outer">
+          <div class="rm-filters-scroll">
+            <ul
+              class="rm-filters"
+              id="scrollInfo"
+              #scrollInfo="scrollInfo"
+              appIsScrollable
+            >
+              <li>
+                <app-resize
+                  [time]="200"
+                  (sizeChanged)="scrollInfo.calc()"
+                ></app-resize>
+              </li>
 
-            <ng-container *ngFor="let filter of facetConf">
-              <ng-container *ngIf="filter !== form.value.facetParameter">
-                <ng-container
-                  *ngFor="let option of getSetCheckboxValues(filter)"
-                >
+              <ng-container *ngFor="let filter of facetConf">
+                <ng-container *ngIf="filter !== form.value.facetParameter">
                   <ng-container
-                    *ngFor="let deadFacet of [isDeadFacet(filter, option)]"
+                    *ngFor="let option of getRemoveFilterCheckboxData(filter)"
                   >
-                    <ng-container
-                      *ngFor="
-                        let labelText of [
-                          fromInputSafeName(option) | renameRights
-                        ]
-                      "
+                    <label
+                      class="rm-filter"
+                      [ngClass]="{ 'dead-facet': !option.valid }"
                     >
-                      <label
-                        class="rm-filter"
-                        *ngIf="form.value[filter][option]"
-                        [ngClass]="{ 'dead-facet': deadFacet }"
-                      >
-                        <app-checkbox
-                          [form]="form"
-                          [controlName]="option"
-                          [labelText]="labelText"
-                          [group]="filter"
-                          (valueChanged)="updatePageUrl(deadFacet)"
-                          title="remove filter: {{ labelText }}"
-                        ></app-checkbox>
-                        <span
-                          class="x"
-                          title="remove filter: {{ labelText }}"
-                        ></span>
-                      </label>
-                    </ng-container>
+                      <app-checkbox
+                        [form]="form"
+                        [controlName]="option.name"
+                        [labelText]="option.label"
+                        [group]="filter"
+                        (valueChanged)="updatePageUrl(option.valid)"
+                        title="remove filter: {{ option.label }}"
+                      ></app-checkbox>
+                      <span
+                        class="x"
+                        title="remove filter: {{ option.label }}"
+                      ></span>
+                    </label>
                   </ng-container>
                 </ng-container>
               </ng-container>
-            </ng-container>
-            <ng-container *ngIf="queryParams['dataset-id']; let datasets">
-              <ng-container *ngFor="let id of fromCSL(datasets.toString())">
-                <ng-container *ngIf="form.controls['datasetIds'].get(id)">
-                  <label class="rm-filter">
-                    <app-checkbox
-                      [form]="form"
-                      [controlName]="id"
-                      group="datasetIds"
-                      [labelText]="id"
-                      (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
-                      title="remove filter: {{ id }}"
-                    ></app-checkbox>
-                    <span class="x" title="remove filter: {{ id }}"></span>
-                  </label>
+              <ng-container *ngIf="queryParams['dataset-id']; let datasets">
+                <ng-container *ngFor="let id of fromCSL(datasets.toString())">
+                  <ng-container *ngIf="form.controls['datasetIds'].get(id)">
+                    <label class="rm-filter">
+                      <app-checkbox
+                        [form]="form"
+                        [controlName]="id"
+                        group="datasetIds"
+                        [labelText]="id"
+                        (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
+                        title="remove filter: {{ id }}"
+                      ></app-checkbox>
+                      <span class="x" title="remove filter: {{ id }}"></span>
+                    </label>
+                  </ng-container>
                 </ng-container>
               </ng-container>
-            </ng-container>
-          </ul>
-        </div>
-        <div
-          class="rm-filter-nav"
-          [ngClass]="{ active: scrollInfo.canScrollFwd }"
-          *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
-        >
-          <a
-            class="rm-filter-nav-prev"
-            (click)="scrollInfo.back()"
-            [ngClass]="{ active: scrollInfo.canScrollBack }"
-            [title]="scrollInfo.canScrollBack ? 'scroll back' : ''"
-            >&lsaquo;</a
-          >
-          <a
-            class="rm-filter-nav-next"
-            (click)="scrollInfo.fwd()"
-            [ngClass]="{ active: scrollInfo.canScrollFwd }"
-            [title]="scrollInfo.canScrollFwd ? 'scroll forward' : ''"
-            >&rsaquo;</a
-          >
-        </div>
-      </div>
-
-      <!-- Data Area -->
-      <div class="data-area">
-        <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
-        <div *ngIf="emptyDataset && !isLoading" class="no-data">
-          No results found!
-          <ul>
-            <li
-              *ngIf="
-                queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
-              "
-            >
-              try removing the <span class="param">dataset id</span> parameter
-            </li>
-            <li
-              *ngIf="
-                queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
-                queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
-              "
-            >
-              try removing the <span class="param">date</span> parameters
-            </li>
-          </ul>
-        </div>
-        <div class="chart-and-summary">
-          <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
-            <app-bar-chart
-              #barChart
-              [showPercent]="form.value.chartFormat.percent"
-              [extraSettings]="
-                [
-                  DimensionName.contentTier,
-                  DimensionName.metadataTier
-                ].includes(form.value.facetParameter)
-                  ? barChartSettingsTiers
-                  : barChartSettings
-              "
-            ></app-bar-chart>
+            </ul>
           </div>
-          <ng-container>
-            <app-grid-summary
-              #gridSummary
-              *ngIf="dataServerData"
-              [grandTotal]="resultTotal"
-              [summaryData]="dataServerData.results.breakdowns"
-            ></app-grid-summary>
-          </ng-container>
+          <div
+            class="rm-filter-nav"
+            [ngClass]="{ active: scrollInfo.canScrollFwd }"
+            *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
+          >
+            <a
+              class="rm-filter-nav-prev"
+              (click)="scrollInfo.back()"
+              [ngClass]="{ active: scrollInfo.canScrollBack }"
+              [title]="scrollInfo.canScrollBack ? 'scroll back' : ''"
+              >&lsaquo;</a
+            >
+            <a
+              class="rm-filter-nav-next"
+              (click)="scrollInfo.fwd()"
+              [ngClass]="{ active: scrollInfo.canScrollFwd }"
+              [title]="scrollInfo.canScrollFwd ? 'scroll forward' : ''"
+              >&rsaquo;</a
+            >
+          </div>
         </div>
 
-        <ng-container *ngIf="!emptyDataset">
-          <app-checkbox
-            [form]="form"
-            controlName="percent"
-            labelText="As percentages"
-            group="chartFormat"
-            (valueChanged)="refreshChart()"
-          ></app-checkbox>
-        </ng-container>
+        <!-- Data Area -->
+        <div class="data-area">
+          <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
 
-        <!-- SNAPSHOTS -->
-        <ng-container>
-          <app-snapshots
-            #snapshots
-            [facetName]="form.value.facetParameter"
-            (hideItem)="removeSeries($event)"
-            (showItems)="addSeries($event)"
+          <!-- NO-DATA FALLBACK -->
+          <div *ngIf="emptyDataset && !isLoading" class="no-data">
+            <span i18n="Warn no results@@warnNoResults">No results found!</span>
+            <ul>
+              <li
+                *ngIf="
+                  queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
+                "
+                i18n="No results detail dataset id@@warnNoResultsDatasetId"
+              >
+                try removing the <span class="param">dataset id</span> parameter
+              </li>
+              <li
+                *ngIf="
+                  queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
+                  queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
+                "
+                i18n="No results detail date@@warnNoResultsDate"
+              >
+                try removing the <span class="param">date</span> parameters
+              </li>
+            </ul>
+          </div>
+          <!-- CHART AND SUMMARY -->
+          <div class="chart-and-summary">
+            <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
+              <app-bar-chart
+                #barChart
+                [showPercent]="form.value.chartFormat.percent"
+                [extraSettings]="
+                  [
+                    DimensionName.contentTier,
+                    DimensionName.metadataTier
+                  ].includes(form.value.facetParameter)
+                    ? barChartSettingsTiers
+                    : barChartSettings
+                "
+              ></app-bar-chart>
+            </div>
+            <ng-container>
+              <app-grid-summary
+                #gridSummary
+                *ngIf="dataServerData"
+                [grandTotal]="resultTotal"
+                [summaryData]="dataServerData.results.breakdowns"
+              ></app-grid-summary>
+            </ng-container>
+          </div>
+
+          <!-- PERCENT SWITCH -->
+          <ng-container *ngIf="!emptyDataset">
+            <app-checkbox
+              [form]="form"
+              controlName="percent"
+              i18n-labelText="As percentages@@percentSwitchLabel"
+              labelText="As percentages"
+              group="chartFormat"
+              (valueChanged)="refreshChart()"
+            ></app-checkbox>
+          </ng-container>
+
+          <!-- SNAPSHOTS -->
+          <ng-container>
+            <app-snapshots
+              #snapshots
+              [facetName]="form.value.facetParameter"
+              (hideItem)="removeSeries($event)"
+              (showItems)="addSeries($event)"
+              [isVisible]="!emptyDataset"
+            >
+            </app-snapshots>
+          </ng-container>
+
+          <!-- GRID -->
+          <app-grid
+            #grid
+            id="grid"
+            [tierPrefix]="tierPrefix"
+            facet="{{ form.value.facetParameter }}"
+            (refreshData)="showAppliedSeriesInGridAndChart()"
+            (chartPositionChanged)="chartPositionChanged($event)"
             [isVisible]="!emptyDataset"
-          >
-          </app-snapshots>
-        </ng-container>
-        <!-- END SNAPSHOTS -->
+          ></app-grid>
 
-        <app-grid
-          #grid
-          id="grid"
-          facet="{{ form.value.facetParameter }}"
-          [getUrlRow]="getUrlRow.bind(this)"
-          (refreshData)="showAppliedSeriesInGridAndChart()"
-          (chartPositionChanged)="chartPositionChanged($event)"
-          [isVisible]="!emptyDataset"
-        ></app-grid>
-
-        <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
-          <a class="export-opener-link" (click)="export.toggleActive()"
-            >EXPORT DATA</a
-          >
+          <!-- EXPORT LINK -->
+          <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
+            <a
+              class="export-opener-link"
+              (click)="export.toggleActive()"
+              i18n="Share Report Opener@@exportReportOpenerLink"
+              >Export data</a
+            >
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</form>
+  </form>
+</main>

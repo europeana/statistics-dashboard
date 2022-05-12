@@ -9,7 +9,7 @@ export interface CHO {
   [DimensionName.provider]: string;
   [DimensionName.dataProvider]: string;
   [DimensionName.type]: string;
-  [DimensionName.rights]: string;
+  [DimensionName.rightsCategory]: string;
   exclusions: Array<string>;
 }
 

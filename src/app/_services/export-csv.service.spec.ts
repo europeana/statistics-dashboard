@@ -1,16 +1,18 @@
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { HeaderNameType } from '../_models';
 import { ExportCSVService } from './';
 
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      providers: [ExportCSVService]
-    }).compileComponents();
-    service = TestBed.inject(ExportCSVService);
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        providers: [ExportCSVService]
+      }).compileComponents();
+      service = TestBed.inject(ExportCSVService);
+    })
+  );
 
   it('should convert', () => {
     const testHeaders = ['series', 'name', 'count', 'percent'].map(
@@ -22,18 +24,22 @@ describe('ExportCSVService', () => {
       {
         series: 'Series A',
         name: 'Andy' as HeaderNameType,
-        nameOriginal: 'Andy',
         count: 22,
-        percent: 50
+        percent: 50,
+        portalUrlInfo: {
+          href: ''
+        }
       }
     ];
     const testData2 = [
       {
         series: 'Series B',
         name: 'MacLean' as HeaderNameType,
-        nameOriginal: 'MacLean',
         count: 22,
-        percent: null
+        percent: null,
+        portalUrlInfo: {
+          href: ''
+        }
       }
     ];
     expect(service.csvFromTableRows(testHeaders, testData1)).toEqual(

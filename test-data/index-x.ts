@@ -6,9 +6,10 @@ import {
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
+  DimensionName,
   FilterOption,
   GeneralResults,
-  IHashStringArray,
+  IHashArray,
   RequestFilter
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
@@ -51,30 +52,41 @@ new (class extends TestDataServer {
 
     return {
       breakdownBy: filterName,
-      results: possibleValues.map((val: string) => {
-        const valueCHOs = chos.filter((cho: CHO) => {
-          return `${cho[filterName]}` === `${val}`;
-        });
+      results: possibleValues
+        .map((val: string) => {
+          const valueCHOs = chos.filter((cho: CHO) => {
+            return `${cho[filterName]}` === `${val}`;
+          });
+          const percentage = parseFloat(
+            ((valueCHOs.length / chos.length) * 100).toFixed(2)
+          );
 
-        const percentage = parseFloat(
-          ((valueCHOs.length / chos.length) * 100).toFixed(2)
-        );
+          const nestedBreakdown =
+            filterNames.length > 1
+              ? this.asBreakdown(
+                  valueCHOs,
+                  filterNames.slice(1, filterNames.length),
+                  top
+                )
+              : undefined;
 
-        const nestedBreakdown =
-          filterNames.length > 1
-            ? this.asBreakdown(
-                valueCHOs,
-                filterNames.slice(1, filterNames.length)
-              )
-            : undefined;
-
-        return {
-          count: valueCHOs.length,
-          percentage: percentage,
-          value: val,
-          breakdowns: nestedBreakdown
-        };
-      })
+          return {
+            count: valueCHOs.length,
+            percentage: percentage,
+            value: val,
+            breakdowns: nestedBreakdown
+          };
+        })
+        .sort((cpv1: CountPercentageValue, cpv2: CountPercentageValue) => {
+          if (!!top) {
+            if (cpv1.count > cpv2.count) {
+              return -1;
+            } else if (cpv2.count > cpv1.count) {
+              return 1;
+            }
+          }
+          return 0;
+        })
     };
   }
 
@@ -103,12 +115,37 @@ new (class extends TestDataServer {
         this.sendResponse(response, JSON.parse(body) as BreakdownRequest);
       });
     } else {
-      const result: GeneralResults = {
-        allBreakdowns: facetNames.map((fName: string) => {
-          return this.asBreakdown(this.allCHOs, [fName], this.generalShowTop);
-        })
-      };
-      response.end(JSON.stringify(result));
+      const route = request.url as string;
+      const params = url.parse(route, true).query;
+      const cat = params['rightsCategory'];
+
+      if (cat) {
+        const result = encodeURIComponent(`${cat}`.replace(/ /g, '-'));
+        response.end(
+          JSON.stringify([
+            `http://${result}/1.0`,
+            `http://${result}/1.5`,
+            `http://${result}/2.0`
+          ])
+        );
+      } else {
+        const ctZero = params['content-tier-zero'] === 'true';
+
+        let resultCHOs = this.allCHOs;
+
+        if (!ctZero) {
+          resultCHOs = resultCHOs.filter((cho: CHO) => {
+            return cho[DimensionName.contentTier] !== '0';
+          });
+        }
+
+        const result: GeneralResults = {
+          allBreakdowns: facetNames.map((fName: string) => {
+            return this.asBreakdown(resultCHOs, [fName], this.generalShowTop);
+          })
+        };
+        response.end(JSON.stringify(result));
+      }
     }
   };
 
@@ -129,12 +166,11 @@ new (class extends TestDataServer {
           const filter = breakdownRequest.filters[fName] as RequestFilter;
           if (filter.values) {
             if (fName === 'datasetId') {
+              res = true;
               if (!filter.values.includes(cho.datasetId)) {
                 res = false;
               }
-            } else if (
-              !filter.values.includes(encodeURIComponent(cho[fName]))
-            ) {
+            } else if (!filter.values.includes(cho[fName])) {
               cho.exclusions.push(fName);
               res = false;
             }
@@ -144,7 +180,7 @@ new (class extends TestDataServer {
     });
 
     const filterOptions = facetNames.reduce(
-      (result: IHashStringArray, fName: string) => {
+      (result: IHashArray<string>, fName: string) => {
         const nonExcluded = this.allCHOs.filter((cho: CHO) => {
           return (
             cho.exclusions.length === 0 ||

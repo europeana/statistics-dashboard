@@ -5,8 +5,11 @@ import {
   Input,
   Output
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormGroup,
+  NG_VALUE_ACCESSOR
+} from '@angular/forms';
 
 @Component({
   selector: 'app-checkbox',

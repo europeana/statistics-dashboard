@@ -1,25 +1,27 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
-  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick
+  tick,
+  waitForAsync
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
-import { portalNames } from '../_data';
-import { today } from '../_helpers';
+import { nonFacetFilters, portalNames } from '../_data';
+import { today, yearZero } from '../_helpers';
 
 import {
   createMockPipe,
   MockAPIService,
   MockAPIServiceErrors,
   MockBarComponent,
+  MockBreakdowns,
   MockGridComponent
 } from '../_mocked';
 import {
@@ -27,6 +29,7 @@ import {
   BreakdownResults,
   DimensionName,
   NameLabel,
+  NonFacetFilterNames,
   RequestFilter,
   RequestFilterRange
 } from '../_models';
@@ -37,6 +40,12 @@ import { OverviewComponent } from './overview.component';
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
+
+  const dialog = {
+    open: (): void => {
+      // mock open function
+    }
+  };
 
   const contentTierNameLabels = [
     { name: '0', label: '0' },
@@ -83,8 +92,7 @@ describe('OverviewComponent', () => {
         MockBarComponent,
         MockGridComponent,
         SnapshotsComponent,
-        createMockPipe('renameApiFacet'),
-        createMockPipe('renameRights')
+        createMockPipe('renameApiFacet')
       ],
       providers: [
         {
@@ -94,6 +102,10 @@ describe('OverviewComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: { params: params, queryParams: queryParams }
+        },
+        {
+          provide: MatDialog,
+          useValue: dialog
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -120,16 +132,18 @@ describe('OverviewComponent', () => {
   };
 
   describe('Route Parameter', () => {
-    beforeEach(async(() => {
-      configureTestBed(false);
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed(false);
+      })
+    );
 
     beforeEach(() => {
       b4Each();
       params.next({ facet: DimensionName.country });
     });
 
-    it('should poll on initialisation', fakeAsync(() => {
+    it('should load on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
       fixture.detectChanges();
@@ -142,9 +156,11 @@ describe('OverviewComponent', () => {
   });
 
   describe('Normal Operations', () => {
-    beforeEach(async(() => {
-      configureTestBed();
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed();
+      })
+    );
 
     beforeEach(() => {
       b4Each();
@@ -171,41 +187,79 @@ describe('OverviewComponent', () => {
       component.ngOnDestroy();
     }));
 
+    it('should calculate the portal urls', () => {
+      queryParams.next({});
+
+      const rootUrl =
+        'https://www.europeana.eu/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)';
+      const data = [{ name: 'name', value: 1, percent: 1 }];
+
+      component.form.value.facetParameter = DimensionName.rightsCategory;
+      fixture.detectChanges();
+
+      const res1 = component.portalUrlsFromNVPs(
+        DimensionName.rightsCategory,
+        data
+      );
+      expect(res1.name).toEqual(`${rootUrl}`);
+
+      component.form.value.facetParameter = DimensionName.type;
+      fixture.detectChanges();
+
+      const res2 = component.portalUrlsFromNVPs(DimensionName.type, data);
+      expect(res2.name).toEqual(`${rootUrl}&qf=TYPE:\"name\"`);
+    });
+
+    it('should show the date disclaimer', () => {
+      spyOn(dialog, 'open');
+      component.showDateDisclaimer();
+      expect(dialog.open).toHaveBeenCalled();
+    });
+
+    it('should process the server result', () => {
+      const dataServerData = { results: {} } as unknown as BreakdownResults;
+      expect(component.emptyDataset).toBeTruthy();
+      expect(component.processServerResult(dataServerData)).toBeFalsy();
+      expect(component.processServerResult(MockBreakdowns)).toBeTruthy();
+      expect(component.emptyDataset).toBeFalsy();
+    });
+
     it('should post process', () => {
       spyOn(component, 'extractSeriesServerData');
-      component.dataServerData = {} as unknown as BreakdownResults;
+      component.dataServerData = { results: {} } as unknown as BreakdownResults;
       component.postProcessResult();
       expect(component.extractSeriesServerData).not.toHaveBeenCalled();
-      component.dataServerData = {
-        filteringOptions: {
-          contentTier: [],
-          country: [],
-          dataProvider: [],
-          metadataTier: [],
-          provider: [],
-          rights: [],
-          type: []
-        },
-        results: {
-          breakdowns: {
-            results: []
-          }
-        }
-      } as unknown as BreakdownResults;
-
+      component.dataServerData = MockBreakdowns;
       component.postProcessResult();
       expect(component.extractSeriesServerData).toHaveBeenCalled();
+
+      component.dataServerData = Object.assign({}, MockBreakdowns);
+      delete component.dataServerData.results;
+      component.postProcessResult();
+      expect(component.extractSeriesServerData).toHaveBeenCalledTimes(1);
     });
 
     it('should refresh the chart', fakeAsync(() => {
-      component.showAppliedSeriesInGridAndChart();
+      spyOn(component.barChart, 'drawChart');
+
+      component.refreshChart();
+      component.refreshChart(true);
+      component.refreshChart(false);
+      component.refreshChart(true, 1);
+      component.refreshChart(false, 1);
+
+      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+
+      // test invocation
       spyOn(component, 'refreshChart');
+
+      component.showAppliedSeriesInGridAndChart();
       component.form.controls.facetParameter.setValue(
         DimensionName.contentTier
       );
-      expect(component.refreshChart).not.toHaveBeenCalled();
+      fixture.detectChanges();
       tick(400);
-      expect(component.refreshChart).toHaveBeenCalled();
+      expect(component.refreshChart).toHaveBeenCalledWith(true, 0);
       component.ngOnDestroy();
     }));
 
@@ -213,9 +267,96 @@ describe('OverviewComponent', () => {
       expect(component.getChartData()).toBeTruthy();
     });
 
+    it('should track changes in the chart position', () => {
+      expect(component.chartPosition).toEqual(0);
+      spyOn(component.barChart, 'zoomTop');
+      component.chartPositionChanged(component.barChart.maxNumberBars);
+      expect(component.barChart.zoomTop).not.toHaveBeenCalled();
+      component.chartPositionChanged(component.barChart.maxNumberBars);
+      expect(component.barChart.zoomTop).toHaveBeenCalled();
+    });
+
+    it('should get the applied date range', () => {
+      let range = component.getAppliedDateRange();
+
+      expect(range[0]).toEqual(yearZero);
+      expect(range[1]).toEqual(today);
+
+      component.form.get('dateTo').setValue(today);
+      component.form.get('dateFrom').setValue(today);
+
+      range = component.getAppliedDateRange();
+
+      expect(range[0]).toEqual(today);
+      expect(range[1]).toEqual(today);
+    });
+
     it('should get the grid data', () => {
       expect(component.getGridData()).toBeTruthy();
     });
+
+    it('should generate the series label', fakeAsync(() => {
+      queryParams.next({});
+      tick(1);
+      fixture.detectChanges();
+
+      let generatedLabel;
+      component.form.controls.facetParameter.setValue(
+        DimensionName.contentTier
+      );
+      generatedLabel = component.generateSeriesLabel();
+      expect(generatedLabel).toEqual('All (Content Tier)');
+
+      component.form.controls.facetParameter.setValue(
+        DimensionName.rightsCategory
+      );
+      generatedLabel = component.generateSeriesLabel();
+      expect(generatedLabel).toEqual('All (Rights Category)');
+
+      const nextParams = {};
+      nextParams[DimensionName.country] = ['Denmark', 'Iceland'];
+      queryParams.next(nextParams);
+
+      tick(10);
+      fixture.detectChanges();
+
+      generatedLabel = component.generateSeriesLabel();
+      expect(generatedLabel.indexOf('Denmark')).toBeGreaterThan(-1);
+
+      nextParams['date-to'] = [today];
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
+
+      nextParams['date-from'] = [yearZero];
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      expect(component.generateSeriesLabel().indexOf('Period')).toBeGreaterThan(
+        -1
+      );
+
+      nextParams['date-to'] = [];
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
+      expect(
+        component.generateSeriesLabel().indexOf('content-tier-zero')
+      ).toEqual(-1);
+      nextParams['content-tier-zero'] = 'true';
+      queryParams.next(nextParams);
+      tick(10);
+      fixture.detectChanges();
+
+      queryParams.next({});
+      tick(10);
+      component.ngOnDestroy();
+    }));
 
     it('should extract the series server data', () => {
       const br: BreakdownResult = {
@@ -227,68 +368,124 @@ describe('OverviewComponent', () => {
           }
         ]
       };
+      component.queryParams = { any: ['thing'] };
 
       spyOn(component, 'storeSeries');
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();
 
-      component.form.controls.facetParameter.setValue(DimensionName.rights);
+      component.form.controls.facetParameter.setValue(
+        DimensionName.rightsCategory
+      );
       component.extractSeriesServerData(br);
 
       expect(component.storeSeries).toHaveBeenCalledTimes(2);
 
-      component.queryParams = { any: 'thing' };
       component.extractSeriesServerData(br);
-
       expect(component.storeSeries).toHaveBeenCalledTimes(3);
     });
 
+    it('should build the filters', () => {
+      expect(Object.keys(component.filterData).length).toBeFalsy();
+      const ops = {};
+      ops[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+
+      component.buildFilters(ops);
+      fixture.detectChanges();
+      expect(Object.keys(component.filterData).length).toBeTruthy();
+    });
+
+    it('should build the filters (from the query parameters)', fakeAsync(() => {
+      expect(Object.keys(component.filterData).length).toBeFalsy();
+      const ops = {};
+      const nextParams = {};
+      nextParams[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+      queryParams.next(nextParams);
+      tick(1);
+      fixture.detectChanges();
+      component.buildFilters(ops);
+      expect(Object.keys(component.filterData).length).toBeTruthy();
+      component.ngOnDestroy();
+    }));
+
+    it('should load the data', fakeAsync(() => {
+      spyOn(component, 'postProcessResult');
+      component.form.controls.datasetId.setValue('1');
+      fixture.detectChanges();
+      component.loadData();
+      tick(tickTime);
+
+      expect(component.postProcessResult).toHaveBeenCalled();
+
+      component.form.controls.datasetId.setValue('EMPTY');
+      fixture.detectChanges();
+      component.loadData();
+      tick(tickTime);
+
+      expect(component.postProcessResult).toHaveBeenCalledTimes(1);
+
+      component.ngOnDestroy();
+    }));
+
     it('should get the select options', fakeAsync(() => {
+      fixture.detectChanges();
       expect(component.filterData.length).toBeFalsy(0);
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       component.ngOnDestroy();
     }));
 
-    it('should get the url for a dataset', () => {
-      expect(
-        component.getUrl(DimensionName.contentTier).indexOf('XXX')
-      ).toEqual(-1);
+    it('should get the url for a dataset', fakeAsync(() => {
+      expect(component.getUrl().indexOf('XXX')).toEqual(-1);
       component.form.get('datasetId').setValue('XXX');
-      expect(
-        component.getUrl(DimensionName.contentTier).indexOf('XXX')
-      ).toBeTruthy();
-    });
+      expect(component.getUrl().indexOf('XXX')).toBeGreaterThan(-1);
+      component.form.get('datasetId').setValue('');
+
+      queryParams.next({});
+      tick(10);
+      fixture.detectChanges();
+
+      const qp = {};
+      qp[DimensionName.rightsCategory] = ['CC0'];
+      qp[DimensionName.country] = ['Italy'];
+
+      queryParams.next(qp);
+      tick(10);
+      fixture.detectChanges();
+
+      const url = component.getUrl();
+
+      expect(url.indexOf('CC0')).toEqual(-1);
+      expect(url.indexOf('Italy')).toBeGreaterThan(-1);
+
+      queryParams.next({ xxx: '10-11-12' });
+      fixture.detectChanges();
+      tick(1);
+      expect(component.getUrl().indexOf('Italy')).toEqual(-1);
+
+      queryParams.next({});
+      fixture.detectChanges();
+      tick(1);
+      component.ngOnDestroy();
+    }));
 
     it('should get the url for filters', () => {
       const countryUrlParamVal = 'Belgium';
       const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
 
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(countryUrlParamVal)
-      ).toBeFalsy();
+      expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
       component.queryParams = { country: [countryUrlParamVal] };
+      expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
       expect(
-        component.getUrl(DimensionName.contentTier).includes(countryUrlParamVal)
-      ).toBeTruthy();
-      expect(
-        component
-          .getUrl(DimensionName.contentTier)
-          .includes(`COUNTRY:"${countryUrlParamVal}"`)
+        component.getUrl().includes(`COUNTRY:"${countryUrlParamVal}"`)
       ).toBeTruthy();
 
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
-      ).toBeFalsy();
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
       component.queryParams = { 'content-tier-zero': true };
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
-      ).toBeFalsy();
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
       component.form.controls.contentTierZero.setValue(true);
-      expect(
-        component.getUrl(DimensionName.contentTier).includes(ctZeroUrlParamVal)
-      ).toBeTruthy();
+      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeTruthy();
     });
 
     it('should get the formatted date param', () => {
@@ -304,6 +501,27 @@ describe('OverviewComponent', () => {
       component.form.get('dateFrom').setValue(null);
       expect(component.getFormattedDateParam().length).toBeFalsy();
     });
+
+    it('should read the datasetId param', fakeAsync(() => {
+      component.loadData();
+      tick(tickTime);
+
+      expect(component.form.value.datasetId.length).toBeFalsy();
+
+      const nextParams = {};
+      nextParams[nonFacetFilters[NonFacetFilterNames.datasetId]] = '123';
+
+      queryParams.next(nextParams);
+      tick(tickTime);
+      fixture.detectChanges();
+
+      expect(component.form.value.datasetId.length).toBeTruthy();
+      expect(component.form.value.datasetId).toEqual('123');
+
+      queryParams.next({});
+      tick(1);
+      component.ngOnDestroy();
+    }));
 
     it('should update the datasetId param', () => {
       component.form.get('datasetId').setValue('123, 456, 789');
@@ -431,7 +649,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should enable the filters', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       component.filterStates[DimensionName.country].disabled = true;
       component.enableFilters();
@@ -454,7 +672,7 @@ describe('OverviewComponent', () => {
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
-      component.clearFilter(DimensionName.rights);
+      component.clearFilter(DimensionName.rightsCategory);
       expect(
         component.getSetCheckboxValues(DimensionName.type).length
       ).toBeTruthy();
@@ -465,7 +683,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should close the filters', fakeAsync(() => {
-      component.beginPolling();
+      component.loadData();
       tick(tickTime);
       const setAllTrue = (): void => {
         Object.keys(component.filterStates).forEach((s: string) => {
@@ -513,16 +731,39 @@ describe('OverviewComponent', () => {
           .indexOf(portalNames[DimensionName.country])
       ).toBeGreaterThan(-1);
     });
+
+    it('should add the series', () => {
+      spyOn(component.snapshots, 'apply').and.callFake(() => false);
+      spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
+        () => false
+      );
+      component.addSeries(['series-key']);
+      expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
+      expect(component.snapshots.apply).toHaveBeenCalled();
+    });
+
+    it('should remove the series', () => {
+      spyOn(component.snapshots, 'unapply').and.callFake(() => false);
+      spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
+        () => false
+      );
+      component.removeSeries('');
+      expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
+      expect(component.snapshots.unapply).toHaveBeenCalled();
+    });
   });
 
   describe('Request / Url Generation', () => {
-    beforeEach(async(() => {
-      configureTestBed();
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed();
+      })
+    );
 
     beforeEach(() => {
       b4Each();
       component.form.value.facetParameter = DimensionName.contentTier;
+      fixture.detectChanges();
     });
 
     it('should get the data server request', () => {
@@ -624,9 +865,11 @@ describe('OverviewComponent', () => {
   });
 
   describe('Polling', () => {
-    beforeEach(async(() => {
-      configureTestBed();
-    }));
+    beforeEach(
+      waitForAsync(() => {
+        configureTestBed();
+      })
+    );
 
     beforeEach(() => {
       b4Each();
@@ -634,7 +877,7 @@ describe('OverviewComponent', () => {
 
     it('should invoke the provided callback', fakeAsync(() => {
       const spy = jasmine.createSpy();
-      component.beginPolling(spy);
+      component.loadData(spy);
       tick(tickTime);
       expect(spy).toHaveBeenCalled();
       component.ngOnDestroy();

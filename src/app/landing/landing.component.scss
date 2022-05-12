@@ -7,11 +7,11 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
-app-truncate {
+.app-truncate {
   overflow: hidden;
 }
 
-app-bar-chart {
+.app-bar-chart {
   height: 100%;
 }
 
@@ -69,8 +69,27 @@ app-bar-chart {
   font-weight: 600;
   line-height: $card-header-pixels-line-height;
   margin-bottom: $card-header-pixels-margin-bottom;
+  position: relative;
   text-transform: uppercase;
-  display: flex;
+
+  .info-icon {
+    &::after {
+      background-image: svg-url-icon-spinner(#{$gray-light});
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      opacity: 0;
+      left: 0;
+      top: -50%;
+      transition: opacity $transition-duration ease-in-out;
+    }
+  }
+  a.info-icon {
+    &::after {
+      left: 18px;
+    }
+  }
 }
 
 .entry-card-pair {
@@ -82,6 +101,14 @@ app-bar-chart {
 
     .entry-card {
       width: 50%;
+    }
+  }
+}
+
+.loading .entry-card-header {
+  .info-icon {
+    &::after {
+      opacity: 1;
     }
   }
 }

@@ -2,6 +2,12 @@
   class="filter"
   *ngIf="form && group && !state.disabled"
   [formGroup]="form"
+  appClickAware
+  [includeClicksOnClasses]="
+    group + '' === 'dates'
+      ? ['mat-calendar-body', 'mat-datepicker-content']
+      : []
+  "
   (clickOutside)="hide()"
 >
   <li>
@@ -36,7 +42,7 @@
   </ng-template>
 
   <ng-container *ngIf="state.visible">
-    <ng-container *ngIf="_options; else dates">
+    <ng-container *ngIf="optionSet; else dates">
       <li class="checkboxes">
         <ul>
           <li class="checkbox-filter container-h">
@@ -46,27 +52,29 @@
               class="checkbox-filter-input"
               (keyup)="filterOptions($event)"
               formControlName="filter_list_{{ group }}"
-              placeholder="Search"
+              i18n-placeholder="@@filterSearchItemsPlaceholder"
+              placeholder="Search ({{ totalAvailable }} entries)"
             />
           </li>
         </ul>
         <ul class="checkboxes-list">
           <li>
-            <ul *ngFor="let option of filteredOptions">
+            <ul *ngFor="let option of optionSet.options">
               <li>
                 <app-checkbox
                   [form]="form"
                   [controlName]="option.name"
                   [labelText]="
-                    option.label
-                      | renameRights
-                      | highlightMatch: [filterTerm.value]
+                    option.label | highlightMatch: [filterTerm.value]
                   "
                   [group]="group"
                   (valueChanged)="changed()"
                 ></app-checkbox>
               </li>
             </ul>
+          </li>
+          <li class="load-more-item" [ngClass]="{ hidden: !optionSet.hasMore }">
+            <a (click)="loadMore()">view more...</a>
           </li>
         </ul>
       </li>

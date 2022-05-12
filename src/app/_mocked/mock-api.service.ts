@@ -5,8 +5,25 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  IHashString
+  IHash,
+  RequestFilter
 } from '../_models';
+
+const rightsCategories = [
+  'CC0',
+  'CC BY',
+  'CC BY-SA',
+  'CC BY-ND',
+  'CC BY-NC',
+  'CC BY-NC-SA',
+  'CC BY-NC-ND',
+  'No Copyright - Non Commercial Re-Use Only',
+  'No Copyright - Other Known Legal Restriction',
+  'In Copyright - Educational Use Permitted',
+  'In Copyright - EU Orphan Work',
+  'In Copyright',
+  'Copyright Not Evaluated'
+];
 
 export const MockGeneralResults = {
   allBreakdowns: [
@@ -202,47 +219,47 @@ export const MockGeneralResults = {
       ]
     },
     {
-      breakdownBy: DimensionName.rights,
+      breakdownBy: DimensionName.rightsCategory,
       results: [
         {
           count: 50,
           percentage: 5,
-          value: 'https://creativecommons.org/licenses/by-nc-nd'
+          value: rightsCategories[0]
         },
         {
           count: 39,
           percentage: 3.9,
-          value: 'https://creativecommons.org/licenses/by-nc-sa/4.0'
+          value: rightsCategories[1]
         },
         {
           count: 92,
           percentage: 9.2,
-          value: 'https://creativecommons.org/licenses/by-nd/2.5/pl'
+          value: rightsCategories[2]
         },
         {
           count: 16,
           percentage: 1.6,
-          value: 'https://creativecommons.org/licenses/by-nd/3.0/pl'
+          value: rightsCategories[3]
         },
         {
           count: 20,
           percentage: 2,
-          value: 'https://rightsstatements.org/vocab/CNE/1.0'
+          value: rightsCategories[4]
         },
         {
           count: 18,
           percentage: 1.8,
-          value: 'https://creativecommons.org/licenses/by/3.0/de'
+          value: rightsCategories[5]
         },
         {
           count: 14,
           percentage: 1.4,
-          value: 'https://creativecommons.org/licenses/by/2.0/uk'
+          value: rightsCategories[6]
         },
         {
           count: 13,
           percentage: 1.3,
-          value: 'https://rightsstatements.org/vocab/InC/1.0'
+          value: rightsCategories[7]
         }
       ]
     },
@@ -319,72 +336,7 @@ export const MockBreakdowns = {
       'Linked Heritage',
       'AthenaPlus'
     ],
-    rights: [
-      'https://creativecommons.org/licenses/by-nc-sa/4.0',
-      'https://creativecommons.org/licenses/by-nd/2.5/pl',
-      'https://creativecommons.org/licenses/by-nd/3.0/pl',
-      'https://rightsstatements.org/vocab/CNE/1.0',
-      'https://creativecommons.org/licenses/by/2.0/uk',
-      'https://rightsstatements.org/vocab/InC/1.0',
-      'https://creativecommons.org/licenses/by-nc-sa/3.0',
-      'https://creativecommons.org/licenses/by-sa/3.0/de',
-      'https://creativecommons.org/licenses/by/2.5/pl',
-      'https://rightsstatements.org/vocab/InC-EDU/1.0',
-      'https://creativecommons.org/licenses/by/3.0/pl',
-      'https://creativecommons.org/licenses/by-nc-nd/3.0',
-      'https://creativecommons.org/licenses/by/3.0/de',
-      'https://creativecommons.org/licenses/by-sa',
-      'https://creativecommons.org/licenses/by-sa/3.0/nl',
-      'https://creativecommons.org/licenses/by-nc-sa/3.0/pl',
-      'https://creativecommons.org/licenses/by-nc-sa/3.0/de',
-      'https://creativecommons.org/licenses/by-nc-nd/3.0/pl',
-      'https://creativecommons.org/licenses/by-nc/3.0/nl',
-      'https://creativecommons.org/licenses/by-nc-nd/2.5/pl',
-      'https://creativecommons.org/licenses/by-sa/4.0',
-      'https://creativecommons.org/licenses/by/2.5',
-      'https://creativecommons.org/licenses/by-nd/4.0',
-      'https://creativecommons.org/licenses/by-nc-sa/2.5/pl',
-      'https://creativecommons.org/licenses/by-nc-nd/3.0/de',
-      'https://creativecommons.org/licenses/by-sa/3.0/',
-      'https://creativecommons.org/licenses/by-nc/2.5/se',
-      'https://creativecommons.org/licenses/by-nc-sa/3.0/ie',
-      'https://creativecommons.org/licenses/by/3.0',
-      'https://rightsstatements.org/vocab/NoC-NC/1.0',
-      'https://creativecommons.org/licenses/by-nc-nd',
-      'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.de',
-      'https://creativecommons.org/licenses/by-nc-nd/2.5/pt',
-      'https://creativecommons.org/licenses/by-sa/2.5',
-      'https://creativecommons.org/licenses/by-nc/3.0/de',
-      'https://creativecommons.org/licenses/by-nc/2.5/pl',
-      'https://rightsstatements.org/page/InC/1.0',
-      'https://creativecommons.org/licenses/by-nc-sa/2.5/fr',
-      'https://creativecommons.org/licenses/by-nc-nd/4.0',
-      'https://creativecommons.org/licenses/by-nc/3.0/pl',
-      'https://rightsstatements.org/vocab/InC-OW-EU/1.0',
-      'https://creativecommons.org/licenses/by/4.0',
-      'https://creativecommons.org/licenses/by-nc-nd/3.0/gr',
-      'https://creativecommons.org/licenses/by/2.0/',
-      'https://creativecommons.org/licenses/by-nc/4.0',
-      'https://www.europeana.eu/rights/rr-f',
-      'https://creativecommons.org/licenses/by-nd/3.0',
-      'https://creativecommons.org/licenses/by-nc-nd/2.5',
-      'https://creativecommons.org/publicdomain/mark/1.0',
-      'https://creativecommons.org/licenses/by-nc/2.0/at',
-      'https://creativecommons.org/licenses/by-nc-nd/3.0/es/deed.ca',
-      'https://creativecommons.org/licenses/by-nd/3.0/de',
-      'https://creativecommons.org/licenses/by-sa/3.0/pl',
-      'https://creativecommons.org/licenses/by-nc-sa/2.5',
-      'https://www.europeana.eu/rights/out-of-copyright-non-commercial',
-      'https://creativecommons.org/licenses/by-nc-nd/2.0',
-      'https://creativecommons.org/publicdomain/zero/1.0',
-      'https://creativecommons.org/licenses/by-nc/3.0/pt',
-      'https://creativecommons.org/licenses/by-sa/3.0',
-      'https://creativecommons.org/licenses/by-nc/2.0',
-      'https://creativecommons.org/licenses/by-nc-sa/3.0/es',
-      'https://creativecommons.org/licenses/by-nc-nd/2.5/ch',
-      'https://creativecommons.org/licenses/by-nc/3.0',
-      'https://rightsstatements.org/vocab/NoC-OKLR/1.0'
-    ],
+    rightsCategory: rightsCategories,
     type: ['IMAGE', 'SOUND', 'VIDEO']
   },
   results: {
@@ -399,12 +351,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Denmark',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[7],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -424,12 +376,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Ireland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[8],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -449,12 +401,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Norway',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[9],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -474,12 +426,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Finland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[10],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -499,12 +451,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Germany',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[11],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -524,12 +476,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Portugal',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[12],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -549,12 +501,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Poland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[0],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -574,12 +526,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Italy',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[1],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -599,12 +551,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Holy See (Vatican City State)',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[2],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -624,12 +576,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Croatia',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[3],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -649,12 +601,12 @@ export const MockBreakdowns = {
           percentage: 9.09,
           value: 'Iceland',
           breakdowns: {
-            breakdownBy: DimensionName.rights,
+            breakdownBy: DimensionName.rightsCategory,
             results: [
               {
                 count: 1,
                 percentage: 100,
-                value: 'https://creativecommons.org/licenses/by/2.0/uk',
+                value: rightsCategories[4],
                 breakdowns: {
                   breakdownBy: DimensionName.contentTier,
                   results: [
@@ -677,24 +629,34 @@ export const MockBreakdowns = {
 export class MockAPIService {
   errorMode = false;
 
-  loadISOCountryCodes(): IHashString {
+  loadISOCountryCodes(): IHash<string> {
     return {
       Belgium: 'BE'
     };
   }
 
-  getBreakdowns(_: BreakdownRequest): Observable<BreakdownResults> {
+  getBreakdowns(br: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return of({ filteringOptions: {}, results: {} } as BreakdownResults).pipe(
         delay(1)
       );
+    } else if (br.filters.datasetId) {
+      const datasetFilter = br.filters.datasetId as RequestFilter;
+      if (datasetFilter.values[0] === 'EMPTY') {
+        return of({} as unknown as BreakdownResults).pipe(delay(1));
+      }
     }
     return of(MockBreakdowns).pipe(delay(1));
   }
 
   getGeneralResults(): Observable<GeneralResults> {
     return of(MockGeneralResults).pipe(delay(1));
+  }
+
+  getRightsCategoryUrls(
+    rightsCategories: Array<string>
+  ): Observable<Array<string>> {
+    return of([`${rightsCategories[0]}/1.0`, `${rightsCategories[0]}/2.0`]);
   }
 }
 

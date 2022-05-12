@@ -4,7 +4,7 @@ export enum DimensionName {
   dataProvider = 'dataProvider',
   metadataTier = 'metadataTier',
   provider = 'provider',
-  rights = 'rights',
+  rightsCategory = 'rightsCategory',
   type = 'type'
 }
 

@@ -1,10 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
-  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick
+  tick,
+  waitForAsync
 } from '@angular/core/testing';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 
@@ -18,17 +18,27 @@ describe('FilterComponent', () => {
   let component: FilterComponent;
   let fixture: ComponentFixture<FilterComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
-      declarations: [
-        FilterComponent,
-        createMockPipe('renameApiFacet'),
-        createMockPipe('renameRights')
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
-    }).compileComponents();
-  }));
+  const dataOptions = {
+    hasMore: false,
+    options: [
+      {
+        name: 'name',
+        label: 'label'
+      }
+    ]
+  };
+
+  const emptyOptions = { options: [], hasMore: false };
+
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [ReactiveFormsModule],
+        declarations: [FilterComponent, createMockPipe('renameApiFacet')],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);
@@ -46,13 +56,28 @@ describe('FilterComponent', () => {
 
   it('should enable when options are added', () => {
     expect(component.isDisabled()).toBeTruthy();
-    component.options = [
-      {
-        name: 'name',
-        label: 'label'
-      }
-    ];
+    component.optionSet = emptyOptions;
+    expect(component.isDisabled()).toBeTruthy();
+    component.optionSet = dataOptions;
     expect(component.isDisabled()).toBeFalsy();
+  });
+
+  it('should track when the filter is empty and the data is empty', () => {
+    expect(component.empty).toBeTruthy();
+    expect(component.emptyData).toBeTruthy();
+    component.optionSet = emptyOptions;
+    expect(component.empty).toBeTruthy();
+    expect(component.emptyData).toBeTruthy();
+
+    component.term = '';
+    component.optionSet = dataOptions;
+    expect(component.empty).toBeFalsy();
+    expect(component.emptyData).toBeFalsy();
+
+    component.term = 'xxx';
+    component.optionSet = dataOptions;
+    expect(component.empty).toBeFalsy();
+    expect(component.emptyData).toBeFalsy();
   });
 
   it('should not disable the date if a range has been specified', () => {
@@ -66,6 +91,30 @@ describe('FilterComponent', () => {
 
     component.form.get('dateFrom').setValue(null);
     expect(component.isDisabled()).toBeTruthy();
+  });
+
+  it('should not disable the on the basis of a filter', () => {
+    component.state = {
+      visible: true,
+      disabled: false
+    };
+
+    component.empty = false;
+    component.emptyData = false;
+    expect(component.isDisabled()).toBeFalsy();
+
+    component.empty = true;
+    component.emptyData = true;
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.emptyData = false;
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.term = 'xxx';
+    expect(component.isDisabled()).toBeTruthy();
+
+    component.state.visible = false;
+    expect(component.isDisabled()).toBeFalsy();
   });
 
   it('should determine if a select option is enabled', () => {
@@ -84,16 +133,28 @@ describe('FilterComponent', () => {
 
   it('should set the filter options', () => {
     const evt = {
+      key: '1',
       target: {
         value: 'option_1'
       }
     };
-    expect(component.filteredOptions).toBeFalsy();
+    expect(component.optionSet).toBeFalsy();
     component.filterOptions(evt);
-    expect(component.filteredOptions).toBeFalsy();
-    component.options = [{ name: 'option_1', label: 'option_1' }];
+    expect(component.optionSet).toBeFalsy();
+
+    component.optionSet = {
+      options: [{ name: 'option_1', label: 'option_1' }]
+    };
     component.filterOptions(evt);
-    expect(component.filteredOptions.length).toEqual(1);
+    expect(component.optionSet.options.length).toEqual(1);
+
+    spyOn(component, 'hide');
+    component.filterOptions(evt);
+    expect(component.hide).not.toHaveBeenCalled();
+
+    evt.key = 'Escape';
+    component.filterOptions(evt);
+    expect(component.hide).toHaveBeenCalled();
   });
 
   it('should get the values', () => {
@@ -119,6 +180,8 @@ describe('FilterComponent', () => {
       'xxx, yyy, zzz'
     );
 
+    component.tierPrefix = 'Tier ';
+
     createFormControls(DimensionName.metadataTier, ['aaa', 'bbb']);
     expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
       'aaa, bbb'
@@ -135,14 +198,14 @@ describe('FilterComponent', () => {
       'Europeana'
     );
 
-    component.group = DimensionName.rights;
-    createFormControls(DimensionName.rights, [
+    component.group = DimensionName.rightsCategory;
+    createFormControls(DimensionName.rightsCategory, [
       'xxx',
-      toInputSafeName('//creativecommons.org/licenses/by-nc-nd')
+      toInputSafeName('CC BY-ND')
     ]);
-    expect(component.getSetCheckboxValues(DimensionName.rights)).toEqual(
-      'xxx, CC BY-NC-ND'
-    );
+    expect(
+      component.getSetCheckboxValues(DimensionName.rightsCategory)
+    ).toEqual('xxx, CC BY-ND');
   });
 
   it('should signal changes', () => {
@@ -187,4 +250,15 @@ describe('FilterComponent', () => {
     expect(component.state.visible).toBeTruthy();
     expect(hasCalledFocus).toBeTruthy();
   }));
+
+  it('should load more', () => {
+    spyOn(component.filterTermChanged, 'emit');
+
+    expect(component.pagesVisible).toEqual(1);
+
+    component.loadMore();
+
+    expect(component.filterTermChanged.emit).toHaveBeenCalled();
+    expect(component.pagesVisible).toEqual(2);
+  });
 });

@@ -7,8 +7,13 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { getFormValueList, rightsUrlMatch } from '../_helpers';
-import { DimensionName, FilterInfo, FilterState, NameLabel } from '../_models';
+import { getFormValueList } from '../_helpers';
+import {
+  DimensionName,
+  FilterInfo,
+  FilterOptionSet,
+  FilterState
+} from '../_models';
 
 @Component({
   selector: 'app-filter',
@@ -19,22 +24,31 @@ export class FilterComponent {
   @Input() emptyDataset: boolean;
   @Input() form: FormGroup;
   @Input() group: DimensionName;
+  @Input() totalAvailable: number;
 
-  filteredOptions?: Array<NameLabel>;
-  _options?: Array<NameLabel>;
+  _optionSet?: FilterOptionSet;
   empty = true;
+  emptyData = true;
+  term = '';
+  pagesVisible = 1;
 
-  @Input() set options(ops: Array<NameLabel>) {
-    this._options = ops;
-    this.filteredOptions = ops;
-
-    if (ops && ops.length > 0) {
+  get optionSet(): FilterOptionSet {
+    return this._optionSet;
+  }
+  @Input() set optionSet(optionSet: FilterOptionSet) {
+    if (optionSet && optionSet.options.length > 0) {
+      // if there's data (with no filter) then capture that fact.
+      if (!this.term || this.term.length === 0) {
+        this.emptyData = false;
+      }
       this.empty = false;
     } else {
       this.empty = true;
     }
+    this._optionSet = optionSet;
   }
   @Input() state: FilterState;
+  @Input() tierPrefix: string;
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
   @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
@@ -45,14 +59,23 @@ export class FilterComponent {
     this.valueChanged.emit(true);
   }
 
-  filterOptions(evt: { target: { value: string } }): void {
-    if (!this._options) {
+  filterOptions(evt: { key: string; target: { value: string } }): void {
+    if (!this.optionSet) {
       return;
     }
-    const term = evt.target.value;
-    this.filterTermChanged.emit({ term: term, dimension: this.group });
+    if (evt.key === 'Escape') {
+      this.hide();
+    }
+    this.term = evt.target.value;
+    this.filterTermChanged.emit({
+      term: this.term,
+      dimension: this.group
+    });
   }
 
+  /** isDisabled
+  /* disabling is conditional for dates
+  */
   isDisabled(): boolean {
     if ((this.group as string) === 'dates') {
       if (this.form.value.dateFrom && this.form.value.dateTo) {
@@ -61,10 +84,23 @@ export class FilterComponent {
         return this.emptyDataset;
       }
     } else {
+      // consider there to be data (and allow the user to open) if the term is blocking
+      if (
+        this.empty &&
+        !this.emptyData &&
+        this.term.length > 0 &&
+        !this.state.visible
+      ) {
+        return false;
+      }
       return this.empty;
     }
   }
 
+  /** getSetCheckboxValues
+  /* Template utility for selection string
+  /* @param {DimensionName} filterName - the form value key
+  */
   getSetCheckboxValues(filterName: DimensionName): string {
     return getFormValueList(this.form, filterName)
       .map((s: string) => {
@@ -74,10 +110,7 @@ export class FilterComponent {
             this.group
           )
         ) {
-          prefix = 'Tier ';
-        } else if (this.group === DimensionName.rights) {
-          const swapped = rightsUrlMatch(s);
-          s = swapped ? swapped : s;
+          prefix = this.tierPrefix;
         }
         return prefix + s;
       })
@@ -103,9 +136,28 @@ export class FilterComponent {
     }
   }
 
+  /** selectOptionEnabled
+   * @param { string  } group - the formGroup
+   * @param { string  } val - the form value
+   * @returns boolean
+   */
   selectOptionEnabled(group: string, val: string): boolean {
     return val === '0' && group === DimensionName.contentTier
       ? this.form.value.contentTierZero
       : true;
+  }
+
+  /** loadMore
+   *  function invoked by clicking on the "load more" link.
+   * @param { string : filterName } - the filter data to check
+   * @returns number
+   */
+  loadMore(): void {
+    this.pagesVisible++;
+    this.filterTermChanged.emit({
+      term: this.term,
+      dimension: this.group,
+      upToPage: this.pagesVisible
+    });
   }
 }

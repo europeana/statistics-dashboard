@@ -1,45 +1,52 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { formatDate } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { facetNames, nonFacetFilters, portalNames } from '../_data';
-import { filterList, fromCSL } from '../_helpers';
-import { DimensionName, FilterInfo, NonFacetFilterNames } from '../_models';
-import { RenameRightsPipe } from '../_translate';
-import { BarChartCool } from '../chart/chart-defaults';
-import { BarComponent } from '../chart';
-import { SnapshotsComponent } from '../snapshots';
-
 import {
+  externalLinks,
+  facetNames,
+  nonFacetFilters,
+  portalNames,
+  portalNamesFriendly
+} from '../_data';
+import {
+  filterList,
+  fromCSL,
   fromInputSafeName,
-  rightsUrlMatch,
+  getDateAsISOString,
   today,
   toInputSafeName,
   validateDateGeneric,
   yearZero
 } from '../_helpers';
-
+import { BarChartCool } from '../chart/chart-defaults';
+import { BarComponent } from '../chart';
+import { SubscriptionManager } from '../subscription-manager';
 import {
   BreakdownRequest,
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
+  DimensionName,
+  FilterInfo,
+  FilterOptionSet,
   FilterState,
   FmtTableData,
-  IHashArrayNameLabel,
-  IHashNumber,
-  IHashString,
-  IHashStringArray,
+  IHash,
+  IHashArray,
   NameLabel,
+  NameLabelValid,
   NamesValuePercent,
+  NonFacetFilterNames,
   RequestFilter
 } from '../_models';
 
 import { APIService } from '../_services';
-import { DataPollingComponent } from '../data-polling';
+import { SnapshotsComponent } from '../snapshots';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 import { GridSummaryComponent } from '../grid-summary';
@@ -47,24 +54,26 @@ import { GridSummaryComponent } from '../grid-summary';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.scss'],
-  providers: [RenameRightsPipe]
+  styleUrls: ['./overview.component.scss']
 })
-export class OverviewComponent extends DataPollingComponent implements OnInit {
+export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridSummary') gridSummary: GridSummaryComponent;
   @ViewChild('export') export: ExportComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
+  @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
 
   // Make variables available to template
   public fromCSL = fromCSL;
   public emptyDataset = true;
+  public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public toInputSafeName = toInputSafeName;
   public fromInputSafeName = fromInputSafeName;
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
+  public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
   public barChartSettings = Object.assign(
     {
       prefixValueAxis: ''
@@ -73,7 +82,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   );
   public barChartSettingsTiers = Object.assign(
     {
-      prefixValueAxis: 'Tier'
+      prefixValueAxis: this.tierPrefix
     },
     BarChartCool
   );
@@ -82,9 +91,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   readonly facetConf = facetNames;
 
   filterStates: { [key: string]: FilterState } = {};
-  userFilterSearchTerms = facetNames.reduce((map, item: string) => {
-    map[item] = '';
-    return map;
+  userFilterSearchTerms = facetNames.reduce((newMap, item: string) => {
+    newMap[item] = {
+      dimension: item,
+      term: ''
+    };
+    return newMap as FilterInfo;
   }, {});
 
   chartPosition = 0;
@@ -94,27 +106,28 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     .fill(0)
     .map((x, index) => `${x + index}`);
 
-  disabledParams: IHashStringArray;
-
-  pollRefresh: Subject<boolean>;
+  disabledParams: IHashArray<string>;
   form: FormGroup;
-  isLoading = false;
+  isLoading = true;
+  locale = 'en-GB';
 
   selFacetIndex = 0;
   resultTotal: number;
 
-  filterData: IHashArrayNameLabel = {};
-  displayedFilterData: IHashArrayNameLabel = {};
+  filterData: IHashArray<NameLabelValid> = {};
+  displayedFilterData: IHash<FilterOptionSet> = {};
+
   queryParams: Params = {};
+  queryParamsRaw: Params = {};
 
   dataServerData: BreakdownResults;
 
   constructor(
-    private api: APIService,
-    private fb: FormBuilder,
+    private readonly api: APIService,
+    private readonly fb: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly renameRights: RenameRightsPipe
+    private readonly dialog: MatDialog
   ) {
     super();
     this.buildForm();
@@ -129,16 +142,8 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     };
 
     Object.keys(this.queryParams).forEach((key: string) => {
-      const sendValues = [];
-      const values = this.queryParams[key];
-
       if (!Object.values(nonFacetFilters).includes(key)) {
-        values.forEach((valPart: string) => {
-          if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
-            sendValues.push(fromInputSafeName(valPart));
-          }
-        });
-        breakdownRequest.filters[key] = { values: sendValues };
+        breakdownRequest.filters[key] = { values: this.queryParamsRaw[key] };
       }
     });
 
@@ -168,13 +173,12 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     }
 
     const valDatasetId = this.form.value.datasetId;
+
     if (valDatasetId) {
       breakdownRequest.filters['datasetId'] = {
         values: fromCSL(valDatasetId)
       };
     }
-
-    console.log('Request:\n' + JSON.stringify(breakdownRequest, null, 4));
     return breakdownRequest;
   }
 
@@ -191,19 +195,22 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     );
 
     this.subs.push(
-      combineLatest(this.route.params, this.route.queryParams)
+      combineLatest([this.route.params, this.route.queryParams])
         .pipe(
           map((results) => {
             const qp = results[1];
             const qpValArrays = {};
 
-            Object.keys(qp).forEach((s: string) => {
-              qpValArrays[s] = (Array.isArray(qp[s]) ? qp[s] : [qp[s]]).map(
-                (qpVal: string) => {
-                  return toInputSafeName(qpVal);
-                }
-              );
+            Object.keys(qp).forEach((paramName: string) => {
+              this.queryParamsRaw[paramName] = [];
+              qpValArrays[paramName] = (
+                Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+              ).map((qpVal: string) => {
+                this.queryParamsRaw[paramName].push(qpVal);
+                return toInputSafeName(qpVal);
+              });
             });
+
             return {
               params: results[0],
               queryParams: qpValArrays
@@ -235,7 +242,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
           const facetChanged =
             params.facet &&
-            params.facet != this.form.controls.facetParameter.value;
+            params.facet !== this.form.controls.facetParameter.value;
 
           if (facetChanged) {
             this.form.controls.facetParameter.setValue(params.facet);
@@ -248,8 +255,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetIdInputToQueryParam();
-
-          this.triggerLoad();
+          this.loadData((): void => {
+            this.updateFilterAvailability();
+          });
         })
     );
   }
@@ -268,8 +276,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   chartPositionChanged(absPos: number): void {
     const newPosition = Math.floor(absPos / this.barChart.maxNumberBars);
     const scrollDiff = absPos % this.barChart.maxNumberBars;
-
-    if (newPosition != this.chartPosition) {
+    if (newPosition !== this.chartPosition) {
       this.chartPosition = newPosition;
       this.refreshChart(true, scrollDiff);
     } else {
@@ -278,12 +285,13 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** getUrl
+  /* @param {false} omitCTParam - flag to omit the content tier param
   /* returns a url parameter string (for api or the portal) according to the form state
+  /* returns a url parameter string according to the form state
   /* @returns string
   */
-  getUrl(facet: string, value?: string): string {
+  getUrl(omitCTParam = false): string {
     // filterParam cannot rely on checkbox values as filters aren't built until the data is initialised
-
     /*
       for each page query parameter:
         - take its (array of) values
@@ -297,16 +305,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
         const innerRes = [];
         const values = this.queryParams[key];
 
+        // skip rights parameters
+        if (key === DimensionName.rightsCategory) {
+          return '';
+        }
+
         if (values && !Object.values(nonFacetFilters).includes(key)) {
           values.forEach((valPart: string) => {
-            if (!this.isDeadFacet(key, toInputSafeName(valPart))) {
-              const portalKey = portalNames[key] ? portalNames[key] : key;
-              innerRes.push(
-                `${portalKey}:"${encodeURIComponent(
-                  fromInputSafeName(valPart)
-                )}"`
-              );
-            }
+            const portalKey = portalNames[key] ? portalNames[key] : key;
+            innerRes.push(
+              `${portalKey}:"${encodeURIComponent(fromInputSafeName(valPart))}"`
+            );
           });
           return innerRes.join('&qf=');
         }
@@ -324,11 +333,9 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
     const dateParam = this.getFormattedDateParam();
     const ct =
-      (facet === DimensionName.contentTier && value) ||
-      this.queryParams[DimensionName.contentTier]
+      omitCTParam || this.queryParams[DimensionName.contentTier]
         ? ''
         : this.getFormattedContentTierParam();
-
     return `${queryParam}${ct}${filterParam}${dateParam}`;
   }
 
@@ -337,13 +344,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* returns the (portal) url for a specific item
   */
   getUrlRow(facet: string, qfVal?: string): string {
-    const rootUrl = `${environment.serverPortal}${this.getUrl(facet, qfVal)}`;
+    const rootUrl = `${environment.serverPortal}${this.getUrl(
+      facet === DimensionName.contentTier && !!qfVal
+    )}`;
     if (!qfVal) {
       return rootUrl;
     }
-    return `${rootUrl}&qf=${
-      portalNames[this.form.value.facetParameter]
-    }:"${encodeURIComponent(qfVal)}"`;
+    if (facet === DimensionName.rightsCategory) {
+      // the rest of the rights url is decoded when the link is clicked
+      return rootUrl;
+    }
+    return `${rootUrl}&qf=${portalNames[facet]}:"${encodeURIComponent(qfVal)}"`;
   }
 
   /** processServerResult
@@ -356,12 +367,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       this.resultTotal = results.results.count;
       return true;
     } else {
-      this.barChart.removeAllSeries();
-      this.emptyDataset = true;
-      this.grid.setRows([]);
-      if (this.gridSummary) {
-        this.gridSummary.summaryData = { breakdownBy: '', results: [] };
-      }
+      this.clearData();
       return false;
     }
   }
@@ -375,9 +381,34 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     // initialise filterData and add checkboxes
     const dsd = this.dataServerData;
     if (dsd && dsd.filteringOptions) {
-      const ops = dsd.filteringOptions;
+      this.buildFilters(dsd.filteringOptions);
+      if (dsd.results && dsd.results.breakdowns) {
+        // set pie and table data
+        this.extractSeriesServerData(dsd.results.breakdowns);
+      } else {
+        this.clearData();
+      }
+    }
+  }
 
-      this.facetConf.forEach((facetName: DimensionName) => {
+  formatNLV(prefix: string, name: string, valid: boolean): NameLabelValid {
+    return {
+      name: toInputSafeName(name),
+      label: prefix + name,
+      valid: valid
+    };
+  }
+
+  /** buildFilters
+   * maintains this.filterData sorted data and invokes this.filterDisplayData()
+   * @param { IHashArray<string> : ops } - the filter data
+   **/
+  buildFilters(ops: IHashArray<string>): void {
+    this.facetConf
+      .filter((facetName: DimensionName) => {
+        return !!ops[facetName];
+      })
+      .forEach((facetName: DimensionName) => {
         // calculate prefix
         let prefix = '';
         if (
@@ -385,83 +416,77 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
             facetName
           )
         ) {
-          prefix = 'Tier ';
+          prefix = this.tierPrefix;
         }
 
-        if (!ops[facetName]) {
-          console.error('Missing dimension data: ' + facetName);
-        } else {
-          // calculate full list of in-memory safe options
-          const safeOps = ops[facetName]
-            .filter((op: string) => {
-              return !(
-                !this.form.value.contentTierZero &&
-                op === '0' &&
-                facetName === DimensionName.contentTier
-              );
-            })
-            .map((op: string) => {
-              return {
-                name: toInputSafeName(op),
-                label: prefix + op
-              };
-            })
-            .sort((op1: NameLabel, op2: NameLabel) => {
-              // ensure that selected filters appear...
-              const qp = this.queryParams;
-              if (qp && qp[facetName]) {
-                const includes1 = qp[facetName].includes(op1.name);
-                const includes2 = qp[facetName].includes(op2.name);
-                if (includes1 && !includes2) {
-                  return -1;
-                } else if (includes2 && !includes1) {
-                  return 1;
-                }
-              }
+        // calculate filter options from the data and query params
+        const opsFromData = ops[facetName];
+        const opsFromQP: Array<NameLabelValid> = [];
+        const qpVals = this.queryParams[facetName];
 
-              // ...and sort on label
-              if (op1.label > op2.label) {
-                return 1;
-              }
-              return -1;
-            });
-          this.filterData[facetName] = safeOps;
-
-          const previousTerm = this.userFilterSearchTerms[facetName];
-          this.filterDisplayData({
-            term: previousTerm ? previousTerm : '',
-            dimension: facetName
+        if (qpVals) {
+          this.queryParamsRaw[facetName].forEach((val: string) => {
+            if (!opsFromData.includes(val)) {
+              opsFromQP.push(this.formatNLV(prefix, val, false));
+            }
           });
         }
-      });
 
-      if (dsd.results && dsd.results.breakdowns) {
-        // set pie and table data
-        this.extractSeriesServerData(dsd.results.breakdowns);
-      }
-    }
+        // calculate full list of in-memory safe options
+        const allSortedOps = opsFromData
+          .filter((op: string) => {
+            return !(
+              !this.form.value.contentTierZero &&
+              op === '0' &&
+              facetName === DimensionName.contentTier
+            );
+          })
+          .map((op: string) => {
+            return this.formatNLV(prefix, op, true);
+          })
+          .concat(opsFromQP);
+
+        allSortedOps.sort((op1: NameLabel, op2: NameLabel) => {
+          // ensure that selected filters appear...
+          const qp = this.queryParams;
+          if (qp && qp[facetName]) {
+            const includes1 = qp[facetName].includes(op1.name);
+            const includes2 = qp[facetName].includes(op2.name);
+            if (includes1 && !includes2) {
+              return -1;
+            } else if (includes2 && !includes1) {
+              return 1;
+            }
+          }
+          // ...and sort on label
+          return op1.label.localeCompare(op2.label);
+        });
+
+        this.filterData[facetName] = allSortedOps;
+        this.filterDisplayData(this.userFilterSearchTerms[facetName]);
+      });
   }
 
-  /** beginPolling
-  /* - set up data polling for facet data
+  /** loadData
+  /* - loads the facet data
   */
-  beginPolling(fnCallback?: (refresh?: boolean) => void): void {
-    this.pollRefresh = this.createNewDataPoller(
-      60 * 100000,
-      () => {
-        this.isLoading = true;
-        return this.api.getBreakdowns(this.getDataServerDataRequest());
-      },
-      (breakdownResults: BreakdownResults) => {
-        this.isLoading = false;
-        if (this.processServerResult(breakdownResults)) {
-          this.postProcessResult();
-        }
-        if (fnCallback) {
-          fnCallback();
-        }
-      }
-    ).getPollingSubject();
+  loadData(fnCallback?: (refresh?: boolean) => void): void {
+    this.subs.push(
+      this.api
+        .getBreakdowns(this.getDataServerDataRequest())
+        .subscribe((breakdownResults: BreakdownResults) => {
+          this.isLoading = false;
+          if (this.processServerResult(breakdownResults)) {
+            this.postProcessResult();
+          } else {
+            // build filter data using param data to allow removal of any blocking filters
+            this.buildFilters(this.queryParamsRaw);
+          }
+          if (fnCallback) {
+            fnCallback();
+          }
+        })
+    );
   }
 
   initialiseFilterStates(): void {
@@ -474,31 +499,91 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.filterStates.dates = { visible: false, disabled: false };
   }
 
-  seriesNameFromUrl(): string {
-    return JSON.stringify(this.queryParams).replace(
-      /[:\".,\s\(\)\[\]\{\}]/g,
-      ''
-    );
-  }
-
   iHashNumberFromNVPs(
     src: Array<NamesValuePercent>,
     percent = false
-  ): IHashNumber {
-    return src.reduce(function (map: IHashNumber, nvp: NamesValuePercent) {
-      map[nvp.name] = percent ? nvp.percent : nvp.value;
-      return map;
+  ): IHash<number> {
+    return src.reduce(function (newMap: IHash<number>, nvp: NamesValuePercent) {
+      newMap[nvp.name] = percent ? nvp.percent : nvp.value;
+      return newMap;
     }, {});
   }
 
-  originalNamesFromNVPs(src: Array<NamesValuePercent>): IHashString | null {
-    if (this.form.value.facetParameter !== DimensionName.rights) {
-      return null;
+  /** portalUrlsFromNVPs
+  /* Generates portal urls from form info and result data
+  /* @param { string : facet } - the current facet
+  /* @param { Array<NamesValuePercent> : src } - the data to convert
+  /* @returns IHash<string> - (map { [name]: url })
+  /*
+  **/
+  portalUrlsFromNVPs(
+    facet: string,
+    src: Array<NamesValuePercent>
+  ): IHash<string> {
+    const result = src.reduce(
+      (newMap: IHash<string>, nvp: NamesValuePercent) => {
+        const url = this.getUrlRow(facet, nvp.name);
+        newMap[nvp.name] = url;
+        return newMap;
+      },
+      {}
+    );
+    result['summary'] = this.getUrlRow(facet);
+    return result;
+  }
+
+  /** generateSeriesLabel
+  /* Generates a human readable label for the current series
+  **/
+  generateSeriesLabel(): string {
+    if (Object.keys(this.queryParams).length === 0) {
+      const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
+      return $localize`:@@snapshotTitleAll:All (${friendlyName})`;
     }
-    return src.reduce(function (map: IHashString, nvp: NamesValuePercent) {
-      map[nvp.name] = nvp.rawName;
-      return map;
-    }, {});
+
+    const snapshotTitleOr = $localize`:@@snapshotTitleOr:or`;
+    const snapshotTitleAnd = $localize`:@@snapshotTitleAnd:and`;
+
+    return Object.keys(this.queryParams)
+      .map((key: string) => {
+        const values = this.queryParamsRaw[key];
+        if (values.length === 0) {
+          return '';
+        } else if (key === 'content-tier-zero') {
+          return $localize`:@@snapshotTitleCTZero:CT-Zero`;
+        } else if (key === 'date-from') {
+          // return both dates, formatted and localised
+          const dateToValues = this.queryParamsRaw['date-to'];
+          if (dateToValues.length === 0) {
+            return '';
+          }
+          const fmt = 'MMM d, y';
+          const label = $localize`:@@snapshotTitlePeriod:Period`;
+          const dateFrom = formatDate(new Date(values[0]), fmt, this.locale);
+          const dateTo = formatDate(
+            new Date(dateToValues[0]),
+            fmt,
+            this.locale
+          );
+          return `${label} (${dateFrom} - ${dateTo})`;
+        } else if (key === 'date-to') {
+          // this is handled together with "date-from"
+          return '';
+        } else if (key === 'dataset-id') {
+          const label = $localize`:@@snapshotTitleDatasetId:Dataset Id`;
+          return `${label} (${values[0]})`;
+        } else {
+          const innerRes = [];
+          this.queryParamsRaw[key].forEach((valPart: string) => {
+            innerRes.push(valPart);
+          });
+          const friendlyKey = portalNamesFriendly[key];
+          const joinedVals = innerRes.join(` ${snapshotTitleOr} `);
+          return `${friendlyKey} (${joinedVals})`;
+        }
+      })
+      .filter((x) => x.length > 0)
+      .join(` ${snapshotTitleAnd} `);
   }
 
   /** storeSeries
@@ -511,44 +596,24 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     nvs: Array<NamesValuePercent>,
     seriesTotal: number
   ): void {
-    const name = this.seriesNameFromUrl();
-    let label = `All (${this.form.value.facetParameter})`;
-
-    // Generate human-readable label
-    if (Object.keys(this.queryParams).length > 0) {
-      label = Object.keys(this.queryParams)
-        .map((key: string) => {
-          if (key === 'content-tier-zero') {
-            return 'CT-Zero';
-          }
-
-          const innerRes = [];
-          const values = this.queryParams[key];
-
-          if (!Object.values(nonFacetFilters).includes(key)) {
-            values
-              .map((s: string) => {
-                return fromInputSafeName(s);
-              })
-              .forEach((valPart: string) => {
-                innerRes.push(this.renameRights.transform(valPart));
-              });
-            return `${key} (${innerRes.join(' or ')})`;
-          }
-          return '';
-        })
-        .filter((x) => x.length > 0)
-        .join(' and ');
-    }
+    const name = JSON.stringify(this.queryParams).replace(
+      /[:\".,\s\(\)\[\]\{\}]/g,
+      ''
+    );
+    const rightsInfo = this.form.value.rightsCategory;
+    const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
+      return rightsInfo[key];
+    });
 
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
-      label: label,
+      label: this.generateSeriesLabel(),
       data: this.iHashNumberFromNVPs(nvs),
       dataPercent: this.iHashNumberFromNVPs(nvs, true),
-      namesOriginal: this.originalNamesFromNVPs(nvs),
       orderOriginal: [],
       orderPreferred: [],
+      portalUrls: this.portalUrlsFromNVPs(this.form.value.facetParameter, nvs),
+      rightsFilters: rightsFilters,
       applied: applied,
       pinIndex: 0,
       saved: saved,
@@ -571,17 +636,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       'applied'
     );
 
-    const sortInfo = this.grid.sortInfo;
-
     this.snapshots.preSortAndFilter(
       this.form.value.facetParameter,
       seriesKeys,
-      sortInfo,
+      this.grid.sortInfo,
       this.grid.filterTerm
     );
 
     this.showAppliedSeriesInGrid();
     this.chartRefresher.next(true);
+  }
+
+  showDateDisclaimer(): void {
+    this.dialog.open(this.dialogRef);
   }
 
   /** addSeries
@@ -640,7 +707,6 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   addOrUpdateFilterControls(name: string, options: Array<NameLabel>): void {
     const checkboxes = this.form.get(name) as FormGroup;
-
     options.forEach((option: NameLabel) => {
       const fName = option.name;
       const ctrl = this.form.get(`${name}.${fName}`);
@@ -673,7 +739,7 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       new FormControl(false)
     );
 
-    this.facetConf.map((s: string) => {
+    this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));
       this.form.addControl(`filter_list_${s}`, new FormControl(''));
     });
@@ -696,32 +762,33 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   }
 
   /** filterDisplayData
-  /* @param {FilterInfo} filterInfo
-  /* updates this.displayedFilterData to a filtered and truncated subset for display
-  /* (called on initialisation and in response to a search term changing)
-  */
+   * - updates displayedFilterData to a filtered and (then) truncated subset for display
+   * - ensures form controls exist for all data
+   *
+   * @param {FilterInfo} filterInfo
+   */
   filterDisplayData(filterInfo: FilterInfo): void {
     if (!filterInfo.dimension) {
       filterInfo.dimension = this.form.value.facetParameter;
     }
+    this.userFilterSearchTerms[filterInfo.dimension] = filterInfo;
 
-    this.userFilterSearchTerms[filterInfo.dimension] = filterInfo.term;
-
-    const toDisplay = filterList(
+    const multiplier = filterInfo.upToPage ? filterInfo.upToPage : 1;
+    const possibleToDisplay = filterList(
       filterInfo.term,
-      this.filterData[filterInfo.dimension].map((nl: NameLabel) => {
-        return filterInfo.dimension !== DimensionName.rights
-          ? nl
-          : {
-              name: nl.name,
-              label: this.renameRights.transform(nl.label)
-            };
-      }),
+      this.filterData[filterInfo.dimension],
       'label'
-    ).slice(0, this.MAX_FILTER_OPTIONS);
+    );
+    const toDisplay = possibleToDisplay.slice(
+      0,
+      multiplier * this.MAX_FILTER_OPTIONS
+    );
 
     this.addOrUpdateFilterControls(filterInfo.dimension, toDisplay);
-    this.displayedFilterData[filterInfo.dimension] = toDisplay;
+    this.displayedFilterData[filterInfo.dimension] = {
+      options: toDisplay,
+      hasMore: possibleToDisplay.length > toDisplay.length
+    };
   }
 
   /** getFormattedContentTierParam
@@ -729,19 +796,21 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   /* @returns { string } - contentTierZero value if filterContentTier values not present
   */
   getFormattedContentTierParam(): string {
-    let res = '';
     const filterContentTierParam = this.getSetCheckboxValues(
       DimensionName.contentTier
     );
+    let res: Array<string> = [];
 
-    res = (
-      filterContentTierParam.length > 0
-        ? filterContentTierParam
-        : this.form.value.contentTierZero
-        ? this.contentTiersOptions
-        : this.contentTiersOptions.slice(1)
-    ).join(' OR ');
-    return `&qf=contentTier:(${encodeURIComponent(res)})`;
+    if (filterContentTierParam.length > 0) {
+      res = filterContentTierParam;
+    } else {
+      if (this.form.value.contentTierZero) {
+        res = this.contentTiersOptions;
+      } else {
+        res = this.contentTiersOptions.slice(1);
+      }
+    }
+    return `&qf=contentTier:(${encodeURIComponent(res.join(' OR '))})`;
   }
 
   /** getFormattedDatasetIdParam
@@ -782,19 +851,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     return '';
   }
 
-  /** getFormattedDateStrings
-  /* gets the date range (set or default) as a string array
-  /* @returns Array<string>
+  /** getAppliedDateRange
+  /* gets the date range (set or default)
+  /* @returns Array<Date>
   */
-  getFormattedDateStrings(): Array<string> {
+  getAppliedDateRange(): Array<string> {
     const form = this.form;
     const bothPresent = form.value.dateFrom && form.value.dateTo;
     const valFrom = bothPresent ? form.value.dateFrom : yearZero;
     const valTo = bothPresent ? form.value.dateTo : today;
-    return [valFrom, valTo].map((date: Date) => {
-      const parts = new Date(date).toDateString().split(' ').slice(1);
-      return [parts.slice(0, 2).join(' '), parts[2]].join(', ');
-    });
+    return [valFrom, valTo];
   }
 
   /** setCTZeroInputToQueryParam
@@ -853,11 +919,23 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     });
   }
 
+  /** filterKeysLength
+  /* Template utility
+  /* @param { string } filterName - the filter data to check
+  /* @returns number
+  */
+  filterKeysLength(filterName: string): number {
+    if (this.filterData && this.filterData[filterName]) {
+      return Object.keys(this.filterData[filterName]).length;
+    }
+    return 0;
+  }
+
   /** getSetCheckboxValues
   /*
-  /* gets the values of the set values in a filter
+  /* gets the options set in the form
   /*
-  /* @param { string? } filterName - the filter to return
+  /* @param { string } filterName - the relevant filter
   /* @returns Array<string>
   */
   getSetCheckboxValues(filterName: string): Array<string> {
@@ -869,18 +947,22 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
       : [];
   }
 
-  /** isDeadFacet
-  /* Detect if a facet value is present in the filterData
-  /* @returns boolean
+  /** getRemoveFilterCheckboxData
+  /*
+  /* gets displayedFilterData[] filtered according to options set in the form
+  /*
+  /* @param { string } filterName - the filter to return
+  /* @returns Array<NameLabelValid>
   */
-  isDeadFacet(filterName: string, filterValue: string): boolean {
-    if (Object.keys(this.filterData).length === 0) {
-      return false;
+  getRemoveFilterCheckboxData(filterName: string): Array<NameLabelValid> {
+    const dfData = this.filterData[filterName];
+    if (!dfData) {
+      return [];
     }
-    const res = this.filterData[filterName].findIndex((nl: NameLabel) => {
-      return nl.name === filterValue;
+    const checkedVals = this.getSetCheckboxValues(filterName);
+    return dfData.filter((nlv: NameLabelValid) => {
+      return checkedVals.includes(nlv.name);
     });
-    return res === -1;
   }
 
   /** datesClear
@@ -930,16 +1012,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
 
   /** updatePageUrl
   /* Navigate to url according to form state
+  /* @param {false} skipload
   */
-  updatePageUrl(skipLoad?: boolean): void {
+  updatePageUrl(skipLoad = false): void {
     const qp = {};
-
     this.getEnabledFilterNames().forEach((filterName: string) => {
       const filterVals = this.getSetCheckboxValues(filterName).map(
-        (s: string) => {
-          return fromInputSafeName(s);
+        (filterVal: string) => {
+          return fromInputSafeName(filterVal);
         }
       );
+
       if (filterVals.length > 0) {
         qp[filterName] = filterVals;
       }
@@ -950,15 +1033,16 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     const valTo = this.form.value.dateTo;
 
     if (valFrom) {
-      qp[nonFacetFilters[NonFacetFilterNames.dateFrom]] = new Date(valFrom)
-        .toISOString()
-        .split('T')[0];
+      qp[nonFacetFilters[NonFacetFilterNames.dateFrom]] = getDateAsISOString(
+        new Date(valFrom)
+      );
     }
     if (valTo) {
-      qp[nonFacetFilters[NonFacetFilterNames.dateTo]] = new Date(valTo)
-        .toISOString()
-        .split('T')[0];
+      qp[nonFacetFilters[NonFacetFilterNames.dateTo]] = getDateAsISOString(
+        new Date(valTo)
+      );
     }
+
     if (dataset) {
       qp[nonFacetFilters[NonFacetFilterNames.datasetId]] = dataset;
     }
@@ -988,33 +1072,17 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     switch (cleanVal.length) {
       case 0: {
         ctrl.setValue('');
+        break;
       }
       case 1: {
         ctrl.setValue(cleanVal[0]);
+        break;
       }
       default: {
         ctrl.setValue(cleanVal.join(', '));
       }
     }
     this.updatePageUrl();
-  }
-
-  /** triggerLoad
-  /* invokes beginPolling or triggers a data refresh
-  /* calls updateFilterAvailability once data is loaded
-  **/
-  triggerLoad(): void {
-    const onDataReady = (refresh = false): void => {
-      this.updateFilterAvailability();
-      if (refresh) {
-        this.pollRefresh.next(true);
-      }
-    };
-    if (!this.pollRefresh) {
-      this.beginPolling(onDataReady);
-    } else {
-      onDataReady(true);
-    }
   }
 
   /** switchFacet
@@ -1025,6 +1093,19 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
     this.postProcessResult();
     this.updateFilterAvailability();
     this.updatePageUrl();
+  }
+
+  /** clearData
+  /*
+  /* clears the chart and grid data
+  */
+  clearData(): void {
+    this.barChart.removeAllSeries();
+    this.emptyDataset = true;
+    this.grid.setRows([]);
+    if (this.gridSummary) {
+      this.gridSummary.summaryData = { breakdownBy: '', results: [] };
+    }
   }
 
   /** clearFilter
@@ -1046,11 +1127,11 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   closeFilters(exempt = ''): void {
     Object.keys(this.filterStates)
-      .filter((s: string) => {
-        return s !== exempt;
+      .filter((state: string) => {
+        return state !== exempt;
       })
-      .forEach((s: string) => {
-        this.filterStates[s].visible = false;
+      .forEach((state: string) => {
+        this.filterStates[state].visible = false;
       });
   }
 
@@ -1059,15 +1140,10 @@ export class OverviewComponent extends DataPollingComponent implements OnInit {
   */
   extractSeriesServerData(br: BreakdownResult): void {
     const chartData = br.results.map((cpv: CountPercentageValue) => {
-      let formattedName;
-      if (this.form.value.facetParameter === DimensionName.rights) {
-        formattedName = rightsUrlMatch(cpv.value);
-      }
       return {
-        name: formattedName ? formattedName : cpv.value,
+        name: cpv.value,
         value: cpv.count,
-        percent: cpv.percentage,
-        rawName: formattedName ? cpv.value : null
+        percent: cpv.percentage
       };
     });
 

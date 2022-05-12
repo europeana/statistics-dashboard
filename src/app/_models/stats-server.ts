@@ -1,7 +1,8 @@
 // FILTER / BREAKDOWN REQUEST
 
+import { IHashArray, NamesValuePercent } from './';
+
 export interface BreakdownRequest {
-  datasetId?: string;
   filters: {
     [details: string]: RequestFilter | RequestFilterRange;
   };
@@ -37,12 +38,14 @@ export interface BreakdownResult {
 }
 
 export interface BreakdownResults {
-  filteringOptions: {
-    [details: string]: Array<string>;
-  };
+  filteringOptions: IHashArray<string>;
   results: CountPercentageValue;
 }
 
 export interface GeneralResults {
   allBreakdowns: Array<BreakdownResult>;
+}
+
+export interface GeneralResultsFormatted {
+  [facetName: string]: Array<NamesValuePercent>;
 }
