@@ -1,4 +1,41 @@
 @import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+
+.feedback-wrapper {
+  margin-bottom: 2em;
+  padding-top: 0.5em;
+
+  a {
+    font-size: 18px;
+    font-weight: bold;
+    position: relative;
+
+    &::after {
+      background-image: svg-url-icon-external("#{$stats-blue}");
+      background-repeat: no-repeat;
+      background-size: cover;
+      content: "";
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      position: absolute;
+      right: -20px;
+      top: 6px;
+    }
+
+    &:hover::after {
+      background-image: svg-url-icon-external(darken($textcolour_link, 15%));
+    }
+  }
+
+  @media (min-width: $bp-desktop) {
+    text-align: right;
+    a {
+      left: -20px;
+      left: -42px;
+    }
+  }
+}
 
 .flag {
   align-items: flex-start;

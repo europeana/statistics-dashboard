@@ -134,8 +134,8 @@ class AppDateAdapter extends NativeDateAdapter {
 })
 export class AppModule {
   constructor(
-    @Inject(LOCALE_ID) private locale: string,
-    private dateAdapter: DateAdapter<unknown>
+    @Inject(LOCALE_ID) private readonly locale: string,
+    private readonly dateAdapter: DateAdapter<unknown>
   ) {
     this.dateAdapter.setLocale(locale);
   }
