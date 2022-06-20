@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { externalLinks } from '../_data/static-data';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-footer',
@@ -8,4 +9,5 @@ import { externalLinks } from '../_data/static-data';
 })
 export class FooterComponent {
   public externalLinks = externalLinks;
+  public feedbackUrl = environment.feedbackUrl;
 }

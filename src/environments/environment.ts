@@ -3,6 +3,7 @@
  **/
 
 export const environment = {
+  feedbackUrl: 'https://europeana.atlassian.net/servicedesk/customer/portal/10',
   production: false,
   //serverAPI: 'https://api.europeana.eu/record/v2/search.json',
   serverAPI: 'https://metis-statistics-rest-test.eanadev.org/',

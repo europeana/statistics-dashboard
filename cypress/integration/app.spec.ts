@@ -1,11 +1,22 @@
 context('Statistics Dashboard', () => {
+
+  const urlContentTier = '/data/contentTier';
+  const urlParamCTZero = 'content-tier-zero=';
+  const urlParamCTZeroTrue = `?${urlParamCTZero}true`;
+
+  describe('App General', () => {
+    it('should show the feedback link (landing page / data page)', () => {
+      cy.visit('/');
+      cy.get('[data-e2e=feedback-link]').should('have.length', 1);
+      cy.visit(urlContentTier);
+      cy.get('[data-e2e=feedback-link]').should('have.length', 1);
+    });
+  });
+
   describe('App Routes', () => {
     const selCTZero = '#ctZero';
     const selLinkDataContentTier = '[data-e2e=link-entry-ct]';
     const selLinkHeader = '[data-e2e=link-home-header]';
-    const urlContentTier = '/data/contentTier';
-    const urlParamCTZero = 'content-tier-zero=';
-    const urlParamCTZeroTrue = `?${urlParamCTZero}true`;
 
     const checkCTZeroChangesUrl = (): void => {
       cy.get(selCTZero).should('have.length', 1);
