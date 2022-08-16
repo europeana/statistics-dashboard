@@ -439,8 +439,10 @@ describe('OverviewComponent', () => {
     it('should get the url for a dataset', fakeAsync(() => {
       expect(component.getUrl().indexOf('XXX')).toEqual(-1);
       component.form.get('datasetId').setValue('XXX');
+      fixture.detectChanges();
       expect(component.getUrl().indexOf('XXX')).toBeGreaterThan(-1);
       component.form.get('datasetId').setValue('');
+      fixture.detectChanges();
 
       queryParams.next({});
       tick(10);
