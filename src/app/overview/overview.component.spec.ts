@@ -54,6 +54,7 @@ describe('OverviewComponent', () => {
     { name: '3', label: '3' }
   ];
   const tickTime = 1;
+  const tickTimeChartDebounce = 400;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const tmpParams = {};
   tmpParams[DimensionName.country] = 'Italy';
@@ -150,8 +151,7 @@ describe('OverviewComponent', () => {
       const ctrlFacet = component.form.controls.facetParameter as FormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
-      tick();
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
   });
 
@@ -162,9 +162,12 @@ describe('OverviewComponent', () => {
       })
     );
 
-    beforeEach(() => {
-      b4Each();
-    });
+    beforeEach(b4Each);
+
+    afterEach(fakeAsync(() => {
+      component.cleanup();
+      tick(tickTimeChartDebounce);
+    }));
 
     it('should load', fakeAsync(() => {
       spyOn(api, 'getBreakdowns').and.callThrough();
@@ -184,7 +187,7 @@ describe('OverviewComponent', () => {
       tick(1);
       fixture.detectChanges();
       expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should calculate the portal urls', () => {
@@ -250,6 +253,14 @@ describe('OverviewComponent', () => {
 
       expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
 
+      tick(tickTimeChartDebounce);
+      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+      tick(tickTimeChartDebounce);
+      tick(tickTimeChartDebounce);
+      tick(tickTimeChartDebounce);
+      tick(tickTimeChartDebounce);
+      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+
       // test invocation
       spyOn(component, 'refreshChart');
 
@@ -258,9 +269,8 @@ describe('OverviewComponent', () => {
         DimensionName.contentTier
       );
       fixture.detectChanges();
-      tick(400);
+      tick(tickTimeChartDebounce);
       expect(component.refreshChart).toHaveBeenCalledWith(true, 0);
-      component.ngOnDestroy();
     }));
 
     it('should get the chart data', () => {
@@ -297,7 +307,7 @@ describe('OverviewComponent', () => {
 
     it('should generate the series label', fakeAsync(() => {
       queryParams.next({});
-      tick(1);
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       let generatedLabel;
@@ -317,7 +327,7 @@ describe('OverviewComponent', () => {
       nextParams[DimensionName.country] = ['Denmark', 'Iceland'];
       queryParams.next(nextParams);
 
-      tick(10);
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       generatedLabel = component.generateSeriesLabel();
@@ -325,14 +335,14 @@ describe('OverviewComponent', () => {
 
       nextParams['date-to'] = [today];
       queryParams.next(nextParams);
-      tick(10);
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
 
       nextParams['date-from'] = [yearZero];
       queryParams.next(nextParams);
-      tick(10);
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       expect(component.generateSeriesLabel().indexOf('Period')).toBeGreaterThan(
@@ -341,7 +351,7 @@ describe('OverviewComponent', () => {
 
       nextParams['date-to'] = [];
       queryParams.next(nextParams);
-      tick(10);
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
@@ -350,12 +360,13 @@ describe('OverviewComponent', () => {
       ).toEqual(-1);
       nextParams['content-tier-zero'] = 'true';
       queryParams.next(nextParams);
-      tick(10);
+
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       queryParams.next({});
-      tick(10);
-      component.ngOnDestroy();
+      tick(1);
+      tick(tickTimeChartDebounce);
     }));
 
     it('should extract the series server data', () => {
@@ -405,7 +416,7 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
       component.buildFilters(ops);
       expect(Object.keys(component.filterData).length).toBeTruthy();
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should load the data', fakeAsync(() => {
@@ -421,10 +432,8 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
       component.loadData();
       tick(tickTime);
-
       expect(component.postProcessResult).toHaveBeenCalledTimes(1);
-
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should get the select options', fakeAsync(() => {
@@ -433,7 +442,7 @@ describe('OverviewComponent', () => {
       component.loadData();
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should get the url for a dataset', fakeAsync(() => {
@@ -445,7 +454,7 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
 
       queryParams.next({});
-      tick(10);
+      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       const qp = {};
@@ -453,7 +462,7 @@ describe('OverviewComponent', () => {
       qp[DimensionName.country] = ['Italy'];
 
       queryParams.next(qp);
-      tick(10);
+      tick(1);
       fixture.detectChanges();
 
       const url = component.getUrl();
@@ -462,14 +471,13 @@ describe('OverviewComponent', () => {
       expect(url.indexOf('Italy')).toBeGreaterThan(-1);
 
       queryParams.next({ xxx: '10-11-12' });
-      fixture.detectChanges();
       tick(1);
+      fixture.detectChanges();
       expect(component.getUrl().indexOf('Italy')).toEqual(-1);
 
       queryParams.next({});
-      fixture.detectChanges();
       tick(1);
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should get the url for filters', () => {
@@ -507,7 +515,6 @@ describe('OverviewComponent', () => {
     it('should read the datasetId param', fakeAsync(() => {
       component.loadData();
       tick(tickTime);
-
       expect(component.form.value.datasetId.length).toBeFalsy();
 
       const nextParams = {};
@@ -521,8 +528,8 @@ describe('OverviewComponent', () => {
       expect(component.form.value.datasetId).toEqual('123');
 
       queryParams.next({});
-      tick(1);
-      component.ngOnDestroy();
+      tick(tickTime);
+      tick(tickTimeChartDebounce);
     }));
 
     it('should update the datasetId param', () => {
@@ -658,7 +665,7 @@ describe('OverviewComponent', () => {
       expect(
         component.filterStates[DimensionName.country].disabled
       ).toBeFalsy();
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should clear the filters', () => {
@@ -713,7 +720,7 @@ describe('OverviewComponent', () => {
       checkAllValue(true);
       component.closeFilters(exception);
       expect(component.filterStates[exception].visible).toBeTruthy();
-      component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
 
     it('should convert the facet names for the portal query', () => {
@@ -734,7 +741,7 @@ describe('OverviewComponent', () => {
       ).toBeGreaterThan(-1);
     });
 
-    it('should add the series', () => {
+    it('should add the series', fakeAsync(() => {
       spyOn(component.snapshots, 'apply').and.callFake(() => false);
       spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
         () => false
@@ -742,9 +749,10 @@ describe('OverviewComponent', () => {
       component.addSeries(['series-key']);
       expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
       expect(component.snapshots.apply).toHaveBeenCalled();
-    });
+      tick(tickTimeChartDebounce);
+    }));
 
-    it('should remove the series', () => {
+    it('should remove the series', fakeAsync(() => {
       spyOn(component.snapshots, 'unapply').and.callFake(() => false);
       spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
         () => false
@@ -752,7 +760,8 @@ describe('OverviewComponent', () => {
       component.removeSeries('');
       expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
       expect(component.snapshots.unapply).toHaveBeenCalled();
-    });
+      tick(tickTimeChartDebounce);
+    }));
   });
 
   describe('Request / Url Generation', () => {
@@ -883,6 +892,7 @@ describe('OverviewComponent', () => {
       tick(tickTime);
       expect(spy).toHaveBeenCalled();
       component.ngOnDestroy();
+      tick(tickTimeChartDebounce);
     }));
   });
 });
