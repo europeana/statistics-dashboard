@@ -1,6 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
@@ -107,7 +107,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     .map((x, index) => `${x + index}`);
 
   disabledParams: IHashArray<string>;
-  form: FormGroup;
+  form: UntypedFormGroup;
   isLoading = true;
   locale = 'en-GB';
 
@@ -124,7 +124,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   constructor(
     private readonly api: APIService,
-    private readonly fb: FormBuilder,
+    private readonly fb: UntypedFormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly dialog: MatDialog
@@ -229,9 +229,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           const datasetId =
             queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
           if (datasetId) {
-            const datasetIds = this.form.get('datasetIds') as FormGroup;
+            const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
             `${datasetId}`.split(',').forEach((part: string) => {
-              datasetIds.addControl(part.trim(), new FormControl(''));
+              datasetIds.addControl(part.trim(), new UntypedFormControl(''));
             });
           }
 
@@ -706,7 +706,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /*
   */
   addOrUpdateFilterControls(name: string, options: Array<NameLabel>): void {
-    const checkboxes = this.form.get(name) as FormGroup;
+    const checkboxes = this.form.get(name) as UntypedFormGroup;
     options.forEach((option: NameLabel) => {
       const fName = option.name;
       const ctrl = this.form.get(`${name}.${fName}`);
@@ -714,9 +714,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         this.queryParams[name] && this.queryParams[name].includes(option.name);
 
       if (!ctrl) {
-        checkboxes.addControl(fName, new FormControl(defaultValue));
+        checkboxes.addControl(fName, new UntypedFormControl(defaultValue));
       } else {
-        (ctrl as FormControl).setValue(defaultValue);
+        (ctrl as UntypedFormControl).setValue(defaultValue);
       }
     });
   }
@@ -734,14 +734,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     });
 
     this.form.addControl('chartFormat', this.fb.group({}));
-    (this.form.get('chartFormat') as FormGroup).addControl(
+    (this.form.get('chartFormat') as UntypedFormGroup).addControl(
       'percent',
-      new FormControl(false)
+      new UntypedFormControl(false)
     );
 
     this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));
-      this.form.addControl(`filter_list_${s}`, new FormControl(''));
+      this.form.addControl(`filter_list_${s}`, new UntypedFormControl(''));
     });
   }
 
@@ -749,7 +749,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
-  validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
+  validateDateFrom(control: UntypedFormControl): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateFrom');
   }
 
@@ -757,7 +757,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
-  validateDateTo(control: FormControl): { [key: string]: boolean } | null {
+  validateDateTo(control: UntypedFormControl): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateTo');
   }
 

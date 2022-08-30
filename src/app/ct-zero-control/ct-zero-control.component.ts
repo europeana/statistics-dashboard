@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { externalLinks } from '../_data';
 
 @Component({
@@ -8,7 +8,7 @@ import { externalLinks } from '../_data';
   styleUrls: ['./ct-zero-control.component.scss']
 })
 export class CTZeroControlComponent {
-  @Input() form: FormGroup;
+  @Input() form: UntypedFormGroup;
   @Input() disabled = false;
   @Output() onChange = new EventEmitter<void>();
 

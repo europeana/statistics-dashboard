@@ -6,7 +6,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { toInputSafeName } from '../_helpers';
 import { createMockPipe } from '../_mocked';
@@ -43,7 +43,7 @@ describe('FilterComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);
     component = fixture.componentInstance;
-    component.form = new FormBuilder().group({
+    component.form = new UntypedFormBuilder().group({
       facetParameter: [],
       contentTierZero: [''],
       contentTier: [''],
@@ -161,14 +161,14 @@ describe('FilterComponent', () => {
     const createFormControls = (
       grp: DimensionName,
       ops: Array<string>
-    ): Array<FormControl> => {
-      const fGroup = new FormBuilder().group({});
+    ): Array<UntypedFormControl> => {
+      const fGroup = new UntypedFormBuilder().group({});
       expect(component.getSetCheckboxValues(grp).length).toBe(0);
       component.form.addControl(grp, fGroup);
       const res = [];
       ops.forEach((s: string) => {
-        fGroup.addControl(s, new FormControl(false));
-        const ctrl = component.form.get(`${grp}.${s}`) as FormControl;
+        fGroup.addControl(s, new UntypedFormControl(false));
+        const ctrl = component.form.get(`${grp}.${s}`) as UntypedFormControl;
         ctrl.setValue(true);
         res.push(ctrl);
       });

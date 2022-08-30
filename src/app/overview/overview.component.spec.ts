@@ -10,7 +10,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
@@ -123,7 +123,7 @@ describe('OverviewComponent', () => {
   };
 
   const setFilterValue1 = (group: string): void => {
-    component.form.addControl(group, new FormBuilder().group({}));
+    component.form.addControl(group, new UntypedFormBuilder().group({}));
     component.addOrUpdateFilterControls(group, contentTierNameLabels);
     component.form.get(`${group}.1`).setValue(true);
   };
@@ -148,7 +148,7 @@ describe('OverviewComponent', () => {
       component.ngOnInit();
       tick(1);
       fixture.detectChanges();
-      const ctrlFacet = component.form.controls.facetParameter as FormControl;
+      const ctrlFacet = component.form.controls.facetParameter as UntypedFormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
       tick(tickTimeChartDebounce);
@@ -587,7 +587,7 @@ describe('OverviewComponent', () => {
         expect(form.get(`${testName}.${nl.name}`)).toBeFalsy();
       });
 
-      form.addControl(testName, new FormBuilder().group({}));
+      form.addControl(testName, new UntypedFormBuilder().group({}));
 
       component.addOrUpdateFilterControls(testName, contentTierNameLabels);
 
@@ -610,7 +610,7 @@ describe('OverviewComponent', () => {
       let selected = component.getSetCheckboxValues(fName);
       expect(selected.length).toEqual(0);
 
-      component.form.addControl(fName, new FormBuilder().group({}));
+      component.form.addControl(fName, new UntypedFormBuilder().group({}));
       component.addOrUpdateFilterControls(fName, contentTierNameLabels);
 
       component.form.get(`${fName}.1`).setValue(true);

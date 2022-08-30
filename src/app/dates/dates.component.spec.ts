@@ -1,8 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
-  FormBuilder,
-  FormControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
   ReactiveFormsModule,
   ValidationErrors
 } from '@angular/forms';
@@ -24,7 +24,7 @@ describe('DatesComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DatesComponent);
     component = fixture.componentInstance;
-    component.form = new FormBuilder().group({
+    component.form = new UntypedFormBuilder().group({
       dateFrom: [
         '',
         (control): ValidationErrors | null => {
@@ -120,8 +120,8 @@ describe('DatesComponent', () => {
     component.form.value.dateFrom = null;
     component.form.value.dateTo = null;
 
-    const dateFrom = component.form.controls.dateFrom as FormControl;
-    const dateTo = component.form.controls.dateTo as FormControl;
+    const dateFrom = component.form.controls.dateFrom as UntypedFormControl;
+    const dateTo = component.form.controls.dateTo as UntypedFormControl;
 
     let resFrom = validateDateGeneric(dateFrom, 'dateFrom');
     expect(resFrom).toBeFalsy();
