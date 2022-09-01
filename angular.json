@@ -36,6 +36,8 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
+              "html2canvas",
+              "rgbcolor"
               "core-js",
               "polylabel",
               "raf",

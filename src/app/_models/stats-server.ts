@@ -1,6 +1,6 @@
 // FILTER / BREAKDOWN REQUEST
 
-import { IHashArray, NamesValuePercent } from './';
+import { IHashArray, NamesValuePercent } from './models';
 
 export interface BreakdownRequest {
   filters: {

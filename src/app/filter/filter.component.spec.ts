@@ -6,8 +6,12 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { UntypedFormBuilder, UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
-
+import {
+  FormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { toInputSafeName } from '../_helpers';
 import { createMockPipe } from '../_mocked';
 import { DimensionName } from '../_models';
@@ -33,7 +37,7 @@ describe('FilterComponent', () => {
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule],
+        imports: [FormsModule, ReactiveFormsModule],
         declarations: [FilterComponent, createMockPipe('renameApiFacet')],
         schemas: [CUSTOM_ELEMENTS_SCHEMA]
       }).compileComponents();

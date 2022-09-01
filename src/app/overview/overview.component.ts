@@ -1,6 +1,10 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
@@ -749,7 +753,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
-  validateDateFrom(control: UntypedFormControl): { [key: string]: boolean } | null {
+  validateDateFrom(
+    control: UntypedFormControl
+  ): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateFrom');
   }
 
@@ -757,7 +763,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
-  validateDateTo(control: UntypedFormControl): { [key: string]: boolean } | null {
+  validateDateTo(
+    control: UntypedFormControl
+  ): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateTo');
   }
 

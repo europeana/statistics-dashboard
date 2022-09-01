@@ -7,10 +7,15 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
-import { UntypedFormBuilder, UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormControl,
+  ReactiveFormsModule
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
@@ -65,6 +70,7 @@ describe('OverviewComponent', () => {
   const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
       imports: [
+        FormsModule,
         HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
@@ -148,7 +154,8 @@ describe('OverviewComponent', () => {
       component.ngOnInit();
       tick(1);
       fixture.detectChanges();
-      const ctrlFacet = component.form.controls.facetParameter as UntypedFormControl;
+      const ctrlFacet = component.form.controls
+        .facetParameter as UntypedFormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
       tick(tickTimeChartDebounce);
@@ -820,9 +827,11 @@ describe('OverviewComponent', () => {
       ).toBeTruthy();
     });
 
-    it('should get the total figure', () => {
+    it('should get the total figure', fakeAsync(() => {
+      tick(1);
+      fixture.detectChanges();
       expect(component.getUrlRow(DimensionName.contentTier)).toBeTruthy();
-    });
+    }));
 
     it('should include the facet selection', () => {
       [2, 3, 4].forEach((qfVal: number) => {
