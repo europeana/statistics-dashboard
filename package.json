@@ -48,7 +48,6 @@
     "rxjs": "^6.6.7",
     "ts-loader": "^9.3.1",
     "tslib": "^2.0.0",
-    "typescript": "^4.7.4",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -59,10 +58,10 @@
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "^2.0.10",
     "@types/node": "^12.20.26",
-    "@typescript-eslint/eslint-plugin": "^4.31.2",
-    "@typescript-eslint/eslint-plugin-tslint": "^4.31.2",
-    "@typescript-eslint/parser": "^4.31.2",
-    "@typescript-eslint/types": "^4.31.2",
+    "@typescript-eslint/eslint-plugin": "^5.36.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^5.36.0",
+    "@typescript-eslint/parser": "^5.36.0",
+    "@typescript-eslint/types": "^5.36.0",
     "axe-core": "^4.4.1",
     "codelyzer": "^6.0.0",
     "cypress": "^10.5.0",
@@ -82,6 +81,7 @@
     "prettier": "^2.4.1",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
+    "typescript": "^4.8.2",
     "typescript-eslint": "0.0.1-alpha.0"
   }
 }
