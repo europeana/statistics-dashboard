@@ -1,4 +1,4 @@
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { DiacriticsMap } from '../_data';
 
 const sanitationRegex = /[.*+?^${}()|[\]\\]/g;
@@ -164,7 +164,7 @@ export function fromCSL(s: string): Array<string> {
 }
 
 export function getFormValueList(
-  form: FormGroup,
+  form: UntypedFormGroup,
   field: string
 ): Array<string> {
   const vals = form.value[field];

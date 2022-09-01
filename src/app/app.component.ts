@@ -6,7 +6,7 @@ import {
   LOCALE_ID,
   OnInit
 } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SubscriptionManager } from './subscription-manager';
 import { APIService, ClickService } from './_services';
@@ -23,7 +23,7 @@ import { OverviewComponent } from './overview';
   templateUrl: './app.component.html'
 })
 export class AppComponent extends SubscriptionManager implements OnInit {
-  formCTZero: FormGroup;
+  formCTZero: UntypedFormGroup;
   landingData: GeneralResultsFormatted;
   landingComponentRef: LandingComponent;
   paramNameCTZero = 'content-tier-zero';
@@ -47,7 +47,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * - builds single-field form for the general data content-tier zero option
    **/
   buildForm(): void {
-    this.formCTZero = new FormBuilder().group({
+    this.formCTZero = new UntypedFormBuilder().group({
       contentTierZero: this.lastSetContentTierZeroValue
     });
 
@@ -79,8 +79,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * - convenience function
    * @returns the contentTierZero input as a FormControl
    **/
-  getCtrlCTZero(): FormControl {
-    return this.formCTZero.get('contentTierZero') as FormControl;
+  getCtrlCTZero(): UntypedFormControl {
+    return this.formCTZero.get('contentTierZero') as UntypedFormControl;
   }
 
   /** loadLandingData

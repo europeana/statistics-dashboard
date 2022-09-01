@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { getDateAsISOString, today, yearZero } from '../_helpers';
 
 @Component({
@@ -19,7 +19,7 @@ export class DatesComponent {
   public today = today;
   public yearZero = yearZero;
 
-  @Input() form: FormGroup;
+  @Input() form: UntypedFormGroup;
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
 
   @ViewChild('dateFrom') dateFrom: ElementRef;

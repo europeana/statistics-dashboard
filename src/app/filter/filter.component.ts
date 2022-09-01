@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { getFormValueList } from '../_helpers';
 import {
   DimensionName,
@@ -22,7 +22,7 @@ import {
 })
 export class FilterComponent {
   @Input() emptyDataset: boolean;
-  @Input() form: FormGroup;
+  @Input() form: UntypedFormGroup;
   @Input() group: DimensionName;
   @Input() totalAvailable: number;
 
