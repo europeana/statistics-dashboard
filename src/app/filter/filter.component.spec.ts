@@ -8,9 +8,9 @@ import {
 } from '@angular/core/testing';
 import {
   FormsModule,
+  ReactiveFormsModule,
   UntypedFormBuilder,
-  UntypedFormControl,
-  ReactiveFormsModule
+  UntypedFormControl
 } from '@angular/forms';
 import { toInputSafeName } from '../_helpers';
 import { createMockPipe } from '../_mocked';
@@ -34,15 +34,13 @@ describe('FilterComponent', () => {
 
   const emptyOptions = { options: [], hasMore: false };
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [FormsModule, ReactiveFormsModule],
-        declarations: [FilterComponent, createMockPipe('renameApiFacet')],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule, ReactiveFormsModule],
+      declarations: [FilterComponent, createMockPipe('renameApiFacet')],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);

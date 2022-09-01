@@ -12,9 +12,9 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import {
+  ReactiveFormsModule,
   UntypedFormBuilder,
-  UntypedFormControl,
-  ReactiveFormsModule
+  UntypedFormControl
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
@@ -139,11 +139,9 @@ describe('OverviewComponent', () => {
   };
 
   describe('Route Parameter', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed(false);
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed(false);
+    }));
 
     beforeEach(() => {
       b4Each();
@@ -163,11 +161,9 @@ describe('OverviewComponent', () => {
   });
 
   describe('Normal Operations', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed();
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed();
+    }));
 
     beforeEach(b4Each);
 
@@ -772,11 +768,9 @@ describe('OverviewComponent', () => {
   });
 
   describe('Request / Url Generation', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed();
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed();
+    }));
 
     beforeEach(() => {
       b4Each();
@@ -885,11 +879,9 @@ describe('OverviewComponent', () => {
   });
 
   describe('Polling', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed();
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed();
+    }));
 
     beforeEach(() => {
       b4Each();

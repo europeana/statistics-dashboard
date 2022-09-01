@@ -28,29 +28,27 @@ describe('AppComponent', () => {
   tmpParams['content-tier-zero'] = false;
   const queryParams = new BehaviorSubject(tmpParams as Params);
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule,
-          RouterTestingModule.withRoutes([
-            { path: './data', component: AppComponent },
-            { path: './', component: LandingComponent }
-          ])
-        ],
-        providers: [
-          {
-            provide: ActivatedRoute,
-            useValue: { params: params, queryParams: queryParams }
-          },
-          {
-            provide: APIService,
-            useClass: MockAPIService
-          }
-        ]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule.withRoutes([
+          { path: './data', component: AppComponent },
+          { path: './', component: LandingComponent }
+        ])
+      ],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: { params: params, queryParams: queryParams }
+        },
+        {
+          provide: APIService,
+          useClass: MockAPIService
+        }
+      ]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
@@ -102,16 +100,6 @@ describe('AppComponent', () => {
     expect(component.lastSetContentTierZeroValue).toBeFalsy();
 
     // trigger location change with different value
-    location.go('/');
-
-    tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
-
-    location.go('/?content-tier-zero=true');
-
-    tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeTruthy();
-
     location.go('/');
 
     tick(1);

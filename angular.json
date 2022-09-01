@@ -37,7 +37,7 @@
             "tsConfig": "tsconfig.app.json",
             "allowedCommonJsDependencies": [
               "html2canvas",
-              "rgbcolor"
+              "rgbcolor",
               "core-js",
               "polylabel",
               "raf",

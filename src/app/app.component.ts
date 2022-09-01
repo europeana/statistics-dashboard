@@ -6,7 +6,11 @@ import {
   LOCALE_ID,
   OnInit
 } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup
+} from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SubscriptionManager } from './subscription-manager';
 import { APIService, ClickService } from './_services';

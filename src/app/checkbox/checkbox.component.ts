@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import {
   ControlValueAccessor,
-  UntypedFormGroup,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  UntypedFormGroup
 } from '@angular/forms';
 
 @Component({

@@ -17,17 +17,13 @@ describe('ExportComponent', () => {
   let fixture: ComponentFixture<ExportComponent>;
   let exportCSV: ExportCSVService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [ExportComponent],
-        providers: [
-          { provide: ExportCSVService, useClass: MockExportCSVService }
-        ]
-      }).compileComponents();
-      exportCSV = TestBed.inject(ExportCSVService);
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ExportComponent],
+      providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
+    }).compileComponents();
+    exportCSV = TestBed.inject(ExportCSVService);
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExportComponent);
