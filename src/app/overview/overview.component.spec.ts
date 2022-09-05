@@ -8,7 +8,7 @@ import {
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
 import {
@@ -45,6 +45,7 @@ import { OverviewComponent } from './overview.component';
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
+  let router: Router;
 
   const dialog = {
     open: (): void => {
@@ -124,6 +125,12 @@ describe('OverviewComponent', () => {
   const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.callFake((_)=> {
+      return new Promise((resolve) => {
+        resolve(null);
+      });
+    });
     component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
@@ -604,6 +611,7 @@ describe('OverviewComponent', () => {
       expect(component.isFilterApplied(DimensionName.type)).toBeFalsy();
       expect(component.isFilterApplied('FAKE')).toBeFalsy();
       setFilterValue1(DimensionName.type);
+      fixture.detectChanges();
       expect(component.isFilterApplied(DimensionName.type)).toBeTruthy();
       expect(component.isFilterApplied()).toBeTruthy();
     });
@@ -727,8 +735,6 @@ describe('OverviewComponent', () => {
     }));
 
     it('should convert the facet names for the portal query', () => {
-      component.form.reset();
-      component.buildForm();
       fixture.detectChanges();
       component.form.get('facetParameter').setValue(DimensionName.country);
       fixture.detectChanges();

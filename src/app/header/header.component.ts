@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -7,7 +7,7 @@ import { UntypedFormGroup } from '@angular/forms';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  @Input() form?: UntypedFormGroup;
+  @Input() form?: FormGroup;
   @Input() includeCTZero: boolean;
   @Input() showPageTitle = false;
 }

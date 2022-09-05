@@ -1,8 +1,9 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import {
+  FormControl,
+  FormGroup,
   UntypedFormBuilder,
-  UntypedFormControl,
   UntypedFormGroup
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -111,7 +112,17 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     .map((x, index) => `${x + index}`);
 
   disabledParams: IHashArray<string>;
-  form: UntypedFormGroup;
+  form = this.fb.group({
+    facetParameter: [],
+    contentTierZero: [false],
+    datasetId: [''],
+    dateFrom: ['', this.validateDateFrom.bind(this)],
+    dateTo: ['', this.validateDateTo.bind(this)],
+    chartFormat: this.fb.group({
+      percent: [false]
+    })
+  });
+
   isLoading = true;
   locale = 'en-GB';
 
@@ -126,6 +137,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   dataServerData: BreakdownResults;
 
+  /**
+   * constructor
+   * untyped formbuilder used so that unpredictable datasetId fields can be added
+   **/
   constructor(
     private readonly api: APIService,
     private readonly fb: UntypedFormBuilder,
@@ -134,7 +149,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     private readonly dialog: MatDialog
   ) {
     super();
-    this.buildForm();
+    this.facetConf.forEach((s: string) => {
+      this.form.addControl(s, this.fb.group({}));
+      this.form.addControl(`filter_list_${s}`, new FormControl(''));
+    });
     this.initialiseFilterStates();
   }
 
@@ -235,7 +253,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           if (datasetId) {
             const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
             `${datasetId}`.split(',').forEach((part: string) => {
-              datasetIds.addControl(part.trim(), new UntypedFormControl(''));
+              datasetIds.addControl(part.trim(), new FormControl(''));
             });
           }
 
@@ -540,7 +558,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* Generates a human readable label for the current series
   **/
   generateSeriesLabel(): string {
-    if (Object.keys(this.queryParams).length === 0) {
+    const queryKeys = Object.keys(this.queryParams);
+    if (!queryKeys || queryKeys.length === 0) {
       const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
       return $localize`:@@snapshotTitleAll:All (${friendlyName})`;
     }
@@ -710,42 +729,19 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /*
   */
   addOrUpdateFilterControls(name: string, options: Array<NameLabel>): void {
-    const checkboxes = this.form.get(name) as UntypedFormGroup;
+    const checkboxes = this.form.get(name) as FormGroup;
+
     options.forEach((option: NameLabel) => {
       const fName = option.name;
-      const ctrl = this.form.get(`${name}.${fName}`);
+      const ctrl = checkboxes[fName];
       const defaultValue =
-        this.queryParams[name] && this.queryParams[name].includes(option.name);
+        this.queryParams[name] && this.queryParams[name].includes(fName);
 
       if (!ctrl) {
-        checkboxes.addControl(fName, new UntypedFormControl(defaultValue));
+        checkboxes.addControl(fName, new FormControl(defaultValue));
       } else {
-        (ctrl as UntypedFormControl).setValue(defaultValue);
+        ctrl.setValue(defaultValue);
       }
-    });
-  }
-
-  /** buildForm
-  /* - set upt data polling
-  */
-  buildForm(): void {
-    this.form = this.fb.group({
-      facetParameter: [],
-      contentTierZero: [false],
-      datasetId: [''],
-      dateFrom: ['', this.validateDateFrom.bind(this)],
-      dateTo: ['', this.validateDateTo.bind(this)]
-    });
-
-    this.form.addControl('chartFormat', this.fb.group({}));
-    (this.form.get('chartFormat') as UntypedFormGroup).addControl(
-      'percent',
-      new UntypedFormControl(false)
-    );
-
-    this.facetConf.forEach((s: string) => {
-      this.form.addControl(s, this.fb.group({}));
-      this.form.addControl(`filter_list_${s}`, new UntypedFormControl(''));
     });
   }
 
@@ -753,9 +749,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
-  validateDateFrom(
-    control: UntypedFormControl
-  ): { [key: string]: boolean } | null {
+  validateDateFrom(control: FormControl): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateFrom');
   }
 
@@ -763,9 +757,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param {FormControl} control - the field to validate
   /* - returns an errors object map
   */
-  validateDateTo(
-    control: UntypedFormControl
-  ): { [key: string]: boolean } | null {
+  validateDateTo(control: FormControl): { [key: string]: boolean } | null {
     return validateDateGeneric(control, 'dateTo');
   }
 
@@ -827,7 +819,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   getFormattedDatasetIdParam(): string {
     const filterDatasetIdParam = this.form.value.datasetId;
-    if (filterDatasetIdParam.length > 0) {
+    if (filterDatasetIdParam && filterDatasetIdParam.length > 0) {
       const values = fromCSL(filterDatasetIdParam)
         .map((id: string) => {
           return `${id}_*`;

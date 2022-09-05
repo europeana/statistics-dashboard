@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { externalLinks } from '../_data';
 
 @Component({
@@ -8,14 +8,18 @@ import { externalLinks } from '../_data';
   styleUrls: ['./ct-zero-control.component.scss']
 })
 export class CTZeroControlComponent {
-  @Input() form: UntypedFormGroup;
+  @Input() form: FormGroup<{ contentTierZero: FormControl<boolean> }>;
+
   @Input() disabled = false;
   @Output() onChange = new EventEmitter<void>();
 
   public externalLinks = externalLinks;
 
+  /**
+   * valueChanged
+   * emits event (invokes updatePageUrl())
+  **/
   valueChanged(): void {
     this.onChange.emit();
-    // hooks to updatePageUrl()
   }
 }

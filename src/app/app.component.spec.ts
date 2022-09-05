@@ -120,23 +120,20 @@ describe('AppComponent', () => {
   }));
 
   it('should handle the outlet load', () => {
-    expect(component.formCTZero).toBeFalsy();
     expect(component.showPageTitle).toBeFalsy();
 
     spyOn(component, 'loadLandingData');
 
     component.onOutletLoaded(new LandingComponent());
-    expect(component.formCTZero).toBeTruthy();
+
     expect(component.showPageTitle).toBeTruthy();
     expect(component.loadLandingData).toHaveBeenCalled();
 
     component.onOutletLoaded({} as unknown as OverviewComponent);
-    expect(component.formCTZero).toBeTruthy();
     expect(component.showPageTitle).toBeFalsy();
     expect(component.loadLandingData).toHaveBeenCalledTimes(1);
 
     component.onOutletLoaded(new LandingComponent());
-    expect(component.formCTZero).toBeTruthy();
     expect(component.showPageTitle).toBeTruthy();
     expect(component.loadLandingData).toHaveBeenCalledTimes(1);
 
@@ -144,7 +141,6 @@ describe('AppComponent', () => {
     component.lastSetContentTierZeroValue = true;
 
     component.onOutletLoaded(new LandingComponent());
-    expect(component.formCTZero).toBeTruthy();
     expect(component.showPageTitle).toBeTruthy();
     expect(component.loadLandingData).toHaveBeenCalledTimes(2);
   });

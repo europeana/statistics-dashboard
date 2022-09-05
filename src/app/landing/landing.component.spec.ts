@@ -6,7 +6,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BarComponent } from '../chart';
 import { LandingComponent } from '.';
 
@@ -16,7 +16,7 @@ describe('LandingComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-      imports: [FormsModule],
+      imports: [FormsModule, ReactiveFormsModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   };

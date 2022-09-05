@@ -1,4 +1,4 @@
-import { UntypedFormControl, ValidationErrors } from '@angular/forms';
+import { FormControl, ValidationErrors } from '@angular/forms';
 
 export const today = new Date().toISOString().split('T')[0];
 
@@ -65,7 +65,7 @@ function setErrorIfLate(
 /* - returns a ValidationErrors object or null
 */
 export function validateDateGeneric(
-  control: UntypedFormControl,
+  control: FormControl,
   fieldName: string
 ): ValidationErrors | null {
   const val = control.value || null;
