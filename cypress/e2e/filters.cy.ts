@@ -97,7 +97,7 @@ context('Statistics Dashboard', () => {
       // search for inexistent country 'xxx'
       cy.get(selCheckbox).should('have.length.gt', 0);
       cy.get(selFilterOpenerDisabled).should('have.length', 0);
-      cy.get(selSearch).type('xxx', 1);
+      cy.get(selSearch).type('xxx');
       cy.get(selCheckbox).should('have.length', 0);
       cy.get(selFilterOpenerDisabled).should('have.length', 1);
 
@@ -144,7 +144,7 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
       cy.get(selSearch).should('have.length', 1);
 
-      cy.get(selSearch).type('Ge', 1);
+      cy.get(selSearch).type('Ge');
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
 
@@ -159,12 +159,12 @@ context('Statistics Dashboard', () => {
       cy.get(selCheckbox).should('have.length', 25);
       cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 1);
 
-      cy.get(selSearch).type('a', 1);
+      cy.get(selSearch).type('a');
       cy.get(selCheckbox).should('have.length', 20);
       cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Croatia').should('have.length', 1);
 
-      cy.get(selSearch).clear().type('^a', 1);
+      cy.get(selSearch).clear().type('^a');
       cy.get(selCheckbox).should('have.length', 1);
       cy.get(selFilterValueLabel).contains('Croatia').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Austria').should('have.length', 1);
@@ -176,12 +176,12 @@ context('Statistics Dashboard', () => {
       cy.get(selCheckbox).should('have.length', 25);
       cy.get(selFilterValueLabel).contains('Austria').should('have.length', 1);
 
-      cy.get(selSearch).type('e', 1);
+      cy.get(selSearch).type('e');
       cy.get(selCheckbox).should('have.length', 13);
       cy.get(selFilterValueLabel).contains('Austria').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 1);
 
-      cy.get(selSearch).clear().type('e$', 1);
+      cy.get(selSearch).clear().type('e$');
       cy.get(selCheckbox).should('have.length', 3);
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('France').should('have.length', 1);
@@ -191,11 +191,11 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpener).eq(3).click(force);
       cy.get(selCheckbox).should('have.length', 38);
-      cy.get(selSearch).type('^', 1);
+      cy.get(selSearch).type('^');
       cy.get(selCheckbox).should('have.length', 2);
       cy.get(selSearch).clear();
       cy.get(selCheckbox).should('have.length', 38);
-      cy.get(selSearch).type('$', 1);
+      cy.get(selSearch).type('$');
     });
 
     it('should search the filters (diacritics)', () => {
@@ -203,30 +203,33 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterOpener).eq(2).click(force);
       cy.get(selFilterValueLabel).contains('Österreichische Nationalbibliothek - Austrian National Library').should('have.length', 1);
 
-      cy.get(selSearch).type('oster', 1);
+      cy.get(selSearch).type('oster');
       cy.get(selFilterValueLabel).should('have.length', 1);
       cy.get(selSearch).clear();
       cy.get(selFilterValueLabel).should('have.length', 50);
-      cy.get(selSearch).type('Öster', 1);
+      cy.get(selSearch).type('Öster');
       cy.get(selFilterValueLabel).should('have.length', 1);
       cy.get(selSearch).clear();
-      cy.get(selSearch).type('Ester', 1);
+      cy.get(selSearch).type('Ester');
       cy.get(selFilterValueLabel).should('have.length', 0);
       cy.get(selSearch).clear();
-      cy.get(selSearch).type('oster', 1);
+      cy.get(selSearch).type('oster');
       cy.get(selFilterValueLabel).should('have.length', 1);
     });
 
     it('should allow date range definitions', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selDateFrom).should('have.length', 0);
-      cy.get(selDateTo).should('have.length', 0);
+      cy.get(selDateFrom).should('not.exist');
+      cy.get(selDateTo).should('not.exist');
       cy.get(selFilterOpener).last().click(force);
       cy.get(selDateFrom).should('have.length', 1);
+      cy.get(selDateTo).should('have.length', 1);
 
       const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
       cy.get(selDateFrom).type(today);
-      cy.get(selDateTo).type(today);
+      cy.get(selDateFrom).type('{enter}', force);
+      cy.get(selDateTo).type(today, force);
+      cy.get(selDateTo).type('{enter}', force);
 
       cy.get(selCloseDateOverride).should('be.visible');
       cy.get(selDateFrom).clear(force);
@@ -235,7 +238,7 @@ context('Statistics Dashboard', () => {
 
     it('should filter on the dataset id', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selFilterRemove).should('have.length', 0);
+      cy.get(selFilterRemove).should('not.exist');
 
       cy.get(selDatasetId).type('dataset_1{enter}');
       cy.get(selFilterRemove).should('have.length', 1);

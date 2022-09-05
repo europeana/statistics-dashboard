@@ -28,29 +28,27 @@ describe('AppComponent', () => {
   tmpParams['content-tier-zero'] = false;
   const queryParams = new BehaviorSubject(tmpParams as Params);
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule,
-          RouterTestingModule.withRoutes([
-            { path: './data', component: AppComponent },
-            { path: './', component: LandingComponent }
-          ])
-        ],
-        providers: [
-          {
-            provide: ActivatedRoute,
-            useValue: { params: params, queryParams: queryParams }
-          },
-          {
-            provide: APIService,
-            useClass: MockAPIService
-          }
-        ]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule.withRoutes([
+          { path: './data', component: AppComponent },
+          { path: './', component: LandingComponent }
+        ])
+      ],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: { params: params, queryParams: queryParams }
+        },
+        {
+          provide: APIService,
+          useClass: MockAPIService
+        }
+      ]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
@@ -106,16 +104,6 @@ describe('AppComponent', () => {
 
     tick(1);
     expect(component.lastSetContentTierZeroValue).toBeFalsy();
-
-    location.go('/?content-tier-zero=true');
-
-    tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeTruthy();
-
-    location.go('/');
-
-    tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
   }));
 
   it('should load the landing data', fakeAsync(() => {
@@ -132,23 +120,20 @@ describe('AppComponent', () => {
   }));
 
   it('should handle the outlet load', () => {
-    expect(component.formCTZero).toBeFalsy();
     expect(component.showPageTitle).toBeFalsy();
 
     spyOn(component, 'loadLandingData');
 
     component.onOutletLoaded(new LandingComponent());
-    expect(component.formCTZero).toBeTruthy();
+
     expect(component.showPageTitle).toBeTruthy();
     expect(component.loadLandingData).toHaveBeenCalled();
 
     component.onOutletLoaded({} as unknown as OverviewComponent);
-    expect(component.formCTZero).toBeTruthy();
     expect(component.showPageTitle).toBeFalsy();
     expect(component.loadLandingData).toHaveBeenCalledTimes(1);
 
     component.onOutletLoaded(new LandingComponent());
-    expect(component.formCTZero).toBeTruthy();
     expect(component.showPageTitle).toBeTruthy();
     expect(component.loadLandingData).toHaveBeenCalledTimes(1);
 
@@ -156,7 +141,6 @@ describe('AppComponent', () => {
     component.lastSetContentTierZeroValue = true;
 
     component.onOutletLoaded(new LandingComponent());
-    expect(component.formCTZero).toBeTruthy();
     expect(component.showPageTitle).toBeTruthy();
     expect(component.loadLandingData).toHaveBeenCalledTimes(2);
   });

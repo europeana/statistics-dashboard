@@ -23,11 +23,9 @@ describe('TruncateComponent', () => {
     }).compileComponents();
   };
 
-  beforeEach(
-    waitForAsync(() => {
-      configureTestBed();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    configureTestBed();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TruncateComponent);

@@ -7,10 +7,15 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute, Params } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
-import { UntypedFormBuilder, UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
@@ -40,6 +45,7 @@ import { OverviewComponent } from './overview.component';
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
+  let router: Router;
 
   const dialog = {
     open: (): void => {
@@ -65,6 +71,7 @@ describe('OverviewComponent', () => {
   const configureTestBed = (errorMode = false): void => {
     TestBed.configureTestingModule({
       imports: [
+        FormsModule,
         HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
@@ -118,6 +125,12 @@ describe('OverviewComponent', () => {
   const b4Each = (): void => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.callFake((_)=> {
+      return new Promise((resolve) => {
+        resolve(null);
+      });
+    });
     component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
@@ -133,11 +146,9 @@ describe('OverviewComponent', () => {
   };
 
   describe('Route Parameter', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed(false);
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed(false);
+    }));
 
     beforeEach(() => {
       b4Each();
@@ -148,7 +159,8 @@ describe('OverviewComponent', () => {
       component.ngOnInit();
       tick(1);
       fixture.detectChanges();
-      const ctrlFacet = component.form.controls.facetParameter as UntypedFormControl;
+      const ctrlFacet = component.form.controls
+        .facetParameter as UntypedFormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
       expect(component.dataServerData).toBeTruthy();
       tick(tickTimeChartDebounce);
@@ -156,11 +168,9 @@ describe('OverviewComponent', () => {
   });
 
   describe('Normal Operations', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed();
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed();
+    }));
 
     beforeEach(b4Each);
 
@@ -601,6 +611,7 @@ describe('OverviewComponent', () => {
       expect(component.isFilterApplied(DimensionName.type)).toBeFalsy();
       expect(component.isFilterApplied('FAKE')).toBeFalsy();
       setFilterValue1(DimensionName.type);
+      fixture.detectChanges();
       expect(component.isFilterApplied(DimensionName.type)).toBeTruthy();
       expect(component.isFilterApplied()).toBeTruthy();
     });
@@ -724,8 +735,6 @@ describe('OverviewComponent', () => {
     }));
 
     it('should convert the facet names for the portal query', () => {
-      component.form.reset();
-      component.buildForm();
       fixture.detectChanges();
       component.form.get('facetParameter').setValue(DimensionName.country);
       fixture.detectChanges();
@@ -765,11 +774,9 @@ describe('OverviewComponent', () => {
   });
 
   describe('Request / Url Generation', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed();
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed();
+    }));
 
     beforeEach(() => {
       b4Each();
@@ -820,9 +827,9 @@ describe('OverviewComponent', () => {
       ).toBeTruthy();
     });
 
-    it('should get the total figure', () => {
+    it('should get the total figure', fakeAsync(() => {
       expect(component.getUrlRow(DimensionName.contentTier)).toBeTruthy();
-    });
+    }));
 
     it('should include the facet selection', () => {
       [2, 3, 4].forEach((qfVal: number) => {
@@ -876,11 +883,9 @@ describe('OverviewComponent', () => {
   });
 
   describe('Polling', () => {
-    beforeEach(
-      waitForAsync(() => {
-        configureTestBed();
-      })
-    );
+    beforeEach(waitForAsync(() => {
+      configureTestBed();
+    }));
 
     beforeEach(() => {
       b4Each();

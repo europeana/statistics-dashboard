@@ -6,6 +6,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BarComponent } from '../chart';
 import { LandingComponent } from '.';
 
@@ -15,15 +16,14 @@ describe('LandingComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
+      imports: [FormsModule, ReactiveFormsModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   };
 
-  beforeEach(
-    waitForAsync(() => {
-      configureTestBed();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    configureTestBed();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LandingComponent);

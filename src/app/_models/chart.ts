@@ -1,4 +1,4 @@
-import { IHash } from '.';
+import { IHash } from './models';
 
 export interface ChartSettings {
   configurable: boolean;
