@@ -828,8 +828,6 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the total figure', fakeAsync(() => {
-      tick(1);
-      fixture.detectChanges();
       expect(component.getUrlRow(DimensionName.contentTier)).toBeTruthy();
     }));
 
