@@ -76,6 +76,7 @@ export class GridComponent extends SubscriptionManager {
         .subscribe((urls: Array<string>) => {
           const rightsParams = urls
             .map((url: string) => {
+              // eslint-disable-next-line no-useless-escape
               return `&qf=RIGHTS:\"${url}\"`;
             })
             .join('');

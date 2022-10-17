@@ -232,7 +232,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
                 return toInputSafeName(qpVal);
               });
             });
-
             return {
               params: results[0],
               queryParams: qpValArrays
@@ -273,7 +272,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             }
           }
           this.queryParams = queryParams;
-
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetIdInputToQueryParam();
@@ -483,7 +481,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           // ...and sort on label
           return op1.label.localeCompare(op2.label);
         });
-
         this.filterData[facetName] = allSortedOps;
         this.filterDisplayData(this.userFilterSearchTerms[facetName]);
       });
@@ -620,14 +617,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     seriesTotal: number
   ): void {
     const name = JSON.stringify(this.queryParams).replace(
-      /[:\".,\s\(\)\[\]\{\}]/g,
+      /[:".,\s()[]{}]/g,
       ''
     );
     const rightsInfo = this.form.value.rightsCategory;
     const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
       return rightsInfo[key];
     });
-
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
       label: this.generateSeriesLabel(),

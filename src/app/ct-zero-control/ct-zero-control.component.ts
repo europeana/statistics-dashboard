@@ -18,7 +18,7 @@ export class CTZeroControlComponent {
   /**
    * valueChanged
    * emits event (invokes updatePageUrl())
-  **/
+   **/
   valueChanged(): void {
     this.onChange.emit();
   }
