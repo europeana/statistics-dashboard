@@ -16,6 +16,7 @@ describe('LandingComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
+      declarations: [LandingComponent],
       imports: [FormsModule, ReactiveFormsModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
