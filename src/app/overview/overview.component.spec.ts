@@ -126,7 +126,7 @@ describe('OverviewComponent', () => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.callFake((_)=> {
+    spyOn(router, 'navigate').and.callFake((_) => {
       return new Promise((resolve) => {
         resolve(null);
       });
@@ -220,6 +220,8 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
 
       const res2 = component.portalUrlsFromNVPs(DimensionName.type, data);
+
+      // eslint-disable-next-line no-useless-escape
       expect(res2.name).toEqual(`${rootUrl}&qf=TYPE:\"name\"`);
     });
 
