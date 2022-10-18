@@ -69,6 +69,10 @@ describe('OverviewComponent', () => {
   let api: APIService;
 
   const configureTestBed = (errorMode = false): void => {
+    // clear parameter data
+    queryParams.next({});
+    params.next({});
+
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
@@ -220,7 +224,6 @@ describe('OverviewComponent', () => {
       fixture.detectChanges();
 
       const res2 = component.portalUrlsFromNVPs(DimensionName.type, data);
-
       // eslint-disable-next-line no-useless-escape
       expect(res2.name).toEqual(`${rootUrl}&qf=TYPE:\"name\"`);
     });
@@ -317,29 +320,27 @@ describe('OverviewComponent', () => {
       expect(component.getGridData()).toBeTruthy();
     });
 
-    it('should generate the series label', fakeAsync(() => {
-      queryParams.next({});
-      tick(tickTimeChartDebounce);
-      fixture.detectChanges();
-
+    it('should generate the series label', () => {
       let generatedLabel;
       component.form.controls.facetParameter.setValue(
         DimensionName.contentTier
       );
+      fixture.detectChanges();
+
       generatedLabel = component.generateSeriesLabel();
       expect(generatedLabel).toEqual('All (Content Tier)');
 
       component.form.controls.facetParameter.setValue(
         DimensionName.rightsCategory
       );
+      fixture.detectChanges();
+
       generatedLabel = component.generateSeriesLabel();
       expect(generatedLabel).toEqual('All (Rights Category)');
 
       const nextParams = {};
       nextParams[DimensionName.country] = ['Denmark', 'Iceland'];
       queryParams.next(nextParams);
-
-      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       generatedLabel = component.generateSeriesLabel();
@@ -347,14 +348,11 @@ describe('OverviewComponent', () => {
 
       nextParams['date-to'] = [today];
       queryParams.next(nextParams);
-      tick(tickTimeChartDebounce);
-      fixture.detectChanges();
 
       expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
 
       nextParams['date-from'] = [yearZero];
       queryParams.next(nextParams);
-      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       expect(component.generateSeriesLabel().indexOf('Period')).toBeGreaterThan(
@@ -363,7 +361,6 @@ describe('OverviewComponent', () => {
 
       nextParams['date-to'] = [];
       queryParams.next(nextParams);
-      tick(tickTimeChartDebounce);
       fixture.detectChanges();
 
       expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
@@ -372,14 +369,7 @@ describe('OverviewComponent', () => {
       ).toEqual(-1);
       nextParams['content-tier-zero'] = 'true';
       queryParams.next(nextParams);
-
-      tick(tickTimeChartDebounce);
-      fixture.detectChanges();
-
-      queryParams.next({});
-      tick(1);
-      tick(tickTimeChartDebounce);
-    }));
+    });
 
     it('should extract the series server data', () => {
       const br: BreakdownResult = {
@@ -391,7 +381,8 @@ describe('OverviewComponent', () => {
           }
         ]
       };
-      component.queryParams = { any: ['thing'] };
+
+      queryParams.next({ any: ['thing'] });
 
       spyOn(component, 'storeSeries');
       component.extractSeriesServerData(br);
@@ -420,13 +411,13 @@ describe('OverviewComponent', () => {
 
     it('should build the filters (from the query parameters)', fakeAsync(() => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
-      const ops = {};
       const nextParams = {};
       nextParams[DimensionName.country] = ['Scotland', 'Yugoslavia'];
       queryParams.next(nextParams);
-      tick(1);
       fixture.detectChanges();
-      component.buildFilters(ops);
+      tick(1);
+      component.buildFilters({});
+      expect(component.filterData).toBeTruthy();
       expect(Object.keys(component.filterData).length).toBeTruthy();
       tick(tickTimeChartDebounce);
     }));
@@ -457,24 +448,16 @@ describe('OverviewComponent', () => {
       tick(tickTimeChartDebounce);
     }));
 
-    it('should get the url for a dataset', fakeAsync(() => {
+    it('should get the url for a dataset', () => {
       expect(component.getUrl().indexOf('XXX')).toEqual(-1);
       component.form.get('datasetId').setValue('XXX');
       fixture.detectChanges();
       expect(component.getUrl().indexOf('XXX')).toBeGreaterThan(-1);
-      component.form.get('datasetId').setValue('');
-      fixture.detectChanges();
-
-      queryParams.next({});
-      tick(tickTimeChartDebounce);
-      fixture.detectChanges();
 
       const qp = {};
       qp[DimensionName.rightsCategory] = ['CC0'];
       qp[DimensionName.country] = ['Italy'];
-
       queryParams.next(qp);
-      tick(1);
       fixture.detectChanges();
 
       const url = component.getUrl();
@@ -483,31 +466,42 @@ describe('OverviewComponent', () => {
       expect(url.indexOf('Italy')).toBeGreaterThan(-1);
 
       queryParams.next({ xxx: '10-11-12' });
-      tick(1);
+
       fixture.detectChanges();
       expect(component.getUrl().indexOf('Italy')).toEqual(-1);
-
-      queryParams.next({});
-      tick(1);
-      tick(tickTimeChartDebounce);
-    }));
+    });
 
     it('should get the url for filters', () => {
       const countryUrlParamVal = 'Belgium';
       const ctZeroUrlParamVal = '0%20OR%201%20OR%202%20OR%203%20OR%204';
 
       expect(component.getUrl().includes(countryUrlParamVal)).toBeFalsy();
-      component.queryParams = { country: [countryUrlParamVal] };
-      expect(component.getUrl().includes(countryUrlParamVal)).toBeTruthy();
-      expect(
-        component.getUrl().includes(`COUNTRY:"${countryUrlParamVal}"`)
-      ).toBeTruthy();
 
-      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
-      component.queryParams = { 'content-tier-zero': true };
-      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeFalsy();
+      queryParams.next({ country: [countryUrlParamVal] });
+      fixture.detectChanges();
+      let url = component.getUrl();
+
+      expect(url.includes(countryUrlParamVal)).toBeTruthy();
+      expect(url.includes(`COUNTRY:"${countryUrlParamVal}"`)).toBeTruthy();
+      expect(url.includes(ctZeroUrlParamVal)).toBeFalsy();
+
+      queryParams.next({ 'content-tier-zero': 'true' });
+      fixture.detectChanges();
+      url = component.getUrl();
+
+      expect(url.includes(ctZeroUrlParamVal)).toBeTruthy();
+
+      queryParams.next({});
+      fixture.detectChanges();
+      url = component.getUrl();
+
+      expect(url.includes(ctZeroUrlParamVal)).toBeFalsy();
+
       component.form.controls.contentTierZero.setValue(true);
-      expect(component.getUrl().includes(ctZeroUrlParamVal)).toBeTruthy();
+      fixture.detectChanges();
+      url = component.getUrl();
+
+      expect(url.includes(ctZeroUrlParamVal)).toBeTruthy();
     });
 
     it('should get the formatted date param', () => {
@@ -539,8 +533,6 @@ describe('OverviewComponent', () => {
       expect(component.form.value.datasetId.length).toBeTruthy();
       expect(component.form.value.datasetId).toEqual('123');
 
-      queryParams.next({});
-      tick(tickTime);
       tick(tickTimeChartDebounce);
     }));
 
@@ -561,12 +553,16 @@ describe('OverviewComponent', () => {
     });
 
     it('should get the formatted content tier param', () => {
+      queryParams.next({});
+      fixture.detectChanges();
+
       const expectOneToFour = fmtParamCT('1 OR 2 OR 3 OR 4');
       const expectZeroToFour = fmtParamCT('0 OR 1 OR 2 OR 3 OR 4');
 
       expect(component.getFormattedContentTierParam()).toEqual(expectOneToFour);
 
       component.form.get('contentTierZero').setValue(true);
+      fixture.detectChanges();
 
       expect(component.getFormattedContentTierParam()).toEqual(
         expectZeroToFour
@@ -577,15 +573,20 @@ describe('OverviewComponent', () => {
         contentTierNameLabels
       );
       component.form.get('contentTier.0').setValue(true);
+      fixture.detectChanges();
 
       expect(component.getFormattedContentTierParam()).toEqual(fmtParamCT('0'));
 
       component.form.get('contentTier.1').setValue(true);
+      fixture.detectChanges();
+
       expect(component.getFormattedContentTierParam()).toEqual(
         fmtParamCT('0 OR 1')
       );
 
       component.form.get('contentTier.0').setValue(false);
+      fixture.detectChanges();
+
       expect(component.getFormattedContentTierParam()).toEqual(fmtParamCT('1'));
     });
 
@@ -800,13 +801,7 @@ describe('OverviewComponent', () => {
         '3',
         '4'
       ]);
-      component.queryParams = { 'content-tier-zero': true };
-      expect(fnGetRequestFilter(DimensionName.contentTier)).toEqual([
-        '1',
-        '2',
-        '3',
-        '4'
-      ]);
+
       component.form.controls.contentTierZero.setValue(true);
 
       expect(fnGetRequestFilter(DimensionName.contentTier)).toBeFalsy();
@@ -829,9 +824,9 @@ describe('OverviewComponent', () => {
       ).toBeTruthy();
     });
 
-    it('should get the total figure', fakeAsync(() => {
+    it('should get the total figure', () => {
       expect(component.getUrlRow(DimensionName.contentTier)).toBeTruthy();
-    }));
+    });
 
     it('should include the facet selection', () => {
       [2, 3, 4].forEach((qfVal: number) => {
@@ -861,7 +856,7 @@ describe('OverviewComponent', () => {
 
     it('should include contentTierZero', () => {
       const ctZeroDetect = `${DimensionName.contentTier}:(0`;
-
+      component.form.value.contentTierZero = false;
       expect(
         component.getUrlRow(DimensionName.contentTier).indexOf(ctZeroDetect)
       ).toEqual(-1);
