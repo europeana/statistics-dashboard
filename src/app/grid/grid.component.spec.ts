@@ -170,6 +170,14 @@ describe('GridComponent', () => {
     expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
     expect(window.open).toHaveBeenCalledTimes(2);
 
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+    mockTableRow.isTotal = true;
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(window.open).toHaveBeenCalledTimes(2);
+
     // test urls for rightsCategory filters
 
     component.facet = DimensionName.contentTier;

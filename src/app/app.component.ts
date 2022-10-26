@@ -113,6 +113,24 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     );
   }
 
+  /**
+   * handleLocationPopState
+   * capture "back" and "forward" events / sync with form data
+   * @param { PopStateEvent } state - the event
+   **/
+  handleLocationPopState(state: PopStateEvent): void {
+    if (this.landingComponentRef) {
+      const ctrlCTZero = this.getCtrlCTZero();
+      this.lastSetContentTierZeroValue =
+        `${state.url}`.indexOf('content-tier-zero=true') > -1;
+
+      if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
+        this.skipLocationUpdate = true;
+        ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
+      }
+    }
+  }
+
   /** ngOnInit
   /* - bind queryParam events to lastSetContentTierZeroValue
   /* - bind location back / forward events to form
@@ -125,20 +143,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           params[this.paramNameCTZero] === 'true';
       })
     );
-
-    this.location.subscribe((state: PopStateEvent) => {
-      if (this.landingComponentRef) {
-        // capture "back" and "forward" events / sync with form data
-        const ctrlCTZero = this.getCtrlCTZero();
-        this.lastSetContentTierZeroValue =
-          `${state.url}`.indexOf('content-tier-zero=true') > -1;
-
-        if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-          this.skipLocationUpdate = true;
-          ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-        }
-      }
-    });
+    this.location.subscribe(this.handleLocationPopState.bind(this));
   }
 
   /** onOutletLoaded

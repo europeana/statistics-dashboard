@@ -7,7 +7,7 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs';
@@ -363,12 +363,16 @@ describe('OverviewComponent', () => {
       queryParams.next(nextParams);
       fixture.detectChanges();
 
+      const labelCTZero = 'CT-Zero';
+
       expect(component.generateSeriesLabel().indexOf('Period')).toEqual(-1);
-      expect(
-        component.generateSeriesLabel().indexOf('content-tier-zero')
-      ).toEqual(-1);
+      expect(component.generateSeriesLabel().indexOf(labelCTZero)).toEqual(-1);
       nextParams['content-tier-zero'] = 'true';
       queryParams.next(nextParams);
+      fixture.detectChanges();
+      expect(
+        component.generateSeriesLabel().indexOf(labelCTZero)
+      ).toBeGreaterThan(1);
     });
 
     it('should extract the series server data', () => {
@@ -412,12 +416,17 @@ describe('OverviewComponent', () => {
     it('should build the filters (from the query parameters)', fakeAsync(() => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
       const nextParams = {};
-      nextParams[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+      nextParams[DimensionName.country] = [
+        'Scotland',
+        'Yugoslavia',
+        'Italy',
+        'Greece'
+      ];
       queryParams.next(nextParams);
       fixture.detectChanges();
       tick(1);
       component.buildFilters({});
-      expect(component.filterData).toBeTruthy();
+
       expect(Object.keys(component.filterData).length).toBeTruthy();
       tick(tickTimeChartDebounce);
     }));
@@ -540,6 +549,12 @@ describe('OverviewComponent', () => {
       component.form.get('datasetId').setValue('123, 456, 789');
       component.updateDatasetIdFieldAndPageUrl('123');
       expect(component.form.value.datasetId).toEqual('456, 789');
+
+      component.updateDatasetIdFieldAndPageUrl('456');
+      expect(component.form.value.datasetId).toEqual('789');
+
+      component.updateDatasetIdFieldAndPageUrl('789');
+      expect(component.form.value.datasetId).toEqual('');
     });
 
     it('should get the formatted datasetId param', () => {
@@ -595,17 +610,28 @@ describe('OverviewComponent', () => {
       const form = component.form;
 
       expect(form).toBeTruthy();
+      expect(form.get(testName)).toBeFalsy();
 
       contentTierNameLabels.forEach((nl: NameLabel) => {
         expect(form.get(`${testName}.${nl.name}`)).toBeFalsy();
       });
 
       form.addControl(testName, new UntypedFormBuilder().group({}));
+      form.addControl('filter_list_test', new FormControl(''));
+
+      expect(form.get(testName)).toBeTruthy();
+
+      contentTierNameLabels.forEach((nl: NameLabel) => {
+        const ctrl = form.get(`${testName}.${nl.name}`);
+        expect(ctrl).toBeFalsy();
+      });
 
       component.addOrUpdateFilterControls(testName, contentTierNameLabels);
 
       contentTierNameLabels.forEach((nl: NameLabel) => {
-        expect(form.get(`${testName}.${nl.name}`)).toBeTruthy();
+        const ctrl = form.get(`${testName}.${nl.name}`);
+        expect(ctrl).toBeTruthy();
+        expect(ctrl.value).toBeFalsy();
       });
     });
 
@@ -645,6 +671,9 @@ describe('OverviewComponent', () => {
 
       selected = component.getSetCheckboxValues(fName);
       expect(selected.length).toEqual(1);
+
+      selected = component.getSetCheckboxValues('DOES_NOT_EXIST');
+      expect(selected.length).toEqual(0);
     });
 
     it('should clear the dates', fakeAsync(() => {
@@ -774,6 +803,30 @@ describe('OverviewComponent', () => {
       expect(component.snapshots.unapply).toHaveBeenCalled();
       tick(tickTimeChartDebounce);
     }));
+
+    it('should update the page url', () => {
+      expect(router.navigate).not.toHaveBeenCalled();
+
+      component.updatePageUrl();
+      expect(component.queryParams).toEqual({});
+      expect(router.navigate).toHaveBeenCalledTimes(1);
+
+      component.form.controls.dateFrom.setValue(new Date().toISOString());
+      component.form.controls.dateTo.setValue(new Date().toISOString());
+      component.updatePageUrl(true);
+
+      expect(component.queryParams['date-from']).toBeTruthy();
+      expect(component.queryParams['date-to']).toBeTruthy();
+      expect(router.navigate).toHaveBeenCalledTimes(2);
+
+      component.form.controls.contentTierZero.setValue(true);
+      component.updatePageUrl(true);
+      expect(
+        component.queryParams[
+          nonFacetFilters[NonFacetFilterNames.contentTierZero]
+        ]
+      ).toBeTruthy();
+    });
   });
 
   describe('Request / Url Generation', () => {
