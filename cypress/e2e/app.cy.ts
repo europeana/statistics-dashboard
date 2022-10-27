@@ -1,5 +1,7 @@
 context('Statistics Dashboard', () => {
 
+  const force = {force: true};
+  const host = 'http://localhost:4280';
   const urlContentTier = '/data/contentTier';
   const urlParamCTZero = 'content-tier-zero=';
   const urlParamCTZeroTrue = `?${urlParamCTZero}true`;
@@ -13,7 +15,96 @@ context('Statistics Dashboard', () => {
     });
   });
 
-  describe('App Routes', () => {
+  describe('App Route History', () => {
+
+    it('should keep filter controls synced with the url history', () => {
+      const baseUrl = `${host}${urlContentTier}`;
+      const selFilter = `.filters-header + .filters .filter`;
+      const selFilterOpener = '.filter-opener';
+      const selFilterValueLabel = `${selFilter} .checkbox-label`;
+      const selFilterRemove = '.rm-filter .checkbox-label';
+
+      cy.visit(urlContentTier);
+      cy.location('href').should('equal', baseUrl);
+      cy.get(selFilterRemove).should('not.exist');
+
+      // filter on country Belgium / confirm url & filter rm buttons updated
+
+      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterValueLabel).contains('Belgium').click();
+
+      cy.location('href').should('equal', `${baseUrl}?country=Belgium`);
+      cy.get(selFilterRemove).contains('Belgium').should('have.length', 1);
+
+      // filter on Metadata Tier 0 / confirm url & filter rm buttons updated
+
+      cy.get(selFilterRemove).contains('Tier 0').should('not.exist');
+      cy.get(selFilterOpener).eq(0).click(force);
+      cy.get(selFilterValueLabel).contains('Tier 0').click(force);
+
+      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium`);
+      cy.get(selFilterRemove).contains('Tier 0').should('have.length', 1);
+
+      // filter on type IMAGE / confirm url & filter rm buttons updated
+
+      cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
+      cy.get(selFilterOpener).eq(5).click(force);
+      cy.get(selFilterValueLabel).contains('IMAGE').click();
+
+      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`);
+      cy.get(selFilterRemove).contains('IMAGE').should('have.length', 1);
+
+      // History Checks
+
+      // go back (remove image)
+
+      cy.go('back');
+
+      cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
+      cy.get(selFilterRemove).contains('Tier 0').should('exist');
+      cy.get(selFilterRemove).contains('Belgium').should('exist');
+      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium`);
+
+      // go back (remove Tier 0)
+      cy.go('back');
+
+      cy.get(selFilterRemove).contains('Tier 0').should('not.exist');
+      cy.get(selFilterRemove).contains('Belgium').should('exist');
+      cy.location('href').should('equal', `${baseUrl}?country=Belgium`);
+
+      // go back (remove Country)
+      cy.go('back');
+
+      cy.get(selFilterRemove).should('not.exist');
+      cy.location('href').should('equal', baseUrl);
+
+      // go forward (re-add Country)
+      cy.go('forward');
+
+      cy.get(selFilterRemove).contains('Belgium').should('exist');
+      cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
+      cy.location('href').should('equal', `${baseUrl}?country=Belgium`);
+
+      // go forward (re-add Tier 0)
+
+      cy.go('forward');
+
+      cy.get(selFilterRemove).contains('Belgium').should('exist');
+      cy.get(selFilterRemove).contains('Tier 0').should('exist');
+      cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
+      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium`);
+
+      // go forward (re-add IMAGE)
+      cy.go('forward');
+
+      cy.get(selFilterRemove).contains('Belgium').should('exist');
+      cy.get(selFilterRemove).contains('Tier 0').should('exist');
+      cy.get(selFilterRemove).contains('IMAGE').should('exist');
+      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`);
+    });
+  });
+
+  describe('App Content Tier Zero', () => {
     const selCTZero = '#ctZero';
     const selLinkDataContentTier = '[data-e2e=link-entry-ct]';
     const selLinkHeader = '[data-e2e=link-home-header]';
@@ -23,7 +114,7 @@ context('Statistics Dashboard', () => {
       cy.get(selCTZero).should('not.be.checked');
       cy.url().should('not.contain', urlParamCTZero);
 
-      cy.get(selCTZero).click({force: true});
+      cy.get(selCTZero).click(force);
       cy.get(selCTZero).should('be.checked');
       cy.url().should('contain', urlParamCTZero);
     };
@@ -40,18 +131,18 @@ context('Statistics Dashboard', () => {
 
     it('the content-tier-zero should be remembered between pages (click test)', () => {
       cy.visit('/');
-      cy.get(selCTZero).click({force: true});
+      cy.get(selCTZero).click(force);
       cy.get(selCTZero).should('be.checked');
       cy.url().should('contain', urlParamCTZero);
 
       const goBackAndForth = () => {
         cy.url().should('not.contain', '/data');
-        cy.get(selLinkDataContentTier).click({force: true});
+        cy.get(selLinkDataContentTier).click(force);
 
         cy.get(selCTZero).should('be.checked');
         cy.url().should('contain', urlParamCTZero);
 
-        cy.get(selLinkHeader).click({force: true});
+        cy.get(selLinkHeader).click(force);
 
         cy.get(selCTZero).should('be.checked');
         cy.url().should('contain', urlParamCTZero);
@@ -62,7 +153,6 @@ context('Statistics Dashboard', () => {
 
     it('the content-tier-zero should be remembered between pages (history test)', () => {
 
-      const host = 'http://localhost:4280';
       cy.visit('/')
       const expectedHistory = ['/', `/${urlParamCTZeroTrue}`, `${urlContentTier}${urlParamCTZeroTrue}`, `${urlContentTier}`, '/'];
 
@@ -70,16 +160,16 @@ context('Statistics Dashboard', () => {
       cy.location('pathname').should('equal', '/');
       cy.location('href').should('equal', `${host}${expectedHistory[0]}`);
 
-      cy.get(selCTZero).click({force: true});
+      cy.get(selCTZero).click(force);
       cy.location('href').should('equal', `${host}${expectedHistory[1]}`);
 
-      cy.get(selLinkDataContentTier).click({force: true});
+      cy.get(selLinkDataContentTier).click(force);
       cy.location('href').should('equal', `${host}${expectedHistory[2]}`);
 
-      cy.get(selCTZero).click({force: true});
+      cy.get(selCTZero).click(force);
       cy.location('href').should('equal', `${host}${expectedHistory[3]}`);
 
-      cy.get(selLinkHeader).click({force: true});
+      cy.get(selLinkHeader).click(force);
       cy.location('href').should('equal', `${host}${expectedHistory[4]}`);
 
       // browser back

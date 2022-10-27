@@ -729,7 +729,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
     options.forEach((option: NameLabel) => {
       const fName = option.name;
-      const ctrl = checkboxes[fName];
+      const ctrl = this.form.get(`${name}.${fName}`);
       const defaultValue =
         this.queryParams[name] && this.queryParams[name].includes(fName);
 
@@ -1056,7 +1056,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   /** updateDatasetIdFieldAndPageUrl
   /*
-  /* Removes a value-part from the daasetId form value and calls updatePageUrl
+  /* Removes a value-part from the dasetId form value and calls updatePageUrl
   /* @param { string } datasetId - the value-part to remove
   */
   updateDatasetIdFieldAndPageUrl(datasetId?: string): void {
