@@ -24,9 +24,7 @@ describe('AppComponent', () => {
   let location: Location;
 
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
-  const tmpParams = {};
-  tmpParams['content-tier-zero'] = false;
-  const queryParams = new BehaviorSubject(tmpParams as Params);
+  const queryParams = new BehaviorSubject({} as Params);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -105,6 +103,23 @@ describe('AppComponent', () => {
     tick(1);
     expect(component.lastSetContentTierZeroValue).toBeFalsy();
   }));
+
+  it('should handle the location pop-state', () => {
+    const ps = {
+      url: '?content-tier-zero=true'
+    } as unknown as PopStateEvent;
+
+    component.buildForm();
+
+    component.landingComponentRef = {
+      isLoading: false
+    } as unknown as LandingComponent;
+
+    expect(component.lastSetContentTierZeroValue).toBeFalsy();
+    component.handleLocationPopState(ps);
+    fixture.detectChanges();
+    expect(component.lastSetContentTierZeroValue).toBeTruthy();
+  });
 
   it('should load the landing data', fakeAsync(() => {
     component.landingComponentRef = {

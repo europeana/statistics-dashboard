@@ -1,5 +1,4 @@
-import { ElementRef, Injectable } from '@angular/core';
-import html2canvas from 'html2canvas';
+import { Injectable } from '@angular/core';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
@@ -62,19 +61,5 @@ export class ExportPDFService {
     };
     const pdfDocGenerator = pdfMake.createPdf(layout);
     pdfDocGenerator.download();
-  }
-
-  getChartAsImageUrl(canvas: ElementRef, source: ElementRef): Promise<string> {
-    return new Promise((resolve, reject) => {
-      html2canvas(source.nativeElement)
-        .then((canvasHTML: HTMLCanvasElement) => {
-          canvas.nativeElement.src = canvasHTML.toDataURL('image/png');
-          resolve(canvas.nativeElement.src);
-        })
-        .catch((error: string) => {
-          console.log(error);
-          reject(error);
-        });
-    });
   }
 }
