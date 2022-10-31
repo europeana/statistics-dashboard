@@ -53,13 +53,9 @@ export class MapComponent {
 
   updateData(): void {
     this.browserOnly((): void => {
-      if (!this.chart) {
-        return;
-      }
       if (!this.results) {
         return;
       }
-
       this.polygonSeries.data = this.results.map((nv: NameValue) => {
         return {
           id: this.countryCodes[nv.name],

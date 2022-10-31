@@ -12,7 +12,6 @@ export const BarChartDefaults: ChartSettings = {
   paddingRight: 0,
   paddingTop: 0,
   prefixValueAxis: null,
-  showExports: false,
   chartLegend: false // used to set class 'offscreen'
 };
 
@@ -21,6 +20,5 @@ export const BarChartCool: ChartSettings = {
   hasScroll: true,
   isHorizontal: true,
   maxLabelWidth: 200,
-  paddingTop: 8,
-  showExports: false
+  paddingTop: 8
 };

@@ -25,12 +25,6 @@ import { colours } from '../../_data';
 
 import { BarChartDefaults } from '../chart-defaults';
 
-interface CustomLegendItem {
-  name: 'string';
-  fill: 'string';
-  customData: { hide(): void; show(): void };
-}
-
 @Component({
   selector: 'app-bar-chart',
   templateUrl: './bar.component.html',
@@ -44,7 +38,6 @@ export class BarComponent implements AfterViewInit {
 
   _results?: Array<NameValue>;
   categoryAxis: am4charts.CategoryAxis;
-  legendContainer: am4core.Container;
 
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
@@ -162,81 +155,6 @@ export class BarComponent implements AfterViewInit {
     axisBreak.defaultState.transitionDuration = 1000;
   }
 
-  /** addLegend
-  /* - create legend and legendContainer
-  /* - create custom items from series
-  /* - add event handling for resize / click
-  */
-  addLegend(series?: am4charts.ColumnSeries): void {
-    if (!this.settings.chartLegend) {
-      return;
-    }
-
-    const legendId = 'barLegend';
-    let legend = this.chart.legend;
-
-    if (!legend) {
-      legend = new am4charts.Legend();
-      this.chart.legend = legend;
-
-      this.legendContainer = am4core.create(legendId, am4core.Container);
-      this.legendContainer.width = am4core.percent(100);
-      this.legendContainer.height = am4core.percent(100);
-      legend.parent = this.legendContainer;
-
-      legend.itemContainers.template.events.on(
-        'hit',
-        (ev: { type: 'hit'; target: am4core.Container }) => {
-          const context = ev.target.dataItem.dataContext as CustomLegendItem;
-          if (!ev.target.isActive) {
-            context.customData.hide();
-          } else {
-            context.customData.show();
-          }
-        }
-      );
-    }
-
-    if (!series) {
-      return;
-    }
-
-    let seriesReady = false;
-
-    const resizeLegend = (): void => {
-      if (legend.appeared && seriesReady) {
-        const el = document.getElementById(legendId);
-        if (el) {
-          el.style.height = `${legend.contentHeight}px`;
-        }
-      }
-    };
-
-    this.chart.events.on('datavalidated', () => {
-      resizeLegend();
-      console.log('datavalidated ever called???');
-    });
-
-    legend.events.on('datavalidated', resizeLegend);
-    this.chart.events.on('maxsizechanged', resizeLegend);
-    legend.events.on('maxsizechanged', resizeLegend);
-
-    series.events.on('ready', (): void => {
-      seriesReady = true;
-      const legenddata = [];
-      const xyTarget = this.settings.isHorizontal ? 'categoryY' : 'categoryX';
-
-      series.columns.each(function (column) {
-        legenddata.push({
-          name: column.dataItem[xyTarget],
-          fill: column.fill,
-          customData: column.dataItem
-        });
-      });
-      legend.data = legenddata;
-    });
-  }
-
   removeSeries(id: string): void {
     const series = this.allSeries[id];
 
@@ -288,7 +206,6 @@ export class BarComponent implements AfterViewInit {
       }
 
       anySeries = this.createSeries(csd.colour, csd.seriesName);
-      this.addLegend(anySeries);
       this.allSeries[csd.seriesName] = anySeries;
     });
 
@@ -329,7 +246,7 @@ export class BarComponent implements AfterViewInit {
   /** createSeries
    * - instantiates and returns a series
    *
-   * @param { string } colour - the series legend / bar colour
+   * @param { string } colour - the series bar colour
    * @param { string } valueField - the field to read
    */
   createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
@@ -447,7 +364,7 @@ export class BarComponent implements AfterViewInit {
   /** drawChart
    * - instantiates chart and axes according to rotation
    * - assigns data
-   * - invokes series, legend and settings functions
+   * - invokes series and settings functions
    */
   drawChart(zoomIndex?: number): void {
     this.browserOnly(() => {
@@ -494,23 +411,6 @@ export class BarComponent implements AfterViewInit {
       }
 
       this.applyRendererDefaults();
-      this.addLegend();
     });
-
-    // this has to be outside browserOnly()
-    if (this.settings.showExports) {
-      this.chart.exporting.menu = new am4core.ExportMenu();
-      this.chart.exporting.menu.align = 'right';
-
-      const legendContainer = this.legendContainer;
-
-      if (legendContainer) {
-        this.chart.exporting.extraSprites.push({
-          sprite: legendContainer,
-          position: 'bottom',
-          marginTop: 20
-        });
-      }
-    }
   }
 }
