@@ -1056,7 +1056,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   /** updateDatasetIdFieldAndPageUrl
   /*
-  /* Removes a value-part from the dasetId form value and calls updatePageUrl
+  /* Removes a value-part from the datasetId form value and calls updatePageUrl
   /* @param { string } datasetId - the value-part to remove
   */
   updateDatasetIdFieldAndPageUrl(datasetId?: string): void {
