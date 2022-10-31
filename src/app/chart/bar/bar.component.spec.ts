@@ -65,6 +65,14 @@ describe('BarComponent', () => {
     expect(seriesPct.columns.template.tooltipText).toContain('%');
   });
 
+  it('should format the numbers', () => {
+    component.drawChart();
+    expect(component.valueAxis.numberFormatter.numberFormat).toEqual('#.0a');
+    component.showPercent = true;
+    component.drawChart();
+    expect(component.valueAxis.numberFormatter.numberFormat).toEqual('#.');
+  });
+
   it('should add a series', () => {
     const series = [
       {
