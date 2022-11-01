@@ -34,4 +34,13 @@ describe('MapComponent', () => {
     component.updateData();
     expect(component.polygonSeries.data.length).toEqual(1);
   });
+
+  it('should generate the polygon series', () => {
+    component.polygonSeries = null;
+    component.updateData();
+    expect(component.polygonSeries).toBeFalsy();
+    component.drawChart();
+    fixture.detectChanges();
+    expect(component.polygonSeries.data.length).toEqual(0);
+  });
 });

@@ -13,7 +13,6 @@ export interface ChartSettings {
   paddingRight?: number;
   paddingTop?: number;
   prefixValueAxis?: string;
-  showExports?: boolean;
   chartLegend?: boolean;
 }
 

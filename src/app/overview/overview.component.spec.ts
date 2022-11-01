@@ -33,6 +33,7 @@ import {
   BreakdownResult,
   BreakdownResults,
   DimensionName,
+  FilterInfo,
   NameLabel,
   NonFacetFilterNames,
   RequestFilter,
@@ -401,6 +402,61 @@ describe('OverviewComponent', () => {
 
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalledTimes(3);
+    });
+
+    it('should filter the display data', () => {
+      expect(Object.keys(component.displayedFilterData).length).toBeFalsy();
+
+      component.filterData = {};
+      component.filterData[DimensionName.country] = [
+        {
+          name: 'Scotland',
+          label: 'Scotland',
+          valid: true
+        }
+      ];
+
+      component.filterDisplayData({
+        term: '',
+        dimension: DimensionName.country
+      });
+      expect(Object.keys(component.displayedFilterData).length).toEqual(1);
+
+      component.form.get('facetParameter').setValue(DimensionName.country);
+      component.filterDisplayData({ term: '' } as unknown as FilterInfo);
+
+      expect(Object.keys(component.displayedFilterData).length).toEqual(1);
+      expect(
+        component.displayedFilterData[DimensionName.country].options.length
+      ).toEqual(1);
+
+      component.filterDisplayData({
+        term: 'XXX',
+        dimension: DimensionName.country
+      });
+      expect(
+        component.displayedFilterData[DimensionName.country].options.length
+      ).toEqual(0);
+
+      component.filterDisplayData({
+        term: '',
+        dimension: DimensionName.country
+      });
+      expect(
+        component.displayedFilterData[DimensionName.country].options.length
+      ).toEqual(1);
+      expect(
+        component.displayedFilterData[DimensionName.country].hasMore
+      ).toBeFalsy();
+
+      component.filterDisplayData({
+        term: '',
+        dimension: DimensionName.country,
+        upToPage: -1
+      });
+      expect(
+        component.displayedFilterData[DimensionName.country].hasMore
+      ).toBeTruthy();
     });
 
     it('should build the filters', () => {

@@ -41,16 +41,39 @@ describe('BarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should add a legend', () => {
-    expect(component.legendContainer).toBeFalsy();
-    component.settings.chartLegend = true;
-    component.addLegend();
-    expect(component.legendContainer).toBeTruthy();
-    component.addLegend();
-    expect(component.legendContainer).toBeTruthy();
+  it('should create a series', () => {
+    component.settings.isHorizontal = true;
+    const seriesH = component.createSeries('#000');
+    expect(seriesH).toBeTruthy();
+    expect(seriesH.dataFields.valueX).toBeTruthy();
+    expect(seriesH.dataFields.valueY).toBeFalsy();
+
+    component.settings.isHorizontal = false;
+    const seriesY = component.createSeries('#FFF');
+    expect(seriesY).toBeTruthy();
+    expect(seriesY.dataFields.valueX).toBeFalsy();
+    expect(seriesY.dataFields.valueY).toBeTruthy();
   });
 
-  it('should add a series', fakeAsync(() => {
+  it('should add tooltips to the series', () => {
+    const seriesAbs = component.createSeries('#000');
+    expect(seriesAbs.columns.template.tooltipText).not.toContain('%');
+
+    component.showPercent = true;
+
+    const seriesPct = component.createSeries('#000');
+    expect(seriesPct.columns.template.tooltipText).toContain('%');
+  });
+
+  it('should format the numbers', () => {
+    component.drawChart();
+    expect(component.valueAxis.numberFormatter.numberFormat).toEqual('#.0a');
+    component.showPercent = true;
+    component.drawChart();
+    expect(component.valueAxis.numberFormatter.numberFormat).toEqual('#.');
+  });
+
+  it('should add a series', () => {
     const series = [
       {
         colour: '#FF0000',
@@ -66,8 +89,11 @@ describe('BarComponent', () => {
     expect(Object.keys(component.allSeries).length).toEqual(seriesCount + 1);
     component.addSeries(series);
     expect(Object.keys(component.allSeries).length).toEqual(seriesCount + 1);
-    tick(1);
-  }));
+    component.settings.isHorizontal = false;
+    component.drawChart(1);
+    fixture.detectChanges();
+    expect(Object.keys(component.allSeries).length).toEqual(seriesCount + 1);
+  });
 
   it('should add a series from a result', () => {
     spyOn(component, 'addSeries');
@@ -82,10 +108,34 @@ describe('BarComponent', () => {
     expect(component.addSeries).toHaveBeenCalledTimes(2);
   });
 
+  it('should detect zoomabability', () => {
+    component.results = testResults;
+    expect(component.isZoomable()).toBeFalsy();
+    component.addSeriesFromResult();
+    expect(component.isZoomable()).toBeFalsy();
+    component.preferredNumberBars = 1;
+    component.addSeriesFromResult();
+    expect(component.isZoomable()).toBeTruthy();
+  });
+
   it('should add an axis break', () => {
     expect(component.valueAxis.axisBreaks.length).toEqual(0);
     component.addAxisBreak(0, 100);
     expect(component.valueAxis.axisBreaks.length).toBeGreaterThan(0);
+  });
+
+  it('should add an axis break if zoomability is high', () => {
+    spyOn(component, 'addAxisBreak');
+    component.preferredNumberBars = 1;
+    component.results = testResults;
+    component.addSeriesFromResult();
+    expect(component.isZoomable()).toBeTruthy();
+    expect(component.addAxisBreak).not.toHaveBeenCalled();
+
+    component.preferredNumberBars = 100;
+    component.maxBarSizeRelativeRatio = 0.1;
+    component.addSeriesFromResult();
+    expect(component.addAxisBreak).toHaveBeenCalled();
   });
 
   it('should round up numbers', () => {
