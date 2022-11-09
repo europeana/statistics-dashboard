@@ -598,6 +598,12 @@ describe('OverviewComponent', () => {
       expect(component.form.value.datasetId.length).toBeTruthy();
       expect(component.form.value.datasetId).toEqual('123');
 
+      queryParams.next({});
+      tick(tickTime);
+      fixture.detectChanges();
+
+      expect(component.form.value.datasetId).toEqual('');
+
       tick(tickTimeChartDebounce);
     }));
 

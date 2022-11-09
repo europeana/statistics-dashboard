@@ -887,9 +887,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   setDatasetIdInputToQueryParam(): void {
     const param =
       this.queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
-    if (param) {
-      this.form.controls.datasetId.setValue(param[0]);
-    }
+    this.form.controls.datasetId.setValue(param ? param[0] : '');
   }
 
   /** getEnabledFilterNames
