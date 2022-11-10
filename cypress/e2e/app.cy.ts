@@ -54,7 +54,26 @@ context('Statistics Dashboard', () => {
       cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`);
       cy.get(selFilterRemove).contains('IMAGE').should('have.length', 1);
 
+
+      // filter on inexistent dataset id / confirm url & filter rm buttons updated
+
+      const selDatasetId = '.dataset-name';
+
+      cy.get(selFilterRemove).contains('dataset_not_found').should('not.exist');
+      cy.get(selDatasetId).type('dataset_not_found{enter}');
+      cy.get(selFilterRemove).contains('dataset_not_found').should('have.length', 1);
+
       // History Checks
+
+      // go back (remove dataset id)
+
+      cy.go('back');
+
+      cy.get(selFilterRemove).contains('dataset_not_found').should('not.exist');
+      cy.get(selFilterRemove).contains('IMAGE').should('exist');
+      cy.get(selFilterRemove).contains('Tier 0').should('exist');
+      cy.get(selFilterRemove).contains('Belgium').should('exist');
+
 
       // go back (remove image)
 
