@@ -10,7 +10,7 @@
     "cypress:ci": "run-p --race start:ci cypress:run",
     "cypress:ci-accessibility": "run-p --race start:ci cypress:run-accessibility",
     "cypress:run": "sleep 10 && cypress run --config '{\"component\": {},  \"e2e\": { \"excludeSpecPattern\": \"**/**a11y.cy.ts\"}}'",
-    "cypress:run-accessibility": "sleep 10 && cypress run --config '{\"testFiles\": \"**/a11y.cy.ts\"}'",
+    "cypress:run-accessibility": "sleep 10 && cypress run --spec **/*a11y.cy.ts",
     "dist": "ng build --build-optimizer=false --progress=false --configuration production && cp nginx.conf mime.types dist",
     "dist-localised": "ng build --build-optimizer=false --progress=false --configuration production --localize=true && cp nginx.conf mime.types dist",
     "i18n:extract": "ng extract-i18n --output-path src/locale --out-file messages.en-GB.xlf",
