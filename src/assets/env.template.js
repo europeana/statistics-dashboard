@@ -1,4 +1,4 @@
-(function(window) {
+(function (window) {
   window.__env = window.__env || {};
   const env = window.__env;
   env.feedbackUrl = "${APP_FEEDBACK_URL}";
