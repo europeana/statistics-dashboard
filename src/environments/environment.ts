@@ -2,8 +2,9 @@
 /*  settings that can be used throughout the entire application
  **/
 
-const getEnvVar = (key: string): string => {
-  return (window as any).__env[key];
+const getEnvVar = (key: string): string | null => {
+  const env = (window as any).__env;
+  return env ? env[key] : null;
 };
 
 export const environment = {
