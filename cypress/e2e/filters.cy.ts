@@ -61,7 +61,7 @@ context('Statistics Dashboard', () => {
 
       // apply filter on country Belgium
       cy.get(selFilterOpener).eq(1).click(force);
-      cy.get(selFilterValueLabel).contains('Belgium').click();
+      cy.get(selFilterValueLabel).contains('Belgium').click(force);
       cy.get(selFilterRemove).should('have.length', 1);
 
       cy.get(selFacetSelect).select('Country', force);
@@ -127,7 +127,7 @@ context('Statistics Dashboard', () => {
         .filter(':visible')
         .should('have.length', 1);
 
-      cy.get(selLoadMore).click();
+      cy.get(selLoadMore).click(force);
 
       cy.get(selCheckbox).should('have.length.gt', 50);
       cy.get(selLoadMore)
@@ -226,7 +226,7 @@ context('Statistics Dashboard', () => {
       cy.get(selDateTo).should('have.length', 1);
 
       const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
-      cy.get(selDateFrom).type(today);
+      cy.get(selDateFrom).type(today, force);
       cy.get(selDateFrom).type('{enter}', force);
       cy.get(selDateTo).type(today, force);
       cy.get(selDateTo).type('{enter}', force);
@@ -240,13 +240,13 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterRemove).should('not.exist');
 
-      cy.get(selDatasetId).type('dataset_1{enter}');
+      cy.get(selDatasetId).type('dataset_1{enter}', force);
       cy.get(selFilterRemove).should('have.length', 1);
-      cy.get(selDatasetId).type(',dataset_2{enter}');
+      cy.get(selDatasetId).type(',dataset_2{enter}', force);
       cy.get(selFilterRemove).should('have.length', 2);
 
       cy.get(selDatasetId).clear();
-      cy.get(selDatasetId).type('{enter}');
+      cy.get(selDatasetId).type('{enter}', force);
       cy.get(selFilterRemove).should('have.length', 0);
     });
 
@@ -254,7 +254,7 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selPercentFormat).should('be.visible');
       cy.get(selNoData).should('have.length', 0);
-      cy.get(selDatasetId).type('dataset_x{enter}');
+      cy.get(selDatasetId).type('dataset_x{enter}', force);
       cy.get(selNoData).should('be.visible');
       cy.get(selPercentFormat).should('have.length', 0);
     });
