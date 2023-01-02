@@ -15,6 +15,14 @@ Get the `npm` dependencies:
 
     npm install
 
+## Development environment
+
+To facilitate containerisation the standard angular way of setting environment variables has been amended.
+
+The standard `environment.ts` file exists under `src/app/environments/` but its contents define a function that can load variables from an external source, in this case `src/assets/env.js`.
+
+The file `src/assets/env.js` should therefore be modified before starting the development server.
+
 ## Development server
 
 Run `npm run start` for a dev server. Navigate to [http://localhost:4200/](http://localhost:4200/). The app will automatically reload if you change any of the source files.
@@ -72,3 +80,21 @@ We use jenkins to deploy. Make sure you can access [https://jenkins.eanadev.org/
 
 - `statistics-dashboard-test`
 - `statistics-dashboard-acceptance`
+
+## Docker
+
+To make a (parameterised) docker image of the app first run this command:
+
+`npm run dist-localised`
+
+and then copy the output of that command (from the dist directory) into a docker nginx image:
+
+`docker build -t statistics-dashboard-app-image:v2.0 .`
+
+The image runtime configuration is only set on container startup, so environment variables have to be passed when it's run.  Here they are passed using the project `env_file`:
+
+`docker run -it --rm -d -p 80:80  --env-file=env_file --name stats-db statistics-dashboard-app-image:v2.0`
+
+As with the `src/assets/env.js` file for the development server, the `env_file` file should be adjusted before the nginx server is started.
+
+Note: it may be useful to comment out the line `return 301 https://$host$request_uri;` in `nginx-docker.conf` when testing docker locally or in environments that haven't been configured for https.
