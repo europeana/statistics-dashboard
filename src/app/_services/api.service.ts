@@ -24,14 +24,14 @@ export class APIService {
 
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
     return this.http.post<BreakdownResults>(
-      `${environment.serverAPI}${this.suffixFiltering}`,
+      `${environment.serverAPI}/${this.suffixFiltering}`,
       request
     );
   }
 
   getGeneralResults(includeCTZero = false): Observable<GeneralResults> {
     return this.http.get<GeneralResults>(
-      `${environment.serverAPI}${this.suffixGeneral}`,
+      `${environment.serverAPI}/${this.suffixGeneral}`,
       { params: includeCTZero ? { 'content-tier-zero': true } : {} }
     );
   }
@@ -40,7 +40,7 @@ export class APIService {
     rightsCategories: Array<string>
   ): Observable<Array<string>> {
     return this.http.get<Array<string>>(
-      `${environment.serverAPI}${this.suffixRightsUrls}`,
+      `${environment.serverAPI}/${this.suffixRightsUrls}`,
       { params: { rightsCategories } }
     );
   }

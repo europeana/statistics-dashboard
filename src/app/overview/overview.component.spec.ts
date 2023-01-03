@@ -17,6 +17,7 @@ import {
   UntypedFormControl
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
@@ -208,8 +209,7 @@ describe('OverviewComponent', () => {
     it('should calculate the portal urls', () => {
       queryParams.next({});
 
-      const rootUrl =
-        'https://www.europeana.eu/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)';
+      const rootUrl = `${environment.serverPortal}?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)`;
       const data = [{ name: 'name', value: 1, percent: 1 }];
 
       component.form.value.facetParameter = DimensionName.rightsCategory;

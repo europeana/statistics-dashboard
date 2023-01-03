@@ -31,7 +31,7 @@ context('Statistics Dashboard', () => {
       // filter on country Belgium / confirm url & filter rm buttons updated
 
       cy.get(selFilterOpener).eq(1).click(force);
-      cy.get(selFilterValueLabel).contains('Belgium').click();
+      cy.get(selFilterValueLabel).contains('Belgium').click(force);
 
       cy.location('href').should('equal', `${baseUrl}?country=Belgium`);
       cy.get(selFilterRemove).contains('Belgium').should('have.length', 1);
@@ -49,7 +49,7 @@ context('Statistics Dashboard', () => {
 
       cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
       cy.get(selFilterOpener).eq(5).click(force);
-      cy.get(selFilterValueLabel).contains('IMAGE').click();
+      cy.get(selFilterValueLabel).contains('IMAGE').click(force);
 
       cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`);
       cy.get(selFilterRemove).contains('IMAGE').should('have.length', 1);
@@ -60,7 +60,7 @@ context('Statistics Dashboard', () => {
       const selDatasetId = '.dataset-name';
 
       cy.get(selFilterRemove).contains('dataset_not_found').should('not.exist');
-      cy.get(selDatasetId).type('dataset_not_found{enter}');
+      cy.get(selDatasetId).type('dataset_not_found{enter}', force);
       cy.get(selFilterRemove).contains('dataset_not_found').should('have.length', 1);
 
       // History Checks
