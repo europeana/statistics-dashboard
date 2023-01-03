@@ -21,7 +21,7 @@ describe('APIService', () => {
   }));
 
   it('should load the breakdowns', () => {
-    const baseUrl = `${environment.serverAPI}${service.suffixFiltering}`;
+    const baseUrl = `${environment.serverAPI}/${service.suffixFiltering}`;
     const sub = service
       .getBreakdowns({ filters: {} })
       .subscribe((res: BreakdownResults) => {
@@ -33,7 +33,7 @@ describe('APIService', () => {
   });
 
   it('should load the general results', () => {
-    const baseUrl = `${environment.serverAPI}${service.suffixGeneral}`;
+    const baseUrl = `${environment.serverAPI}/${service.suffixGeneral}`;
     const sub = service.getGeneralResults().subscribe((res: GeneralResults) => {
       expect(res).toBeTruthy();
     });
@@ -44,7 +44,7 @@ describe('APIService', () => {
 
   it('should load the general results with content-tier-zero', () => {
     const ctZeroParam = '?content-tier-zero=true';
-    const baseUrl = `${environment.serverAPI}${service.suffixGeneral}${ctZeroParam}`;
+    const baseUrl = `${environment.serverAPI}/${service.suffixGeneral}${ctZeroParam}`;
     const sub = service
       .getGeneralResults(true)
       .subscribe((res: GeneralResults) => {
