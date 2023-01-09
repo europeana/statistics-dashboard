@@ -6,7 +6,7 @@ A visualisation utility for Europeana API data.
 
 ## Getting started
 
-Make sure you have `node` version 12 and `npm` version 6.x:
+Make sure you have `node` version 14.7.8 and `npm` version 6.x:
 
     node --version
     npm --version
