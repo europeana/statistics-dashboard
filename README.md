@@ -89,12 +89,14 @@ To make a (parameterised) docker image of the app first run this command:
 
 and then copy the output of that command (from the dist directory) into a docker nginx image:
 
-`docker build -t statistics-dashboard-app-image:v2.0 .`
+`docker build -t statistics-dashboard-app-image:version .`
 
 The image runtime configuration is only set on container startup, so environment variables have to be passed when it's run.  Here they are passed using the project `env_file`:
 
-`docker run -it --rm -d -p 80:80  --env-file=env_file --name stats-db statistics-dashboard-app-image:v2.0`
+`docker run -it --rm -d -p 8080:80  --env-file=env_file --name stats-dash statistics-dashboard-app-image:version`
 
 As with the `src/assets/env.js` file for the development server, the `env_file` file should be adjusted before the nginx server is started.
 
-Note: it may be useful to comment out the line `return 301 https://$host$request_uri;` in `nginx-docker.conf` when testing docker locally or in environments that haven't been configured for https.
+Note: by default the docker image's nginx is configured to redirect the browser to the `https` protocol.  To run the image locally or in environments that haven't been configured for `https` the image can be run with the `nginx.conf` file mapped to a non-https variant by using the `-v` (volume) option, i.e.:
+
+`docker run -it --rm -d -p 9090:80   --env-file=env_file  -v /PROJECT_PATH/nginx-local.conf:/etc/nginx/nginx.conf --name stats-dash statistics-dashboard-app-image:version`
