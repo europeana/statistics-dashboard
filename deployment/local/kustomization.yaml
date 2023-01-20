@@ -6,7 +6,7 @@ resources:
 - statistics-dashboard-service.yaml
 - ingress.yaml
 configMapGenerator:
-- name: statistics-dashboard-environment
+- name: statistics-dashboard-ui-environment
   envs:
   - env_file
 - name: statistics-dashboard-nginx-conf
