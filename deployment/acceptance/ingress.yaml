@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: statistics-dashboard-ui-ingress-acceptance
+  annotations:
+    cert-manager.io/issuer: letsencrypt-production
+spec:
+#  ingressClassName: public-iks-k8s-nginx
+#  tls:
+#    - hosts:
+#       TODO note new DNS
+#        - metis-statistics-ui.acceptance.eanadev.org
+#      secretName: metis-statistics-ui.acceptance.eanadev.org
+  rules:
+#    - host: metis-statistics-ui.acceptance.eanadev.org
+#      http:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: statistics-dashboard-ui-service-acceptance
+                port:
+                  number: 8080
