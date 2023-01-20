@@ -8,6 +8,12 @@ sed -i "s/IMAGE_TAG/$IMAGE_TAG/g" deployment/local/deployment.yaml
 sed -i "s/IMAGE_ORGANISATION/$IMAGE_ORGANISATION/g" deployment/local/deployment.yaml
 sed -i "s/IMAGE_NAME/$IMAGE_NAME/g" deployment/local/deployment.yaml
 
-#kubectl delete -k deployment/local/
-kubectl apply -k deployment/local/
+# TODO conditional delete
+# TODO parameterise context
+# TODO parameterise namespace
+# TODO duplicate all this in test / acceptance / production folders
+
+#kubectl --context minikube delete -k deployment/local/
+kubectl --context minikube apply -k deployment/local/
+
 git checkout deployment/local/deployment.yaml
