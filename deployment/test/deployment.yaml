@@ -2,16 +2,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: statistics-dashboard-ui-deployment
-  name: statistics-dashboard-ui-deployment
+    app: statistics-dashboard-ui-deployment-test
+  name: statistics-dashboard-ui-deployment-test
 spec:
   selector:
     matchLabels:
-      app: statistics-dashboard-ui
+      app: statistics-dashboard-ui-test
   template:
     metadata:
       labels:
-        app: statistics-dashboard-ui
+        app: statistics-dashboard-ui-test
     spec:
       containers:
         - image: IMAGE_ORGANISATION/IMAGE_NAME:IMAGE_TAG
