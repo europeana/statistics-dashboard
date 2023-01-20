@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
 - deployment.yaml
 - statistics-dashboard-service.yaml
+- ingress.yaml
 configMapGenerator:
 - name: statistics-dashboard-environment
   envs:
