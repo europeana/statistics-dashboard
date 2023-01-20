@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: default
 resources:
 - deployment.yaml
-- statistics-dashboard-service.yaml
+- statistics-dashboard-ui-service.yaml
 - ingress.yaml
 configMapGenerator:
 - name: statistics-dashboard-ui-environment
