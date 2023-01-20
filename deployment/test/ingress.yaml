@@ -1,16 +1,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: statistics-dashboard-ui-ingress
+  name: statistics-dashboard-ui-ingress-test
   annotations:
     cert-manager.io/issuer: letsencrypt-production
 spec:
-  ingressClassName: public-iks-k8s-nginx
-  tls:
-    - hosts:
-# TODO note new DNS
-        - metis-statistics-ui.test.eanadev.org
-      secretName: metis-statistics-ui.test.eanadev.org
+#  ingressClassName: public-iks-k8s-nginx
+#  tls:
+#    - hosts:
+#       TODO note new DNS
+#        - metis-statistics-ui.test.eanadev.org
+#      secretName: metis-statistics-ui.test.eanadev.org
   rules:
     - host: metis-statistics-ui.test.eanadev.org
       http:
@@ -19,6 +19,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: statistics-dashboard-ui-service
+                name: statistics-dashboard-ui-service-test
                 port:
                   number: 8080

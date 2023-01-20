@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
-                name: statistics-dashboard-ui-environment
+                name: statistics-dashboard-ui-environment-test
       volumes:
         - name: statistics-dashboard-nginx-config-volume
           configMap:

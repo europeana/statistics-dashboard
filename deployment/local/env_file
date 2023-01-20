@@ -1,4 +1,4 @@
-APP_FEEDBACK_URL=https://europeana.atlassian.net/servicedesk/customer/portal/10
-APP_SERVER_API=https://metis-statistics-rest-test.eanadev.org/
-APP_SERVER_PORTAL=https://www.europeana.eu/search
-APP_WS_KEY=api2demo
+APP_FEEDBACK_URL=value
+APP_SERVER_API=value
+APP_SERVER_PORTAL=value
+APP_WS_KEY=value
