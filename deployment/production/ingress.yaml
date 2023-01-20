@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: statistics-dashboard-ui-ingress-production
+  annotations:
+    cert-manager.io/issuer: letsencrypt-production
+spec:
+#  ingressClassName: public-iks-k8s-nginx
+#  tls:
+#    - hosts:
+#        - metis-statistics-ui.production.eanadev.org
+#      secretName: metis-statistics-ui.production.eanadev.org
+#  rules:
+#    - host: metis-statistics-ui.production.eanadev.org
+#      http:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: statistics-dashboard-ui-service-production
+                port:
+                  number: 8080

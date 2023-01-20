@@ -6,6 +6,7 @@ export IMAGE_NAME=statistics-dashboard-app-image
 export CONTEXT=minikube
 export TARGET=local
 
+# Utility to read command line arguments
 has_param() {
   local term="$1"
   shift
@@ -19,15 +20,16 @@ has_param() {
 
 if has_param '-target=test' "$@"; then
   TARGET=test
-  echo "in test"
 elif has_param '-target=acceptance' "$@"; then
   TARGET=acceptance
-  echo "in acceptance"
+elif has_param '-target=production' "$@"; then
+  TARGET=production
+  echo "in production"
 elif ! has_param '-target=test' "$@"; then
   echo "in local"
 fi
 
-# if deleting then delete and exit
+# If deleting then delete and exit
 if has_param '--delete' "$@"; then
   kubectl --context $CONTEXT delete -k deployment/$TARGET/
   exit 0;
@@ -38,5 +40,8 @@ sed -i "s/IMAGE_TAG/$IMAGE_TAG/g" deployment/$TARGET/deployment.yaml
 sed -i "s/IMAGE_ORGANISATION/$IMAGE_ORGANISATION/g" deployment/$TARGET/deployment.yaml
 sed -i "s/IMAGE_NAME/$IMAGE_NAME/g" deployment/$TARGET/deployment.yaml
 
+# Run deployment.yaml
 kubectl --context $CONTEXT apply -k deployment/$TARGET/
+
+# Restore deployment.yaml
 git checkout deployment/$TARGET/deployment.yaml
