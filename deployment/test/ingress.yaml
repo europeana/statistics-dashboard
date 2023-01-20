@@ -5,12 +5,11 @@ metadata:
   annotations:
     cert-manager.io/issuer: letsencrypt-production
 spec:
-#  ingressClassName: public-iks-k8s-nginx
-#  tls:
-#    - hosts:
-#       TODO note new DNS
-#        - metis-statistics-ui.test.eanadev.org
-#      secretName: metis-statistics-ui.test.eanadev.org
+  ingressClassName: public-iks-k8s-nginx
+  tls:
+    - hosts:
+        - metis-statistics-ui.test.eanadev.org
+      secretName: metis-statistics-ui.test.eanadev.org
   rules:
     - host: metis-statistics-ui.test.eanadev.org
       http:

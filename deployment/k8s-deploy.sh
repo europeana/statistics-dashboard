@@ -20,9 +20,14 @@ has_param() {
 if has_param '-target=test' "$@"; then
   TARGET=test
   echo "in test"
+elif has_param '-target=acceptance' "$@"; then
+  TARGET=acceptance
+  echo "in acceptance"
 elif ! has_param '-target=test' "$@"; then
   echo "in local"
 fi
+
+# if deleting then delete and exit
 if has_param '--delete' "$@"; then
   kubectl --context $CONTEXT delete -k deployment/$TARGET/
   exit 0;
