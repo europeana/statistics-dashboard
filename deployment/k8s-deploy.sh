@@ -1,7 +1,7 @@
 #!/bin/bash
 export IMAGE_TAG=v3.0
 export IMAGE_ORGANISATION=andyjmaclean
-export IMAGE_NAME=statistics-dashboard-ui
+export IMAGE_NAME=statistics-dashboard-app-image
 
 #IMAGE_NAME
 sed -i "s/IMAGE_TAG/$IMAGE_TAG/g" deployment/local/deployment.yaml
