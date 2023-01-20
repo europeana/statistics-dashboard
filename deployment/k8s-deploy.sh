@@ -2,18 +2,22 @@
 export IMAGE_TAG=v3.0
 export IMAGE_ORGANISATION=andyjmaclean
 export IMAGE_NAME=statistics-dashboard-app-image
+# TODO override with command line
+export CONTEXT=minikube
 
-#IMAGE_NAME
+if echo $* | grep -e "--delete" -q
+then
+  kubectl --context $CONTEXT delete -k deployment/local/
+  exit 0;
+fi
+
+# Update deployment.yaml with IMAGE variables
 sed -i "s/IMAGE_TAG/$IMAGE_TAG/g" deployment/local/deployment.yaml
 sed -i "s/IMAGE_ORGANISATION/$IMAGE_ORGANISATION/g" deployment/local/deployment.yaml
 sed -i "s/IMAGE_NAME/$IMAGE_NAME/g" deployment/local/deployment.yaml
 
-# TODO conditional delete
-# TODO parameterise context
+kubectl --context $CONTEXT apply -k deployment/local/
+
 # TODO parameterise namespace
-# TODO duplicate all this in test / acceptance / production folders
-
-#kubectl --context minikube delete -k deployment/local/
-kubectl --context minikube apply -k deployment/local/
-
+#   by changing in kustomize.yaml files under test / acceptance / production 
 git checkout deployment/local/deployment.yaml
