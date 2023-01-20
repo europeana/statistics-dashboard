@@ -7,11 +7,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: statistics-dashboard-ui
+      app: statistics-dashboard-ui-test
   template:
     metadata:
       labels:
-        app: statistics-dashboard-ui
+        app: statistics-dashboard-ui-test
     spec:
       containers:
         - image: IMAGE_ORGANISATION/IMAGE_NAME:IMAGE_TAG
