@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: statistics-dashboard-ui-deployment
+  name: statistics-dashboard-ui-deployment
+spec:
+  selector:
+    matchLabels:
+      app: statistics-dashboard-ui
+  template:
+    metadata:
+      labels:
+        app: statistics-dashboard-ui
+    spec:
+      containers:
+        - image: europeana/statistics-dashboard-app-image:v3.0
+#        - image: andyjmaclean/statistics-dashboard-app-image:v3.0
+#        - image: the-versioned-app-image
+#        - image: andyjmaclean/statistics-dashboard-app-image:APP_IMAGE_VERSION
+          name: container
+          volumeMounts:
+            - name: statistics-dashboard-nginx-config-volume
+              mountPath: "/etc/nginx/nginx.conf"
+              subPath: "nginx-local.conf"
+              readOnly: true
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: statistics-dashboard-environment
+      volumes:
+        - name: statistics-dashboard-nginx-config-volume
+          configMap:
+            name: statistics-dashboard-nginx-conf
