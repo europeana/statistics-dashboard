@@ -93,10 +93,28 @@ and then copy the output of that command (from the dist directory) into a docker
 
 The image runtime configuration is only set on container startup, so environment variables have to be passed when it's run.  Here they are passed using the project `env_file`:
 
-`docker run -it --rm -d -p 8080:80  --env-file=env_file --name stats-dash statistics-dashboard-app-image:version`
+`docker run -it --rm -d -p 8080:80  --env-file=deployment/env_file --name stats-dash statistics-dashboard-app-image:version`
 
 As with the `src/assets/env.js` file for the development server, the `env_file` file should be adjusted before the nginx server is started.
 
 Note: by default the docker image's nginx is configured to redirect the browser to the `https` protocol.  To run the image locally or in environments that haven't been configured for `https` the image can be run with the `nginx.conf` file mapped to a non-https variant by using the `-v` (volume) option, i.e.:
 
 `docker run -it --rm -d -p 9090:80   --env-file=env_file  -v /PROJECT_PATH/nginx-local.conf:/etc/nginx/nginx.conf --name stats-dash statistics-dashboard-app-image:version`
+
+## Kubernetes
+
+To deploy the app docker image to kubernetes you first need to make its `nginx.conf` file available as a `ConfigMap` with the command:
+
+`kubectl create configmap statistics-dashboard-nginx-conf --from-file=/PROJECT_PATH/nginx-local.conf`
+
+Another `ConfigMap` is needed to set the app environment.  This is generated together with the `deployment` object by running the command:
+
+`kubectl apply -k deployment`
+
+The deployment can then be made accessible with the commands:
+
+`kubectl expose deployment/statistics-dashboard-ui-deployment --type="LoadBalancer" --port 8080`
+
+and
+
+`minikube tunnel`

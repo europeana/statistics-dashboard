@@ -14,10 +14,7 @@ spec:
         app: statistics-dashboard-ui
     spec:
       containers:
-        - image: europeana/statistics-dashboard-app-image:v3.0
-#        - image: andyjmaclean/statistics-dashboard-app-image:v3.0
-#        - image: the-versioned-app-image
-#        - image: andyjmaclean/statistics-dashboard-app-image:APP_IMAGE_VERSION
+        - image: IMAGE_ORGANISATION/IMAGE_NAME:IMAGE_TAG
           name: container
           volumeMounts:
             - name: statistics-dashboard-nginx-config-volume
