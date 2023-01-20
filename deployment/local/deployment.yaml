@@ -19,7 +19,7 @@ spec:
           volumeMounts:
             - name: statistics-dashboard-nginx-config-volume
               mountPath: "/etc/nginx/nginx.conf"
-              subPath: "nginx-local.conf"
+              subPath: "nginx.conf"
               readOnly: true
           imagePullPolicy: Always
           envFrom:

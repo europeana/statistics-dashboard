@@ -11,7 +11,7 @@ configMapGenerator:
   - env_file
 - name: statistics-dashboard-nginx-conf
   files:
-  - nginx-local.conf
+  - nginx.conf
 generatorOptions:
   disableNameSuffixHash: true
   labels:
