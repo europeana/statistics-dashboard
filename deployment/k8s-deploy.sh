@@ -1,7 +1,5 @@
 #!/bin/bash
-export IMAGE_TAG=v3.0
-export IMAGE_ORGANISATION=andyjmaclean
-export IMAGE_NAME=statistics-dashboard-app-image
+export IMAGE_FULL_VALUE=andyjmaclean/statistics-dashboard-app-image:v3.0
 
 # Default context / delete / target
 export CONTEXT=minikube
@@ -32,10 +30,8 @@ then
   exit 0;
 fi
 
-# Update deployment.yaml with IMAGE variables
-sed -i "s/IMAGE_TAG/$IMAGE_TAG/g" deployment/$TARGET/deployment.yaml
-sed -i "s/IMAGE_ORGANISATION/$IMAGE_ORGANISATION/g" deployment/$TARGET/deployment.yaml
-sed -i "s/IMAGE_NAME/$IMAGE_NAME/g" deployment/$TARGET/deployment.yaml
+# Update deployment.yaml with IMAGE variable
+sed -i "s,IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" deployment/$TARGET/deployment.yaml
 
 # Run deployment.yaml
 kubectl --context $CONTEXT apply -k deployment/$TARGET/
