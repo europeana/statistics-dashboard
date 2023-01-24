@@ -23,7 +23,7 @@ spec:
               readOnly: true
           imagePullPolicy: Always
           envFrom:
-            - configMapRef:
+            - secretRef:
                 name: statistics-dashboard-ui-environment-production
       volumes:
         - name: statistics-dashboard-nginx-config-volume

@@ -6,12 +6,13 @@ resources:
 - statistics-dashboard-ui-service.yaml
 - ingress.yaml
 configMapGenerator:
-- name: statistics-dashboard-ui-environment
-  envs:
-  - env_file
 - name: statistics-dashboard-nginx-conf
   files:
   - nginx.conf
+secretGenerator:
+- name: statistics-dashboard-ui-environment
+  envs:
+  - env_file
 generatorOptions:
   disableNameSuffixHash: true
   labels:
