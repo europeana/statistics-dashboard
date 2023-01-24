@@ -14,7 +14,7 @@ spec:
         app: statistics-dashboard-ui
     spec:
       containers:
-        - image: IMAGE_ORGANISATION/IMAGE_NAME:IMAGE_TAG
+        - image: IMAGE_FULL_VALUE
           name: container
           volumeMounts:
             - name: statistics-dashboard-nginx-config-volume

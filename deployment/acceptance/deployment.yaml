@@ -14,7 +14,7 @@ spec:
         app: statistics-dashboard-ui-acceptance
     spec:
       containers:
-        - image: andyjmaclean/statistics-dashboard-app-image:v3.0
+        - image: IMAGE_FULL_VALUE
           name: container
           volumeMounts:
             - name: statistics-dashboard-nginx-config-volume
