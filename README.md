@@ -105,17 +105,19 @@ Note: by default the docker image's nginx is configured to redirect the browser 
 
 Running the script:
 
-`./deployment/k8s-deploy.sh`
+`./deployment/k8s-deploy.sh -i myDockerImage`
 
 will deploy the app to a local Kubernetes cluster.
 
 The script accepts the parameter flags:
 - -c (context) default is minikube
 - -d (delete) if present this flag indicates that the app should be deleted
+- -h (help) shows a help message
+- -i (image) default is unset
 - -t (target) default is local
 
 so the command:
 
-    `./deployment/k8s-deploy.sh -d -t acceptance`
+    `./deployment/k8s-deploy.sh -d -t acceptance -i myDockerImage`
 
-...will delete the app in the default context with the acceptance namespace.
+...will delete myDockerImage in the default context with the acceptance namespace.
