@@ -91,12 +91,33 @@ and then copy the output of that command (from the dist directory) into a docker
 
 `docker build -t statistics-dashboard-app-image:version .`
 
-The image runtime configuration is only set on container startup, so environment variables have to be passed when it's run.  Here they are passed using the project `env_file`:
+The image runtime configuration is only set on container startup, so environment variables have to be passed when it's run.  Here they are passed using the (local) project `env_file`:
 
-`docker run -it --rm -d -p 8080:80  --env-file=env_file --name stats-dash statistics-dashboard-app-image:version`
+`docker run -it --rm -d -p 8080:8080  --env-file=deployment/local/env_file --name stats-dash statistics-dashboard-app-image:version`
 
 As with the `src/assets/env.js` file for the development server, the `env_file` file should be adjusted before the nginx server is started.
 
 Note: by default the docker image's nginx is configured to redirect the browser to the `https` protocol.  To run the image locally or in environments that haven't been configured for `https` the image can be run with the `nginx.conf` file mapped to a non-https variant by using the `-v` (volume) option, i.e.:
 
-`docker run -it --rm -d -p 9090:80   --env-file=env_file  -v /PROJECT_PATH/nginx-local.conf:/etc/nginx/nginx.conf --name stats-dash statistics-dashboard-app-image:version`
+`docker run -it --rm -d -p 8080:8080   --env-file=deployment/local/env_file  -v deployment/local/nginx.conf:/etc/nginx/nginx.conf --name stats-dash statistics-dashboard-app-image:version`
+
+## Kubernetes
+
+Running the script:
+
+`./deployment/k8s-deploy.sh -i myDockerImage`
+
+will deploy the app to a local Kubernetes cluster.
+
+The script accepts the parameter flags:
+- -c (context) default is minikube
+- -d (delete) if present this flag indicates that the app should be deleted
+- -h (help) shows a help message
+- -i (image) default is unset
+- -t (target) default is local
+
+so the command:
+
+    `./deployment/k8s-deploy.sh -d -t acceptance -i myDockerImage`
+
+...will delete myDockerImage in the default context with the acceptance namespace.

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: statistics-dashboard-ui-deployment-acceptance
+  name: statistics-dashboard-ui-deployment-acceptance
+spec:
+  selector:
+    matchLabels:
+      app: statistics-dashboard-ui-acceptance
+  template:
+    metadata:
+      labels:
+        app: statistics-dashboard-ui-acceptance
+    spec:
+      containers:
+        - image: IMAGE_FULL_VALUE
+          name: container
+          volumeMounts:
+            - name: statistics-dashboard-nginx-config-volume
+              mountPath: "/etc/nginx/nginx.conf"
+              subPath: "nginx.conf"
+              readOnly: true
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: statistics-dashboard-ui-environment-acceptance
+      volumes:
+        - name: statistics-dashboard-nginx-config-volume
+          configMap:
+            name: statistics-dashboard-nginx-conf-acceptance
