@@ -30,6 +30,10 @@ export class APIService {
   }
 
   getGeneralResults(includeCTZero = false): Observable<GeneralResults> {
+
+    console.log('getGeneralResults: ');
+    console.log(`${environment.serverAPI}/${this.suffixGeneral}`);
+
     return this.http.get<GeneralResults>(
       `${environment.serverAPI}/${this.suffixGeneral}`,
       { params: includeCTZero ? { 'content-tier-zero': true } : {} }
