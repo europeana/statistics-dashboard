@@ -6,6 +6,10 @@ export DELETE=false
 export IMAGE_FULL_VALUE=
 export TARGET=local
 
+# Set replicas min / max
+MIN_REPLICAS=3
+MAX_REPLICAS=5
+
 # Track numnber of arguments supplied
 export NUMARGS=$#
 
@@ -21,9 +25,10 @@ function HELP {
   echo "The following optional parameters are recognised:"
   echo "${REV}-c${NORM}  --Sets the ${BOLD}context${NORM}. The default is ${BOLD}${CONTEXT}${NORM}."
   echo "${REV}-d${NORM}  --Sets the ${BOLD}delete${NORM} flag. The default is ${BOLD}${DELETE}${NORM}."
+  echo "${REV}-r${NORM}  --Sets the ${BOLD}replica${NORM} ${BOLD}min-max${NORM}. The default is ${BOLD}${MIN_REPLICAS}-${MAX_REPLICAS}${NORM}."
   echo "${REV}-t${NORM}  --Sets the ${BOLD}target${NORM}. The default is ${BOLD}${TARGET}${NORM}."
-  echo -e "${REV}-h${NORM}  --Displays this help message. No further functions are performed."\\n
-  echo -e "Example: ${BOLD}$SCRIPT -i dockerhub/myImage:version -d -c myCluster -t acceptance${NORM}"\\n
+  echo -e "${REV}-h${NORM}  --Displays this ${BOLD}help${NORM} message. No further functions are performed."\\n
+  echo -e "Example: ${BOLD}$SCRIPT -i dockerhub/myImage:version -d -c myCluster -r 3-12 -t acceptance${NORM}"\\n
   exit 1
 }
 
@@ -32,7 +37,7 @@ if [ $NUMARGS -eq 0 ]; then
 fi
 
 # Check for missing parameter values
-while getopts "c:dhi:t:" opt; do
+while getopts "c:dhr:i:t:" opt; do
   case $opt in
     d) ;;
     h) ;;
@@ -48,7 +53,7 @@ done
 
 # Reset args and override default context / delete / target / image
 OPTIND=1
-while getopts ":c:dhi:t:" o; do
+while getopts ":c:dhr:i:t:" o; do
   case "${o}" in
     c)
       CONTEXT=${OPTARG}
@@ -61,6 +66,11 @@ while getopts ":c:dhi:t:" o; do
       ;;
     i)
       IMAGE_FULL_VALUE=${OPTARG}
+      ;;
+    r)
+      ARR=(${OPTARG//-/ })
+      MIN_REPLICAS="${ARR[0]}"
+      MAX_REPLICAS="${ARR[1]}"
       ;;
     t)
       TARGET=${OPTARG}
@@ -81,10 +91,16 @@ echo "Will run deploy with the parameters:"
 echo "  - ${BOLD}CONTEXT${NORM} = ${CONTEXT}"
 echo "  - ${BOLD}DELETE${NORM} = ${DELETE}"
 echo "  - ${BOLD}IMAGE_FULL_VALUE${NORM} = ${IMAGE_FULL_VALUE}"
+echo "  - ${BOLD}MAX_REPLICAS${NORM} = ${MAX_REPLICAS}"
+echo "  - ${BOLD}MIN_REPLICAS${NORM} = ${MIN_REPLICAS}"
 echo "  - ${BOLD}TARGET${NORM} = ${TARGET}"
 
 # Update deployment.yaml with IMAGE variable
 sed -i "s,IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" deployment/$TARGET/deployment.yaml
+
+# Update hda.yaml with MAX / MIN replicas
+sed -i "s,MAX_REPLICAS,$MAX_REPLICAS,g" deployment/$TARGET/hpa.yaml
+sed -i "s,MIN_REPLICAS,$MIN_REPLICAS,g" deployment/$TARGET/hpa.yaml
 
 if $DELETE;
 then
@@ -95,5 +111,6 @@ else
   kubectl --context $CONTEXT apply -k deployment/$TARGET/
 fi
 
-# Restore deployment.yaml
+# Restore deployment.yaml /  hpa.yaml
 git checkout deployment/$TARGET/deployment.yaml
+git checkout deployment/$TARGET/hpa.yaml
