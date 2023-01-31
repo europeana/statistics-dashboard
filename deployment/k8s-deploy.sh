@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Set default context / delete / image / target
-export CONTEXT=minikube
-export DELETE=false
-export IMAGE_FULL_VALUE=
-export TARGET=local
+CONTEXT=minikube
+DELETE=false
+IMAGE_FULL_VALUE=
+TARGET=local
+UTILISATION_AVERAGE_PERCENT=50
 
 # Set replicas min / max
 MIN_REPLICAS=3
@@ -27,6 +28,7 @@ function HELP {
   echo "${REV}-d${NORM}  --Sets the ${BOLD}delete${NORM} flag. The default is ${BOLD}${DELETE}${NORM}."
   echo "${REV}-r${NORM}  --Sets the ${BOLD}replica${NORM} ${BOLD}min-max${NORM}. The default is ${BOLD}${MIN_REPLICAS}-${MAX_REPLICAS}${NORM}."
   echo "${REV}-t${NORM}  --Sets the ${BOLD}target${NORM}. The default is ${BOLD}${TARGET}${NORM}."
+  echo "${REV}-t${NORM}  --Sets the desired resource ${BOLD}utilisation${NORM} average. The default is ${BOLD}${UTILISATION_AVERAGE_PERCENT}${NORM}(%)."
   echo -e "${REV}-h${NORM}  --Displays this ${BOLD}help${NORM} message. No further functions are performed."\\n
   echo -e "Example: ${BOLD}$SCRIPT -i dockerhub/myImage:version -d -c myCluster -r 3-12 -t acceptance${NORM}"\\n
   exit 1
@@ -37,7 +39,7 @@ if [ $NUMARGS -eq 0 ]; then
 fi
 
 # Check for missing parameter values
-while getopts "c:dhr:i:t:" opt; do
+while getopts "c:dhr:i:t:u:" opt; do
   case $opt in
     d) ;;
     h) ;;
@@ -53,7 +55,7 @@ done
 
 # Reset args and override default context / delete / target / image
 OPTIND=1
-while getopts ":c:dhr:i:t:" o; do
+while getopts ":c:dhr:i:t:u:" o; do
   case "${o}" in
     c)
       CONTEXT=${OPTARG}
@@ -75,6 +77,9 @@ while getopts ":c:dhr:i:t:" o; do
     t)
       TARGET=${OPTARG}
       ;;
+    u)
+      UTILISATION_AVERAGE_PERCENT=${OPTARG}
+      ;;
   esac
 done
 
@@ -94,6 +99,7 @@ echo "  - ${BOLD}IMAGE_FULL_VALUE${NORM} = ${IMAGE_FULL_VALUE}"
 echo "  - ${BOLD}MAX_REPLICAS${NORM} = ${MAX_REPLICAS}"
 echo "  - ${BOLD}MIN_REPLICAS${NORM} = ${MIN_REPLICAS}"
 echo "  - ${BOLD}TARGET${NORM} = ${TARGET}"
+echo "  - ${BOLD}UTILISATION_AVERAGE_PERCENT${NORM} = ${UTILISATION_AVERAGE_PERCENT}"
 
 # Update deployment.yaml with IMAGE variable
 sed -i "s,IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" deployment/$TARGET/deployment.yaml
@@ -101,6 +107,9 @@ sed -i "s,IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" deployment/$TARGET/deployment.ya
 # Update hda.yaml with MAX / MIN replicas
 sed -i "s,MAX_REPLICAS,$MAX_REPLICAS,g" deployment/$TARGET/hpa.yaml
 sed -i "s,MIN_REPLICAS,$MIN_REPLICAS,g" deployment/$TARGET/hpa.yaml
+
+# Update hda.yaml with UTILISATION_AVERAGE_PERCENT
+sed -i "s,UTILISATION_AVERAGE_PERCENT,$UTILISATION_AVERAGE_PERCENT,g" deployment/$TARGET/hpa.yaml
 
 if $DELETE;
 then

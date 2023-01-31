@@ -20,4 +20,4 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 85
+          averageUtilization: UTILISATION_AVERAGE_PERCENT
