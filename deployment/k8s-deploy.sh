@@ -125,6 +125,7 @@ for REPLACE in "${REPLACEMENTS[@]}"
 do
   sed -i "s,\$${REPLACE},${!REPLACE},g" $HPA_FILE
 done
+cat $HPA_FILE
 
 # Delete or apply
 if $DELETE;
