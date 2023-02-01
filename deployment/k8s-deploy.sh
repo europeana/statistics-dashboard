@@ -130,9 +130,9 @@ cat $HPA_FILE
 # Delete or apply
 if $DELETE;
 then
-  kubectl --context $CONTEXT delete -k deployment/$TARGET/
+  kubectl --context $CONTEXT delete -k deployment/$TARGET/ --validate=false
 else
-  kubectl --context $CONTEXT apply -k deployment/$TARGET/
+  kubectl --context $CONTEXT apply -k deployment/$TARGET/ --validate=false
 fi
 
 # Restore files deployment.yaml and hpa.yaml
