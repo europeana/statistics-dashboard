@@ -1,4 +1,5 @@
 #!/bin/bash
+TERM=xterm
 
 # Set default context / delete / image / target
 CONTEXT=minikube
@@ -130,9 +131,9 @@ cat $HPA_FILE
 # Delete or apply
 if $DELETE;
 then
-  kubectl --context $CONTEXT delete -k deployment/$TARGET/ --validate=false
+  kubectl --context $CONTEXT delete -k deployment/$TARGET/
 else
-  kubectl --context $CONTEXT apply -k deployment/$TARGET/ --validate=false
+  kubectl --context $CONTEXT apply -k deployment/$TARGET/
 fi
 
 # Restore files deployment.yaml and hpa.yaml
