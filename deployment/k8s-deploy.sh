@@ -7,9 +7,13 @@ IMAGE_FULL_VALUE=
 TARGET=local
 UTILISATION_AVERAGE_PERCENT=50
 
-# Set replicas min / max
+# Set default replicas min / max
 MIN_REPLICAS=3
 MAX_REPLICAS=5
+
+# Set files to modify
+HPA_FILE=deployment/$TARGET/hpa.yaml
+DEPLOYMENT_FILE=deployment/$TARGET/deployment.yaml
 
 # Track numnber of arguments supplied
 export NUMARGS=$#
@@ -28,7 +32,7 @@ function HELP {
   echo "${REV}-d${NORM}  --Sets the ${BOLD}delete${NORM} flag. The default is ${BOLD}${DELETE}${NORM}."
   echo "${REV}-r${NORM}  --Sets the ${BOLD}replica${NORM} ${BOLD}min-max${NORM}. The default is ${BOLD}${MIN_REPLICAS}-${MAX_REPLICAS}${NORM}."
   echo "${REV}-t${NORM}  --Sets the ${BOLD}target${NORM}. The default is ${BOLD}${TARGET}${NORM}."
-  echo "${REV}-t${NORM}  --Sets the desired resource ${BOLD}utilisation${NORM} average. The default is ${BOLD}${UTILISATION_AVERAGE_PERCENT}${NORM}(%)."
+  echo "${REV}-u${NORM}  --Sets the desired resource ${BOLD}utilisation${NORM} average. The default is ${BOLD}${UTILISATION_AVERAGE_PERCENT}${NORM}(%)."
   echo -e "${REV}-h${NORM}  --Displays this ${BOLD}help${NORM} message. No further functions are performed."\\n
   echo -e "Example: ${BOLD}$SCRIPT -i dockerhub/myImage:version -d -c myCluster -r 3-12 -t acceptance${NORM}"\\n
   exit 1
@@ -89,7 +93,18 @@ shift $((OPTIND-1))
 if [ -z "$IMAGE_FULL_VALUE" ];
 then
   echo "usage: an image must be set with the -i parameter"
-  exit 0;
+  exit 1;
+fi
+
+# Check for invalid min-max replicas or an invalid utilisation average
+re='^[0-9]+$'
+if ! [[ $MIN_REPLICAS =~ $re && $MAX_REPLICAS =~ $re ]] ; then
+  echo "usage: the -r parameter should be two integers separated by a dash"
+  exit 1;
+fi
+if ! [[ $UTILISATION_AVERAGE_PERCENT =~ $re ]] ; then
+  echo "usage: the -u parameter should be an integer"
+  exit 1;
 fi
 
 echo "Will run deploy with the parameters:"
@@ -101,25 +116,22 @@ echo "  - ${BOLD}MIN_REPLICAS${NORM} = ${MIN_REPLICAS}"
 echo "  - ${BOLD}TARGET${NORM} = ${TARGET}"
 echo "  - ${BOLD}UTILISATION_AVERAGE_PERCENT${NORM} = ${UTILISATION_AVERAGE_PERCENT}"
 
-# Update deployment.yaml with IMAGE variable
-sed -i "s,IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" deployment/$TARGET/deployment.yaml
+# Modify files deployment.yaml and hpa.yaml with variable data
+sed -i "s,\$IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" $DEPLOYMENT_FILE
+REPLACEMENTS=(MAX_REPLICAS MIN_REPLICAS UTILISATION_AVERAGE_PERCENT)
+for REPLACE in "${REPLACEMENTS[@]}"
+do
+  sed -i "s,\$${REPLACE},${!REPLACE},g" $HPA_FILE
+done
 
-# Update hda.yaml with MAX / MIN replicas
-sed -i "s,MAX_REPLICAS,$MAX_REPLICAS,g" deployment/$TARGET/hpa.yaml
-sed -i "s,MIN_REPLICAS,$MIN_REPLICAS,g" deployment/$TARGET/hpa.yaml
-
-# Update hda.yaml with UTILISATION_AVERAGE_PERCENT
-sed -i "s,UTILISATION_AVERAGE_PERCENT,$UTILISATION_AVERAGE_PERCENT,g" deployment/$TARGET/hpa.yaml
-
+# Delete or apply
 if $DELETE;
 then
-  # If deleting then delete
   kubectl --context $CONTEXT delete -k deployment/$TARGET/
 else
-  # Run deployment.yaml
   kubectl --context $CONTEXT apply -k deployment/$TARGET/
 fi
 
-# Restore deployment.yaml /  hpa.yaml
-git checkout deployment/$TARGET/deployment.yaml
-git checkout deployment/$TARGET/hpa.yaml
+# Restore files deployment.yaml and hpa.yaml
+git checkout $HPA_FILE
+git checkout $DEPLOYMENT_FILE
