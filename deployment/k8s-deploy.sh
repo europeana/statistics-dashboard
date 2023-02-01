@@ -1,5 +1,4 @@
 #!/bin/bash
-TERM=xterm
 
 # Set default context / delete / image / target
 CONTEXT=minikube
@@ -9,8 +8,8 @@ TARGET=local
 UTILISATION_AVERAGE_PERCENT=50
 
 # Set default replicas min / max
-MIN_REPLICAS=3
-MAX_REPLICAS=5
+MIN_REPLICAS=2
+MAX_REPLICAS=4
 
 # Set files to modify
 HPA_FILE=deployment/$TARGET/hpa.yaml
