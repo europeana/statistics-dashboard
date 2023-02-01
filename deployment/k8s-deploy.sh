@@ -4,7 +4,8 @@
 CONTEXT=minikube
 DELETE=false
 APP_IMAGE=
-TARGET=local
+#TARGET=local
+TARGET=test
 UTILISATION_AVERAGE_PERCENT=50
 
 # Set default replicas min / max
