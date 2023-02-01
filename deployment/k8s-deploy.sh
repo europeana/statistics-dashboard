@@ -5,7 +5,7 @@ CONTEXT=minikube
 DELETE=false
 APP_IMAGE=
 TARGET=local
-UTILISATION_AVERAGE_PERCENT=50
+UTILISATION_AVERAGE_PERCENT=50%
 
 # Set default replicas min / max
 MIN_REPLICAS=3
@@ -102,10 +102,10 @@ if ! [[ $MIN_REPLICAS =~ $re && $MAX_REPLICAS =~ $re ]] ; then
   echo "usage: the -r parameter should be two integers separated by a dash"
   exit 1;
 fi
-if ! [[ $UTILISATION_AVERAGE_PERCENT =~ $re ]] ; then
-  echo "usage: the -u parameter should be an integer"
-  exit 1;
-fi
+#if ! [[ $UTILISATION_AVERAGE_PERCENT =~ $re ]] ; then
+#  echo "usage: the -u parameter should be an integer"
+#  exit 1;
+#fi
 
 echo "Will run deploy with the parameters:"
 echo "  - ${BOLD}CONTEXT${NORM} = ${CONTEXT}"
