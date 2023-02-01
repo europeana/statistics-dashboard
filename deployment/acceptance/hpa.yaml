@@ -1,0 +1,23 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: statistics-dashboard-ui-acceptance-hpa
+spec:
+  maxReplicas: $MAX_REPLICAS
+  minReplicas: $MIN_REPLICAS
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: statistics-dashboard-ui-deployment-acceptance
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+    scaleUp:
+      stabilizationWindowSeconds: 15
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: $UTILISATION_AVERAGE_PERCENT

@@ -5,6 +5,7 @@ resources:
 - deployment.yaml
 - statistics-dashboard-ui-service.yaml
 - ingress.yaml
+- hpa.yaml
 configMapGenerator:
 - name: statistics-dashboard-nginx-conf-acceptance
   files:

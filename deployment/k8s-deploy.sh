@@ -3,7 +3,7 @@
 # Set default context / delete / image / target
 CONTEXT=minikube
 DELETE=false
-IMAGE_FULL_VALUE=
+APP_IMAGE=
 TARGET=local
 UTILISATION_AVERAGE_PERCENT=50
 
@@ -71,7 +71,7 @@ while getopts ":c:dhr:i:t:u:" o; do
       HELP
       ;;
     i)
-      IMAGE_FULL_VALUE=${OPTARG}
+      APP_IMAGE=${OPTARG}
       ;;
     r)
       ARR=(${OPTARG//-/ })
@@ -90,7 +90,7 @@ done
 shift $((OPTIND-1))
 
 # Check for unset image
-if [ -z "$IMAGE_FULL_VALUE" ];
+if [ -z "$APP_IMAGE" ];
 then
   echo "usage: an image must be set with the -i parameter"
   exit 1;
@@ -110,14 +110,14 @@ fi
 echo "Will run deploy with the parameters:"
 echo "  - ${BOLD}CONTEXT${NORM} = ${CONTEXT}"
 echo "  - ${BOLD}DELETE${NORM} = ${DELETE}"
-echo "  - ${BOLD}IMAGE_FULL_VALUE${NORM} = ${IMAGE_FULL_VALUE}"
+echo "  - ${BOLD}APP_IMAGE${NORM} = ${APP_IMAGE}"
 echo "  - ${BOLD}MAX_REPLICAS${NORM} = ${MAX_REPLICAS}"
 echo "  - ${BOLD}MIN_REPLICAS${NORM} = ${MIN_REPLICAS}"
 echo "  - ${BOLD}TARGET${NORM} = ${TARGET}"
 echo "  - ${BOLD}UTILISATION_AVERAGE_PERCENT${NORM} = ${UTILISATION_AVERAGE_PERCENT}"
 
 # Modify files deployment.yaml and hpa.yaml with variable data
-sed -i "s,\$IMAGE_FULL_VALUE,$IMAGE_FULL_VALUE,g" $DEPLOYMENT_FILE
+sed -i "s,\$APP_IMAGE,$APP_IMAGE,g" $DEPLOYMENT_FILE
 REPLACEMENTS=(MAX_REPLICAS MIN_REPLICAS UTILISATION_AVERAGE_PERCENT)
 for REPLACE in "${REPLACEMENTS[@]}"
 do

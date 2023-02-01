@@ -110,11 +110,13 @@ Running the script:
 will deploy the app to a local Kubernetes cluster.
 
 The script accepts the parameter flags:
-- -c (context) default is minikube
-- -d (delete) if present this flag indicates that the app should be deleted
+- -c (context) the kubernetes context
+- -d (delete) flag that the app should be deleted
 - -h (help) shows a help message
-- -i (image) default is unset
-- -t (target) default is local
+- -i (image) the application image to deploy
+- -r (replicas) hyphen-separated integers defining the min / max number of replicas
+- -t (target) the deploy target: local, test, acceptance, production
+- -u (utilisation) the CPU usage threshold for autoscaling
 
 so the command:
 
