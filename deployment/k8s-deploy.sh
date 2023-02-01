@@ -4,8 +4,7 @@
 CONTEXT=minikube
 DELETE=false
 APP_IMAGE=
-#TARGET=local
-TARGET=test
+TARGET=local
 UTILISATION_AVERAGE_PERCENT=50
 
 # Set default replicas min / max
@@ -137,5 +136,5 @@ else
 fi
 
 # Restore files deployment.yaml and hpa.yaml
-#git checkout $HPA_FILE
-#git checkout $DEPLOYMENT_FILE
+git checkout $HPA_FILE
+git checkout $DEPLOYMENT_FILE
