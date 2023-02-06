@@ -25,6 +25,13 @@ spec:
           envFrom:
             - secretRef:
                 name: statistics-dashboard-ui-environment-production
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50M
+            limits:
+              cpu: 50m
+              memory: 50M
       volumes:
         - name: statistics-dashboard-nginx-config-volume
           configMap:
