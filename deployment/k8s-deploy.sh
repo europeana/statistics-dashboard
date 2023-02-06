@@ -5,15 +5,11 @@ CONTEXT=minikube
 DELETE=false
 APP_IMAGE=
 TARGET=local
-UTILISATION_AVERAGE_PERCENT=50
+UTILISATION_AVERAGE_PERCENT=75
 
 # Set default replicas min / max
 MIN_REPLICAS=2
 MAX_REPLICAS=4
-
-# Set files to modify
-#HPA_FILE=deployment/$TARGET/hpa.yaml
-#DEPLOYMENT_FILE=deployment/$TARGET/deployment.yaml
 
 # Track numnber of arguments supplied
 export NUMARGS=$#
@@ -118,17 +114,9 @@ echo "  - ${BOLD}UTILISATION_AVERAGE_PERCENT${NORM} = ${UTILISATION_AVERAGE_PERC
 
 # Modify files deployment.yaml and hpa.yaml with variable data
 sed -i "s,APP_IMAGE,$APP_IMAGE,g" deployment/$TARGET/deployment.yaml
-#cat $DEPLOYMENT_FILE
-cat deployment/$TARGET/deployment.yaml
-
-
 sed -i "s,MAX_REPLICAS,$MAX_REPLICAS,g" deployment/$TARGET/hpa.yaml
 sed -i "s,MIN_REPLICAS,$MIN_REPLICAS,g" deployment/$TARGET/hpa.yaml
 sed -i "s,UTILISATION_AVERAGE_PERCENT,$UTILISATION_AVERAGE_PERCENT,g" deployment/$TARGET/hpa.yaml
-
-#cat $HPA_FILE
-cat deployment/$TARGET/hpa.yaml
-
 
 # Delete or apply
 if $DELETE;

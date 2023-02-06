@@ -27,10 +27,10 @@ spec:
                 name: statistics-dashboard-ui-environment-acceptance
           resources:
             requests:
-              cpu: 50m
+              cpu: 30m
               memory: 50M
             limits:
-              cpu: 50m
+              cpu: 30m
               memory: 50M
       volumes:
         - name: statistics-dashboard-nginx-config-volume
