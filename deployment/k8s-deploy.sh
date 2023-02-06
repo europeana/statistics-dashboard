@@ -117,14 +117,12 @@ echo "  - ${BOLD}TARGET${NORM} = ${TARGET}"
 echo "  - ${BOLD}UTILISATION_AVERAGE_PERCENT${NORM} = ${UTILISATION_AVERAGE_PERCENT}"
 
 # Modify files deployment.yaml and hpa.yaml with variable data
-sed -i "s,\$APP_IMAGE,$APP_IMAGE,g" $DEPLOYMENT_FILE
+sed -i "s,APP_IMAGE,$APP_IMAGE,g" $DEPLOYMENT_FILE
 cat $DEPLOYMENT_FILE
 
-REPLACEMENTS=(MAX_REPLICAS MIN_REPLICAS UTILISATION_AVERAGE_PERCENT)
-for REPLACE in "${REPLACEMENTS[@]}"
-do
-  sed -i "s,\$${REPLACE},${!REPLACE},g" $HPA_FILE
-done
+sed -i "s,MAX_REPLICAS,$MAX_REPLICAS,g" $HPA_FILE
+sed -i "s,MIN_REPLICAS,$MIN_REPLICAS,g" $HPA_FILE
+sed -i "s,UTILISATION_AVERAGE_PERCENT,$UTILISATION_AVERAGE_PERCENT,g" $HPA_FILE
 cat $HPA_FILE
 
 # Delete or apply
@@ -136,5 +134,5 @@ else
 fi
 
 # Restore files deployment.yaml and hpa.yaml
-git checkout $HPA_FILE
-git checkout $DEPLOYMENT_FILE
+#git checkout $HPA_FILE
+#git checkout $DEPLOYMENT_FILE
