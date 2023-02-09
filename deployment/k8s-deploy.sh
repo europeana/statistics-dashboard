@@ -98,8 +98,17 @@ if ! [[ $MIN_REPLICAS =~ $re && $MAX_REPLICAS =~ $re ]] ; then
   echo "usage: the -r parameter should be two integers separated by a dash"
   exit 1;
 fi
+if [[ $MIN_REPLICAS -gt $MAX_REPLICAS ]] ; then
+  echo "usage: the -r parameter should specify a maximimum number of replicas that is greater than or equal to the minimum number"
+  exit 1;
+fi
 if ! [[ $UTILISATION_AVERAGE_PERCENT =~ $re ]] ; then
   echo "usage: the -u parameter should be an integer"
+  exit 1;
+fi
+if [[ $UTILISATION_AVERAGE_PERCENT -gt 100 ]] ; then
+  echo $UTILISATION_AVERAGE_PERCENT
+  echo "usage: the -u parameter should not be greater than 100"
   exit 1;
 fi
 
