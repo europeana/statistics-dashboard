@@ -136,5 +136,5 @@ else
 fi
 
 # Restore files deployment.yaml and hpa.yaml
-git checkout deployment/$TARGET/hpa.yaml
+git checkout deployment/$TARGET/deployment.yaml
 git checkout deployment/$TARGET/hpa.yaml
