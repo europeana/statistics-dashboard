@@ -14,7 +14,7 @@ spec:
         app: statistics-dashboard-ui-acceptance
     spec:
       containers:
-        - image: IMAGE_FULL_VALUE
+        - image: APP_IMAGE
           name: container
           volumeMounts:
             - name: statistics-dashboard-nginx-config-volume
@@ -25,6 +25,13 @@ spec:
           envFrom:
             - secretRef:
                 name: statistics-dashboard-ui-environment-acceptance
+          resources:
+            requests:
+              cpu: 30m
+              memory: 50M
+            limits:
+              cpu: 30m
+              memory: 50M
       volumes:
         - name: statistics-dashboard-nginx-config-volume
           configMap:
