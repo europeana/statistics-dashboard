@@ -25,10 +25,6 @@ export class MockBarComponent {
     // mock toggleCtrls
   }
 
-  addLegend(_: am4charts.ColumnSeries): void {
-    // mock addLegend
-  }
-
   removeSeries(_: string): void {
     // mock removeSeries
   }

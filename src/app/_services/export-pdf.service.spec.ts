@@ -1,4 +1,3 @@
-import { ElementRef } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { MockExportPDFService } from '../_mocked';
 import { TableRow } from '../_models';
@@ -7,27 +6,12 @@ import { ExportPDFService } from './';
 describe('ExportPDFService', () => {
   let service: ExportPDFService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        providers: [ExportPDFService]
-      }).compileComponents();
-      service = TestBed.inject(ExportPDFService);
-    })
-  );
-
-  it('should get the image url', () => {
-    const e1 = document.createElement('div');
-    const e2 = document.createElement('div');
-
-    document.body.append(e1);
-    document.body.append(e2);
-
-    const el1 = { nativeElement: e1 } as ElementRef;
-    const el2 = { nativeElement: e2 } as ElementRef;
-
-    expect(service.getChartAsImageUrl(el1, el2)).toBeTruthy();
-  });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      providers: [ExportPDFService]
+    }).compileComponents();
+    service = TestBed.inject(ExportPDFService);
+  }));
 
   it('should get the fill colour', () => {
     expect(service.getFillColour(0)).toBeTruthy();

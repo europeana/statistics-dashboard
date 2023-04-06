@@ -6,8 +6,12 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl
+} from '@angular/forms';
 import { toInputSafeName } from '../_helpers';
 import { createMockPipe } from '../_mocked';
 import { DimensionName } from '../_models';
@@ -30,20 +34,18 @@ describe('FilterComponent', () => {
 
   const emptyOptions = { options: [], hasMore: false };
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [ReactiveFormsModule],
-        declarations: [FilterComponent, createMockPipe('renameApiFacet')],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [FormsModule, ReactiveFormsModule],
+      declarations: [FilterComponent, createMockPipe('renameApiFacet')],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);
     component = fixture.componentInstance;
-    component.form = new FormBuilder().group({
+    component.form = new UntypedFormBuilder().group({
       facetParameter: [],
       contentTierZero: [''],
       contentTier: [''],
@@ -161,14 +163,14 @@ describe('FilterComponent', () => {
     const createFormControls = (
       grp: DimensionName,
       ops: Array<string>
-    ): Array<FormControl> => {
-      const fGroup = new FormBuilder().group({});
+    ): Array<UntypedFormControl> => {
+      const fGroup = new UntypedFormBuilder().group({});
       expect(component.getSetCheckboxValues(grp).length).toBe(0);
       component.form.addControl(grp, fGroup);
       const res = [];
       ops.forEach((s: string) => {
-        fGroup.addControl(s, new FormControl(false));
-        const ctrl = component.form.get(`${grp}.${s}`) as FormControl;
+        fGroup.addControl(s, new UntypedFormControl(false));
+        const ctrl = component.form.get(`${grp}.${s}`) as UntypedFormControl;
         ctrl.setValue(true);
         res.push(ctrl);
       });

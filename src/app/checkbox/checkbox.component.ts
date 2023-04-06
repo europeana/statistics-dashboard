@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import {
   ControlValueAccessor,
-  FormGroup,
-  NG_VALUE_ACCESSOR
+  NG_VALUE_ACCESSOR,
+  UntypedFormGroup
 } from '@angular/forms';
 
 @Component({
@@ -23,7 +23,7 @@ import {
   ]
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  @Input() form: FormGroup;
+  @Input() form: UntypedFormGroup;
   @Input() labelText: string;
   @Input() group: string;
   @Input() controlName: string;

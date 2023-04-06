@@ -15,6 +15,10 @@ describe('highlight pipe', () => {
     expect(pipe.transform('hello')).toBe('hello');
   });
 
+  it('should not alter the string if escapable args are supplied', () => {
+    expect(pipe.transform('()', ['()'])).toBe('()');
+  });
+
   it('should highlight', () => {
     expect(pipe.transform('hello', ['a'])).toBe('hello');
     expect(pipe.transform('hello', ['e'])).toBe(`h${tagOpen}e${tagClose}llo`);

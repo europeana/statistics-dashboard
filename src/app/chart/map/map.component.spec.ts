@@ -10,15 +10,13 @@ describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [MapComponent],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA],
-        providers: [{ provide: APIService, useClass: MockAPIService }]
-      }).compileComponents();
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [MapComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [{ provide: APIService, useClass: MockAPIService }]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
@@ -35,5 +33,14 @@ describe('MapComponent', () => {
     component.results = [{ name: 'Italy', value: 1881 }];
     component.updateData();
     expect(component.polygonSeries.data.length).toEqual(1);
+  });
+
+  it('should generate the polygon series', () => {
+    component.polygonSeries = null;
+    component.updateData();
+    expect(component.polygonSeries).toBeFalsy();
+    component.drawChart();
+    fixture.detectChanges();
+    expect(component.polygonSeries.data.length).toEqual(0);
   });
 });

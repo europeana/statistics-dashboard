@@ -1,4 +1,4 @@
-import { TableRow } from '.';
+import { TableRow } from './models';
 
 export enum SortBy {
   name = 'name',

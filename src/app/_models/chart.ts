@@ -1,4 +1,4 @@
-import { IHash } from '.';
+import { IHash } from './models';
 
 export interface ChartSettings {
   configurable: boolean;
@@ -13,7 +13,6 @@ export interface ChartSettings {
   paddingRight?: number;
   paddingTop?: number;
   prefixValueAxis?: string;
-  showExports?: boolean;
   chartLegend?: boolean;
 }
 

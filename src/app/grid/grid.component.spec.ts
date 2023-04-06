@@ -5,6 +5,7 @@ import {
   TestBed,
   tick
 } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { createMockPipe, MockAPIService } from '../_mocked';
 import { DimensionName, PagerInfo, SortBy, TableRow } from '../_models';
 import { APIService } from '../_services';
@@ -61,6 +62,7 @@ describe('GridComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
+      imports: [FormsModule],
       declarations: [
         createMockPipe('renameApiFacet'),
         GridComponent,
@@ -162,6 +164,14 @@ describe('GridComponent', () => {
     expect(window.open).toHaveBeenCalledTimes(1);
 
     mockTableRow.portalUrlInfo.hrefRewritten = false;
+    component.loadFullLink(mockTableRow, true);
+    tick();
+
+    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(window.open).toHaveBeenCalledTimes(2);
+
+    mockTableRow.portalUrlInfo.hrefRewritten = false;
+    mockTableRow.isTotal = true;
     component.loadFullLink(mockTableRow, true);
     tick();
 

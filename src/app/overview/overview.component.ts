@@ -1,6 +1,11 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormGroup
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
@@ -107,7 +112,17 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     .map((x, index) => `${x + index}`);
 
   disabledParams: IHashArray<string>;
-  form: FormGroup;
+  form = this.fb.group({
+    facetParameter: [],
+    contentTierZero: [false],
+    datasetId: [''],
+    dateFrom: ['', this.validateDateFrom.bind(this)],
+    dateTo: ['', this.validateDateTo.bind(this)],
+    chartFormat: this.fb.group({
+      percent: [false]
+    })
+  });
+
   isLoading = true;
   locale = 'en-GB';
 
@@ -122,15 +137,22 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   dataServerData: BreakdownResults;
 
+  /**
+   * constructor
+   * untyped formbuilder used so that unpredictable datasetId fields can be added
+   **/
   constructor(
     private readonly api: APIService,
-    private readonly fb: FormBuilder,
+    private readonly fb: UntypedFormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly dialog: MatDialog
   ) {
     super();
-    this.buildForm();
+    this.facetConf.forEach((s: string) => {
+      this.form.addControl(s, this.fb.group({}));
+      this.form.addControl(`filter_list_${s}`, new FormControl(''));
+    });
     this.initialiseFilterStates();
   }
 
@@ -210,7 +232,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
                 return toInputSafeName(qpVal);
               });
             });
-
             return {
               params: results[0],
               queryParams: qpValArrays
@@ -229,7 +250,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           const datasetId =
             queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
           if (datasetId) {
-            const datasetIds = this.form.get('datasetIds') as FormGroup;
+            const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
             `${datasetId}`.split(',').forEach((part: string) => {
               datasetIds.addControl(part.trim(), new FormControl(''));
             });
@@ -251,7 +272,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             }
           }
           this.queryParams = queryParams;
-
           this.setCtZeroInputToQueryParam();
           this.setDateInputsToQueryParams();
           this.setDatasetIdInputToQueryParam();
@@ -461,7 +481,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           // ...and sort on label
           return op1.label.localeCompare(op2.label);
         });
-
         this.filterData[facetName] = allSortedOps;
         this.filterDisplayData(this.userFilterSearchTerms[facetName]);
       });
@@ -536,7 +555,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* Generates a human readable label for the current series
   **/
   generateSeriesLabel(): string {
-    if (Object.keys(this.queryParams).length === 0) {
+    const queryKeys = Object.keys(this.queryParams);
+    if (!queryKeys || queryKeys.length === 0) {
       const friendlyName = portalNamesFriendly[this.form.value.facetParameter];
       return $localize`:@@snapshotTitleAll:All (${friendlyName})`;
     }
@@ -597,14 +617,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     seriesTotal: number
   ): void {
     const name = JSON.stringify(this.queryParams).replace(
-      /[:\".,\s\(\)\[\]\{\}]/g,
+      /[:".,\s()[]{}]/g,
       ''
     );
     const rightsInfo = this.form.value.rightsCategory;
     const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
       return rightsInfo[key];
     });
-
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
       label: this.generateSeriesLabel(),
@@ -707,41 +726,18 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   addOrUpdateFilterControls(name: string, options: Array<NameLabel>): void {
     const checkboxes = this.form.get(name) as FormGroup;
+
     options.forEach((option: NameLabel) => {
       const fName = option.name;
       const ctrl = this.form.get(`${name}.${fName}`);
       const defaultValue =
-        this.queryParams[name] && this.queryParams[name].includes(option.name);
+        this.queryParams[name] && this.queryParams[name].includes(fName);
 
       if (!ctrl) {
         checkboxes.addControl(fName, new FormControl(defaultValue));
       } else {
-        (ctrl as FormControl).setValue(defaultValue);
+        ctrl.setValue(defaultValue);
       }
-    });
-  }
-
-  /** buildForm
-  /* - set upt data polling
-  */
-  buildForm(): void {
-    this.form = this.fb.group({
-      facetParameter: [],
-      contentTierZero: [false],
-      datasetId: [''],
-      dateFrom: ['', this.validateDateFrom.bind(this)],
-      dateTo: ['', this.validateDateTo.bind(this)]
-    });
-
-    this.form.addControl('chartFormat', this.fb.group({}));
-    (this.form.get('chartFormat') as FormGroup).addControl(
-      'percent',
-      new FormControl(false)
-    );
-
-    this.facetConf.forEach((s: string) => {
-      this.form.addControl(s, this.fb.group({}));
-      this.form.addControl(`filter_list_${s}`, new FormControl(''));
     });
   }
 
@@ -819,7 +815,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   getFormattedDatasetIdParam(): string {
     const filterDatasetIdParam = this.form.value.datasetId;
-    if (filterDatasetIdParam.length > 0) {
+    if (filterDatasetIdParam && filterDatasetIdParam.length > 0) {
       const values = fromCSL(filterDatasetIdParam)
         .map((id: string) => {
           return `${id}_*`;
@@ -891,9 +887,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   setDatasetIdInputToQueryParam(): void {
     const param =
       this.queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
-    if (param) {
-      this.form.controls.datasetId.setValue(param[0]);
-    }
+    this.form.controls.datasetId.setValue(param ? param[0] : '');
   }
 
   /** getEnabledFilterNames
@@ -1060,7 +1054,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   /** updateDatasetIdFieldAndPageUrl
   /*
-  /* Removes a value-part from the daasetId form value and calls updatePageUrl
+  /* Removes a value-part from the datasetId form value and calls updatePageUrl
   /* @param { string } datasetId - the value-part to remove
   */
   updateDatasetIdFieldAndPageUrl(datasetId?: string): void {

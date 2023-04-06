@@ -53,7 +53,7 @@ export class MapComponent {
 
   updateData(): void {
     this.browserOnly((): void => {
-      if (!this.chart) {
+      if (!this.polygonSeries) {
         return;
       }
       if (!this.results) {

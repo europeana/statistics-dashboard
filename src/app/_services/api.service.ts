@@ -22,16 +22,24 @@ export class APIService {
     return ISOCountryCodes;
   }
 
+  replaceDoubleSlashes(s: string): string {
+    return s.replace(/([^:]\/)\/+/g, '$1');
+  }
+
   getBreakdowns(request: BreakdownRequest): Observable<BreakdownResults> {
     return this.http.post<BreakdownResults>(
-      `${environment.serverAPI}${this.suffixFiltering}`,
+      this.replaceDoubleSlashes(
+        `${environment.serverAPI}/${this.suffixFiltering}`
+      ),
       request
     );
   }
 
   getGeneralResults(includeCTZero = false): Observable<GeneralResults> {
     return this.http.get<GeneralResults>(
-      `${environment.serverAPI}${this.suffixGeneral}`,
+      this.replaceDoubleSlashes(
+        `${environment.serverAPI}/${this.suffixGeneral}`
+      ),
       { params: includeCTZero ? { 'content-tier-zero': true } : {} }
     );
   }
@@ -40,7 +48,9 @@ export class APIService {
     rightsCategories: Array<string>
   ): Observable<Array<string>> {
     return this.http.get<Array<string>>(
-      `${environment.serverAPI}${this.suffixRightsUrls}`,
+      this.replaceDoubleSlashes(
+        `${environment.serverAPI}/${this.suffixRightsUrls}`
+      ),
       { params: { rightsCategories } }
     );
   }

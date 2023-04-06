@@ -5,14 +5,12 @@ import { ExportCSVService } from './';
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        providers: [ExportCSVService]
-      }).compileComponents();
-      service = TestBed.inject(ExportCSVService);
-    })
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      providers: [ExportCSVService]
+    }).compileComponents();
+    service = TestBed.inject(ExportCSVService);
+  }));
 
   it('should convert', () => {
     const testHeaders = ['series', 'name', 'count', 'percent'].map(

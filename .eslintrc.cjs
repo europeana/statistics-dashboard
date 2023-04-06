@@ -4,6 +4,7 @@ module.exports = {
   env: {
     node: true
   },
+  ignorePatterns: ['**/dist/*', '**/cypress/plugins/*', '**/cypress/fixtures/*'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: path.resolve(__dirname, './tsconfig.json'),
@@ -11,8 +12,11 @@ module.exports = {
     sourceType: 'module',
     tsconfigRootDir: __dirname
   },
-  plugins: ['@typescript-eslint', '@typescript-eslint/tslint', 'rxjs'],
-  extends: ['plugin:@typescript-eslint/eslint-recommended'],
+  plugins: ['@typescript-eslint', 'rxjs'],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   rules: {
     'rxjs/no-async-subscribe': 'error',
     'rxjs/no-ignored-observable': 'error',

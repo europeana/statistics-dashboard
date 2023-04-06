@@ -1,8 +1,9 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es6", "dom"],
-    "types": ["cypress"]
+    "outDir": "./out-tsc/app",
+    "types": ["cypress", "node"]
   },
-  "include": ["**/*.ts"]
+  "files": ["../src/main.ts", "../src/polyfills.ts"],
+  "include": ["../**/*.d.ts"]
 }

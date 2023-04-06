@@ -6,7 +6,7 @@ A visualisation utility for Europeana API data.
 
 ## Getting started
 
-Make sure you have `node` version 12 and `npm` version 6.x:
+Make sure you have `node` version 14.7.8 and `npm` version 6.x:
 
     node --version
     npm --version
@@ -14,6 +14,14 @@ Make sure you have `node` version 12 and `npm` version 6.x:
 Get the `npm` dependencies:
 
     npm install
+
+## Development environment
+
+To facilitate containerisation the standard angular way of setting environment variables has been amended.
+
+The standard `environment.ts` file exists under `src/app/environments/` but its contents define a function that can load variables from an external source, in this case `src/assets/env.js`.
+
+The file `src/assets/env.js` should therefore be modified before starting the development server.
 
 ## Development server
 
@@ -72,3 +80,46 @@ We use jenkins to deploy. Make sure you can access [https://jenkins.eanadev.org/
 
 - `statistics-dashboard-test`
 - `statistics-dashboard-acceptance`
+
+## Docker
+
+To make a (parameterised) docker image of the app first run this command:
+
+`npm run dist-localised`
+
+and then copy the output of that command (from the dist directory) into a docker nginx image:
+
+`docker build -t statistics-dashboard-app-image:version .`
+
+The image runtime configuration is only set on container startup, so environment variables have to be passed when it's run.  Here they are passed using the (local) project `env_file`:
+
+`docker run -it --rm -d -p 8080:8080  --env-file=deployment/local/env_file --name stats-dash statistics-dashboard-app-image:version`
+
+As with the `src/assets/env.js` file for the development server, the `env_file` file should be adjusted before the nginx server is started.
+
+Note: by default the docker image's nginx is configured to redirect the browser to the `https` protocol.  To run the image locally or in environments that haven't been configured for `https` the image can be run with the `nginx.conf` file mapped to a non-https variant by using the `-v` (volume) option, i.e.:
+
+`docker run -it --rm -d -p 8080:8080   --env-file=deployment/local/env_file  -v deployment/local/nginx.conf:/etc/nginx/nginx.conf --name stats-dash statistics-dashboard-app-image:version`
+
+## Kubernetes
+
+Running the script:
+
+`./deployment/k8s-deploy.sh -i myDockerImage`
+
+will deploy the app to a local Kubernetes cluster.
+
+The script accepts the parameter flags:
+- -c (context) the kubernetes context
+- -d (delete) flag that the app should be deleted
+- -h (help) shows a help message
+- -i (image) the application image to deploy
+- -r (replicas) hyphen-separated integers defining the min / max number of replicas
+- -t (target) the deploy target: local, test, acceptance, production
+- -u (utilisation) the CPU usage threshold for autoscaling
+
+so the command:
+
+    `./deployment/k8s-deploy.sh -d -t acceptance -i myDockerImage`
+
+...will delete myDockerImage in the default context with the acceptance namespace.
