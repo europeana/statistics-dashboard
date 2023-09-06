@@ -6,4 +6,6 @@
   env.serverAPI = "";
   env.serverPortal = "";
   env.wskey = "";
+  env.remoteEnvUrl = "";
+  env.remoteEnvKey = "";
 })(this);
