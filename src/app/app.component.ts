@@ -10,8 +10,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   MaintenanceItem,
-  MaintenanceScheduleService,
-  MaintenanceSettings
+  MaintenanceScheduleService
 } from '@europeana/metis-ui-maintenance-utils';
 
 import { maintenanceSettings } from '../environments/maintenance-settings';
