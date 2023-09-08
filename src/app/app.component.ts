@@ -9,10 +9,11 @@ import {
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
-  ApiSettingsGeneric,
-  EnvItem,
-  RemoteEnvService
+  MaintenanceSettings,
+  MaintenanceItem,
+  MaintenanceScheduleService
 } from '@europeana/metis-ui-maintenance-utils';
+
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
 import { APIService, ClickService } from './_services';
@@ -37,7 +38,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   showPageTitle: boolean;
   lastSetContentTierZeroValue = false;
   skipLocationUpdate = false;
-  maintenanceInfo?: EnvItem = undefined;
+  maintenanceInfo?: MaintenanceItem = undefined;
 
   constructor(
     private readonly api: APIService,
@@ -45,17 +46,16 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
-    private readonly remoteEnvs: RemoteEnvService,
+    private readonly maintenanceService: MaintenanceScheduleService,
     @Inject(LOCALE_ID) private readonly locale: string
   ) {
     super();
     document.title = 'Statistics Dashboard';
-
-    this.remoteEnvs.setApiSettings(maintenanceSettings as ApiSettingsGeneric);
+    this.maintenanceService.setApiSettings(maintenanceSettings);
     this.subs.push(
-      this.remoteEnvs
-        .loadObervableEnv()
-        .subscribe((item: EnvItem | undefined) => {
+      this.maintenanceService
+        .loadMaintenanceItem()
+        .subscribe((item: MaintenanceItem | undefined) => {
           this.maintenanceInfo = item;
           if (item && item.maintenanceMessage && this.landingComponentRef) {
             this.landingComponentRef.isLoading = false;

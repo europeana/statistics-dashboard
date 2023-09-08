@@ -17,6 +17,7 @@ import {
   MaintenanceInterceptorProvider,
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
+
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
