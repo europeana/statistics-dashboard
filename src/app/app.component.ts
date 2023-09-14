@@ -8,6 +8,12 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import {
+  MaintenanceItem,
+  MaintenanceScheduleService
+} from '@europeana/metis-ui-maintenance-utils';
+
+import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
 import { APIService, ClickService } from './_services';
 import {
@@ -18,6 +24,7 @@ import {
 } from './_models';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
@@ -30,6 +37,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   showPageTitle: boolean;
   lastSetContentTierZeroValue = false;
   skipLocationUpdate = false;
+  maintenanceInfo?: MaintenanceItem = undefined;
 
   constructor(
     private readonly api: APIService,
@@ -37,10 +45,22 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
+    private readonly maintenanceService: MaintenanceScheduleService,
     @Inject(LOCALE_ID) private readonly locale: string
   ) {
     super();
     document.title = 'Statistics Dashboard';
+    this.maintenanceService.setApiSettings(maintenanceSettings);
+    this.subs.push(
+      this.maintenanceService
+        .loadMaintenanceItem()
+        .subscribe((item: MaintenanceItem | undefined) => {
+          this.maintenanceInfo = item;
+          if (item && item.maintenanceMessage && this.landingComponentRef) {
+            this.landingComponentRef.isLoading = false;
+          }
+        })
+    );
   }
 
   /** buildForm

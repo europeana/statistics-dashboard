@@ -5,4 +5,6 @@
   env.serverAPI = "${APP_SERVER_API}";
   env.serverPortal = "${APP_SERVER_PORTAL}";
   env.wskey = "${APP_WS_KEY}";
+  env.maintenanceScheduleUrl = "${APP_MAINTENANCE_SCHEDULE_ENV_URL}";
+  env.maintenanceScheduleKey = "${APP_MAINTENANCE_SCHEDULE_ENV_KEY}";
 })(this);

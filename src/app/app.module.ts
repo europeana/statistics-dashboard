@@ -12,6 +12,12 @@ import {
 } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import {
+  MAINTENANCE_INTERCEPTOR_SETTINGS,
+  MaintenanceInterceptorProvider,
+  MaintenanceUtilsModule
+} from '@europeana/metis-ui-maintenance-utils';
+
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -36,8 +42,8 @@ import { OverviewComponent } from './overview';
 import { ResizeComponent } from './resize';
 import { SnapshotsComponent } from './snapshots';
 import { TruncateComponent } from './truncate';
-
 import { getDateAsISOString } from './_helpers';
+import { maintenanceSettings } from '../environments/maintenance-settings';
 
 @Injectable()
 class AppDateAdapter extends NativeDateAdapter {
@@ -106,6 +112,7 @@ class AppDateAdapter extends NativeDateAdapter {
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    MaintenanceUtilsModule,
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -128,6 +135,11 @@ class AppDateAdapter extends NativeDateAdapter {
           monthYearA11yLabel: 'MMMM YYYY'
         }
       }
+    },
+    MaintenanceInterceptorProvider,
+    {
+      provide: MAINTENANCE_INTERCEPTOR_SETTINGS,
+      useValue: maintenanceSettings
     }
   ],
   bootstrap: [AppComponent]

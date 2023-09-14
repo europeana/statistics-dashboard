@@ -1,7 +1,18 @@
+<div
+  class="fixed-modal"
+  *ngIf="maintenanceInfo && maintenanceInfo.maintenanceMessage"
+>
+  <div class="fixed-modal-content">
+    <lib-maintenance-info [maintenanceInfo]="maintenanceInfo">
+    </lib-maintenance-info>
+  </div>
+</div>
+
 <app-header
   [showPageTitle]="showPageTitle"
   [form]="formCTZero"
   [includeCTZero]="lastSetContentTierZeroValue"
 ></app-header>
+
 <router-outlet (activate)="onOutletLoaded($event)"></router-outlet>
 <app-footer></app-footer>
