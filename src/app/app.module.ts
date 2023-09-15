@@ -121,7 +121,8 @@ class AppDateAdapter extends NativeDateAdapter {
     MatNativeDateModule,
     ReactiveFormsModule,
     MatomoModule.forRoot({
-      scriptUrl: matomoSettings.matomoScriptUrl,
+      //scriptUrl: matomoSettings.matomoScriptUrl,
+      scriptUrl: '/assets/matomo.js',
       trackers: [
         {
           trackerUrl: matomoSettings.matomoTrackerUrl,
