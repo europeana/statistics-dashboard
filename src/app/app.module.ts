@@ -124,7 +124,7 @@ class AppDateAdapter extends NativeDateAdapter {
       scriptUrl: matomoSettings.matomoScriptUrl,
       trackers: [
         {
-          trackerUrl: matomoSettings.matomoHost,
+          trackerUrl: matomoSettings.matomoTrackerUrl,
           siteId: matomoSettings.matomoSiteId
         }
       ],
