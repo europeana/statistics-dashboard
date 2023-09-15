@@ -18,7 +18,7 @@ import {
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
 
-//import { MatomoModule } from 'ngx-matomo';
+import { MatomoModule } from 'ngx-matomo';
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -120,21 +120,21 @@ class AppDateAdapter extends NativeDateAdapter {
     MatFormFieldModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    /*
+
     MatomoModule.forRoot({
       //scriptUrl: matomoSettings.matomoScriptUrl,
-      scriptUrl: '/assets/matomo.js',
+      scriptUrl: 'https://stats.europeana.eu/matomo.js',
       trackers: [
         {
-          trackerUrl: matomoSettings.matomoTrackerUrl,
-          siteId: matomoSettings.matomoSiteId
+          trackerUrl: 'https://stats.europeana.eu/matomo.php',//matomoSettings.matomoTrackerUrl,
+          siteId: 7 //matomoSettings.matomoSiteId
         }
       ],
       routeTracking: {
         enable: true
       }
     })
-    */
+
   ],
   providers: [
     { provide: DateAdapter, useClass: AppDateAdapter },
