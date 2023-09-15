@@ -122,8 +122,8 @@ class AppDateAdapter extends NativeDateAdapter {
     ReactiveFormsModule,
 
     MatomoModule.forRoot({
-      //scriptUrl: matomoSettings.matomoScriptUrl,
-      scriptUrl: '//stats.europeana.eu/matomo.js',
+      scriptUrl: matomoSettings.matomoScriptUrl,
+      //scriptUrl: '//stats.europeana.eu/matomo.js',
       trackers: [
         {
           trackerUrl: matomoSettings.matomoTrackerUrl,
