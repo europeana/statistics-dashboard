@@ -126,7 +126,7 @@ class AppDateAdapter extends NativeDateAdapter {
       scriptUrl: '//stats.europeana.eu/matomo.js',
       trackers: [
         {
-          trackerUrl: '//stats.europeana.eu/matomo.php',//matomoSettings.matomoTrackerUrl,
+          trackerUrl: matomoSettings.matomoTrackerUrl,
           siteId: matomoSettings.matomoSiteId
         }
       ],

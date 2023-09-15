@@ -10,8 +10,8 @@ const matomoHost = getEnvVar('matomoHost');
 const matomoSiteId = getEnvVar('matomoSiteId');
 
 export const matomoSettings = {
-  //matomoTrackerUrl: `${matomoHost}/matomo.php`,
-  matomoTrackerUrl: `${matomoHost}`,
+  matomoTrackerUrl: `${matomoHost}/matomo.php`,
+  //matomoTrackerUrl: `${matomoHost}`,
   matomoScriptUrl: `${matomoHost}/matomo.js`,
   matomoSiteId: parseInt(matomoSiteId)
 };
