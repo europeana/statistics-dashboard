@@ -18,6 +18,7 @@ import {
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
 
+import { MatomoModule } from 'ngx-matomo';
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -44,6 +45,7 @@ import { SnapshotsComponent } from './snapshots';
 import { TruncateComponent } from './truncate';
 import { getDateAsISOString } from './_helpers';
 import { maintenanceSettings } from '../environments/maintenance-settings';
+import { matomoSettings } from '../environments/matomo-settings';
 
 @Injectable()
 class AppDateAdapter extends NativeDateAdapter {
@@ -117,7 +119,19 @@ class AppDateAdapter extends NativeDateAdapter {
     MatDialogModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatomoModule.forRoot({
+      scriptUrl: matomoSettings.matomoScriptUrl,
+      trackers: [
+        {
+          trackerUrl: matomoSettings.matomoHost,
+          siteId: matomoSettings.matomoSiteId
+        }
+      ],
+      routeTracking: {
+        enable: true
+      }
+    })
   ],
   providers: [
     { provide: DateAdapter, useClass: AppDateAdapter },
