@@ -8,4 +8,6 @@
   env.wskey = "";
   env.maintenanceScheduleUrl = "";
   env.maintenanceScheduleKey = "";
+  env.matomoSiteId = "";
+  env.matomoHost = "";
 })(this);
