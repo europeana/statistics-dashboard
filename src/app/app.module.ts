@@ -11,8 +11,8 @@ import {
   MatNativeDateModule,
   NativeDateAdapter
 } from '@angular/material/core';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import {
 //  MAINTENANCE_INTERCEPTOR_SETTINGS,
 //  MaintenanceInterceptorProvider,
