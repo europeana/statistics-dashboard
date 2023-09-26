@@ -48,12 +48,10 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
-//    private readonly maintenanceService: MaintenanceScheduleService,
     @Inject(LOCALE_ID) private readonly locale: string
   ) {
     super();
     document.title = 'Statistics Dashboard';
-    //this.maintenanceService.setApiSettings(maintenanceSettings);
 
     this.maintenanceService = inject(MaintenanceScheduleService);
     this.maintenanceService.setApiSettings(maintenanceSettings);

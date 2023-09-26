@@ -17,7 +17,7 @@ import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
 import { MockAPIService } from './_mocked';
 
-fdescribe('AppComponent', () => {
+describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let clicks: ClickService;
