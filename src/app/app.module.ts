@@ -1,4 +1,5 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule,  provideHttpClient,
+  withInterceptors } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Inject, Injectable, LOCALE_ID, NgModule } from '@angular/core';
@@ -13,8 +14,9 @@ import {
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {
-  MAINTENANCE_INTERCEPTOR_SETTINGS,
-  MaintenanceInterceptorProvider,
+//  MAINTENANCE_INTERCEPTOR_SETTINGS,
+//  MaintenanceInterceptorProvider,
+  maintenanceInterceptor,
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
 
@@ -150,11 +152,14 @@ class AppDateAdapter extends NativeDateAdapter {
         }
       }
     },
+    provideHttpClient(withInterceptors([maintenanceInterceptor(maintenanceSettings)]))
+    /*
     MaintenanceInterceptorProvider,
     {
       provide: MAINTENANCE_INTERCEPTOR_SETTINGS,
       useValue: maintenanceSettings
     }
+    */
   ],
   bootstrap: [AppComponent]
 })
