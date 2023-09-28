@@ -17,8 +17,6 @@ import {
 import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import {
-  //  MAINTENANCE_INTERCEPTOR_SETTINGS,
-  //  MaintenanceInterceptorProvider,
   maintenanceInterceptor,
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
