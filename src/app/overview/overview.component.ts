@@ -1,10 +1,4 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  TemplateRef,
-  ViewChild
-} from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import {
   FormControl,
@@ -12,7 +6,7 @@ import {
   UntypedFormBuilder,
   UntypedFormGroup
 } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
@@ -74,12 +68,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
   @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
-
-  private readonly api = inject(APIService);
-  private readonly fb = inject(UntypedFormBuilder);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly dialog = inject(MatDialog);
 
   // Make variables available to template
   public fromCSL = fromCSL;
@@ -153,7 +141,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
    * constructor
    * untyped formbuilder used so that unpredictable datasetId fields can be added
    **/
-  constructor() {
+  constructor(
+    private readonly api: APIService,
+    private readonly fb: UntypedFormBuilder,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly dialog: MatDialog
+  ) {
     super();
     this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));

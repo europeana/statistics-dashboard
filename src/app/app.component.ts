@@ -2,7 +2,6 @@ import { Location, PopStateEvent } from '@angular/common';
 import {
   Component,
   HostListener,
-  inject,
   Inject,
   LOCALE_ID,
   OnInit
@@ -40,22 +39,18 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   skipLocationUpdate = false;
   maintenanceInfo?: MaintenanceItem = undefined;
 
-  private readonly maintenanceService: MaintenanceScheduleService;
-
   constructor(
     private readonly api: APIService,
     private readonly clickService: ClickService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
+    private readonly maintenanceService: MaintenanceScheduleService,
     @Inject(LOCALE_ID) private readonly locale: string
   ) {
     super();
     document.title = 'Statistics Dashboard';
-
-    this.maintenanceService = inject(MaintenanceScheduleService);
     this.maintenanceService.setApiSettings(maintenanceSettings);
-
     this.subs.push(
       this.maintenanceService
         .loadMaintenanceItem()
