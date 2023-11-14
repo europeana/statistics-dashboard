@@ -28,12 +28,8 @@ export class ExportComponent {
   ) {}
 
   copy(): void {
-    const element = this.contentRef.nativeElement;
-    element.select();
-    document.execCommand('copy');
-    element.setSelectionRange(0, 0);
+    navigator.clipboard.writeText(this.contentRef.nativeElement.value);
     this.copied = true;
-
     const fn = (): void => {
       this.copied = false;
     };
