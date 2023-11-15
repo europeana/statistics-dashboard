@@ -7,3 +7,8 @@
 @import "scss/links";
 @import "scss/headings_simple";
 @import "scss/main";
+
+:root {
+  --eu-cm-color-theme: #095f90;
+  --eu-cm-color-theme-highlight: #4d4d4d; // = $eu-grey-dark
+}

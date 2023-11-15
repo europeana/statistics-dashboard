@@ -375,6 +375,10 @@
         </context-group>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
+      <trans-unit id="footerLinkTextPrivacySettings" datatype="html">
+        <source>Privacy Settings</source>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
       <trans-unit id="footerEUFlagText" datatype="html">
         <source>Co-financed by the Connecting Europe Facility of the European Union</source>
         <context-group purpose="location">
@@ -811,6 +815,60 @@
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
           <context context-type="linenumber">577</context>
         </context-group>
+      </trans-unit>
+
+      <!--consent management -->
+
+      <trans-unit id="cmAlwaysRequired" datatype="html">
+        <source>always required</source>
+      </trans-unit>
+      <trans-unit id="cmTitle" datatype="html">
+        <source>Services we would like to use</source>
+      </trans-unit>
+      <trans-unit id="cmDescription" datatype="html">
+        <source>Here you can see and customise the services that we'd like to use on this website. To learn more please read our</source>
+      </trans-unit>
+      <trans-unit id="cmPrivacyPolicy" datatype="html">
+        <source>privacy policy</source>
+      </trans-unit>
+      <trans-unit id="cmServiceSingle" datatype="html">
+        <source>one service</source>
+      </trans-unit>
+      <trans-unit id="cmServicePlural" datatype="html">
+        <source>services</source>
+      </trans-unit>
+      <trans-unit id="cmOptionalTitle" datatype="html">
+        <source>Services to capture website usage and feedback</source>
+      </trans-unit>
+      <trans-unit id="cmOptionalDescription" datatype="html">
+        <source>These services collect the information to help us better understand how the website gets used</source>
+      </trans-unit>
+      <trans-unit id="cmRequiredTitle" datatype="html">
+        <source>Essential services for security and customization</source>
+      </trans-unit>
+      <trans-unit id="cmRequiredDescription" datatype="html">
+        <source>These services are essential for the correct functioning of this website.</source>
+      </trans-unit>
+      <trans-unit id="cmUserDecline" datatype="html">
+        <source>I decline</source>
+      </trans-unit>
+      <trans-unit id="cmUserAcceptSelected" datatype="html">
+        <source>Accept Selected</source>
+      </trans-unit>
+      <trans-unit id="cmUserAcceptAll" datatype="html">
+        <source>Accept All</source>
+      </trans-unit>
+      <trans-unit id="cmMiniModeText" datatype="html">
+        <source>Hi! We’d like your permission to collect anonymous usage statistics that will help us improve our applications. You can always change or withdraw your consent later.</source>
+      </trans-unit>
+      <trans-unit id="cmMiniModeUserChoose" datatype="html">
+        <source>Let me choose</source>
+      </trans-unit>
+      <trans-unit id="cmMiniModeUserAcceptAll" datatype="html">
+        <source>Okay</source>
+      </trans-unit>
+      <trans-unit id="cmMiniModeUserDecline" datatype="html">
+        <source>I decline</source>
       </trans-unit>
     </body>
   </file>

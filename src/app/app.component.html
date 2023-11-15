@@ -15,4 +15,9 @@
 ></app-header>
 
 <router-outlet (activate)="onOutletLoaded($event)"></router-outlet>
-<app-footer></app-footer>
+
+<app-footer (showCookieConsent)="showCookieConsent(true)"></app-footer>
+
+<div class="consent-container">
+  <div #consentContainer></div>
+</div>
