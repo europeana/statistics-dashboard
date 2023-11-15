@@ -294,7 +294,7 @@ label {
 .chart-wrapper {
   flex-grow: 1;
   height: 300px;
-  margin: 0 -$spacing-s;
+  margin: 0 (-$spacing-s);
   max-width: 100%;
 
   &.hidden {

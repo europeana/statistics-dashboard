@@ -25,40 +25,41 @@ export const cookieConsentConfig = {
     {
       name: 'matomo',
       label: 'matomo tracker',
-      description: 'Collects anonymous statistics on how visitors interact with the website.',
+      description:
+        'Collects anonymous statistics on how visitors interact with the website.',
       purposes: ['usage tracking'],
       callback: callbackMatomo,
       cookies: [/_pk_id\./, /_pk_ses\./]
     }
   ],
   translations: {
-    alwaysRequired: 'sempre necessario',
-    title: 'Servizi che vogliamo usare',
-    description:
-      'Qui puoi vedere e aggiustare i servizi che vorremo usare su questo sito. Per impararne di piu legge nostro ',
-    privacyPolicy: 'privacy policy',
-    serviceSingle: 'uno servizio',
-    servicePlural: 'servizi',
-    services: {} as { [key: string]: { [key: string]: Array<string> | string | undefined } },
+    alwaysRequired: $localize`:@@cmAlwaysRequired:always required`,
+    title: $localize`:@@cmTitle:Services we would like to use`,
+    description: $localize`:@@cmDescription:Here you can see and customise the services that we'd like to use on this website. To learn more please read our`,
+    privacyPolicy: $localize`:@@cmPrivacyPolicy:privacy policy`,
+    serviceSingle: $localize`:@@cmServiceSingle:one service`,
+    servicePlural: $localize`:@@cmServicePlural:services`,
+    services: {} as {
+      [key: string]: { [key: string]: Array<string> | string | undefined };
+    },
     optional: {
-      title: 'Servizi per ricordare come il sito si usa',
-      description: 'Questi servizi raccolgono informazioni per aiutarci capire come il sito si usa.'
+      title: $localize`:@@cmOptionalTitle:Services to capture website usage and feedback`,
+      description: $localize`:@@cmOptionalDescription:These services collect the information to help us better understand how the website gets used`
     },
     required: {
-      title: "Servizi essenziali per la funzionalita' di questo sito",
-      title2: '(always required)',
-      description:
-        'Questi servizi sono essenziali per questo sito a funzionare giustamenteessenziali'
+      title: $localize`:@@cmRequiredTitle:Essential services for security and customization`,
+      description: $localize`:@@cmRequiredDescription:These services are essential for the correct functioning of this website.`
     },
-    userDecline: 'Io declino',
-    userAcceptSelected: 'Accetto Selezionati',
-    userAcceptAll: 'Accetto tutto',
+    userDecline: $localize`:@@cmUserDecline:I decline`,
+    userAcceptSelected: $localize`:@@cmUserAcceptSelected:Accept Selected`,
+    userAcceptAll: $localize`:@@cmUserAcceptAll:Accept All`,
     miniMode: {
       text:
-        "Potremmo attivare aluni servizi per analytici e sicurrezza? Si puo' sempre cambiare o negare il tuo consento dopo.",
-      userChoose: 'Fammi scegliere',
-      userAcceptAll: 'Va bene',
-      userDecline: 'Io declino'
+        // eslint-disable-next-line max-len
+        $localize`:@@cmMiniModeText:Hi! We’d like your permission to collect anonymous usage statistics that will help us improve our applications. You can always change or withdraw your consent later.`,
+      userChoose: $localize`:@@cmMiniModeUserChoose:Let me choose`,
+      userAcceptAll: $localize`:@@cmMiniModeUserAcceptAll:Okay`,
+      userDecline: $localize`:@@cmMiniModeUserDecline:I decline`
     }
   }
 };
