@@ -5,7 +5,9 @@ import {
   inject,
   Inject,
   LOCALE_ID,
-  OnInit
+  OnInit,
+  ViewChild,
+  ViewContainerRef
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -14,6 +16,7 @@ import {
   MaintenanceScheduleService
 } from '@europeana/metis-ui-maintenance-utils';
 
+import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
 import { APIService, ClickService } from './_services';
@@ -28,6 +31,7 @@ import { OverviewComponent } from './overview';
 
 @Component({
   selector: 'app-root',
+  styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html'
 })
 export class AppComponent extends SubscriptionManager implements OnInit {
@@ -39,6 +43,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   lastSetContentTierZeroValue = false;
   skipLocationUpdate = false;
   maintenanceInfo?: MaintenanceItem = undefined;
+
+  @ViewChild('consentContainer', { read: ViewContainerRef })
+  consentContainer: ViewContainerRef;
 
   private readonly maintenanceService: MaintenanceScheduleService;
 
@@ -66,6 +73,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           }
         })
     );
+    this.showCookieConsent();
   }
 
   /** buildForm
@@ -210,6 +218,36 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       component.locale = this.locale;
       this.landingComponentRef = undefined;
       this.showPageTitle = false;
+    }
+  }
+
+  /**
+   * showCookieConsent
+   * - calls show on cookieConsent
+   **/
+  async showCookieConsent(force = false): Promise<void> {
+    const CookieConsentComponent = (
+      await import(
+        '../../node_modules/@europeana/metis-ui-consent-management/dist/metis-ui-consent-management'
+      )
+    ).CookieConsentComponent;
+
+    this.consentContainer.clear();
+
+    const cookieConsent = this.consentContainer.createComponent(
+      CookieConsentComponent
+    );
+
+    cookieConsent.setInput('privacyPolicyClass', 'external-link');
+    cookieConsent.setInput('translations', cookieConsentConfig.translations);
+    cookieConsent.setInput('services', cookieConsentConfig.services);
+    cookieConsent.setInput(
+      'privacyPolicyUrl',
+      cookieConsentConfig.privacyPolicyUrl
+    );
+
+    if (force) {
+      cookieConsent.instance.show();
     }
   }
 
