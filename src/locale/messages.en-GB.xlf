@@ -870,6 +870,14 @@
       <trans-unit id="cmMiniModeUserDecline" datatype="html">
         <source>I decline</source>
       </trans-unit>
+
+      <!--consent management services -->
+      <trans-unit id="cmServiceDescriptionMatomo" datatype="html">
+        <source>Collects anonymous statistics on how visitors interact with the website.</source>
+      </trans-unit>
+      <trans-unit id="cmServiceDescriptionConsent" datatype="html">
+        <source>Remembers what consent you have given for the use of services on this web application.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

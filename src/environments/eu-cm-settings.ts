@@ -25,11 +25,16 @@ export const cookieConsentConfig = {
     {
       name: 'matomo',
       label: 'matomo tracker',
-      description:
-        'Collects anonymous statistics on how visitors interact with the website.',
+      description: $localize`:@@cmServiceDescriptionMatomo:Collects anonymous statistics on how visitors interact with the website.`,
       purposes: ['usage tracking'],
       callback: callbackMatomo,
       cookies: [/_pk_id\./, /_pk_ses\./]
+    },
+    {
+      name: 'Consent',
+      label: 'Consent',
+      description: $localize`:@@cmServiceDescriptionConsent:Remembers what consent you have given for the use of services on this web application.`,
+      required: true
     }
   ],
   translations: {

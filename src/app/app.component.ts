@@ -228,7 +228,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   async showCookieConsent(force = false): Promise<void> {
     const CookieConsentComponent = (
       await import(
-        '../../node_modules/metis-ui-consent-management/dist/metis-ui-consent-management'
+        '../../node_modules/@europeana/metis-ui-consent-management/dist/metis-ui-consent-management'
       )
     ).CookieConsentComponent;
 
