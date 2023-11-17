@@ -375,9 +375,8 @@
         </context-group>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
-      <trans-unit id="footerLinkTextPrivacySettings" datatype="html">
+      <trans-unit id="privacySettings" datatype="html">
         <source>Privacy Settings</source>
-        <note priority="1" from="description">Footer link text</note>
       </trans-unit>
       <trans-unit id="footerEUFlagText" datatype="html">
         <source>Co-financed by the Connecting Europe Facility of the European Union</source>
