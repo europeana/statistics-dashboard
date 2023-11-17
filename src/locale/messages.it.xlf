@@ -361,7 +361,7 @@
         <source>sempre necessario</source>
       </trans-unit>
       <trans-unit id="cmTitle" datatype="html">
-        <source>Servizi che vorremo usare</source>
+        <source>Servizi che Vorremo Usare</source>
       </trans-unit>
       <trans-unit id="cmDescription" datatype="html">
         <source>Qui puoi vedere e aggiustare i servizi che vorremo usare su questo sito. Per impararne di piu legge nostro</source>
@@ -376,13 +376,13 @@
         <source>servizi</source>
       </trans-unit>
       <trans-unit id="cmOptionalTitle" datatype="html">
-        <source>Servizi per ricordare come il sito si usa</source>
+        <source>Servizi per ricordare come si usa il sito</source>
       </trans-unit>
       <trans-unit id="cmOptionalDescription" datatype="html">
         <source>Questi servizi raccolgono informazioni per aiutarci capire come il sito si usa.</source>
       </trans-unit>
       <trans-unit id="cmRequiredTitle" datatype="html">
-        <source>Servizi essenziali per la funzionalita' di questo sito</source>
+        <source>Servizi essenziali a questo sito</source>
       </trans-unit>
       <trans-unit id="cmRequiredDescription" datatype="html">
         <source>Questi servizi sono essenziali per questo sito a funzionare giustamenteessenziali</source>
@@ -394,7 +394,7 @@
         <source>Accetto Selezionati</source>
       </trans-unit>
       <trans-unit id="cmUserAcceptAll" datatype="html">
-        <source>Accetto tutto</source>
+        <source>Accetto Tutti</source>
       </trans-unit>
       <trans-unit id="cmMiniModeText" datatype="html">
         <source>Potremmo attivare aluni servizi per analytici e sicurrezza? Si puo' sempre cambiare o negare il tuo consento dopo.</source>
