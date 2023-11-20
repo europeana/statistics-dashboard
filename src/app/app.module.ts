@@ -7,15 +7,16 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Inject, Injectable, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   DateAdapter,
   MAT_DATE_FORMATS,
-  MatNativeDateModule,
   NativeDateAdapter
 } from '@angular/material/core';
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
-import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
+
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import {
   maintenanceInterceptor,
   MaintenanceUtilsModule
@@ -121,7 +122,6 @@ class AppDateAdapter extends NativeDateAdapter {
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
-    MatNativeDateModule,
     ReactiveFormsModule,
     MatomoModule.forRoot({
       scriptUrl: matomoSettings.matomoScriptUrl,
