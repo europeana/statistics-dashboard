@@ -53,14 +53,16 @@ describe('AppComponent', () => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
 
-    component.consentContainer = ({
+    component.consentContainer = {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       clear: (): void => {},
       createComponent: () => {
         return {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           setInput: () => void {}
         };
       }
-    } as unknown) as ViewContainerRef;
+    } as unknown as ViewContainerRef;
 
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
