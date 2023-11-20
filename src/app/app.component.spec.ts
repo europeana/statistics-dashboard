@@ -1,4 +1,5 @@
 import { Location } from '@angular/common';
+import { ViewContainerRef } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -51,6 +52,16 @@ describe('AppComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
+
+    component.consentContainer = ({
+      clear: (): void => {},
+      createComponent: () => {
+        return {
+          setInput: () => void {}
+        };
+      }
+    } as unknown) as ViewContainerRef;
+
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
     fixture.detectChanges();
