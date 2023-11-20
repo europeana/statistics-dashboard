@@ -9,13 +9,13 @@
     <app-resize (sizeChanged)="refreshChart(true)"></app-resize>
 
     <ng-template #dialogRef>
-      <div class="container-h dialog-content">
-        <span class="warn-icon"></span>
-        <span class="warning" i18n="Warning data recency@@warnDataNotLive"
-          >The data is not live and may be a few days old</span
-        >
-      </div>
-      <div class="container-h dialog-content">
+      <div class="dialog-content">
+        <div class="container-h">
+          <span class="warn-icon"></span>
+          <span class="warning" i18n="Warning data recency@@warnDataNotLive"
+            >The data is not live and may be a few days old</span
+          >
+        </div>
         <button mat-button mat-dialog-close>Close</button>
       </div>
     </ng-template>

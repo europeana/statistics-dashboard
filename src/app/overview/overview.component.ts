@@ -12,7 +12,7 @@ import {
   UntypedFormBuilder,
   UntypedFormGroup
 } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
