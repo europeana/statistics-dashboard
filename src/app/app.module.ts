@@ -124,6 +124,7 @@ class AppDateAdapter extends NativeDateAdapter {
     MatFormFieldModule,
     ReactiveFormsModule,
     MatomoModule.forRoot({
+      requireCookieConsent: true,
       scriptUrl: matomoSettings.matomoScriptUrl,
       trackers: [
         {
