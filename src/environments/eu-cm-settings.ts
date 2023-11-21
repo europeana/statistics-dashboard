@@ -19,7 +19,8 @@ const callbackMatomo = (consent: boolean): void => {
       //_paq.push(['setCookieConsentGiven']);
       _paq.push(['rememberCookieConsentGiven']);
     } else {
-      console.log('callbackMatomo FORGET IT!');
+      console.log('callbackMatomo disable and FORGET!');      
+      _paq.push(['disableCookies']);
       _paq.push(['forgetCookieConsentGiven']);
     }
   }
