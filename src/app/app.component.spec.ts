@@ -59,7 +59,7 @@ describe('AppComponent', () => {
       createComponent: () => {
         return {
           // eslint-disable-next-line @typescript-eslint/no-empty-function
-          setInput: () => void {}
+          setInput: (): void => void {}
         };
       }
     } as unknown as ViewContainerRef;
