@@ -9,18 +9,13 @@ import { matomoSettings } from './matomo-settings';
  * @param { boolean: consent }
  **/
 const callbackMatomo = (consent: boolean): void => {
-
   console.log('in the callback.... ' + consent);
 
   const _paq = matomoSettings.getPAQ();
   if (_paq) {
     if (consent == true) {
-      console.log('callbackMatomo REMEMBER IT!');
-      //_paq.push(['setCookieConsentGiven']);
       _paq.push(['rememberCookieConsentGiven']);
     } else {
-      console.log('callbackMatomo disable and FORGET!');      
-      _paq.push(['disableCookies']);
       _paq.push(['forgetCookieConsentGiven']);
     }
   }
