@@ -5,7 +5,7 @@ import { TableRow } from '../_models';
 export class ExportCSVService {
   csvFromTableRows(headers: Array<string>, rows: Array<TableRow>): string {
     const replacer = (_: string, value: string): string => {
-      return value === null ? '' : value;
+      return value ?? '';
     };
 
     const csv = rows.map((row: TableRow) => {
