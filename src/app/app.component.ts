@@ -239,10 +239,11 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     cookieConsent.setInput('privacyPolicyClass', 'external-link');
     cookieConsent.setInput('translations', cookieConsentConfig.translations);
     cookieConsent.setInput('services', cookieConsentConfig.services);
-    cookieConsent.setInput(
-      'privacyPolicyUrl',
-      cookieConsentConfig.privacyPolicyUrl
-    );
+
+    cookieConsent.setInput('fnPrivacyPolicyClick', (): void => {
+      cookieConsent.instance.shrink();
+      this.router.navigate(['/privacy-policy']);
+    });
 
     if (force) {
       cookieConsent.instance.show();

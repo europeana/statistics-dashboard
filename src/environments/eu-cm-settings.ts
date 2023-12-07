@@ -9,8 +9,6 @@ import { matomoSettings } from './matomo-settings';
  * @param { boolean: consent }
  **/
 const callbackMatomo = (consent: boolean): void => {
-  console.log('in the callback.... ' + consent);
-
   const _paq = matomoSettings.getPAQ();
   if (_paq) {
     if (consent == true) {
@@ -22,7 +20,6 @@ const callbackMatomo = (consent: boolean): void => {
 };
 
 export const cookieConsentConfig = {
-  privacyPolicyUrl: externalLinks.privacy,
   services: [
     {
       name: 'matomo',

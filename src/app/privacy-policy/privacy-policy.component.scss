@@ -1,0 +1,32 @@
+@import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+
+h2 {
+  margin-bottom: 1em;
+  &:not(.page-title) {
+    margin-top: 2em;
+  }
+}
+
+ul li {
+  list-style: disc;
+  margin-left: 1em;
+}
+
+h2:not(.page-title),
+ul,
+p {
+  padding: 0 16px;
+}
+
+ul {
+  margin: 0.75em 0;
+}
+
+p + p {
+  margin-top: 0.75em;
+}
+
+.fit-to-page {
+  margin-bottom: 5em;
+}

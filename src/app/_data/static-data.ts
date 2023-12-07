@@ -93,7 +93,6 @@ export const externalLinks = {
   pro: '//pro.europeana.eu',
   api: '//api.europeana.eu',
   tos: '//www.europeana.eu/rights/terms-of-use',
-  privacy: '//www.europeana.eu/rights/privacy-policy',
   help: {
     contentTier: {
       href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
