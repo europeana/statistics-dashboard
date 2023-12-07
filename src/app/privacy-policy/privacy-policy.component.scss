@@ -1,16 +1,8 @@
-@import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
-
 h2 {
   margin-bottom: 1em;
   &:not(.page-title) {
     margin-top: 2em;
   }
-}
-
-ul li {
-  list-style: disc;
-  margin-left: 1em;
 }
 
 h2:not(.page-title),
@@ -21,6 +13,11 @@ p {
 
 ul {
   margin: 0.75em 0;
+}
+
+ul li {
+  list-style: disc;
+  margin-left: 1em;
 }
 
 p + p {
