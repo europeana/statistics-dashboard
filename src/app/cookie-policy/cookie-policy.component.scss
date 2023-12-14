@@ -1,0 +1,47 @@
+@import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+
+h2:not(.page-title),
+h3 {
+  font-weight: normal;
+  padding: 16px;
+}
+
+p {
+  padding: 16px;
+  code {
+    font-size: 0.9em;
+    font-style: italic;
+    padding-left: 0.2em;
+  }
+  + h2 {
+    margin-top: 0.75em;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-gap: 1em;
+  //grid-template-columns: 4fr 3fr 1fr 1fr 1fr;
+  //grid-template-columns: 2fr 1fr 1fr 1fr;
+  //grid-template-columns: auto auto auto auto;
+  grid-template-columns: 4fr 1fr 1fr 1fr;
+  padding: 16px;
+
+  &.auto-size {
+    //  grid-template-columns: auto auto auto auto auto;
+  }
+
+  .grid-header {
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  & > :not(.grid-header) {
+    //  margin: 0.5em 0;
+  }
+
+  & > * {
+    font-size: 14px;
+  }
+}

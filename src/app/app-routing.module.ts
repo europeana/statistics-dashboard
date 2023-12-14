@@ -3,11 +3,16 @@ import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
 import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
+import { CookiePolicyComponent } from './cookie-policy/cookie-policy.component';
 
 const routes: Routes = [
   {
     path: 'data/:facet',
     component: OverviewComponent
+  },
+  {
+    path: 'cookie-policy',
+    component: CookiePolicyComponent
   },
   {
     path: 'privacy-policy',
