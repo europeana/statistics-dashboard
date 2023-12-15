@@ -1,8 +1,10 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-cookie-policy',
-  templateUrl: './cookie-policy.component.html',
-  styleUrls: ['./cookie-policy.component.scss']
+  imports: [CommonModule],
+  standalone: true,
+  styleUrls: ['./cookie-policy.component.scss'],
+  templateUrl: './cookie-policy.component.html'
 })
 export class CookiePolicyComponent {}
