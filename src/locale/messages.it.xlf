@@ -153,6 +153,9 @@
       <trans-unit id="footerLinkTextPrivacy" datatype="html">
         <source>Norme sulla privacy</source>
       </trans-unit>
+      <trans-unit id="footerLinkTextCookies" datatype="html">
+        <source>Norme su cookies</source>
+      </trans-unit>
       <trans-unit id="privacySettings" datatype="html">
         <source>Impostazioni della privacy</source>
       </trans-unit>

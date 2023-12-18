@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
-import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
 
 const routes: Routes = [
   {
@@ -10,8 +9,16 @@ const routes: Routes = [
     component: OverviewComponent
   },
   {
+    path: 'cookie-policy',
+    loadComponent: async () =>
+      (await import('./cookie-policy/cookie-policy.component'))
+        .CookiePolicyComponent
+  },
+  {
     path: 'privacy-policy',
-    component: PrivacyPolicyComponent
+    loadComponent: async () =>
+      (await import('./privacy-policy/privacy-policy.component'))
+        .PrivacyPolicyComponent
   },
   {
     path: '',

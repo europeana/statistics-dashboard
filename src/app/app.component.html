@@ -1,7 +1,4 @@
-<div
-  class="fixed-modal"
-  *ngIf="maintenanceInfo && maintenanceInfo.maintenanceMessage"
->
+<div class="fixed-modal" *ngIf="maintenanceInfo?.maintenanceMessage">
   <div class="fixed-modal-content">
     <lib-maintenance-info [maintenanceInfo]="maintenanceInfo">
     </lib-maintenance-info>
