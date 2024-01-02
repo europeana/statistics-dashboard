@@ -42,7 +42,7 @@ export class BarComponent implements AfterViewInit {
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
 
-  settings = Object.assign({}, BarChartDefaults);
+  settings = structuredClone(BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
 
   @Input() chartId = 'barChart';
@@ -55,7 +55,7 @@ export class BarComponent implements AfterViewInit {
     return this._results;
   }
   @Input() set extraSettings(extraSettings: ChartSettings) {
-    this.settings = Object.assign(this.settings, extraSettings);
+    this.settings = { ...this.settings, ...extraSettings };
   }
   get extraSettings(): ChartSettings {
     return this.settings;

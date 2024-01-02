@@ -252,7 +252,7 @@ describe('OverviewComponent', () => {
       component.postProcessResult();
       expect(component.extractSeriesServerData).toHaveBeenCalled();
 
-      component.dataServerData = Object.assign({}, MockBreakdowns);
+      component.dataServerData = structuredClone(MockBreakdowns);
       delete component.dataServerData.results;
       component.postProcessResult();
       expect(component.extractSeriesServerData).toHaveBeenCalledTimes(1);

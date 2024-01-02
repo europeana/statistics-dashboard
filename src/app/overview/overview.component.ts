@@ -91,18 +91,16 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
   public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
-  public barChartSettings = Object.assign(
-    {
-      prefixValueAxis: ''
-    },
-    BarChartCool
-  );
-  public barChartSettingsTiers = Object.assign(
-    {
-      prefixValueAxis: this.tierPrefix
-    },
-    BarChartCool
-  );
+
+  public barChartSettings = {
+    prefixValueAxis: '',
+    ...BarChartCool
+  };
+
+  public barChartSettingsTiers = {
+    prefixValueAxis: this.tierPrefix,
+    ...BarChartCool
+  };
 
   readonly MAX_FILTER_OPTIONS = 50;
   readonly facetConf = facetNames;
@@ -1054,7 +1052,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       this.queryParams = qp;
     }
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
-      queryParams: Object.assign(qp, this.disabledParams)
+      queryParams: { ...qp, ...this.disabledParams }
     });
   }
 
