@@ -850,7 +850,7 @@
         <source>Essential services for security and customization</source>
       </trans-unit>
       <trans-unit id="cmRequiredDescription" datatype="html">
-        <source>These services are essential for the correct functioning of this website.</source>
+        <source>These services are essential for the correct functioning of this website</source>
       </trans-unit>
       <trans-unit id="cmUserDecline" datatype="html">
         <source>I decline</source>
