@@ -25,7 +25,6 @@ export const cookieConsentConfig = {
       name: 'matomo',
       label: 'matomo tracker',
       description: $localize`:@@cmServiceDescriptionMatomo:Collects anonymous statistics on how visitors interact with the website.`,
-      purposes: ['usage tracking'],
       callback: callbackMatomo,
       cookies: [/_pk_id\./, /_pk_ses\./]
     },
@@ -52,7 +51,7 @@ export const cookieConsentConfig = {
     },
     required: {
       title: $localize`:@@cmRequiredTitle:Essential services for security and customization`,
-      description: $localize`:@@cmRequiredDescription:These services are essential for the correct functioning of this website.`
+      description: $localize`:@@cmRequiredDescription:These services are essential for the correct functioning of this website`
     },
     userDecline: $localize`:@@cmUserDecline:I decline`,
     userAcceptSelected: $localize`:@@cmUserAcceptSelected:Accept Selected`,
