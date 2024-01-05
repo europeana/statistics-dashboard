@@ -414,10 +414,10 @@
 
       <!--consent management services -->
       <trans-unit id="cmServiceDescriptionMatomo" datatype="html">
-        <source>Raccoglie statistiche (anonime) su come gli utenti interagiscono co'l sito.</source>
+        <source>Raccoglie statistiche (anonime) su come gli utenti interagiscono co'l sito</source>
       </trans-unit>
       <trans-unit id="cmServiceDescriptionConsent" datatype="html">
-        <source>Ricorda quale sono i servizi a cui hai consentito.</source>
+        <source>Ricorda quale sono i servizi a cui hai consentito</source>
       </trans-unit>
     </body>
   </file>
