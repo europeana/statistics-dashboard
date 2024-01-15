@@ -368,7 +368,7 @@
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
       <trans-unit id="footerLinkTextCookies" datatype="html">
-        <source>Cookie Policy</source>
+        <source>Cookies Policy</source>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
       <trans-unit id="privacySettings" datatype="html">
