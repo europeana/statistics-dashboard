@@ -147,9 +147,6 @@
       <trans-unit id="footerLinkTextAPI" datatype="html">
         <source>Europeana API</source>
       </trans-unit>
-      <trans-unit id="footerLinkTextTOS" datatype="html">
-        <source>Termini di Servizio</source>
-      </trans-unit>
       <trans-unit id="footerLinkTextPrivacy" datatype="html">
         <source>Norme sulla privacy</source>
       </trans-unit>

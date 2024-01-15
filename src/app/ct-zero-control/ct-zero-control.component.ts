@@ -20,6 +20,7 @@ export class CTZeroControlComponent {
    * emits event (invokes updatePageUrl())
    **/
   valueChanged(): void {
+    console.log('the value changes here...............');
     this.onChange.emit();
   }
 }
