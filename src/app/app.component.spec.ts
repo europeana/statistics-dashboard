@@ -11,7 +11,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
+import {
+  MaintenanceScheduleItemKey,
+  MaintenanceScheduleService
+} from '@europeana/metis-ui-maintenance-utils';
 import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
 import { LandingComponent } from './landing';
@@ -19,10 +23,11 @@ import { OverviewComponent } from './overview';
 import { MockAPIService } from './_mocked';
 
 describe('AppComponent', () => {
-  let component: AppComponent;
+  let app: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let clicks: ClickService;
   let location: Location;
+  let maintenanceSchedules: MaintenanceScheduleService;
 
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({} as Params);
@@ -51,9 +56,9 @@ describe('AppComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
+    app = fixture.componentInstance;
 
-    component.consentContainer = {
+    app.consentContainer = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       clear: (): void => {},
       createComponent: () => {
@@ -66,11 +71,12 @@ describe('AppComponent', () => {
 
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
+    maintenanceSchedules = TestBed.inject(MaintenanceScheduleService);
     fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(app).toBeTruthy();
   });
 
   it('should listen for document clicks', fakeAsync(() => {
@@ -79,42 +85,42 @@ describe('AppComponent', () => {
     el.nativeElement.click();
     tick(1);
     expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
-    component.documentClick({ target: {} as unknown as HTMLElement });
+    app.documentClick({ target: {} as unknown as HTMLElement });
     expect(clicks.documentClickedTarget.next).toHaveBeenCalledTimes(2);
   }));
 
   it('should listen for history navigation', fakeAsync(() => {
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
-    component.buildForm();
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    app.buildForm();
 
     // trigger location change does nothing
-    component.updateLocation();
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
+    app.updateLocation();
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
 
-    component.landingComponentRef = {
+    app.landingComponentRef = {
       isLoading: true
     } as unknown as LandingComponent;
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
 
-    component.updateLocation();
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
+    app.updateLocation();
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
 
     // trigger location change with different value
-    const ctrl = component.getCtrlCTZero();
+    const ctrl = app.getCtrlCTZero();
     ctrl.setValue(true);
 
     tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeTruthy();
+    expect(app.lastSetContentTierZeroValue).toBeTruthy();
     ctrl.setValue(false);
 
     tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
 
     // trigger location change with different value
     location.go('/');
 
     tick(1);
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
   }));
 
   it('should handle the location pop-state', () => {
@@ -122,54 +128,78 @@ describe('AppComponent', () => {
       url: '?content-tier-zero=true'
     } as unknown as PopStateEvent;
 
-    component.buildForm();
+    app.buildForm();
 
-    component.landingComponentRef = {
+    app.landingComponentRef = {
       isLoading: false
     } as unknown as LandingComponent;
 
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
-    component.handleLocationPopState(ps);
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    app.handleLocationPopState(ps);
     fixture.detectChanges();
-    expect(component.lastSetContentTierZeroValue).toBeTruthy();
+    expect(app.lastSetContentTierZeroValue).toBeTruthy();
   });
 
   it('should load the landing data', fakeAsync(() => {
-    component.landingComponentRef = {
+    app.landingComponentRef = {
       isLoading: true
     } as unknown as LandingComponent;
-    expect(component.landingComponentRef.isLoading).toBeTruthy();
-    expect(component.landingComponentRef.landingData).toBeFalsy();
-    component.buildForm();
-    component.loadLandingData(false);
+    expect(app.landingComponentRef.isLoading).toBeTruthy();
+    expect(app.landingComponentRef.landingData).toBeFalsy();
+    app.buildForm();
+    app.loadLandingData(false);
     tick(1);
-    expect(component.landingComponentRef.isLoading).toBeFalsy();
-    expect(component.landingComponentRef.landingData).toBeTruthy();
+    expect(app.landingComponentRef.isLoading).toBeFalsy();
+    expect(app.landingComponentRef.landingData).toBeTruthy();
   }));
 
   it('should handle the outlet load', () => {
-    expect(component.showPageTitle).toBeFalsy();
+    expect(app.showPageTitle).toBeFalsy();
 
-    spyOn(component, 'loadLandingData');
+    spyOn(app, 'loadLandingData');
 
-    component.onOutletLoaded(new LandingComponent());
+    app.onOutletLoaded(new LandingComponent());
 
-    expect(component.showPageTitle).toBeTruthy();
-    expect(component.loadLandingData).toHaveBeenCalled();
+    expect(app.showPageTitle).toBeTruthy();
+    expect(app.loadLandingData).toHaveBeenCalled();
 
-    component.onOutletLoaded({} as unknown as OverviewComponent);
-    expect(component.showPageTitle).toBeFalsy();
-    expect(component.loadLandingData).toHaveBeenCalledTimes(1);
+    app.onOutletLoaded({} as unknown as OverviewComponent);
+    expect(app.showPageTitle).toBeFalsy();
+    expect(app.loadLandingData).toHaveBeenCalledTimes(1);
 
-    component.onOutletLoaded(new LandingComponent());
-    expect(component.showPageTitle).toBeTruthy();
-    expect(component.loadLandingData).toHaveBeenCalledTimes(1);
+    app.onOutletLoaded(new LandingComponent());
+    expect(app.showPageTitle).toBeTruthy();
+    expect(app.loadLandingData).toHaveBeenCalledTimes(1);
 
-    expect(component.lastSetContentTierZeroValue).toBeFalsy();
-    component.lastSetContentTierZeroValue = true;
+    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    app.lastSetContentTierZeroValue = true;
 
-    component.onOutletLoaded(new LandingComponent());
-    expect(component.showPageTitle).toBeTruthy();
-    expect(component.loadLandingData).toHaveBeenCalledTimes(2);
+    app.onOutletLoaded(new LandingComponent());
+    expect(app.showPageTitle).toBeTruthy();
+    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
   });
+
+  it('should check if maintenance is due', fakeAsync(() => {
+    app.landingComponentRef = {
+      isLoading: true
+    } as unknown as LandingComponent;
+
+    const maintenanceSettings = {
+      pollInterval: 1,
+      maintenanceScheduleUrl: 'http://maintenance',
+      maintenanceScheduleKey:
+        MaintenanceScheduleItemKey.STATISTICS_DASHBOARD_TEST,
+      maintenanceItem: {}
+    };
+
+    spyOn(maintenanceSchedules, 'loadMaintenanceItem').and.callFake(() => {
+      return of({
+        maintenanceMessage: 'Hello'
+      });
+    });
+
+    app.checkIfMaintenanceDue(maintenanceSettings);
+    expect(maintenanceSchedules.loadMaintenanceItem).toHaveBeenCalled();
+    expect(app.landingComponentRef.isLoading).toBeFalsy();
+  }));
 });

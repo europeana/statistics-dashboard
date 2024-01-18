@@ -13,7 +13,8 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   MaintenanceItem,
-  MaintenanceScheduleService
+  MaintenanceScheduleService,
+  MaintenanceSettings
 } from '@europeana/metis-ui-maintenance-utils';
 
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
@@ -35,6 +36,8 @@ import { OverviewComponent } from './overview';
   templateUrl: './app.component.html'
 })
 export class AppComponent extends SubscriptionManager implements OnInit {
+  private readonly maintenanceService = inject(MaintenanceScheduleService);
+
   formCTZero: FormGroup<{ contentTierZero: FormControl<boolean> }>;
   landingData: GeneralResultsFormatted;
   landingComponentRef: LandingComponent;
@@ -47,8 +50,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   @ViewChild('consentContainer', { read: ViewContainerRef })
   consentContainer: ViewContainerRef;
 
-  private readonly maintenanceService: MaintenanceScheduleService;
-
   constructor(
     private readonly api: APIService,
     private readonly clickService: ClickService,
@@ -59,10 +60,12 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   ) {
     super();
     document.title = 'Statistics Dashboard';
+    this.checkIfMaintenanceDue(maintenanceSettings);
+    this.showCookieConsent();
+  }
 
-    this.maintenanceService = inject(MaintenanceScheduleService);
-    this.maintenanceService.setApiSettings(maintenanceSettings);
-
+  checkIfMaintenanceDue(settings: MaintenanceSettings): void {
+    this.maintenanceService.setApiSettings(settings);
     this.subs.push(
       this.maintenanceService
         .loadMaintenanceItem()
@@ -73,7 +76,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           }
         })
     );
-    this.showCookieConsent();
   }
 
   /** buildForm
