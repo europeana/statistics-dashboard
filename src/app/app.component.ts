@@ -68,7 +68,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         .loadMaintenanceItem()
         .subscribe((item: MaintenanceItem | undefined) => {
           this.maintenanceInfo = item;
-          if (item && item.maintenanceMessage && this.landingComponentRef) {
+          if (item?.maintenanceMessage && this.landingComponentRef) {
             this.landingComponentRef.isLoading = false;
           }
         })

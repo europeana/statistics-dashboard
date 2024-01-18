@@ -39,11 +39,11 @@ export class DatesComponent {
 
     this.dateTo.nativeElement.setAttribute(
       'min',
-      getDateAsISOString(new Date(valFrom ? valFrom : yearZero))
+      getDateAsISOString(new Date(valFrom || yearZero))
     );
     this.dateFrom.nativeElement.setAttribute(
       'max',
-      getDateAsISOString(new Date(valTo ? valTo : today))
+      getDateAsISOString(new Date(valTo || today))
     );
 
     this.form.controls.dateTo.updateValueAndValidity();
