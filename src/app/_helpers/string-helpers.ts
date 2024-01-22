@@ -68,7 +68,7 @@ export function sanitiseSearchTerm(filterString: string): string {
     return '';
   }
 
-  const modifierStart = filterString.indexOf('^') === 0;
+  const modifierStart = filterString.startsWith('^');
   const modifierEnd = filterString.indexOf('$') === filterString.length - 1;
 
   if (modifierStart) {

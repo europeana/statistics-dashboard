@@ -53,7 +53,7 @@ import { matomoSettings } from '../environments/matomo-settings';
 
 @Injectable()
 class AppDateAdapter extends NativeDateAdapter {
-  public static preferredFormat = 'DD/MM/YYYY';
+  public static readonly preferredFormat = 'DD/MM/YYYY';
 
   // used to display dates closed and open
   format(date: Date, displayFormat: Object): string {

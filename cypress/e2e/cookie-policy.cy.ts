@@ -15,7 +15,7 @@ context('Statistics Dashboard', () => {
 
     it('should show the cookie policy when the user clicks the footer link', () => {
       cy.get(selCookiePolicy).should('not.exist');
-      cy.get('a').contains('Cookie Policy').should('have.length', 1).click({ force: true });
+      cy.get('a').contains('Cookies Policy').should('have.length', 1).click({ force: true });
       cy.get(selCookiePolicy).should('have.length', 1);
     });
   });
