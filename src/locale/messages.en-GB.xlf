@@ -824,7 +824,7 @@
         <source>Here you can see and customise the services that we'd like to use on this website. To learn more please read our</source>
       </trans-unit>
       <trans-unit id="cmPrivacyPolicy" datatype="html">
-        <source>privacy policy</source>
+        <source>cookies policy</source>
       </trans-unit>
       <trans-unit id="cmServiceSingle" datatype="html">
         <source>one service</source>

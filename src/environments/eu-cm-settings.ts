@@ -39,7 +39,7 @@ export const cookieConsentConfig = {
     alwaysRequired: $localize`:@@cmAlwaysRequired:always required`,
     title: $localize`:@@cmTitle:Services we would like to use`,
     description: $localize`:@@cmDescription:Here you can see and customise the services that we'd like to use on this website. To learn more please read our`,
-    privacyPolicy: $localize`:@@cmPrivacyPolicy:privacy policy`,
+    linkText: $localize`:@@cmLinkText:cookies policy`,
     serviceSingle: $localize`:@@cmServiceSingle:one service`,
     servicePlural: $localize`:@@cmServicePlural:services`,
     services: {} as {

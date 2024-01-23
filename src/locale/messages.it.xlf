@@ -366,8 +366,8 @@
       <trans-unit id="cmDescription" datatype="html">
         <source>Qui puoi vedere e aggiustare i servizi che vorremo usare su questo sito. Per impararne di piu legge nostro</source>
       </trans-unit>
-      <trans-unit id="cmPrivacyPolicy" datatype="html">
-        <source>policy sulla privacy</source>
+      <trans-unit id="cmLinkText" datatype="html">
+        <source>policy sulle cookies</source>
       </trans-unit>
       <trans-unit id="cmServiceSingle" datatype="html">
         <source>un servizio</source>
