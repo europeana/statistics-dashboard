@@ -240,9 +240,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
     cookieConsent.setInput('translations', cookieConsentConfig.translations);
     cookieConsent.setInput('services', cookieConsentConfig.services);
-    cookieConsent.setInput('fnPrivacyPolicyClick', (): void => {
+    cookieConsent.setInput('fnLinkClick', (): void => {
       cookieConsent.instance.shrink();
-      this.router.navigate(['/privacy-policy']);
+      this.router.navigate(['/cookie-policy']);
     });
 
     if (force) {

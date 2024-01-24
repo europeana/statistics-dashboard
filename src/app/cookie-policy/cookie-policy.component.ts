@@ -7,6 +7,4 @@ import { Component } from '@angular/core';
   styleUrls: ['./cookie-policy.component.scss'],
   templateUrl: './cookie-policy.component.html'
 })
-export class CookiePolicyComponent {
-  siteAddress = document.baseURI.replace(/\/$/, '');
-}
+export class CookiePolicyComponent {}
