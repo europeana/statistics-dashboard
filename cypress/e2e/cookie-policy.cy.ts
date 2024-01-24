@@ -19,7 +19,7 @@ context('Statistics Dashboard', () => {
       cy.get(selCookiePolicy).should('have.length', 1);
     });
 
-    it('should show the privacy policy from the consent manager', () => {
+    it('should show the cookie policy from the consent manager', () => {
       const selCmLink = '.eu-cm a';
       cy.get(selCookiePolicy).should('not.exist');
       cy.get(selCmLink).should('not.exist');
