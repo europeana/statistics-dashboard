@@ -22,7 +22,7 @@ import {
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
 
-import { MatomoModule } from 'ngx-matomo-client';
+import { MatomoConsentMode, MatomoModule } from 'ngx-matomo-client';
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -124,7 +124,7 @@ class AppDateAdapter extends NativeDateAdapter {
     MatFormFieldModule,
     ReactiveFormsModule,
     MatomoModule.forRoot({
-      requireCookieConsent: true,
+      requireConsent: MatomoConsentMode.COOKIE,
       scriptUrl: matomoSettings.matomoScriptUrl,
       trackers: [
         {
@@ -132,9 +132,7 @@ class AppDateAdapter extends NativeDateAdapter {
           siteId: matomoSettings.matomoSiteId
         }
       ],
-      routeTracking: {
-        enable: true
-      }
+      enableLinkTracking: true
     })
   ],
   providers: [
