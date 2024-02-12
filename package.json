@@ -32,7 +32,6 @@
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.22",
     "@amcharts/amcharts4-geodata": "^4.1.21",
-    "@andyjmaclean/ngx-matomo": "^3.0.1",
     "@angular/animations": "^17.1.1",
     "@angular/cdk": "^16.2.5",
     "@angular/common": "^17.1.1",
@@ -47,6 +46,7 @@
     "@europeana/metis-ui-consent-management": "^0.0.15",
     "@europeana/metis-ui-maintenance-utils": "^0.0.9",
     "ngx-cookie-service": "^17.0.1",
+    "ngx-matomo-client": "^6.0.2",
     "pdfmake": "^0.1.72",
     "rxjs": "^7.8.1",
     "ts-loader": "^9.3.1",
