@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Inject, LOCALE_ID, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -117,11 +117,4 @@ import { matomoSettings } from '../environments/matomo-settings';
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-  constructor(
-    @Inject(LOCALE_ID) private readonly locale: string,
-    private readonly dateAdapter: DateAdapter<unknown>
-  ) {
-    this.dateAdapter.setLocale(locale);
-  }
-}
+export class AppModule {}

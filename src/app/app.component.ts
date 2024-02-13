@@ -20,6 +20,7 @@ import {
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
+import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService } from './_services';
 import {
   BreakdownResult,
@@ -56,7 +57,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
-    @Inject(LOCALE_ID) private readonly locale: string
+    @Inject(LOCALE_ID) private readonly locale: string,
+    @Inject(LOCALE_ID) private readonly dateAdapter: AppDateAdapter
   ) {
     super();
     document.title = 'Statistics Dashboard';
