@@ -12,10 +12,10 @@ import {
   TableRow
 } from '../_models';
 import {
-  NgIf,
   NgClass,
-  NgStyle,
   NgFor,
+  NgIf,
+  NgStyle,
   NgTemplateOutlet
 } from '@angular/common';
 

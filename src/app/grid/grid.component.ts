@@ -23,12 +23,12 @@ import { TruncateComponent } from '../truncate/truncate.component';
 import { GridPaginatorComponent as GridPaginatorComponent_1 } from '../grid-paginator/grid-paginator.component';
 import { FormsModule } from '@angular/forms';
 import {
-  NgIf,
+  DecimalPipe,
   NgClass,
-  NgStyle,
   NgFor,
-  NgTemplateOutlet,
-  DecimalPipe
+  NgIf,
+  NgStyle,
+  NgTemplateOutlet
 } from '@angular/common';
 
 @Component({

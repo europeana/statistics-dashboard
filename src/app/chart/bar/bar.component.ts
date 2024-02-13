@@ -6,7 +6,7 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
-import { isPlatformBrowser, NgIf, NgClass } from '@angular/common';
+import { isPlatformBrowser, NgClass, NgIf } from '@angular/common';
 
 // amCharts imports
 import * as am4core from '@amcharts/amcharts4/core';

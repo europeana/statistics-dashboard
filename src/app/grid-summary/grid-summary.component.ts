@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { BreakdownResult, CountPercentageValue } from '../_models';
 import { RenameApiFacetShortPipe } from '../_translate/rename-facet-short.pipe';
-import { NgIf, DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-grid-summary',

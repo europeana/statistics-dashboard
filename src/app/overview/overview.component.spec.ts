@@ -2,8 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
-  flush,
-  discardPeriodicTasks,
   TestBed,
   tick,
   waitForAsync
@@ -514,9 +512,6 @@ fdescribe('OverviewComponent', () => {
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       tick(tickTimeChartDebounce);
-      tick(tickTime);
-      flush();
-      discardPeriodicTasks();
     }));
 
     it('should get the url for a dataset', () => {

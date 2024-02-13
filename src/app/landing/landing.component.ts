@@ -10,13 +10,13 @@ import { BarComponent as BarComponent_1 } from '../chart/bar/bar.component';
 import { TruncateComponent } from '../truncate/truncate.component';
 import { ResizeComponent } from '../resize/resize.component';
 import {
-  NgClass,
-  NgIf,
-  NgFor,
-  NgTemplateOutlet,
-  UpperCasePipe,
+  DecimalPipe,
   LowerCasePipe,
-  DecimalPipe
+  NgClass,
+  NgFor,
+  NgIf,
+  NgTemplateOutlet,
+  UpperCasePipe
 } from '@angular/common';
 
 @Component({

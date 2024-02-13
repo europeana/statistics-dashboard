@@ -5,14 +5,14 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { formatDate, NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe, formatDate, NgClass, NgFor, NgIf } from '@angular/common';
 import {
   FormControl,
   FormGroup,
-  UntypedFormBuilder,
-  UntypedFormGroup,
   FormsModule,
-  ReactiveFormsModule
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup
 } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';

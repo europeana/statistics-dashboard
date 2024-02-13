@@ -7,9 +7,9 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  UntypedFormGroup,
   FormsModule,
-  ReactiveFormsModule
+  ReactiveFormsModule,
+  UntypedFormGroup
 } from '@angular/forms';
 import { getDateAsISOString, today, yearZero } from '../_helpers';
 import { NgIf } from '@angular/common';

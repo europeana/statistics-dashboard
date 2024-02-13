@@ -5,15 +5,11 @@ import {
 } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Inject, Injectable, LOCALE_ID, NgModule } from '@angular/core';
+import { Inject, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  DateAdapter,
-  MAT_DATE_FORMATS,
-  NativeDateAdapter
-} from '@angular/material/core';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -26,6 +22,7 @@ import { MatomoConsentMode, MatomoModule } from 'ngx-matomo-client';
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AppDateAdapter } from './_helpers';
 import {
   HighlightMatchPipe,
   RenameApiFacetPipe,
@@ -47,44 +44,8 @@ import { OverviewComponent } from './overview';
 import { ResizeComponent } from './resize';
 import { SnapshotsComponent } from './snapshots';
 import { TruncateComponent } from './truncate';
-import { getDateAsISOString } from './_helpers';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { matomoSettings } from '../environments/matomo-settings';
-
-@Injectable()
-class AppDateAdapter extends NativeDateAdapter {
-  public static readonly preferredFormat = 'DD/MM/YYYY';
-
-  // used to display dates closed and open
-  format(date: Date, displayFormat: Object): string {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    };
-    if (
-      displayFormat === 'input' ||
-      displayFormat === AppDateAdapter.preferredFormat
-    ) {
-      return getDateAsISOString(date).split('-').reverse().join('/');
-    }
-    return date.toLocaleDateString(this.locale, options);
-  }
-
-  // Used when user types date into input
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  parse(value: any): Date | null {
-    if (typeof value === 'string' && value.indexOf('/') > -1) {
-      const str = value.split('/');
-      const year = Number(str[2]);
-      const month = Number(str[1]) - 1;
-      const date = Number(str[0]);
-      return new Date(year, month, date);
-    }
-    return null;
-  }
-}
 
 @NgModule({
   declarations: [AppComponent],

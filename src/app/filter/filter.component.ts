@@ -19,7 +19,7 @@ import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { DatesComponent } from '../dates/dates.component';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
-import { NgIf, NgClass, NgFor } from '@angular/common';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-filter',
