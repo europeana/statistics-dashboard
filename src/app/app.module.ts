@@ -87,8 +87,29 @@ class AppDateAdapter extends NativeDateAdapter {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
+  declarations: [AppComponent],
+  imports: [
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    MaintenanceUtilsModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatomoModule.forRoot({
+      requireConsent: MatomoConsentMode.COOKIE,
+      scriptUrl: matomoSettings.matomoScriptUrl,
+      trackers: [
+        {
+          trackerUrl: matomoSettings.matomoTrackerUrl,
+          siteId: matomoSettings.matomoSiteId
+        }
+      ],
+      enableLinkTracking: true
+    }),
     BarComponent,
     CheckboxComponent,
     CTZeroControlComponent,
@@ -111,29 +132,6 @@ class AppDateAdapter extends NativeDateAdapter {
     SnapshotsComponent,
     TruncateComponent,
     IsScrollableDirective
-  ],
-  imports: [
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    MaintenanceUtilsModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
-    MatomoModule.forRoot({
-      requireConsent: MatomoConsentMode.COOKIE,
-      scriptUrl: matomoSettings.matomoScriptUrl,
-      trackers: [
-        {
-          trackerUrl: matomoSettings.matomoTrackerUrl,
-          siteId: matomoSettings.matomoSiteId
-        }
-      ],
-      enableLinkTracking: true
-    })
   ],
   providers: [
     { provide: DateAdapter, useClass: AppDateAdapter },

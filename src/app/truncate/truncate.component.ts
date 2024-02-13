@@ -1,9 +1,14 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
+import { NgClass } from '@angular/common';
+import { ResizeComponent } from '../resize/resize.component';
 
 @Component({
   selector: 'app-truncate',
   templateUrl: './truncate.component.html',
-  styleUrls: ['./truncate.component.scss']
+  styleUrls: ['./truncate.component.scss'],
+  standalone: true,
+  imports: [ResizeComponent, NgClass, HighlightMatchPipe]
 })
 export class TruncateComponent implements OnInit {
   applySpace = false;

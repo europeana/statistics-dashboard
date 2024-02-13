@@ -24,7 +24,8 @@ import { ClickAwareDirective } from '.';
       </div>
     </div>
   `,
-  styles: ['.collapsed{ background-color: red; }']
+  styles: ['.collapsed{ background-color: red; }'],
+  standalone: true
 })
 class TestClickAwareDirectiveComponent {
   @ViewChild('clickInfo') clickInfo: ClickAwareDirective;
@@ -43,7 +44,7 @@ describe('ClickAwareDirective', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ClickAwareDirective, TestClickAwareDirectiveComponent],
+      imports: [ClickAwareDirective, TestClickAwareDirectiveComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));

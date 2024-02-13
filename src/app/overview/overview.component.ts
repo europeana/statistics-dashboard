@@ -5,15 +5,17 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { formatDate } from '@angular/common';
+import { formatDate, NgClass, NgIf, NgFor, DatePipe } from '@angular/common';
 import {
   FormControl,
   FormGroup,
   UntypedFormBuilder,
-  UntypedFormGroup
+  UntypedFormGroup,
+  FormsModule,
+  ReactiveFormsModule
 } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -61,11 +63,44 @@ import { SnapshotsComponent } from '../snapshots';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 import { GridSummaryComponent } from '../grid-summary';
+import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
+import { GridComponent as GridComponent_1 } from '../grid/grid.component';
+import { SnapshotsComponent as SnapshotsComponent_1 } from '../snapshots/snapshots.component';
+import { GridSummaryComponent as GridSummaryComponent_1 } from '../grid-summary/grid-summary.component';
+import { BarComponent as BarComponent_1 } from '../chart/bar/bar.component';
+import { CheckboxComponent } from '../checkbox/checkbox.component';
+import { IsScrollableDirective } from '../_directives/is-scrollable/is-scrollable.directive';
+import { ExportComponent as ExportComponent_1 } from '../export/export.component';
+import { FilterComponent } from '../filter/filter.component';
+import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
+import { ResizeComponent } from '../resize/resize.component';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.scss']
+  styleUrls: ['./overview.component.scss'],
+  standalone: true,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    NgClass,
+    ResizeComponent,
+    MatDialogModule,
+    RouterLink,
+    CTZeroControlComponent,
+    NgIf,
+    NgFor,
+    FilterComponent,
+    ExportComponent_1,
+    IsScrollableDirective,
+    CheckboxComponent,
+    BarComponent_1,
+    GridSummaryComponent_1,
+    SnapshotsComponent_1,
+    GridComponent_1,
+    DatePipe,
+    RenameApiFacetPipe
+  ]
 })
 export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('grid') grid: GridComponent;

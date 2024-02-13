@@ -15,8 +15,7 @@ describe('DatesComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
-      declarations: [DatesComponent],
+      imports: [ReactiveFormsModule, DatesComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });

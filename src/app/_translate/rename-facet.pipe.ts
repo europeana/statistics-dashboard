@@ -7,7 +7,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { portalNamesFriendly } from '../_data';
 
 @Pipe({
-  name: 'renameApiFacet'
+  name: 'renameApiFacet',
+  standalone: true
 })
 export class RenameApiFacetPipe implements PipeTransform {
   transform(value: string): string {

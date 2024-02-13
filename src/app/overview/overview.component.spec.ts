@@ -98,16 +98,13 @@ describe('OverviewComponent', () => {
             component: OverviewComponent
           },
           { path: `data/${DimensionName.type}`, component: OverviewComponent }
-        ])
-      ],
-      declarations: [
+        ]),
         IsScrollableDirective,
         OverviewComponent,
-        MockBarComponent,
-        MockGridComponent,
         SnapshotsComponent,
         createMockPipe('renameApiFacet')
       ],
+      declarations: [MockBarComponent, MockGridComponent],
       providers: [
         {
           provide: APIService,

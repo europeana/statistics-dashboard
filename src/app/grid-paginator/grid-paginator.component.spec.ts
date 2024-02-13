@@ -38,7 +38,7 @@ describe('GridPaginatorComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [GridPaginatorComponent],
+      imports: [GridPaginatorComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });

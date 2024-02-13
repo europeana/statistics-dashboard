@@ -19,7 +19,7 @@ describe('ExportComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ExportComponent],
+      imports: [ExportComponent],
       providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
     }).compileComponents();
     exportCSV = TestBed.inject(ExportCSVService);

@@ -62,8 +62,8 @@ describe('GridComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [FormsModule],
-      declarations: [
+      imports: [
+        FormsModule,
         createMockPipe('renameApiFacet'),
         GridComponent,
         GridPaginatorComponent

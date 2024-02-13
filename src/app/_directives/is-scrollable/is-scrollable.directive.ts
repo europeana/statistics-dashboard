@@ -2,7 +2,8 @@ import { AfterViewInit, Directive, ElementRef } from '@angular/core';
 
 @Directive({
   selector: '[appIsScrollable]',
-  exportAs: 'scrollInfo'
+  exportAs: 'scrollInfo',
+  standalone: true
 })
 export class IsScrollableDirective implements AfterViewInit {
   canScrollBack = false;

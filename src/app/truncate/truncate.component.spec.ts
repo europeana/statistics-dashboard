@@ -15,7 +15,7 @@ describe('TruncateComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-      declarations: [
+      imports: [
         TruncateComponent,
         ResizeComponent,
         createMockPipe('highlightMatch')

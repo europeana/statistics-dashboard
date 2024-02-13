@@ -36,8 +36,12 @@ describe('FilterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule],
-      declarations: [FilterComponent, createMockPipe('renameApiFacet')],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        FilterComponent,
+        createMockPipe('renameApiFacet')
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));

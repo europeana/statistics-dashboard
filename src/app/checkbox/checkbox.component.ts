@@ -8,8 +8,11 @@ import {
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-  UntypedFormGroup
+  UntypedFormGroup,
+  FormsModule,
+  ReactiveFormsModule
 } from '@angular/forms';
+import { NgIf, NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-checkbox',
@@ -20,7 +23,9 @@ import {
       useExisting: forwardRef(() => CheckboxComponent),
       multi: true
     }
-  ]
+  ],
+  standalone: true,
+  imports: [NgIf, FormsModule, ReactiveFormsModule, NgClass]
 })
 export class CheckboxComponent implements ControlValueAccessor {
   @Input() form: UntypedFormGroup;
