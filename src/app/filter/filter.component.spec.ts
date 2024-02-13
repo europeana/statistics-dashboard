@@ -13,8 +13,8 @@ import {
   UntypedFormControl
 } from '@angular/forms';
 import { toInputSafeName } from '../_helpers';
-import { createMockPipe } from '../_mocked';
 import { DimensionName } from '../_models';
+import { RenameApiFacetPipe } from '../_translate';
 
 import { FilterComponent } from '.';
 
@@ -36,12 +36,8 @@ describe('FilterComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        FilterComponent,
-        createMockPipe('renameApiFacet')
-      ],
+      imports: [FormsModule, ReactiveFormsModule, FilterComponent],
+      providers: [RenameApiFacetPipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));

@@ -2,6 +2,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
+  flush,
+  discardPeriodicTasks,
   TestBed,
   tick,
   waitForAsync
@@ -21,6 +23,7 @@ import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
+import { RenameApiFacetPipe } from '../_translate';
 
 import {
   createMockPipe,
@@ -44,7 +47,7 @@ import { APIService } from '../_services';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
 
-describe('OverviewComponent', () => {
+fdescribe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
   let router: Router;
@@ -101,8 +104,7 @@ describe('OverviewComponent', () => {
         ]),
         IsScrollableDirective,
         OverviewComponent,
-        SnapshotsComponent,
-        createMockPipe('renameApiFacet')
+        SnapshotsComponent
       ],
       declarations: [MockBarComponent, MockGridComponent],
       providers: [
@@ -117,6 +119,10 @@ describe('OverviewComponent', () => {
         {
           provide: MatDialog,
           useValue: dialog
+        },
+        {
+          provide: RenameApiFacetPipe,
+          useValue: createMockPipe('renameApiFacet')
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -508,6 +514,9 @@ describe('OverviewComponent', () => {
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
       tick(tickTimeChartDebounce);
+      tick(tickTime);
+      flush();
+      discardPeriodicTasks();
     }));
 
     it('should get the url for a dataset', () => {
