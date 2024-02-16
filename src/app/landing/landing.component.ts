@@ -1,14 +1,3 @@
-import { Component, Input, QueryList, ViewChildren } from '@angular/core';
-import { externalLinks } from '../_data';
-import { BarComponent } from '../chart';
-import { DimensionName, GeneralResultsFormatted } from '../_models';
-import { RenameApiFacetShortPipe } from '../_translate/rename-facet-short.pipe';
-import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
-import { MapComponent } from '../chart/map/map.component';
-import { RouterLink } from '@angular/router';
-import { BarComponent as BarComponent_1 } from '../chart/bar/bar.component';
-import { TruncateComponent } from '../truncate/truncate.component';
-import { ResizeComponent } from '../resize/resize.component';
 import {
   DecimalPipe,
   LowerCasePipe,
@@ -18,6 +7,16 @@ import {
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
+import { Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+import { externalLinks } from '../_data';
+import { DimensionName, GeneralResultsFormatted } from '../_models';
+import { RenameApiFacetPipe, RenameApiFacetShortPipe } from '../_translate';
+import { BarComponent } from '../chart';
+import { MapComponent } from '../chart/map/map.component';
+import { ResizeComponent } from '../resize';
+import { TruncateComponent } from '../truncate';
 
 @Component({
   selector: 'app-landing',
@@ -31,7 +30,7 @@ import {
     NgFor,
     TruncateComponent,
     NgTemplateOutlet,
-    BarComponent_1,
+    BarComponent,
     RouterLink,
     MapComponent,
     UpperCasePipe,

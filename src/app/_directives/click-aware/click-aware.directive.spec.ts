@@ -6,6 +6,7 @@ import { ClickService } from '../../_services';
 import { ClickAwareDirective } from '.';
 
 @Component({
+  imports: [ClickAwareDirective],
   template: `
     <div class="cmp">
       <div class="dead-zone">

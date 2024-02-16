@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FooterComponent } from '.';
+import { ActivatedRoute } from '@angular/router';
 
 describe('FooterComponent', () => {
   let component: FooterComponent;
@@ -7,7 +8,13 @@ describe('FooterComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [FooterComponent]
+      imports: [FooterComponent],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {}
+        }
+      ]
     }).compileComponents();
   });
 

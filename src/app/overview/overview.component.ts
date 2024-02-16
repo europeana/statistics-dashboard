@@ -37,7 +37,6 @@ import {
   yearZero
 } from '../_helpers';
 import { BarChartCool } from '../chart/chart-defaults';
-import { BarComponent } from '../chart';
 import { SubscriptionManager } from '../subscription-manager';
 import {
   BreakdownRequest,
@@ -59,18 +58,14 @@ import {
 } from '../_models';
 
 import { APIService } from '../_services';
+import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 import { GridSummaryComponent } from '../grid-summary';
 import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
-import { GridComponent as GridComponent_1 } from '../grid/grid.component';
-import { SnapshotsComponent as SnapshotsComponent_1 } from '../snapshots/snapshots.component';
-import { GridSummaryComponent as GridSummaryComponent_1 } from '../grid-summary/grid-summary.component';
-import { BarComponent as BarComponent_1 } from '../chart/bar/bar.component';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { IsScrollableDirective } from '../_directives/is-scrollable/is-scrollable.directive';
-import { ExportComponent as ExportComponent_1 } from '../export/export.component';
 import { FilterComponent } from '../filter/filter.component';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
 import { ResizeComponent } from '../resize/resize.component';
@@ -91,13 +86,13 @@ import { ResizeComponent } from '../resize/resize.component';
     NgIf,
     NgFor,
     FilterComponent,
-    ExportComponent_1,
     IsScrollableDirective,
     CheckboxComponent,
-    BarComponent_1,
-    GridSummaryComponent_1,
-    SnapshotsComponent_1,
-    GridComponent_1,
+    ExportComponent,
+    BarComponent,
+    GridSummaryComponent,
+    SnapshotsComponent,
+    GridComponent,
     DatePipe,
     RenameApiFacetPipe
   ]

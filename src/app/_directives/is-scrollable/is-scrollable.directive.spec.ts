@@ -9,6 +9,7 @@ import { By } from '@angular/platform-browser';
 import { IsScrollableDirective } from '.';
 
 @Component({
+  imports: [IsScrollableDirective],
   template: `
     <div class="cmp">
       <div

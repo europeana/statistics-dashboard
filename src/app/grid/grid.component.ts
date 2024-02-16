@@ -20,7 +20,6 @@ import { GridPaginatorComponent } from '../grid-paginator';
 import { SubscriptionManager } from '../subscription-manager';
 import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
 import { TruncateComponent } from '../truncate/truncate.component';
-import { GridPaginatorComponent as GridPaginatorComponent_1 } from '../grid-paginator/grid-paginator.component';
 import { FormsModule } from '@angular/forms';
 import {
   DecimalPipe,
@@ -42,7 +41,7 @@ import {
     NgStyle,
     FormsModule,
     NgFor,
-    GridPaginatorComponent_1,
+    GridPaginatorComponent,
     NgTemplateOutlet,
     TruncateComponent,
     DecimalPipe,
