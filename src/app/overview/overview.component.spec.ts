@@ -16,7 +16,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl
 } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
@@ -66,6 +66,7 @@ describe('OverviewComponent', () => {
   const queryParams = new BehaviorSubject(tmpParams as Params);
 
   let api: APIService;
+  let dialog: MatDialog;
 
   const configureTestBed = (errorMode = false): void => {
     // clear parameter data
@@ -122,7 +123,9 @@ describe('OverviewComponent', () => {
         add: { imports: [MockBarComponent, MockGridComponent] }
       })
       .compileComponents();
-    api = TestBed.inject(APIService);
+
+    api = TestBed.get(APIService);
+    dialog = TestBed.get(MatDialog);
   };
 
   const b4Each = (): void => {
@@ -232,9 +235,7 @@ describe('OverviewComponent', () => {
       spyOn(dialog, 'open').and.callFake(()=> {
         return {} as any;
       });
-      try {
-        component.showDateDisclaimer();
-      } catch(e) {}
+      component.showDateDisclaimer();
       expect(dialog.open).toHaveBeenCalled();
     });
     */

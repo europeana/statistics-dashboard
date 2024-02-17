@@ -40,7 +40,7 @@ describe('DatesComponent', () => {
             }
           }
         },
-        provideAnimations()
+        provideAnimations(),
         // TODO: are these needed?
         MatDatepickerModule,
         MatFormFieldModule,

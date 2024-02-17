@@ -73,11 +73,9 @@ describe('AppComponent', () => {
 
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
-
     maintenanceSchedules = fixture.debugElement.injector.get(
       MaintenanceScheduleService
     );
-
     fixture.detectChanges();
   });
 
