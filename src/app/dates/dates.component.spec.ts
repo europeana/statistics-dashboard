@@ -43,7 +43,7 @@ describe('DatesComponent', () => {
         provideAnimations(),
         // TODO: are these needed?
         MatDatepickerModule,
-        MatFormFieldModule,
+        MatFormFieldModule
       ]
     }).compileComponents();
   });
@@ -83,8 +83,6 @@ describe('DatesComponent', () => {
       component.today
     );
 
-    // TODO refactor now that adapter is available
-    /*
     component.form.value.dateTo = yesterday.toISOString();
     component.dateChange();
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
@@ -96,7 +94,6 @@ describe('DatesComponent', () => {
     expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
       component.today
     );
-    */
   });
 
   it('should set the min-max attributes', () => {
@@ -217,30 +214,5 @@ describe('DatesComponent', () => {
     resFrom = validateDateGeneric(dateFrom, 'dateFrom');
     expect(resFrom.isTooEarly).toBeFalsy();
     expect(resFrom.isTooLate).toBeTruthy();
-  });
-
-  it('should handle the to-date change', () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    //    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(null);
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      component.today
-    );
-
-    // TODO refactor now that adapter is available
-    /*
-    component.form.value.dateTo = yesterday.toISOString();
-    component.dateChange();
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      yesterday.toISOString().split('T')[0]
-    );
-
-    component.form.value.dateTo = null;
-    component.dateChange();
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      component.today
-    );
-    */
   });
 });
