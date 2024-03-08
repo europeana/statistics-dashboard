@@ -2,8 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
+import { TargetsComponent } from './targets/targets.component';
 
 const routes: Routes = [
+  {
+    path: 'targets',
+    component: TargetsComponent
+  },
   {
     path: 'data/:facet',
     component: OverviewComponent
