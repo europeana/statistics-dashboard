@@ -1,0 +1,128 @@
+<main class="fit-to-page landing-page">
+  <br />
+  <h2>
+    <span *ngFor="let c of pinnedCountries | keyvalue" class="title">
+      {{ c.key | renameCountry }}
+    </span>
+  </h2>
+
+  <ng-template
+    #legendItemSeries
+    let-targetType="targetType"
+    let-series="series"
+    let-country="country"
+  >
+    <ul>
+      <li>
+        <a
+          (click)="toggleSeries(country, targetType, series?.series)"
+          [ngClass]="{ hidden: !series || series.series.isHidden }"
+          class="legend-item-series-opener"
+        >
+          <span
+            class="marker"
+            [ngStyle]="{
+            backgroundColor: series && !series.series.isHidden ? series.series.fill : undefined,
+            borderColor: series && series.series.isHidden ? series.series.fill : undefined,
+          }"
+          >
+          </span>
+          <span>
+            {{ targetType | renameTargetType }}
+          </span>
+          <span class="target-total">{{ 2145376 | number }}</span>
+        </a>
+      </li>
+      <li
+        class="roll-down-wrapper"
+        *ngIf="series && targetData[country]"
+        [ngClass]="{ 'is-open': !series.series.isHidden }"
+      >
+        <ul class="roll-down">
+          <li
+            class="indented"
+            [ngStyle]="{ color: series.series.fill }"
+            [ngClass]="{ bulleted: data.range }"
+            *ngFor="let data of targetData[country][targetType]; let i = index"
+          >
+            <a
+              class="legend-item-target-opener"
+              *ngIf="data.range"
+              (click)="removeRange(country, targetType, i)"
+            >
+              {{ data.label }}
+            </a>
+            <a
+              class="legend-item-target-opener"
+              *ngIf="!data.range"
+              (click)="
+                lineChart.showRange(country, targetType, i, series.series.fill)
+              "
+            >
+              {{ data.label }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </ng-template>
+
+  <div style="display: inline-block">
+    <span class="legend-grid">
+      <ng-container *ngFor="let country of targetCountries">
+        <span
+          style="margin-left: 1em"
+          [ngClass]="{ 'stick-left': pinnedCountries[country] > -1 }"
+          [ngStyle]="{
+            'top.px': pinnedCountries[country]
+          }"
+        >
+          <span style="position: relative">
+            <a
+              class="save"
+              [ngClass]="{ saved: pinnedCountries[country] > -1 }"
+              (click)="togglePin(country)"
+            ></a>
+            <a
+              class="bold legend-item-country-opener"
+              (click)="toggleCountryTargetData(country)"
+              >{{ country | renameCountry }}
+            </a>
+          </span>
+        </span>
+
+        <span
+          class="legend-grid-wide-cell"
+          [ngClass]="{
+            'stick-right': pinnedCountries[country] > -1
+          }"
+          [ngStyle]="{
+            'top.px': pinnedCountries[country]
+          }"
+        >
+          <span class="legend-grid-inner">
+            <span *ngFor="let seriesSuffix of seriesSuffixes; let i = index">
+              <ng-content
+                *ngTemplateOutlet="
+                  legendItemSeries;
+                  context: {
+                    series: lineChart.allSeriesData[country + seriesSuffix],
+                    targetType: seriesValueNames[i],
+                    country: country
+                  }
+                "
+              ></ng-content>
+            </span>
+          </span>
+        </span>
+      </ng-container>
+    </span>
+  </div>
+
+  <br />
+
+  <app-line-chart #lineChart [targetData]="targetData"> </app-line-chart>
+  <label style="float: right">
+    Zoomable <input type="checkbox" value="true" />
+  </label>
+</main>
