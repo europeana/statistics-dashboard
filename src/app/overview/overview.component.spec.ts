@@ -16,7 +16,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl
 } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
@@ -66,7 +66,6 @@ describe('OverviewComponent', () => {
   const queryParams = new BehaviorSubject(tmpParams as Params);
 
   let api: APIService;
-  let dialog: MatDialog;
 
   const configureTestBed = (errorMode = false): void => {
     // clear parameter data
@@ -123,9 +122,7 @@ describe('OverviewComponent', () => {
         add: { imports: [MockBarComponent, MockGridComponent] }
       })
       .compileComponents();
-
     api = TestBed.get(APIService);
-    dialog = TestBed.get(MatDialog);
   };
 
   const b4Each = (): void => {
@@ -228,17 +225,6 @@ describe('OverviewComponent', () => {
       // eslint-disable-next-line no-useless-escape
       expect(res2.name).toEqual(`${rootUrl}&qf=TYPE:\"name\"`);
     });
-
-    // TODO: unable to land spy on dialog
-    /*
-    it('should show the date disclaimer', () => {
-      spyOn(dialog, 'open').and.callFake(()=> {
-        return {} as any;
-      });
-      component.showDateDisclaimer();
-      expect(dialog.open).toHaveBeenCalled();
-    });
-    */
 
     it('should process the server result', () => {
       const dataServerData = { results: {} } as unknown as BreakdownResults;

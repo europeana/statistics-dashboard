@@ -1,8 +1,7 @@
 context('Statistics Dashboard', () => {
   describe('home', () => {
-
     beforeEach(() => {
-      cy.visit('/')
+      cy.visit('/');
     });
 
     const selHeader = '.header';
@@ -20,7 +19,6 @@ context('Statistics Dashboard', () => {
     const selMapLegend = '#mapLegend';
 
     it('should show the header with home link and title', () => {
-      console.log('selHeaderTitle ' + selHeaderTitle)
       cy.get(selHeader).should('have.length', 1);
       cy.get(selHeaderTitle).should('have.length', 1);
       cy.get(selLinkHeader).should('have.length', 1);
@@ -44,6 +42,5 @@ context('Statistics Dashboard', () => {
       cy.get(selLinkDataDataProvider).should('have.length', 1);
       cy.get(selLinkDataProvider).should('have.length', 1);
     });
-
   });
 });

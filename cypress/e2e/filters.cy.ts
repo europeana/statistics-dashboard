@@ -2,7 +2,6 @@ import { DimensionName } from '../../src/app/_models';
 
 context('Statistics Dashboard', () => {
   describe('filters', () => {
-
     const force = { force: true };
     const selCloseDateOverride = '[data-e2e="close-date-override"]';
     const selDatasetId = '.dataset-name';
@@ -26,11 +25,15 @@ context('Statistics Dashboard', () => {
     it('should not include filters for the current dimension', () => {
       cy.visit(`/data/${DimensionName.country}`);
       cy.get(selFilterOpenerName).contains('Country').should('have.length', 0);
-      cy.get(selFilterOpenerName).contains('Content Tier').should('have.length', 1);
+      cy.get(selFilterOpenerName)
+        .contains('Content Tier')
+        .should('have.length', 1);
 
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpenerName).contains('Country').should('have.length', 1);
-      cy.get(selFilterOpenerName).contains('Content Tier').should('have.length', 0);
+      cy.get(selFilterOpenerName)
+        .contains('Content Tier')
+        .should('have.length', 0);
     });
 
     it('should show the filters (closed)', () => {
@@ -70,7 +73,7 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterRemove).should('have.length', 1);
     });
 
-    it('should disable and re-enable filters when data isn\'t present', () => {
+    it("should disable and re-enable filters when data isn't present", () => {
       cy.visit(`/data/${DimensionName.contentTier}?type=4D`);
       cy.get(selFilterOpenerDisabled).should('have.length', 7);
 
@@ -118,21 +121,16 @@ context('Statistics Dashboard', () => {
       const selLoadMore = '.load-more-item a';
 
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selLoadMore)
-        .should('have.length', 0);
+      cy.get(selLoadMore).should('have.length', 0);
       cy.get(selFilterOpener).eq(2).click(force);
 
       cy.get(selCheckbox).should('have.length', 50);
-      cy.get(selLoadMore)
-        .filter(':visible')
-        .should('have.length', 1);
+      cy.get(selLoadMore).filter(':visible').should('have.length', 1);
 
       cy.get(selLoadMore).click(force);
 
       cy.get(selCheckbox).should('have.length.gt', 50);
-      cy.get(selLoadMore)
-        .filter(':visible')
-        .should('have.length', 0);
+      cy.get(selLoadMore).filter(':visible').should('have.length', 0);
     });
 
     it('should search the filters and remember the term when re-opened', () => {
@@ -201,7 +199,11 @@ context('Statistics Dashboard', () => {
     it('should search the filters (diacritics)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterOpener).eq(2).click(force);
-      cy.get(selFilterValueLabel).contains('Österreichische Nationalbibliothek - Austrian National Library').should('have.length', 1);
+      cy.get(selFilterValueLabel)
+        .contains(
+          'Österreichische Nationalbibliothek - Austrian National Library'
+        )
+        .should('have.length', 1);
 
       cy.get(selSearch).type('oster');
       cy.get(selFilterValueLabel).should('have.length', 1);

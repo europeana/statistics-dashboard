@@ -18,7 +18,7 @@
     "lint:ci": "eslint --ext .ts src/app",
     "lite": "test -d ./dist/statistics-dashboard && lite-server --baseDir=./dist/statistics-dashboard || echo '(run dist first)'",
     "prep-test-data": "node tools/test-data-prep/rename-files-to-mjs.mjs ./out-tsc && (node tools/test-data-prep/remove-localisation.mjs ./out-tsc)",
-    "prettier": "prettier --write '{src,test-data}/**/*.{ts,js,json,scss,html}' '*.{js,json}'",
+    "prettier": "prettier --write '{src,cypress,test-data}/**/*.{ts,js,json,scss,html}' '*.{js,json}'",
     "prettier:ci": "prettier --list-different '{src,test-data}/**/*.{ts,js,json,scss,html}' '*.{js,json}'",
     "start:ci": "ng serve --port 4280 --live-reload=false --configuration=e2e",
     "start:ci-data": "tsc --project tsconfig.test-data.json && npm run prep-test-data && (node --experimental-specifier-resolution=node --use_strict ./out-tsc/app/test-data/index-x.mjs)",

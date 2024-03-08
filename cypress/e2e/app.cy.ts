@@ -1,6 +1,5 @@
 context('Statistics Dashboard', () => {
-
-  const force = {force: true};
+  const force = { force: true };
   const host = 'http://localhost:4280';
   const urlContentTier = '/data/contentTier';
   const urlParamCTZero = 'content-tier-zero=';
@@ -16,7 +15,6 @@ context('Statistics Dashboard', () => {
   });
 
   describe('App Route History', () => {
-
     it('should keep filter controls synced with the url history', () => {
       const baseUrl = `${host}${urlContentTier}`;
       const selFilter = `.filters-header + .filters .filter`;
@@ -42,7 +40,10 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterOpener).eq(0).click(force);
       cy.get(selFilterValueLabel).contains('Tier 0').click(force);
 
-      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium`);
+      cy.location('href').should(
+        'equal',
+        `${baseUrl}?metadataTier=0&country=Belgium`
+      );
       cy.get(selFilterRemove).contains('Tier 0').should('have.length', 1);
 
       // filter on type IMAGE / confirm url & filter rm buttons updated
@@ -51,9 +52,11 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterOpener).eq(5).click(force);
       cy.get(selFilterValueLabel).contains('IMAGE').click(force);
 
-      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`);
+      cy.location('href').should(
+        'equal',
+        `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`
+      );
       cy.get(selFilterRemove).contains('IMAGE').should('have.length', 1);
-
 
       // filter on inexistent dataset id / confirm url & filter rm buttons updated
 
@@ -61,7 +64,9 @@ context('Statistics Dashboard', () => {
 
       cy.get(selFilterRemove).contains('dataset_not_found').should('not.exist');
       cy.get(selDatasetId).type('dataset_not_found{enter}', force);
-      cy.get(selFilterRemove).contains('dataset_not_found').should('have.length', 1);
+      cy.get(selFilterRemove)
+        .contains('dataset_not_found')
+        .should('have.length', 1);
 
       // History Checks
 
@@ -74,7 +79,6 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterRemove).contains('Tier 0').should('exist');
       cy.get(selFilterRemove).contains('Belgium').should('exist');
 
-
       // go back (remove image)
 
       cy.go('back');
@@ -82,7 +86,10 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
       cy.get(selFilterRemove).contains('Tier 0').should('exist');
       cy.get(selFilterRemove).contains('Belgium').should('exist');
-      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium`);
+      cy.location('href').should(
+        'equal',
+        `${baseUrl}?metadataTier=0&country=Belgium`
+      );
 
       // go back (remove Tier 0)
       cy.go('back');
@@ -111,7 +118,10 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterRemove).contains('Belgium').should('exist');
       cy.get(selFilterRemove).contains('Tier 0').should('exist');
       cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
-      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium`);
+      cy.location('href').should(
+        'equal',
+        `${baseUrl}?metadataTier=0&country=Belgium`
+      );
 
       // go forward (re-add IMAGE)
       cy.go('forward');
@@ -119,7 +129,10 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterRemove).contains('Belgium').should('exist');
       cy.get(selFilterRemove).contains('Tier 0').should('exist');
       cy.get(selFilterRemove).contains('IMAGE').should('exist');
-      cy.location('href').should('equal', `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`);
+      cy.location('href').should(
+        'equal',
+        `${baseUrl}?metadataTier=0&country=Belgium&type=IMAGE`
+      );
     });
   });
 
@@ -171,9 +184,14 @@ context('Statistics Dashboard', () => {
     });
 
     it('the content-tier-zero should be remembered between pages (history test)', () => {
-
-      cy.visit('/')
-      const expectedHistory = ['/', `/${urlParamCTZeroTrue}`, `${urlContentTier}${urlParamCTZeroTrue}`, `${urlContentTier}`, '/'];
+      cy.visit('/');
+      const expectedHistory = [
+        '/',
+        `/${urlParamCTZeroTrue}`,
+        `${urlContentTier}${urlParamCTZeroTrue}`,
+        `${urlContentTier}`,
+        '/'
+      ];
 
       cy.location('search').should('equal', '');
       cy.location('pathname').should('equal', '/');
@@ -192,14 +210,17 @@ context('Statistics Dashboard', () => {
       cy.location('href').should('equal', `${host}${expectedHistory[4]}`);
 
       // browser back
-      for(let i = 0; i < expectedHistory.length -1; i++) {
+      for (let i = 0; i < expectedHistory.length - 1; i++) {
         const historyIndex = expectedHistory.length - (i + 1);
-        cy.location('href').should('equal', `${host}${expectedHistory[historyIndex]}`);
+        cy.location('href').should(
+          'equal',
+          `${host}${expectedHistory[historyIndex]}`
+        );
         cy.go('back');
       }
 
       // browser forward
-      for(let i = 0; i < expectedHistory.length -1; i++) {
+      for (let i = 0; i < expectedHistory.length - 1; i++) {
         cy.location('href').should('equal', `${host}${expectedHistory[i]}`);
         cy.go('forward');
       }

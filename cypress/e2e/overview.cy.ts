@@ -3,7 +3,6 @@ import { DimensionName } from '../../src/app/_models';
 
 context('Statistics Dashboard', () => {
   describe('overview', () => {
-
     const selLinkHomeHeader = '[data-e2e=link-home-header]';
     const selLinkHome = '[data-e2e=link-home]';
     const selCTZero = '.ct-zero input';
@@ -11,7 +10,7 @@ context('Statistics Dashboard', () => {
 
     it('should show for all urls', () => {
       facetNames.forEach((url: string) => {
-        cy.visit(`/data/${url}`)
+        cy.visit(`/data/${url}`);
         cy.url().should('contain', url);
         cy.get(selLinkHomeHeader).click();
         cy.url().should('not.contain', url);
