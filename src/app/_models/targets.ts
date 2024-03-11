@@ -11,10 +11,6 @@ export interface TargetData {
 export interface TemporalDataItem extends IHash<number | string> {
   date: string;
 }
-
-export interface CountryTargetData {
-  targetAll: number;
-  target3D: number;
-  targetMetaTierA: number;
-  dataRows: Array<TemporalDataItem>;
+export interface TemporalLocalisedDataItem extends TemporalDataItem {
+  country: string;
 }

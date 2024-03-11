@@ -4,11 +4,23 @@ context('Statistics Dashboard', () => {
       cy.visit('/targets');
     });
 
+    const force = { force: true };
     const selIsOpen = '.is-open';
     const selLegendGrid = '.legend-grid';
     const selPinnedOpener = '.stick-left';
-    const selOpenerCountry = '.legend-item-country-opener';
-    const selOpenerSeries = '.legend-item-series-opener';
+    const selToggleCountry = '.legend-item-country-toggle';
+    const selOpenerSeries = '.legend-item-series-toggle';
+
+    const clickSeriesOpener = (country: string, seriesIndex = 0): void => {
+      cy.get(selToggleCountry)
+        .contains(country)
+        .closest(selToggleCountry)
+        .next()
+        .find(selOpenerSeries)
+        .eq(seriesIndex)
+        .click(force);
+      cy.wait(1000);
+    };
 
     it('should show the legend', () => {
       cy.get('#lineChart').should('have.length', 1);
@@ -17,7 +29,7 @@ context('Statistics Dashboard', () => {
 
     it('should pin a country when opened', () => {
       cy.get(selPinnedOpener).should('have.length', 1);
-      cy.get(selOpenerCountry)
+      cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
         .click();
@@ -28,14 +40,14 @@ context('Statistics Dashboard', () => {
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', 3);
 
-      cy.get(selOpenerCountry)
+      cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
         .click();
       cy.get(selPinnedOpener).should('have.length', 2);
       cy.get(selIsOpen).should('have.length', 6);
 
-      cy.get(selOpenerCountry).contains('Cyprus').click();
+      cy.get(selToggleCountry).contains('Cyprus').click();
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', 3);
     });
@@ -43,24 +55,27 @@ context('Statistics Dashboard', () => {
     it('should pin a country (when individual item opened)', () => {
       cy.get(selPinnedOpener).should('have.length', 1);
 
-      // Open an entry under Cyprus
-      cy.get(selOpenerSeries).eq(6).click();
+      // Open (the first) Cyprus series
+      clickSeriesOpener('Cyprus');
       cy.get(selPinnedOpener).should('have.length', 2);
 
-      // Open an entry under Denmark
-      cy.get(selOpenerSeries).eq(12).click();
+      // Open (the first) Danish series
+      clickSeriesOpener('Denmark');
       cy.get(selPinnedOpener).should('have.length', 3);
 
-      // Close again with country openers
-      cy.get(selOpenerCountry).contains('Cyprus').click();
+      // Close each with country togglers
+      cy.get(selToggleCountry).contains('Cyprus').click(force);
+      cy.wait(1000);
+
       cy.get(selPinnedOpener).should('have.length', 2);
 
-      cy.get(selOpenerCountry).contains('Denmark').click();
+      cy.get(selToggleCountry).contains('Denmark').click(force);
+      cy.wait(1000);
+
       cy.get(selPinnedOpener).should('have.length', 1);
 
-      cy.wait(1000);
       // Open the next Danish entry
-      cy.get(selOpenerSeries).eq(13).click();
+      clickSeriesOpener('Denmark', 1);
       cy.get(selPinnedOpener).should('have.length', 2);
     });
 
@@ -70,7 +85,7 @@ context('Statistics Dashboard', () => {
 
       // open with individual item
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
-      cy.get(selOpenerSeries).eq(12).click();
+      clickSeriesOpener('Denmark');
       cy.get(selIsOpen).should('have.length', 4);
 
       // close with country opener
@@ -80,7 +95,7 @@ context('Statistics Dashboard', () => {
       cy.get(selIsOpen).should('have.length', 3);
 
       // open again with country opener
-      cy.get(selOpenerCountry).contains('Denmark').click();
+      cy.get(selToggleCountry).contains('Denmark').click();
       cy.get(selIsOpen).should('have.length', 4);
     });
 
@@ -88,11 +103,12 @@ context('Statistics Dashboard', () => {
       cy.get(selIsOpen).should('have.length', 3);
 
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
-      cy.get(selOpenerSeries).eq(12).click();
+      clickSeriesOpener('Denmark');
+
       cy.get(selIsOpen).should('have.length', 4);
       cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
 
-      cy.get(selOpenerSeries).eq(4).click();
+      clickSeriesOpener('Denmark', 1);
       cy.get(selIsOpen).should('have.length', 5);
     });
   });

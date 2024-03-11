@@ -1,10 +1,11 @@
-<main class="fit-to-page landing-page">
-  <br />
-  <h2>
-    <span *ngFor="let c of pinnedCountries | keyvalue" class="title">
+<main class="fit-to-page">
+  <h1 class="page-title">Europeana member state targets</h1>
+
+  <span class="page-subtitle">
+    <span *ngFor="let c of pinnedCountries | keyvalue">
       {{ c.key | renameCountry }}
     </span>
-  </h2>
+  </span>
 
   <ng-template
     #legendItemSeries
@@ -15,49 +16,57 @@
     <ul>
       <li>
         <a
-          (click)="toggleSeries(country, targetType, series?.series)"
-          [ngClass]="{ hidden: !series || series.series.isHidden }"
-          class="legend-item-series-opener"
+          (click)="toggleSeries(country, targetType, series)"
+          [ngClass]="{ hidden: !series || series.isHidden }"
+          class="legend-item-series-toggle"
         >
           <span
             class="marker"
             [ngStyle]="{
-            backgroundColor: series && !series.series.isHidden ? series.series.fill : undefined,
-            borderColor: series && series.series.isHidden ? series.series.fill : undefined,
+            backgroundColor: series && !series.isHidden ? series.fill : undefined,
+            borderColor: series && series.isHidden ? series.fill : undefined,
           }"
           >
           </span>
           <span>
             {{ targetType | renameTargetType }}
           </span>
-          <span class="target-total">{{ 2145376 | number }}</span>
+          <span
+            class="target-total right"
+            *ngIf="countryData[country]"
+            [ngClass]="{ 'pad-right': targetType === 'meta_tier_a' }"
+          >
+            {{
+              countryData[country][countryData[country].length - 1][targetType]
+                | number
+            }}
+          </span>
         </a>
       </li>
       <li
         class="roll-down-wrapper"
         *ngIf="series && targetData[country]"
-        [ngClass]="{ 'is-open': !series.series.isHidden }"
+        [ngClass]="{ 'is-open': !series.isHidden }"
       >
         <ul class="roll-down">
           <li
             class="indented"
-            [ngStyle]="{ color: series.series.fill }"
+            [ngStyle]="{ color: series.fill }"
             [ngClass]="{ bulleted: data.range }"
             *ngFor="let data of targetData[country][targetType]; let i = index"
           >
             <a
-              class="legend-item-target-opener"
+              class="legend-item-target-toggle"
               *ngIf="data.range"
               (click)="removeRange(country, targetType, i)"
             >
               {{ data.label }}
+              <span class="target-total italic">{{ data.value | number }}</span>
             </a>
             <a
-              class="legend-item-target-opener"
+              class="legend-item-target-toggle"
               *ngIf="!data.range"
-              (click)="
-                lineChart.showRange(country, targetType, i, series.series.fill)
-              "
+              (click)="lineChart.showRange(country, targetType, i, series.fill)"
             >
               {{ data.label }}
             </a>
@@ -67,62 +76,159 @@
     </ul>
   </ng-template>
 
-  <div style="display: inline-block">
-    <span class="legend-grid">
-      <ng-container *ngFor="let country of targetCountries">
-        <span
-          style="margin-left: 1em"
-          [ngClass]="{ 'stick-left': pinnedCountries[country] > -1 }"
-          [ngStyle]="{
-            'top.px': pinnedCountries[country]
-          }"
-        >
-          <span style="position: relative">
-            <a
-              class="save"
-              [ngClass]="{ saved: pinnedCountries[country] > -1 }"
-              (click)="togglePin(country)"
-            ></a>
-            <a
-              class="bold legend-item-country-opener"
-              (click)="toggleCountryTargetData(country)"
-              >{{ country | renameCountry }}
-            </a>
-          </span>
-        </span>
+  <div class="chart-and-legend-wrapper">
+    <div class="headed-item">
+      <span class="item-header">Data Over Time </span>
 
-        <span
-          class="legend-grid-wide-cell"
-          [ngClass]="{
-            'stick-right': pinnedCountries[country] > -1
-          }"
-          [ngStyle]="{
-            'top.px': pinnedCountries[country]
-          }"
-        >
-          <span class="legend-grid-inner">
-            <span *ngFor="let seriesSuffix of seriesSuffixes; let i = index">
-              <ng-content
-                *ngTemplateOutlet="
-                  legendItemSeries;
-                  context: {
-                    series: lineChart.allSeriesData[country + seriesSuffix],
-                    targetType: seriesValueNames[i],
-                    country: country
-                  }
-                "
-              ></ng-content>
+      <div class="line-chart-wrapper">
+        <app-line-chart #lineChart [targetData]="targetData"> </app-line-chart>
+        <a class="data-link hover-show"
+          >Chart options
+          <div class="hover-show-content">
+            <span class="hover-show-content-inner">
+              <a style="data-link" (click)="toggleScrollbar()"
+                >&lt; toggle scrollbar</a
+              >
+              <br />
+              <a style="white-space: nowrap" (click)="toggleCursor()"
+                >&lt; toggle cursor</a
+              >
+              <br />
+              <a style="white-space: nowrap" (click)="toggleGridlines()"
+                >&lt; toggle gridlines</a
+              >
             </span>
-          </span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="headed-item legend-grid-wrapper">
+      <span class="item-header">Data Selection</span>
+
+      <div class="legend-wrapper">
+        <span
+          class="legend-grid scrollable-downwards"
+          (scroll)="gridScroll()"
+          #legendGrid
+        >
+          <ng-container *ngFor="let country of targetCountries">
+            <span
+              class="legend-item-country-toggle"
+              [ngClass]="{ 'stick-left': pinnedCountries[country] > -1 }"
+              [ngStyle]="{
+                'top.px': pinnedCountries[country]
+              }"
+            >
+              <a
+                (click)="toggleCountry(country)"
+                style="position: relative; display: flex"
+              >
+                <span>{{ country | renameCountry }} </span>
+                <span
+                  class="save"
+                  [ngClass]="{ saved: pinnedCountries[country] > -1 }"
+                ></span>
+              </a>
+              <span class="legend-item-sizer"
+                >{{ country | renameCountry }}
+              </span>
+            </span>
+
+            <span
+              class="legend-grid-inner"
+              [ngClass]="{
+                'stick-right': pinnedCountries[country] > -1
+              }"
+              [ngStyle]="{
+                'top.px': pinnedCountries[country]
+              }"
+            >
+              <span *ngFor="let seriesSuffix of seriesSuffixes; let i = index">
+                <ng-content
+                  *ngTemplateOutlet="
+                    legendItemSeries;
+                    context: {
+                      series: lineChart.allSeriesData[country + seriesSuffix],
+                      targetType: seriesValueNames[i],
+                      country: country
+                    }
+                  "
+                ></ng-content>
+              </span>
+            </span>
+          </ng-container>
+          <span class="scrollable-indicator"></span>
         </span>
-      </ng-container>
-    </span>
+        <a class="data-link hover-show"
+          >View country data
+          <div class="hover-show-content">
+            <span class="hover-show-content-inner">
+              Will open
+              <code><pre>/data/country[?newParam]</pre></code> overlaid with the
+              (all-records) target data
+            </span>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
 
-  <br />
+  <div class="headed-item appendice-grid-wrapper">
+    <span class="item-header">Member State Data</span>
 
-  <app-line-chart #lineChart [targetData]="targetData"> </app-line-chart>
-  <label style="float: right">
-    Zoomable <input type="checkbox" value="true" />
-  </label>
+    <div class="appendice-grid">
+      <span class="header"> Date </span>
+      <span class="header"> Country </span>
+      <span class="header"> Total </span>
+      <span class="header"> (2025) </span>
+      <span class="header"> (2030) </span>
+      <span class="header"> 3D </span>
+      <span class="header"> (2025) </span>
+      <span class="header"> (2030) </span>
+      <span class="header"> Meta Tier A </span>
+      <span class="header"> (2025) </span>
+      <span class="header"> (2030) </span>
+
+      <ng-container *ngFor="let country of pinnedCountries | keyvalue">
+        <ng-container *ngFor="let row of countryData[country.key]">
+          <ng-container *ngIf="targetData[country.key]">
+            <span>
+              {{ row["date"] | date: "dd/MM/yyyy" }}
+            </span>
+            <span>
+              {{ country.key | renameCountry }}
+            </span>
+            <span>
+              {{ row["total"] | number }}
+            </span>
+            <span>
+              {{ targetData[country.key]["total"][0].value | json }}
+            </span>
+            <span>
+              {{ targetData[country.key]["total"][1].value | json }}
+            </span>
+            <span>
+              {{ row["three_d"] | number }}
+            </span>
+            <span>
+              {{ targetData[country.key]["three_d"][0].value | json }}
+            </span>
+            <span>
+              {{ targetData[country.key]["three_d"][1].value | json }}
+            </span>
+            <span>
+              {{ row["meta_tier_a"] | number }}
+            </span>
+            <span>
+              {{ targetData[country.key]["meta_tier_a"][0].value | json }}
+            </span>
+            <span>
+              {{ targetData[country.key]["meta_tier_a"][1].value | json }}
+            </span>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
 </main>
