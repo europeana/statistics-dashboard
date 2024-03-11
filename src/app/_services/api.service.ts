@@ -176,7 +176,7 @@ export class APIService {
 
     const targetDataRef = this.reduceTargetData(this.targetData);
 
-    this.targetCountries.forEach((country: string, countryIndex: number) => {
+    this.targetCountries.forEach((country: string) => {
       const baseValueTotal = targetDataRef[country]['total'][1].value;
       const baseValue3D = targetDataRef[country]['three_d'][1].value;
       const baseValueTierA = targetDataRef[country]['meta_tier_a'][1].value;
