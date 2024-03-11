@@ -3,13 +3,13 @@ import { delay } from 'rxjs/operators';
 import {
   BreakdownRequest,
   BreakdownResults,
-  CountryTargetData,
   DimensionName,
   GeneralResults,
   IHash,
   IHashArray,
   RequestFilter,
-  TargetData
+  TargetData,
+  TemporalLocalisedDataItem
 } from '../_models';
 
 const rightsCategories = [
@@ -666,34 +666,8 @@ export class MockAPIService {
     return of({});
   }
 
-  loadCountryTargetData(country: string): Observable<CountryTargetData> {
-    const ticks = 24;
-    const baseValue = 12;
-
-    const date = new Date();
-    const dataRows = [];
-
-    [...Array(ticks).keys()].forEach(() => {
-      dataRows.push({
-        date: date,
-        total: baseValue,
-        three_d: baseValue,
-        meta_tier_a: baseValue
-      });
-    });
-
-    const res = {
-      targetAll: 1000,
-      target3D: 200,
-      targetMetaTierA: 200,
-      dataRows: dataRows
-    };
-    if (country === 'DE') {
-      res.targetAll = 1700;
-      res.target3D = 400;
-      res.targetMetaTierA = 300;
-    }
-    return of(res);
+  loadCountryData(): Observable<Array<TemporalLocalisedDataItem>> {
+    return of([]);
   }
 }
 

@@ -6,11 +6,11 @@ import { environment } from '../../environments/environment';
 import {
   BreakdownRequest,
   BreakdownResults,
-  CountryTargetData,
   GeneralResults,
   IHash,
   IHashArray,
-  TargetData
+  TargetData,
+  TemporalLocalisedDataItem
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
 
@@ -21,6 +21,47 @@ export class APIService {
   suffixRightsUrls = 'statistics/rights/urls';
 
   dateTicks: Array<string> = [];
+  targetCountries = [
+    'BA',
+    'BE',
+    'CY',
+    'CZ',
+    'DK',
+    'FI',
+    'FR',
+    'DE',
+    'GR',
+    'HU',
+    'IT',
+    'MK',
+    'MT',
+    'NL',
+    'PL',
+    'SK',
+    'SI',
+    'SE'
+  ];
+
+  targetData = [].concat(
+    ...this.targetCountries.map((country: string, index: number) => {
+      const resLabel = ['2025', '2030'].map((label: string) => {
+        // make values larger for later targets
+        let value = parseInt(label) * (index + 1);
+        return ['total', 'three_d', 'meta_tier_a'].map((targetType: string) => {
+          // make subtarget values smaller than total
+          value -= 123;
+          return {
+            country,
+            targetType,
+            label,
+            interim: label === '2025',
+            value: label === '2025' ? Math.floor(value * 0.7) : value
+          };
+        });
+      });
+      return [].concat(...resLabel);
+    })
+  );
 
   constructor(private readonly http: HttpClient) {
     for (let i = 0; i < 24; i++) {
@@ -83,44 +124,39 @@ export class APIService {
    *  }...
    **/
   loadTargetData(): Observable<Array<IHash<string | number | boolean>>> {
-    const res = [
-      'BE',
-      'CY',
-      'CZ',
-      'DK',
-      'FI',
-      'FR',
-      'DE',
-      'GR',
-      'HU',
-      'IT',
-      'MK',
-      'MT',
-      'NL',
-      'PL',
-      'SK',
-      'SI',
-      'SE'
-    ].map((country: string, index: number) => {
-      const resLabel = ['2025', '2030'].map((label: string) => {
-        // make values larger for later targets
-        let value = parseInt(label) * (index + 1);
-        return ['total', 'three_d', 'meta_tier_a'].map((targetType: string) => {
-          // make subtarget values smaller than total
-          value -= 123;
-          return {
-            country,
-            targetType,
-            label,
-            interim: label === '2025',
-            value
-          };
-        });
-      });
-      return [].concat(...resLabel);
-    });
-    const rows = [].concat(...res);
-    return of(rows);
+    return of(this.targetData);
+  }
+
+  reduceTargetData(
+    rows: Array<IHash<string | number | boolean>>
+  ): IHash<IHashArray<TargetData>> {
+    return rows.reduce(
+      (
+        res: IHash<IHashArray<TargetData>>,
+        item: IHash<string | number | boolean>
+      ) => {
+        const country = item.country as string;
+        if (!res[country]) {
+          res[country] = {};
+        }
+
+        let arr = res[country][item.targetType as string];
+        if (!arr) {
+          arr = [];
+          res[country][item.targetType as string] = arr;
+        }
+
+        const resEntry = {} as TargetData;
+
+        resEntry.label = item.label as string;
+        resEntry.value = item.value as number;
+        resEntry.interim = item.interim as boolean;
+
+        arr.push(resEntry);
+        return res;
+      },
+      {}
+    );
   }
 
   /** getTargetData
@@ -129,64 +165,51 @@ export class APIService {
   getTargetData(): Observable<IHash<IHashArray<TargetData>>> {
     return this.loadTargetData().pipe(
       map((rows: Array<IHash<string | number | boolean>>) => {
-        return rows.reduce(
-          (
-            res: IHash<IHashArray<TargetData>>,
-            item: IHash<string | number | boolean>
-          ) => {
-            const country = item.country as string;
-            if (!res[country]) {
-              res[country] = {};
-            }
-
-            let arr = res[country][item.targetType as string];
-            if (!arr) {
-              arr = [];
-              res[country][item.targetType as string] = arr;
-            }
-
-            const resEntry = {} as TargetData;
-
-            resEntry.label = item.label as string;
-            resEntry.value = item.value as number;
-            resEntry.interim = item.interim as boolean;
-
-            arr.push(resEntry);
-            return res;
-          },
-          {}
-        );
+        return this.reduceTargetData(rows);
       })
     );
   }
 
-  loadCountryTargetData(country: string): Observable<CountryTargetData> {
-    let baseValue = 12;
+  loadCountryData(): Observable<Array<TemporalLocalisedDataItem>> {
     const numDateTicks = this.dateTicks.length;
+    const res = [];
 
-    const res = {
-      targetAll: 1000,
-      target3D: 200,
-      targetMetaTierA: 200,
-      dataRows: []
-    };
-    if (country === 'DE') {
-      res.targetAll = 1700;
-      res.target3D = 400;
-      res.targetMetaTierA = 300;
-      baseValue = baseValue * 12;
-    }
-    res.dataRows = this.dateTicks.map((dateTick: string) => {
-      baseValue +=
-        (baseValue % (numDateTicks + 1)) - (baseValue % (numDateTicks / 2));
-      return {
-        date: dateTick,
-        total: baseValue,
-        three_d: baseValue / 4,
-        meta_tier_a: baseValue / 5
-      };
+    const targetDataRef = this.reduceTargetData(this.targetData);
+
+    this.targetCountries.forEach((country: string, countryIndex: number) => {
+      const baseValueTotal = targetDataRef[country]['total'][1].value;
+      const baseValue3D = targetDataRef[country]['three_d'][1].value;
+      const baseValueTierA = targetDataRef[country]['meta_tier_a'][1].value;
+
+      let value = baseValueTotal * 1;
+      let value3D = baseValue3D * 1.2;
+      let valueTierA = baseValueTierA * 0.9;
+
+      this.dateTicks.forEach((dateTick: string, dateTickIndex: number) => {
+        const random1 =
+          (value % (numDateTicks + 1)) - (value % (numDateTicks / 2));
+
+        value -= random1;
+        value3D -= random1;
+        valueTierA += random1;
+
+        const random2 =
+          (value % (numDateTicks + 1)) + (value % (numDateTicks / 2));
+
+        value -= 0.8 * (random2 % random1);
+        value3D -= 100 * (random1 % random2);
+        valueTierA -= 1 * (random2 * random1 * 5);
+        value -= value3D / numDateTicks;
+
+        res.push({
+          country,
+          date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
+          total: Math.floor(value),
+          three_d: Math.floor(value3D),
+          meta_tier_a: Math.floor(valueTierA)
+        });
+      });
     });
-
-    return of(res);
+    return of(res.reverse());
   }
 }
