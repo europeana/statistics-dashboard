@@ -45,6 +45,7 @@
     "@angular/router": "^17.1.1",
     "@europeana/metis-ui-consent-management": "^0.0.16",
     "@europeana/metis-ui-maintenance-utils": "^0.0.12",
+    "cypress-axe": "^1.5.0",
     "ngx-cookie-service": "^17.0.1",
     "ngx-matomo-client": "^6.0.2",
     "pdfmake": "^0.1.72",
