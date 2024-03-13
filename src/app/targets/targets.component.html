@@ -17,7 +17,7 @@
       <li>
         <a
           (click)="toggleSeries(country, targetType, series)"
-          [ngClass]="{ hidden: !series || series.isHidden }"
+          [ngClass]="{ 'rolled-up': !series || series.isHidden }"
           class="legend-item-series-toggle"
         >
           <span
@@ -57,18 +57,19 @@
           >
             <a
               class="legend-item-target-toggle"
-              *ngIf="data.range"
-              (click)="removeRange(country, targetType, i)"
+              (click)="
+                toggleRange(
+                  country,
+                  targetType,
+                  i,
+                  data.range ? undefined : series.fill
+                )
+              "
             >
               {{ data.label }}
-              <span class="target-total italic">{{ data.value | number }}</span>
-            </a>
-            <a
-              class="legend-item-target-toggle"
-              *ngIf="!data.range"
-              (click)="lineChart.showRange(country, targetType, i, series.fill)"
-            >
-              {{ data.label }}
+              <span class="target-total range-value">{{
+                data.value | number
+              }}</span>
             </a>
           </li>
         </ul>

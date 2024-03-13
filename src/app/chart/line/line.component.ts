@@ -113,7 +113,6 @@ export class LineComponent implements AfterViewInit {
     range.grid.stroke = colour;
     range.grid.strokeWidth = 2;
     range.grid.strokeOpacity = 1;
-
     range.label.align = 'right';
     range.label.fill = range.grid.stroke;
     range.label.fontSize = 14;
@@ -121,7 +120,6 @@ export class LineComponent implements AfterViewInit {
     range.label.location = 0;
     range.label.text = targetData.label;
     range.label.verticalCenter = 'bottom';
-
     range.value = targetData.value;
 
     const pin = range.label.createChild(am4plugins_bullets.PinBullet);
@@ -129,7 +127,7 @@ export class LineComponent implements AfterViewInit {
     pin.background.radius = 10;
     pin.background.fill = colourPin;
     pin.cursorOverStyle = am4core.MouseCursorStyle.pointer;
-    pin.dy = 26;
+    pin.dy = 28;
     pin.image = new am4core.Image();
     pin.image.href =
       'https://upload.wikimedia.org/wikipedia/en/2/27/EU_flag_square.PNG';
@@ -267,8 +265,24 @@ export class LineComponent implements AfterViewInit {
       this.chart.scrollbarX = undefined;
     } else {
       const scrollbar = new am4core.Scrollbar();
+      const scrollbarColour = am4core.color('#0a72cc');
+
       this.chart.scrollbarX = scrollbar;
       scrollbar.dy = -25;
+
+      const customiseGrip = (grip): void => {
+        grip.icon.disabled = true;
+        grip.background.fill = scrollbarColour;
+        grip.background.fillOpacity = 0.8;
+      };
+      customiseGrip(scrollbar.startGrip);
+      customiseGrip(scrollbar.endGrip);
+
+      scrollbar.background.fill = scrollbarColour;
+      scrollbar.background.fillOpacity = 0.1;
+
+      scrollbar.thumb.background.fill = scrollbarColour;
+      scrollbar.thumb.background.fillOpacity = 0.2;
     }
   }
 }
