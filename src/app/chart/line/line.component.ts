@@ -162,13 +162,6 @@ export class LineComponent implements AfterViewInit {
     }
   }
 
-  showSeries(id: string): void {
-    const series = this.allSeriesData[id];
-    if (series) {
-      series.show();
-    }
-  }
-
   addSeries(
     seriesDisplayName: string,
     seriesValueY: string,

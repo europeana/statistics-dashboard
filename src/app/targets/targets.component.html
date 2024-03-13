@@ -17,15 +17,23 @@
       <li>
         <a
           (click)="toggleSeries(country, targetType, series)"
-          [ngClass]="{ 'rolled-up': !series || series.isHidden }"
+          [ngClass]="{
+            'rolled-up': !series || series.isHidden || series.isHiding
+          }"
           class="legend-item-series-toggle"
         >
           <span
             class="marker"
             [ngStyle]="{
-            backgroundColor: series && !series.isHidden ? series.fill : undefined,
-            borderColor: series && series.isHidden ? series.fill : undefined,
-          }"
+              backgroundColor:
+                series && !(series.isHidden || series.isHiding)
+                  ? series.fill
+                  : undefined,
+              borderColor:
+                series && (series.isHidden || series.isHiding)
+                  ? series.fill
+                  : undefined
+            }"
           >
           </span>
           <span>
@@ -46,7 +54,7 @@
       <li
         class="roll-down-wrapper"
         *ngIf="series && targetData[country]"
-        [ngClass]="{ 'is-open': !series.isHidden }"
+        [ngClass]="{ 'is-open': !(series.isHidden || series.isHiding) }"
       >
         <ul class="roll-down">
           <li
