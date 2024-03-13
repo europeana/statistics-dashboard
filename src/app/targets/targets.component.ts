@@ -16,6 +16,7 @@ import {
   ViewChild
 } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
+import * as am4core from '@amcharts/amcharts4/core';
 
 import {
   IHash,
@@ -99,7 +100,13 @@ export class TargetsComponent extends SubscriptionManager {
 
   ngAfterContentInit(): void {
     setTimeout(() => {
-      this.toggleCountry('DE');
+      this.toggleCountry('FR');
+      this.toggleRange(
+        'FR',
+        'total',
+        0,
+        this.lineChart.chart.colors.getIndex(0)
+      );
     }, 0);
   }
 
@@ -173,8 +180,6 @@ export class TargetsComponent extends SubscriptionManager {
         this.lineChart.removeRange(country);
         this.togglePin(country);
       } else {
-        // should create missinf...
-
         countrySeries.forEach((series: am4charts.LineSeries) => {
           series.show();
         });
@@ -183,11 +188,7 @@ export class TargetsComponent extends SubscriptionManager {
     }
   }
 
-  addSeriesSetAndPin(
-    country: string,
-    data: Array<TemporalDataItem>
-    //    specificSeriesTypeIndex?: number
-  ): void {
+  addSeriesSetAndPin(country: string, data: Array<TemporalDataItem>): void {
     this.resetChartColors();
 
     // add pin and series
@@ -204,8 +205,17 @@ export class TargetsComponent extends SubscriptionManager {
     });
   }
 
-  removeRange(country: string, type: string, index: number): void {
-    this.lineChart.removeRange(country, type, index);
+  toggleRange(
+    country: string,
+    type: string,
+    index: number,
+    colour?: am4core.Color
+  ): void {
+    if (colour) {
+      this.lineChart.showRange(country, type, index, colour);
+    } else {
+      this.lineChart.removeRange(country, type, index);
+    }
   }
 
   /** togglePin
