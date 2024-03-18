@@ -1,17 +1,28 @@
-import { HttpClientModule } from '@angular/common/http';
+import {
+  HttpClientModule,
+  provideHttpClient,
+  withInterceptors
+} from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Inject, Injectable, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   DateAdapter,
   MAT_DATE_FORMATS,
-  MatNativeDateModule,
   NativeDateAdapter
 } from '@angular/material/core';
+
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import {
+  maintenanceInterceptor,
+  MaintenanceUtilsModule
+} from '@europeana/metis-ui-maintenance-utils';
+
+import { MatomoModule } from 'ngx-matomo';
 import { ClickAwareDirective, IsScrollableDirective } from './_directives';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -36,12 +47,13 @@ import { OverviewComponent } from './overview';
 import { ResizeComponent } from './resize';
 import { SnapshotsComponent } from './snapshots';
 import { TruncateComponent } from './truncate';
-
 import { getDateAsISOString } from './_helpers';
+import { maintenanceSettings } from '../environments/maintenance-settings';
+import { matomoSettings } from '../environments/matomo-settings';
 
 @Injectable()
 class AppDateAdapter extends NativeDateAdapter {
-  public static preferredFormat = 'DD/MM/YYYY';
+  public static readonly preferredFormat = 'DD/MM/YYYY';
 
   // used to display dates closed and open
   format(date: Date, displayFormat: Object): string {
@@ -106,11 +118,24 @@ class AppDateAdapter extends NativeDateAdapter {
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    MaintenanceUtilsModule,
     MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
-    MatNativeDateModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatomoModule.forRoot({
+      requireCookieConsent: true,
+      scriptUrl: matomoSettings.matomoScriptUrl,
+      trackers: [
+        {
+          trackerUrl: matomoSettings.matomoTrackerUrl,
+          siteId: matomoSettings.matomoSiteId
+        }
+      ],
+      routeTracking: {
+        enable: true
+      }
+    })
   ],
   providers: [
     { provide: DateAdapter, useClass: AppDateAdapter },
@@ -128,7 +153,10 @@ class AppDateAdapter extends NativeDateAdapter {
           monthYearA11yLabel: 'MMMM YYYY'
         }
       }
-    }
+    },
+    provideHttpClient(
+      withInterceptors([maintenanceInterceptor(maintenanceSettings)])
+    )
   ],
   bootstrap: [AppComponent]
 })

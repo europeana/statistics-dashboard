@@ -257,9 +257,8 @@
   }
 }
 
-.mat-form-field-appearance-outline .mat-form-field-outline,
-.mat-form-field-appearance-outline .mat-form-field-outline-thick {
-  color: $gray-med;
+.mat-form-field {
+  width: 100%;
 }
 
 .mat-form-field-appearance-outline.mat-form-field-invalid
@@ -267,6 +266,19 @@
   color: $eu-red;
 }
 
-.mat-form-field-wrapper {
-  padding-bottom: 4px;
+// today
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled) {
+  &.mat-calendar-body-active:focus {
+    .mat-calendar-body-cell-content:not(.mat-calendar-body-selected).mat-focus-indicator {
+      background-color: $offwhite;
+    }
+  }
+}
+
+:root {
+  --mat-datepicker-calendar-date-selected-state-background-color: #095f90;
+  --mat-datepicker-calendar-date-in-range-state-background-color: #d8d8d8;
+  --mat-datepicker-calendar-date-hover-state-background-color: #d8d8d8;
+  --mdc-outlined-text-field-outline-color: #d8d8d8;
+  --mdc-outlined-text-field-hover-outline-color: #095f90;
 }

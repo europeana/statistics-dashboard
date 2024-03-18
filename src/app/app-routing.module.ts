@@ -9,6 +9,18 @@ const routes: Routes = [
     component: OverviewComponent
   },
   {
+    path: 'cookie-policy',
+    loadComponent: async () =>
+      (await import('./cookie-policy/cookie-policy.component'))
+        .CookiePolicyComponent
+  },
+  {
+    path: 'privacy-policy',
+    loadComponent: async () =>
+      (await import('./privacy-policy/privacy-policy.component'))
+        .PrivacyPolicyComponent
+  },
+  {
     path: '',
     component: LandingComponent
   },

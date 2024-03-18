@@ -22,14 +22,12 @@ describe('SnapshotsComponent', () => {
     current: true
   };
 
-  const dscContentTierQueried: CompareDataDescriptor = Object.assign(
-    Object.assign({}, dscContentTier),
-    {
-      name: 'countryLuxembourg',
-      label: 'country (Luxembourg)',
-      pinIndex: 0
-    }
-  );
+  const dscContentTierQueried: CompareDataDescriptor = {
+    ...structuredClone(dscContentTier),
+    name: 'countryLuxembourg',
+    label: 'country (Luxembourg)',
+    pinIndex: 0
+  };
 
   const dscCountry: CompareDataDescriptor = {
     name: '',

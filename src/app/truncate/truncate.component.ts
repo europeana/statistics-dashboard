@@ -50,8 +50,8 @@ export class TruncateComponent implements OnInit {
     const omit = Math.floor(this.omitCount / 2);
     const cutOff = Math.floor(textLength / 2);
 
-    this.textLeft = this.text.substr(0, cutOff - omit);
-    this.textRight = this.text.substr(cutOff + omit);
+    this.textLeft = this.text.substring(0, cutOff - omit);
+    this.textRight = this.text.substring(cutOff + omit);
 
     this.applySpace =
       this.textLeft.endsWith(' ') || this.textRight.startsWith(' ');

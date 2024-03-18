@@ -14,7 +14,7 @@ export class GridSummaryComponent {
     return this._summaryData;
   }
   @Input() set summaryData(data: BreakdownResult) {
-    this._summaryData = Object.assign({}, data);
+    this._summaryData = structuredClone(data);
     if (data) {
       this._summaryData.results.sort(
         (a: CountPercentageValue, b: CountPercentageValue) => {

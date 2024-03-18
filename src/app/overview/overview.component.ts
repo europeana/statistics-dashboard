@@ -1,4 +1,10 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import { formatDate } from '@angular/common';
 import {
   FormControl,
@@ -69,6 +75,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
   @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
 
+  private readonly api = inject(APIService);
+  private readonly fb = inject(UntypedFormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+
   // Make variables available to template
   public fromCSL = fromCSL;
   public emptyDataset = true;
@@ -79,18 +91,16 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
   public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
-  public barChartSettings = Object.assign(
-    {
-      prefixValueAxis: ''
-    },
-    BarChartCool
-  );
-  public barChartSettingsTiers = Object.assign(
-    {
-      prefixValueAxis: this.tierPrefix
-    },
-    BarChartCool
-  );
+
+  public barChartSettings = {
+    prefixValueAxis: '',
+    ...BarChartCool
+  };
+
+  public barChartSettingsTiers = {
+    prefixValueAxis: this.tierPrefix,
+    ...BarChartCool
+  };
 
   readonly MAX_FILTER_OPTIONS = 50;
   readonly facetConf = facetNames;
@@ -141,13 +151,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
    * constructor
    * untyped formbuilder used so that unpredictable datasetId fields can be added
    **/
-  constructor(
-    private readonly api: APIService,
-    private readonly fb: UntypedFormBuilder,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly dialog: MatDialog
-  ) {
+  constructor() {
     super();
     this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));
@@ -175,9 +179,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       ] as RequestFilter;
       if (!ct) {
         breakdownRequest.filters[DimensionName.contentTier] = {};
-        ct = breakdownRequest.filters[
-          DimensionName.contentTier
-        ] as RequestFilter;
+        ct = breakdownRequest.filters[DimensionName.contentTier];
       }
       if (!ct.values) {
         ct.values = ['1', '2', '3', '4'];
@@ -382,7 +384,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   **/
   processServerResult(results: BreakdownResults): boolean {
     this.dataServerData = results;
-    if (results.results && results.results.count) {
+    if (results.results?.count) {
       this.emptyDataset = false;
       this.resultTotal = results.results.count;
       return true;
@@ -400,9 +402,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   postProcessResult(): void {
     // initialise filterData and add checkboxes
     const dsd = this.dataServerData;
-    if (dsd && dsd.filteringOptions) {
+    if (dsd?.filteringOptions) {
       this.buildFilters(dsd.filteringOptions);
-      if (dsd.results && dsd.results.breakdowns) {
+      if (dsd.results?.breakdowns) {
         // set pie and table data
         this.extractSeriesServerData(dsd.results.breakdowns);
       } else {
@@ -469,7 +471,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         allSortedOps.sort((op1: NameLabel, op2: NameLabel) => {
           // ensure that selected filters appear...
           const qp = this.queryParams;
-          if (qp && qp[facetName]) {
+          if (qp[facetName]) {
             const includes1 = qp[facetName].includes(op1.name);
             const includes2 = qp[facetName].includes(op2.name);
             if (includes1 && !includes2) {
@@ -730,8 +732,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     options.forEach((option: NameLabel) => {
       const fName = option.name;
       const ctrl = this.form.get(`${name}.${fName}`);
-      const defaultValue =
-        this.queryParams[name] && this.queryParams[name].includes(fName);
+      const defaultValue = `${this.queryParams[name]}`.includes(fName);
 
       if (!ctrl) {
         checkboxes.addControl(fName, new FormControl(defaultValue));
@@ -799,12 +800,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
     if (filterContentTierParam.length > 0) {
       res = filterContentTierParam;
+    } else if (this.form.value.contentTierZero) {
+      res = this.contentTiersOptions;
     } else {
-      if (this.form.value.contentTierZero) {
-        res = this.contentTiersOptions;
-      } else {
-        res = this.contentTiersOptions.slice(1);
-      }
+      res = this.contentTiersOptions.slice(1);
     }
     return `&qf=contentTier:(${encodeURIComponent(res.join(' OR '))})`;
   }
@@ -919,7 +918,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @returns number
   */
   filterKeysLength(filterName: string): number {
-    if (this.filterData && this.filterData[filterName]) {
+    if (this.filterData[filterName]) {
       return Object.keys(this.filterData[filterName]).length;
     }
     return 0;
@@ -1048,7 +1047,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       this.queryParams = qp;
     }
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
-      queryParams: Object.assign(qp, this.disabledParams)
+      queryParams: { ...qp, ...this.disabledParams }
     });
   }
 

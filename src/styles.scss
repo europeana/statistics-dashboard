@@ -5,5 +5,34 @@
 @import "scss/forms";
 @import "scss/lists";
 @import "scss/links";
+@import "scss/headings";
 @import "scss/headings_simple";
 @import "scss/main";
+
+:root {
+  --eu-cm-color-theme: #095f90;
+  --eu-cm-color-theme-highlight: #4d4d4d; // = $eu-grey-dark
+  --eu-cm-color-theme-middle: #ededed; // $offwhite
+  --eu-cm-color-border-button-hover: #4d4d4d;
+}
+
+.eu-cm-wrapper .external-link {
+  display: inline-block;
+  position: relative;
+  &::after {
+    background-image: svg-url-icon-external("#{$stats-blue}");
+    background-repeat: no-repeat;
+    background-size: cover;
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    right: -19px;
+    top: 5px;
+  }
+
+  &:hover::after {
+    background-image: svg-url-icon-external(#4d4d4d);
+  }
+}

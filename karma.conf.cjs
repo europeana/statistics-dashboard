@@ -36,8 +36,14 @@ module.exports = function (config) {
       level: "log"
     },
     autoWatch: true,
-    browsers: ["ChromeHeadless"],
+    browsers: ["ChromeHeadlessNoSandbox"],
     singleRun: true,
-    restartOnFileChange: true
+    restartOnFileChange: true,
+    customLaunchers: {
+       ChromeHeadlessNoSandbox: {
+         base: 'ChromeHeadless',
+         flags: ['--no-sandbox', '--no-proxy-server', '--user-data-dir=./karma-chrome']
+       }
+     }
   });
 };
