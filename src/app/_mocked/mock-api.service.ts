@@ -5,10 +5,12 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
+  GeneralResultsFormatted,
   IHash,
   IHashArray,
   RequestFilter,
   TargetData,
+  TemporalDataItem,
   TemporalLocalisedDataItem
 } from '../_models';
 
@@ -668,6 +670,14 @@ export class MockAPIService {
 
   loadCountryData(): Observable<Array<TemporalLocalisedDataItem>> {
     return of([]);
+  }
+
+  getCountryData(): Observable<IHash<Array<TemporalDataItem>>> {
+    return of({});
+  }
+
+  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
+    return of({});
   }
 }
 
