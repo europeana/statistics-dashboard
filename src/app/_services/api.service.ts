@@ -5,11 +5,15 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   BreakdownRequest,
+  BreakdownResult,
   BreakdownResults,
+  CountPercentageValue,
   GeneralResults,
+  GeneralResultsFormatted,
   IHash,
   IHashArray,
   TargetData,
+  TemporalDataItem,
   TemporalLocalisedDataItem
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
@@ -95,6 +99,24 @@ export class APIService {
         `${environment.serverAPI}/${this.suffixGeneral}`
       ),
       { params: includeCTZero ? { 'content-tier-zero': true } : {} }
+    );
+  }
+
+  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
+    return this.getGeneralResults().pipe(
+      map((data: GeneralResults) => {
+        const res: GeneralResultsFormatted = {};
+        data.allBreakdowns.forEach((br: BreakdownResult) => {
+          res[br.breakdownBy] = br.results.map((cpv: CountPercentageValue) => {
+            return {
+              name: cpv.value,
+              value: cpv.count,
+              percent: cpv.percentage
+            };
+          });
+        });
+        return res;
+      })
     );
   }
 
@@ -211,5 +233,26 @@ export class APIService {
       });
     });
     return of(res.reverse());
+  }
+
+  getCountryData(): Observable<IHash<Array<TemporalDataItem>>> {
+    return this.loadCountryData().pipe(
+      map((rows: Array<TemporalLocalisedDataItem>) => {
+        return rows.reduce(
+          (
+            res: IHash<Array<TemporalDataItem>>,
+            item: TemporalLocalisedDataItem
+          ) => {
+            if (!res[item.country]) {
+              res[item.country] = [];
+            }
+            const { country, ...itemNoCountry } = item;
+            res[country].push(itemNoCountry);
+            return res;
+          },
+          {}
+        );
+      })
+    );
   }
 }

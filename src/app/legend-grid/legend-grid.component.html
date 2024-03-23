@@ -1,0 +1,131 @@
+<div class="legend-grid-wrapper">
+  <ng-template
+    #legendItemSeries
+    let-targetType="targetType"
+    let-series="series"
+    let-country="country"
+  >
+    <ul>
+      <li>
+        <a
+          (click)="toggleSeries(country, targetType, series)"
+          [ngClass]="{
+            'rolled-up': !series || series.isHidden || series.isHiding
+          }"
+          class="legend-item-series-toggle"
+        >
+          <span
+            class="marker"
+            [ngStyle]="{
+              backgroundColor:
+                series && !(series.isHidden || series.isHiding)
+                  ? series.fill
+                  : undefined,
+              borderColor:
+                series && (series.isHidden || series.isHiding)
+                  ? series.fill
+                  : undefined
+            }"
+          >
+          </span>
+          <span>
+            {{ targetType | renameTargetType }}
+          </span>
+          <span
+            class="target-total right"
+            *ngIf="countryData[country]"
+            [ngClass]="{ 'pad-right': targetType === 'meta_tier_a' }"
+          >
+            {{
+              countryData[country][countryData[country].length - 1][targetType]
+                | number
+            }}
+          </span>
+        </a>
+      </li>
+      <li
+        class="roll-down-wrapper"
+        *ngIf="series && targetData[country]"
+        [ngClass]="{ 'is-open': !(series.isHidden || series.isHiding) }"
+      >
+        <ul class="roll-down">
+          <li
+            class="indented"
+            [ngStyle]="{ color: series.fill }"
+            [ngClass]="{ bulleted: data.range }"
+            *ngFor="let data of targetData[country][targetType]; let i = index"
+          >
+            <a
+              class="legend-item-target-toggle"
+              (click)="
+                toggleRange(
+                  country,
+                  targetType,
+                  i,
+                  data.range ? undefined : series.fill
+                )
+              "
+            >
+              {{ data.label }}
+              <span class="target-total range-value">{{
+                data.value | number
+              }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </ng-template>
+
+  <span
+    class="legend-grid scrollable-downwards"
+    (scroll)="gridScroll()"
+    #legendGrid
+  >
+    <ng-container *ngFor="let country of targetCountries">
+      <span
+        class="legend-item-country-toggle"
+        [ngClass]="{ 'stick-left': pinnedCountries[country] > -1 }"
+        [ngStyle]="{
+          'top.px': pinnedCountries[country]
+        }"
+      >
+        <a
+          (click)="toggleCountry(country)"
+          style="position: relative; display: flex"
+        >
+          <span>{{ country | renameCountry }} </span>
+          <span
+            class="save"
+            [ngClass]="{ saved: pinnedCountries[country] > -1 }"
+          ></span>
+        </a>
+        <span class="legend-item-sizer">{{ country | renameCountry }} </span>
+      </span>
+
+      <span
+        class="legend-grid-inner"
+        [ngClass]="{
+          'stick-right': pinnedCountries[country] > -1
+        }"
+        [ngStyle]="{
+          'top.px': pinnedCountries[country]
+        }"
+      >
+        <span *ngFor="let seriesSuffix of seriesSuffixes; let i = index">
+          <ng-content
+            *ngTemplateOutlet="
+              legendItemSeries;
+              context: {
+                series: lineChart.allSeriesData[country + seriesSuffix],
+                targetType: seriesValueNames[i],
+                country: country
+              }
+            "
+          ></ng-content>
+        </span>
+      </span>
+    </ng-container>
+    <span class="scrollable-indicator"></span>
+  </span>
+</div>

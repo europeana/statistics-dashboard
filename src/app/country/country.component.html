@@ -1,0 +1,516 @@
+<main
+  class="fit-to-page landing-page"
+  [ngClass]="{
+    'loading-modal': false,
+    loading: false
+  }"
+>
+  <h1 class="page-title" style="margin: 1em 0.6em">France: Target Data</h1>
+
+  <ng-template
+    #powerLevel
+    let-percent="percent"
+    let-label="label"
+    let-target="target"
+    let-above="above"
+  >
+    <div
+      [ngClass]="{ 'labels-above': above, monotone: monotonePowerbars }"
+      title="Click to toggle style......................TODO: decide"
+      class="powerbar-wrapper"
+    >
+      <span class="powerbar-target-labels">
+        <span class="powerbar-label-left">{{ label }}</span>
+        <span class="powerbar-label-right">{{ target | number }}</span>
+      </span>
+      <div class="powerbar" (click)="monotonePowerbars = !monotonePowerbars">
+        <div class="powerbar-charge" style="width: {{ percent }}%"></div>
+        <span class="powerbar-charge-label">{{ percent }}%</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template
+    #cardSummary
+    let-name="name"
+    let-dimension="dimension"
+    let-percent="percent"
+    let-value="value"
+    let-isPowerLevel="isPowerLevel"
+  >
+    <span class="container-h totals">
+      <span class="container-v">
+        <span
+          class="total-title bold"
+          i18n="landing chart summary prefix@@landingChartSummaryPrefix"
+          >@if(isPowerLevel) { Data } @else { Top
+          {{ dimension | renameApiFacetShort | lowercase }}
+          }
+        </span>
+        <span class="total bold">{{ name }}</span>
+      </span>
+      <span class="container-v">
+        <span
+          class="total-title"
+          i18n="landing chart summary prefix@@landingChartSummaryCount"
+          >@if(isPowerLevel) { Total {{ name }} records count } @else { Top
+          {{ dimension | renameApiFacetShort | lowercase }} records count }
+        </span>
+        <span class="total">{{ value | number }}</span>
+      </span>
+      <span class="container-v">
+        <span
+          class="total-title"
+          i18n="landing chart summary percentage@@landingChartSummaryPercentage"
+          >Corresponding percentage</span
+        >
+        <span class="total">{{ percent | number }}%</span>
+      </span>
+    </span>
+  </ng-template>
+
+  <ng-template #powerLevelSummary let-name="name" let-valName="valName">
+    <ng-content
+      *ngTemplateOutlet="
+        cardSummary;
+        context: {
+          name: name,
+          value: latestCountryData[valName],
+          percent: latestCountryData['total'] / latestCountryData[valName],
+          isPowerLevel: true
+        }
+      "
+    ></ng-content>
+  </ng-template>
+
+  <ng-template #dataRows let-dimension="dimension" let-data="data">
+    <div class="container-v data-rows" *ngIf="data">
+      <div class="container-h data-rows-title">
+        <span>{{ dimension | renameApiFacet | uppercase }}</span>
+        <span>RECORDS PROVIDED</span>
+      </div>
+      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+        <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
+        <span class="numeric">{{ row.value | number }}</span>
+        <span class="numeric">{{ row.percent }}%</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="container-v">
+    <div class="entry-card-pair">
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >3D Data<a
+            class="info-icon"
+            [href]="externalLinks.help.contentTier.href"
+            target="_blank"
+            [title]="externalLinks.help.contentTier.description"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevelSummary;
+              context: {
+                name: '3D',
+                valName: 'three_d'
+              }
+            "
+          ></ng-content>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                above: true,
+                percent: '50',
+                label: '2025',
+                target: 30000
+              }
+            "
+          ></ng-content>
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                percent: '42',
+                label: '2030',
+                target: 50000
+              }
+            "
+          ></ng-content>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="{
+              'content-tier-zero': includeCTZero || undefined,
+              country: country,
+              type: '3D'
+            }"
+            data-e2e="link-entry-ct"
+            >View (3D data) by content tier</a
+          >
+        </div>
+      </div>
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >HQ Data<a
+            class="info-icon"
+            [href]="externalLinks.help.metadataTier.href"
+            target="_blank"
+            [title]="externalLinks.help.metadataTier.description"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevelSummary;
+              context: {
+                name: 'HQ',
+                valName: 'meta_tier_a'
+              }
+            "
+          ></ng-content>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                above: true,
+                percent: '60',
+                label: '2025',
+                target: 35000
+              }
+            "
+          ></ng-content>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                percent: '47.3',
+                label: '2030',
+                target: 8000
+              }
+            "
+          ></ng-content>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.type }}"
+            [queryParams]="{
+              'content-tier-zero': includeCTZero || undefined,
+              country: country,
+              contentTier: [2, 3, 4],
+              metadataTier: ['A', 'B', 'C']
+            }"
+            data-e2e="link-entry-metadata"
+            >View (HQ data) by type</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-card double-card line-and-legend">
+      <span class="entry-card-header"
+        >Countries By Target Progress<span class="info-icon"></span
+      ></span>
+      <div class="entry-card-content">
+        <div class="entry-card-pair">
+          <app-line-chart #lineChart [targetData]="targetData">
+          </app-line-chart>
+
+          <app-legend-grid
+            #legendGrid
+            [countryData]="countryData"
+            [targetData]="targetData"
+            [lineChart]="lineChart"
+          ></app-legend-grid>
+        </div>
+
+        <div
+          class="appendice-grid-wrapper"
+          [ngClass]="{ 'is-open': detailsExpanded }"
+        >
+          <div class="appendice-grid">
+            <span class="cell-header"> <!-- Country--> </span>
+            <span class="cell-header"> <!--(total)--> </span>
+            <span class="cell-header cell-bold cell-left"> Date </span>
+
+            <span class="cell-header cell-bold"> 3D data</span>
+            <span class="cell-header"> <!--(2025)--> </span>
+            <span class="cell-header"> <!--(2030)--> </span>
+
+            <span class="cell-header cell-bold"> HQ data</span>
+            <span class="cell-header"> <!--(2025)--> </span>
+            <span class="cell-header cell-pad-right"> <!--(2030)--> </span>
+
+            <span class="appendice-grid-scrollable-section">
+              <ng-template
+                #countryRow
+                let-targetData="targetData"
+                let-isHeader="isHeader"
+                let-country="country"
+                let-row="row"
+                let-wrap="wrap"
+              >
+                @if(wrap){
+                <span class="appendice-grid-sticky-row">
+                  <ng-content
+                    *ngTemplateOutlet="
+                      countryRow;
+                      context: {
+                        targetData: targetData,
+                        isHeader: isHeader,
+                        country: country,
+                        row: row,
+                        wrap: false
+                      }
+                    "
+                  ></ng-content>
+                </span>
+
+                } @else {
+
+                <span class="cell-bold cell-left">
+                  @if(isHeader) {
+                  {{ country | renameCountry }}
+                  }
+                </span>
+
+                <span class="cell-total">
+                  @if(isHeader) {
+                  {{ row["total"] | number }}
+                  }
+                </span>
+
+                <span class="cell-left cell-live">
+                  {{ row["date"] | date: "dd/MM/yyyy" }}
+                </span>
+
+                <span
+                  class="cell-live"
+                  [ngClass]="{ 'cell-line': row['three_d'] }"
+                  style="border-right-color: {{
+                    lineChart?.allSeriesData[country + '3D']?.fill ||
+                      'transparent'
+                  }}"
+                >
+                  {{ row["three_d"] | number }}
+                </span>
+
+                <span class="cell-2025">
+                  @if(isHeader) {
+                  {{ targetData["three_d"][0].value | number }}
+                  }
+                </span>
+
+                <span class="cell-2030">
+                  @if(isHeader) {
+                  {{ targetData["three_d"][1].value | number }}
+                  }
+                </span>
+
+                <span
+                  class="cell-live"
+                  [ngClass]="{ 'cell-line': row['meta_tier_a'] }"
+                  style="border-right-color: {{
+                    lineChart?.allSeriesData[country + 'META_A']?.fill ||
+                      'transparent'
+                  }}"
+                >
+                  {{ row["meta_tier_a"] | number }}
+                </span>
+
+                <span class="cell-2025">
+                  @if(isHeader && targetData["meta_tier_a"]) {
+                  {{ targetData["meta_tier_a"][0].value | number }}
+                  }
+                </span>
+
+                <span class="cell-2030 cell-pad-right">
+                  @if(isHeader && targetData["meta_tier_a"]) {
+                  {{ targetData["meta_tier_a"][1].value | number }}
+                  }
+                </span>
+                }
+              </ng-template>
+
+              <ng-container
+                *ngFor="
+                  let country of legendGrid.pinnedCountries | keyvalue;
+                  let countryIndex = index
+                "
+              >
+                <ng-container
+                  *ngFor="
+                    let row of countryData[country.key];
+                    let countryRowIndex = index
+                  "
+                >
+                  <ng-container *ngIf="targetData[country.key]">
+                    <ng-content
+                      *ngTemplateOutlet="
+                        countryRow;
+                        context: {
+                          targetData: targetData[country.key],
+                          isHeader: countryRowIndex === 0,
+                          country: country.key,
+                          row: row,
+
+                          wrap: countryRowIndex === 0
+                        }
+                      "
+                    ></ng-content>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </span>
+          </div>
+        </div>
+        <a class="data-link" (click)="toggleDetails()">
+          @if (detailsExpanded) { Hide data } @else { View data }</a
+        >
+      </div>
+    </div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >Explore by type of content<span class="info-icon"></span
+        ></span>
+        <div
+          class="entry-card-content"
+          *ngIf="countryLandingData[DimensionName.type]"
+        >
+          <ng-content
+            *ngTemplateOutlet="
+              cardSummary;
+              context: {
+                dimension: DimensionName.type,
+                name: countryLandingData[DimensionName.type][0].name,
+                value: countryLandingData[DimensionName.type][0].value,
+                percent: countryLandingData[DimensionName.type][0].percent,
+                isPowerLevel: false
+              }
+            "
+          ></ng-content>
+
+          <app-bar-chart
+            chartId="typeChart"
+            [results]="countryLandingData[DimensionName.type]"
+          ></app-bar-chart>
+
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.type }}"
+            [queryParams]="{
+              'content-tier-zero': includeCTZero || undefined,
+              country: country
+            }"
+            data-e2e="link-entry-type"
+            >View by type</a
+          >
+        </div>
+      </div>
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >Explore by rights category<a
+            class="info-icon"
+            [href]="externalLinks.help.rights.href"
+            target="_blank"
+            [title]="externalLinks.help.rights.description"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <div class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: {
+                  dimension: DimensionName.rightsCategory,
+                  data: countryLandingData[DimensionName.rightsCategory]
+                }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.rightsCategory }}"
+            [queryParams]="{
+              'content-tier-zero': includeCTZero || undefined,
+              country: country
+            }"
+            data-e2e="link-entry-rights"
+            >View by rights category</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="entry-card-pair">
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >Explore by data provider<span class="info-icon"></span
+        ></span>
+        <div class="entry-card-content">
+          <div class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: {
+                  dimension: DimensionName.dataProvider,
+                  data: countryLandingData[DimensionName.dataProvider]
+                }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.dataProvider }}"
+            [queryParams]="{
+              'content-tier-zero': includeCTZero || undefined,
+              country: country
+            }"
+            data-e2e="link-entry-data-provider"
+            >View by data provider</a
+          >
+        </div>
+      </div>
+      <div class="entry-card">
+        <span class="entry-card-header"
+          >Explore by provider<a
+            class="info-icon"
+            [href]="externalLinks.help.provider.href"
+            target="_blank"
+            [title]="externalLinks.help.provider.description"
+          ></a
+        ></span>
+        <div class="entry-card-content">
+          <div class="container-h">
+            <ng-content
+              *ngTemplateOutlet="
+                dataRows;
+                context: {
+                  dimension: DimensionName.provider,
+                  data: countryLandingData[DimensionName.provider]
+                }
+              "
+            ></ng-content>
+          </div>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.provider }}"
+            [queryParams]="{
+              'content-tier-zero': includeCTZero || undefined,
+              country: country
+            }"
+            data-e2e="link-entry-provider"
+            >View by provider</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</main>
