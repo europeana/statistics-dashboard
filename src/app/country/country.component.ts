@@ -24,9 +24,9 @@ import {
 } from '../_models';
 import { APIService } from '../_services';
 import {
-  RenameCountryPipe,
   RenameApiFacetPipe,
-  RenameApiFacetShortPipe
+  RenameApiFacetShortPipe,
+  RenameCountryPipe
 } from '../_translate';
 
 import { BarComponent, LineComponent } from '../chart';
@@ -79,8 +79,8 @@ export class CountryComponent extends SubscriptionManager {
   targetData: IHash<IHashArray<TargetData>>;
   countryData: IHash<Array<TemporalDataItem>> = {};
   latestCountryData: TemporalDataItem;
-  detailsExpanded: boolean = false;
-  monotonePowerbars: boolean = false; //true;
+  detailsExpanded = false;
+  monotonePowerbars = false; //true;
 
   constructor(private readonly api: APIService) {
     super();

@@ -22,7 +22,6 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { IHash, IHashArray, TargetData, TemporalDataItem } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
-import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
   selector: 'app-legend-grid',
