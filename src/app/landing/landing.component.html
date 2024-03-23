@@ -42,7 +42,11 @@
     </span>
   </ng-template>
 
-  <ng-template #dataRows let-dimension="facetName">
+  <ng-template
+    #dataRows
+    let-dimension="facetName"
+    let-countryLink="countryLink"
+  >
     <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
       <div class="container-h data-rows-title">
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
@@ -51,7 +55,13 @@
         >
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+        @if (countryLink){
+        <a routerLink="/country">
+          <span>{{ row.name }}</span>
+        </a>
+        } @else {
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
+        }
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
@@ -158,7 +168,7 @@
           <ng-content
             *ngTemplateOutlet="
               dataRows;
-              context: { facetName: DimensionName.country }
+              context: { facetName: DimensionName.country, countryLink: true }
             "
           ></ng-content>
         </div>
