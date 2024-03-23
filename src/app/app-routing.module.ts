@@ -21,7 +21,7 @@ const routes: Routes = [
     children: [
       {
         path: 'x',
-        loadComponent: async () => {
+        loadComponent: async (): Promise<typeof DocArrowsComponent> => {
           const { DocArrowsComponent } = await import(
             './doc-arrows/doc-arrows.component'
           );
