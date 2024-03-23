@@ -77,7 +77,7 @@ export class LineComponent implements AfterViewInit {
     if (this.valueAxis.axisRanges.values.length === 0) {
       this.chart.paddingRight = this.padding.rightDefault;
     }
-    this.chart.invalidateData();
+    //this.chart.invalidateData();
   }
 
   showRange(
@@ -223,7 +223,8 @@ export class LineComponent implements AfterViewInit {
     const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     this.valueAxis = valueAxis;
     valueAxis.extraMax = 0.1;
-    valueAxis.includeRangesInMinMax = true;
+    valueAxis.min = 0;
+    //valueAxis.includeRangesInMinMax = true;
     valueAxis.renderer.labels.template.fill = colourAxis;
     valueAxis.renderer.labels.template.fontSize = 14;
 

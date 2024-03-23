@@ -13,29 +13,22 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
+  Input,
   ViewChild
 } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
-import {
-  IHash,
-  IHashArray,
-  TargetData,
-  TemporalDataItem,
-  TemporalLocalisedDataItem
-} from '../_models';
-import { APIService } from '../_services';
+import { IHash, IHashArray, TargetData, TemporalDataItem } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
-import { LegendGridComponent } from '../legend-grid';
 import { LineComponent } from '../chart';
 import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
-  selector: 'app-targets',
-  templateUrl: './targets.component.html',
+  selector: 'app-legend-grid',
+  templateUrl: './legend-grid.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  styleUrls: ['./targets.component.scss'],
+  styleUrls: ['./legend-grid.component.scss'],
   standalone: true,
   imports: [
     DatePipe,
@@ -47,58 +40,38 @@ import { SubscriptionManager } from '../subscription-manager';
     NgTemplateOutlet,
     NgStyle,
     KeyValuePipe,
-    LegendGridComponent,
     LineComponent,
     RenameCountryPipe,
     RenameTargetTypePipe
   ]
 })
-export class TargetsComponent extends SubscriptionManager {
+export class LegendGridComponent {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
-  targetData: IHash<IHashArray<TargetData>>;
-  countryData: IHash<Array<TemporalDataItem>> = {};
+
+  _targetData: IHash<IHashArray<TargetData>>;
+
+  @Input() set targetData(targetData: IHash<IHashArray<TargetData>>) {
+    this._targetData = targetData;
+    this.targetCountries = Object.keys(targetData);
+    this.targetCountriesOO = Object.keys(targetData);
+  }
+  get targetData(): IHash<IHashArray<TargetData>> {
+    return this._targetData;
+  }
+
+  @Input() countryData: IHash<Array<TemporalDataItem>> = {};
+
   pinnedCountries: IHash<number> = {};
 
   public seriesSuffixes = ['total', '3D', 'META_A'];
   public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
   public seriesValueNames = ['total', 'three_d', 'meta_tier_a'];
 
-  @ViewChild('lineChart') lineChart: LineComponent;
+  @Input() lineChart: LineComponent;
+
+  //@ViewChild('lineChart') lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: ElementRef;
-
-  constructor(private readonly api: APIService) {
-    super();
-
-    this.subs.push(
-      this.api
-        .loadCountryData()
-        .subscribe((countryData: Array<TemporalLocalisedDataItem>) => {
-          this.countryData = countryData.reduce(
-            (
-              res: IHash<Array<TemporalDataItem>>,
-              item: TemporalLocalisedDataItem
-            ) => {
-              if (!res[item.country]) {
-                res[item.country] = [];
-              }
-              const { country, ...itemNoCountry } = item;
-              res[country].push(itemNoCountry);
-              return res;
-            },
-            {}
-          );
-        })
-    );
-
-    this.subs.push(
-      this.api.getTargetData().subscribe((targetData) => {
-        this.targetData = targetData;
-        this.targetCountries = Object.keys(targetData);
-        this.targetCountriesOO = Object.keys(targetData);
-      })
-    );
-  }
 
   ngAfterContentInit(): void {
     setTimeout(() => {
@@ -111,6 +84,8 @@ export class TargetsComponent extends SubscriptionManager {
       );
     }, 0);
   }
+  /*
+   */
 
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
     const res = this.seriesSuffixes
