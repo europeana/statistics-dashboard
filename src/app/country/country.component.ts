@@ -80,7 +80,7 @@ export class CountryComponent extends SubscriptionManager {
   countryData: IHash<Array<TemporalDataItem>> = {};
   latestCountryData: TemporalDataItem;
   detailsExpanded = false;
-  monotonePowerbars = false; //true;
+  monotonePowerbars = true;
 
   constructor(private readonly api: APIService) {
     super();

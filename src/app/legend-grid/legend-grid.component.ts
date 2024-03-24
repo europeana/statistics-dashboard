@@ -19,7 +19,13 @@ import {
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
-import { IHash, IHashArray, TargetData, TemporalDataItem } from '../_models';
+import {
+  IHash,
+  IHashArray,
+  SeriesValueNames,
+  TargetData,
+  TemporalDataItem
+} from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
 
@@ -60,31 +66,28 @@ export class LegendGridComponent {
   }
 
   @Input() countryData: IHash<Array<TemporalDataItem>> = {};
+  @Input() lineChart: LineComponent;
+  @ViewChild('legendGrid') legendGrid: ElementRef;
 
   pinnedCountries: IHash<number> = {};
 
   public seriesSuffixes = ['total', '3D', 'META_A'];
   public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
-  public seriesValueNames = ['total', 'three_d', 'meta_tier_a'];
 
-  @Input() lineChart: LineComponent;
-
-  //@ViewChild('lineChart') lineChart: LineComponent;
-  @ViewChild('legendGrid') legendGrid: ElementRef;
+  public seriesValueNames = Object.keys(SeriesValueNames);
+  public SeriesValueNames = SeriesValueNames;
 
   ngAfterContentInit(): void {
     setTimeout(() => {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        'total',
+        SeriesValueNames.TOTAL,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
     }, 0);
   }
-  /*
-   */
 
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
     const res = this.seriesSuffixes
@@ -95,18 +98,6 @@ export class LegendGridComponent {
         return x;
       });
     return res;
-  }
-
-  toggleCursor(): void {
-    this.lineChart.toggleCursor();
-  }
-
-  toggleGridlines(): void {
-    this.lineChart.toggleGridlines();
-  }
-
-  toggleScrollbar(): void {
-    this.lineChart.toggleScrollbar();
   }
 
   /** resetChartColors
@@ -175,7 +166,7 @@ export class LegendGridComponent {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
         country + this.seriesSuffixes[i],
-        this.seriesValueNames[i],
+        SeriesValueNames[this.seriesValueNames[i]],
         data
       );
     });
@@ -183,7 +174,7 @@ export class LegendGridComponent {
 
   toggleRange(
     country: string,
-    type: string,
+    type: SeriesValueNames,
     index: number,
     colour?: am4core.Color
   ): void {
@@ -239,10 +230,10 @@ export class LegendGridComponent {
    **/
   toggleSeries(
     country: string,
-    type: string,
+    type: SeriesValueNames,
     series?: am4charts.LineSeries
   ): void {
-    const typeIndex = this.seriesValueNames.indexOf(type);
+    const typeIndex = Object.values(SeriesValueNames).indexOf(type);
 
     if (!series) {
       // create from existing data

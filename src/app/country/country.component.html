@@ -99,7 +99,7 @@
 
   <div class="container-v">
     <div class="entry-card-pair">
-      <div class="entry-card">
+      <div class="entry-card" *ngIf="latestCountryData">
         <span class="entry-card-header"
           >3D Data<a
             class="info-icon"
@@ -118,7 +118,6 @@
               }
             "
           ></ng-content>
-
           <ng-content
             *ngTemplateOutlet="
               powerLevel;
@@ -153,7 +152,7 @@
           >
         </div>
       </div>
-      <div class="entry-card">
+      <div class="entry-card" *ngIf="latestCountryData">
         <span class="entry-card-header"
           >HQ Data<a
             class="info-icon"
@@ -234,13 +233,10 @@
         >
           <div class="appendice-grid">
             <span class="cell-header"> <!-- Country--> </span>
-            <span class="cell-header"> <!--(total)--> </span>
             <span class="cell-header cell-bold cell-left"> Date </span>
-
             <span class="cell-header cell-bold"> 3D data</span>
             <span class="cell-header"> <!--(2025)--> </span>
             <span class="cell-header"> <!--(2030)--> </span>
-
             <span class="cell-header cell-bold"> HQ data</span>
             <span class="cell-header"> <!--(2025)--> </span>
             <span class="cell-header cell-pad-right"> <!--(2030)--> </span>
@@ -248,19 +244,25 @@
             <span class="appendice-grid-scrollable-section">
               <ng-template
                 #countryRow
-                let-targetData="targetData"
+                let-targets="targets"
                 let-isHeader="isHeader"
                 let-country="country"
                 let-row="row"
                 let-wrap="wrap"
+                let-colour3D="colour3D"
+                let-colourHQ="colourHQ"
               >
                 @if(wrap){
+                <!-- wrap -->
                 <span class="appendice-grid-sticky-row">
+                  <!-- recurse -->
                   <ng-content
                     *ngTemplateOutlet="
                       countryRow;
                       context: {
-                        targetData: targetData,
+                        colour3D: colour3D,
+                        colourHQ: colourHQ,
+                        targets: targets,
                         isHeader: isHeader,
                         country: country,
                         row: row,
@@ -274,13 +276,12 @@
 
                 <span class="cell-bold cell-left">
                   @if(isHeader) {
-                  {{ country | renameCountry }}
-                  }
-                </span>
-
-                <span class="cell-total">
-                  @if(isHeader) {
-                  {{ row["total"] | number }}
+                  <span>
+                    {{ country | renameCountry }}
+                  </span>
+                  <span class="cell-total">
+                    {{ row["total"] | number }}
+                  </span>
                   }
                 </span>
 
@@ -290,57 +291,48 @@
 
                 <span
                   class="cell-live"
-                  [ngClass]="{ 'cell-line': row['three_d'] }"
-                  style="border-right-color: {{
-                    lineChart?.allSeriesData[country + '3D']?.fill ||
-                      'transparent'
-                  }}"
+                  [ngClass]="{ 'cell-line': !!row['three_d'] }"
+                  [attr.style]="'border-right-color: ' + colour3D"
                 >
                   {{ row["three_d"] | number }}
                 </span>
 
                 <span class="cell-2025">
                   @if(isHeader) {
-                  {{ targetData["three_d"][0].value | number }}
+                  {{ targets[0][0] | number }}
                   }
                 </span>
 
                 <span class="cell-2030">
                   @if(isHeader) {
-                  {{ targetData["three_d"][1].value | number }}
+                  {{ targets[0][1] | number }}
                   }
                 </span>
 
                 <span
                   class="cell-live"
-                  [ngClass]="{ 'cell-line': row['meta_tier_a'] }"
-                  style="border-right-color: {{
-                    lineChart?.allSeriesData[country + 'META_A']?.fill ||
-                      'transparent'
-                  }}"
+                  [ngClass]="{ 'cell-line': !!row['meta_tier_a'] }"
+                  [attr.style]="'border-right-color: ' + colourHQ"
                 >
                   {{ row["meta_tier_a"] | number }}
                 </span>
 
                 <span class="cell-2025">
-                  @if(isHeader && targetData["meta_tier_a"]) {
-                  {{ targetData["meta_tier_a"][0].value | number }}
+                  @if(isHeader) {
+                  {{ targets[1][0] | number }}
                   }
                 </span>
 
                 <span class="cell-2030 cell-pad-right">
-                  @if(isHeader && targetData["meta_tier_a"]) {
-                  {{ targetData["meta_tier_a"][1].value | number }}
+                  @if(isHeader) {
+                  {{ targets[1][1] | number }}
                   }
                 </span>
                 }
               </ng-template>
 
               <ng-container
-                *ngFor="
-                  let country of legendGrid.pinnedCountries | keyvalue;
-                  let countryIndex = index
-                "
+                *ngFor="let country of legendGrid.pinnedCountries | keyvalue"
               >
                 <ng-container
                   *ngFor="
@@ -353,11 +345,25 @@
                       *ngTemplateOutlet="
                         countryRow;
                         context: {
-                          targetData: targetData[country.key],
+                          colour3D:
+                            lineChart.allSeriesData[country.key + '3D']?.fill ||
+                            'transparent',
+                          colourHQ:
+                            lineChart.allSeriesData[country.key + 'META_A']
+                              ?.fill || 'transparent',
                           isHeader: countryRowIndex === 0,
                           country: country.key,
                           row: row,
-
+                          targets: [
+                            [
+                              targetData[country.key]['three_d'][0].value,
+                              targetData[country.key]['three_d'][1].value
+                            ],
+                            [
+                              targetData[country.key]['meta_tier_a'][0].value,
+                              targetData[country.key]['meta_tier_a'][1].value
+                            ]
+                          ],
                           wrap: countryRowIndex === 0
                         }
                       "

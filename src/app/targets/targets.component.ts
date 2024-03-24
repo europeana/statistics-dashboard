@@ -21,6 +21,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
   IHash,
   IHashArray,
+  SeriesValueNames,
   TargetData,
   TemporalDataItem,
   TemporalLocalisedDataItem
@@ -105,7 +106,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        'total',
+        SeriesValueNames.TOTAL,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
@@ -209,7 +210,7 @@ export class TargetsComponent extends SubscriptionManager {
 
   toggleRange(
     country: string,
-    type: string,
+    type: SeriesValueNames,
     index: number,
     colour?: am4core.Color
   ): void {

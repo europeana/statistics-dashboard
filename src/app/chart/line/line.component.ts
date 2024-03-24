@@ -14,7 +14,13 @@ import * as am4plugins_bullets from '@amcharts/amcharts4/plugins/bullets';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import { colours } from '../../_data';
-import { IHash, IHashArray, TargetData, TemporalDataItem } from '../../_models';
+import {
+  IHash,
+  IHashArray,
+  TargetData,
+  TemporalDataItem,
+  SeriesValueNames
+} from '../../_models';
 
 @Component({
   selector: 'app-line-chart',
@@ -54,12 +60,16 @@ export class LineComponent implements AfterViewInit {
    **/
   removeRange(
     country: string,
-    specificType?: string,
+    specificValueName?: string,
     specificIndex?: number
   ): void {
-    ['total', 'three_d', 'meta_tier_a'].forEach((seriesValueName: string) => {
-      if (!specificType || specificType === seriesValueName) {
-        const targetDataType = this.targetData[country][seriesValueName];
+    Object.keys(SeriesValueNames).forEach((seriesValueName: string) => {
+      if (
+        !specificValueName ||
+        specificValueName === SeriesValueNames[seriesValueName]
+      ) {
+        const targetDataType =
+          this.targetData[country][SeriesValueNames[seriesValueName]];
         if (targetDataType) {
           targetDataType.forEach((td: TargetData, tdIndex: number) => {
             if (parseInt(`${specificIndex}`) > -1) {
@@ -82,11 +92,11 @@ export class LineComponent implements AfterViewInit {
 
   showRange(
     country: string,
-    type: string,
+    seriesValueName: SeriesValueNames,
     index: number,
     colour: am4core.Color
   ): void {
-    const targetData = this.targetData[country][type][index];
+    const targetData = this.targetData[country][seriesValueName][index];
     this.createRange(targetData, colour);
     this.chart.paddingRight = this.padding.rightWide;
   }
