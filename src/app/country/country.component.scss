@@ -20,7 +20,7 @@
   }
 }
 
-$appendice-grid-num-cols: 9;
+$appendice-grid-num-cols: 8;
 
 .appendice-grid {
   display: grid;
@@ -56,6 +56,8 @@ $appendice-grid-num-cols: 9;
   }
 
   .cell-total {
+    font-weight: normal;
+    padding-left: 3.2em;
     padding-right: 3.2em;
     &:not(:empty)::after {
       content: " (total)";

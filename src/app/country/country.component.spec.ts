@@ -8,7 +8,7 @@ import { LineComponent } from '../chart';
 
 import { CountryComponent } from '.';
 
-fdescribe('CountryComponent', () => {
+describe('CountryComponent', () => {
   let component: CountryComponent;
   let fixture: ComponentFixture<CountryComponent>;
 
