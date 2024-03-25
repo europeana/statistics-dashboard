@@ -12,9 +12,9 @@ import {
   GeneralResultsFormatted,
   IHash,
   IHashArray,
-  SeriesValueNames,
   TargetData,
   TargetDataRaw,
+  TargetFieldNames,
   TemporalDataItem,
   TemporalLocalisedDataItem
 } from '../_models';
@@ -54,11 +54,11 @@ export class APIService {
         // make values larger for later targets
         let value = parseInt(label) * (index + 1);
 
-        return Object.keys(SeriesValueNames).map(
-          (targetType: SeriesValueNames) => {
+        return Object.keys(TargetFieldNames).map(
+          (targetType: TargetFieldNames) => {
             // make subtarget values smaller than total
             value -= 123;
-            const fieldName = SeriesValueNames[targetType];
+            const fieldName = TargetFieldNames[targetType];
             return {
               country,
               fieldName,
@@ -200,11 +200,11 @@ export class APIService {
 
     this.targetCountries.forEach((country: string) => {
       const baseValueTotal =
-        targetDataRef[country][SeriesValueNames.TOTAL][1].value;
+        targetDataRef[country][TargetFieldNames.TOTAL][1].value;
       const baseValue3D =
-        targetDataRef[country][SeriesValueNames.THREE_D][1].value;
+        targetDataRef[country][TargetFieldNames.THREE_D][1].value;
       const baseValueTierA =
-        targetDataRef[country][SeriesValueNames.HQ][1].value;
+        targetDataRef[country][TargetFieldNames.HQ][1].value;
 
       let value = baseValueTotal * 1;
       let value3D = baseValue3D * 1.2;
@@ -226,15 +226,13 @@ export class APIService {
         valueTierA -= 1 * (random2 * random1 * 5);
         value -= value3D / numDateTicks;
 
-        res.push(
-          {
-            country,
-            date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
-            total: Math.floor(value),
-            three_d: Math.floor(value3D),
-            meta_tier_a: Math.floor(valueTierA)
-          }
-        );
+        res.push({
+          country,
+          date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
+          total: Math.floor(value),
+          three_d: Math.floor(value3D),
+          meta_tier_a: Math.floor(valueTierA)
+        });
       });
     });
     return of(res.reverse());

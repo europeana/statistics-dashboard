@@ -1,27 +1,28 @@
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { IHash } from '../_models';
 
-//export enum TargetFieldNames {
-export enum SeriesValueNames {
+export enum TargetFieldNames {
   TOTAL = 'total',
   THREE_D = 'three_d',
   HQ = 'meta_tier_a'
 }
 
-export interface TargetData {
+export interface TargetDataBase {
   value: number;
   label: string;
   interim?: boolean;
+}
+
+export interface TargetDataRaw extends TargetDataBase {
+  country: string;
+  targetType: TargetFieldNames;
+}
+
+export interface TargetData extends TargetDataBase {
   range?: am4charts.ValueAxisDataItem;
 }
 
-export interface TargetDataRaw extends TargetData {
-  country: string;
-  targetType: SeriesValueNames;
-}
-
 type TargetFieldNameType = {
-  [key in SeriesValueNames]: string;
+  [key in TargetFieldNames]: string;
 };
 
 export interface TemporalDataItem extends TargetFieldNameType {

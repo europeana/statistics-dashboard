@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
-import { SeriesValueNames } from '../_models';
+import { TargetFieldNames } from '../_models';
 
 @Component({
   standalone: true,
@@ -22,7 +22,7 @@ export class MockLineComponent {
 
   showRange(
     _: string,
-    __: SeriesValueNames,
+    __: TargetFieldNames,
     ___: number,
     ____: am4core.Color
   ): void {
