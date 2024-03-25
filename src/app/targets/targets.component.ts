@@ -21,10 +21,10 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
   IHash,
   IHashArray,
+  TargetCountryData,
   TargetData,
-  TargetFieldNames,
-  TemporalDataItem,
-  TemporalLocalisedDataItem
+  TargetFieldName,
+  TargetMetaData
 } from '../_models';
 import { APIService } from '../_services';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
@@ -57,13 +57,13 @@ import { SubscriptionManager } from '../subscription-manager';
 export class TargetsComponent extends SubscriptionManager {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
-  targetData: IHash<IHashArray<TargetData>>;
-  countryData: IHash<Array<TemporalDataItem>> = {};
+  targetMetaData: IHash<IHashArray<TargetMetaData>>;
+  countryData: IHash<Array<TargetData>> = {};
   pinnedCountries: IHash<number> = {};
 
   public seriesSuffixes = ['total', '3D', 'META_A'];
   public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
-  public seriesValueNames = Object.keys(TargetFieldNames);
+  public seriesValueNames = Object.keys(TargetFieldName);
 
   @ViewChild('lineChart') lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: ElementRef;
@@ -74,12 +74,9 @@ export class TargetsComponent extends SubscriptionManager {
     this.subs.push(
       this.api
         .loadCountryData()
-        .subscribe((countryData: Array<TemporalLocalisedDataItem>) => {
+        .subscribe((countryData: Array<TargetCountryData>) => {
           this.countryData = countryData.reduce(
-            (
-              res: IHash<Array<TemporalDataItem>>,
-              item: TemporalLocalisedDataItem
-            ) => {
+            (res: IHash<Array<TargetData>>, item: TargetCountryData) => {
               if (!res[item.country]) {
                 res[item.country] = [];
               }
@@ -93,10 +90,10 @@ export class TargetsComponent extends SubscriptionManager {
     );
 
     this.subs.push(
-      this.api.getTargetData().subscribe((targetData) => {
-        this.targetData = targetData;
-        this.targetCountries = Object.keys(targetData);
-        this.targetCountriesOO = Object.keys(targetData);
+      this.api.getTargetMetaData().subscribe((data) => {
+        this.targetMetaData = data;
+        this.targetCountries = Object.keys(data);
+        this.targetCountriesOO = Object.keys(data);
       })
     );
   }
@@ -106,7 +103,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        TargetFieldNames.TOTAL,
+        TargetFieldName.TOTAL,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
@@ -191,7 +188,7 @@ export class TargetsComponent extends SubscriptionManager {
     }
   }
 
-  addSeriesSetAndPin(country: string, data: Array<TemporalDataItem>): void {
+  addSeriesSetAndPin(country: string, data: Array<TargetData>): void {
     this.resetChartColors();
 
     // add pin and series
@@ -202,7 +199,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
         country + this.seriesSuffixes[i],
-        TargetFieldNames[this.seriesValueNames[i]],
+        TargetFieldName[this.seriesValueNames[i]],
         data
       );
     });
@@ -210,7 +207,7 @@ export class TargetsComponent extends SubscriptionManager {
 
   toggleRange(
     country: string,
-    type: TargetFieldNames,
+    type: TargetFieldName,
     index: number,
     colour?: am4core.Color
   ): void {
@@ -283,7 +280,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
         country + this.seriesSuffixes[typeIndex],
-        TargetFieldNames[this.seriesValueNames[typeIndex]],
+        TargetFieldName[this.seriesValueNames[typeIndex]],
         this.countryData[country]
       );
 

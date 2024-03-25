@@ -9,9 +9,9 @@ import {
   IHash,
   IHashArray,
   RequestFilter,
+  TargetCountryData,
   TargetData,
-  TemporalDataItem,
-  TemporalLocalisedDataItem
+  TargetMetaData
 } from '../_models';
 
 const rightsCategories = [
@@ -664,15 +664,15 @@ export class MockAPIService {
     return of([`${rightsCategories[0]}/1.0`, `${rightsCategories[0]}/2.0`]);
   }
 
-  getTargetData(): Observable<IHash<IHashArray<TargetData>>> {
+  getTargetMetaData(): Observable<IHash<IHashArray<TargetMetaData>>> {
     return of({});
   }
 
-  loadCountryData(): Observable<Array<TemporalLocalisedDataItem>> {
+  loadCountryData(): Observable<Array<TargetCountryData>> {
     return of([]);
   }
 
-  getCountryData(): Observable<IHash<Array<TemporalDataItem>>> {
+  getCountryData(): Observable<IHash<Array<TargetData>>> {
     return of({});
   }
 

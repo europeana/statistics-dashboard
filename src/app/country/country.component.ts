@@ -20,7 +20,7 @@ import {
   IHash,
   IHashArray,
   TargetData,
-  TemporalDataItem
+  TargetMetaData
 } from '../_models';
 import { APIService } from '../_services';
 import {
@@ -76,9 +76,9 @@ export class CountryComponent extends SubscriptionManager {
   country = 'France';
   countryCode = 'FR';
   countryLandingData: GeneralResultsFormatted = {};
-  targetData: IHash<IHashArray<TargetData>>;
-  countryData: IHash<Array<TemporalDataItem>> = {};
-  latestCountryData: TemporalDataItem;
+  targetMetaData: IHash<IHashArray<TargetMetaData>>;
+  countryData: IHash<Array<TargetData>> = {};
+  latestCountryData: TargetData;
   detailsExpanded = false;
   monotonePowerbars = true;
 
@@ -86,10 +86,9 @@ export class CountryComponent extends SubscriptionManager {
     super();
     this.subs.push(
       api.getCountryData().subscribe((countryData) => {
-        // this is all... for the chart
         this.countryData = countryData;
-
         const specificCountryData = countryData[this.countryCode];
+
         if (specificCountryData.length) {
           this.latestCountryData =
             specificCountryData[specificCountryData.length - 1];
@@ -98,10 +97,8 @@ export class CountryComponent extends SubscriptionManager {
     );
 
     this.subs.push(
-      this.api.getTargetData().subscribe((targetData) => {
-        this.targetData = targetData;
-        //this.targetCountries = Object.keys(targetData);
-        //this.targetCountriesOO = Object.keys(targetData);
+      this.api.getTargetMetaData().subscribe((data) => {
+        this.targetMetaData = data;
       })
     );
 
@@ -119,10 +116,5 @@ export class CountryComponent extends SubscriptionManager {
     this.lineChart.toggleCursor();
     this.lineChart.toggleGridlines();
     //this.lineChart.toggleScrollbar();
-
-    // extra
-    import(`../doc-arrows/doc-arrows.component`).then(
-      ({ DocArrowsComponent }) => new DocArrowsComponent()
-    );
   }
 }

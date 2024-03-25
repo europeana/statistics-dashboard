@@ -23,8 +23,8 @@ import {
   IHash,
   IHashArray,
   TargetData,
-  TargetFieldNames,
-  TemporalDataItem
+  TargetFieldName,
+  TargetMetaData
 } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
@@ -54,18 +54,18 @@ export class LegendGridComponent {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
 
-  _targetData: IHash<IHashArray<TargetData>>;
+  _targetMetaData: IHash<IHashArray<TargetMetaData>>;
 
-  @Input() set targetData(targetData: IHash<IHashArray<TargetData>>) {
-    this._targetData = targetData;
-    this.targetCountries = Object.keys(targetData);
-    this.targetCountriesOO = Object.keys(targetData);
+  @Input() set targetMetaData(data: IHash<IHashArray<TargetMetaData>>) {
+    this._targetMetaData = data;
+    this.targetCountries = Object.keys(data);
+    this.targetCountriesOO = Object.keys(data);
   }
-  get targetData(): IHash<IHashArray<TargetData>> {
-    return this._targetData;
+  get targetMetaData(): IHash<IHashArray<TargetMetaData>> {
+    return this._targetMetaData;
   }
 
-  @Input() countryData: IHash<Array<TemporalDataItem>> = {};
+  @Input() countryData: IHash<Array<TargetData>> = {};
   @Input() lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: ElementRef;
 
@@ -74,15 +74,15 @@ export class LegendGridComponent {
   public seriesSuffixes = ['total', '3D', 'META_A'];
   public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
 
-  public seriesValueNames = Object.keys(TargetFieldNames);
-  public TargetFieldNames = TargetFieldNames;
+  public seriesValueNames = Object.keys(TargetFieldName);
+  public TargetFieldName = TargetFieldName;
 
   ngAfterContentInit(): void {
     setTimeout(() => {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        TargetFieldNames.TOTAL,
+        TargetFieldName.TOTAL,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
@@ -155,7 +155,7 @@ export class LegendGridComponent {
     }
   }
 
-  addSeriesSetAndPin(country: string, data: Array<TemporalDataItem>): void {
+  addSeriesSetAndPin(country: string, data: Array<TargetData>): void {
     this.resetChartColors();
 
     // add pin and series
@@ -166,7 +166,7 @@ export class LegendGridComponent {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
         country + this.seriesSuffixes[i],
-        TargetFieldNames[this.seriesValueNames[i]],
+        TargetFieldName[this.seriesValueNames[i]],
         data
       );
     });
@@ -174,7 +174,7 @@ export class LegendGridComponent {
 
   toggleRange(
     country: string,
-    type: TargetFieldNames,
+    type: TargetFieldName,
     index: number,
     colour?: am4core.Color
   ): void {
@@ -230,10 +230,10 @@ export class LegendGridComponent {
    **/
   toggleSeries(
     country: string,
-    type: TargetFieldNames,
+    type: TargetFieldName,
     series?: am4charts.LineSeries
   ): void {
-    const typeIndex = Object.values(TargetFieldNames).indexOf(type);
+    const typeIndex = Object.values(TargetFieldName).indexOf(type);
 
     if (!series) {
       // create from existing data
@@ -247,7 +247,7 @@ export class LegendGridComponent {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
         country + this.seriesSuffixes[typeIndex],
-        TargetFieldNames[this.seriesValueNames[typeIndex]],
+        TargetFieldName[this.seriesValueNames[typeIndex]],
         this.countryData[country]
       );
 

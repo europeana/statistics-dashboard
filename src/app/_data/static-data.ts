@@ -56,17 +56,7 @@ facetNamesFriendly['dates'] = $localize`:@@facetNameDates:Last Updated`;
 
 export const portalNamesFriendly = facetNamesFriendly;
 
-export const colours = [
-  '#0a72cc',
-  '#e11d53',
-  '#ffae00',
-  '#219d31',
-
-  '#0a72cc',
-  '#e11d53',
-  '#ffae00',
-  '#219d31'
-];
+export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
 
 export const DiacriticsMap = {
   A: 'AÁĂẮẶẰẲẴǍÂẤẬẦẨẪÄẠÀẢĀĄÅǺÃÆǼА',

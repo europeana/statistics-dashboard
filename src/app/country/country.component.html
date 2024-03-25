@@ -216,13 +216,13 @@
       ></span>
       <div class="entry-card-content">
         <div class="entry-card-pair">
-          <app-line-chart #lineChart [targetData]="targetData">
+          <app-line-chart #lineChart [targetMetaData]="targetMetaData">
           </app-line-chart>
 
           <app-legend-grid
             #legendGrid
             [countryData]="countryData"
-            [targetData]="targetData"
+            [targetMetaData]="targetMetaData"
             [lineChart]="lineChart"
           ></app-legend-grid>
         </div>
@@ -340,7 +340,7 @@
                     let countryRowIndex = index
                   "
                 >
-                  <ng-container *ngIf="targetData[country.key]">
+                  <ng-container *ngIf="targetMetaData[country.key]">
                     <ng-content
                       *ngTemplateOutlet="
                         countryRow;
@@ -356,12 +356,14 @@
                           row: row,
                           targets: [
                             [
-                              targetData[country.key]['three_d'][0].value,
-                              targetData[country.key]['three_d'][1].value
+                              targetMetaData[country.key]['three_d'][0].value,
+                              targetMetaData[country.key]['three_d'][1].value
                             ],
                             [
-                              targetData[country.key]['meta_tier_a'][0].value,
-                              targetData[country.key]['meta_tier_a'][1].value
+                              targetMetaData[country.key]['meta_tier_a'][0]
+                                .value,
+                              targetMetaData[country.key]['meta_tier_a'][1]
+                                .value
                             ]
                           ],
                           wrap: countryRowIndex === 0

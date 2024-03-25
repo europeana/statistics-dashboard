@@ -12,7 +12,8 @@
       <span class="item-header">Data Over Time </span>
 
       <div class="line-chart-wrapper">
-        <app-line-chart #lineChart [targetData]="targetData"> </app-line-chart>
+        <app-line-chart #lineChart [targetMetaData]="targetMetaData">
+        </app-line-chart>
         <a class="data-link hover-show"
           >Chart options
           <div class="hover-show-content">
@@ -40,7 +41,7 @@
       <ng-container *ngIf="lineChart">
         <app-legend-grid
           [countryData]="countryData"
-          [targetData]="targetData"
+          [targetMetaData]="targetMetaData"
           [lineChart]="lineChart"
         ></app-legend-grid>
       </ng-container>
@@ -76,7 +77,7 @@
 
       <ng-container *ngFor="let country of pinnedCountries | keyvalue">
         <ng-container *ngFor="let row of countryData[country.key]">
-          <ng-container *ngIf="targetData[country.key]">
+          <ng-container *ngIf="targetMetaData[country.key]">
             <span>
               {{ row["date"] | date: "dd/MM/yyyy" }}
             </span>
@@ -87,28 +88,28 @@
               {{ row["total"] | number }}
             </span>
             <span>
-              {{ targetData[country.key]["total"][0].value | json }}
+              {{ targetMetaData[country.key]["total"][0].value | json }}
             </span>
             <span>
-              {{ targetData[country.key]["total"][1].value | json }}
+              {{ targetMetaData[country.key]["total"][1].value | json }}
             </span>
             <span>
               {{ row["three_d"] | number }}
             </span>
             <span>
-              {{ targetData[country.key]["three_d"][0].value | json }}
+              {{ targetMetaData[country.key]["three_d"][0].value | json }}
             </span>
             <span>
-              {{ targetData[country.key]["three_d"][1].value | json }}
+              {{ targetMetaData[country.key]["three_d"][1].value | json }}
             </span>
             <span>
               {{ row["meta_tier_a"] | number }}
             </span>
             <span>
-              {{ targetData[country.key]["meta_tier_a"][0].value | json }}
+              {{ targetMetaData[country.key]["meta_tier_a"][0].value | json }}
             </span>
             <span>
-              {{ targetData[country.key]["meta_tier_a"][1].value | json }}
+              {{ targetMetaData[country.key]["meta_tier_a"][1].value | json }}
             </span>
           </ng-container>
         </ng-container>

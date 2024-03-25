@@ -1,36 +1,35 @@
 import * as am4charts from '@amcharts/amcharts4/charts';
 
-export enum TargetFieldNames {
+export enum TargetFieldName {
   TOTAL = 'total',
   THREE_D = 'three_d',
   HQ = 'meta_tier_a'
 }
 
-export interface TargetDataBase {
+interface TargetMetaDataBase {
   value: number;
   label: string;
   interim?: boolean;
 }
 
-export interface TargetDataRaw extends TargetDataBase {
+export interface TargetMetaDataRaw extends TargetMetaDataBase {
   country: string;
-  targetType: TargetFieldNames;
+  targetType: TargetFieldName;
 }
 
-export interface TargetData extends TargetDataBase {
+export interface TargetMetaData extends TargetMetaDataBase {
   range?: am4charts.ValueAxisDataItem;
 }
 
 type TargetFieldNameType = {
-  [key in TargetFieldNames]: string;
+  [key in TargetFieldName]: string;
 };
 
-export interface TemporalDataItem extends TargetFieldNameType {
+export interface TargetData extends TargetFieldNameType {
   date: string;
   label: string;
-  interim?: boolean;
 }
 
-export interface TemporalLocalisedDataItem extends TemporalDataItem {
+export interface TargetCountryData extends TargetData {
   country: string;
 }

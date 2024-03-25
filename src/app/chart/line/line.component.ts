@@ -18,8 +18,8 @@ import {
   IHash,
   IHashArray,
   TargetData,
-  TargetFieldNames,
-  TemporalDataItem
+  TargetFieldName,
+  TargetMetaData
 } from '../../_models';
 
 @Component({
@@ -42,7 +42,7 @@ export class LineComponent implements AfterViewInit {
   };
   valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>;
 
-  @Input() targetData: IHash<IHashArray<TargetData>>;
+  @Input() targetMetaData: IHash<IHashArray<TargetMetaData>>;
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId,
@@ -63,15 +63,15 @@ export class LineComponent implements AfterViewInit {
     specificValueName?: string,
     specificIndex?: number
   ): void {
-    Object.keys(TargetFieldNames).forEach((seriesValueName: string) => {
+    Object.keys(TargetFieldName).forEach((seriesValueName: string) => {
       if (
         !specificValueName ||
-        specificValueName === TargetFieldNames[seriesValueName]
+        specificValueName === TargetFieldName[seriesValueName]
       ) {
         const targetDataType =
-          this.targetData[country][TargetFieldNames[seriesValueName]];
+          this.targetMetaData[country][TargetFieldName[seriesValueName]];
         if (targetDataType) {
-          targetDataType.forEach((td: TargetData, tdIndex: number) => {
+          targetDataType.forEach((td: TargetMetaData, tdIndex: number) => {
             if (parseInt(`${specificIndex}`) > -1) {
               if (specificIndex !== tdIndex) {
                 return;
@@ -92,12 +92,14 @@ export class LineComponent implements AfterViewInit {
 
   showRange(
     country: string,
-    seriesValueName: TargetFieldNames,
+    seriesValueName: TargetFieldName,
     index: number,
     colour: am4core.Color
   ): void {
-    const targetData = this.targetData[country][seriesValueName][index];
-    this.createRange(targetData, colour);
+    this.createRange(
+      this.targetMetaData[country][seriesValueName][index],
+      colour
+    );
     this.chart.paddingRight = this.padding.rightWide;
   }
 
@@ -105,7 +107,7 @@ export class LineComponent implements AfterViewInit {
    * creates and styles a (pinned) axisRange
    * assigns reference for open / closing behaviour
    **/
-  createRange(targetData: TargetData, colour: am4core.Color): void {
+  createRange(targetData: TargetMetaData, colour: am4core.Color): void {
     const colourPin = am4core.color('#0c529c'); // eu-flag colour
     const range = this.valueAxis.axisRanges.create();
 
@@ -178,14 +180,14 @@ export class LineComponent implements AfterViewInit {
    * adds the (renmed) series data to the chart data
    * @param { string } axisLabel - axis label
    * @param { string } seriesValueY - unique per-series per-country series key
-   * @param { TargetFieldNames } valueY
-   * @param { Array<TemporalDataItem> } seriesData:
+   * @param { TargetFieldName } valueY
+   * @param { Array<TargetData> } seriesData:
    **/
   addSeries(
     axisLabel: string,
     seriesValueY: string,
-    valueY: TargetFieldNames,
-    seriesData: Array<TemporalDataItem>
+    valueY: TargetFieldName,
+    seriesData: Array<TargetData>
   ): void {
     const series = this.chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueY = seriesValueY;
@@ -197,7 +199,7 @@ export class LineComponent implements AfterViewInit {
 
     const chartData = this.chart.data;
 
-    seriesData.forEach((sd: TemporalDataItem, rowIndex: number) => {
+    seriesData.forEach((sd: TargetData, rowIndex: number) => {
       const val = sd[valueY];
       if (rowIndex >= chartData.length) {
         chartData.push(sd);
