@@ -9,6 +9,7 @@ import { By } from '@angular/platform-browser';
 import { IsScrollableDirective } from '.';
 
 @Component({
+  imports: [IsScrollableDirective],
   template: `
     <div class="cmp">
       <div
@@ -21,7 +22,8 @@ import { IsScrollableDirective } from '.';
       <a class="fwd" (click)="scrollInfo.fwd()">FWD</a>
     </div>
   `,
-  styles: ['.scrollable{ width: 100px; max-width: 100px; }']
+  styles: ['.scrollable{ width: 100px; max-width: 100px; }'],
+  standalone: true
 })
 class TestIsScrollableDirectiveComponent {}
 
@@ -33,7 +35,7 @@ describe('IsScrollableDirective', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [IsScrollableDirective, TestIsScrollableDirectiveComponent],
+      imports: [IsScrollableDirective, TestIsScrollableDirectiveComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   }));

@@ -5,7 +5,8 @@ import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
   selector: 'app-resize',
-  template: ''
+  template: '',
+  standalone: true
 })
 export class ResizeComponent extends SubscriptionManager implements OnInit {
   @Input() time = 200;

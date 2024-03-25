@@ -6,11 +6,12 @@ import {
   tick
 } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { createMockPipe, MockAPIService } from '../_mocked';
+import { MockAPIService } from '../_mocked';
 import { DimensionName, PagerInfo, SortBy, TableRow } from '../_models';
 import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { GridComponent } from '.';
+import { RenameApiFacetPipe } from '../_translate';
 
 describe('GridComponent', () => {
   let component: GridComponent;
@@ -62,17 +63,13 @@ describe('GridComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [FormsModule],
-      declarations: [
-        createMockPipe('renameApiFacet'),
-        GridComponent,
-        GridPaginatorComponent
-      ],
+      imports: [FormsModule, GridComponent, GridPaginatorComponent],
       providers: [
         {
           provide: APIService,
           useClass: MockAPIService
-        }
+        },
+        RenameApiFacetPipe
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();

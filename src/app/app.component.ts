@@ -1,4 +1,4 @@
-import { Location, PopStateEvent } from '@angular/common';
+import { Location, NgIf, PopStateEvent } from '@angular/common';
 import {
   Component,
   HostListener,
@@ -10,16 +10,18 @@ import {
   ViewContainerRef
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterOutlet } from '@angular/router';
 import {
   MaintenanceItem,
   MaintenanceScheduleService,
-  MaintenanceSettings
+  MaintenanceSettings,
+  MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
 
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
+import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService } from './_services';
 import {
   BreakdownResult,
@@ -29,11 +31,21 @@ import {
 } from './_models';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
+import { FooterComponent } from './footer/footer.component';
+import { HeaderComponent } from './header/header.component';
 
 @Component({
   selector: 'app-root',
   styleUrls: ['./app.component.scss'],
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  standalone: true,
+  imports: [
+    NgIf,
+    MaintenanceUtilsModule,
+    HeaderComponent,
+    RouterOutlet,
+    FooterComponent
+  ]
 })
 export class AppComponent extends SubscriptionManager implements OnInit {
   private readonly maintenanceService = inject(MaintenanceScheduleService);
@@ -56,7 +68,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly location: Location,
-    @Inject(LOCALE_ID) private readonly locale: string
+    @Inject(LOCALE_ID) private readonly locale: string,
+    @Inject(LOCALE_ID) private readonly dateAdapter: AppDateAdapter
   ) {
     super();
     document.title = 'Statistics Dashboard';

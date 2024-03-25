@@ -62,7 +62,8 @@ facetNames[
 ] = $localize`:@@facetNameShortPluralProvider:Providers`;
 
 @Pipe({
-  name: 'renameApiFacetShort'
+  name: 'renameApiFacetShort',
+  standalone: true
 })
 export class RenameApiFacetShortPipe implements PipeTransform {
   transform(value: string): string {

@@ -6,8 +6,8 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { ResizeComponent } from '../resize';
-import { createMockPipe } from '../_mocked';
 import { TruncateComponent } from './';
+import { HighlightMatchPipe } from '../_translate';
 
 describe('TruncateComponent', () => {
   let component: TruncateComponent;
@@ -15,11 +15,8 @@ describe('TruncateComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-      declarations: [
-        TruncateComponent,
-        ResizeComponent,
-        createMockPipe('highlightMatch')
-      ]
+      imports: [TruncateComponent, ResizeComponent],
+      providers: [HighlightMatchPipe]
     }).compileComponents();
   };
 

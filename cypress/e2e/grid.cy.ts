@@ -2,10 +2,9 @@ import { DimensionName } from '../../src/app/_models';
 
 context('Statistics Dashboard', () => {
   describe('grid', () => {
-
-    const force = { force : true };
+    const force = { force: true };
     const selInputGoTo = 'input.go-to';
-    const selInputPageSize = 'select.max-page-size'
+    const selInputPageSize = 'select.max-page-size';
     const selRowName = '[data-e2e="grid-row-name"]';
     const selPageNext = '[data-e2e="grid-page-next"]';
     const selPagePrev = '[data-e2e="grid-page-prev"]';
@@ -14,8 +13,11 @@ context('Statistics Dashboard', () => {
     const selFilter = '.search';
 
     const assertRowLength = (values: Array<string>, length: number): void => {
-      values.forEach((value: string)=> {
-        cy.get(selRowName + '[title="' + value +'"]').should('have.length', length);
+      values.forEach((value: string) => {
+        cy.get(selRowName + '[title="' + value + '"]').should(
+          'have.length',
+          length
+        );
       });
     };
 
@@ -24,8 +26,12 @@ context('Statistics Dashboard', () => {
 
       const arCountries = ['Bulgaria', 'Denmark', 'Hungary'];
       const orCountries = ['Norway', 'Portugal'];
-      const arProviders = ['Arts Council Norway', 'CARARE', '^The European Library'];
-      const waProviders  = ['EFG - The European Film Gateway'];
+      const arProviders = [
+        'Arts Council Norway',
+        'CARARE',
+        '^The European Library'
+      ];
+      const waProviders = ['EFG - The European Film Gateway'];
 
       cy.get(selFilter).type('ar', force);
 
@@ -165,6 +171,5 @@ context('Statistics Dashboard', () => {
       assertRowLength(inFirst20, 1);
       assertRowLength(inSecond20, 0);
     });
-
   });
 });

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
 
 @Component({
+  standalone: true,
   selector: 'app-grid',
   template: ''
 })

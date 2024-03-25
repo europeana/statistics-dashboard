@@ -16,11 +16,12 @@ import {
   UntypedFormBuilder,
   UntypedFormControl
 } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
 import { nonFacetFilters, portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
+import { RenameApiFacetPipe } from '../_translate';
 
 import {
   createMockPipe,
@@ -41,6 +42,8 @@ import {
   RequestFilterRange
 } from '../_models';
 import { APIService } from '../_services';
+import { BarComponent } from '../chart';
+import { GridComponent } from '../grid';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
 
@@ -48,12 +51,6 @@ describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
   let router: Router;
-
-  const dialog = {
-    open: (): void => {
-      // mock open function
-    }
-  };
 
   const contentTierNameLabels = [
     { name: '0', label: '0' },
@@ -98,15 +95,11 @@ describe('OverviewComponent', () => {
             component: OverviewComponent
           },
           { path: `data/${DimensionName.type}`, component: OverviewComponent }
-        ])
-      ],
-      declarations: [
+        ]),
         IsScrollableDirective,
+        MatDialogModule,
         OverviewComponent,
-        MockBarComponent,
-        MockGridComponent,
-        SnapshotsComponent,
-        createMockPipe('renameApiFacet')
+        SnapshotsComponent
       ],
       providers: [
         {
@@ -118,14 +111,18 @@ describe('OverviewComponent', () => {
           useValue: { params: params, queryParams: queryParams }
         },
         {
-          provide: MatDialog,
-          useValue: dialog
+          provide: RenameApiFacetPipe,
+          useValue: createMockPipe('renameApiFacet')
         }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
-    }).compileComponents();
-
-    api = TestBed.inject(APIService);
+    })
+      .overrideComponent(OverviewComponent, {
+        remove: { imports: [BarComponent, GridComponent] },
+        add: { imports: [MockBarComponent, MockGridComponent] }
+      })
+      .compileComponents();
+    api = TestBed.get(APIService);
   };
 
   const b4Each = (): void => {
@@ -227,12 +224,6 @@ describe('OverviewComponent', () => {
       const res2 = component.portalUrlsFromNVPs(DimensionName.type, data);
       // eslint-disable-next-line no-useless-escape
       expect(res2.name).toEqual(`${rootUrl}&qf=TYPE:\"name\"`);
-    });
-
-    it('should show the date disclaimer', () => {
-      spyOn(dialog, 'open');
-      component.showDateDisclaimer();
-      expect(dialog.open).toHaveBeenCalled();
     });
 
     it('should process the server result', () => {

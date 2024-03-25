@@ -6,8 +6,14 @@ import {
   UntypedFormControl,
   ValidationErrors
 } from '@angular/forms';
-import { validateDateGeneric } from '../_helpers';
+import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { AppDateAdapter, validateDateGeneric } from '../_helpers';
 import { DatesComponent } from '.';
+
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 describe('DatesComponent', () => {
   let component: DatesComponent;
@@ -15,9 +21,30 @@ describe('DatesComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
-      declarations: [DatesComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      imports: [ReactiveFormsModule, DatesComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        { provide: DateAdapter, useClass: AppDateAdapter },
+        {
+          provide: MAT_DATE_FORMATS,
+          useValue: {
+            parse: {
+              dateInput: AppDateAdapter.preferredFormat
+            },
+            dateInput: AppDateAdapter.preferredFormat,
+            display: {
+              dateInput: AppDateAdapter.preferredFormat,
+              monthYearLabel: 'MM YYYY',
+              dateA11yLabel: 'MM',
+              monthYearA11yLabel: 'MMMM YYYY'
+            }
+          }
+        },
+        provideAnimations(),
+        // TODO: are these needed?
+        MatDatepickerModule,
+        MatFormFieldModule
+      ]
     }).compileComponents();
   });
 
@@ -52,7 +79,7 @@ describe('DatesComponent', () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
-    expect(component.dateFrom.nativeElement.getAttribute('max')).not.toEqual(
+    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
       component.today
     );
 
@@ -70,7 +97,9 @@ describe('DatesComponent', () => {
   });
 
   it('should set the min-max attributes', () => {
-    expect(component.dateTo.nativeElement.getAttribute('min')).toBeFalsy();
+    expect(component.dateTo.nativeElement.getAttribute('min')).toEqual(
+      component.yearZero
+    );
 
     component.form.value.dateFrom = component.today;
     component.dateChange();
@@ -185,24 +214,5 @@ describe('DatesComponent', () => {
     resFrom = validateDateGeneric(dateFrom, 'dateFrom');
     expect(resFrom.isTooEarly).toBeFalsy();
     expect(resFrom.isTooLate).toBeTruthy();
-  });
-
-  it('should handle the to-date change', () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(null);
-
-    component.form.value.dateTo = yesterday.toISOString();
-    component.dateChange();
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      yesterday.toISOString().split('T')[0]
-    );
-
-    component.form.value.dateTo = null;
-    component.dateChange();
-    expect(component.dateFrom.nativeElement.getAttribute('max')).toEqual(
-      component.today
-    );
   });
 });

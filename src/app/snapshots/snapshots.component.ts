@@ -11,11 +11,20 @@ import {
   SortInfo,
   TableRow
 } from '../_models';
+import {
+  NgClass,
+  NgFor,
+  NgIf,
+  NgStyle,
+  NgTemplateOutlet
+} from '@angular/common';
 
 @Component({
   selector: 'app-snapshots',
   templateUrl: './snapshots.component.html',
-  styleUrls: ['./snapshots.component.scss']
+  styleUrls: ['./snapshots.component.scss'],
+  standalone: true,
+  imports: [NgIf, NgClass, NgStyle, NgFor, NgTemplateOutlet]
 })
 export class SnapshotsComponent {
   public colours = colours;

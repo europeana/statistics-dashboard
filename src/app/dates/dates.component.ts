@@ -6,13 +6,28 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormGroup
+} from '@angular/forms';
 import { getDateAsISOString, today, yearZero } from '../_helpers';
+import { NgIf } from '@angular/common';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @Component({
   selector: 'app-dates',
   templateUrl: './dates.component.html',
-  styleUrls: ['./dates.component.scss']
+  styleUrls: ['./dates.component.scss'],
+  standalone: true,
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    NgIf
+  ]
 })
 export class DatesComponent {
   // Make imports available to template

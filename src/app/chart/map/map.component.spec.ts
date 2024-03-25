@@ -12,7 +12,7 @@ describe('MapComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MapComponent],
+      imports: [MapComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [{ provide: APIService, useClass: MockAPIService }]
     }).compileComponents();

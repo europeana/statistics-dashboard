@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { getFormValueList } from '../_helpers';
 import {
   DimensionName,
@@ -14,11 +14,30 @@ import {
   FilterOptionSet,
   FilterState
 } from '../_models';
+import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
+import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
+import { CheckboxComponent } from '../checkbox/checkbox.component';
+import { DatesComponent } from '../dates/dates.component';
+import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-filter',
   templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.scss']
+  styleUrls: ['./filter.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    ClickAwareDirective,
+    FormsModule,
+    ReactiveFormsModule,
+    NgClass,
+    DatesComponent,
+    NgFor,
+    CheckboxComponent,
+    HighlightMatchPipe,
+    RenameApiFacetPipe
+  ]
 })
 export class FilterComponent {
   @Input() emptyDataset: boolean;

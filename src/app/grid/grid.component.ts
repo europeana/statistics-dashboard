@@ -18,11 +18,35 @@ import {
 import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { SubscriptionManager } from '../subscription-manager';
+import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
+import { TruncateComponent } from '../truncate/truncate.component';
+import { FormsModule } from '@angular/forms';
+import {
+  DecimalPipe,
+  NgClass,
+  NgFor,
+  NgIf,
+  NgStyle,
+  NgTemplateOutlet
+} from '@angular/common';
 
 @Component({
   selector: 'app-grid',
   templateUrl: './grid.component.html',
-  styleUrls: ['./grid.component.scss']
+  styleUrls: ['./grid.component.scss'],
+  standalone: true,
+  imports: [
+    NgIf,
+    NgClass,
+    NgStyle,
+    FormsModule,
+    NgFor,
+    GridPaginatorComponent,
+    NgTemplateOutlet,
+    TruncateComponent,
+    DecimalPipe,
+    RenameApiFacetPipe
+  ]
 })
 export class GridComponent extends SubscriptionManager {
   @Input() facet: DimensionName;

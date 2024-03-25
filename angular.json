@@ -99,21 +99,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "statistics-dashboard:build"
+            "buildTarget": "statistics-dashboard:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "statistics-dashboard:build:production"
+              "buildTarget": "statistics-dashboard:build:production"
             },
             "e2e": {
-              "browserTarget": "statistics-dashboard:build:e2e"
+              "buildTarget": "statistics-dashboard:build:e2e"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "statistics-dashboard:build"
+            "buildTarget": "statistics-dashboard:build"
           }
         },
         "test": {
