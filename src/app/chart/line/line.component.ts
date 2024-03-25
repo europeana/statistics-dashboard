@@ -18,8 +18,8 @@ import {
   IHash,
   IHashArray,
   TargetData,
-  TemporalDataItem,
-  SeriesValueNames
+  TargetFieldNames,
+  TemporalDataItem
 } from '../../_models';
 
 @Component({
@@ -63,13 +63,13 @@ export class LineComponent implements AfterViewInit {
     specificValueName?: string,
     specificIndex?: number
   ): void {
-    Object.keys(SeriesValueNames).forEach((seriesValueName: string) => {
+    Object.keys(TargetFieldNames).forEach((seriesValueName: string) => {
       if (
         !specificValueName ||
-        specificValueName === SeriesValueNames[seriesValueName]
+        specificValueName === TargetFieldNames[seriesValueName]
       ) {
         const targetDataType =
-          this.targetData[country][SeriesValueNames[seriesValueName]];
+          this.targetData[country][TargetFieldNames[seriesValueName]];
         if (targetDataType) {
           targetDataType.forEach((td: TargetData, tdIndex: number) => {
             if (parseInt(`${specificIndex}`) > -1) {
@@ -92,7 +92,7 @@ export class LineComponent implements AfterViewInit {
 
   showRange(
     country: string,
-    seriesValueName: SeriesValueNames,
+    seriesValueName: TargetFieldNames,
     index: number,
     colour: am4core.Color
   ): void {
@@ -172,24 +172,33 @@ export class LineComponent implements AfterViewInit {
     }
   }
 
+  /**
+   * addSeries
+   * adds a LineSeries object to the chart / stores ref to this.allSeriesData
+   * adds the (renmed) series data to the chart data
+   * @param { string } axisLabel - axis label
+   * @param { string } seriesValueY - unique per-series per-country series key
+   * @param { TargetFieldNames } valueY
+   * @param { Array<TemporalDataItem> } seriesData:
+   **/
   addSeries(
-    seriesDisplayName: string,
+    axisLabel: string,
     seriesValueY: string,
-    valueY: string,
+    valueY: TargetFieldNames,
     seriesData: Array<TemporalDataItem>
   ): void {
     const series = this.chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueY = seriesValueY;
     series.dataFields.dateX = 'date';
     series.strokeWidth = 2;
-    series.tooltipText = `${seriesDisplayName} {${seriesValueY}}`;
+    series.tooltipText = `${axisLabel} {${seriesValueY}}`;
     series.tooltip.pointerOrientation = 'vertical';
     series.tooltip.getFillFromObject = true;
 
     const chartData = this.chart.data;
 
     seriesData.forEach((sd: TemporalDataItem, rowIndex: number) => {
-      const val = sd[valueY] as number;
+      const val = sd[valueY];
       if (rowIndex >= chartData.length) {
         chartData.push(sd);
       }
@@ -199,8 +208,8 @@ export class LineComponent implements AfterViewInit {
   }
 
   /** drawChart
-  /* ...
-  */
+   * initialises chart object
+   **/
   drawChart(): void {
     am4core.useTheme(am4themes_animated);
 

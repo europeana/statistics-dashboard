@@ -3,16 +3,17 @@
 @import "../../scss/functions/_replace";
 
 .appendice-grid-wrapper {
-  //$timeTransition: 0.25s;
-  $timeTransition: 0.5s; // speed depends on distance... which is at least double
+  $timeTransition: 0.5s;
 
   display: grid;
   grid-template-rows: 0fr;
-  margin-top: 2em;
-  transition: grid-template-rows $timeTransition linear;
+  margin-top: 0;
+  transition: grid-template-rows $timeTransition linear,
+    margin-top $timeTransition linear;
 
   &.is-open {
     grid-template-rows: 1fr;
+    margin-top: 2em;
   }
 
   & > * {

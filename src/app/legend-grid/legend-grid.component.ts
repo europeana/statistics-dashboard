@@ -22,8 +22,8 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
   IHash,
   IHashArray,
-  SeriesValueNames,
   TargetData,
+  TargetFieldNames,
   TemporalDataItem
 } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
@@ -74,15 +74,15 @@ export class LegendGridComponent {
   public seriesSuffixes = ['total', '3D', 'META_A'];
   public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
 
-  public seriesValueNames = Object.keys(SeriesValueNames);
-  public SeriesValueNames = SeriesValueNames;
+  public seriesValueNames = Object.keys(TargetFieldNames);
+  public TargetFieldNames = TargetFieldNames;
 
   ngAfterContentInit(): void {
     setTimeout(() => {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        SeriesValueNames.TOTAL,
+        TargetFieldNames.TOTAL,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
@@ -166,7 +166,7 @@ export class LegendGridComponent {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
         country + this.seriesSuffixes[i],
-        SeriesValueNames[this.seriesValueNames[i]],
+        TargetFieldNames[this.seriesValueNames[i]],
         data
       );
     });
@@ -174,7 +174,7 @@ export class LegendGridComponent {
 
   toggleRange(
     country: string,
-    type: SeriesValueNames,
+    type: TargetFieldNames,
     index: number,
     colour?: am4core.Color
   ): void {
@@ -230,10 +230,10 @@ export class LegendGridComponent {
    **/
   toggleSeries(
     country: string,
-    type: SeriesValueNames,
+    type: TargetFieldNames,
     series?: am4charts.LineSeries
   ): void {
-    const typeIndex = Object.values(SeriesValueNames).indexOf(type);
+    const typeIndex = Object.values(TargetFieldNames).indexOf(type);
 
     if (!series) {
       // create from existing data
@@ -247,7 +247,7 @@ export class LegendGridComponent {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
         country + this.seriesSuffixes[typeIndex],
-        this.seriesValueNames[typeIndex],
+        TargetFieldNames[this.seriesValueNames[typeIndex]],
         this.countryData[country]
       );
 

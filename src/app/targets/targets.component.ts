@@ -21,8 +21,8 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
   IHash,
   IHashArray,
-  SeriesValueNames,
   TargetData,
+  TargetFieldNames,
   TemporalDataItem,
   TemporalLocalisedDataItem
 } from '../_models';
@@ -63,7 +63,7 @@ export class TargetsComponent extends SubscriptionManager {
 
   public seriesSuffixes = ['total', '3D', 'META_A'];
   public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
-  public seriesValueNames = ['total', 'three_d', 'meta_tier_a'];
+  public seriesValueNames = Object.keys(TargetFieldNames);
 
   @ViewChild('lineChart') lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: ElementRef;
@@ -106,7 +106,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        SeriesValueNames.TOTAL,
+        TargetFieldNames.TOTAL,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
@@ -202,7 +202,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
         country + this.seriesSuffixes[i],
-        this.seriesValueNames[i],
+        TargetFieldNames[this.seriesValueNames[i]],
         data
       );
     });
@@ -210,7 +210,7 @@ export class TargetsComponent extends SubscriptionManager {
 
   toggleRange(
     country: string,
-    type: SeriesValueNames,
+    type: TargetFieldNames,
     index: number,
     colour?: am4core.Color
   ): void {
@@ -283,7 +283,7 @@ export class TargetsComponent extends SubscriptionManager {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
         country + this.seriesSuffixes[typeIndex],
-        this.seriesValueNames[typeIndex],
+        TargetFieldNames[this.seriesValueNames[typeIndex]],
         this.countryData[country]
       );
 
