@@ -31,6 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feat/MET-5843-GitHub-Actions-Deployment
+
       - uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
@@ -81,6 +84,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: feat/MET-5843-GitHub-Actions-Deployment
+
       - name: Build Artifact
         uses: actions/setup-node@v4
         with:
@@ -101,12 +107,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      #- name: Build Artifact
-      #  uses: actions/setup-node@v4
-      #  with:
-      #    node-version: '18.18.0'
-      #- run: npm install
-      #- run: npm run dist-localised
+        with:
+          ref: feat/MET-5843-GitHub-Actions-Deployment
 
       - name: Get Built Artifact
         uses: actions/download-artifact@master

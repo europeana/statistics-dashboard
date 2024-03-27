@@ -6,6 +6,8 @@ jobs:
     steps:
       - run: env
       - uses: actions/checkout@v4
+        with:
+          ref: feat/MET-5843-GitHub-Actions-Deployment
       - name: Inject Variables 1
         uses: cschleiden/replace-tokens@v1
         with:
