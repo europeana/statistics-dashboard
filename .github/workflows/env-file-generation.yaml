@@ -1,4 +1,4 @@
-name: Env File Generation
+name: '- helper (env file)'
 run-name: ${{ github.actor }} is generating an env_file
 on:
   workflow_call:
@@ -14,32 +14,34 @@ jobs:
     steps:
       - run: |
           touch env_file
-          case ${{ deploy_environment }} in
+          case ${{ github.event.inputs.deploy_environment }} in
             'production')
               echo APP_SERVER_PORTAL=${{ secrets.PRODUCTION_SERVER_PORTAL }} >> env_file
               echo APP_WS_KEY=${{ secrets.PRODUCTION_WS_KEY }} >> env_file
               echo APP_SERVER_API=${{ secrets.PRODUCTION_SERVER_API }} >> env_file
               echo APP_MAINTENANCE_SCHEDULE_ENV_KEY=${{ secrets.PRODUCTION_MAINTENANCE_SCHEDULE_ENV_KEY }} >> env_file
+              echo APP_MATOMO_SITE_ID=${{ secrets.PRODUCTION_MATOMO_SITE_ID }} >> env_file
             ;;
             'acceptance')
               echo APP_SERVER_PORTAL=${{ secrets.ACCEPTANCE_SERVER_PORTAL }} >> env_file
               echo APP_WS_KEY=${{ secrets.ACCEPTANCE_WS_KEY }} >> env_file
               echo APP_SERVER_API=${{ secrets.ACCEPTANCE_SERVER_API }} >> env_file
               echo APP_MAINTENANCE_SCHEDULE_ENV_KEY=${{ secrets.ACCEPTANCE_MAINTENANCE_SCHEDULE_ENV_KEY }} >> env_file
+              echo APP_MATOMO_SITE_ID=${{ secrets.ACCEPTANCE_MATOMO_SITE_ID }} >> env_file
             ;;
             'test')
               echo APP_SERVER_PORTAL=${{ secrets.TEST_SERVER_PORTAL }} >> env_file
               echo APP_WS_KEY=${{ secrets.TEST_WS_KEY }} >> env_file
               echo APP_SERVER_API=${{ secrets.TEST_SERVER_API }} >> env_file
               echo APP_MAINTENANCE_SCHEDULE_ENV_KEY=${{ secrets.TEST_MAINTENANCE_SCHEDULE_ENV_KEY }} >> env_file
+              echo APP_MATOMO_SITE_ID=${{ secrets.TEST_MATOMO_SITE_ID }} >> env_file
             ;;
           esac
-          echo APP_FEEDBACK_URL=${{ vars.APP_FEEDBACK_URL }} >> env_file
+          echo APP_FEEDBACK_URL=${{ secrets.APP_FEEDBACK_URL }} >> env_file
           echo APP_MAINTENANCE_SCHEDULE_ENV_URL=${{ secrets.APP_MAINTENANCE_SCHEDULE_ENV_URL }} >> env_file
           echo APP_MATOMO_HOST=${{ secrets.APP_MATOMO_HOST }} >> env_file
-          echo APP_MATOMO_SITE_ID=${{ secrets.APP_MATOMO_SITE_ID }} >> env_file
           cat env_file
       - uses: actions/upload-artifact@master
         with:
           name: envFile
-          path: env_file
+          path: ./env_file

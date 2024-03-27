@@ -1,0 +1,26 @@
+name: '- helper (unit testing)'
+on: workflow_call
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+      - run: npm install
+      - run: |
+          npm run test:dev
+      - run: |
+          cp coverage/**/lcov.info .
+      - uses: actions/upload-artifact@master
+        with:
+          name: appSource
+          path: src/app
+      - uses: actions/upload-artifact@master
+        with:
+          name: appLcov
+          path: ./lcov.info
