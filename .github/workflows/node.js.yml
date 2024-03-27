@@ -107,8 +107,8 @@ jobs:
         env:
           PROJECT_VERSION: ${{ secrets.PROJECT_VERSION }}
         with:
-          images: ${{ GITHUB_REPOSITORY }}
-          #images: europeana/statistics-dashboard
+          #images: ${{ GITHUB_REPOSITORY }}
+          images: europeana/statistics-dashboard
           tags: |
             type=schedule
             type=ref,event=branch
