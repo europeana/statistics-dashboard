@@ -1,5 +1,6 @@
 import {
   Component,
+  CUSTOM_ELEMENTS_SCHEMA,
   inject,
   OnInit,
   TemplateRef,
@@ -73,6 +74,7 @@ import { ResizeComponent } from '../resize/resize.component';
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./overview.component.scss'],
   standalone: true,
   imports: [

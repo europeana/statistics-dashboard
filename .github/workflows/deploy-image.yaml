@@ -1,0 +1,49 @@
+name: Deploy Image
+run-name: ${{ github.actor }} is deploying the stats-dash
+on: workflow_call
+jobs:
+  deploy-image:
+    runs-on: ubuntu-latest
+    steps:
+      - run: env
+      - uses: actions/checkout@v4
+      - name: Inject Variables 1
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: '#{'
+          tokenSuffix: '}#'
+          files: '["deployment/${{ github.event.inputs.deploy_environment }}/*.yaml"]'
+        env:
+          APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || secrets.PROJECT_VERSION }}
+          MAX_REPLICAS: '4'
+          MIN_REPLICAS: '2'
+          UTILISATION_AVERAGE_PERCENT: '75'
+      - run: ls -l deployment/${{ github.event.inputs.deploy_environment }}
+      - run: cat deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
+      - run: cat deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
+
+      - name: Set the Kubernetes context
+        uses: azure/k8s-set-context@v2
+        with:
+          method: service-account
+          # from https://nicwortel.nl/blog/2022/continuous-deployment-to-kubernetes-with-github-actions
+          #   Replace <server-url> with the URL of the cluster's API server, which can be found using the following command:
+          #   kubectl config view --minify -o 'jsonpath={.clusters[0].cluster.server}'
+          k8s-url: '<server-url>'
+          k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
+
+      - name: Deploy to the Kubernetes cluster
+        uses: azure/k8s-deploy@v1
+        with:
+          namespace: default
+          manifests: |
+            deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
+            deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
+            deployment/${{ github.event.inputs.deploy_environment }}/ingress.yaml
+            deployment/${{ github.event.inputs.deploy_environment }}/kustomization.yaml
+            deployment/${{ github.event.inputs.deploy_environment }}/statistics-dashboard-ui-service.yaml
+          # deployment/${{ github.event.inputs.deploy_environment }}/nginx.conf
+          images: |
+            ${{ env.APP_IMAGE }}
+        env:
+          APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || secrets.PROJECT_VERSION }}
