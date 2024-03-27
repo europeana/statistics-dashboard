@@ -14,7 +14,7 @@ jobs:
     steps:
       - run: |
           touch env_file
-          case ${{ deploy_environment }} in
+          case ${{ github.event.inputs.deploy_environment }} in
             'production')
               echo APP_SERVER_PORTAL=${{ secrets.PRODUCTION_SERVER_PORTAL }} >> env_file
               echo APP_WS_KEY=${{ secrets.PRODUCTION_WS_KEY }} >> env_file
