@@ -47,7 +47,7 @@ import { GridComponent } from '../grid';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
 
-fdescribe('OverviewComponent', () => {
+describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
   let router: Router;
@@ -156,10 +156,6 @@ fdescribe('OverviewComponent', () => {
     beforeEach(() => {
       b4Each();
       params.next({ facet: DimensionName.country });
-    });
-
-    it('should intentionally fail', () => {
-      expect(false).toBeTruthy();
     });
 
     it('should load on initialisation', fakeAsync(() => {
