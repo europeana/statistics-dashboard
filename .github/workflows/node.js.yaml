@@ -75,7 +75,7 @@ jobs:
             -Dsonar.exclusions=src/**/_mocked/**
             -Dsonar.javascript.lcov.reportPaths=./lcov.info/lcov.info
 
-  build-docker-image:
+  build-dist:
     if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -87,6 +87,33 @@ jobs:
           node-version: '18.18.0'
       - run: npm install
       - run: npm run dist-localised
+
+      #- run: mkdir tmp-dir && mv dist tmp-dir/ && mv tmp-dir dist
+      - uses: actions/upload-artifact@master
+        with:
+          name: dist
+          path: ./dist
+
+  push-docker-image:
+    if: ${{ github.event.inputs.run_build == 'true' }}
+    needs: [build-dist, run-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      #- name: Build Artifact
+      #  uses: actions/setup-node@v4
+      #  with:
+      #    node-version: '18.18.0'
+      #- run: npm install
+      #- run: npm run dist-localised
+
+      - name: Get Built Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: dist
+          path: ./dist
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -125,6 +152,7 @@ jobs:
 
   call-deploy-image:
     if: always() && !contains(needs.*.result, 'failure')
-    needs: [run-sonar, make-env-file]
+    #needs: [run-sonar, make-env-file]
+    needs: [push-docker-image, make-env-file]
     uses: ./.github/workflows/deploy-image.yaml
     secrets: inherit
