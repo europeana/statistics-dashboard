@@ -158,6 +158,10 @@ describe('OverviewComponent', () => {
       params.next({ facet: DimensionName.country });
     });
 
+    it('should fail', () => {
+      expect(false).toBeTruthy();
+    })
+
     it('should load on initialisation', fakeAsync(() => {
       component.ngOnInit();
       tick(1);
