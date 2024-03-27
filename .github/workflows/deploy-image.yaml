@@ -1,5 +1,4 @@
 name: Deploy Image
-run-name: ${{ github.actor }} is deploying the stats-dash
 on: workflow_call
 jobs:
   deploy-image:
@@ -22,15 +21,27 @@ jobs:
       - run: cat deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
       - run: cat deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
 
-      - name: Set the Kubernetes context
-        uses: azure/k8s-set-context@v2
-        with:
-          method: service-account
-          # from https://nicwortel.nl/blog/2022/continuous-deployment-to-kubernetes-with-github-actions
-          #   Replace <server-url> with the URL of the cluster's API server, which can be found using the following command:
-          #   kubectl config view --minify -o 'jsonpath={.clusters[0].cluster.server}'
-          k8s-url: '<server-url>'
-          k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
+      #- name: Set the Kubernetes context
+      #  uses: azure/k8s-set-context@v2
+      #  with:
+      #    method: service-account
+      #    # from https://nicwortel.nl/blog/2022/continuous-deployment-to-kubernetes-with-github-actions
+      #    #   Replace <server-url> with the URL of the cluster's API server, which can be found using the following command:
+      #    #   kubectl config view --minify -o 'jsonpath={.clusters[0].cluster.server}'
+      #    k8s-url: '<server-url>'
+      #    k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
+
+      - name: Install IBM Cloud CLI
+        run: |
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+          ibmcloud --version
+          ibmcloud config --check-version=false
+          ibmcloud plugin install -f kubernetes-service
+          ibmcloud plugin install -f container-registry
+      - name: Prepare Cluster Config
+        run: |
+          ibmcloud login -a "${IBM_CLOUD_API_ENDPOINT}" -r "${IBM_CLOUD_REGION}" --apikey "${IBM_CLOUD_API_KEY}"
+          ibmcloud ks cluster config --cluster "${IBM_CLOUD_K8S_CLUSTER_NAME}"
 
       - name: Deploy to the Kubernetes cluster
         uses: azure/k8s-deploy@v1

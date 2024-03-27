@@ -31,9 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        #with:
-        #  repository: europeana/statistics-dashboard
-        #  ref: feat/MET-5843-GitHub-Actions-Deployment
       - uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
@@ -84,8 +81,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        #with:
-        #  repository: europeana/statistics-dashboard
       - name: Build Artifact
         uses: actions/setup-node@v4
         with:
@@ -107,7 +102,6 @@ jobs:
         env:
           PROJECT_VERSION: ${{ secrets.PROJECT_VERSION }}
         with:
-          #images: ${{ GITHUB_REPOSITORY }}
           images: europeana/statistics-dashboard
           tags: |
             type=schedule
