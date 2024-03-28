@@ -101,7 +101,7 @@ jobs:
           path: ./dist
 
   push-docker-image:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ github.event.inputs.run_build == 'false' || !contains(needs.*.result, 'failure') }}
     needs: [build-dist, run-tests]
     runs-on: ubuntu-latest
     steps:
