@@ -38,7 +38,13 @@ jobs:
       - name: Prepare Cluster Config
         run: |
           ibmcloud login -a "${{ secrets.IBM_CLOUD_API_ENDPOINT}}" -r "${{ secrets.IBM_CLOUD_REGION}}" --apikey "${{ secrets.IBM_CLOUD_API_KEY }}"
-      #    ibmcloud ks cluster config --cluster "${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}"
+          ibmcloud ks cluster config --cluster "${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}"
+
+      - name: Install Kubectl
+        run: |
+          curl -fsSL "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" | sh
+          kubectl --context ${{ secrets.TEST_K8S_CONTEXT }} apply -k ${{ github.event.inputs.deploy_environment }}
+
       #- name: Set the Kubernetes context
       #  uses: azure/k8s-set-context@v2
       #  with:
@@ -49,15 +55,24 @@ jobs:
       #    k8s-url: '<server-url>'
       #    k8s-secret: ${{ secrets.KUBERNETES_SECRET }}
 
-      - name: Set the Kubernetes context
-        uses: azure/k8s-set-context@v2
-        with:
-          method: service-account
+      # service-account approach
+      #- name: Set the Kubernetes context
+      #  uses: azure/k8s-set-context@v2
+      #  with:
+      #    method: service-account
           #k8s-url: <URL of the cluster's API server>
-          k8s-url: ${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}
+      #    k8s-url: ${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}
           #k8s-secret: <secret associated with the service account>
-          k8s-secret: ${{ secrets.IBM_CLOUD_API_KEY }}
-        id: setcontext
+      #    k8s-secret: ${{ secrets.IBM_CLOUD_API_KEY }}
+      #  id: setcontext
+
+      # Kubeconfig approach
+      #- uses: azure/k8s-set-context@v1
+      #  with:
+      #    method: kubeconfig
+      #    kubeconfig: <your kubeconfig> # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+      #    context: <context name>  #If left unspecified, current-context from kubeconfig is used as default
+      #  id: setcontext
 
       - name: Deploy to the Kubernetes cluster
         uses: azure/k8s-deploy@v1
