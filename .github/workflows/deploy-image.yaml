@@ -59,4 +59,4 @@ jobs:
           images: |
             ${{ env.APP_IMAGE }}
         env:
-          APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || secrets.PROJECT_VERSION }}
+          APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || ('develop' + secrets.PROJECT_VERSION) }}
