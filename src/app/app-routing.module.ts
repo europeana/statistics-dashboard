@@ -2,8 +2,37 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
+import { TargetsComponent } from './targets/targets.component';
+import { CountryComponent } from './country/country.component';
 
 const routes: Routes = [
+  {
+    path: 'targets',
+    component: TargetsComponent
+  },
+  {
+    path: 'country',
+    component: CountryComponent,
+
+    data: {
+      reuseComponent: true
+    },
+
+    children: [
+      {
+        path: 'x',
+        loadComponent: async (): Promise<typeof DocArrowsComponent> => {
+          const { DocArrowsComponent } = await import(
+            './doc-arrows/doc-arrows.component'
+          );
+          return DocArrowsComponent;
+        },
+        data: {
+          reuseComponent: true
+        }
+      }
+    ]
+  },
   {
     path: 'data/:facet',
     component: OverviewComponent

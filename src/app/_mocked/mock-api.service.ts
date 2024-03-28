@@ -5,8 +5,13 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
+  GeneralResultsFormatted,
   IHash,
-  RequestFilter
+  IHashArray,
+  RequestFilter,
+  TargetCountryData,
+  TargetData,
+  TargetMetaData
 } from '../_models';
 
 const rightsCategories = [
@@ -657,6 +662,22 @@ export class MockAPIService {
     rightsCategories: Array<string>
   ): Observable<Array<string>> {
     return of([`${rightsCategories[0]}/1.0`, `${rightsCategories[0]}/2.0`]);
+  }
+
+  getTargetMetaData(): Observable<IHash<IHashArray<TargetMetaData>>> {
+    return of({});
+  }
+
+  loadCountryData(): Observable<Array<TargetCountryData>> {
+    return of([]);
+  }
+
+  getCountryData(): Observable<IHash<Array<TargetData>>> {
+    return of({});
+  }
+
+  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
+    return of({});
   }
 }
 
