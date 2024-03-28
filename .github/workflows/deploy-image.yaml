@@ -1,5 +1,7 @@
 name: Deploy Image
 on: workflow_call
+env:
+  APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || 'develop' }}
 jobs:
   deploy-image:
     runs-on: ubuntu-latest
@@ -15,7 +17,7 @@ jobs:
           tokenSuffix: '}#'
           files: '["deployment/${{ github.event.inputs.deploy_environment }}/*.yaml"]'
         env:
-          APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || secrets.PROJECT_VERSION }}
+          #APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || secrets.PROJECT_VERSION }}
           MAX_REPLICAS: '4'
           MIN_REPLICAS: '2'
           UTILISATION_AVERAGE_PERCENT: '75'
@@ -58,5 +60,5 @@ jobs:
           # deployment/${{ github.event.inputs.deploy_environment }}/nginx.conf
           images: |
             ${{ env.APP_IMAGE }}
-        env:
-          APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || 'develop' }}
+        #env:
+        #  APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || 'develop' }}
