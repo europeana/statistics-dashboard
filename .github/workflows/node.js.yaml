@@ -141,7 +141,8 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
             europeana/statistics-dashboard-ui:${{ env.PROJECT_VERSION }}
-            ${{ github.event.inputs.tag_name }}
+            europeana/statistics-dashboard-ui:${{ github.event.inputs.tag_name || 'develop' }}
+            ${{ github.event.inputs.tag_name || 'develop' }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
