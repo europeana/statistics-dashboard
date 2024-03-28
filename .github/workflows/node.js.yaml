@@ -13,7 +13,8 @@ on:
         - acceptance
         - production
       tag_name:
-        description: 'tag (defaults to PROJECT_VERSION)'
+        description: 'branch or tag to deploy'
+        default: 'develop'
         type: string
       run_build:
         description: '(re)build docker image'
@@ -30,10 +31,10 @@ jobs:
     if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          ref: feat/MET-5843-GitHub-Actions-Deployment
-
+          ref: ${{ github.event.inputs.tag_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
@@ -85,8 +86,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: feat/MET-5843-GitHub-Actions-Deployment
-
+          ref: ${{ github.event.inputs.tag_name }}
       - name: Build Artifact
         uses: actions/setup-node@v4
         with:
@@ -108,8 +108,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: feat/MET-5843-GitHub-Actions-Deployment
-
+          ref: ${{ github.event.inputs.tag_name }}
       - name: Get Built Artifact
         uses: actions/download-artifact@master
         with:
@@ -152,9 +151,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  call-deploy-image:
+  push-to-kubernetes:
     if: always() && !contains(needs.*.result, 'failure')
-    #needs: [run-sonar, make-env-file]
     needs: [push-docker-image, make-env-file]
     uses: ./.github/workflows/deploy-image.yaml
     secrets: inherit

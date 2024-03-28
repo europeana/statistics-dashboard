@@ -7,7 +7,7 @@ jobs:
       - run: env
       - uses: actions/checkout@v4
         with:
-          ref: feat/MET-5843-GitHub-Actions-Deployment
+          ref: ${{ github.event.inputs.tag_name }}
       - name: Inject Variables 1
         uses: cschleiden/replace-tokens@v1
         with:
