@@ -21,7 +21,9 @@ jobs:
           MAX_REPLICAS: '4'
           MIN_REPLICAS: '2'
           UTILISATION_AVERAGE_PERCENT: '75'
-      - run: ls -l deployment/${{ github.event.inputs.deploy_environment }}
+      - run: |
+          ls -l deployment/${{ github.event.inputs.deploy_environment }}
+          echo APP_IMAGE ${{ APP_IMAGE }}
       - run: cat deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
       - run: cat deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
 
