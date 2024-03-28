@@ -41,7 +41,9 @@ jobs:
           ibmcloud ks cluster config --cluster "${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}"
       - name: Push image
         run: |
+          cd ${{ github.event.inputs.deploy_environment }}
           kubectl --context ${{ secrets.TEST_K8S_CONTEXT }} apply -k ${{ github.event.inputs.deploy_environment }}
+
       #- name: Set the Kubernetes context
       #  uses: azure/k8s-set-context@v2
       #  with:
@@ -71,21 +73,21 @@ jobs:
       #    context: <context name>  #If left unspecified, current-context from kubeconfig is used as default
       #  id: setcontext
 
-      - name: Deploy to the Kubernetes cluster
-        uses: azure/k8s-deploy@v1
-        with:
-          namespace: default
-          manifests: |
-            deployment/${{ github.event.inputs.deploy_environment }}
+      #- name: Deploy to the Kubernetes cluster
+      #  uses: azure/k8s-deploy@v1
+      #  with:
+      #    namespace: default
+      #    manifests: |
+      #      deployment/${{ github.event.inputs.deploy_environment }}
           #  deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
           #  deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
           #  deployment/${{ github.event.inputs.deploy_environment }}/ingress.yaml
           #  deployment/${{ github.event.inputs.deploy_environment }}/kustomization.yaml
           #  deployment/${{ github.event.inputs.deploy_environment }}/statistics-dashboard-ui-service.yaml
           #  #deployment/${{ github.event.inputs.deploy_environment }}/nginx.conf
-          images: |
-            ${{ env.APP_IMAGE }}
-          action: deploy
+      #    images: |
+      #      ${{ env.APP_IMAGE }}
+      #    action: deploy
 
         #env:
         #  APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || 'develop' }}
