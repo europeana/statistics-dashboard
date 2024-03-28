@@ -42,8 +42,8 @@ jobs:
           ibmcloud plugin install -f container-registry
       - name: Prepare Cluster Config
         run: |
-          ibmcloud login -a "${IBM_CLOUD_API_ENDPOINT}" -r "${IBM_CLOUD_REGION}" --apikey "${IBM_CLOUD_API_KEY}"
-          ibmcloud ks cluster config --cluster "${IBM_CLOUD_K8S_CLUSTER_NAME}"
+          ibmcloud login -a "${{ secrets.IBM_CLOUD_API_ENDPOINT}}" -r "${{ secrets.IBM_CLOUD_REGION}}" --apikey "${{ secrets.IBM_CLOUD_API_KEY }}"
+          ibmcloud ks cluster config --cluster "${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}"
 
       - name: Deploy to the Kubernetes cluster
         uses: azure/k8s-deploy@v1
