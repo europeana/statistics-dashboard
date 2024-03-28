@@ -38,9 +38,15 @@ jobs:
       - name: Prepare Cluster Config
         run: |
           ibmcloud login -a "${{ secrets.IBM_CLOUD_API_ENDPOINT}}" -r "${{ secrets.IBM_CLOUD_REGION}}" --apikey "${{ secrets.IBM_CLOUD_API_KEY }}"
+
+          echo 'logged in to IBM'
+
           ibmcloud ks cluster config --cluster "${{ secrets.IBM_CLOUD_K8S_CLUSTER_NAME }}"
+
+          echo 'configured cluster'
+
           sleep 5
-          if github.event.inputs.delete == 'true'
+          if ${{ github.event.inputs.delete }} == 'true'
           then
             kubectl --context ${{ secrets.TEST_K8S_CONTEXT }} delete -k deployment/${{ github.event.inputs.deploy_environment }}
           else
