@@ -55,13 +55,16 @@ jobs:
         with:
           namespace: default
           manifests: |
-            deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
-            deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
-            deployment/${{ github.event.inputs.deploy_environment }}/ingress.yaml
-            deployment/${{ github.event.inputs.deploy_environment }}/kustomization.yaml
-            deployment/${{ github.event.inputs.deploy_environment }}/statistics-dashboard-ui-service.yaml
-          # deployment/${{ github.event.inputs.deploy_environment }}/nginx.conf
+            deployment/${{ github.event.inputs.deploy_environment }}
+          #  deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
+          #  deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
+          #  deployment/${{ github.event.inputs.deploy_environment }}/ingress.yaml
+          #  deployment/${{ github.event.inputs.deploy_environment }}/kustomization.yaml
+          #  deployment/${{ github.event.inputs.deploy_environment }}/statistics-dashboard-ui-service.yaml
+          #  #deployment/${{ github.event.inputs.deploy_environment }}/nginx.conf
           images: |
             ${{ env.APP_IMAGE }}
+          action: deploy
+
         #env:
         #  APP_IMAGE: europeana/statistics-dashboard:${{ github.event.inputs.tag_name || 'develop' }}
