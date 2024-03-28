@@ -20,6 +20,9 @@ on:
         description: '(re)build docker image'
         default: false
         type: boolean
+      delete:
+        default: false
+        type: boolean
 jobs:
   make-env-file:
     uses: ./.github/workflows/env-file-generation.yaml
