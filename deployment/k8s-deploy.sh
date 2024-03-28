@@ -127,6 +127,9 @@ sed -i "s,\#{MAX_REPLICAS}\#,$MAX_REPLICAS,g" deployment/$TARGET/hpa.yaml
 sed -i "s,\#{MIN_REPLICAS}\#,$MIN_REPLICAS,g" deployment/$TARGET/hpa.yaml
 sed -i "s,\#{UTILISATION_AVERAGE_PERCENT}\#,$UTILISATION_AVERAGE_PERCENT,g" deployment/$TARGET/hpa.yaml
 
+cat deployment/$TARGET/deployment.yaml
+cat deployment/$TARGET/hpa.yaml
+
 # Delete or apply
 if $DELETE;
 then
