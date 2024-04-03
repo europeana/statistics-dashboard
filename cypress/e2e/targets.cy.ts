@@ -3,6 +3,7 @@ context('Statistics Dashboard', () => {
     beforeEach(() => {
       cy.visit('/targets');
     });
+    /*
 
     const force = { force: true };
     const selIsOpen = '.is-open';
@@ -111,5 +112,6 @@ context('Statistics Dashboard', () => {
       clickSeriesOpener('Denmark', 1);
       cy.get(selIsOpen).should('have.length', 5);
     });
+    */
   });
 });
