@@ -16,10 +16,10 @@ jobs:
           npm run test:dev
       - run: |
           cp coverage/**/lcov.info .
-      - uses: actions/upload-artifact@master
-        with:
-          name: appSource
-          path: src/app
+      #- uses: actions/upload-artifact@master
+      #  with:
+      #    name: appSource
+      #    path: src/app
       - uses: actions/upload-artifact@master
         with:
           name: appLcov
