@@ -2,14 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
-import { TargetsComponent } from './targets/targets.component';
 import { CountryComponent } from './country/country.component';
 
 const routes: Routes = [
-  {
-    path: 'targets',
-    component: TargetsComponent
-  },
   {
     path: 'country',
     component: CountryComponent,

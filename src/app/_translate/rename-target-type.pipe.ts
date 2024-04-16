@@ -8,7 +8,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 const targetTypeNames = {
   total: 'Total',
   three_d: '3D',
-  meta_tier_a: 'Metadata Tier A'
+  hq: 'HQ'
 };
 
 @Pipe({

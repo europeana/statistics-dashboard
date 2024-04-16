@@ -93,12 +93,10 @@ $appendice-grid-num-cols: 8;
   }
 }
 
-.appendice-grid,
 .appendice-grid-sticky-row,
 .appendice-grid-scrollable-section {
   & > :not(.appendice-grid-sticky-row) {
     padding: 4px 8px;
-    //background: red;
   }
 }
 

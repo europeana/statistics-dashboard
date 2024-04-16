@@ -147,7 +147,7 @@ export class APIService {
    *    "label": "2025",
    *    "value": 370,
    *    "interim": true,
-   *    "targetType": "total" | "three_d" | "meta_tier_a"
+   *    "targetType": "three_d" | "hq"
    *  }...
    *
    * @return [TargetMetaDataRaw]
@@ -211,37 +211,30 @@ export class APIService {
     const tgtDataRef = this.reduceTargetMetaData(this.targetData);
 
     this.targetCountries.forEach((country: string) => {
-      const baseValueTotal =
-        tgtDataRef[country][TargetFieldName.TOTAL][1].value;
       const baseValue3D = tgtDataRef[country][TargetFieldName.THREE_D][1].value;
-      const baseValueTierA = tgtDataRef[country][TargetFieldName.HQ][1].value;
+      const basevalueHQ = tgtDataRef[country][TargetFieldName.HQ][1].value;
 
-      let value = baseValueTotal * 1;
       let value3D = baseValue3D * 1.2;
-      let valueTierA = baseValueTierA * 0.9;
+      let valueHQ = basevalueHQ * 0.9;
 
       this.dateTicks.forEach((dateTick: string, dateTickIndex: number) => {
         const random1 =
-          (value % (numDateTicks + 1)) - (value % (numDateTicks / 2));
+          (value3D % (numDateTicks + 1)) - (value3D % (numDateTicks / 2));
 
-        value -= random1;
         value3D -= random1;
-        valueTierA += random1;
+        valueHQ += random1;
 
         const random2 =
-          (value % (numDateTicks + 1)) + (value % (numDateTicks / 2));
+          (valueHQ % (numDateTicks + 1)) + (valueHQ % (numDateTicks / 2));
 
-        value -= 0.8 * (random2 % random1);
-        value3D -= 100 * (random1 % random2);
-        valueTierA -= 1 * (random2 * random1 * 5);
-        value -= value3D / numDateTicks;
+        value3D -= 0.8 * (random2 % random1);
+        valueHQ -= 1 * (random2 * random1 * 5);
 
         res.push({
           country,
           date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
-          total: Math.floor(value),
           three_d: Math.floor(value3D),
-          meta_tier_a: Math.floor(valueTierA)
+          hq: Math.floor(valueHQ)
         });
       });
     });

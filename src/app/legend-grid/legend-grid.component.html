@@ -34,7 +34,7 @@
           <span
             class="target-total right"
             *ngIf="countryData[country]"
-            [ngClass]="{ 'pad-right': targetType === 'meta_tier_a' }"
+            [ngClass]="{ 'pad-right': targetType === TargetFieldName.HQ }"
           >
             {{
               countryData[country][countryData[country].length - 1][targetType]
@@ -115,7 +115,7 @@
           'top.px': pinnedCountries[country]
         }"
       >
-        <span *ngFor="let seriesSuffix of seriesSuffixes; let i = index">
+        <span *ngFor="let seriesSuffix of TargetSeriesSuffixes; let i = index">
           <ng-content
             *ngTemplateOutlet="
               legendItemSeries;

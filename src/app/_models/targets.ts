@@ -1,9 +1,8 @@
 import * as am4charts from '@amcharts/amcharts4/charts';
 
 export enum TargetFieldName {
-  TOTAL = 'total',
   THREE_D = 'three_d',
-  HQ = 'meta_tier_a'
+  HQ = 'hq'
 }
 
 interface TargetMetaDataBase {
@@ -33,3 +32,5 @@ export interface TargetData extends TargetFieldNameType {
 export interface TargetCountryData extends TargetData {
   country: string;
 }
+
+export const TargetSeriesSuffixes = ['3D', 'META_A'];

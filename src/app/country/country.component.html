@@ -167,7 +167,7 @@
               powerLevelSummary;
               context: {
                 name: 'HQ',
-                valName: 'meta_tier_a'
+                valName: TargetFieldName.HQ
               }
             "
           ></ng-content>
@@ -291,10 +291,10 @@
 
                 <span
                   class="cell-live"
-                  [ngClass]="{ 'cell-line': !!row['three_d'] }"
+                  [ngClass]="{ 'cell-line': !!row[TargetFieldName.THREE_D] }"
                   [attr.style]="'border-right-color: ' + colour3D"
                 >
-                  {{ row["three_d"] | number }}
+                  {{ row[TargetFieldName.THREE_D] | number }}
                 </span>
 
                 <span class="cell-2025">
@@ -311,10 +311,10 @@
 
                 <span
                   class="cell-live"
-                  [ngClass]="{ 'cell-line': !!row['meta_tier_a'] }"
+                  [ngClass]="{ 'cell-line': !!row[TargetFieldName.HQ] }"
                   [attr.style]="'border-right-color: ' + colourHQ"
                 >
-                  {{ row["meta_tier_a"] | number }}
+                  {{ row[TargetFieldName.HQ] | number }}
                 </span>
 
                 <span class="cell-2025">
@@ -356,13 +356,17 @@
                           row: row,
                           targets: [
                             [
-                              targetMetaData[country.key]['three_d'][0].value,
-                              targetMetaData[country.key]['three_d'][1].value
+                              targetMetaData[country.key][
+                                TargetFieldName.THREE_D
+                              ][0].value,
+                              targetMetaData[country.key][
+                                TargetFieldName.THREE_D
+                              ][1].value
                             ],
                             [
-                              targetMetaData[country.key]['meta_tier_a'][0]
+                              targetMetaData[country.key][TargetFieldName.HQ][0]
                                 .value,
-                              targetMetaData[country.key]['meta_tier_a'][1]
+                              targetMetaData[country.key][TargetFieldName.HQ][1]
                                 .value
                             ]
                           ],

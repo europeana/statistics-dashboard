@@ -20,6 +20,7 @@ import {
   IHash,
   IHashArray,
   TargetData,
+  TargetFieldName,
   TargetMetaData
 } from '../_models';
 import { APIService } from '../_services';
@@ -67,6 +68,7 @@ import { TruncateComponent } from '../truncate';
 export class CountryComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
+  public TargetFieldName = TargetFieldName;
   public colours = colours;
 
   // Used to parameterise links to the data page

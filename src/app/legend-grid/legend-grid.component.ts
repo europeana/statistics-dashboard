@@ -24,7 +24,8 @@ import {
   IHashArray,
   TargetData,
   TargetFieldName,
-  TargetMetaData
+  TargetMetaData,
+  TargetSeriesSuffixes
 } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
@@ -71,9 +72,8 @@ export class LegendGridComponent {
 
   pinnedCountries: IHash<number> = {};
 
-  public seriesSuffixes = ['total', '3D', 'META_A'];
-  public seriesSuffixesFmt = [' (total)', ' (3D)', ' (meta tier A)'];
-
+  public TargetSeriesSuffixes = TargetSeriesSuffixes;
+  public seriesSuffixesFmt = [' (3D)', ' (meta tier A)'];
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
 
@@ -82,7 +82,7 @@ export class LegendGridComponent {
       this.toggleCountry('FR');
       this.toggleRange(
         'FR',
-        TargetFieldName.TOTAL,
+        TargetFieldName.THREE_D,
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
@@ -90,7 +90,7 @@ export class LegendGridComponent {
   }
 
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
-    const res = this.seriesSuffixes
+    const res = TargetSeriesSuffixes
       .map((seriesSuffix: string) => {
         return this.lineChart.allSeriesData[`${country}${seriesSuffix}`];
       })
@@ -162,10 +162,10 @@ export class LegendGridComponent {
     this.togglePin(country);
 
     // loop the types
-    [...Array(3).keys()].forEach((i: number) => {
+    [...Array(2).keys()].forEach((i: number) => {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
-        country + this.seriesSuffixes[i],
+        country + TargetSeriesSuffixes[i],
         TargetFieldName[this.seriesValueNames[i]],
         data
       );
@@ -246,7 +246,7 @@ export class LegendGridComponent {
 
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
-        country + this.seriesSuffixes[typeIndex],
+        country + TargetSeriesSuffixes[typeIndex],
         TargetFieldName[this.seriesValueNames[typeIndex]],
         this.countryData[country]
       );
@@ -265,7 +265,7 @@ export class LegendGridComponent {
       this.lineChart.removeRange(country, type);
 
       let visCount = 0;
-      this.seriesSuffixes.forEach((suffix: string) => {
+      TargetSeriesSuffixes.forEach((suffix: string) => {
         const sd = this.lineChart.allSeriesData[country + suffix];
         if (sd && !sd.isHidden) {
           visCount += 1;
