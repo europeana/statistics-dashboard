@@ -10,8 +10,16 @@ import {
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
-import { Component, Input, ViewChild } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import {
+  ApplicationRef,
+  Component,
+  ElementRef,
+  inject,
+  Input,
+  ViewChild
+} from '@angular/core';
+import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import { combineLatest, map } from 'rxjs';
 
 import { colours, externalLinks } from '../_data';
 import {
@@ -74,9 +82,13 @@ export class CountryComponent extends SubscriptionManager {
   // Used to parameterise links to the data page
   @Input() includeCTZero = false;
   @ViewChild('lineChart') lineChart: LineComponent;
+  @ViewChild('legendGrid') legendGrid: LegendGridComponent;
 
-  country = 'France';
-  countryCode = 'FR';
+  private readonly route = inject(ActivatedRoute);
+  private readonly api = inject(APIService);
+
+  country: string;
+  countryCode: string;
   countryLandingData: GeneralResultsFormatted = {};
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
@@ -84,18 +96,35 @@ export class CountryComponent extends SubscriptionManager {
   detailsExpanded = false;
   monotonePowerbars = true;
 
-  constructor(private readonly api: APIService) {
-    super();
-    this.subs.push(
-      api.getCountryData().subscribe((countryData) => {
-        this.countryData = countryData;
-        const specificCountryData = countryData[this.countryCode];
+  private rootRef: ElementRef;
 
-        if (specificCountryData.length) {
-          this.latestCountryData =
-            specificCountryData[specificCountryData.length - 1];
-        }
-      })
+  constructor(private applicationRef: ApplicationRef) {
+    super();
+
+    this.rootRef = this.applicationRef.components[0].instance;
+
+    this.subs.push(
+      combineLatest([this.api.getCountryData(), this.route.params])
+        .pipe(
+          map((results) => {
+            return {
+              countryData: results[0],
+              params: results[1]
+            };
+          })
+        )
+        .subscribe({
+          next: (combined) => {
+            this.countryData = combined.countryData;
+            this.setCountryToParam(combined.params['country']);
+            (
+              this.rootRef as unknown as { header: { activeCountry: string } }
+            ).header.activeCountry = combined.params['country'];
+          },
+          error: (e: Error) => {
+            console.log(e);
+          }
+        })
     );
 
     this.subs.push(
@@ -113,10 +142,30 @@ export class CountryComponent extends SubscriptionManager {
     );
   }
 
+  setCountryToParam(country: string): void {
+    if (this.legendGrid) {
+      // remove old chart lines
+      Object.keys(this.legendGrid.pinnedCountries).forEach(
+        (countryCode: string) => {
+          this.legendGrid.toggleCountry(countryCode);
+        }
+      );
+    }
+
+    this.country = country;
+    const code = this.api.loadISOCountryCodes()[this.country];
+    this.countryCode = code;
+
+    const specificCountryData = this.countryData[this.countryCode];
+    if (specificCountryData.length) {
+      this.latestCountryData =
+        specificCountryData[specificCountryData.length - 1];
+    }
+  }
+
   toggleDetails(): void {
     this.detailsExpanded = !this.detailsExpanded;
     this.lineChart.toggleCursor();
     this.lineChart.toggleGridlines();
-    //this.lineChart.toggleScrollbar();
   }
 }

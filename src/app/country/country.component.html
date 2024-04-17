@@ -5,7 +5,9 @@
     loading: false
   }"
 >
-  <h1 class="page-title" style="margin: 1em 0.6em">France: Target Data</h1>
+  <h1 class="page-title" style="margin: 1em 0.6em">
+    {{ country }}: Target Data
+  </h1>
 
   <ng-template
     #powerLevel
@@ -222,6 +224,7 @@
           <app-legend-grid
             #legendGrid
             [countryData]="countryData"
+            [countryCode]="countryCode"
             [targetMetaData]="targetMetaData"
             [lineChart]="lineChart"
           ></app-legend-grid>
@@ -280,7 +283,7 @@
                     {{ country | renameCountry }}
                   </span>
                   <span class="cell-total">
-                    {{ row["total"] | number }}
+                    xxx{{ row["total"] | number }}xxx
                   </span>
                   }
                 </span>

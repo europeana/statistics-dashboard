@@ -11,3 +11,15 @@
   font-weight: 600;
   margin-bottom: $spacing-xs;
 }
+
+.target {
+  border: 3px solid red;
+  transform: translateX(33px);
+}
+
+:hover + .target {
+  border-color: darken($textcolour_link, 15%) !important;
+  &::after {
+    background-color: darken($textcolour_link, 15%) !important;
+  }
+}

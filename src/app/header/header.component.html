@@ -14,6 +14,22 @@
         <br />dashboard
       </span>
     </a>
+    <span class="text country-link" data-e2e="link-home-header">
+      2025
+      <br />2030
+    </span>
+    <span class="target">
+      <span class="target-select">
+        <ng-container *ngFor="let country of cd | keyvalue">
+          <a
+            [routerLink]="['/country', country.key]"
+            [ngClass]="{ highlight: country.key === activeCountry }"
+          >
+            <span>{{ country.key }}</span>
+          </a>
+        </ng-container>
+      </span>
+    </span>
   </div>
 
   <div *ngIf="showPageTitle" class="fit-to-page page-title-wrapper">

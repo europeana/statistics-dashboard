@@ -36,6 +36,7 @@ export class APIService {
     'FI',
     'FR',
     'DE',
+    'GB',
     'GR',
     'HU',
     'IT',

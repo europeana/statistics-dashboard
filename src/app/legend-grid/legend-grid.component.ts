@@ -55,7 +55,25 @@ export class LegendGridComponent {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
 
+  _countryCode: string;
   _targetMetaData: IHash<IHashArray<TargetMetaData>>;
+
+  @Input() set countryCode(countryCode: string) {
+    this._countryCode = countryCode;
+    setTimeout(() => {
+      this.toggleCountry(this.countryCode);
+      this.toggleRange(
+        this.countryCode,
+        TargetFieldName.THREE_D,
+        0,
+        this.lineChart.chart.colors.getIndex(0)
+      );
+    }, 0);
+  }
+
+  get countryCode(): string {
+    return this._countryCode;
+  }
 
   @Input() set targetMetaData(data: IHash<IHashArray<TargetMetaData>>) {
     this._targetMetaData = data;
@@ -77,26 +95,12 @@ export class LegendGridComponent {
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
 
-  ngAfterContentInit(): void {
-    setTimeout(() => {
-      this.toggleCountry('FR');
-      this.toggleRange(
-        'FR',
-        TargetFieldName.THREE_D,
-        0,
-        this.lineChart.chart.colors.getIndex(0)
-      );
-    }, 0);
-  }
-
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
-    const res = TargetSeriesSuffixes
-      .map((seriesSuffix: string) => {
-        return this.lineChart.allSeriesData[`${country}${seriesSuffix}`];
-      })
-      .filter((x) => {
-        return x;
-      });
+    const res = TargetSeriesSuffixes.map((seriesSuffix: string) => {
+      return this.lineChart.allSeriesData[`${country}${seriesSuffix}`];
+    }).filter((x) => {
+      return x;
+    });
     return res;
   }
 

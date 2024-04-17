@@ -6,27 +6,8 @@ import { CountryComponent } from './country/country.component';
 
 const routes: Routes = [
   {
-    path: 'country',
-    component: CountryComponent,
-
-    data: {
-      reuseComponent: true
-    },
-
-    children: [
-      {
-        path: 'x',
-        loadComponent: async (): Promise<typeof DocArrowsComponent> => {
-          const { DocArrowsComponent } = await import(
-            './doc-arrows/doc-arrows.component'
-          );
-          return DocArrowsComponent;
-        },
-        data: {
-          reuseComponent: true
-        }
-      }
-    ]
+    path: 'country/:country',
+    component: CountryComponent
   },
   {
     path: 'data/:facet',

@@ -59,6 +59,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   skipLocationUpdate = false;
   maintenanceInfo?: MaintenanceItem = undefined;
 
+  @ViewChild('header') header: HeaderComponent;
   @ViewChild('consentContainer', { read: ViewContainerRef })
   consentContainer: ViewContainerRef;
 
