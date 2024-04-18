@@ -25,7 +25,9 @@
   }
 }
 
-:hover + .target {
+:hover + .target,
+:active .target,
+.target:hover {
   border-color: darken($textcolour_link, 15%);
   &::after {
     background-color: darken($textcolour_link, 15%);

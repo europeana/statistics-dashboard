@@ -6,6 +6,46 @@
   src: url("/assets/fonts/chevin/ChevinMedium.otf") format("opentype");
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes spinIn {
+  from {
+    transform: rotateX(90deg);
+  }
+  to {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes spinOut {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(90deg);
+  }
+}
+
+$targetAnimationDelay: 1250ms;
+$targetAnimationTime: 1750ms;
+$targetAnimationTimeSlow: 3750ms;
+
 .header,
 .logo {
   display: flex;
@@ -74,7 +114,8 @@
 }
 
 .country-link {
-  animation: 1250ms spin 1750ms forwards;
+  animation: $targetAnimationTime spinOut $targetAnimationDelay forwards,
+    $targetAnimationTime fadeOut $targetAnimationDelay forwards;
   color: $linkblue;
   font-size: 20px;
   font-weight: 900;
@@ -87,29 +128,12 @@
 }
 
 .active-country {
-  animation: 1000ms fadeIn 2500ms forwards;
+  animation: $targetAnimationTime spinIn $targetAnimationDelay forwards,
+    $targetAnimationTime fadeIn $targetAnimationDelay forwards;
   color: $linkblue;
   font-weight: 600;
   opacity: 0;
   padding-left: 0.4em;
-}
-
-@keyframes spin {
-  from {
-    transform: rotateX(0deg);
-  }
-  to {
-    transform: rotateX(90deg);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .target-menu-wrapper {
@@ -160,6 +184,10 @@
     height: auto;
   }
 
+  .target-menu-wrapper:hover .active-country {
+    color: darken($textcolour_link, 15%);
+  }
+
   .target:hover .target-select {
     border-width: 1px;
     opacity: 1;
@@ -169,5 +197,5 @@
 
 .target {
   opacity: 0;
-  animation: 1750ms fadeIn 1750ms forwards;
+  animation: $targetAnimationTimeSlow fadeIn $targetAnimationDelay forwards;
 }
