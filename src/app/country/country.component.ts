@@ -116,10 +116,9 @@ export class CountryComponent extends SubscriptionManager {
         .subscribe({
           next: (combined) => {
             this.countryData = combined.countryData;
-            this.setCountryToParam(combined.params['country']);
-            (
-              this.rootRef as unknown as { header: { activeCountry: string } }
-            ).header.activeCountry = combined.params['country'];
+            const country = combined.params['country'];
+            this.setCountryToParam(country);
+            this.setCountryInHeaderMenu(country);
           },
           error: (e: Error) => {
             console.log(e);
@@ -140,6 +139,12 @@ export class CountryComponent extends SubscriptionManager {
           this.countryLandingData = data;
         })
     );
+  }
+
+  setCountryInHeaderMenu(country?: string): void {
+    (
+      this.rootRef as unknown as { header: { activeCountry: string } }
+    ).header.activeCountry = country;
   }
 
   setCountryToParam(country: string): void {
@@ -167,5 +172,9 @@ export class CountryComponent extends SubscriptionManager {
     this.detailsExpanded = !this.detailsExpanded;
     this.lineChart.toggleCursor();
     this.lineChart.toggleGridlines();
+  }
+
+  ngOnDestroy(): void {
+    this.setCountryInHeaderMenu();
   }
 }

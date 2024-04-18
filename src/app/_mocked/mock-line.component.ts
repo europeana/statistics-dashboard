@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
+import { Component, Input } from '@angular/core';
 import * as am4core from '@amcharts/amcharts4/core';
 
-import { TargetFieldName } from '../_models';
+import { IHash, IHashArray, TargetFieldName, TargetMetaData } from '../_models';
 
 @Component({
   standalone: true,
@@ -10,7 +9,7 @@ import { TargetFieldName } from '../_models';
   template: ''
 })
 export class MockLineComponent {
-  allSeries: { [key: string]: am4charts.LineSeries } = {};
+  @Input() targetMetaData: IHash<IHashArray<TargetMetaData>>;
 
   addSeries(_, __, ___, ____, _____): void {
     console.log('MockLineComponent addSeries');

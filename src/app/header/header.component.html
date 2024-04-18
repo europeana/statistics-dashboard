@@ -14,20 +14,29 @@
         <br />dashboard
       </span>
     </a>
-    <span class="text country-link" data-e2e="link-home-header">
+
+    <span class="text country-link">
       2025
       <br />2030
     </span>
-    <span class="target">
-      <span class="target-select">
-        <ng-container *ngFor="let country of cd | keyvalue">
-          <a
-            [routerLink]="['/country', country.key]"
-            [ngClass]="{ highlight: country.key === activeCountry }"
-          >
-            <span>{{ country.key }}</span>
-          </a>
-        </ng-container>
+
+    <span class="target-menu-wrapper">
+      <span class="active-country">
+        2025 / 2030 Targets @if(activeCountry) { - {{ activeCountry }}
+        }
+      </span>
+
+      <span class="target">
+        <span class="target-select">
+          <ng-container *ngFor="let country of cd | keyvalue">
+            <a
+              [routerLink]="['/country', country.key]"
+              [ngClass]="{ highlight: country.key === activeCountry }"
+            >
+              <span>{{ country.key }}</span>
+            </a>
+          </ng-container>
+        </span>
       </span>
     </span>
   </div>

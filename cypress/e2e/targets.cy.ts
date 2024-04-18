@@ -1,7 +1,7 @@
 context('Statistics Dashboard', () => {
   describe('targets', () => {
     beforeEach(() => {
-      cy.visit('/targets');
+      cy.visit('/country/France');
     });
     /*
 

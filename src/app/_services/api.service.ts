@@ -233,6 +233,7 @@ export class APIService {
 
         res.push({
           country,
+          total: (Math.max(value3D, valueHQ) || 1000) * 15,
           date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
           three_d: Math.floor(value3D),
           hq: Math.floor(valueHQ)

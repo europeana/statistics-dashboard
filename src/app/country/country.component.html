@@ -78,7 +78,7 @@
         context: {
           name: name,
           value: latestCountryData[valName],
-          percent: latestCountryData['total'] / latestCountryData[valName],
+          percent: latestCountryData.total / latestCountryData[valName],
           isPowerLevel: true
         }
       "
@@ -283,7 +283,7 @@
                     {{ country | renameCountry }}
                   </span>
                   <span class="cell-total">
-                    xxx{{ row["total"] | number }}xxx
+                    {{ row["total"] | number }}
                   </span>
                   }
                 </span>

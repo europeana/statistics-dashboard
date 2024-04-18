@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { FormGroup } from '@angular/forms';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
 import { KeyValuePipe, NgClass, NgFor } from '@angular/common';
@@ -10,7 +11,14 @@ import { SubscriptionManager } from '../subscription-manager';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [CTZeroControlComponent, KeyValuePipe, NgClass, NgFor, RouterLink]
+  imports: [
+    CTZeroControlComponent,
+    KeyValuePipe,
+    NgClass,
+    NgIf,
+    NgFor,
+    RouterLink
+  ]
 })
 export class HeaderComponent extends SubscriptionManager {
   @Input() form?: FormGroup;

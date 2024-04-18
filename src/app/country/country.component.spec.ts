@@ -1,6 +1,12 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  ApplicationRef,
+  ComponentRef,
+  CUSTOM_ELEMENTS_SCHEMA
+} from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
+
+import { of } from 'rxjs';
 
 import { APIService } from '../_services';
 import { MockAPIService, MockLineComponent } from '../_mocked';
@@ -18,7 +24,7 @@ describe('CountryComponent', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: {}
+          useValue: { params: of({ country: 'France' }) }
         },
         { provide: APIService, useClass: MockAPIService }
       ],
@@ -36,6 +42,13 @@ describe('CountryComponent', () => {
   }));
 
   beforeEach(() => {
+    const appRef = TestBed.get(ApplicationRef) as ApplicationRef;
+    appRef.components.push({
+      header: {
+        activeCountry: 'France'
+      }
+    } as unknown as ComponentRef<unknown>);
+
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
