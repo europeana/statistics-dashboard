@@ -1,0 +1,33 @@
+.target {
+  $dmOuter: 16px;
+  $dmInner: 5px;
+
+  background-color: white;
+  border-radius: 50%;
+  border: 3px solid $linkblue;
+  display: inline-block;
+  height: $dmOuter;
+  position: relative;
+  width: $dmOuter;
+  z-index: 1;
+
+  &::after {
+    content: "";
+    display: block;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    height: $dmInner;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: $dmInner;
+  }
+}
+
+:hover + .target {
+  border-color: darken($textcolour_link, 15%);
+  &::after {
+    background-color: darken($textcolour_link, 15%);
+  }
+}

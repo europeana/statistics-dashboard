@@ -57,7 +57,7 @@
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         @if (countryLink){
         <a [routerLink]="['/country', row.name]">
-          <span>{{ row.name }}</span>
+          <span>{{ row.name }}<span class="target"></span></span>
         </a>
         } @else {
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>

@@ -154,6 +154,17 @@ $card-header-height: $card-header-pixels-line-height +
   z-index: 1;
 }
 
+.target {
+  margin-left: 7px;
+  opacity: 0;
+  top: 4px;
+  transition: opacity 0.2s linear;
+}
+
+a:hover .target {
+  opacity: 1;
+}
+
 @media (min-width: $bp-desktop) {
   .double-card .data-rows {
     margin-left: 2em;
