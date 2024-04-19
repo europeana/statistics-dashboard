@@ -4,7 +4,8 @@ import { FormGroup } from '@angular/forms';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
 import { KeyValuePipe, NgClass, NgFor } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { SubscriptionManager } from '../subscription-manager';
+import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
+import { CountryTotalInfo, IHash } from '../_models';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +13,7 @@ import { SubscriptionManager } from '../subscription-manager';
   styleUrls: ['./header.component.scss'],
   standalone: true,
   imports: [
+    ClickAwareDirective,
     CTZeroControlComponent,
     KeyValuePipe,
     NgClass,
@@ -20,21 +22,27 @@ import { SubscriptionManager } from '../subscription-manager';
     RouterLink
   ]
 })
-export class HeaderComponent extends SubscriptionManager {
+export class HeaderComponent {
   @Input() form?: FormGroup;
   @Input() includeCTZero: boolean;
   @Input() showPageTitle = false;
-  @Input() activeCountry?: string;
 
-  constructor() {
-    super();
+  countryTotalMap: IHash<CountryTotalInfo> = {};
+  menuIsOpen = false;
+  _activeCountry?: string;
+
+  @Input() set activeCountry(activeCountry: string | undefined) {
+    this.menuIsOpen = false;
+    this._activeCountry = activeCountry;
   }
 
-  cd = {
-    Germany: 'DE',
-    'Bosnia and Herzegovina': 'BO',
-    Netherlands: 'NL',
-    France: 'FR',
-    'United Kingdom': 'GB'
-  };
+  get activeCountry(): string | undefined {
+    return this._activeCountry;
+  }
+
+  toggleMenu(e: { target: HTMLElement }): void {
+    if (!e.target.getAttribute('disabled')) {
+      this.menuIsOpen = !this.menuIsOpen;
+    }
+  }
 }

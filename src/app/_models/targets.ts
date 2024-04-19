@@ -27,7 +27,6 @@ type TargetFieldNameType = {
 export interface TargetData extends TargetFieldNameType {
   date: string;
   label: string;
-  total: number;
 }
 
 export interface TargetCountryData extends TargetData {

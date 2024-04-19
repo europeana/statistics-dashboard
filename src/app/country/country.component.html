@@ -72,17 +72,27 @@
   </ng-template>
 
   <ng-template #powerLevelSummary let-name="name" let-valName="valName">
-    <ng-content
-      *ngTemplateOutlet="
-        cardSummary;
-        context: {
-          name: name,
-          value: latestCountryData[valName],
-          percent: latestCountryData.total / latestCountryData[valName],
-          isPowerLevel: true
-        }
+    <ng-container
+      *ngIf="
+        headerRef &&
+        headerRef['countryTotalMap'] &&
+        headerRef['countryTotalMap'][country]
       "
-    ></ng-content>
+    >
+      <ng-content
+        *ngTemplateOutlet="
+          cardSummary;
+          context: {
+            name: name,
+            value: latestCountryData[valName],
+            percent:
+              headerRef['countryTotalMap'][country]['total'] /
+              latestCountryData[valName],
+            isPowerLevel: true
+          }
+        "
+      ></ng-content>
+    </ng-container>
   </ng-template>
 
   <ng-template #dataRows let-dimension="dimension" let-data="data">
@@ -107,7 +117,10 @@
             class="info-icon"
             [href]="externalLinks.help.contentTier.href"
             target="_blank"
-            [title]="externalLinks.help.contentTier.description"
+            [attr.title]="
+              'TODO: link to 3D docs?  Do as with ' +
+              externalLinks.help.contentTier.description
+            "
           ></a
         ></span>
         <div class="entry-card-content">
@@ -160,7 +173,10 @@
             class="info-icon"
             [href]="externalLinks.help.metadataTier.href"
             target="_blank"
-            [title]="externalLinks.help.metadataTier.description"
+            [attr.title]="
+              'TODO: link to HQ docs? Do as with ' +
+              externalLinks.help.metadataTier.description
+            "
           ></a
         ></span>
         <div class="entry-card-content">
@@ -283,7 +299,14 @@
                     {{ country | renameCountry }}
                   </span>
                   <span class="cell-total">
-                    {{ row["total"] | number }}
+                    @if( headerRef && headerRef['countryTotalMap'] &&
+                    headerRef['countryTotalMap'][country | renameCountry] ){
+                    {{
+                      headerRef["countryTotalMap"][country | renameCountry][
+                        "total"
+                      ] | number
+                    }}
+                    }
                   </span>
                   }
                 </span>

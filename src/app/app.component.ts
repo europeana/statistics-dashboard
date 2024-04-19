@@ -21,11 +21,13 @@ import {
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
+import { ISOCountryCodes } from './_data';
 import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService } from './_services';
 import {
   BreakdownResult,
   CountPercentageValue,
+  CountryTotalInfo,
   GeneralResults,
   GeneralResultsFormatted
 } from './_models';
@@ -132,13 +134,20 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     return this.formCTZero.get('contentTierZero') as FormControl;
   }
 
-  /** loadLandingData
-  /* - loads the general breakdown data
-  /* - sets data on landingComponentRef
-  /* @param { boolean: includeCTZero } - request content-tier-zero
-  */
+  /*** loadLandingData
+   * - resets local landingData object
+   * - loads the general breakdown data / reconstructs local object
+   * - sets landingComponentRef landingData to local object
+   * - derives countryTotalMap data and assigns to header component
+   * @param { boolean: includeCTZero } - request content-tier-zero
+   ***/
   loadLandingData(includeCTZero: boolean): void {
-    this.landingComponentRef.isLoading = true;
+    if (this.landingComponentRef) {
+      this.landingComponentRef.isLoading = true;
+    }
+
+    const countryTotalMap: { [key: string]: CountryTotalInfo } = {};
+
     this.subs.push(
       this.api
         .getGeneralResults(includeCTZero)
@@ -154,10 +163,24 @@ export class AppComponent extends SubscriptionManager implements OnInit {
                 };
               }
             );
+            if (br.breakdownBy === 'country') {
+              br.results.forEach((result: CountPercentageValue) => {
+                countryTotalMap[result.value] = {
+                  total: result.count,
+                  code: ISOCountryCodes[result.value]
+                };
+              });
+            }
           });
-          this.landingComponentRef.includeCTZero = includeCTZero;
-          this.landingComponentRef.landingData = this.landingData;
-          this.landingComponentRef.isLoading = false;
+
+          if (this.landingComponentRef) {
+            this.landingComponentRef.includeCTZero = includeCTZero;
+            this.landingComponentRef.landingData = this.landingData;
+            this.landingComponentRef.isLoading = false;
+          }
+
+          // assign country data
+          this.header.countryTotalMap = countryTotalMap;
         })
     );
   }
@@ -193,20 +216,18 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       })
     );
     this.location.subscribe(this.handleLocationPopState.bind(this));
+    this.buildForm();
+    this.loadLandingData(this.formCTZero.value.contentTierZero);
   }
 
   /** onOutletLoaded
   /* - invoked when router component loads
-  /*    - handles component data binding (since @Input() is unavailable in router-outlet)
+  /*    - handles component data binding
   /*    - sets showPageTitle
-  /* - if it's the landing page (first visit):
-  /*      - builds the form
-  /*      - loads the landing data
-  /*    - sets landingComponentRef data
-  /*    - and if it's the first arrival it:
-  /* - (subsequent vist)
-  /*    - reassigns existing landing data to landingComponentRef unless stale
-  /*    - triggers data reload if form data is stale
+  /* - if it's the landing page (and ct-zero control value matches):
+  /*      - assigns landing data
+  /* - if ct-zero control value doesn't match:
+  /*    - updates control (triggers data reload)
   /* - (OverviewComponent)
   /*    - unassigns landingComponentRef
   /*
@@ -217,16 +238,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       this.showPageTitle = true;
       this.landingComponentRef = component;
       this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
-
-      if (!this.formCTZero) {
-        this.buildForm();
-        this.loadLandingData(this.formCTZero.value.contentTierZero);
+      const ctrlCTZero = this.getCtrlCTZero();
+      if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
+        this.skipLocationUpdate = true;
+        // trigger the load
+        ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
       } else {
-        const ctrlCTZero = this.getCtrlCTZero();
-        if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-          this.skipLocationUpdate = true;
-          ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-        } else {
+        if (this.landingComponentRef && this.landingData) {
           this.landingComponentRef.landingData = this.landingData;
         }
       }

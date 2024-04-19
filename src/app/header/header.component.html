@@ -20,22 +20,33 @@
       <br />2030
     </span>
 
-    <span class="target-menu-wrapper">
-      <span class="active-country">
+    <span
+      class="target-menu-wrapper"
+      [ngClass]="{ open: menuIsOpen }"
+      appClickAware
+      (clickOutside)="menuIsOpen = false"
+    >
+      <span class="active-country" (click)="toggleMenu($event)">
         2025 / 2030 Targets @if(activeCountry) { - {{ activeCountry }}
         }
       </span>
 
       <span class="target">
         <span class="target-select">
-          <ng-container *ngFor="let country of cd | keyvalue">
+          <span
+            class="target-select-item"
+            *ngFor="let country of countryTotalMap | keyvalue"
+          >
             <a
+              (click)="toggleMenu($event)"
+              [attr.disabled]="
+                country.key === activeCountry ? 'disabled' : null
+              "
               [routerLink]="['/country', country.key]"
-              [ngClass]="{ highlight: country.key === activeCountry }"
             >
               <span>{{ country.key }}</span>
             </a>
-          </ng-container>
+          </span>
         </span>
       </span>
     </span>

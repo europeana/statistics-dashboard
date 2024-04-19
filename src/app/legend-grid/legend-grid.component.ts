@@ -59,6 +59,22 @@ export class LegendGridComponent {
   _targetMetaData: IHash<IHashArray<TargetMetaData>>;
 
   @Input() set countryCode(countryCode: string) {
+    let timeout = 0;
+
+    // remove old chart lines
+
+    if (this._countryCode) {
+      const pinned = Object.keys(this.pinnedCountries);
+      if (pinned.length) {
+        timeout = 800;
+      }
+      pinned.forEach((countryCode: string) => {
+        this.toggleCountry(countryCode);
+      });
+    }
+
+    // set new country
+
     this._countryCode = countryCode;
     setTimeout(() => {
       this.toggleCountry(this.countryCode);
@@ -68,7 +84,7 @@ export class LegendGridComponent {
         0,
         this.lineChart.chart.colors.getIndex(0)
       );
-    }, 0);
+    }, timeout);
   }
 
   get countryCode(): string {

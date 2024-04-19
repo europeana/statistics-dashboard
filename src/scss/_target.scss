@@ -7,6 +7,8 @@
   border: 3px solid $linkblue;
   display: inline-block;
   height: $dmOuter;
+  min-height: $dmOuter;
+  min-width: $dmOuter;
   position: relative;
   width: $dmOuter;
   z-index: 1;

@@ -45,7 +45,8 @@ describe('CountryComponent', () => {
     const appRef = TestBed.get(ApplicationRef) as ApplicationRef;
     appRef.components.push({
       header: {
-        activeCountry: 'France'
+        activeCountry: 'France',
+        countryTotalMap: {}
       }
     } as unknown as ComponentRef<unknown>);
 

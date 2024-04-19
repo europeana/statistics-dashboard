@@ -21,8 +21,9 @@ import {
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 
-import { colours, externalLinks } from '../_data';
+import { colours, externalLinks, ISOCountryCodes } from '../_data';
 import {
+  CountryTotalInfo,
   DimensionName,
   GeneralResultsFormatted,
   IHash,
@@ -45,13 +46,11 @@ import { SubscriptionManager } from '../subscription-manager';
 import { TruncateComponent } from '../truncate';
 
 @Component({
-  //selector: 'app-country',
   templateUrl: './country.component.html',
   styleUrls: ['../landing/landing.component.scss', './country.component.scss'],
   standalone: true,
   imports: [
     RouterOutlet,
-    //DocArrowsComponent,
     DatePipe,
     JsonPipe,
     NgClass,
@@ -92,16 +91,21 @@ export class CountryComponent extends SubscriptionManager {
   countryLandingData: GeneralResultsFormatted = {};
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
+  countryTotalMap: IHash<CountryTotalInfo>;
   latestCountryData: TargetData;
   detailsExpanded = false;
   monotonePowerbars = true;
 
   private rootRef: ElementRef;
+  public headerRef: ElementRef;
 
   constructor(private applicationRef: ApplicationRef) {
     super();
 
     this.rootRef = this.applicationRef.components[0].instance;
+    if (this.rootRef) {
+      this.headerRef = this.rootRef['header'];
+    }
 
     this.subs.push(
       combineLatest([this.api.getCountryData(), this.route.params])
@@ -148,18 +152,8 @@ export class CountryComponent extends SubscriptionManager {
   }
 
   setCountryToParam(country: string): void {
-    if (this.legendGrid) {
-      // remove old chart lines
-      Object.keys(this.legendGrid.pinnedCountries).forEach(
-        (countryCode: string) => {
-          this.legendGrid.toggleCountry(countryCode);
-        }
-      );
-    }
-
     this.country = country;
-    const code = this.api.loadISOCountryCodes()[this.country];
-    this.countryCode = code;
+    this.countryCode = ISOCountryCodes[this.country];
 
     const specificCountryData = this.countryData[this.countryCode];
     if (specificCountryData.length) {

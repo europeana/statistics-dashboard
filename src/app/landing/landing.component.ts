@@ -19,7 +19,6 @@ import { ResizeComponent } from '../resize';
 import { TruncateComponent } from '../truncate';
 
 @Component({
-  selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
   standalone: true,

@@ -131,6 +131,7 @@ $targetAnimationTimeSlow: 3750ms;
   animation: $targetAnimationTime spinIn $targetAnimationDelay forwards,
     $targetAnimationTime fadeIn $targetAnimationDelay forwards;
   color: $linkblue;
+  cursor: pointer;
   font-weight: 600;
   opacity: 0;
   padding-left: 0.4em;
@@ -145,50 +146,48 @@ $targetAnimationTimeSlow: 3750ms;
 .target-select {
   background-color: #fff;
   box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
-  display: flex;
-  font-size: 14px;
-  flex-direction: column;
-  left: 16px;
-  line-height: 32px;
-  position: absolute;
-  top: 18px;
-  z-index: 0;
-
-  a {
-    color: $gray-med;
-    padding: 0.5em 0.75em;
-    white-space: nowrap;
-
-    &:hover {
-      background-color: $offwhite;
-    }
-  }
-
-  .highlight {
-    font-weight: bold;
-  }
-}
-
-.target-select {
   border-width: 0;
+  display: grid;
+
+  //font-size: 12px;
+
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  height: 0;
+  left: 4px;
+  line-height: 18px;
   opacity: 0;
   overflow: hidden;
-  height: 0;
+  position: absolute;
   transition: opacity 0.1s linear;
+  top: 24px;
+  z-index: 0;
+
+  .target-select-item {
+    padding: 10px 16px;
+  }
+
+  a {
+    //color: $near-black;
+    white-space: nowrap;
+
+    &[disabled] {
+      //color: $gray-light;
+      cursor: default;
+      pointer-events: none;
+      font-weight: bold;
+    }
+  }
 }
 
-.header:hover {
-  .active-country:hover + .target > .target-select {
-    border-width: 1px;
-    opacity: 1;
-    height: auto;
-  }
-
-  .target-menu-wrapper:hover .active-country {
+.target-menu-wrapper:hover,
+.target-menu-wrapper.open {
+  .active-country {
     color: darken($textcolour_link, 15%);
   }
+}
 
-  .target:hover .target-select {
+.target-menu-wrapper.open {
+  .target-select {
     border-width: 1px;
     opacity: 1;
     height: auto;

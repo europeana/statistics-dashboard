@@ -293,6 +293,33 @@
               </li>
             </ul>
           </div>
+
+          <!-- COUNTRY TARGET PAGE LINK -->
+          <ul
+            *ngIf="targetLinkAvailable"
+            style="float: right; display: flex; flex-direction: column"
+          >
+            <li *ngFor="let country of queryParams['country']">
+              <a
+                [attr.title]="country + ' 2025 / 2030 target data'"
+                style="
+                  display: flex;
+                  flex-direction: row;
+                  font-size: 12px;
+                  align-items: center;
+
+                  line-height: 20px;
+                "
+                [routerLink]="['/country', country]"
+              >
+                <span style="text-align: right; width: 100%"
+                  >{{ country }} Targets &nbsp;</span
+                >
+                <span class="target"></span>
+              </a>
+            </li>
+          </ul>
+
           <!-- CHART AND SUMMARY -->
           <div class="chart-and-summary">
             <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">

@@ -28,25 +28,52 @@ export class APIService {
 
   dateTicks: Array<string> = [];
   targetCountries = [
+    'AL',
+    'AT',
+    'AZ',
+    'AZ',
     'BA',
     'BE',
+    'BG',
+    'BY',
+    'CH',
     'CY',
     'CZ',
     'DK',
+    'EE',
     'FI',
     'FR',
     'DE',
+    'ES',
     'GB',
+    'GE',
     'GR',
+    'HR',
     'HU',
+    'IE',
+    'IL',
+    'IS',
     'IT',
+    'LT',
+    'LU',
+    'LV',
+    'MD',
+    'ME',
     'MK',
     'MT',
     'NL',
+    'NO',
     'PL',
+    'PT',
+    'RO',
+    'RS',
+    'RU',
     'SK',
     'SI',
-    'SE'
+    'SE',
+    'TR',
+    'UA',
+    'USA'
   ];
 
   targetData = [].concat(
@@ -233,7 +260,6 @@ export class APIService {
 
         res.push({
           country,
-          total: (Math.max(value3D, valueHQ) || 1000) * 15,
           date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
           three_d: Math.floor(value3D),
           hq: Math.floor(valueHQ)
