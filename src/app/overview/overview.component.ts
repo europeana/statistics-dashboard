@@ -5,7 +5,14 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { DatePipe, formatDate, NgClass, NgFor, NgIf } from '@angular/common';
+import {
+  DatePipe,
+  formatDate,
+  NgClass,
+  NgFor,
+  NgIf,
+  NgTemplateOutlet
+} from '@angular/common';
 import {
   FormControl,
   FormGroup,
@@ -85,6 +92,7 @@ import { ResizeComponent } from '../resize/resize.component';
     CTZeroControlComponent,
     NgIf,
     NgFor,
+    NgTemplateOutlet,
     FilterComponent,
     IsScrollableDirective,
     CheckboxComponent,

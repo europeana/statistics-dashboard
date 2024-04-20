@@ -268,10 +268,45 @@
 
         <!-- Data Area -->
         <div class="data-area">
+          <ng-template #targetLinks>
+            <!-- COUNTRY TARGET PAGE LINK -->
+            <ul
+              *ngIf="targetLinkAvailable"
+              style="
+                position: absolute;
+                right: 1em;
+                display: flex;
+                flex-direction: column;
+              "
+            >
+              <li
+                style="list-style: none"
+                *ngFor="let country of queryParams['country']"
+              >
+                <a
+                  [attr.title]="country + ' 2025 / 2030 target data'"
+                  style="
+                    display: flex;
+                    flex-direction: row;
+                    font-size: 12px;
+                    align-items: center;
+                    line-height: 20px;
+                  "
+                  [routerLink]="['/country', country]"
+                >
+                  <span class="target"></span>
+                </a>
+              </li>
+            </ul>
+          </ng-template>
+
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
 
           <!-- NO-DATA FALLBACK -->
           <div *ngIf="emptyDataset && !isLoading" class="no-data">
+            <!-- COUNTRY TARGET PAGE LINK -->
+            <ng-content *ngTemplateOutlet="targetLinks"></ng-content>
+
             <span i18n="Warn no results@@warnNoResults">No results found!</span>
             <ul>
               <li
@@ -295,30 +330,9 @@
           </div>
 
           <!-- COUNTRY TARGET PAGE LINK -->
-          <ul
-            *ngIf="targetLinkAvailable"
-            style="float: right; display: flex; flex-direction: column"
-          >
-            <li *ngFor="let country of queryParams['country']">
-              <a
-                [attr.title]="country + ' 2025 / 2030 target data'"
-                style="
-                  display: flex;
-                  flex-direction: row;
-                  font-size: 12px;
-                  align-items: center;
-
-                  line-height: 20px;
-                "
-                [routerLink]="['/country', country]"
-              >
-                <span style="text-align: right; width: 100%"
-                  >{{ country }} Targets &nbsp;</span
-                >
-                <span class="target"></span>
-              </a>
-            </li>
-          </ul>
+          <ng-container *ngIf="!emptyDataset">
+            <ng-content *ngTemplateOutlet="targetLinks"></ng-content>
+          </ng-container>
 
           <!-- CHART AND SUMMARY -->
           <div class="chart-and-summary">

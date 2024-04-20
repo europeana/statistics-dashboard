@@ -96,15 +96,14 @@ export class CountryComponent extends SubscriptionManager {
   detailsExpanded = false;
   monotonePowerbars = true;
 
-  private rootRef: ElementRef;
   public headerRef: ElementRef;
 
   constructor(private applicationRef: ApplicationRef) {
     super();
 
-    this.rootRef = this.applicationRef.components[0].instance;
-    if (this.rootRef) {
-      this.headerRef = this.rootRef['header'];
+    const rootRef = this.applicationRef.components[0].instance;
+    if (rootRef) {
+      this.headerRef = rootRef['header'];
     }
 
     this.subs.push(
@@ -146,9 +145,8 @@ export class CountryComponent extends SubscriptionManager {
   }
 
   setCountryInHeaderMenu(country?: string): void {
-    (
-      this.rootRef as unknown as { header: { activeCountry: string } }
-    ).header.activeCountry = country;
+    (this.headerRef as unknown as { activeCountry: string }).activeCountry =
+      country;
   }
 
   setCountryToParam(country: string): void {
