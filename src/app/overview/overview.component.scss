@@ -331,7 +331,7 @@ label {
 
   .no-data {
     font-size: 24px;
-    ul {
+    ul:not(.target-links) {
       font-size: 14px;
       list-style: disc;
       margin: 12px 0 0 20px;
