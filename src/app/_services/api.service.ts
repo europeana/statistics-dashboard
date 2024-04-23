@@ -19,9 +19,13 @@ import {
   TargetMetaDataRaw
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
+import { Cache } from '../_helpers';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
+  private readonly countries = new Cache(() => this.loadCountryData());
+  private readonly generalResults = new Cache(() => this.getGeneralResults());
+
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
   suffixRightsUrls = 'statistics/rights/urls';
@@ -138,7 +142,7 @@ export class APIService {
   }
 
   getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
-    return this.getGeneralResults().pipe(
+    return this.generalResults.get().pipe(
       map((data: GeneralResults) => {
         const res: GeneralResultsFormatted = {};
         data.allBreakdowns.forEach((br: BreakdownResult) => {
@@ -280,7 +284,7 @@ export class APIService {
    * returns the result of loadCountryData mapped to a hash (key: country)
    **/
   getCountryData(): Observable<IHash<Array<TargetData>>> {
-    return this.loadCountryData().pipe(
+    return this.countries.get().pipe(
       map((rows: Array<TargetCountryData>) => {
         return rows.reduce(
           (res: IHash<Array<TargetData>>, item: TargetCountryData) => {

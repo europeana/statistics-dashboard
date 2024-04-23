@@ -6,6 +6,9 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
+
+import * as am4charts from '@amcharts/amcharts4/charts';
+
 import { MockLineComponent } from '../_mocked';
 import { TargetFieldName } from '../_models';
 import { LineComponent } from '../chart';
@@ -114,11 +117,13 @@ describe('LegendGridComponent', () => {
     expect(component.lineChart.addSeries).toHaveBeenCalledTimes(2);
   });
 
-  it('should toggle the country ', () => {
+  it('should toggle the country', () => {
     component.targetMetaData = mockTargetMetaData;
 
-    spyOn(component, 'addSeriesSetAndPin');
     spyOn(component, 'togglePin');
+    spyOn(component, 'addSeriesSetAndPin').and.callFake(() => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+    });
 
     component.toggleCountry('FR');
     expect(component.togglePin).toHaveBeenCalled();
@@ -127,6 +132,61 @@ describe('LegendGridComponent', () => {
     expect(component.togglePin).toHaveBeenCalledTimes(2);
 
     component.toggleCountry('DE');
+    expect(component.togglePin).toHaveBeenCalledTimes(3);
+
+    expect(component.addSeriesSetAndPin).not.toHaveBeenCalled();
+
+    spyOn(component, 'getCountrySeries').and.callFake(() => {
+      return [];
+    });
+    component.toggleCountry('DE');
+
+    expect(component.togglePin).toHaveBeenCalledTimes(3);
+    expect(component.addSeriesSetAndPin).toHaveBeenCalled();
+  });
+
+  it('should toggle the series', () => {
+    const seriesItemHidden = {
+      isHidden: true,
+      show: () => {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+      },
+      hide: () => {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+      }
+    } as unknown as am4charts.LineSeries;
+    const seriesItemShowing = {
+      ...seriesItemHidden,
+      isHidden: false
+    } as unknown as am4charts.LineSeries;
+    const seriesArray = [seriesItemShowing];
+
+    spyOn(component, 'getCountrySeries').and.callFake((_) => {
+      return seriesArray;
+    });
+    spyOn(component, 'togglePin');
+    spyOn(component.lineChart, 'addSeries');
+
+    component.toggleSeries('DE', TargetFieldName.THREE_D);
+
+    expect(component.lineChart.addSeries).toHaveBeenCalled();
+    expect(component.togglePin).not.toHaveBeenCalled();
+
+    seriesArray.pop();
+    seriesArray.push(seriesItemHidden);
+
+    component.toggleSeries('DE', TargetFieldName.THREE_D);
+    expect(component.togglePin).toHaveBeenCalled();
+
+    // supply the series parameter
+    spyOn(seriesItemShowing, 'hide');
+    component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemShowing);
+    expect(seriesItemShowing.hide).toHaveBeenCalled();
+    expect(component.togglePin).toHaveBeenCalledTimes(2);
+
+    spyOn(seriesItemHidden, 'show');
+    component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemHidden);
+    expect(seriesItemHidden.show).toHaveBeenCalled();
     expect(component.togglePin).toHaveBeenCalledTimes(3);
   });
 

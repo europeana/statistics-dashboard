@@ -22,16 +22,16 @@ context('Statistics Dashboard', () => {
         .and('eq', 'rgb(77, 77, 77)');
 
       cy.visit('/country/Belgium');
-        cy.get(selPowerBarChargeLabel)
-          .eq(0)
-          .should('have.css', 'color')
-          .and('eq', 'rgb(255, 255, 255)');
+      cy.get(selPowerBarChargeLabel)
+        .eq(0)
+        .should('have.css', 'color')
+        .and('eq', 'rgb(255, 255, 255)');
 
       cy.visit('/country/Belgium');
-        cy.get(selPowerBarChargeLabel)
-          .eq(1)
-          .should('have.css', 'color')
-          .and('eq', 'rgb(10, 114, 204)');
+      cy.get(selPowerBarChargeLabel)
+        .eq(1)
+        .should('have.css', 'color')
+        .and('eq', 'rgb(10, 114, 204)');
     });
 
     it('should link to the 3D data', () => {

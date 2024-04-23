@@ -87,7 +87,6 @@ export class LineComponent implements AfterViewInit {
     if (this.valueAxis.axisRanges.values.length === 0) {
       this.chart.paddingRight = this.padding.rightDefault;
     }
-    //this.chart.invalidateData();
   }
 
   showRange(
