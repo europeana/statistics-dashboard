@@ -1,5 +1,5 @@
 context('Statistics Dashboard', () => {
-  describe('targets', () => {
+  describe('legend grid', () => {
     beforeEach(() => {
       cy.visit('/country/France');
     });

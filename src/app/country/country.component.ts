@@ -85,6 +85,7 @@ export class CountryComponent extends SubscriptionManager {
 
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
+  public countryCodes = ISOCountryCodes;
 
   country: string;
   countryCode: string;

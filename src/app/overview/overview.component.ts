@@ -294,7 +294,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           if (!this.targetLinkAvailable) {
             this.targetLinkAvailable =
               !!queryParams['country'] &&
-              queryParams['country'].length === 1 &&
               !!queryParams['metadataTier'] &&
               queryParams['metadataTier'].indexOf('0') === -1 &&
               !!queryParams['contentTier'] &&

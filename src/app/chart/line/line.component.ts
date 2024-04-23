@@ -245,7 +245,7 @@ export class LineComponent implements AfterViewInit {
     this.valueAxis = valueAxis;
     valueAxis.extraMax = 0.1;
     valueAxis.min = 0;
-    //valueAxis.includeRangesInMinMax = true;
+    valueAxis.includeRangesInMinMax = true;
     valueAxis.renderer.labels.template.fill = colourAxis;
     valueAxis.renderer.labels.template.fontSize = 14;
 

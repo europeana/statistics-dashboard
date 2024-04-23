@@ -239,8 +239,15 @@ export class APIService {
     const tgtDataRef = this.reduceTargetMetaData(this.targetData);
 
     this.targetCountries.forEach((country: string) => {
-      const baseValue3D = tgtDataRef[country][TargetFieldName.THREE_D][1].value;
-      const basevalueHQ = tgtDataRef[country][TargetFieldName.HQ][1].value;
+      const countryName = Object.keys(ISOCountryCodes).find(
+        (key) => ISOCountryCodes[key] === country
+      );
+      const countryRandom = Math.max(1.5, (countryName.length * 12) % 5);
+
+      const baseValue3D =
+        tgtDataRef[country][TargetFieldName.THREE_D][1].value / countryRandom;
+      const basevalueHQ =
+        tgtDataRef[country][TargetFieldName.HQ][1].value / countryRandom;
 
       let value3D = baseValue3D * 1.2;
       let valueHQ = basevalueHQ * 0.9;
@@ -261,8 +268,8 @@ export class APIService {
         res.push({
           country,
           date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
-          three_d: Math.floor(value3D),
-          hq: Math.floor(valueHQ)
+          three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
+          hq: isNaN(valueHQ) ? 0 : Math.floor(valueHQ)
         });
       });
     });

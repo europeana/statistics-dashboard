@@ -17,7 +17,9 @@
     let-above="above"
   >
     <div
-      [ngClass]="{ 'labels-above': above, monotone: monotonePowerbars }"
+      [ngClass]="{
+        'labels-above': above, monotone: monotonePowerbars,
+      }"
       title="Click to toggle style......................TODO: decide"
       class="powerbar-wrapper"
     >
@@ -27,7 +29,11 @@
       </span>
       <div class="powerbar" (click)="monotonePowerbars = !monotonePowerbars">
         <div class="powerbar-charge" style="width: {{ percent }}%"></div>
-        <span class="powerbar-charge-label">{{ percent }}%</span>
+        <span
+          [ngClass]="{ centred: percent < 30, zeroed: percent === 0 }"
+          class="powerbar-charge-label"
+          >{{ percent | number: "1.0-2" }}%</span
+        >
       </div>
     </div>
   </ng-template>
@@ -66,7 +72,7 @@
           i18n="landing chart summary percentage@@landingChartSummaryPercentage"
           >Corresponding percentage</span
         >
-        <span class="total">{{ percent | number }}%</span>
+        <span class="total">{{ percent | number: "1.0-2" }}%</span>
       </span>
     </span>
   </ng-template>
@@ -75,8 +81,10 @@
     <ng-container
       *ngIf="
         headerRef &&
-        headerRef['countryTotalMap'] &&
-        headerRef['countryTotalMap'][country]
+          headerRef['countryTotalMap'] &&
+          headerRef['countryTotalMap'][country] &&
+          headerRef['countryTotalMap'][country]['total'];
+        let countryTotal
       "
     >
       <ng-content
@@ -86,8 +94,9 @@
             name: name,
             value: latestCountryData[valName],
             percent:
-              headerRef['countryTotalMap'][country]['total'] /
-              latestCountryData[valName],
+              latestCountryData[valName] === 0
+                ? 0
+                : countryTotal / latestCountryData[valName],
             isPowerLevel: true
           }
         "
@@ -123,13 +132,20 @@
             "
           ></a
         ></span>
-        <div class="entry-card-content">
+
+        <div
+          class="entry-card-content"
+          *ngIf="
+            targetMetaData[countryCodes[country]][TargetFieldName.THREE_D];
+            let targets3D
+          "
+        >
           <ng-content
             *ngTemplateOutlet="
               powerLevelSummary;
               context: {
                 name: '3D',
-                valName: 'three_d'
+                valName: TargetFieldName.THREE_D
               }
             "
           ></ng-content>
@@ -138,9 +154,12 @@
               powerLevel;
               context: {
                 above: true,
-                percent: '50',
+                percent:
+                  ((latestCountryData[TargetFieldName.THREE_D] || 0) /
+                    targets3D[0].value) *
+                  100,
                 label: '2025',
-                target: 30000
+                target: targets3D[0].value
               }
             "
           ></ng-content>
@@ -148,9 +167,12 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                percent: '42',
+                percent:
+                  (latestCountryData[TargetFieldName.THREE_D] /
+                    targets3D[1].value) *
+                  100,
                 label: '2030',
-                target: 50000
+                target: targets3D[1].value
               }
             "
           ></ng-content>
@@ -162,7 +184,7 @@
               country: country,
               type: '3D'
             }"
-            data-e2e="link-entry-ct"
+            data-e2e="link-entry-3d"
             >View (3D data) by content tier</a
           >
         </div>
@@ -179,7 +201,13 @@
             "
           ></a
         ></span>
-        <div class="entry-card-content">
+        <div
+          class="entry-card-content"
+          *ngIf="
+            targetMetaData[countryCodes[country]][TargetFieldName.HQ];
+            let targetsHQ
+          "
+        >
           <ng-content
             *ngTemplateOutlet="
               powerLevelSummary;
@@ -195,9 +223,11 @@
               powerLevel;
               context: {
                 above: true,
-                percent: '60',
+                percent:
+                  (latestCountryData[TargetFieldName.HQ] / targetsHQ[0].value) *
+                  100,
                 label: '2025',
-                target: 35000
+                target: targetsHQ[0].value
               }
             "
           ></ng-content>
@@ -206,9 +236,11 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                percent: '47.3',
+                percent:
+                  (latestCountryData[TargetFieldName.HQ] / targetsHQ[1].value) *
+                  100,
                 label: '2030',
-                target: 8000
+                target: targetsHQ[1].value
               }
             "
           ></ng-content>
@@ -221,7 +253,7 @@
               contentTier: [2, 3, 4],
               metadataTier: ['A', 'B', 'C']
             }"
-            data-e2e="link-entry-metadata"
+            data-e2e="link-entry-hq"
             >View (HQ data) by type</a
           >
         </div>
@@ -375,8 +407,8 @@
                             lineChart.allSeriesData[country.key + '3D']?.fill ||
                             'transparent',
                           colourHQ:
-                            lineChart.allSeriesData[country.key + 'META_A']
-                              ?.fill || 'transparent',
+                            lineChart.allSeriesData[country.key + 'HQ']?.fill ||
+                            'transparent',
                           isHeader: countryRowIndex === 0,
                           country: country.key,
                           row: row,

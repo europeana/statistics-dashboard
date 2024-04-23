@@ -33,4 +33,4 @@ export interface TargetCountryData extends TargetData {
   country: string;
 }
 
-export const TargetSeriesSuffixes = ['3D', 'META_A'];
+export const TargetSeriesSuffixes = ['3D', 'hq'];

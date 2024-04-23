@@ -379,6 +379,15 @@ label {
   }
 }
 
+.target-links {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  list-style: none;
+}
+
 @media (min-width: $bp-xl) {
   .statistics-dashboard {
     flex-direction: row;

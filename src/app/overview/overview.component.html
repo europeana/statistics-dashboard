@@ -270,31 +270,13 @@
         <div class="data-area">
           <ng-template #targetLinks>
             <!-- COUNTRY TARGET PAGE LINK -->
-            <ul
-              *ngIf="targetLinkAvailable"
-              style="
-                position: absolute;
-                right: 1em;
-                display: flex;
-                flex-direction: column;
-              "
-            >
-              <li
-                style="list-style: none"
-                *ngFor="let country of queryParams['country']"
-              >
+            <ul *ngIf="targetLinkAvailable" class="target-links">
+              <li *ngFor="let country of queryParams['country']">
                 <a
+                  class="target"
                   [attr.title]="country + ' 2025 / 2030 target data'"
-                  style="
-                    display: flex;
-                    flex-direction: row;
-                    font-size: 12px;
-                    align-items: center;
-                    line-height: 20px;
-                  "
                   [routerLink]="['/country', country]"
                 >
-                  <span class="target"></span>
                 </a>
               </li>
             </ul>

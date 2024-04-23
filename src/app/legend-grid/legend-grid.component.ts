@@ -54,6 +54,8 @@ import { LineComponent } from '../chart';
 export class LegendGridComponent {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
+  timeoutAnimation = 800;
+  static itemHeight = 84.5;
 
   _countryCode: string;
   _targetMetaData: IHash<IHashArray<TargetMetaData>>;
@@ -66,7 +68,7 @@ export class LegendGridComponent {
     if (this._countryCode) {
       const pinned = Object.keys(this.pinnedCountries);
       if (pinned.length) {
-        timeout = 800;
+        timeout = this.timeoutAnimation;
       }
       pinned.forEach((countryCode: string) => {
         this.toggleCountry(countryCode);
@@ -107,10 +109,14 @@ export class LegendGridComponent {
   pinnedCountries: IHash<number> = {};
 
   public TargetSeriesSuffixes = TargetSeriesSuffixes;
-  public seriesSuffixesFmt = [' (3D)', ' (meta tier A)'];
+  public seriesSuffixesFmt = [' (3D)', ' (hq)'];
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
 
+  /** getCountrySeries
+   * @param { string } country
+   * @returns country mapped to the series suffix
+   **/
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
     const res = TargetSeriesSuffixes.map((seriesSuffix: string) => {
       return this.lineChart.allSeriesData[`${country}${seriesSuffix}`];
@@ -211,18 +217,17 @@ export class LegendGridComponent {
    * @param { string } country - the country to (un)pin
    **/
   togglePin(country: string): void {
-    const itemHeight = 84.5;
-
     if (country in this.pinnedCountries) {
       // delete and re-assign existing pin values
       delete this.pinnedCountries[country];
       Object.keys(this.pinnedCountries).forEach((key: string, i: number) => {
-        this.pinnedCountries[key] = i * itemHeight;
+        this.pinnedCountries[key] = i * LegendGridComponent.itemHeight;
       });
     } else {
       // add new pin
       this.pinnedCountries[country] =
-        Object.keys(this.pinnedCountries).length * itemHeight;
+        Object.keys(this.pinnedCountries).length *
+        LegendGridComponent.itemHeight;
     }
 
     // re-order targetCountries, putting the pinned items first
