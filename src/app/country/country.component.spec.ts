@@ -38,14 +38,14 @@ describe('CountryComponent', () => {
       .compileComponents();
   };
 
+  let appRef: ApplicationRef;
+
   beforeEach(waitForAsync(() => {
     configureTestBed();
+    appRef = TestBed.get(ApplicationRef) as ApplicationRef;
   }));
 
   beforeEach(() => {
-    const appRef = TestBed.get(ApplicationRef) as ApplicationRef;
-    console.log(!!ComponentRef);
-
     const header = {
       activeCountry: 'France',
       countryTotalMap: {
@@ -83,7 +83,6 @@ describe('CountryComponent', () => {
   it('should create', () => {
     const datum = {
       date: new Date().toISOString(),
-      // TODO why string???
       three_d: '111',
       hq: '222',
       label: 'last'

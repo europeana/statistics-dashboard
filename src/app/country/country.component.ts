@@ -95,7 +95,6 @@ export class CountryComponent extends SubscriptionManager {
   countryTotalMap: IHash<CountryTotalInfo>;
   latestCountryData: TargetData;
   detailsExpanded = false;
-  monotonePowerbars = true;
 
   public headerRef: ElementRef;
 
@@ -164,7 +163,6 @@ export class CountryComponent extends SubscriptionManager {
   toggleDetails(): void {
     this.detailsExpanded = !this.detailsExpanded;
     this.lineChart.toggleCursor();
-    this.lineChart.toggleGridlines();
   }
 
   ngOnDestroy(): void {

@@ -13,6 +13,7 @@ context('Statistics Dashboard', () => {
       cy.get(selPowerBar3D).should('have.length', 2);
     });
 
+    /*
     it('should colour the power bar charge label', () => {
       const selPowerBarChargeLabel = '.powerbar-charge-label';
       cy.visit('/country/Belarus');
@@ -33,6 +34,7 @@ context('Statistics Dashboard', () => {
         .should('have.css', 'color')
         .and('eq', 'rgb(10, 114, 204)');
     });
+    */
 
     it('should link to the 3D data', () => {
       const selLinkEntry3D = '[data-e2e=link-entry-3d]';

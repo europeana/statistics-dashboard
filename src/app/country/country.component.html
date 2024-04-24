@@ -18,7 +18,7 @@
   >
     <div
       [ngClass]="{
-        'labels-above': above, monotone: monotonePowerbars,
+        'labels-above': above
       }"
       title="Click to toggle style......................TODO: decide"
       class="powerbar-wrapper"
@@ -27,10 +27,10 @@
         <span class="powerbar-label-left">{{ label }}</span>
         <span class="powerbar-label-right">{{ target | number }}</span>
       </span>
-      <div class="powerbar" (click)="monotonePowerbars = !monotonePowerbars">
+      <div class="powerbar">
         <div class="powerbar-charge" style="width: {{ percent }}%"></div>
         <span
-          [ngClass]="{ centred: percent < 30, zeroed: percent === 0 }"
+          [ngClass]="{ zeroed: percent >= 30 }"
           class="powerbar-charge-label"
           >{{ percent | number: "1.0-2" }}%</span
         >

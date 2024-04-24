@@ -241,18 +241,8 @@ export class LineComponent implements AfterViewInit {
     valueAxis.renderer.labels.template.fill = colourAxis;
     valueAxis.renderer.labels.template.fontSize = 14;
 
-    this.toggleGridlines();
-  }
-
-  toggleGridlines(): void {
-    // disable grid lines
-    if (this.dateAxis.renderer.grid.template.disabled) {
-      this.dateAxis.renderer.grid.template.disabled = false;
-      this.valueAxis.renderer.grid.template.disabled = false;
-    } else {
-      this.dateAxis.renderer.grid.template.disabled = true;
-      this.valueAxis.renderer.grid.template.disabled = true;
-    }
+    this.dateAxis.renderer.grid.template.disabled = true;
+    this.valueAxis.renderer.grid.template.disabled = true;
   }
 
   toggleCursor(): void {

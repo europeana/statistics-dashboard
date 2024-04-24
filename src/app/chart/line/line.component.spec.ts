@@ -1,10 +1,9 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
-import { IHash, TargetFieldName, TargetMetaData } from '../../_models';
+import { TargetFieldName, TargetMetaData } from '../../_models';
 
 import { LineComponent } from './line.component';
 
@@ -101,6 +100,7 @@ describe('LineComponent', () => {
     expect(component.chart.data.length).toBeTruthy();
   });
 
+  /*
   it('should toggle the grid lines', () => {
     expect(component.valueAxis.renderer.grid.template.disabled).toBeTruthy();
     component.toggleGridlines();
@@ -108,6 +108,7 @@ describe('LineComponent', () => {
     component.toggleGridlines();
     expect(component.valueAxis.renderer.grid.template.disabled).toBeTruthy();
   });
+  */
 
   it('should toggle the cursor', () => {
     expect(component.chart.cursor).toBeFalsy();

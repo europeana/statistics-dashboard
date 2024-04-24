@@ -116,25 +116,36 @@ $appendice-grid-num-cols: 8;
   }
 }
 
+.powerbar,
+.powerbar-charge {
+  height: 3em;
+}
+
 .powerbar {
-  background-color: $stats-blue;
   position: relative;
+  background-color: transparent;
+  border: 1px solid $gray-5;
 }
 
 .powerbar-charge {
-  background-color: #e11d53;
-  height: 3em;
-  display: block;
+  background-color: $stats-blue;
+  display: inline-block;
   max-width: 100%;
 }
 
 .powerbar-charge-label {
-  color: #fff;
-  position: absolute;
-  left: 1rem;
-  top: 6px;
+  color: $stats-blue;
   font-size: 22px;
   font-weight: bold;
+  line-height: 150%;
+  margin-left: 1rem;
+  position: absolute;
+  top: 6px;
+
+  &.zeroed {
+    color: #fff;
+    left: 0;
+  }
 }
 
 .powerbar-label-left,
@@ -168,28 +179,6 @@ $appendice-grid-num-cols: 8;
   &.labels-above {
     .powerbar-target-labels {
       margin-bottom: 0.6em;
-    }
-  }
-
-  &.monotone {
-    .powerbar-charge-label {
-      &.centred {
-        left: 50%;
-        transform: translateX(-50%);
-        color: $stats-blue;
-      }
-      &.zeroed {
-        color: $gray-med;
-        font-weight: normal;
-      }
-    }
-
-    .powerbar {
-      background-color: transparent;
-      border: 1px solid $gray-5;
-      .powerbar-charge {
-        background-color: $stats-blue;
-      }
     }
   }
 }
