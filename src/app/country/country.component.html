@@ -48,21 +48,26 @@
   >
     <span class="container-h totals">
       <span class="container-v">
-        <span
-          class="total-title bold"
-          i18n="landing chart summary prefix@@landingChartSummaryPrefix"
-          >@if(isPowerLevel) { Data } @else { Top
-          {{ dimension | renameApiFacetShort | lowercase }}
-          }
+        <span class="total-title bold">
+          <ng-template #defaultCopy>
+            Top
+            {{ dimension | renameApiFacetShort | lowercase }}
+          </ng-template>
+          <ng-container *ngIf="isPowerLevel; else defaultCopy">
+            Data
+          </ng-container>
         </span>
         <span class="total bold">{{ name }}</span>
       </span>
       <span class="container-v">
-        <span
-          class="total-title"
-          i18n="landing chart summary prefix@@landingChartSummaryCount"
-          >@if(isPowerLevel) { Total {{ name }} records count } @else { Top
-          {{ dimension | renameApiFacetShort | lowercase }} records count }
+        <span class="total-title">
+          <ng-template #defaultCopy>
+            Top
+            {{ dimension | renameApiFacetShort | lowercase }} records count
+          </ng-template>
+          <ng-container *ngIf="isPowerLevel; else defaultCopy">
+            Total {{ name }} records count
+          </ng-container>
         </span>
         <span class="total">{{ value | number }}</span>
       </span>

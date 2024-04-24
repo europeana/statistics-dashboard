@@ -101,10 +101,6 @@ export class MockLineComponent {
     console.log('MockLineComponent hideRange');
   }
 
-  hideSeries(_: string): void {
-    console.log('MockLineComponent hideSeries');
-  }
-
   toggleCursor(): void {
     console.log('MockLineComponent toggleCursor');
   }

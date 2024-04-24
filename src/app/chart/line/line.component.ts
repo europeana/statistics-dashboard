@@ -166,13 +166,6 @@ export class LineComponent implements AfterViewInit {
     });
   }
 
-  hideSeries(id: string): void {
-    const series = this.allSeriesData[id];
-    if (series) {
-      series.hide();
-    }
-  }
-
   /**
    * addSeries
    * adds a LineSeries object to the chart / stores ref to this.allSeriesData

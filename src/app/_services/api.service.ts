@@ -25,6 +25,9 @@ import { Cache } from '../_helpers';
 export class APIService {
   private readonly countries = new Cache(() => this.loadCountryData());
   private readonly generalResults = new Cache(() => this.getGeneralResults());
+  public readonly generalResultsCountry = new Cache(() =>
+    this.loadGeneralResultsCountry()
+  );
 
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
@@ -141,8 +144,12 @@ export class APIService {
     );
   }
 
+  loadGeneralResultsCountry(): Observable<GeneralResults> {
+    return this.generalResults.get();
+  }
+
   getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
-    return this.generalResults.get().pipe(
+    return this.generalResultsCountry.get().pipe(
       map((data: GeneralResults) => {
         const res: GeneralResultsFormatted = {};
         data.allBreakdowns.forEach((br: BreakdownResult) => {

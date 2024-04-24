@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import { ColourSeriesData } from '../_models';
+import { ChartSettings, ColourSeriesData } from '../_models';
 
 @Component({
   standalone: true,
@@ -9,6 +9,9 @@ import { ColourSeriesData } from '../_models';
 })
 export class MockBarComponent {
   readonly maxNumberBars = 50;
+
+  @Input() showPercent: boolean;
+  @Input() extraSettings: ChartSettings;
 
   browserOnly(_: () => void): void {
     // mock browserOnly

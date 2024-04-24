@@ -86,17 +86,6 @@ describe('LineComponent', () => {
     ).toBeTruthy();
   });
 
-  it('should hide the series', () => {
-    component.hideSeries('');
-    component.allSeriesData = {
-      test: {
-        hide: jasmine.createSpy()
-      }
-    } as unknown as IHash<am4charts.LineSeries>;
-    component.hideSeries('test');
-    expect(component.allSeriesData.test.hide).toHaveBeenCalled();
-  });
-
   it('should add the series', () => {
     component.chart.data = [];
     expect(component.allSeriesData['myVal']).toBeFalsy();
