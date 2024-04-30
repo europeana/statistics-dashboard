@@ -256,8 +256,7 @@
         <note priority="1" from="description">landing section link countries</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleType" datatype="html">
-        <source>Esplora per tipo di media<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Esplora per tipo di media</source>
         <note priority="1" from="description">landing section title type</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkType" datatype="html">
@@ -279,8 +278,7 @@
         <note priority="1" from="description">landing section link rights</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleDataProvider" datatype="html">
-        <source>Esplora per istituzione<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Esplora per istituzione</source>
         <note priority="1" from="description">landing section title data provider</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkDataProvider" datatype="html">
