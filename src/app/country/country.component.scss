@@ -109,6 +109,10 @@ $appendice-grid-num-cols: 8;
   overflow-y: auto;
 }
 
+.entry-card-header {
+  position: relative;
+}
+
 .line-and-legend .entry-card-pair {
   justify-content: space-evenly;
   & > :first-child {
@@ -181,4 +185,47 @@ $appendice-grid-num-cols: 8;
       margin-bottom: 0.6em;
     }
   }
+}
+
+.powerbar-charge-label,
+.total,
+.total-title {
+  .hide-on-triple {
+    display: inline;
+  }
+  .show-on-triple {
+    display: none;
+  }
+
+  &.triple {
+    .hide-on-triple {
+      display: none;
+    }
+
+    .show-on-triple {
+      display: inline;
+    }
+  }
+}
+
+.entry-card-content.entry-card-totals {
+  .totals {
+    & > :last-child {
+      display: none;
+    }
+  }
+}
+
+.entry-card-pair {
+  position: relative;
+}
+
+.save {
+  opacity: 1;
+}
+
+.unpin-totals {
+  cursor: pointer;
+  margin-left: 1.25rem;
+  position: relative;
 }

@@ -4,6 +4,7 @@ context('Statistics Dashboard', () => {
       cy.visit('/country/France');
     });
 
+    const numSeriesInGroup = 3;
     const force = { force: true };
     const selIsOpen = '.roll-down-wrapper.is-open';
     const selLegendGrid = '.legend-grid';
@@ -38,18 +39,18 @@ context('Statistics Dashboard', () => {
 
     it('should unpin a country when closed', () => {
       cy.get(selPinnedOpener).should('have.length', 1);
-      cy.get(selIsOpen).should('have.length', 2);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
         .click();
       cy.get(selPinnedOpener).should('have.length', 2);
-      cy.get(selIsOpen).should('have.length', 4);
+      cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
 
       cy.get(selToggleCountry).contains('Cyprus').click();
       cy.get(selPinnedOpener).should('have.length', 1);
-      cy.get(selIsOpen).should('have.length', 2);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
     });
 
     it('should pin a country (when individual item opened)', () => {
@@ -58,10 +59,9 @@ context('Statistics Dashboard', () => {
       // Open (the first) Cyprus series
       clickSeriesOpener('Cyprus');
       cy.get(selPinnedOpener).should('have.length', 2);
-
       // Open (the first) Danish series
       clickSeriesOpener('Denmark');
-      cy.get(selPinnedOpener).should('have.length', 3);
+      cy.get(selPinnedOpener).should('have.length', numSeriesInGroup);
 
       // Close each with country togglers
       cy.get(selToggleCountry).contains('Cyprus').click(force);
@@ -81,36 +81,36 @@ context('Statistics Dashboard', () => {
 
     it('should re-open a country initially opened by an individual item', () => {
       cy.get(selPinnedOpener).should('have.length', 1);
-      cy.get(selIsOpen).should('have.length', 2);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       // open with individual item
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       clickSeriesOpener('Denmark');
-      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
 
       // close with country opener
       cy.get(selPinnedOpener).contains('Denmark').click();
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       cy.get(selPinnedOpener).should('have.length', 1);
-      cy.get(selIsOpen).should('have.length', 2);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       cy.wait(1000);
       // open again with country opener
       cy.get(selToggleCountry).contains('Denmark').click();
-      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
     });
 
     it('should keep individually-opened items open when siblings added', () => {
-      cy.get(selIsOpen).should('have.length', 2);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       clickSeriesOpener('Denmark');
 
-      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
       cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
 
       clickSeriesOpener('Denmark', 1);
-      cy.get(selIsOpen).should('have.length', 4);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup + 2);
     });
   });
 });

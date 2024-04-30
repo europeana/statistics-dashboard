@@ -90,6 +90,7 @@ export class CountryComponent extends SubscriptionManager {
   country: string;
   countryCode: string;
   countryLandingData: GeneralResultsFormatted = {};
+  numberOfSeriesTypes = 3;
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
   countryTotalMap: IHash<CountryTotalInfo>;
@@ -163,6 +164,14 @@ export class CountryComponent extends SubscriptionManager {
   toggleDetails(): void {
     this.detailsExpanded = !this.detailsExpanded;
     this.lineChart.toggleCursor();
+  }
+
+  toggleTotals(): void {
+    if (this.numberOfSeriesTypes == 2) {
+      this.numberOfSeriesTypes = 3;
+    } else {
+      this.numberOfSeriesTypes = 2;
+    }
   }
 
   ngOnDestroy(): void {

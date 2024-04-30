@@ -7,14 +7,18 @@ import { IHash, IHashArray, TargetFieldName, TargetMetaData } from '../_models';
 const mockTargetMetaData = {
   AT: {
     three_d: [],
-    hq: []
+    hq: [],
+    total: []
   },
   DE: {
     three_d: [],
-    hq: []
+    hq: [],
+    total: []
   },
   FR: {
-    three_d: []
+    three_d: [],
+    hq: [],
+    total: []
   }
 };
 
@@ -40,11 +44,13 @@ export class MockLineComponent {
     mockTargetMetaData;
 
   allSeriesData = ['FR', 'DE'].reduce((ob, code: string) => {
-    [TargetFieldName.THREE_D, TargetFieldName.HQ].forEach(
-      (fName: TargetFieldName) => {
-        ob[`${code}${fName}`] = new MockSeries();
-      }
-    );
+    [
+      TargetFieldName.THREE_D,
+      TargetFieldName.HQ,
+      TargetFieldName.TOTAL
+    ].forEach((fName: TargetFieldName) => {
+      ob[`${code}${fName}`] = new MockSeries();
+    });
     return ob;
   }, {}) as unknown as IHash<am4charts.LineSeries>;
 

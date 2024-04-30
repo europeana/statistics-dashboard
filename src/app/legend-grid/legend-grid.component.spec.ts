@@ -48,6 +48,7 @@ describe('LegendGridComponent', () => {
     fixture = TestBed.createComponent(LegendGridComponent);
     component = fixture.componentInstance;
     component.lineChart = new MockLineComponent() as unknown as LineComponent;
+    component.numberOfSeriesTypes = 3;
     fixture.detectChanges();
   });
 
@@ -114,7 +115,7 @@ describe('LegendGridComponent', () => {
       'FR',
       mockTargetMetaData['FR'][TargetFieldName.THREE_D]
     );
-    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(2);
+    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(3);
   });
 
   it('should toggle the country', () => {
@@ -182,12 +183,12 @@ describe('LegendGridComponent', () => {
     spyOn(seriesItemShowing, 'hide');
     component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemShowing);
     expect(seriesItemShowing.hide).toHaveBeenCalled();
-    expect(component.togglePin).toHaveBeenCalledTimes(2);
+    expect(component.togglePin).toHaveBeenCalledTimes(1);
 
     spyOn(seriesItemHidden, 'show');
     component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemHidden);
     expect(seriesItemHidden.show).toHaveBeenCalled();
-    expect(component.togglePin).toHaveBeenCalledTimes(3);
+    expect(component.togglePin).toHaveBeenCalledTimes(2);
   });
 
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {

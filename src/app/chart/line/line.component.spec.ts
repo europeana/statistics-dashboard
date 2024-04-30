@@ -26,7 +26,8 @@ describe('LineComponent', () => {
           label: '2025',
           value: 2
         } as TargetMetaData
-      ]
+      ],
+      total: []
     },
     FR: {
       three_d: []
@@ -93,6 +94,7 @@ describe('LineComponent', () => {
         date: '14/12/2001',
         label: 'xxx',
         three_d: '12',
+        total: '40',
         hq: '10'
       }
     ]);

@@ -38,7 +38,6 @@ export class APIService {
     'AL',
     'AT',
     'AZ',
-    'AZ',
     'BY',
     'BE',
     'BA',
@@ -100,7 +99,12 @@ export class APIService {
               targetType: fieldName,
               label,
               interim: label === '2025',
-              value: label === '2025' ? Math.floor(value * 0.7) : value
+              value:
+                fieldName === TargetFieldName.TOTAL
+                  ? value * (label === '2025' ? 9 : 12)
+                  : label === '2025'
+                  ? Math.floor(value * 0.7)
+                  : value
             };
           }
         );
@@ -276,12 +280,16 @@ export class APIService {
         value3D -= 0.8 * (random2 % random1);
         valueHQ -= 1 * (random2 * random1 * 5);
 
-        res.push({
+        const resultItem = {
           country,
           date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
           three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
-          hq: isNaN(valueHQ) ? 0 : Math.floor(valueHQ)
-        });
+          hq: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),
+          total: 0
+        };
+
+        resultItem.total = Math.max(resultItem.three_d, resultItem.hq) * 12;
+        res.push(resultItem);
       });
     });
     return of(res.reverse());

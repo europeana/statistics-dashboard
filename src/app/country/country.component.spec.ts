@@ -85,6 +85,7 @@ describe('CountryComponent', () => {
       date: new Date().toISOString(),
       three_d: '111',
       hq: '222',
+      total: '333',
       label: 'last'
     };
     component.countryData = {

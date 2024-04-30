@@ -15,12 +15,12 @@
     let-label="label"
     let-target="target"
     let-above="above"
+    let-bgColor="bgColor"
   >
     <div
       [ngClass]="{
         'labels-above': above
       }"
-      title="Click to toggle style......................TODO: decide"
       class="powerbar-wrapper"
     >
       <span class="powerbar-target-labels">
@@ -28,12 +28,22 @@
         <span class="powerbar-label-right">{{ target | number }}</span>
       </span>
       <div class="powerbar">
-        <div class="powerbar-charge" style="width: {{ percent }}%"></div>
+        <div
+          class="powerbar-charge"
+          [style.backgroundColor]="colours[bgColor]"
+          [style.width]="percent + '%'"
+        ></div>
         <span
-          [ngClass]="{ zeroed: percent >= 30 }"
           class="powerbar-charge-label"
-          >{{ percent | number: "1.0-2" }}%</span
+          [ngClass]="{
+            zeroed: percent >= 35,
+            triple: numberOfSeriesTypes === 3
+          }"
+          [style.color]="percent < 35 ? colours[bgColor] : undefined"
         >
+          <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
+          <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
+        </span>
       </div>
     </div>
   </ng-template>
@@ -60,13 +70,17 @@
         <span class="total bold">{{ name }}</span>
       </span>
       <span class="container-v">
-        <span class="total-title">
+        <span
+          class="total-title"
+          [ngClass]="{ triple: numberOfSeriesTypes === 3 }"
+        >
           <ng-template #defaultCopy>
             Top
             {{ dimension | renameApiFacetShort | lowercase }} records count
           </ng-template>
           <ng-container *ngIf="isPowerLevel; else defaultCopy">
-            Total {{ name }} records count
+            <span class="hide-on-triple">Total {{ name }} records count</span>
+            <span class="show-on-triple">Records</span>
           </ng-container>
         </span>
         <span class="total">{{ value | number }}</span>
@@ -74,10 +88,23 @@
       <span class="container-v">
         <span
           class="total-title"
-          i18n="landing chart summary percentage@@landingChartSummaryPercentage"
-          >Corresponding percentage</span
+          [ngClass]="{ triple: numberOfSeriesTypes === 3 }"
         >
-        <span class="total">{{ percent | number: "1.0-2" }}%</span>
+          <span
+            class="hide-on-triple"
+            i18n="
+              landing chart summary percentage@@landingChartSummaryPercentage"
+          >
+            Corresponding percentage
+          </span>
+          <span class="show-on-triple"></span>
+          Percent
+        </span>
+
+        <span class="total" [ngClass]="{ triple: numberOfSeriesTypes === 3 }">
+          <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
+          <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
+        </span>
       </span>
     </span>
   </ng-template>
@@ -177,7 +204,7 @@
                     targets3D[1].value) *
                   100,
                 label: '2030',
-                target: targets3D[1].value
+                target: targets3D[1].value,
               }
             "
           ></ng-content>
@@ -194,6 +221,7 @@
           >
         </div>
       </div>
+
       <div class="entry-card" *ngIf="latestCountryData">
         <span class="entry-card-header"
           >HQ Data<a
@@ -232,7 +260,8 @@
                   (latestCountryData[TargetFieldName.HQ] / targetsHQ[0].value) *
                   100,
                 label: '2025',
-                target: targetsHQ[0].value
+                target: targetsHQ[0].value,
+                bgColor: numberOfSeriesTypes === 2 ? 0 : 1
               }
             "
           ></ng-content>
@@ -245,7 +274,8 @@
                   (latestCountryData[TargetFieldName.HQ] / targetsHQ[1].value) *
                   100,
                 label: '2030',
-                target: targetsHQ[1].value
+                target: targetsHQ[1].value,
+                bgColor: numberOfSeriesTypes === 2 ? 0 : 1
               }
             "
           ></ng-content>
@@ -263,12 +293,97 @@
           >
         </div>
       </div>
+
+      <span
+        *ngIf="numberOfSeriesTypes === 2"
+        class="entry-card-header unpin-totals"
+        (click)="toggleTotals()"
+        style="position: absolute; white-space: nowrap; right: 1rem; top: 1rem"
+        title="Show all data"
+      >
+        <span>
+          <span style="font-weight: bold">&lt;&lt;</span>
+          &nbsp; All Data
+        </span>
+      </span>
+
+      <!-- begin duplicate-->
+
+      <div
+        class="entry-card"
+        *ngIf="latestCountryData && numberOfSeriesTypes === 3"
+      >
+        <span class="entry-card-header">
+          <span class="unpin-totals" (click)="toggleTotals()">
+            <span> All Data </span>
+            <span
+              class="save"
+              [ngClass]="{ saved: numberOfSeriesTypes === 3 }"
+            ></span>
+          </span>
+        </span>
+        <div
+          class="entry-card-content entry-card-totals"
+          *ngIf="
+            targetMetaData[countryCodes[country]][TargetFieldName.TOTAL];
+            let targetsTOTAL
+          "
+        >
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevelSummary;
+              context: {
+                name: 'ALL',
+                valName: TargetFieldName.TOTAL
+              }
+            "
+          ></ng-content>
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                above: true,
+                percent:
+                  (latestCountryData[TargetFieldName.TOTAL] /
+                    targetsTOTAL[0].value) *
+                  100,
+                label: '2025',
+                target: targetsTOTAL[0].value,
+                bgColor: numberOfSeriesTypes === 2 ? 0 : 2
+              }
+            "
+          ></ng-content>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                percent:
+                  (latestCountryData[TargetFieldName.TOTAL] /
+                    targetsTOTAL[1].value) *
+                  100,
+                label: '2030',
+                target: targetsTOTAL[1].value,
+                bgColor: numberOfSeriesTypes === 2 ? 0 : 2
+              }
+            "
+          ></ng-content>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="{
+              country: country
+            }"
+            >View all {{ country }} data</a
+          >
+        </div>
+      </div>
+      <!-- end duplicate-->
     </div>
 
     <div class="entry-card double-card line-and-legend">
-      <span class="entry-card-header"
-        >Countries By Target Progress<span class="info-icon"></span
-      ></span>
+      <span class="entry-card-header">Countries By Target Progress</span>
+
       <div class="entry-card-content">
         <div class="entry-card-pair">
           <app-line-chart #lineChart [targetMetaData]="targetMetaData">
@@ -280,6 +395,7 @@
             [countryCode]="countryCode"
             [targetMetaData]="targetMetaData"
             [lineChart]="lineChart"
+            [numberOfSeriesTypes]="numberOfSeriesTypes"
           ></app-legend-grid>
         </div>
 
@@ -451,9 +567,7 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header"
-          >Explore by type of content<span class="info-icon"></span
-        ></span>
+        <span class="entry-card-header">Explore by type of content</span>
         <div
           class="entry-card-content"
           *ngIf="countryLandingData[DimensionName.type]"
@@ -525,9 +639,7 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header"
-          >Explore by data provider<span class="info-icon"></span
-        ></span>
+        <span class="entry-card-header">Explore by data provider</span>
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content

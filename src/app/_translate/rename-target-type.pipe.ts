@@ -6,7 +6,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 const targetTypeNames = {
-  total: 'Total',
+  total: 'All',
   three_d: '3D',
   hq: 'HQ'
 };

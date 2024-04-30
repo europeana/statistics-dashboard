@@ -57,6 +57,21 @@ export class LegendGridComponent {
   timeoutAnimation = 800;
   static itemHeight = 84.5;
 
+  _numberOfSeriesTypes: number;
+
+  @Input() set numberOfSeriesTypes(numberOfSeriesTypes: number) {
+    this._numberOfSeriesTypes = numberOfSeriesTypes;
+    if (numberOfSeriesTypes == 3) {
+      this.showTotalsSeries();
+    } else {
+      this.hideTotalsSeries();
+    }
+  }
+
+  get numberOfSeriesTypes(): number {
+    return this._numberOfSeriesTypes;
+  }
+
   _countryCode: string;
   _targetMetaData: IHash<IHashArray<TargetMetaData>>;
 
@@ -106,10 +121,11 @@ export class LegendGridComponent {
   @Input() lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: ElementRef;
 
+  // country names mapped to pin offset
   pinnedCountries: IHash<number> = {};
 
   public TargetSeriesSuffixes = TargetSeriesSuffixes;
-  public seriesSuffixesFmt = [' (3D)', ' (hq)'];
+  public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
 
@@ -124,6 +140,62 @@ export class LegendGridComponent {
       return x;
     });
     return res;
+  }
+
+  hiddenCountrySeries: IHash<Array<am4charts.LineSeries>> = {};
+
+  /** showTotalsSeries
+   *
+   * - calls show() on the series referenced in hiddenCountrySeries
+   * - optionally pins the country associated with the series
+   **/
+  showTotalsSeries(): void {
+    Object.keys(this.hiddenCountrySeries).forEach((country: string) => {
+      this.hiddenCountrySeries[country].forEach(
+        (series: am4charts.LineSeries) => {
+          series.show();
+        }
+      );
+      if (!(country in this.pinnedCountries)) {
+        this.togglePin(country);
+      }
+    });
+    this.hiddenCountrySeries = {};
+  }
+
+  /** hideTotalsSeries
+   *
+   * - hides any 'total' series stores the country/object in hiddenCountrySeries
+   * - optionally unpins the series' associated country
+   **/
+  hideTotalsSeries(): void {
+    Object.keys(this.pinnedCountries).forEach((country: string) => {
+      const seriesKeys = TargetSeriesSuffixes.map((suffix: string) => {
+        return `${country}${suffix}`;
+      });
+      const datas = seriesKeys.map((key: string) => {
+        return this.lineChart.allSeriesData[key];
+      });
+
+      const lastIndex = seriesKeys.length - 1;
+
+      if (datas[lastIndex]) {
+        this.hiddenCountrySeries[country] = [];
+        this.hiddenCountrySeries[country].push(datas[lastIndex]);
+
+        datas[lastIndex].hide();
+
+        let hasOtherVisible = false;
+        for (let i = 0; i < lastIndex; i++) {
+          if (datas[i] && !datas[i].isHidden) {
+            hasOtherVisible = true;
+          }
+        }
+        if (!hasOtherVisible) {
+          this.togglePin(country);
+        }
+      }
+    });
   }
 
   /** resetChartColors
@@ -188,7 +260,7 @@ export class LegendGridComponent {
     this.togglePin(country);
 
     // loop the types
-    [...Array(2).keys()].forEach((i: number) => {
+    [...Array(this.numberOfSeriesTypes).keys()].forEach((i: number) => {
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[i],
         country + TargetSeriesSuffixes[i],

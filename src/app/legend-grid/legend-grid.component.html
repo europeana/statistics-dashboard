@@ -103,7 +103,6 @@
             [ngClass]="{ saved: pinnedCountries[country] > -1 }"
           ></span>
         </a>
-        <span class="legend-item-sizer">{{ country | renameCountry }} </span>
       </span>
 
       <span
@@ -115,12 +114,18 @@
           'top.px': pinnedCountries[country]
         }"
       >
-        <span *ngFor="let seriesSuffix of TargetSeriesSuffixes; let i = index">
+        <span
+          *ngFor="
+            let unreadVar of [].constructor(numberOfSeriesTypes);
+            let i = index
+          "
+        >
           <ng-content
             *ngTemplateOutlet="
               legendItemSeries;
               context: {
-                series: lineChart.allSeriesData[country + seriesSuffix],
+                series:
+                  lineChart.allSeriesData[country + TargetSeriesSuffixes[i]],
                 targetType: TargetFieldName[seriesValueNames[i]],
                 country: country
               }
