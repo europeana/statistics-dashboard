@@ -248,8 +248,7 @@
         <note priority="1" from="description">landing section link metadata</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleCountries" datatype="html">
-        <source>Esplora fornendo paesi<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-      &gt;"/></source>
+        <source>Esplora fornendo paesi</source>
         <note priority="1" from="description">landing section title countries</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkCountries" datatype="html">
