@@ -1,3 +1,7 @@
+<span *ngFor="let item of hiddenCountrySeries | keyvalue">
+  hidden = {{ item.key }}
+</span>
+
 <div class="legend-grid-wrapper">
   <ng-template
     #legendItemSeries
@@ -116,21 +120,23 @@
       >
         <span
           *ngFor="
-            let unreadVar of [].constructor(numberOfSeriesTypes);
+            let enabled of [columnEnabled3D, columnEnabledHQ, columnEnabledALL];
             let i = index
           "
         >
-          <ng-content
-            *ngTemplateOutlet="
-              legendItemSeries;
-              context: {
-                series:
-                  lineChart.allSeriesData[country + TargetSeriesSuffixes[i]],
-                targetType: TargetFieldName[seriesValueNames[i]],
-                country: country
-              }
-            "
-          ></ng-content>
+          <ng-container *ngIf="enabled">
+            <ng-content
+              *ngTemplateOutlet="
+                legendItemSeries;
+                context: {
+                  series:
+                    lineChart.allSeriesData[country + TargetSeriesSuffixes[i]],
+                  targetType: TargetFieldName[seriesValueNames[i]],
+                  country: country
+                }
+              "
+            ></ng-content>
+          </ng-container>
         </span>
       </span>
     </ng-container>

@@ -28,7 +28,6 @@ context('Statistics Dashboard', () => {
       cy.get(selLinkDataDataProvider).should('have.length', 1);
       cy.get(selLinkDataProvider).should('have.length', 1);
     });
-
   });
 
   describe('Country Target Menu', () => {

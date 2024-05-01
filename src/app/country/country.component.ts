@@ -34,6 +34,7 @@ import {
 } from '../_models';
 import { APIService } from '../_services';
 import {
+  AbbreviateNumberPipe,
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
   RenameCountryPipe
@@ -50,6 +51,7 @@ import { TruncateComponent } from '../truncate';
   styleUrls: ['../landing/landing.component.scss', './country.component.scss'],
   standalone: true,
   imports: [
+    AbbreviateNumberPipe,
     RouterOutlet,
     DatePipe,
     JsonPipe,
@@ -87,10 +89,12 @@ export class CountryComponent extends SubscriptionManager {
   private readonly api = inject(APIService);
   public countryCodes = ISOCountryCodes;
 
+  columnsEnabled: IHash<boolean> = {};
+
   country: string;
   countryCode: string;
   countryLandingData: GeneralResultsFormatted = {};
-  numberOfSeriesTypes = 3;
+
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
   countryTotalMap: IHash<CountryTotalInfo>;
@@ -101,6 +105,10 @@ export class CountryComponent extends SubscriptionManager {
 
   constructor(private applicationRef: ApplicationRef) {
     super();
+
+    Object.values(TargetFieldName).forEach((key: string) => {
+      this.columnsEnabled[key] = true;
+    });
 
     const rootRef = this.applicationRef.components[0].instance;
     if (rootRef) {
@@ -167,11 +175,8 @@ export class CountryComponent extends SubscriptionManager {
   }
 
   toggleTotals(): void {
-    if (this.numberOfSeriesTypes == 2) {
-      this.numberOfSeriesTypes = 3;
-    } else {
-      this.numberOfSeriesTypes = 2;
-    }
+    this.columnsEnabled[TargetFieldName.TOTAL] =
+      !this.columnsEnabled[TargetFieldName.TOTAL];
   }
 
   ngOnDestroy(): void {

@@ -57,19 +57,33 @@ export class LegendGridComponent {
   timeoutAnimation = 800;
   static itemHeight = 84.5;
 
-  _numberOfSeriesTypes: number;
+  _columnEnabled3D = true;
+  _columnEnabledHQ = true;
+  _columnEnabledALL = true;
 
-  @Input() set numberOfSeriesTypes(numberOfSeriesTypes: number) {
-    this._numberOfSeriesTypes = numberOfSeriesTypes;
-    if (numberOfSeriesTypes == 3) {
+  @Input() set columnEnabled3D(value: boolean) {
+    this._columnEnabled3D = value;
+  }
+  @Input() set columnEnabledHQ(value: boolean) {
+    this._columnEnabledHQ = value;
+  }
+  @Input() set columnEnabledALL(value: boolean) {
+    if (value) {
       this.showTotalsSeries();
     } else {
       this.hideTotalsSeries();
     }
+    this._columnEnabledALL = value;
   }
 
-  get numberOfSeriesTypes(): number {
-    return this._numberOfSeriesTypes;
+  get columnEnabled3D(): boolean {
+    return this._columnEnabled3D;
+  }
+  get columnEnabledHQ(): boolean {
+    return this._columnEnabledHQ;
+  }
+  get columnEnabledALL(): boolean {
+    return this._columnEnabledALL;
   }
 
   _countryCode: string;
@@ -256,18 +270,22 @@ export class LegendGridComponent {
   addSeriesSetAndPin(country: string, data: Array<TargetData>): void {
     this.resetChartColors();
 
-    // add pin and series
+    // add pin
     this.togglePin(country);
 
-    // loop the types
-    [...Array(this.numberOfSeriesTypes).keys()].forEach((i: number) => {
-      this.lineChart.addSeries(
-        country + this.seriesSuffixesFmt[i],
-        country + TargetSeriesSuffixes[i],
-        TargetFieldName[this.seriesValueNames[i]],
-        data
-      );
-    });
+    // add relevant series
+    [this.columnEnabled3D, this.columnEnabledHQ, this.columnEnabledALL].forEach(
+      (colEnabled: boolean, i: number) => {
+        if (colEnabled) {
+          this.lineChart.addSeries(
+            country + this.seriesSuffixesFmt[i],
+            country + TargetSeriesSuffixes[i],
+            TargetFieldName[this.seriesValueNames[i]],
+            data
+          );
+        }
+      }
+    );
   }
 
   toggleRange(

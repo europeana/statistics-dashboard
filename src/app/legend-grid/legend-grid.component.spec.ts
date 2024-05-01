@@ -48,7 +48,6 @@ describe('LegendGridComponent', () => {
     fixture = TestBed.createComponent(LegendGridComponent);
     component = fixture.componentInstance;
     component.lineChart = new MockLineComponent() as unknown as LineComponent;
-    component.numberOfSeriesTypes = 3;
     fixture.detectChanges();
   });
 

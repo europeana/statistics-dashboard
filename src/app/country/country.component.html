@@ -15,7 +15,7 @@
     let-label="label"
     let-target="target"
     let-above="above"
-    let-bgColor="bgColor"
+    let-colourIndex="colourIndex"
   >
     <div
       [ngClass]="{
@@ -30,16 +30,20 @@
       <div class="powerbar">
         <div
           class="powerbar-charge"
-          [style.backgroundColor]="colours[bgColor]"
+          [style.backgroundColor]="colours[colourIndex]"
           [style.width]="percent + '%'"
         ></div>
         <span
           class="powerbar-charge-label"
           [ngClass]="{
             zeroed: percent >= 35,
-            triple: numberOfSeriesTypes === 3
+
+            triple:
+              columnsEnabled[TargetFieldName.THREE_D] &&
+              columnsEnabled[TargetFieldName.HQ] &&
+              columnsEnabled[TargetFieldName.TOTAL]
           }"
-          [style.color]="percent < 35 ? colours[bgColor] : undefined"
+          [style.color]="percent < 35 ? colours[colourIndex] : undefined"
         >
           <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
           <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
@@ -72,23 +76,49 @@
       <span class="container-v">
         <span
           class="total-title"
-          [ngClass]="{ triple: numberOfSeriesTypes === 3 }"
+          [ngClass]="{
+            triple:
+              columnsEnabled[TargetFieldName.THREE_D] &&
+              columnsEnabled[TargetFieldName.HQ] &&
+              columnsEnabled[TargetFieldName.TOTAL]
+          }"
         >
+          <!-- the "top" header -->
           <ng-template #defaultCopy>
             Top
             {{ dimension | renameApiFacetShort | lowercase }} records count
           </ng-template>
+
+          <!-- the "power-level" header -->
           <ng-container *ngIf="isPowerLevel; else defaultCopy">
             <span class="hide-on-triple">Total {{ name }} records count</span>
             <span class="show-on-triple">Records</span>
           </ng-container>
         </span>
-        <span class="total">{{ value | number }}</span>
+        <span
+          class="total"
+          [ngClass]="{
+            triple:
+              columnsEnabled[TargetFieldName.THREE_D] &&
+              columnsEnabled[TargetFieldName.HQ] &&
+              columnsEnabled[TargetFieldName.TOTAL]
+          }"
+        >
+          <span class="hide-on-triple">{{ value | number }}</span>
+          <span class="show-on-triple" [attr.title]="value | number">{{
+            value | abbreviateNumber
+          }}</span>
+        </span>
       </span>
       <span class="container-v">
         <span
           class="total-title"
-          [ngClass]="{ triple: numberOfSeriesTypes === 3 }"
+          [ngClass]="{
+            triple:
+              columnsEnabled[TargetFieldName.THREE_D] &&
+              columnsEnabled[TargetFieldName.HQ] &&
+              columnsEnabled[TargetFieldName.TOTAL]
+          }"
         >
           <span
             class="hide-on-triple"
@@ -97,11 +127,18 @@
           >
             Corresponding percentage
           </span>
-          <span class="show-on-triple"></span>
-          Percent
+          <span class="show-on-triple"> Percent </span>
         </span>
 
-        <span class="total" [ngClass]="{ triple: numberOfSeriesTypes === 3 }">
+        <span
+          class="total"
+          [ngClass]="{
+            triple:
+              columnsEnabled[TargetFieldName.THREE_D] &&
+              columnsEnabled[TargetFieldName.HQ] &&
+              columnsEnabled[TargetFieldName.TOTAL]
+          }"
+        >
           <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
           <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
         </span>
@@ -150,6 +187,13 @@
     </div>
   </ng-template>
 
+  <ng-template #tmpCardPin let-visible="visible" let-showLabel="showLabel">
+    <span *ngIf="visible" class="unpin-totals" (click)="toggleTotals()">
+      <span *ngIf="showLabel"> All Data {{ showLabel }}</span>
+      <span class="save"></span>
+    </span>
+  </ng-template>
+
   <div class="container-v">
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="latestCountryData">
@@ -158,10 +202,6 @@
             class="info-icon"
             [href]="externalLinks.help.contentTier.href"
             target="_blank"
-            [attr.title]="
-              'TODO: link to 3D docs?  Do as with ' +
-              externalLinks.help.contentTier.description
-            "
           ></a
         ></span>
 
@@ -228,12 +268,21 @@
             class="info-icon"
             [href]="externalLinks.help.metadataTier.href"
             target="_blank"
-            [attr.title]="
-              'TODO: link to HQ docs? Do as with ' +
-              externalLinks.help.metadataTier.description
+          ></a>
+          <ng-content
+            *ngTemplateOutlet="
+              tmpCardPin;
+              context: {
+                showLabel: true,
+                visible: !(
+                  columnsEnabled[TargetFieldName.THREE_D] &&
+                  columnsEnabled[TargetFieldName.HQ] &&
+                  columnsEnabled[TargetFieldName.TOTAL]
+                )
+              }
             "
-          ></a
-        ></span>
+          ></ng-content>
+        </span>
         <div
           class="entry-card-content"
           *ngIf="
@@ -261,7 +310,7 @@
                   100,
                 label: '2025',
                 target: targetsHQ[0].value,
-                bgColor: numberOfSeriesTypes === 2 ? 0 : 1
+                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 1 : 0
               }
             "
           ></ng-content>
@@ -275,7 +324,7 @@
                   100,
                 label: '2030',
                 target: targetsHQ[1].value,
-                bgColor: numberOfSeriesTypes === 2 ? 0 : 1
+                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 1 : 0
               }
             "
           ></ng-content>
@@ -294,34 +343,26 @@
         </div>
       </div>
 
-      <span
-        *ngIf="numberOfSeriesTypes === 2"
-        class="entry-card-header unpin-totals"
-        (click)="toggleTotals()"
-        style="position: absolute; white-space: nowrap; right: 1rem; top: 1rem"
-        title="Show all data"
-      >
-        <span>
-          <span style="font-weight: bold">&lt;&lt;</span>
-          &nbsp; All Data
-        </span>
-      </span>
-
       <!-- begin duplicate-->
+
+      <!-- begin 3 -->
 
       <div
         class="entry-card"
-        *ngIf="latestCountryData && numberOfSeriesTypes === 3"
+        *ngIf="latestCountryData && columnsEnabled[TargetFieldName.TOTAL]"
       >
         <span class="entry-card-header">
-          <span class="unpin-totals" (click)="toggleTotals()">
-            <span> All Data </span>
-            <span
-              class="save"
-              [ngClass]="{ saved: numberOfSeriesTypes === 3 }"
-            ></span>
-          </span>
+          <ng-content
+            *ngTemplateOutlet="
+              tmpCardPin;
+              context: {
+                showLabel: true,
+                visible: true
+              }
+            "
+          ></ng-content>
         </span>
+
         <div
           class="entry-card-content entry-card-totals"
           *ngIf="
@@ -349,7 +390,7 @@
                   100,
                 label: '2025',
                 target: targetsTOTAL[0].value,
-                bgColor: numberOfSeriesTypes === 2 ? 0 : 2
+                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 2 : 0
               }
             "
           ></ng-content>
@@ -364,7 +405,7 @@
                   100,
                 label: '2030',
                 target: targetsTOTAL[1].value,
-                bgColor: numberOfSeriesTypes === 2 ? 0 : 2
+                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 2 : 0
               }
             "
           ></ng-content>
@@ -395,10 +436,50 @@
             [countryCode]="countryCode"
             [targetMetaData]="targetMetaData"
             [lineChart]="lineChart"
-            [numberOfSeriesTypes]="numberOfSeriesTypes"
+            [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
+            [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
+            [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
           ></app-legend-grid>
         </div>
+        <!--
+        <span
+          class="ccc"
+          *ngIf="
+            columnsEnabled[TargetFieldName.THREE_D] &&
+            columnsEnabled[TargetFieldName.HQ] &&
+            columnsEnabled[TargetFieldName.TOTAL]
+          "
+        >
+          <ng-content
+            *ngTemplateOutlet="
+              tmpCardPin;
+              context: {
+                showLabel: false,
+                visible: true
+              }
+            "
+          ></ng-content>
+        </span>
 
+        <strong
+          class="ddd"
+          *ngIf="
+            !(
+              columnsEnabled[TargetFieldName.THREE_D] &&
+              columnsEnabled[TargetFieldName.HQ] &&
+              columnsEnabled[TargetFieldName.TOTAL]
+            )
+          "
+        >
+          <span
+            (click)="toggleTotals()"
+            title="show hidden series"
+            style="cursor: pointer"
+          >
+            &nbsp;&gt;&gt;
+          </span>
+        </strong>
+        -->
         <div
           class="appendice-grid-wrapper"
           [ngClass]="{ 'is-open': detailsExpanded }"
