@@ -246,7 +246,7 @@ $appendice-grid-num-cols: 8;
 }
 
 // show only the last restore link
-.entry-card:not(:last-child) .column-restore {
+.entry-card:not(:last-child):not(.line-and-legend) .column-restore {
   display: none;
 }
 
@@ -262,40 +262,6 @@ $appendice-grid-num-cols: 8;
     }
   }
 }
-
-/*
-.ccc,
-.ddd {
-  display: none;
-  position: absolute;
-}
-
-.ccc {
-  //background-color: yellow;
-  right: 3rem;
-  top: 55px;
-}
-
-.ddd {
-  display: none;
-  position: absolute;
-}
-
-.ddd {
-  //background-color: orange;
-  right: 24px;
-  top: 80px;
-  line-height: 5em;
-  width: 24px;
-}
-
-//.ccc:hover,
-//:hover + .ccc,
-.ddd:hover,
-:hover + .ddd {
-  display: block;
-}
-*/
 
 .entry-card {
   display: flex;

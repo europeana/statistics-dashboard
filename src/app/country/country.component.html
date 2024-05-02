@@ -424,6 +424,7 @@
 
     <div class="entry-card double-card line-and-legend">
       <span class="entry-card-header">Countries By Target Progress</span>
+      <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
 
       <div class="entry-card-content">
         <div class="entry-card-pair">
@@ -442,26 +443,6 @@
             (unpinColumn)="toggleColumn($event)"
           ></app-legend-grid>
         </div>
-        <!--
-        <strong
-          class="ddd"
-          *ngIf="
-            !(
-              columnsEnabled[TargetFieldName.THREE_D] &&
-              columnsEnabled[TargetFieldName.HQ] &&
-              columnsEnabled[TargetFieldName.TOTAL]
-            )
-          "
-        >
-          <span
-            (click)="toggleColumn()"
-            title="show hidden series"
-            style="cursor: pointer"
-          >
-            &nbsp;&gt;&gt;
-          </span>
-        </strong>
-        -->
 
         <div
           class="appendice-grid-wrapper"
