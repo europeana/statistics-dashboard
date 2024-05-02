@@ -174,9 +174,17 @@ export class CountryComponent extends SubscriptionManager {
     this.lineChart.toggleCursor();
   }
 
-  toggleTotals(): void {
-    this.columnsEnabled[TargetFieldName.TOTAL] =
-      !this.columnsEnabled[TargetFieldName.TOTAL];
+  /** toggleColumn
+   *
+   * @param { TargetFieldName } column
+   **/
+  toggleColumn(column?: TargetFieldName): void {
+    if (!column) {
+      column = Object.values(TargetFieldName).find((tfn: TargetFieldName) => {
+        return !this.columnsEnabled[tfn];
+      });
+    }
+    this.columnsEnabled[column] = !this.columnsEnabled[column];
   }
 
   ngOnDestroy(): void {

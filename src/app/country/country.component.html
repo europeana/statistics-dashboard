@@ -187,23 +187,34 @@
     </div>
   </ng-template>
 
-  <ng-template #tmpCardPin let-visible="visible" let-showLabel="showLabel">
-    <span *ngIf="visible" class="unpin-totals" (click)="toggleTotals()">
-      <span *ngIf="showLabel"> All Data {{ showLabel }}</span>
-      <span class="save"></span>
-    </span>
+  <ng-template #tmpRestoreColumn>
+    <a
+      class="column-restore"
+      (click)="toggleColumn()"
+      title="restore series"
+      *ngIf="
+        !(
+          columnsEnabled[TargetFieldName.THREE_D] &&
+          columnsEnabled[TargetFieldName.HQ] &&
+          columnsEnabled[TargetFieldName.TOTAL]
+        )
+      "
+      >&gt;&gt;</a
+    >
   </ng-template>
 
   <div class="container-v">
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="latestCountryData">
-        <span class="entry-card-header"
-          >3D Data<a
-            class="info-icon"
-            [href]="externalLinks.help.contentTier.href"
-            target="_blank"
-          ></a
-        ></span>
+      <!-- 3D -->
+      <div
+        class="entry-card"
+        *ngIf="latestCountryData && columnsEnabled[TargetFieldName.THREE_D]"
+      >
+        <a
+          class="entry-card-header column-close"
+          (click)="toggleColumn(TargetFieldName.THREE_D)"
+          >3D Data<span class="x"></span
+        ></a>
 
         <div
           class="entry-card-content"
@@ -260,29 +271,21 @@
             >View (3D data) by content tier</a
           >
         </div>
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
       </div>
 
-      <div class="entry-card" *ngIf="latestCountryData">
-        <span class="entry-card-header"
-          >HQ Data<a
-            class="info-icon"
-            [href]="externalLinks.help.metadataTier.href"
-            target="_blank"
-          ></a>
-          <ng-content
-            *ngTemplateOutlet="
-              tmpCardPin;
-              context: {
-                showLabel: true,
-                visible: !(
-                  columnsEnabled[TargetFieldName.THREE_D] &&
-                  columnsEnabled[TargetFieldName.HQ] &&
-                  columnsEnabled[TargetFieldName.TOTAL]
-                )
-              }
-            "
-          ></ng-content>
-        </span>
+      <!-- HQ -->
+
+      <div
+        class="entry-card"
+        *ngIf="latestCountryData && columnsEnabled[TargetFieldName.HQ]"
+      >
+        <a
+          class="entry-card-header column-close"
+          (click)="toggleColumn(TargetFieldName.HQ)"
+          >HQ Data<span class="x"></span
+        ></a>
+
         <div
           class="entry-card-content"
           *ngIf="
@@ -341,27 +344,21 @@
             >View (HQ data) by type</a
           >
         </div>
+
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
       </div>
 
-      <!-- begin duplicate-->
-
-      <!-- begin 3 -->
+      <!-- TOTAL -->
 
       <div
         class="entry-card"
         *ngIf="latestCountryData && columnsEnabled[TargetFieldName.TOTAL]"
       >
-        <span class="entry-card-header">
-          <ng-content
-            *ngTemplateOutlet="
-              tmpCardPin;
-              context: {
-                showLabel: true,
-                visible: true
-              }
-            "
-          ></ng-content>
-        </span>
+        <a
+          class="entry-card-header column-close"
+          (click)="toggleColumn(TargetFieldName.TOTAL)"
+          >All Data<span class="x"></span
+        ></a>
 
         <div
           class="entry-card-content entry-card-totals"
@@ -418,9 +415,12 @@
             >View all {{ country }} data</a
           >
         </div>
+
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
       </div>
-      <!-- end duplicate-->
     </div>
+
+    <!-- secondary content -->
 
     <div class="entry-card double-card line-and-legend">
       <span class="entry-card-header">Countries By Target Progress</span>
@@ -439,28 +439,10 @@
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
             [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
             [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
+            (unpinColumn)="toggleColumn($event)"
           ></app-legend-grid>
         </div>
         <!--
-        <span
-          class="ccc"
-          *ngIf="
-            columnsEnabled[TargetFieldName.THREE_D] &&
-            columnsEnabled[TargetFieldName.HQ] &&
-            columnsEnabled[TargetFieldName.TOTAL]
-          "
-        >
-          <ng-content
-            *ngTemplateOutlet="
-              tmpCardPin;
-              context: {
-                showLabel: false,
-                visible: true
-              }
-            "
-          ></ng-content>
-        </span>
-
         <strong
           class="ddd"
           *ngIf="
@@ -472,7 +454,7 @@
           "
         >
           <span
-            (click)="toggleTotals()"
+            (click)="toggleColumn()"
             title="show hidden series"
             style="cursor: pointer"
           >
@@ -480,6 +462,7 @@
           </span>
         </strong>
         -->
+
         <div
           class="appendice-grid-wrapper"
           [ngClass]="{ 'is-open': detailsExpanded }"

@@ -13,7 +13,9 @@ import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
+  EventEmitter,
   Input,
+  Output,
   ViewChild
 } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -62,26 +64,40 @@ export class LegendGridComponent {
   _columnEnabledALL = true;
 
   @Input() set columnEnabled3D(value: boolean) {
-    this._columnEnabled3D = value;
-  }
-  @Input() set columnEnabledHQ(value: boolean) {
-    this._columnEnabledHQ = value;
-  }
-  @Input() set columnEnabledALL(value: boolean) {
     if (value) {
-      this.showTotalsSeries();
+      this.showSeriesSet(0);
     } else {
-      this.hideTotalsSeries();
+      this.hideSeriesSet(0);
     }
-    this._columnEnabledALL = value;
+    this._columnEnabled3D = value;
   }
 
   get columnEnabled3D(): boolean {
     return this._columnEnabled3D;
   }
+
+  @Input() set columnEnabledHQ(value: boolean) {
+    if (value) {
+      this.showSeriesSet(1);
+    } else {
+      this.hideSeriesSet(1);
+    }
+    this._columnEnabledHQ = value;
+  }
+
   get columnEnabledHQ(): boolean {
     return this._columnEnabledHQ;
   }
+
+  @Input() set columnEnabledALL(value: boolean) {
+    if (value) {
+      this.showSeriesSet(2);
+    } else {
+      this.hideSeriesSet(2);
+    }
+    this._columnEnabledALL = value;
+  }
+
   get columnEnabledALL(): boolean {
     return this._columnEnabledALL;
   }
@@ -133,10 +149,13 @@ export class LegendGridComponent {
 
   @Input() countryData: IHash<Array<TargetData>> = {};
   @Input() lineChart: LineComponent;
+
+  @Output() unpinColumn: EventEmitter<TargetFieldName> = new EventEmitter();
   @ViewChild('legendGrid') legendGrid: ElementRef;
 
   // country names mapped to pin offset
   pinnedCountries: IHash<number> = {};
+  hiddenSeriesSets: Array<IHash<Array<am4charts.LineSeries>>> = [{}, {}, {}];
 
   public TargetSeriesSuffixes = TargetSeriesSuffixes;
   public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
@@ -156,16 +175,14 @@ export class LegendGridComponent {
     return res;
   }
 
-  hiddenCountrySeries: IHash<Array<am4charts.LineSeries>> = {};
-
-  /** showTotalsSeries
+  /** showSeriesSet
    *
    * - calls show() on the series referenced in hiddenCountrySeries
    * - optionally pins the country associated with the series
    **/
-  showTotalsSeries(): void {
-    Object.keys(this.hiddenCountrySeries).forEach((country: string) => {
-      this.hiddenCountrySeries[country].forEach(
+  showSeriesSet(colIndex: number): void {
+    Object.keys(this.hiddenSeriesSets[colIndex]).forEach((country: string) => {
+      this.hiddenSeriesSets[colIndex][country].forEach(
         (series: am4charts.LineSeries) => {
           series.show();
         }
@@ -174,34 +191,43 @@ export class LegendGridComponent {
         this.togglePin(country);
       }
     });
-    this.hiddenCountrySeries = {};
+    this.hiddenSeriesSets[colIndex] = {};
   }
 
-  /** hideTotalsSeries
+  /** hideSeriesSet
    *
    * - hides any 'total' series stores the country/object in hiddenCountrySeries
    * - optionally unpins the series' associated country
+   *
+   * @param { TargetFieldName } setType - the type to hide
    **/
-  hideTotalsSeries(): void {
+  hideSeriesSet(colIndex: number): void {
+    console.log('LegendGrid.hideSeriesSet ' + colIndex);
+
     Object.keys(this.pinnedCountries).forEach((country: string) => {
-      const seriesKeys = TargetSeriesSuffixes.map((suffix: string) => {
+      const countrySeriesKeys = TargetSeriesSuffixes.map((suffix: string) => {
         return `${country}${suffix}`;
       });
-      const datas = seriesKeys.map((key: string) => {
+
+      const countrySeriesData = countrySeriesKeys.map((key: string) => {
         return this.lineChart.allSeriesData[key];
       });
 
-      const lastIndex = seriesKeys.length - 1;
+      if (countrySeriesData[colIndex]) {
+        this.hiddenSeriesSets[colIndex][country] = [];
+        this.hiddenSeriesSets[colIndex][country].push(
+          countrySeriesData[colIndex]
+        );
 
-      if (datas[lastIndex]) {
-        this.hiddenCountrySeries[country] = [];
-        this.hiddenCountrySeries[country].push(datas[lastIndex]);
-
-        datas[lastIndex].hide();
+        countrySeriesData[colIndex].hide();
 
         let hasOtherVisible = false;
-        for (let i = 0; i < lastIndex; i++) {
-          if (datas[i] && !datas[i].isHidden) {
+        for (let i = 0; i < 3; i++) {
+          if (
+            i !== colIndex &&
+            countrySeriesData[i] &&
+            !countrySeriesData[i].isHidden
+          ) {
             hasOtherVisible = true;
           }
         }
@@ -391,5 +417,14 @@ export class LegendGridComponent {
         this.togglePin(country);
       }
     }
+  }
+
+  /** fireUnpinColumn
+   *
+   *  invokes emit unpinColumn
+   * @param { TargetFieldName } column
+   ***/
+  fireUnpinColumn(column: TargetFieldName): void {
+    this.unpinColumn.emit(column);
   }
 }

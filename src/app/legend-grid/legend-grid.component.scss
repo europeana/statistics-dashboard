@@ -1,6 +1,7 @@
 @import "../../scss/_variables";
 
 $disabled-colour: $gray-5;
+$forced-space: 10px;
 
 li {
   list-style: none;
@@ -49,13 +50,6 @@ li {
   &.scrollable-downwards .scrollable-indicator {
     opacity: 1;
   }
-
-  // TODO push scrollbar away from data (chrome only please!)
-  /*
-  .pad-right {
-    padding-right: 0.6em;
-  }
-  */
 
   .scrollable-indicator {
     opacity: 0;
@@ -171,6 +165,62 @@ li {
 // push scrollbar away from data
 .pad-right {
   padding-right: 0.6em;
+}
+
+.top-pin {
+  background: #fff;
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: -20px;
+  transform: translateY(-20px);
+
+  > ul {
+    //padding: 0.6em;
+    //border-left: 1px solid red;
+  }
+}
+
+.perma-pin-left {
+  top: $forced-space;
+  position: relative;
+
+  // hide content scrolling below visible in the gap above
+  &::before {
+    content: "";
+    background: #fff;
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: -$forced-space;
+    height: $forced-space;
+  }
+}
+
+.perma-pin {
+  display: block;
+  height: 20px;
+  opacity: 0;
+  text-align: center;
+  .x {
+    display: block;
+    margin: auto;
+  }
+}
+
+.stick-right .series-column {
+  // TODO border trick...
+
+  //border-left-color: transparent;
+}
+
+.legend-grid-wrapper {
+  margin-top: -10px;
+}
+
+.perma-pin:hover,
+ul:hover ~ .perma-pin {
+  opacity: 1;
+  //background-color: orange !important;
 }
 
 .stick-left,

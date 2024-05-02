@@ -109,6 +109,39 @@ $appendice-grid-num-cols: 8;
   overflow-y: auto;
 }
 
+.column-close {
+  align-items: center;
+  align-self: flex-start;
+  display: flex;
+  white-space: nowrap;
+
+  .x {
+    margin-left: 0.6em;
+    opacity: 0;
+  }
+
+  &:hover .x {
+    opacity: 1;
+  }
+
+  &:active + .entry-card-content {
+    transform: rotate(2deg);
+  }
+}
+
+.column-close,
+.column-restore {
+  color: $gray-med;
+}
+
+.column-restore {
+  font-weight: bold;
+  position: absolute;
+  right: 1em;
+  top: 1em;
+}
+
+.entry-card,
 .entry-card-header {
   position: relative;
 }
@@ -212,6 +245,16 @@ $appendice-grid-num-cols: 8;
   }
 }
 
+// show only the last restore link
+.entry-card:not(:last-child) .column-restore {
+  display: none;
+}
+
+// prevent user from deleting everything
+.entry-card:first-child:last-child .column-close {
+  pointer-events: none;
+}
+
 .entry-card-content.entry-card-totals {
   .totals {
     & > :last-child {
@@ -234,6 +277,11 @@ $appendice-grid-num-cols: 8;
 }
 
 .ddd {
+  display: none;
+  position: absolute;
+}
+
+.ddd {
   //background-color: orange;
   right: 24px;
   top: 80px;
@@ -241,14 +289,18 @@ $appendice-grid-num-cols: 8;
   width: 24px;
 }
 
-.ccc:hover,
-:hover + .ccc,
+//.ccc:hover,
+//:hover + .ccc,
 .ddd:hover,
 :hover + .ddd {
   display: block;
 }
 */
 
+.entry-card {
+  display: flex;
+  flex-direction: column;
+}
 .entry-card-pair {
   position: relative;
 }

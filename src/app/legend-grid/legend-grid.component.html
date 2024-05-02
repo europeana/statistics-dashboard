@@ -1,7 +1,3 @@
-<span *ngFor="let item of hiddenCountrySeries | keyvalue">
-  hidden = {{ item.key }}
-</span>
-
 <div class="legend-grid-wrapper">
   <ng-template
     #legendItemSeries
@@ -89,12 +85,22 @@
     (scroll)="gridScroll()"
     #legendGrid
   >
-    <ng-container *ngFor="let country of targetCountries">
+    <ng-template
+      #countryBlock
+      let-country="country"
+      let-countryPinValue="countryPinValue"
+      let-isPinned="isPinned"
+      let-isTopPin="isTopPin"
+    >
+      <!-- offset the top by 10 if zero and is top -->
       <span
         class="legend-item-country-toggle"
-        [ngClass]="{ 'stick-left': pinnedCountries[country] > -1 }"
+        [ngClass]="{
+          'stick-left': isPinned,
+          'perma-pin-left': isTopPin
+        }"
         [ngStyle]="{
-          'top.px': pinnedCountries[country]
+          'top.px': isTopPin ? countryPinValue || 10 : countryPinValue
         }"
       >
         <a
@@ -102,44 +108,73 @@
           style="position: relative; display: flex"
         >
           <span>{{ country | renameCountry }} </span>
-          <span
-            class="save"
-            [ngClass]="{ saved: pinnedCountries[country] > -1 }"
-          ></span>
+          <span class="save" [ngClass]="{ saved: isPinned }"></span>
         </a>
       </span>
 
+      <!-- offset the top by 10 if zero -->
       <span
         class="legend-grid-inner"
         [ngClass]="{
-          'stick-right': pinnedCountries[country] > -1
+          'stick-right': isPinned
         }"
         [ngStyle]="{
-          'top.px': pinnedCountries[country]
+          'top.px': countryPinValue || 10
         }"
       >
-        <span
+        <ng-container
           *ngFor="
             let enabled of [columnEnabled3D, columnEnabledHQ, columnEnabledALL];
             let i = index
           "
+          class="series-column"
         >
-          <ng-container *ngIf="enabled">
-            <ng-content
-              *ngTemplateOutlet="
-                legendItemSeries;
-                context: {
-                  series:
-                    lineChart.allSeriesData[country + TargetSeriesSuffixes[i]],
-                  targetType: TargetFieldName[seriesValueNames[i]],
-                  country: country
-                }
-              "
-            ></ng-content>
-          </ng-container>
-        </span>
+          <span *ngIf="enabled">
+            <span [ngClass]="{ 'top-pin': isTopPin }">
+              <ng-content
+                *ngTemplateOutlet="
+                  legendItemSeries;
+                  context: {
+                    series:
+                      lineChart.allSeriesData[
+                        country + TargetSeriesSuffixes[i]
+                      ],
+                    targetType: TargetFieldName[seriesValueNames[i]],
+                    country: country
+                  }
+                "
+              ></ng-content>
+
+              <ng-container *ngIf="isTopPin">
+                <span class="perma-pin">
+                  <a
+                    class="x"
+                    (click)="
+                      fireUnpinColumn(TargetFieldName[seriesValueNames[i]])
+                    "
+                  ></a>
+                </span>
+              </ng-container>
+            </span>
+          </span>
+        </ng-container>
       </span>
+    </ng-template>
+
+    <ng-container *ngFor="let country of targetCountries">
+      <ng-content
+        *ngTemplateOutlet="
+          countryBlock;
+          context: {
+            country: country,
+            countryPinValue: pinnedCountries[country],
+            isTopPin: pinnedCountries[country] === 0,
+            isPinned: pinnedCountries[country] > -1
+          }
+        "
+      ></ng-content>
     </ng-container>
+
     <span class="scrollable-indicator"></span>
   </span>
 </div>
