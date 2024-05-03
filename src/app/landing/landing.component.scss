@@ -92,6 +92,11 @@ $card-header-height: $card-header-pixels-line-height +
   }
 }
 
+.entry-card-multi {
+  position: relative;
+}
+
+.entry-card-multi,
 .entry-card-pair {
   width: 100%;
   @media (min-width: $bp-desktop) {

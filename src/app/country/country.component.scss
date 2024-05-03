@@ -125,7 +125,7 @@ $appendice-grid-num-cols: 8;
   }
 
   &:active + .entry-card-content {
-    transform: rotate(2deg);
+    transform: rotate(1deg);
   }
 }
 
@@ -146,10 +146,14 @@ $appendice-grid-num-cols: 8;
   position: relative;
 }
 
+.entry-card-multi > .entry-card:first-child:last-child {
+  width: 100%;
+}
+
 .line-and-legend {
   position: relative;
 
-  .entry-card-pair {
+  .entry-card-multi {
     justify-content: space-evenly;
     & > :first-child {
       flex-grow: 1;
@@ -267,21 +271,7 @@ $appendice-grid-num-cols: 8;
   display: flex;
   flex-direction: column;
 }
-.entry-card-pair {
-  position: relative;
-}
-
-.info-icon + .unpin-totals {
-  margin-left: auto;
-}
 
 .save {
   opacity: 1;
-}
-
-.unpin-totals {
-  cursor: pointer;
-  margin-left: 1.25rem;
-  position: relative;
-  white-space: nowrap;
 }

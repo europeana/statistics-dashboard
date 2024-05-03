@@ -6,8 +6,35 @@ context('Statistics Dashboard', () => {
     const selPowerBar3D = '.entry-card:first-child .powerbar-charge';
     const selPowerBarHQ = '.entry-card:last-child .powerbar-charge';
 
-    it('should show the power bars', () => {
+    beforeEach(() => {
       cy.visit('/country/Austria');
+    });
+
+    it('should toggle the cards and columns', () => {
+      const selColClose = '.column-close';
+      const selColRestore = '.column-restore';
+
+      cy.get(selPowerBar).should('have.length', 6);
+
+      cy.get(selColClose).should('have.length', 3);
+      cy.get(selColRestore).should('not.exist', 2);
+
+      cy.get(selColClose).eq(0).click(force);
+      cy.get(selPowerBar).should('have.length', 4);
+      cy.get(selColRestore).filter(':visible').should('have.length', 2);
+
+      cy.get(selColClose).eq(0).click(force);
+      cy.get(selPowerBar).should('have.length', 2);
+      cy.get(selColRestore).filter(':visible').should('have.length', 2);
+
+      // restore
+      cy.get(selColRestore).eq(0).click(force);
+      cy.get(selPowerBar).should('have.length', 4);
+      cy.get(selColRestore).eq(0).click(force);
+      cy.get(selPowerBar).should('have.length', 6);
+    });
+
+    it('should show the power bars', () => {
       cy.get(selPowerBar).should('have.length', 6);
       cy.get(selPowerBarHQ).should('have.length', 2);
       cy.get(selPowerBar3D).should('have.length', 2);

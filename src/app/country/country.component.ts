@@ -37,7 +37,8 @@ import {
   AbbreviateNumberPipe,
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
-  RenameCountryPipe
+  RenameCountryPipe,
+  RenameTargetTypePipe
 } from '../_translate';
 
 import { BarComponent, LineComponent } from '../chart';
@@ -71,7 +72,8 @@ import { TruncateComponent } from '../truncate';
     DecimalPipe,
     RenameCountryPipe,
     RenameApiFacetPipe,
-    RenameApiFacetShortPipe
+    RenameApiFacetShortPipe,
+    RenameTargetTypePipe
   ]
 })
 export class CountryComponent extends SubscriptionManager {
@@ -89,7 +91,9 @@ export class CountryComponent extends SubscriptionManager {
   private readonly api = inject(APIService);
   public countryCodes = ISOCountryCodes;
 
+  columnsEnabledCount = 3;
   columnsEnabled: IHash<boolean> = {};
+  columnToEnable?: TargetFieldName;
 
   country: string;
   countryCode: string;
@@ -174,17 +178,31 @@ export class CountryComponent extends SubscriptionManager {
     this.lineChart.toggleCursor();
   }
 
+  /** nextColToEnable
+   *
+   * @return TargetFieldName
+   **/
+  nextColToEnable(): TargetFieldName {
+    return Object.values(TargetFieldName).find((tfn: TargetFieldName) => {
+      return !this.columnsEnabled[tfn];
+    });
+  }
+
   /** toggleColumn
    *
    * @param { TargetFieldName } column
    **/
   toggleColumn(column?: TargetFieldName): void {
-    if (!column) {
-      column = Object.values(TargetFieldName).find((tfn: TargetFieldName) => {
-        return !this.columnsEnabled[tfn];
-      });
-    }
+    column = column || this.nextColToEnable();
     this.columnsEnabled[column] = !this.columnsEnabled[column];
+
+    this.columnsEnabledCount = Object.values(TargetFieldName).filter(
+      (tfn: TargetFieldName) => {
+        return this.columnsEnabled[tfn];
+      }
+    ).length;
+
+    this.columnToEnable = this.nextColToEnable();
   }
 
   ngOnDestroy(): void {

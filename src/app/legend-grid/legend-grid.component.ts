@@ -62,6 +62,7 @@ export class LegendGridComponent {
   _columnEnabled3D = true;
   _columnEnabledHQ = true;
   _columnEnabledALL = true;
+  columnsEnabledCount = 3;
 
   @Input() set columnEnabled3D(value: boolean) {
     if (value) {
@@ -70,6 +71,7 @@ export class LegendGridComponent {
       this.hideSeriesSet(0);
     }
     this._columnEnabled3D = value;
+    this.calculateColumnsEnabledCount();
   }
 
   get columnEnabled3D(): boolean {
@@ -83,6 +85,7 @@ export class LegendGridComponent {
       this.hideSeriesSet(1);
     }
     this._columnEnabledHQ = value;
+    this.calculateColumnsEnabledCount();
   }
 
   get columnEnabledHQ(): boolean {
@@ -96,6 +99,7 @@ export class LegendGridComponent {
       this.hideSeriesSet(2);
     }
     this._columnEnabledALL = value;
+    this.calculateColumnsEnabledCount();
   }
 
   get columnEnabledALL(): boolean {
@@ -155,12 +159,36 @@ export class LegendGridComponent {
 
   // country names mapped to pin offset
   pinnedCountries: IHash<number> = {};
-  hiddenSeriesSets: Array<IHash<Array<am4charts.LineSeries>>> = [{}, {}, {}];
+  hiddenSeriesSetData: Array<IHash<IHash<Array<am4charts.LineSeries>>>> = [
+    {},
+    {},
+    {}
+  ];
+  /*
+    - has prevPins  // TODO
+
+    - restoring the pin order:
+  	- record previous pins
+  	- look up dependency graph when restoring
+  	- full rewrite of toggleCountry() needed
+
+        - because this breaks UI state maintenance
+
+        - colour maintenance...
+  */
 
   public TargetSeriesSuffixes = TargetSeriesSuffixes;
   public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
+
+  calculateColumnsEnabledCount(): void {
+    this.columnsEnabledCount = [
+      this.columnEnabled3D,
+      this.columnEnabledHQ,
+      this.columnEnabledALL
+    ].filter((val: boolean) => !!val).length;
+  }
 
   /** getCountrySeries
    * @param { string } country
@@ -181,17 +209,19 @@ export class LegendGridComponent {
    * - optionally pins the country associated with the series
    **/
   showSeriesSet(colIndex: number): void {
-    Object.keys(this.hiddenSeriesSets[colIndex]).forEach((country: string) => {
-      this.hiddenSeriesSets[colIndex][country].forEach(
-        (series: am4charts.LineSeries) => {
-          series.show();
+    Object.keys(this.hiddenSeriesSetData[colIndex]).forEach(
+      (country: string) => {
+        this.hiddenSeriesSetData[colIndex][country].series.forEach(
+          (series: am4charts.LineSeries) => {
+            series.show();
+          }
+        );
+        if (!(country in this.pinnedCountries)) {
+          this.togglePin(country);
         }
-      );
-      if (!(country in this.pinnedCountries)) {
-        this.togglePin(country);
       }
-    });
-    this.hiddenSeriesSets[colIndex] = {};
+    );
+    this.hiddenSeriesSetData[colIndex] = {};
   }
 
   /** hideSeriesSet
@@ -202,8 +232,6 @@ export class LegendGridComponent {
    * @param { TargetFieldName } setType - the type to hide
    **/
   hideSeriesSet(colIndex: number): void {
-    console.log('LegendGrid.hideSeriesSet ' + colIndex);
-
     Object.keys(this.pinnedCountries).forEach((country: string) => {
       const countrySeriesKeys = TargetSeriesSuffixes.map((suffix: string) => {
         return `${country}${suffix}`;
@@ -213,13 +241,20 @@ export class LegendGridComponent {
         return this.lineChart.allSeriesData[key];
       });
 
-      if (countrySeriesData[colIndex]) {
-        this.hiddenSeriesSets[colIndex][country] = [];
-        this.hiddenSeriesSets[colIndex][country].push(
+      if (
+        countrySeriesData[colIndex] &&
+        !countrySeriesData[colIndex].isHidden
+      ) {
+        this.hiddenSeriesSetData[colIndex][country] = { series: [] };
+        this.hiddenSeriesSetData[colIndex][country].series.push(
           countrySeriesData[colIndex]
         );
 
         countrySeriesData[colIndex].hide();
+        this.lineChart.removeRange(
+          country,
+          TargetFieldName[this.seriesValueNames[colIndex]]
+        );
 
         let hasOtherVisible = false;
         for (let i = 0; i < 3; i++) {

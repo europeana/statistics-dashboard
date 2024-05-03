@@ -37,11 +37,7 @@
           class="powerbar-charge-label"
           [ngClass]="{
             zeroed: percent >= 35,
-
-            triple:
-              columnsEnabled[TargetFieldName.THREE_D] &&
-              columnsEnabled[TargetFieldName.HQ] &&
-              columnsEnabled[TargetFieldName.TOTAL]
+            triple: columnsEnabledCount === 3
           }"
           [style.color]="percent < 35 ? colours[colourIndex] : undefined"
         >
@@ -77,10 +73,7 @@
         <span
           class="total-title"
           [ngClass]="{
-            triple:
-              columnsEnabled[TargetFieldName.THREE_D] &&
-              columnsEnabled[TargetFieldName.HQ] &&
-              columnsEnabled[TargetFieldName.TOTAL]
+            triple: columnsEnabledCount === 3
           }"
         >
           <!-- the "top" header -->
@@ -98,10 +91,7 @@
         <span
           class="total"
           [ngClass]="{
-            triple:
-              columnsEnabled[TargetFieldName.THREE_D] &&
-              columnsEnabled[TargetFieldName.HQ] &&
-              columnsEnabled[TargetFieldName.TOTAL]
+            triple: columnsEnabledCount === 3
           }"
         >
           <span class="hide-on-triple">{{ value | number }}</span>
@@ -114,10 +104,7 @@
         <span
           class="total-title"
           [ngClass]="{
-            triple:
-              columnsEnabled[TargetFieldName.THREE_D] &&
-              columnsEnabled[TargetFieldName.HQ] &&
-              columnsEnabled[TargetFieldName.TOTAL]
+            triple: columnsEnabledCount === 3
           }"
         >
           <span
@@ -133,10 +120,7 @@
         <span
           class="total"
           [ngClass]="{
-            triple:
-              columnsEnabled[TargetFieldName.THREE_D] &&
-              columnsEnabled[TargetFieldName.HQ] &&
-              columnsEnabled[TargetFieldName.TOTAL]
+            triple: columnsEnabledCount === 3
           }"
         >
           <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
@@ -191,25 +175,21 @@
     <a
       class="column-restore"
       (click)="toggleColumn()"
-      title="restore series"
-      *ngIf="
-        !(
-          columnsEnabled[TargetFieldName.THREE_D] &&
-          columnsEnabled[TargetFieldName.HQ] &&
-          columnsEnabled[TargetFieldName.TOTAL]
-        )
-      "
+      [attr.title]="'restore ' + (columnToEnable | renameTargetType)"
+      *ngIf="columnsEnabledCount < 3"
       >&gt;&gt;</a
     >
   </ng-template>
 
   <div class="container-v">
-    <div class="entry-card-pair">
+    <div class="entry-card-multi">
       <!-- 3D -->
+
       <div
         class="entry-card"
         *ngIf="latestCountryData && columnsEnabled[TargetFieldName.THREE_D]"
       >
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.THREE_D)"
@@ -242,7 +222,8 @@
                     targets3D[0].value) *
                   100,
                 label: '2025',
-                target: targets3D[0].value
+                target: targets3D[0].value,
+                colourIndex: 0
               }
             "
           ></ng-content>
@@ -256,6 +237,7 @@
                   100,
                 label: '2030',
                 target: targets3D[1].value,
+                colourIndex: 0
               }
             "
           ></ng-content>
@@ -271,7 +253,6 @@
             >View (3D data) by content tier</a
           >
         </div>
-        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
       </div>
 
       <!-- HQ -->
@@ -280,6 +261,8 @@
         class="entry-card"
         *ngIf="latestCountryData && columnsEnabled[TargetFieldName.HQ]"
       >
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
+
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.HQ)"
@@ -313,7 +296,7 @@
                   100,
                 label: '2025',
                 target: targetsHQ[0].value,
-                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 1 : 0
+                colourIndex: 1
               }
             "
           ></ng-content>
@@ -327,7 +310,7 @@
                   100,
                 label: '2030',
                 target: targetsHQ[1].value,
-                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 1 : 0
+                colourIndex: 1
               }
             "
           ></ng-content>
@@ -344,8 +327,6 @@
             >View (HQ data) by type</a
           >
         </div>
-
-        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
       </div>
 
       <!-- TOTAL -->
@@ -387,7 +368,7 @@
                   100,
                 label: '2025',
                 target: targetsTOTAL[0].value,
-                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 2 : 0
+                colourIndex: 2
               }
             "
           ></ng-content>
@@ -402,7 +383,7 @@
                   100,
                 label: '2030',
                 target: targetsTOTAL[1].value,
-                colourIndex: columnsEnabled[TargetFieldName.TOTAL] ? 2 : 0
+                colourIndex: 2
               }
             "
           ></ng-content>
@@ -427,7 +408,7 @@
       <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
 
       <div class="entry-card-content">
-        <div class="entry-card-pair">
+        <div class="entry-card-multi">
           <app-line-chart #lineChart [targetMetaData]="targetMetaData">
           </app-line-chart>
 

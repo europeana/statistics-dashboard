@@ -149,6 +149,7 @@
                 <span class="perma-pin">
                   <a
                     class="x"
+                    *ngIf="columnsEnabledCount > 1"
                     (click)="
                       fireUnpinColumn(TargetFieldName[seriesValueNames[i]])
                     "

@@ -95,7 +95,6 @@ export class APIService {
             const fieldName = TargetFieldName[targetType];
             return {
               country,
-              fieldName,
               targetType: fieldName,
               label,
               interim: label === '2025',
@@ -301,7 +300,7 @@ export class APIService {
   getCountryData(): Observable<IHash<Array<TargetData>>> {
     return this.countries.get().pipe(
       map((rows: Array<TargetCountryData>) => {
-        return rows.reduce(
+        const res = rows.reduce(
           (res: IHash<Array<TargetData>>, item: TargetCountryData) => {
             if (!res[item.country]) {
               res[item.country] = [];
@@ -312,6 +311,7 @@ export class APIService {
           },
           {}
         );
+        return res;
       })
     );
   }

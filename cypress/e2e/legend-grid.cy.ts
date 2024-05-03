@@ -20,7 +20,6 @@ context('Statistics Dashboard', () => {
         .find(selOpenerSeries)
         .eq(seriesIndex)
         .click(force);
-      cy.wait(1000);
     };
 
     it('should show the legend', () => {
@@ -111,6 +110,63 @@ context('Statistics Dashboard', () => {
 
       clickSeriesOpener('Denmark', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup + 2);
+    });
+
+    it('should toggle the columns', () => {
+      const selColClose = '.column-close';
+      const selColRestore = '.column-restore';
+
+      cy.get(selIsOpen).should('have.length', 3);
+
+      cy.get(selColClose).eq(0).click(force);
+      cy.get(selIsOpen).should('have.length', 2);
+
+      cy.get(selColClose).eq(0).click(force);
+      cy.get(selIsOpen).should('have.length', 1);
+
+      cy.get(selColRestore).eq(0).click(force);
+      cy.get(selIsOpen).should('have.length', 2);
+
+      cy.get(selColRestore).eq(0).click(force);
+      cy.get(selIsOpen).should('have.length', 3);
+    });
+
+    it('should remove and restore pins when toggling columns', () => {
+      const selColClose = '.column-close';
+      const selColRestore = '.column-restore';
+
+      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
+
+      // open Denmark 3D
+      clickSeriesOpener('Denmark', 0);
+
+      cy.get(selIsOpen).should('have.length', 4);
+      cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
+
+      // hide 3d column
+      cy.get(selColClose).eq(0).click(force);
+
+      cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
+      cy.get(selIsOpen).should('have.length', 2);
+
+      // restore
+      cy.get(selColRestore).eq(0).click(force);
+      cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
+      cy.get(selIsOpen).should('have.length', 4);
+
+      // now repeat with the original 3d item closed
+
+      clickSeriesOpener('France', 0);
+      cy.wait(1000);
+      cy.get(selIsOpen).should('have.length', 3);
+
+      cy.get(selColClose).eq(0).click(force);
+      cy.get(selIsOpen).should('have.length', 2);
+      cy.get(selColRestore).eq(0).click(force);
+
+      // confirm it did not accifentally re-enable the original 3d item
+      cy.get(selIsOpen).should('have.length', 3);
     });
   });
 });

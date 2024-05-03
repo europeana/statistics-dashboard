@@ -2,6 +2,7 @@
 
 $disabled-colour: $gray-5;
 $forced-space: 10px;
+$timeTransitionRollDown: 0.25s;
 
 li {
   list-style: none;
@@ -89,6 +90,7 @@ li {
 .legend-grid-wrapper {
   display: flex;
   flex-direction: column;
+  margin-top: 4em;
 }
 
 .legend-item-country-toggle {
@@ -201,9 +203,20 @@ li {
   height: 20px;
   opacity: 0;
   text-align: center;
+
   .x {
     display: block;
     margin: auto;
+    &::after,
+    &::before {
+      background: #777;
+    }
+    &:hover {
+      &::after,
+      &::before {
+        background: $gray-med;
+      }
+    }
   }
 }
 
@@ -213,14 +226,9 @@ li {
   //border-left-color: transparent;
 }
 
-.legend-grid-wrapper {
-  margin-top: -10px;
-}
-
 .perma-pin:hover,
 ul:hover ~ .perma-pin {
   opacity: 1;
-  //background-color: orange !important;
 }
 
 .stick-left,
@@ -244,13 +252,11 @@ ul:hover ~ .perma-pin {
   }
 }
 
-$timeTransition: 0.25s;
-
 .roll-down-wrapper {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows $timeTransition linear,
-    margin-bottom $timeTransition linear;
+  transition: grid-template-rows $timeTransitionRollDown linear,
+    margin-bottom $timeTransitionRollDown linear;
 
   &:not(.is-open) > * {
     grid-template-rows: 1fr;
@@ -263,5 +269,11 @@ $timeTransition: 0.25s;
   .roll-down {
     overflow-y: hidden;
     margin: 0.2em 0 0.3em 0;
+  }
+}
+
+@media (min-width: $bp-desktop) {
+  .legend-grid-wrapper {
+    margin-top: -10px;
   }
 }
