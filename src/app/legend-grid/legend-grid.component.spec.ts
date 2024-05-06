@@ -10,7 +10,7 @@ import {
 import * as am4charts from '@amcharts/amcharts4/charts';
 
 import { MockLineComponent } from '../_mocked';
-import { TargetFieldName } from '../_models';
+import { TargetFieldName, TargetSeriesSuffixes } from '../_models';
 import { LineComponent } from '../chart';
 import { LegendGridComponent } from '.';
 
@@ -55,6 +55,74 @@ describe('LegendGridComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should show the series set', () => {
+    const showSpy = jasmine.createSpy();
+    spyOn(component, 'togglePin');
+
+    component.hiddenSeriesSetData[0] = {
+      Italy: {
+        show: showSpy
+      } as unknown as am4charts.LineSeries
+    };
+
+    component.showSeriesSet(0);
+    expect(showSpy).toHaveBeenCalled();
+    expect(component.togglePin).toHaveBeenCalled();
+  });
+
+  it('should hide the series set', () => {
+    const hideSpy = jasmine.createSpy();
+
+    spyOn(component, 'togglePin');
+
+    component.hideSeriesSet(0);
+
+    expect(hideSpy).not.toHaveBeenCalled();
+    expect(component.togglePin).not.toHaveBeenCalled();
+
+    component.pinnedCountries['FR'] = 12;
+
+    const setData = (indexes: Array<number>): void => {
+      TargetSeriesSuffixes.forEach((suffix: string, suffixIndex: number) => {
+        component.lineChart.allSeriesData['FR' + suffix] = !indexes.includes(
+          suffixIndex
+        )
+          ? undefined
+          : ({
+              hide: hideSpy
+            } as unknown as am4charts.LineSeries);
+      });
+    };
+    setData([0, 1]);
+
+    component.hideSeriesSet(0);
+    expect(hideSpy).toHaveBeenCalled();
+    expect(component.togglePin).not.toHaveBeenCalled();
+
+    setData([0]);
+    component.hideSeriesSet(0);
+    expect(hideSpy).toHaveBeenCalledTimes(2);
+    expect(component.togglePin).toHaveBeenCalled();
+  });
+
+  it('should get the enabled columns', () => {
+    expect(component.columnsEnabledCount).toEqual(3);
+
+    component.columnEnabled3D = false;
+    expect(component.columnsEnabledCount).toEqual(2);
+    component.columnEnabledHQ = false;
+    expect(component.columnsEnabledCount).toEqual(1);
+    component.columnEnabledALL = false;
+    expect(component.columnsEnabledCount).toEqual(0);
+
+    component.columnEnabled3D = true;
+    expect(component.columnsEnabledCount).toEqual(1);
+    component.columnEnabledHQ = true;
+    expect(component.columnsEnabledCount).toEqual(2);
+    component.columnEnabledALL = true;
+    expect(component.columnsEnabledCount).toEqual(3);
+  });
+
   it('should get the country series', () => {
     component.targetMetaData = mockTargetMetaData;
 
@@ -81,6 +149,26 @@ describe('LegendGridComponent', () => {
 
     expect(component.pinnedCountries['FR']).toEqual(0);
     expect(Object.keys(component.pinnedCountries).length).toEqual(1);
+
+    // order check
+
+    component.togglePin('DE');
+    component.togglePin('AU');
+
+    let countries = Object.keys(component.pinnedCountries);
+
+    expect(countries[0]).toEqual('FR');
+    expect(countries[1]).toEqual('DE');
+    expect(countries[2]).toEqual('AU');
+
+    const sortSequence = ['TOP', 'DE', 'AU', 'FR'];
+
+    component.togglePin('TOP', false, sortSequence);
+    countries = Object.keys(component.pinnedCountries);
+
+    sortSequence.forEach((item: string, index: number) => {
+      expect(countries[index]).toEqual(item);
+    });
   });
 
   it('should handle scrolling', () => {
@@ -226,4 +314,15 @@ describe('LegendGridComponent', () => {
     tick(component.timeoutAnimation);
     expect(component.toggleCountry).toHaveBeenCalledTimes(5);
   }));
+
+  it('should sort the pins', () => {
+    const desiredOrder = ['NL', 'IT'];
+    const testArray = ['ES', 'IT', 'CH', 'NL'];
+
+    component.sortPins(testArray, desiredOrder);
+
+    expect(testArray[0]).toEqual('NL');
+    expect(testArray[1]).toEqual('IT');
+    expect(testArray[testArray.length - 1]).toEqual('CH');
+  });
 });

@@ -11,6 +11,8 @@ context('Statistics Dashboard', () => {
     const selPinnedOpener = '.stick-left';
     const selToggleCountry = '.legend-item-country-toggle';
     const selOpenerSeries = '.legend-item-series-toggle';
+    const selColClose = '.column-close';
+    const selColRestore = '.column-restore';
 
     const clickSeriesOpener = (country: string, seriesIndex = 0): void => {
       cy.get(selToggleCountry)
@@ -113,9 +115,6 @@ context('Statistics Dashboard', () => {
     });
 
     it('should toggle the columns', () => {
-      const selColClose = '.column-close';
-      const selColRestore = '.column-restore';
-
       cy.get(selIsOpen).should('have.length', 3);
 
       cy.get(selColClose).eq(0).click(force);
@@ -132,9 +131,6 @@ context('Statistics Dashboard', () => {
     });
 
     it('should remove and restore pins when toggling columns', () => {
-      const selColClose = '.column-close';
-      const selColRestore = '.column-restore';
-
       cy.get(selIsOpen).should('have.length', 3);
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
 
@@ -167,6 +163,90 @@ context('Statistics Dashboard', () => {
 
       // confirm it did not accifentally re-enable the original 3d item
       cy.get(selIsOpen).should('have.length', 3);
+    });
+
+    it('should restore pins in the correct order', () => {
+      const countries = ['Belgium', 'Croatia', 'Denmark'];
+      const checkPinOrder = () => {
+        ['France', ...countries].forEach((country: string, index: number) => {
+          cy.get(selPinnedOpener)
+            .eq(index)
+            .contains(country)
+            .should('have.length', 1);
+        });
+      };
+
+      countries.forEach((country: string, index: number) => {
+        clickSeriesOpener(country, index);
+      });
+
+      // check the pin order
+      checkPinOrder();
+
+      // Hide column, removing Belgium's only series
+      cy.get(selColClose).eq(0).click(force);
+
+      cy.get(selPinnedOpener).contains('Belgium').should('not.exist');
+
+      cy.get(selPinnedOpener).eq(0).contains('France').should('have.length', 1);
+      cy.get(selPinnedOpener)
+        .eq(1)
+        .contains('Croatia')
+        .should('have.length', 1);
+      cy.get(selPinnedOpener)
+        .eq(2)
+        .contains('Denmark')
+        .should('have.length', 1);
+
+      // Restore column
+      cy.get(selColRestore).eq(0).click(force);
+
+      // Belgian pin should be restored
+      cy.get(selPinnedOpener).contains('Belgium').should('exist');
+      checkPinOrder();
+
+      // Hide column, removing Croatia's only series
+      cy.get(selColClose).eq(1).click(force);
+      cy.get(selPinnedOpener).contains('Croatia').should('not.exist');
+
+      // Restore column
+      cy.get(selColRestore).eq(1).click(force);
+      cy.get(selPinnedOpener).contains('Croatia').should('exist');
+      checkPinOrder();
+
+      // Hide column, removing Denmark's only series
+      cy.get(selColClose).eq(2).click(force);
+      cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
+
+      // Restore column
+      cy.get(selColRestore).eq(2).click(force);
+      cy.get(selPinnedOpener).contains('Denmark').should('exist');
+      checkPinOrder();
+
+      // Additional test: remove the default pin when the column is hidden
+
+      // Hide column, removing Croatia's only series
+      cy.get(selColClose).eq(1).click(force);
+      cy.get(selPinnedOpener).contains('Croatia').should('not.exist');
+
+      // Hide default pin
+      cy.get(selPinnedOpener).contains('France').click(force);
+      cy.wait(5);
+      cy.get(selPinnedOpener).contains('France').should('not.exist');
+      cy.get(selPinnedOpener).contains('Croatia').should('not.exist');
+
+      // Restore column
+      cy.get(selColRestore).eq(1).click(force);
+      cy.get(selPinnedOpener).contains('Croatia').should('exist');
+      cy.get(selPinnedOpener).contains('France').should('not.exist');
+
+      // Check order (without France)
+      countries.forEach((country: string, index: number) => {
+        cy.get(selPinnedOpener)
+          .eq(index)
+          .contains(country)
+          .should('have.length', 1);
+      });
     });
   });
 });

@@ -159,23 +159,8 @@ export class LegendGridComponent {
 
   // country names mapped to pin offset
   pinnedCountries: IHash<number> = {};
-  hiddenSeriesSetData: Array<IHash<IHash<Array<am4charts.LineSeries>>>> = [
-    {},
-    {},
-    {}
-  ];
-  /*
-    - has prevPins  // TODO
-
-    - restoring the pin order:
-  	- record previous pins
-  	- look up dependency graph when restoring
-  	- full rewrite of toggleCountry() needed
-
-        - because this breaks UI state maintenance
-
-        - colour maintenance...
-  */
+  hiddenColumnPinData: Array<Array<string>> = [[], [], []];
+  hiddenSeriesSetData: Array<IHash<am4charts.LineSeries>> = [{}, {}, {}];
 
   public TargetSeriesSuffixes = TargetSeriesSuffixes;
   public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
@@ -203,25 +188,45 @@ export class LegendGridComponent {
     return res;
   }
 
+  /** sortPins
+   * sorts string array based on order of strings in separate array
+   * @param { Array<string> } strings
+   * @param { Array<string> } desiredOrder
+   **/
+  sortPins(strings: Array<string>, desiredOrder: Array<string>): void {
+    desiredOrder = structuredClone(desiredOrder).reverse();
+    strings.sort((a: string, b: string) => {
+      const indexA = desiredOrder.indexOf(a);
+      const indexB = desiredOrder.indexOf(b);
+      if (indexA < indexB) {
+        return 1;
+      }
+      if (indexA > indexB) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
   /** showSeriesSet
    *
    * - calls show() on the series referenced in hiddenCountrySeries
    * - optionally pins the country associated with the series
    **/
   showSeriesSet(colIndex: number): void {
-    Object.keys(this.hiddenSeriesSetData[colIndex]).forEach(
-      (country: string) => {
-        this.hiddenSeriesSetData[colIndex][country].series.forEach(
-          (series: am4charts.LineSeries) => {
-            series.show();
-          }
-        );
-        if (!(country in this.pinnedCountries)) {
-          this.togglePin(country);
-        }
+    const seriesSet = this.hiddenSeriesSetData[colIndex];
+    const pinOrder = this.hiddenColumnPinData[colIndex];
+
+    // re-enable pins
+    Object.keys(seriesSet).forEach((country: string) => {
+      seriesSet[country].show();
+      if (!(country in this.pinnedCountries)) {
+        this.togglePin(country, false, pinOrder);
       }
-    );
+    });
+
     this.hiddenSeriesSetData[colIndex] = {};
+    this.hiddenColumnPinData[colIndex] = [];
   }
 
   /** hideSeriesSet
@@ -232,42 +237,34 @@ export class LegendGridComponent {
    * @param { TargetFieldName } setType - the type to hide
    **/
   hideSeriesSet(colIndex: number): void {
-    Object.keys(this.pinnedCountries).forEach((country: string) => {
+    const countries = Object.keys(this.pinnedCountries);
+
+    countries.forEach((country: string) => {
       const countrySeriesKeys = TargetSeriesSuffixes.map((suffix: string) => {
         return `${country}${suffix}`;
       });
 
-      const countrySeriesData = countrySeriesKeys.map((key: string) => {
+      const countrySeriesObjects = countrySeriesKeys.map((key: string) => {
         return this.lineChart.allSeriesData[key];
       });
 
-      if (
-        countrySeriesData[colIndex] &&
-        !countrySeriesData[colIndex].isHidden
-      ) {
-        this.hiddenSeriesSetData[colIndex][country] = { series: [] };
-        this.hiddenSeriesSetData[colIndex][country].series.push(
-          countrySeriesData[colIndex]
-        );
+      const targetSeries = countrySeriesObjects[colIndex];
 
-        countrySeriesData[colIndex].hide();
+      if (targetSeries && !targetSeries.isHidden) {
+        targetSeries.hide();
+        this.hiddenSeriesSetData[colIndex][country] = targetSeries;
         this.lineChart.removeRange(
           country,
           TargetFieldName[this.seriesValueNames[colIndex]]
         );
 
-        let hasOtherVisible = false;
-        for (let i = 0; i < 3; i++) {
-          if (
-            i !== colIndex &&
-            countrySeriesData[i] &&
-            !countrySeriesData[i].isHidden
-          ) {
-            hasOtherVisible = true;
-          }
-        }
-        if (!hasOtherVisible) {
-          this.togglePin(country);
+        if (
+          countrySeriesObjects.filter((item) => {
+            return item && !item.isHidden;
+          }).length === 1
+        ) {
+          this.hiddenColumnPinData[colIndex] = structuredClone(countries);
+          this.togglePin(country, false);
         }
       }
     });
@@ -366,20 +363,48 @@ export class LegendGridComponent {
    * pins or unpins an item, maintaining pinnedCountries
    * and the order of targetCountries
    * @param { string } country - the country to (un)pin
+   * @param { boolean } purgePinData - flag pin data deletion
    **/
-  togglePin(country: string): void {
+  togglePin(
+    country: string,
+    purgePinData = true,
+    reorder?: Array<string>
+  ): void {
     if (country in this.pinnedCountries) {
-      // delete and re-assign existing pin values
       delete this.pinnedCountries[country];
-      Object.keys(this.pinnedCountries).forEach((key: string, i: number) => {
-        this.pinnedCountries[key] = i * LegendGridComponent.itemHeight;
-      });
+
+      if (purgePinData) {
+        [0, 1, 2].forEach((colIndex: number) => {
+          const pinOrder = this.hiddenColumnPinData[colIndex];
+          if (pinOrder) {
+            this.hiddenColumnPinData[colIndex] = pinOrder.filter(
+              (elem) => elem !== country
+            );
+            delete this.hiddenSeriesSetData[colIndex][country];
+          }
+        });
+      }
     } else {
-      // add new pin
-      this.pinnedCountries[country] =
-        Object.keys(this.pinnedCountries).length *
-        LegendGridComponent.itemHeight;
+      this.pinnedCountries[country] = 1;
     }
+
+    // re-assign pin keys
+    if (reorder) {
+      const sortTarget = structuredClone(Object.keys(this.pinnedCountries));
+      this.sortPins(sortTarget, reorder);
+      this.pinnedCountries = sortTarget.reduce(
+        (res: IHash<number>, item: string) => {
+          res[item] = 0;
+          return res;
+        },
+        {}
+      );
+    }
+
+    // re-assign pin values
+    Object.keys(this.pinnedCountries).forEach((key: string, i: number) => {
+      this.pinnedCountries[key] = i * LegendGridComponent.itemHeight;
+    });
 
     // re-order targetCountries, putting the pinned items first
     this.targetCountries = Object.keys(this.pinnedCountries).concat(
