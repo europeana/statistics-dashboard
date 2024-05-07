@@ -41,6 +41,7 @@ import {
   RenameTargetTypePipe
 } from '../_translate';
 
+import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent } from '../chart';
 import { LegendGridComponent } from '../legend-grid';
 import { ResizeComponent } from '../resize';
@@ -53,6 +54,7 @@ import { TruncateComponent } from '../truncate';
   standalone: true,
   imports: [
     AbbreviateNumberPipe,
+    AppendiceSectionComponent,
     RouterOutlet,
     DatePipe,
     JsonPipe,
@@ -103,7 +105,7 @@ export class CountryComponent extends SubscriptionManager {
   countryData: IHash<Array<TargetData>> = {};
   countryTotalMap: IHash<CountryTotalInfo>;
   latestCountryData: TargetData;
-  detailsExpanded = false;
+  appendiceExpanded = false;
 
   public headerRef: ElementRef;
 
@@ -173,8 +175,8 @@ export class CountryComponent extends SubscriptionManager {
     }
   }
 
-  toggleDetails(): void {
-    this.detailsExpanded = !this.detailsExpanded;
+  toggleAppendice(): void {
+    this.appendiceExpanded = !this.appendiceExpanded;
     this.lineChart.toggleCursor();
   }
 

@@ -10,28 +10,53 @@ context('Statistics Dashboard', () => {
       cy.visit('/country/Austria');
     });
 
+    it('should toggle the appendices', () => {
+      const selAppendiceToggle = '.appendice-toggle';
+      const selAppendiceTable = '.appendice-grid';
+
+      cy.get(selAppendiceTable).filter(':visible').should('have.length', 0);
+      cy.get(selAppendiceToggle).click(force);
+      cy.get(selAppendiceTable).filter(':visible').should('have.length', 1);
+      cy.get(selAppendiceToggle).click(force);
+      cy.get(selAppendiceTable).filter(':visible').should('have.length', 0);
+    });
+
     it('should toggle the cards and columns', () => {
       const selColClose = '.column-close';
       const selColRestore = '.column-restore';
+      const selAppendiceToggle = '.appendice-toggle';
+      const selAppendiceTable = '.appendice-grid';
 
+      cy.get(selAppendiceTable).should('not.have.class', 'single');
+      cy.get(selAppendiceTable).should('not.have.class', 'double');
       cy.get(selPowerBar).should('have.length', 6);
-
       cy.get(selColClose).should('have.length', 3);
       cy.get(selColRestore).should('not.exist', 2);
 
+      // close the first column
       cy.get(selColClose).eq(0).click(force);
       cy.get(selPowerBar).should('have.length', 4);
       cy.get(selColRestore).filter(':visible').should('have.length', 2);
+      cy.get(selAppendiceTable).should('not.have.class', 'single');
+      cy.get(selAppendiceTable).should('have.class', 'double');
 
+      // close the 2nd column
       cy.get(selColClose).eq(0).click(force);
       cy.get(selPowerBar).should('have.length', 2);
       cy.get(selColRestore).filter(':visible').should('have.length', 2);
+      cy.get(selAppendiceTable).should('have.class', 'single');
+      cy.get(selAppendiceTable).should('not.have.class', 'double');
 
       // restore
       cy.get(selColRestore).eq(0).click(force);
       cy.get(selPowerBar).should('have.length', 4);
+      cy.get(selAppendiceTable).should('not.have.class', 'single');
+      cy.get(selAppendiceTable).should('have.class', 'double');
+
       cy.get(selColRestore).eq(0).click(force);
       cy.get(selPowerBar).should('have.length', 6);
+      cy.get(selAppendiceTable).should('not.have.class', 'single');
+      cy.get(selAppendiceTable).should('not.have.class', 'double');
     });
 
     it('should show the power bars', () => {
@@ -50,7 +75,7 @@ context('Statistics Dashboard', () => {
 
       cy.get(selLinkData3D).should('have.length', 1);
       cy.get(selLinkDataHQ).should('have.length', 1);
-      //cy.get(selLinkDataType).should('have.length', 1);
+      cy.get(selLinkDataType).should('have.length', 1);
       cy.get(selLinkDataRights).should('have.length', 1);
       cy.get(selLinkDataDataProvider).should('have.length', 1);
       cy.get(selLinkDataProvider).should('have.length', 1);

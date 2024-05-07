@@ -13,7 +13,7 @@
 
   &.is-open {
     grid-template-rows: 1fr;
-    margin-top: 2em;
+    margin-top: 1em;
   }
 
   & > * {
@@ -21,92 +21,27 @@
   }
 }
 
-$appendice-grid-num-cols: 8;
+.appendice-toggle {
+  display: flex;
+  justify-self: flex-end;
+  flex-direction: row;
 
-.appendice-grid {
-  display: grid;
-  grid-template-columns: repeat($appendice-grid-num-cols, auto);
-  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
 
-  .cell-bold {
-    font-weight: 600;
+  margin: 14px 22px 0 auto;
+
+  position: relative;
+  color: $gray-med;
+  .save {
+    position: absolute;
+    left: auto;
+    right: -24px;
+    transform: rotate(90deg);
   }
-
-  .cell-header {
-    margin-bottom: 0.6em;
+  &:hover .save {
+    transform: rotate(0deg);
   }
-
-  .cell-left {
-    text-align: left;
-  }
-
-  .cell-line {
-    border-right-style: solid;
-    border-right-width: 1px;
-    border-right-color: transparent;
-  }
-
-  .cell-live {
-    background-color: #fff;
-    color: #777;
-    z-index: 1;
-  }
-
-  .cell-pad-right {
-    padding-right: 1.6em;
-  }
-
-  .cell-total {
-    font-weight: normal;
-    padding-left: 3.2em;
-    padding-right: 3.2em;
-    &:not(:empty)::after {
-      content: " (total)";
-      font-weight: 600;
-    }
-  }
-
-  .cell-2025 {
-    &:not(:empty)::after {
-      content: " (2025)";
-      font-weight: 600;
-    }
-  }
-  .cell-2030 {
-    &:not(:empty)::after {
-      content: " (2030)";
-      font-weight: 600;
-    }
-  }
-}
-
-.appendice-grid-sticky-row {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / calc($appendice-grid-num-cols + 1);
-  position: sticky;
-  top: 0;
-  background-color: #fff;
-
-  .cell-live {
-    z-index: 0;
-  }
-}
-
-.appendice-grid-sticky-row,
-.appendice-grid-scrollable-section {
-  & > :not(.appendice-grid-sticky-row) {
-    padding: 4px 8px;
-  }
-}
-
-.appendice-grid-scrollable-section {
-  display: grid;
-  grid-column: 1 / calc($appendice-grid-num-cols + 1);
-  grid-template-columns: subgrid;
-
-  max-height: 20em;
-  overflow-y: auto;
 }
 
 .column-close {

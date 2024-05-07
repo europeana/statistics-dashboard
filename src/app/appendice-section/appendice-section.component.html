@@ -1,0 +1,200 @@
+<div
+  class="appendice-grid"
+  [ngClass]="{
+    single: columnsEnabledCount === 1,
+    double: columnsEnabledCount === 2
+  }"
+>
+  <span class="cell-header"><!-- Country--></span>
+
+  <span class="cell-header cell-bold cell-left"><!--Date--></span>
+
+  <span *ngIf="columnEnabled3D" class="cell-header cell-bold">3D</span>
+  <span *ngIf="columnEnabled3D" class="cell-header diminished">(2025)</span>
+  <span *ngIf="columnEnabled3D" class="cell-header diminished">(2030)</span>
+
+  <span *ngIf="columnEnabledHQ" class="cell-header cell-bold">HQ</span>
+  <span *ngIf="columnEnabledHQ" class="cell-header diminished">2025</span>
+  <span *ngIf="columnEnabledHQ" class="cell-header diminished">2030</span>
+
+  <span *ngIf="columnEnabledALL" class="cell-header cell-bold">All</span>
+  <span *ngIf="columnEnabledALL" class="cell-header diminished">2025</span>
+  <span *ngIf="columnEnabledALL" class="cell-header diminished cell-pad-right"
+    >2030</span
+  >
+
+  <span class="appendice-grid-scrollable-section">
+    <ng-template
+      #headerGroup
+      let-targets="targets"
+      let-isHeader="isHeader"
+      let-colour="colour"
+      let-headerValue="headerValue"
+      let-headerIndex="headerIndex"
+    >
+      <span
+        class="cell-live"
+        [ngClass]="{ 'cell-line': !!headerValue }"
+        [attr.style]="'border-left-color: ' + colour"
+      >
+        {{ headerValue | number }}
+      </span>
+
+      <span class="cell-target" [attr.title]="targets[headerIndex][0] | number">
+        @if(isHeader) {
+        {{ targets[headerIndex][0] | abbreviateNumber }}
+        }
+      </span>
+
+      <span
+        class="cell-target"
+        [attr.title]="targets[headerIndex][1] | number"
+        [ngClass]="{ 'cell-pad-right': headerIndex === 2 }"
+      >
+        @if(isHeader) {
+        {{ targets[headerIndex][1] | abbreviateNumber }}
+        }
+      </span>
+    </ng-template>
+
+    <ng-template
+      #countryRow
+      let-targets="targets"
+      let-isHeader="isHeader"
+      let-country="country"
+      let-row="row"
+      let-wrap="wrap"
+      let-colour3D="colour3D"
+      let-colourHQ="colourHQ"
+      let-colourTOTAL="colourTOTAL"
+    >
+      @if(wrap){
+      <!-- wrap -->
+      <span class="appendice-grid-sticky-row">
+        <!-- recurse -->
+        <ng-content
+          *ngTemplateOutlet="
+            countryRow;
+            context: {
+              colour3D: colour3D,
+              colourHQ: colourHQ,
+              colourTOTAL: colourTOTAL,
+              targets: targets,
+              isHeader: isHeader,
+              country: country,
+              row: row,
+              wrap: false
+            }
+          "
+        ></ng-content>
+      </span>
+
+      } @else {
+
+      <span class="cell-bold cell-left">
+        @if(isHeader) {
+        {{ country | renameCountry }}
+        }
+      </span>
+
+      <span class="cell-left cell-live">
+        {{ row["date"] | date: "dd/MM/yyyy" }}
+      </span>
+
+      <ng-container *ngIf="columnEnabled3D">
+        <ng-content
+          *ngTemplateOutlet="
+            headerGroup;
+            context: {
+              colour: colour3D,
+              targets: targets,
+              isHeader: isHeader,
+              headerValue: row[TargetFieldName.THREE_D],
+              headerIndex: 0
+            }
+          "
+        ></ng-content>
+      </ng-container>
+
+      <ng-container *ngIf="columnEnabledHQ">
+        <ng-content
+          *ngTemplateOutlet="
+            headerGroup;
+            context: {
+              colour: colourHQ,
+
+              targets: targets,
+              isHeader: isHeader,
+              headerValue: row[TargetFieldName.HQ],
+              headerIndex: 1
+            }
+          "
+        ></ng-content>
+      </ng-container>
+
+      <ng-container *ngIf="columnEnabledALL">
+        <ng-content
+          *ngTemplateOutlet="
+            headerGroup;
+            context: {
+              colour: colourTOTAL,
+              targets: targets,
+              isHeader: isHeader,
+              headerValue: row[TargetFieldName.TOTAL],
+              headerIndex: 2
+            }
+          "
+        ></ng-content>
+      </ng-container>
+      }
+    </ng-template>
+
+    <ng-container *ngFor="let country of pinnedCountries | keyvalue">
+      <ng-container
+        *ngFor="
+          let row of countryData[country.key];
+          let countryRowIndex = index
+        "
+      >
+        <ng-container *ngIf="targetMetaData[country.key]">
+          <ng-content
+            *ngTemplateOutlet="
+              countryRow;
+              context: {
+                colour3D:
+                  colourMap[country.key + TargetSeriesSuffixes[0]]?.fill ||
+                  'transparent',
+                colourHQ:
+                  colourMap[country.key + TargetSeriesSuffixes[1]]?.fill ||
+                  'transparent',
+                colourTOTAL:
+                  colourMap[country.key + TargetSeriesSuffixes[2]]?.fill ||
+                  'transparent',
+                isHeader: countryRowIndex === 0,
+                country: country.key,
+                row: row,
+                targets: [
+                  [
+                    targetMetaData[country.key][TargetFieldName.THREE_D][0]
+                      .value,
+                    targetMetaData[country.key][TargetFieldName.THREE_D][1]
+                      .value
+                  ],
+                  [
+                    targetMetaData[country.key][TargetFieldName.HQ][0].value,
+                    targetMetaData[country.key][TargetFieldName.HQ][1].value
+                  ],
+                  [
+                    targetMetaData[country.key][TargetFieldName.TOTAL][0].value,
+                    targetMetaData[country.key][TargetFieldName.TOTAL][1].value
+                  ]
+                ],
+                wrap: countryRowIndex === 0
+              }
+            "
+          ></ng-content>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </span>
+</div>

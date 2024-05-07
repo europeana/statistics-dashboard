@@ -1,10 +1,4 @@
-<main
-  class="fit-to-page landing-page"
-  [ngClass]="{
-    'loading-modal': false,
-    loading: false
-  }"
->
+<main class="fit-to-page landing-page">
   <h1 class="page-title" style="margin: 1em 0.6em">
     {{ country }}: Target Data
   </h1>
@@ -411,7 +405,6 @@
         <div class="entry-card-multi">
           <app-line-chart #lineChart [targetMetaData]="targetMetaData">
           </app-line-chart>
-
           <app-legend-grid
             #legendGrid
             [countryData]="countryData"
@@ -425,169 +418,25 @@
           ></app-legend-grid>
         </div>
 
+        <a class="appendice-toggle" (click)="toggleAppendice()">
+          <span>@if (appendiceExpanded) { Hide data } @else { Show data }</span>
+          <span class="save"></span>
+        </a>
+
         <div
           class="appendice-grid-wrapper"
-          [ngClass]="{ 'is-open': detailsExpanded }"
+          [ngClass]="{ 'is-open': appendiceExpanded }"
         >
-          <div class="appendice-grid">
-            <span class="cell-header"> <!-- Country--> </span>
-            <span class="cell-header cell-bold cell-left"> Date </span>
-            <span class="cell-header cell-bold"> 3D data</span>
-            <span class="cell-header"> <!--(2025)--> </span>
-            <span class="cell-header"> <!--(2030)--> </span>
-            <span class="cell-header cell-bold"> HQ data</span>
-            <span class="cell-header"> <!--(2025)--> </span>
-            <span class="cell-header cell-pad-right"> <!--(2030)--> </span>
-
-            <span class="appendice-grid-scrollable-section">
-              <ng-template
-                #countryRow
-                let-targets="targets"
-                let-isHeader="isHeader"
-                let-country="country"
-                let-row="row"
-                let-wrap="wrap"
-                let-colour3D="colour3D"
-                let-colourHQ="colourHQ"
-              >
-                @if(wrap){
-                <!-- wrap -->
-                <span class="appendice-grid-sticky-row">
-                  <!-- recurse -->
-                  <ng-content
-                    *ngTemplateOutlet="
-                      countryRow;
-                      context: {
-                        colour3D: colour3D,
-                        colourHQ: colourHQ,
-                        targets: targets,
-                        isHeader: isHeader,
-                        country: country,
-                        row: row,
-                        wrap: false
-                      }
-                    "
-                  ></ng-content>
-                </span>
-
-                } @else {
-
-                <span class="cell-bold cell-left">
-                  @if(isHeader) {
-                  <span>
-                    {{ country | renameCountry }}
-                  </span>
-                  <span class="cell-total">
-                    @if( headerRef && headerRef['countryTotalMap'] &&
-                    headerRef['countryTotalMap'][country | renameCountry] ){
-                    {{
-                      headerRef["countryTotalMap"][country | renameCountry][
-                        "total"
-                      ] | number
-                    }}
-                    }
-                  </span>
-                  }
-                </span>
-
-                <span class="cell-left cell-live">
-                  {{ row["date"] | date: "dd/MM/yyyy" }}
-                </span>
-
-                <span
-                  class="cell-live"
-                  [ngClass]="{ 'cell-line': !!row[TargetFieldName.THREE_D] }"
-                  [attr.style]="'border-right-color: ' + colour3D"
-                >
-                  {{ row[TargetFieldName.THREE_D] | number }}
-                </span>
-
-                <span class="cell-2025">
-                  @if(isHeader) {
-                  {{ targets[0][0] | number }}
-                  }
-                </span>
-
-                <span class="cell-2030">
-                  @if(isHeader) {
-                  {{ targets[0][1] | number }}
-                  }
-                </span>
-
-                <span
-                  class="cell-live"
-                  [ngClass]="{ 'cell-line': !!row[TargetFieldName.HQ] }"
-                  [attr.style]="'border-right-color: ' + colourHQ"
-                >
-                  {{ row[TargetFieldName.HQ] | number }}
-                </span>
-
-                <span class="cell-2025">
-                  @if(isHeader) {
-                  {{ targets[1][0] | number }}
-                  }
-                </span>
-
-                <span class="cell-2030 cell-pad-right">
-                  @if(isHeader) {
-                  {{ targets[1][1] | number }}
-                  }
-                </span>
-                }
-              </ng-template>
-
-              <ng-container
-                *ngFor="let country of legendGrid.pinnedCountries | keyvalue"
-              >
-                <ng-container
-                  *ngFor="
-                    let row of countryData[country.key];
-                    let countryRowIndex = index
-                  "
-                >
-                  <ng-container *ngIf="targetMetaData[country.key]">
-                    <ng-content
-                      *ngTemplateOutlet="
-                        countryRow;
-                        context: {
-                          colour3D:
-                            lineChart.allSeriesData[country.key + '3D']?.fill ||
-                            'transparent',
-                          colourHQ:
-                            lineChart.allSeriesData[country.key + 'HQ']?.fill ||
-                            'transparent',
-                          isHeader: countryRowIndex === 0,
-                          country: country.key,
-                          row: row,
-                          targets: [
-                            [
-                              targetMetaData[country.key][
-                                TargetFieldName.THREE_D
-                              ][0].value,
-                              targetMetaData[country.key][
-                                TargetFieldName.THREE_D
-                              ][1].value
-                            ],
-                            [
-                              targetMetaData[country.key][TargetFieldName.HQ][0]
-                                .value,
-                              targetMetaData[country.key][TargetFieldName.HQ][1]
-                                .value
-                            ]
-                          ],
-                          wrap: countryRowIndex === 0
-                        }
-                      "
-                    ></ng-content>
-                  </ng-container>
-                </ng-container>
-              </ng-container>
-            </span>
-          </div>
+          <app-appendice-section
+            [targetMetaData]="targetMetaData"
+            [countryData]="countryData"
+            [colourMap]="lineChart.allSeriesData"
+            [pinnedCountries]="legendGrid.pinnedCountries"
+            [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
+            [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
+            [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
+          ></app-appendice-section>
         </div>
-        <a class="data-link" (click)="toggleDetails()">
-          @if (detailsExpanded) { Hide data } @else { View data }</a
-        >
       </div>
     </div>
 

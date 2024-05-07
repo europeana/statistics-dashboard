@@ -72,12 +72,12 @@ describe('CountryComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should toggle the details', () => {
-    expect(component.detailsExpanded).toBeFalsy();
-    component.toggleDetails();
-    expect(component.detailsExpanded).toBeTruthy();
-    component.toggleDetails();
-    expect(component.detailsExpanded).toBeFalsy();
+  it('should toggle the appendice', () => {
+    expect(component.appendiceExpanded).toBeFalsy();
+    component.toggleAppendice();
+    expect(component.appendiceExpanded).toBeTruthy();
+    component.toggleAppendice();
+    expect(component.appendiceExpanded).toBeFalsy();
   });
 
   it('should create', () => {

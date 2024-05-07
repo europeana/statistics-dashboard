@@ -1,0 +1,128 @@
+@import "../../scss/_variables";
+
+$appendice-grid-num-cols: 11;
+$row-height: 1.6rem;
+
+.appendice-grid {
+  display: grid;
+  grid-template-columns: minmax(10em, 1fr) repeat(
+      ($appendice-grid-num-cols - 1),
+      auto
+    );
+
+  text-align: right;
+
+  .cell-bold {
+    font-weight: 600;
+  }
+
+  .cell-header {
+    margin-bottom: 0.6em;
+  }
+
+  .cell-left {
+    text-align: left;
+  }
+
+  .cell-line {
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-left-color: transparent;
+  }
+
+  .cell-live {
+    background-color: #fff;
+    color: #777;
+    z-index: 1;
+  }
+
+  .diminished {
+    color: #777;
+    line-height: calc(4px + 1.6rem);
+  }
+
+  .cell-target,
+  .diminished {
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  .cell-target {
+    height: $row-height;
+    line-height: $row-height;
+  }
+
+  :not(.cell-header) {
+    font-style: italic;
+    color: #777;
+  }
+
+  @media (min-width: $bp-xxl) {
+    grid-template-columns: minmax(20em, 1fr) repeat(
+        ($appendice-grid-num-cols - 1),
+        auto
+      );
+  }
+}
+
+.appendice-grid-sticky-row {
+  background-color: #fff;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / calc($appendice-grid-num-cols + 1);
+  position: sticky;
+  top: 0;
+  .cell-live {
+    z-index: 0;
+  }
+}
+
+.appendice-grid,
+.appendice-grid-sticky-row,
+.appendice-grid-scrollable-section {
+  max-width: 100;
+  width: 100%;
+
+  & > :not(.appendice-grid-sticky-row) {
+    padding: 4px 1em;
+  }
+
+  & > .cell-pad-right {
+    padding-right: 1rem;
+    &.cell-header {
+      padding-right: 2rem;
+    }
+  }
+}
+
+.appendice-grid-scrollable-section {
+  display: grid;
+  font-size: 14px;
+  grid-column: 1 / calc($appendice-grid-num-cols + 1);
+  grid-template-columns: subgrid;
+
+  max-height: 20em;
+  overflow-y: auto;
+}
+
+.double {
+  &.appendice-grid {
+    grid-template-columns: 1fr repeat(($appendice-grid-num-cols - 4), auto);
+  }
+
+  .appendice-grid-scrollable-section,
+  .appendice-grid-sticky-row {
+    grid-column: 1 / calc(($appendice-grid-num-cols - 3) + 1);
+  }
+}
+
+.single {
+  &.appendice-grid {
+    grid-template-columns: 1fr repeat(($appendice-grid-num-cols - 7), auto);
+  }
+
+  .appendice-grid-scrollable-section,
+  .appendice-grid-sticky-row {
+    grid-column: 1 / calc(($appendice-grid-num-cols - 6) + 1);
+  }
+}
