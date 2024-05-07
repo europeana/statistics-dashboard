@@ -6,17 +6,26 @@
   }"
 >
   <span class="cell-header"><!-- Country--></span>
-
   <span class="cell-header cell-bold cell-left"><!--Date--></span>
+
+  <span *ngIf="columnEnabled3D" class="cell-header window">
+    <span class="window-frame"></span>
+  </span>
 
   <span *ngIf="columnEnabled3D" class="cell-header cell-bold">3D</span>
   <span *ngIf="columnEnabled3D" class="cell-header diminished">(2025)</span>
   <span *ngIf="columnEnabled3D" class="cell-header diminished">(2030)</span>
 
+  <span *ngIf="columnEnabledHQ" class="cell-header window">
+    <span class="window-frame"></span>
+  </span>
   <span *ngIf="columnEnabledHQ" class="cell-header cell-bold">HQ</span>
   <span *ngIf="columnEnabledHQ" class="cell-header diminished">2025</span>
   <span *ngIf="columnEnabledHQ" class="cell-header diminished">2030</span>
 
+  <span *ngIf="columnEnabledALL" class="cell-header window">
+    <span class="window-frame"></span>
+  </span>
   <span *ngIf="columnEnabledALL" class="cell-header cell-bold">All</span>
   <span *ngIf="columnEnabledALL" class="cell-header diminished">2025</span>
   <span *ngIf="columnEnabledALL" class="cell-header diminished cell-pad-right"
@@ -32,6 +41,11 @@
       let-headerValue="headerValue"
       let-headerIndex="headerIndex"
     >
+      <span
+        class="window-pane"
+        [attr.style]="'background-color: ' + colour"
+      ></span>
+
       <span
         class="cell-live"
         [ngClass]="{ 'cell-line': !!headerValue }"
