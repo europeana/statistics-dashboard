@@ -22,7 +22,7 @@ $window-size: $row-height;
     auto
     auto
     auto;
-
+  margin-top: -1rem;
   text-align: right;
 
   .cell-bold {
@@ -118,14 +118,15 @@ $window-size: $row-height;
 
 .appendice-grid-scrollable-section {
   display: grid;
-  font-size: 14px;
   grid-column: 1 / calc($appendice-grid-num-cols + 1);
   grid-template-columns: subgrid;
-
   max-height: $grid-height;
   overflow-y: auto;
-
   padding-top: $window-size;
+
+  @media (min-width: $bp-xxl) {
+    font-size: 14px;
+  }
 }
 
 .cell-header,

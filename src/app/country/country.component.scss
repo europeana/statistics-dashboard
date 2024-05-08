@@ -7,13 +7,10 @@
 
   display: grid;
   grid-template-rows: 0fr;
-  margin-top: 0;
-  transition: grid-template-rows $timeTransition linear,
-    margin-top $timeTransition linear;
+  transition: grid-template-rows $timeTransition linear;
 
   &.is-open {
     grid-template-rows: 1fr;
-    margin-top: 1em;
   }
 
   & > * {

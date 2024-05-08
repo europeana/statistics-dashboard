@@ -136,7 +136,6 @@
             headerGroup;
             context: {
               colour: colourHQ,
-
               targets: targets,
               isHeader: isHeader,
               headerValue: row[TargetFieldName.HQ],
@@ -170,7 +169,9 @@
           let countryRowIndex = index
         "
       >
-        <ng-container *ngIf="targetMetaData[country.key]">
+        <ng-container
+          *ngIf="targetMetaData[country.key]; let countryTargetData"
+        >
           <ng-content
             *ngTemplateOutlet="
               countryRow;
@@ -189,18 +190,16 @@
                 row: row,
                 targets: [
                   [
-                    targetMetaData[country.key][TargetFieldName.THREE_D][0]
-                      .value,
-                    targetMetaData[country.key][TargetFieldName.THREE_D][1]
-                      .value
+                    countryTargetData[TargetFieldName.THREE_D][0].value,
+                    countryTargetData[TargetFieldName.THREE_D][1].value
                   ],
                   [
-                    targetMetaData[country.key][TargetFieldName.HQ][0].value,
-                    targetMetaData[country.key][TargetFieldName.HQ][1].value
+                    countryTargetData[TargetFieldName.HQ][0].value,
+                    countryTargetData[TargetFieldName.HQ][1].value
                   ],
                   [
-                    targetMetaData[country.key][TargetFieldName.TOTAL][0].value,
-                    targetMetaData[country.key][TargetFieldName.TOTAL][1].value
+                    countryTargetData[TargetFieldName.TOTAL][0].value,
+                    countryTargetData[TargetFieldName.TOTAL][1].value
                   ]
                 ],
                 wrap: countryRowIndex === 0
