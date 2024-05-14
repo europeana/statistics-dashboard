@@ -62,7 +62,9 @@ export class LineComponent implements AfterViewInit {
     country: string,
     specificValueName?: string,
     specificIndex?: number
-  ): void {
+  ): IHash<IHash<Array<number>>> {
+    const allRemovals = {} as IHash<IHash<Array<number>>>;
+
     Object.keys(TargetFieldName).forEach((seriesValueName: string) => {
       if (
         !specificValueName ||
@@ -77,8 +79,17 @@ export class LineComponent implements AfterViewInit {
                 return;
               }
             }
-            this.valueAxis.axisRanges.removeValue(td.range);
-            delete td.range;
+
+            if (td.range) {
+              if (!allRemovals[seriesValueName]) {
+                allRemovals[seriesValueName] = {};
+                allRemovals[seriesValueName][country] = [];
+              }
+              allRemovals[seriesValueName][country].push(tdIndex);
+              this.valueAxis.axisRanges.removeValue(td.range);
+              td.range.dispose();
+              delete td.range;
+            }
           });
         }
       }
@@ -87,6 +98,8 @@ export class LineComponent implements AfterViewInit {
     if (this.valueAxis.axisRanges.values.length === 0) {
       this.chart.paddingRight = this.padding.rightDefault;
     }
+
+    return allRemovals;
   }
 
   showRange(
@@ -210,6 +223,7 @@ export class LineComponent implements AfterViewInit {
     // Create chart instance
     const chart = am4core.create('lineChart', am4charts.XYChart);
     this.chart = chart;
+    chart.seriesContainer.zIndex = -1;
 
     chart.paddingTop = this.padding.top;
     chart.paddingBottom = this.padding.bottom;
@@ -240,9 +254,20 @@ export class LineComponent implements AfterViewInit {
     valueAxis.includeRangesInMinMax = true;
     valueAxis.renderer.labels.template.fill = colourAxis;
     valueAxis.renderer.labels.template.fontSize = 14;
-
-    this.dateAxis.renderer.grid.template.disabled = true;
     this.valueAxis.renderer.grid.template.disabled = true;
+    this.dateAxis.renderer.grid.template.disabled = true;
+  }
+
+  toggleGridlines(): void {
+    // disable grid lines
+    if (this.dateAxis.renderer.grid.template.disabled) {
+      this.valueAxis.renderer.grid.template.disabled = false;
+      this.dateAxis.renderer.grid.template.disabled = false;
+    } else {
+      this.valueAxis.renderer.grid.template.disabled = true;
+      this.dateAxis.renderer.grid.template.disabled = true;
+    }
+    this.chart.invalidateData();
   }
 
   toggleCursor(): void {

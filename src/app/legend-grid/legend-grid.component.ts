@@ -67,7 +67,9 @@ export class LegendGridComponent {
   @Input() set columnEnabled3D(value: boolean) {
     if (value) {
       this.showSeriesSet(0);
+      this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
     } else {
+      this.hideRangesByColumn(TargetFieldName.THREE_D);
       this.hideSeriesSet(0);
     }
     this._columnEnabled3D = value;
@@ -81,7 +83,9 @@ export class LegendGridComponent {
   @Input() set columnEnabledHQ(value: boolean) {
     if (value) {
       this.showSeriesSet(1);
+      this.showHiddenRangesByColumn(TargetFieldName.HQ);
     } else {
+      this.hideRangesByColumn(TargetFieldName.HQ);
       this.hideSeriesSet(1);
     }
     this._columnEnabledHQ = value;
@@ -95,7 +99,9 @@ export class LegendGridComponent {
   @Input() set columnEnabledALL(value: boolean) {
     if (value) {
       this.showSeriesSet(2);
+      this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
     } else {
+      this.hideRangesByColumn(TargetFieldName.TOTAL);
       this.hideSeriesSet(2);
     }
     this._columnEnabledALL = value;
@@ -159,6 +165,7 @@ export class LegendGridComponent {
 
   // country names mapped to pin offset
   pinnedCountries: IHash<number> = {};
+  hiddenColumnRanges: IHash<IHash<Array<number>>> = {};
   hiddenColumnPinData: Array<Array<string>> = [[], [], []];
   hiddenSeriesSetData: Array<IHash<am4charts.LineSeries>> = [{}, {}, {}];
 
@@ -231,7 +238,7 @@ export class LegendGridComponent {
 
   /** hideSeriesSet
    *
-   * - hides any 'total' series stores the country/object in hiddenCountrySeries
+   * - stores the country/object in hiddenCountrySeries
    * - optionally unpins the series' associated country
    *
    * @param { TargetFieldName } setType - the type to hide
@@ -253,11 +260,6 @@ export class LegendGridComponent {
       if (targetSeries && !targetSeries.isHidden) {
         targetSeries.hide();
         this.hiddenSeriesSetData[colIndex][country] = targetSeries;
-        this.lineChart.removeRange(
-          country,
-          TargetFieldName[this.seriesValueNames[colIndex]]
-        );
-
         if (
           countrySeriesObjects.filter((item) => {
             return item && !item.isHidden;
@@ -268,6 +270,46 @@ export class LegendGridComponent {
         }
       }
     });
+  }
+
+  hideRangesByColumn(column?: TargetFieldName): void {
+    const all = this.hiddenColumnRanges;
+    Object.keys(this.pinnedCountries).forEach((country: string) => {
+      const removed = this.lineChart.removeRange(country, column);
+      Object.keys(removed).forEach((key: string) => {
+        all[key] = Object.assign(all[key] ? all[key] : {}, removed[key]);
+      });
+    });
+  }
+
+  showHiddenRangesByColumn(column?: TargetFieldName): void {
+    const hidden = this.hiddenColumnRanges;
+
+    Object.keys(hidden)
+      .filter((key: string) => {
+        return column ? TargetFieldName[key] === column : true;
+      })
+      .forEach((targetFieldName: string) => {
+        Object.keys(hidden[targetFieldName]).forEach((country: string) => {
+          // get the range's colour
+          const colour = this.lineChart.allSeriesData[
+            country +
+              TargetSeriesSuffixes[
+                this.seriesValueNames.indexOf(targetFieldName)
+              ]
+          ].fill as am4core.Color;
+
+          hidden[targetFieldName][country].forEach((index: number) => {
+            this.lineChart.showRange(
+              country,
+              TargetFieldName[targetFieldName],
+              index,
+              colour
+            );
+          });
+        });
+        delete hidden[targetFieldName];
+      });
   }
 
   /** resetChartColors

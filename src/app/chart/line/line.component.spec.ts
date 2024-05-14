@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
+import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
 import { TargetFieldName, TargetMetaData } from '../../_models';
@@ -52,23 +53,34 @@ describe('LineComponent', () => {
   });
 
   it('should remove the range', () => {
-    component.targetMetaData = mockTargetMetaData;
+    component.targetMetaData = structuredClone(mockTargetMetaData);
+
+    const deData = component.targetMetaData['DE'];
+
+    Object.keys(deData).forEach((key: string) => {
+      deData[key].forEach((ob: TargetMetaData) => {
+        ob.range = {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          dispose: () => {}
+        } as unknown as am4charts.ValueAxisDataItem;
+      });
+    });
 
     spyOn(component.valueAxis.axisRanges, 'removeValue');
+
+    component.removeRange('DE', TargetFieldName.HQ);
+    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(1);
 
     component.removeRange('DE');
     expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(2);
 
     component.removeRange('DE', TargetFieldName.HQ);
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(3);
-
-    component.removeRange('DE', TargetFieldName.HQ, 1);
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(3);
+    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(2);
   });
 
   it('should show the range', () => {
     const paddingRight = component.chart.paddingRight as number;
-    component.targetMetaData = mockTargetMetaData;
+    component.targetMetaData = structuredClone(mockTargetMetaData);
     component.showRange('DE', TargetFieldName.HQ, 0, am4core.color('#0c529c'));
     expect(component.chart.paddingRight as number).toBeGreaterThan(
       paddingRight
@@ -76,14 +88,13 @@ describe('LineComponent', () => {
   });
 
   it('should create the range', () => {
-    expect((mockTargetMetaData as unknown as TargetMetaData).range).toBeFalsy();
+    const data = structuredClone(mockTargetMetaData);
+    expect((data as unknown as TargetMetaData).range).toBeFalsy();
     component.createRange(
-      mockTargetMetaData as unknown as TargetMetaData,
+      data as unknown as TargetMetaData,
       am4core.color('#0c529c')
     );
-    expect(
-      (mockTargetMetaData as unknown as TargetMetaData).range
-    ).toBeTruthy();
+    expect((data as unknown as TargetMetaData).range).toBeTruthy();
   });
 
   it('should add the series', () => {

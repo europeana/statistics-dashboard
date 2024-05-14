@@ -86,8 +86,17 @@ export class MockLineComponent {
     console.log('MockLineComponent addSeries');
   }
 
-  removeRange(_: string, __?: string, ___?: number): void {
-    console.log('MockLineComponent removeRange');
+  removeRange(
+    country: string,
+    specificValueName?: string,
+    specificIndex?: number
+  ): IHash<IHash<Array<number>>> {
+    const res = {};
+    if (specificValueName) {
+      res[specificValueName] = {};
+      res[country] = [specificIndex];
+    }
+    return res as IHash<IHash<Array<number>>>;
   }
 
   removeSeries(_: string): void {
