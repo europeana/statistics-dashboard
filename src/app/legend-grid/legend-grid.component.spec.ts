@@ -243,10 +243,12 @@ describe('LegendGridComponent', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
       }
     } as unknown as am4charts.LineSeries;
+
     const seriesItemShowing = {
       ...seriesItemHidden,
       isHidden: false
     } as unknown as am4charts.LineSeries;
+
     const seriesArray = [seriesItemShowing];
 
     spyOn(component, 'getCountrySeries').and.callFake((_) => {
@@ -255,11 +257,14 @@ describe('LegendGridComponent', () => {
     spyOn(component, 'togglePin');
     spyOn(component.lineChart, 'addSeries');
 
+    component.pinnedCountries['DE'] = 1;
+
     component.toggleSeries('DE', TargetFieldName.THREE_D);
 
     expect(component.lineChart.addSeries).toHaveBeenCalled();
     expect(component.togglePin).not.toHaveBeenCalled();
 
+    // swap the fake series for the hidden fake series
     seriesArray.pop();
     seriesArray.push(seriesItemHidden);
 
@@ -268,12 +273,14 @@ describe('LegendGridComponent', () => {
 
     // supply the series parameter
     spyOn(seriesItemShowing, 'hide');
+    spyOn(seriesItemHidden, 'show');
+
     component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemShowing);
+
     expect(seriesItemShowing.hide).toHaveBeenCalled();
     expect(component.togglePin).toHaveBeenCalledTimes(1);
 
-    spyOn(seriesItemHidden, 'show');
-    component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemHidden);
+    component.toggleSeries('FR', TargetFieldName.THREE_D, seriesItemHidden);
     expect(seriesItemHidden.show).toHaveBeenCalled();
     expect(component.togglePin).toHaveBeenCalledTimes(2);
   });

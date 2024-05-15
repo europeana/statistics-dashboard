@@ -13,7 +13,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4plugins_bullets from '@amcharts/amcharts4/plugins/bullets';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { colours } from '../../_data';
+import { colourGrid } from '../../_data';
 import {
   IHash,
   IHashArray,
@@ -230,7 +230,7 @@ export class LineComponent implements AfterViewInit {
     chart.paddingLeft = this.padding.left;
     chart.paddingRight = this.padding.rightDefault;
 
-    chart.colors.list = colours.map((colour: string) => {
+    chart.colors.list = colourGrid.map((colour: string) => {
       return am4core.color(colour);
     });
 

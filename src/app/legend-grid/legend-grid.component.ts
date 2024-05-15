@@ -315,24 +315,16 @@ export class LegendGridComponent {
   /** resetChartColors
    * aligns the chart's internal color index with the visible series count
    **/
-  resetChartColors(): void {
-    const data = this.lineChart.allSeriesData;
-    let openCount = 0;
-
-    Object.keys(data).forEach((key: string) => {
-      const isHidden = this.lineChart.allSeriesData[key].isHidden;
-      if (!isHidden) {
-        openCount += 1;
+  resetChartColors(countryPinIndex?: number, seriesIndex?: number): void {
+    if (countryPinIndex === undefined) {
+      countryPinIndex = Object.keys(this.pinnedCountries).length;
+    }
+    const skips = countryPinIndex * 3 + (seriesIndex || 0);
+    if (skips) {
+      this.lineChart.chart.colors.reset();
+      for (let i = 0; i < skips; i++) {
+        this.lineChart.chart.colors.next();
       }
-    });
-
-    this.lineChart.chart.colors.reset();
-    for (
-      let i = 0;
-      i < openCount % this.lineChart.chart.colors.list.length;
-      i++
-    ) {
-      this.lineChart.chart.colors.next();
     }
   }
 
@@ -480,12 +472,19 @@ export class LegendGridComponent {
 
     if (!series) {
       // create from existing data
-      this.resetChartColors();
-      const visibleSiblings = this.getCountrySeries(country).filter(
+
+      const visibleSiblingCount = this.getCountrySeries(country).filter(
         (series: am4charts.LineSeries) => {
           return !series.isHidden;
         }
-      );
+      ).length;
+
+      let countryPinIndex: number = undefined;
+
+      if (visibleSiblingCount > 0) {
+        countryPinIndex = Object.keys(this.pinnedCountries).indexOf(country);
+      }
+      this.resetChartColors(countryPinIndex, typeIndex);
 
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
@@ -494,7 +493,7 @@ export class LegendGridComponent {
         this.countryData[country]
       );
 
-      if (visibleSiblings.length === 0) {
+      if (visibleSiblingCount === 0) {
         this.togglePin(country);
       }
     } else if (series.isHidden) {
