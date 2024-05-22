@@ -6,7 +6,8 @@ const matomoSiteId = getEnvVar('matomoSiteId');
 type PAQ = Array<Array<string>>;
 
 export const matomoSettings = {
-  matomoTrackerUrl: `//stats.europeana.eu/matomo.php`,
+  matomoTrackerUrl: `//stats.europeana.eu/`,
+  //matomoTrackerUrl: `//stats.europeana.eu/matomo.php`,
   //matomoTrackerUrl: `${matomoHost}/matomo.php`,
   matomoScriptUrl: `${matomoHost}/matomo.js`,
   matomoSiteId: parseInt(`${matomoSiteId}`),
