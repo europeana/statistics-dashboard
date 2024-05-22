@@ -29,6 +29,22 @@ if (environment.production) {
   enableProdMode();
 }
 
+if(true){
+  const settings = {
+    requireConsent: MatomoConsentMode.COOKIE,
+    scriptUrl: matomoSettings.matomoScriptUrl,
+    trackers: [
+      {
+        trackerUrl: matomoSettings.matomoTrackerUrl,
+        siteId: matomoSettings.matomoSiteId
+      }
+    ],
+    enableLinkTracking: true
+  };
+
+  console.log(JSON.stringify(settings));
+}
+
 bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(
