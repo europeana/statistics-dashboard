@@ -13,7 +13,8 @@ import { IHash, NameValue } from '../../_models';
 @Component({
   selector: 'app-map-chart',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.scss']
+  styleUrls: ['./map.component.scss'],
+  standalone: true
 })
 export class MapComponent {
   _results: Array<NameValue>;

@@ -6,7 +6,7 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, NgClass, NgIf } from '@angular/common';
 
 // amCharts imports
 import * as am4core from '@amcharts/amcharts4/core';
@@ -24,11 +24,14 @@ import {
 import { colours } from '../../_data';
 
 import { BarChartDefaults } from '../chart-defaults';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bar-chart',
   templateUrl: './bar.component.html',
-  styleUrls: ['./bar.component.scss']
+  styleUrls: ['./bar.component.scss'],
+  standalone: true,
+  imports: [NgIf, FormsModule, NgClass]
 })
 export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;

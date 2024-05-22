@@ -80,7 +80,7 @@ describe('SnapshotsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SnapshotsComponent],
+      imports: [SnapshotsComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });

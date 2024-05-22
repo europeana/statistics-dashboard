@@ -1,7 +1,6 @@
-import 'cypress-axe'
+import 'cypress-axe';
 
 context('Statistics Dashboard Accessibility', () => {
-
   const checkZone = (selector: string): void => {
     cy.get(selector).should('have.length', 1);
     cy.checkA11y(selector);
@@ -25,7 +24,6 @@ context('Statistics Dashboard Accessibility', () => {
   });
 
   describe('Landing Page', () => {
-
     beforeEach(() => {
       cy.visit('/');
       injectAxe();
@@ -45,11 +43,10 @@ context('Statistics Dashboard Accessibility', () => {
 
     it('Has no detectable a11y violations ()', () => {
       cy.checkA11y();
-    })
+    });
   });
 
   describe('Data Page', () => {
-
     beforeEach(() => {
       cy.visit(`/data/contentTier`);
       injectAxe();
@@ -69,7 +66,6 @@ context('Statistics Dashboard Accessibility', () => {
 
     it('Has no detectable a11y violations', () => {
       cy.checkA11y();
-    })
-
+    });
   });
 });

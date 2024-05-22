@@ -3,6 +3,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { ColourSeriesData } from '../_models';
 
 @Component({
+  standalone: true,
   selector: 'app-bar-chart',
   template: ''
 })

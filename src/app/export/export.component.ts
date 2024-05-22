@@ -1,11 +1,14 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
-  styleUrls: ['./export.component.scss']
+  styleUrls: ['./export.component.scss'],
+  standalone: true,
+  imports: [NgClass]
 })
 export class ExportComponent {
   get currentUrl(): string {

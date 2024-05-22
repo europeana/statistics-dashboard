@@ -1,10 +1,14 @@
 import { Component, Input } from '@angular/core';
 import { BreakdownResult, CountPercentageValue } from '../_models';
+import { RenameApiFacetShortPipe } from '../_translate/rename-facet-short.pipe';
+import { DecimalPipe, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-grid-summary',
   templateUrl: './grid-summary.component.html',
-  styleUrls: ['./grid-summary.component.scss']
+  styleUrls: ['./grid-summary.component.scss'],
+  standalone: true,
+  imports: [NgIf, DecimalPipe, RenameApiFacetShortPipe]
 })
 export class GridSummaryComponent {
   _summaryData: BreakdownResult;

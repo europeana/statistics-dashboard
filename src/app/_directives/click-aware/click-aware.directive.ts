@@ -10,7 +10,8 @@ import { ClickService } from '../../_services';
 
 @Directive({
   selector: '[appClickAware]',
-  exportAs: 'clickInfo'
+  exportAs: 'clickInfo',
+  standalone: true
 })
 export class ClickAwareDirective extends SubscriptionManager {
   @Output() clickOutside: EventEmitter<void> = new EventEmitter();

@@ -1,12 +1,44 @@
+import {
+  DecimalPipe,
+  LowerCasePipe,
+  NgClass,
+  NgFor,
+  NgIf,
+  NgTemplateOutlet,
+  UpperCasePipe
+} from '@angular/common';
 import { Component, Input, QueryList, ViewChildren } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
 import { externalLinks } from '../_data';
-import { BarComponent } from '../chart';
 import { DimensionName, GeneralResultsFormatted } from '../_models';
+import { RenameApiFacetPipe, RenameApiFacetShortPipe } from '../_translate';
+import { BarComponent } from '../chart';
+import { MapComponent } from '../chart/map/map.component';
+import { ResizeComponent } from '../resize';
+import { TruncateComponent } from '../truncate';
 
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss']
+  styleUrls: ['./landing.component.scss'],
+  standalone: true,
+  imports: [
+    NgClass,
+    ResizeComponent,
+    NgIf,
+    NgFor,
+    TruncateComponent,
+    NgTemplateOutlet,
+    BarComponent,
+    RouterLink,
+    MapComponent,
+    UpperCasePipe,
+    LowerCasePipe,
+    DecimalPipe,
+    RenameApiFacetPipe,
+    RenameApiFacetShortPipe
+  ]
 })
 export class LandingComponent {
   public externalLinks = externalLinks;

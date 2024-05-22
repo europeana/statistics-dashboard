@@ -12,15 +12,17 @@ import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject, of } from 'rxjs';
+
 import {
   MaintenanceScheduleItemKey,
   MaintenanceScheduleService
 } from '@europeana/metis-ui-maintenance-utils';
+
+import { MockAPIService } from './_mocked';
 import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
-import { MockAPIService } from './_mocked';
 
 describe('AppComponent', () => {
   let app: AppComponent;
@@ -71,7 +73,9 @@ describe('AppComponent', () => {
 
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
-    maintenanceSchedules = TestBed.inject(MaintenanceScheduleService);
+    maintenanceSchedules = fixture.debugElement.injector.get(
+      MaintenanceScheduleService
+    );
     fixture.detectChanges();
   });
 
@@ -179,7 +183,7 @@ describe('AppComponent', () => {
     expect(app.loadLandingData).toHaveBeenCalledTimes(2);
   });
 
-  it('should check if maintenance is due', fakeAsync(() => {
+  it('should check if maintenance is due', () => {
     app.landingComponentRef = {
       isLoading: true
     } as unknown as LandingComponent;
@@ -201,5 +205,5 @@ describe('AppComponent', () => {
     app.checkIfMaintenanceDue(maintenanceSettings);
     expect(maintenanceSchedules.loadMaintenanceItem).toHaveBeenCalled();
     expect(app.landingComponentRef.isLoading).toBeFalsy();
-  }));
+  });
 });

@@ -1,10 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PagerInfo, TableRow } from '../_models';
+import { NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-grid-paginator',
   templateUrl: './grid-paginator.component.html',
-  styleUrls: ['./grid-paginator.component.scss']
+  styleUrls: ['./grid-paginator.component.scss'],
+  standalone: true,
+  imports: [NgIf, NgClass]
 })
 export class GridPaginatorComponent {
   _rows: Array<TableRow>;
