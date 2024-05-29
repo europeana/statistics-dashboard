@@ -1,6 +1,6 @@
 <main class="fit-to-page landing-page">
-  <h1 class="page-title" style="margin: 1em 0.6em">
-    {{ country }}: Target Data
+  <h1 class="page-title">
+    {{ country }}: <span i18n="@@targetCountriesTitle">Target Data</span>
   </h1>
 
   <ng-template
@@ -187,7 +187,7 @@
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.THREE_D)"
-          >3D Data<span class="x"></span
+          ><span i18n="@@countryEntry3D">3D Data</span><span class="x"></span
         ></a>
 
         <div
@@ -256,11 +256,10 @@
         *ngIf="latestCountryData && columnsEnabled[TargetFieldName.HQ]"
       >
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
-
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.HQ)"
-          >HQ Data<span class="x"></span
+          ><span i18n="@@countryEntryHQ">HQ Data</span><span class="x"></span
         ></a>
 
         <div
@@ -332,7 +331,7 @@
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.TOTAL)"
-          >All Data<span class="x"></span
+          ><span i18n="@@countryEntryAll">All Data</span><span class="x"></span
         ></a>
 
         <div
@@ -398,7 +397,9 @@
     <!-- secondary content -->
 
     <div class="entry-card double-card line-and-legend">
-      <span class="entry-card-header">Countries By Target Progress</span>
+      <span class="entry-card-header" i18n="@@countryTargetProgess"
+        >Countries By Target Progress</span
+      >
       <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
 
       <div class="entry-card-content">
@@ -442,7 +443,9 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header">Explore by type of content</span>
+        <span class="entry-card-header" i18n="@@countryEntryType"
+          >Explore by type of content</span
+        >
         <div
           class="entry-card-content"
           *ngIf="countryLandingData[DimensionName.type]"
@@ -479,7 +482,8 @@
       </div>
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by rights category<a
+          ><span i18n="@@countryEntryRights">Explore by rights category</span
+          ><a
             class="info-icon"
             [href]="externalLinks.help.rights.href"
             target="_blank"
@@ -514,7 +518,9 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header">Explore by data provider</span>
+        <span class="entry-card-header" i18n="@@countryEntryDataProvider"
+          >Explore by data provider</span
+        >
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content
@@ -541,7 +547,8 @@
       </div>
       <div class="entry-card">
         <span class="entry-card-header"
-          >Explore by provider<a
+          ><span i18n="@@countryEntryProvider">Explore by provider</span
+          ><a
             class="info-icon"
             [href]="externalLinks.help.provider.href"
             target="_blank"

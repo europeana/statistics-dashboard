@@ -200,74 +200,59 @@
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
-        <source>3D Data<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;x&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>3D Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">191,192</context>
+          <context context-type="linenumber">190</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryHQ" datatype="html">
-        <source>HQ Data<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;x&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>HQ Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">265,266</context>
+          <context context-type="linenumber">262</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryAll" datatype="html">
-        <source>All Data<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;x&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>All Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">338,339</context>
+          <context context-type="linenumber">334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Countries By Target Progress</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">405</context>
+          <context context-type="linenumber">401</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryType" datatype="html">
         <source>Explore by type of content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">451</context>
+          <context context-type="linenumber">447</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryRights" datatype="html">
-        <source>Explore by rights category<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
-            class=&quot;info-icon&quot;
-            [href]=&quot;externalLinks.help.rights.href&quot;
-            target=&quot;_blank&quot;
-            [title]=&quot;externalLinks.help.rights.description&quot;
-          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
-        &gt;"/></source>
+        <source>Explore by rights category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">489,495</context>
+          <context context-type="linenumber">484</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryDataProvider" datatype="html">
         <source>Explore by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">525</context>
+          <context context-type="linenumber">520</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryProvider" datatype="html">
-        <source>Explore by provider<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
-            class=&quot;info-icon&quot;
-            [href]=&quot;externalLinks.help.provider.href&quot;
-            target=&quot;_blank&quot;
-            [title]=&quot;externalLinks.help.provider.description&quot;
-          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
-        &gt;"/></source>
+        <source>Explore by provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">553,559</context>
+          <context context-type="linenumber">548</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
