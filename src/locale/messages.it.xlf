@@ -56,7 +56,9 @@
       <trans-unit id="facetNameShortPluralProvider" datatype="html">
         <source>Aggregatori</source>
       </trans-unit>
-
+      <trans-unit id="countryChartSummaryPercentage" datatype="html">
+        <source>Percentuale corrispondente</source>
+      </trans-unit>
       <trans-unit id="facetNameContentTier" datatype="html">
         <source>Livello di Contenuto</source>
       </trans-unit>
@@ -203,6 +205,9 @@
       </trans-unit>
       <trans-unit id="gridColHeaderView" datatype="html">
         <source>Visualizza in Europeana</source>
+      </trans-unit>
+      <trans-unit id="targetCountriesMenu" datatype="html">
+        <source>2025 / 2030 Bersagli</source>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source>Europeana dataset completo</source>

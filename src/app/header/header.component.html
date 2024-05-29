@@ -27,7 +27,8 @@
       (clickOutside)="menuIsOpen = false"
     >
       <span class="active-country" (click)="toggleMenu($event)">
-        2025 / 2030 Targets @if(activeCountry) { - {{ activeCountry }}
+        <span i18n="header nav opener@@targetCountriesMenu"
+        >2025 / 2030 Targets</span> @if(activeCountry) { - {{ activeCountry }}
         }
       </span>
 

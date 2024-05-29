@@ -62,28 +62,28 @@
         <source>EDM Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">96</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpMetadataTier" datatype="html">
         <source>Tier Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">100</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpProvider" datatype="html">
         <source>Provider Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">104</context>
         </context-group>
       </trans-unit>
       <trans-unit id="tooltipHelpRights" datatype="html">
         <source>Rights Documentation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_data/static-data.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">108</context>
         </context-group>
       </trans-unit>
       <trans-unit id="facetNameShortContentTier" datatype="html">
@@ -183,6 +183,14 @@
           <context context-type="sourcefile">src/app/_translate/rename-facet-short.pipe.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryPercentage" datatype="html">
+        <source> Corresponding percentage </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.html</context>
+          <context context-type="linenumber">108,110</context>
+        </context-group>
+        <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
         <source> Enable content tier 0 </source>
@@ -339,7 +347,7 @@
         <source>Europeana Website</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
@@ -347,7 +355,7 @@
         <source>Europeana Professional</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
@@ -355,7 +363,15 @@
         <source>Europeana API</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <note priority="1" from="description">Footer link text</note>
+      </trans-unit>
+      <trans-unit id="footerLinkTextCookies" datatype="html">
+        <source>Cookies Policy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
@@ -363,30 +379,23 @@
         <source>Privacy Policy</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">51</context>
         </context-group>
-        <note priority="1" from="description">Footer link text</note>
-      </trans-unit>
-      <trans-unit id="footerLinkTextCookies" datatype="html">
-        <source>Cookies Policy</source>
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
       <trans-unit id="privacySettings" datatype="html">
         <source>Privacy Settings</source>
-      </trans-unit>
-      <trans-unit id="footerEUFlagText" datatype="html">
-        <source>Co-financed by the Connecting Europe Facility of the European Union</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">54,55</context>
+          <context context-type="linenumber">57</context>
         </context-group>
-        <note priority="1" from="description">Footer flag text 1</note>
+        <note priority="1" from="description">Footer link text</note>
       </trans-unit>
       <trans-unit id="footerLegalText1" datatype="html">
         <source> Europeana is an initiative of the European Union, financed by the European Union&apos;s Connecting Europe Facility and European Union Member States. The Europeana services, including this website, are operated by a consortium led by the Europeana Foundation under a service contract with the European Commission. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">58,64</context>
+          <context context-type="linenumber">64,70</context>
         </context-group>
         <note priority="1" from="description">Footer legal text 1</note>
       </trans-unit>
@@ -394,7 +403,7 @@
         <source> The European Commission does not guarantee the accuracy of the information and accepts no responsibility or liability whatsoever with regard to the information on this website. Neither the European Commission, nor any person acting on the European Commission&apos;s behalf, is responsible or liable for the accuracy or use of the information on this website. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">65,71</context>
+          <context context-type="linenumber">71,77</context>
         </context-group>
         <note priority="1" from="description">Footer legal text 2</note>
       </trans-unit>
@@ -469,35 +478,43 @@
         <source>Records by</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="gridColHeaderCount" datatype="html">
         <source>Count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">77</context>
         </context-group>
       </trans-unit>
       <trans-unit id="gridColHeaderPercent" datatype="html">
         <source>Percent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="gridColHeaderView" datatype="html">
         <source>View in Europeana</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">79</context>
         </context-group>
+      </trans-unit>
+      <trans-unit id="targetCountriesMenu" datatype="html">
+        <source>2025 / 2030 Targets</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/header/header.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <note priority="1" from="description">header nav opener</note>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source> Europeana complete dataset </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/header/header.component.html</context>
-          <context context-type="linenumber">20,22</context>
+          <context context-type="linenumber">57,59</context>
         </context-group>
         <note priority="1" from="description">landing page title</note>
       </trans-unit>
@@ -529,7 +546,7 @@
         <source>RECORDS PROVIDED</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <note priority="1" from="description">landing data header</note>
       </trans-unit>
@@ -543,7 +560,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">70,76</context>
+          <context context-type="linenumber">80,86</context>
         </context-group>
         <note priority="1" from="description">landing section title edm</note>
       </trans-unit>
@@ -551,7 +568,7 @@
         <source>View by content tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">99</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <note priority="1" from="description">landing section link edm</note>
       </trans-unit>
@@ -565,7 +582,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">110,116</context>
+          <context context-type="linenumber">120,126</context>
         </context-group>
         <note priority="1" from="description">landing section title metadata</note>
       </trans-unit>
@@ -573,7 +590,7 @@
         <source>View by metadata tier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">138</context>
+          <context context-type="linenumber">148</context>
         </context-group>
         <note priority="1" from="description">landing section link metadata</note>
       </trans-unit>
@@ -581,7 +598,7 @@
         <source>Explore by providing countries</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">151,152</context>
+          <context context-type="linenumber">161</context>
         </context-group>
         <note priority="1" from="description">landing section title countries</note>
       </trans-unit>
@@ -589,19 +606,23 @@
         <source>View by countries</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">171</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <note priority="1" from="description">landing section link countries</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleType" datatype="html">
         <source>Explore by type of content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/landing/landing.component.html</context>
+          <context context-type="linenumber">191</context>
+        </context-group>
         <note priority="1" from="description">landing section title type</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkType" datatype="html">
         <source>View by type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">201</context>
+          <context context-type="linenumber">211</context>
         </context-group>
         <note priority="1" from="description">landing section link type</note>
       </trans-unit>
@@ -615,7 +636,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">209,215</context>
+          <context context-type="linenumber">219,225</context>
         </context-group>
         <note priority="1" from="description">landing section title rights</note>
       </trans-unit>
@@ -623,7 +644,7 @@
         <source>View by rights category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">233</context>
+          <context context-type="linenumber">243</context>
         </context-group>
         <note priority="1" from="description">landing section link rights</note>
       </trans-unit>
@@ -631,7 +652,7 @@
         <source>Explore by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">245,246</context>
+          <context context-type="linenumber">255</context>
         </context-group>
         <note priority="1" from="description">landing section title data provider</note>
       </trans-unit>
@@ -639,7 +660,7 @@
         <source>View by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">265</context>
+          <context context-type="linenumber">275</context>
         </context-group>
         <note priority="1" from="description">landing section link data provider</note>
       </trans-unit>
@@ -653,7 +674,7 @@
         &gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">273,279</context>
+          <context context-type="linenumber">283,289</context>
         </context-group>
         <note priority="1" from="description">landing section title provider</note>
       </trans-unit>
@@ -661,7 +682,7 @@
         <source>View by provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
-          <context context-type="linenumber">297</context>
+          <context context-type="linenumber">307</context>
         </context-group>
         <note priority="1" from="description">landing section link provider</note>
       </trans-unit>
@@ -669,7 +690,7 @@
         <source>The data is not live and may be a few days old</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <note priority="1" from="description">Warning data recency</note>
       </trans-unit>
@@ -719,7 +740,7 @@
         <source>No results found!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">275</context>
+          <context context-type="linenumber">292</context>
         </context-group>
         <note priority="1" from="description">Warn no results</note>
       </trans-unit>
@@ -727,7 +748,7 @@
         <source> try removing the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>dataset id<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> parameter </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">282,284</context>
+          <context context-type="linenumber">299,301</context>
         </context-group>
         <note priority="1" from="description">No results detail dataset id</note>
       </trans-unit>
@@ -735,7 +756,7 @@
         <source> try removing the <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;param&quot;&gt;"/>date<x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/> parameters </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">291,293</context>
+          <context context-type="linenumber">308,310</context>
         </context-group>
         <note priority="1" from="description">No results detail date</note>
       </trans-unit>
@@ -743,7 +764,7 @@
         <source>As percentages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">328</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <note priority="1" from="description">As percentages</note>
       </trans-unit>
@@ -751,7 +772,7 @@
         <source>Export data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.html</context>
-          <context context-type="linenumber">363</context>
+          <context context-type="linenumber">386</context>
         </context-group>
         <note priority="1" from="description">Share Report Opener</note>
       </trans-unit>
@@ -759,112 +780,183 @@
         <source>Tier </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">76</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleAll" datatype="html">
         <source>All (<x id="PH" equiv-text="friendlyName"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">617</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleOr" datatype="html">
         <source>or</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">544</context>
+          <context context-type="linenumber">620</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleAnd" datatype="html">
         <source>and</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">545</context>
+          <context context-type="linenumber">621</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleCTZero" datatype="html">
         <source>CT-Zero</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">553</context>
+          <context context-type="linenumber">629</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitlePeriod" datatype="html">
         <source>Period</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">563</context>
+          <context context-type="linenumber">637</context>
         </context-group>
       </trans-unit>
       <trans-unit id="snapshotTitleDatasetId" datatype="html">
         <source>Dataset Id</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/overview/overview.component.ts</context>
-          <context context-type="linenumber">577</context>
+          <context context-type="linenumber">649</context>
         </context-group>
       </trans-unit>
-
-      <!--consent management -->
-
+      <trans-unit id="cmServiceDescriptionMatomo" datatype="html">
+        <source>Collects anonymous statistics on how visitors interact with the website.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cmServiceDescriptionConsent" datatype="html">
+        <source>Remembers what consent you have given for the use of services on this web application.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="cmAlwaysRequired" datatype="html">
         <source>always required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmTitle" datatype="html">
         <source>Services we would like to use</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmDescription" datatype="html">
-        <source>Here you can see and customise the services that we'd like to use on this website. To learn more please read our</source>
+        <source>Here you can see and customise the services that we&apos;d like to use on this website. To learn more please read our</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
       </trans-unit>
-      <trans-unit id="cmPrivacyPolicy" datatype="html">
+      <trans-unit id="cmLinkText" datatype="html">
         <source>cookies policy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmServiceSingle" datatype="html">
         <source>one service</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmServicePlural" datatype="html">
         <source>services</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmOptionalTitle" datatype="html">
         <source>Services to capture website usage and feedback</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmOptionalDescription" datatype="html">
         <source>These services collect the information to help us better understand how the website gets used</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmRequiredTitle" datatype="html">
         <source>Essential services for security and customization</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmRequiredDescription" datatype="html">
         <source>These services are essential for the correct functioning of this website</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmUserDecline" datatype="html">
         <source>I decline</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmUserAcceptSelected" datatype="html">
         <source>Accept Selected</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmUserAcceptAll" datatype="html">
         <source>Accept All</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmMiniModeText" datatype="html">
         <source>Hi! We’d like your permission to collect anonymous usage statistics that will help us improve our applications. You can always change or withdraw your consent later.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmMiniModeUserChoose" datatype="html">
         <source>Let me choose</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmMiniModeUserAcceptAll" datatype="html">
         <source>Okay</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="cmMiniModeUserDecline" datatype="html">
         <source>I decline</source>
-      </trans-unit>
-
-      <!--consent management services -->
-      <trans-unit id="cmServiceDescriptionMatomo" datatype="html">
-        <source>Collects anonymous statistics on how visitors interact with the website</source>
-      </trans-unit>
-      <trans-unit id="cmServiceDescriptionConsent" datatype="html">
-        <source>Remembers what consent you have given for the use of services on this web application</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/environments/eu-cm-settings.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
       </trans-unit>
     </body>
   </file>
