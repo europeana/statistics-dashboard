@@ -63,28 +63,19 @@
         <source>Percentuale corrispondente</source>
       </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
-        <source>Dati 3D<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;x&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Dati 3D</source>
       </trans-unit>
       <trans-unit id="countryEntryHQ" datatype="html">
-        <source>Dati HQ<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;x&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Dati HQ</source>
       </trans-unit>
       <trans-unit id="countryEntryAll" datatype="html">
-        <source>Tutti Dati<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;x&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Tutti Dati</source>
       </trans-unit>
       <trans-unit id="countryEntryType" datatype="html">
         <source>Esplora per tipo di media</source>
       </trans-unit>
       <trans-unit id="countryEntryRights" datatype="html">
-        <source>Esplora per categoria di diritti<x id="START_LINK" ctype="x-a" equiv-text="&lt;a
-            class=&quot;info-icon&quot;
-            [href]=&quot;externalLinks.help.rights.href&quot;
-            target=&quot;_blank&quot;
-            [title]=&quot;externalLinks.help.rights.description&quot;
-          &gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a
-        &gt;"/></source>
+        <source>Esplora per categoria di diritti</source>
       </trans-unit>
       <trans-unit id="countryEntryDataProvider" datatype="html">
         <source>Esplora per aggregatore</source>
