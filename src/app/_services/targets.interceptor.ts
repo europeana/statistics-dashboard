@@ -30,14 +30,13 @@ export function targetsInterceptor(): HttpInterceptorFn {
         return of(event);
       }),
       catchError(() => {
-        if (req.url.includes(urlTargetMetadata)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (event as unknown as { body: any }).body = targetData;
-        } else if (req.url.includes(urlCountryTargetData)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (event as unknown as { body: any }).body = countryTargetData;
-        }
-        return of(event) as unknown as Observable<HttpEvent<unknown>>;
+        console.log('in error handler: ' + req.url);
+        const resResponse = {
+          body: req.url.includes(urlTargetMetadata)
+            ? targetData
+            : countryTargetData
+        };
+        return of(resResponse as unknown as HttpEvent<Object>);
       })
     );
   };
