@@ -23,6 +23,7 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 import { AppDateAdapter } from './app/_helpers';
+import { targetsInterceptor } from './app/_services';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 
 if (environment.production) {
@@ -69,7 +70,10 @@ bootstrapApplication(AppComponent, {
       }
     },
     provideHttpClient(
-      withInterceptors([maintenanceInterceptor(maintenanceSettings)])
+      withInterceptors([
+        maintenanceInterceptor(maintenanceSettings),
+        targetsInterceptor()
+      ])
     ),
     provideAnimations(),
     provideHttpClient(withInterceptorsFromDi())

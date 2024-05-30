@@ -33,93 +33,7 @@ export class APIService {
   suffixFiltering = 'statistics/filtering';
   suffixRightsUrls = 'statistics/rights/urls';
 
-  dateTicks: Array<string> = [];
-  targetCountries = [
-    'AL',
-    'AT',
-    'AZ',
-    'BY',
-    'BE',
-    'BA',
-    'BG',
-    'HR',
-    'CY',
-    'CZ',
-    'DK',
-    'EE',
-    'FI',
-    'FR',
-    'GE',
-    'DE',
-    'GR',
-    'HU',
-    'IS',
-    'IE',
-    'IL',
-    'IT',
-    'LV',
-    'LT',
-    'LU',
-    'MT',
-    'ME',
-    'MD',
-    'NL',
-    'MK',
-    'NO',
-    'PL',
-    'PT',
-    'RO',
-    'RU',
-    'RS',
-    'SK',
-    'SI',
-    'ES',
-    'SE',
-    'CH',
-    'TR',
-    'UA',
-    'GB',
-    'USA'
-  ];
-
-  targetData = [].concat(
-    ...this.targetCountries.map((country: string, index: number) => {
-      const resLabel = ['2025', '2030'].map((label: string) => {
-        // make values larger for later targets
-        let value = parseInt(label) * (index + 1);
-
-        return Object.keys(TargetFieldName).map(
-          (targetType: TargetFieldName) => {
-            // make subtarget values smaller than total
-            value -= 123;
-            const fieldName = TargetFieldName[targetType];
-            return {
-              country,
-              targetType: fieldName,
-              label,
-              interim: label === '2025',
-              value:
-                fieldName === TargetFieldName.TOTAL
-                  ? value * (label === '2025' ? 9 : 12)
-                  : label === '2025'
-                  ? Math.floor(value * 0.7)
-                  : value
-            };
-          }
-        );
-      });
-      return [].concat(...resLabel);
-    })
-  );
-
-  constructor(private readonly http: HttpClient) {
-    for (let i = 0; i < 24; i++) {
-      const date = new Date();
-      date.setHours(0, 0, 0, 0);
-      date.setDate(i);
-      this.dateTicks.push(date.toISOString());
-    }
-  }
+  constructor(private readonly http: HttpClient) {}
 
   loadISOCountryCodes(): IHash<string> {
     return ISOCountryCodes;
@@ -195,7 +109,10 @@ export class APIService {
    * @return [TargetMetaDataRaw]
    **/
   loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
-    return of(this.targetData);
+    console.log('loadTargetMetaData');
+    return this.http.get<Array<TargetMetaDataRaw>>(
+      `${environment.serverAPI}/target-metadata`
+    );
   }
 
   /**
@@ -248,54 +165,13 @@ export class APIService {
   }
 
   loadCountryData(): Observable<Array<TargetCountryData>> {
-    const numDateTicks = this.dateTicks.length;
-    const res = [];
-    const tgtDataRef = this.reduceTargetMetaData(this.targetData);
-
-    this.targetCountries.forEach((country: string) => {
-      const countryName = Object.keys(ISOCountryCodes).find(
-        (key) => ISOCountryCodes[key] === country
-      );
-      const countryRandom = Math.max(1.5, (countryName.length * 12) % 5);
-
-      const baseValue3D =
-        tgtDataRef[country][TargetFieldName.THREE_D][1].value / countryRandom;
-      const basevalueHQ =
-        tgtDataRef[country][TargetFieldName.HQ][1].value / countryRandom;
-
-      let value3D = baseValue3D * 1.2;
-      let valueHQ = basevalueHQ * 0.9;
-
-      this.dateTicks.forEach((dateTick: string, dateTickIndex: number) => {
-        const random1 =
-          (value3D % (numDateTicks + 1)) - (value3D % (numDateTicks / 2));
-
-        value3D -= random1;
-        valueHQ += random1;
-
-        const random2 =
-          (valueHQ % (numDateTicks + 1)) + (valueHQ % (numDateTicks / 2));
-
-        value3D -= 0.8 * (random2 % random1);
-        valueHQ -= 1 * (random2 * random1 * 5);
-
-        const resultItem = {
-          country,
-          date: this.dateTicks[this.dateTicks.length - (dateTickIndex + 1)],
-          three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
-          hq: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),
-          total: 0
-        };
-
-        resultItem.total = Math.max(resultItem.three_d, resultItem.hq) * 12;
-        res.push(resultItem);
-      });
-    });
-    return of(res.reverse());
+    return this.http.get<Array<TargetCountryData>>(
+      `${environment.serverAPI}/country-target-data`
+    );
   }
 
   /** getCountryData
-   * returns the result of loadCountryData mapped to a hash (key: country)
+   * returns the result of countries (the cached loadCountryData) mapped to a hash (key: country)
    **/
   getCountryData(): Observable<IHash<Array<TargetData>>> {
     return this.countries.get().pipe(
