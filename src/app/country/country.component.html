@@ -174,7 +174,9 @@
     <div class="container-v data-rows" *ngIf="data">
       <div class="container-h data-rows-title">
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
-        <span>RECORDS PROVIDED</span>
+        <span i18n="landing chart header@@countryLandingDataHeader"
+          >RECORDS PROVIDED</span
+        >
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>

@@ -232,60 +232,68 @@
         <note priority="1" from="description">landing chart summary
               percentage</note>
       </trans-unit>
+      <trans-unit id="countryLandingDataHeader" datatype="html">
+        <source>RECORDS PROVIDED</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.html</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+        <note priority="1" from="description">landing chart header</note>
+      </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
         <source>3D Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">209</context>
+          <context context-type="linenumber">211</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryHQ" datatype="html">
         <source>HQ Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">281</context>
+          <context context-type="linenumber">283</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryAll" datatype="html">
         <source>All Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">353</context>
+          <context context-type="linenumber">355</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Countries By Target Progress</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">422</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryType" datatype="html">
         <source>Explore by type of content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">466</context>
+          <context context-type="linenumber">468</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryRights" datatype="html">
         <source>Explore by rights category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">504</context>
+          <context context-type="linenumber">506</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryDataProvider" datatype="html">
         <source>Explore by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">541</context>
+          <context context-type="linenumber">543</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryProvider" datatype="html">
         <source>Explore by provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">569</context>
+          <context context-type="linenumber">571</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">

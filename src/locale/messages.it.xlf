@@ -75,6 +75,9 @@
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
         <source>Percentuale</source>
       </trans-unit>
+      <trans-unit id="countryLandingDataHeader" datatype="html">
+        <source>RECORD FORNITI</source>
+      </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
         <source>Dati 3D</source>
       </trans-unit>
