@@ -7,11 +7,10 @@ import {
   HttpInterceptorFn,
   HttpRequest
 } from '@angular/common/http';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, Observable, of, switchMap } from 'rxjs';
 import { countryTargetData, targetData } from '../_data';
 
 export function targetsInterceptor(): HttpInterceptorFn {
-
   const urlTargetMetadata = 'target-metadata';
   const urlCountryTargetData = 'country-target-data';
 
@@ -29,6 +28,16 @@ export function targetsInterceptor(): HttpInterceptorFn {
           (event as unknown as { body: any }).body = countryTargetData;
         }
         return of(event);
+      }),
+      catchError(() => {
+        if (req.url.includes(urlTargetMetadata)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (event as unknown as { body: any }).body = targetData;
+        } else if (req.url.includes(urlCountryTargetData)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (event as unknown as { body: any }).body = countryTargetData;
+        }
+        return of(event) as unknown as Observable<HttpEvent<unknown>>;
       })
     );
   };

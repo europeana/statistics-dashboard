@@ -73,7 +73,9 @@ for (let i = 0; i < 24; i++) {
  *
  * @param { Array<TargetMetaDataRaw> } rows - the source data to reduce
  **/
-const reduceTargetMetaData = (rows: Array<TargetMetaDataRaw>): IHash<IHashArray<TargetMetaData>> => {
+const reduceTargetMetaData = (
+  rows: Array<TargetMetaDataRaw>
+): IHash<IHashArray<TargetMetaData>> => {
   return rows.reduce(
     (res: IHash<IHashArray<TargetMetaData>>, item: TargetMetaDataRaw) => {
       const country = item.country;
