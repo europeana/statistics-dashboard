@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
@@ -17,7 +17,7 @@ import {
   TargetMetaData,
   TargetMetaDataRaw
 } from '../_models';
-import { ISOCountryCodes } from '../_data';
+import { countryTargetData, ISOCountryCodes, targetData } from '../_data';
 import { Cache } from '../_helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -108,10 +108,10 @@ export class APIService {
    * @return [TargetMetaDataRaw]
    **/
   loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
-    console.log('loadTargetMetaData');
-    return this.http.get<Array<TargetMetaDataRaw>>(
-      `${environment.serverAPI}/target-metadata`
-    );
+    return of(targetData);
+    //return this.http.get<Array<TargetMetaDataRaw>>(
+    //  `${environment.serverAPI}/target-metadata`
+    //);
   }
 
   /**
@@ -164,9 +164,7 @@ export class APIService {
   }
 
   loadCountryData(): Observable<Array<TargetCountryData>> {
-    return this.http.get<Array<TargetCountryData>>(
-      `${environment.serverAPI}/country-target-data`
-    );
+    return of(countryTargetData);
   }
 
   /** getCountryData
