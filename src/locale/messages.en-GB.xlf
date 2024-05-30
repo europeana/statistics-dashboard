@@ -191,68 +191,101 @@
           <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="countryChartSummaryData" datatype="html">
+        <source> Data </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.html</context>
+          <context context-type="linenumber">63,65</context>
+        </context-group>
+        <note priority="1" from="description">landing chart summary percentage</note>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryTotal" datatype="html">
+        <source>Total <x id="INTERPOLATION" equiv-text="{{ name }}"/> records count</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.html</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <note priority="1" from="description">landing chart summary percentage</note>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryTotalShort" datatype="html">
+        <source>Records</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.html</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+        <note priority="1" from="description">landing chart summary percentage</note>
+      </trans-unit>
       <trans-unit id="countryChartSummaryPercentage" datatype="html">
         <source> Corresponding percentage </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">108,110</context>
+          <context context-type="linenumber">120,122</context>
         </context-group>
         <note priority="1" from="description">landing chart summary percentage</note>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
+        <source> Percent </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.html</context>
+          <context context-type="linenumber">128,130</context>
+        </context-group>
+        <note priority="1" from="description">landing chart summary
+              percentage</note>
       </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
         <source>3D Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">209</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryHQ" datatype="html">
         <source>HQ Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">262</context>
+          <context context-type="linenumber">281</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryAll" datatype="html">
         <source>All Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">334</context>
+          <context context-type="linenumber">353</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Countries By Target Progress</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">420</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryType" datatype="html">
         <source>Explore by type of content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">447</context>
+          <context context-type="linenumber">466</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryRights" datatype="html">
         <source>Explore by rights category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">484</context>
+          <context context-type="linenumber">504</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryDataProvider" datatype="html">
         <source>Explore by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">520</context>
+          <context context-type="linenumber">541</context>
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryProvider" datatype="html">
         <source>Explore by provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">548</context>
+          <context context-type="linenumber">569</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">

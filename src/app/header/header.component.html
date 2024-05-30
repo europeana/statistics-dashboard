@@ -28,7 +28,9 @@
     >
       <span class="active-country" (click)="toggleMenu($event)">
         <span i18n="header nav opener@@targetCountriesMenu"
-        >2025 / 2030 Targets</span> @if(activeCountry) { - {{ activeCountry }}
+          >2025 / 2030 Targets</span
+        >
+        @if(activeCountry) { - {{ activeCountry }}
         }
       </span>
 

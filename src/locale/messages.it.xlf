@@ -57,10 +57,23 @@
         <source>Aggregatori</source>
       </trans-unit>
       <trans-unit id="targetCountriesTitle" datatype="html">
-        <source>Data Bersagli</source>
+        <source>Dati Target</source>
+      </trans-unit>
+
+      <trans-unit id="countryChartSummaryData" datatype="html">
+        <source> Dati </source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryTotal" datatype="html">
+        <source> Totale  <x id="INTERPOLATION" equiv-text="{{ name }}"/> conteggio record</source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryTotalShort" datatype="html">
+        <source> Totale </source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentage" datatype="html">
         <source>Percentuale corrispondente</source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
+        <source>Percentuale</source>
       </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
         <source>Dati 3D</source>
@@ -82,6 +95,9 @@
       </trans-unit>
       <trans-unit id="countryEntryProvider" datatype="html">
         <source>Esplora per istituzione</source>
+      </trans-unit>
+      <trans-unit id="countryTargetProgess" datatype="html">
+        <source>Paesi per vicinita' ai bersagli</source>
       </trans-unit>
       <trans-unit id="facetNameContentTier" datatype="html">
         <source>Livello di Contenuto</source>

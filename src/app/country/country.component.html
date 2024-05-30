@@ -57,9 +57,12 @@
             Top
             {{ dimension | renameApiFacetShort | lowercase }}
           </ng-template>
-          <ng-container *ngIf="isPowerLevel; else defaultCopy">
+          <span
+            *ngIf="isPowerLevel; else defaultCopy"
+            i18n="landing chart summary percentage@@countryChartSummaryData"
+          >
             Data
-          </ng-container>
+          </span>
         </span>
         <span class="total bold">{{ name }}</span>
       </span>
@@ -78,8 +81,17 @@
 
           <!-- the "power-level" header -->
           <ng-container *ngIf="isPowerLevel; else defaultCopy">
-            <span class="hide-on-triple">Total {{ name }} records count</span>
-            <span class="show-on-triple">Records</span>
+            <span
+              class="hide-on-triple"
+              i18n="landing chart summary percentage@@countryChartSummaryTotal"
+              >Total {{ name }} records count</span
+            >
+            <span
+              class="show-on-triple"
+              i18n="
+                landing chart summary percentage@@countryChartSummaryTotalShort"
+              >Records</span
+            >
           </ng-container>
         </span>
         <span
@@ -108,7 +120,14 @@
           >
             Corresponding percentage
           </span>
-          <span class="show-on-triple"> Percent </span>
+          <span
+            class="show-on-triple"
+            i18n="
+              landing chart summary
+              percentage@@countryChartSummaryPercentageShort"
+          >
+            Percent
+          </span>
         </span>
 
         <span
@@ -175,7 +194,7 @@
     >
   </ng-template>
 
-  <div class="container-v">
+  <div class="container-v" *ngIf="targetMetaData">
     <div class="entry-card-multi">
       <!-- 3D -->
 
