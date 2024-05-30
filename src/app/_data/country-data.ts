@@ -1,4 +1,3 @@
-import { Observable, of } from 'rxjs';
 import {
   IHash,
   IHashArray,
@@ -74,7 +73,7 @@ for (let i = 0; i < 24; i++) {
  *
  * @param { Array<TargetMetaDataRaw> } rows - the source data to reduce
  **/
-const reduceTargetMetaData = (rows: Array<TargetMetaDataRaw>) => {
+const reduceTargetMetaData = (rows: Array<TargetMetaDataRaw>): IHash<IHashArray<TargetMetaData>> => {
   return rows.reduce(
     (res: IHash<IHashArray<TargetMetaData>>, item: TargetMetaDataRaw) => {
       const country = item.country;
@@ -129,7 +128,6 @@ export const targetData = [].concat(
   })
 );
 
-//const fnCountryTargetData = ():Observable<Array<TargetCountryData>> => {
 const fnCountryTargetData = (): Array<TargetCountryData> => {
   const numDateTicks = dateTicks.length;
   const res = [];
