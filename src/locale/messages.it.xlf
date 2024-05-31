@@ -99,6 +99,27 @@
       <trans-unit id="countryEntryProvider" datatype="html">
         <source>Esplora per istituzione</source>
       </trans-unit>
+      <trans-unit id="countrySectionLink3D" datatype="html">
+        <source>Visualizza (dati 3D) per livello di contenuto</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkHQ" datatype="html">
+        <source>Visualizza (dati HQ) per tipo di media</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkCountry" datatype="html">
+        <source>Visualizza tutti i dati</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkType" datatype="html">
+        <source>Visualizza per tipo di media</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkRights" datatype="html">
+        <source>Visualizza per categoria di diritti</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkDataProvider" datatype="html">
+        <source>Visualizza per istituzione</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkProvider" datatype="html">
+        <source>Visualizza per aggregatore</source>
+      </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Paesi per vicinita' ai bersagli</source>
       </trans-unit>
