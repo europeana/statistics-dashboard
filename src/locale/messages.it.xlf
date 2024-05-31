@@ -123,6 +123,12 @@
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Paesi per vicinita' ai bersagli</source>
       </trans-unit>
+      <trans-unit id="toggleTargetDataLabelHide" datatype="html">
+        <source>Nascondi i dati</source>
+      </trans-unit>
+      <trans-unit id="toggleTargetDataLabelShow" datatype="html">
+        <source>Mostri i dati</source>
+      </trans-unit>
       <trans-unit id="facetNameContentTier" datatype="html">
         <source>Livello di Contenuto</source>
       </trans-unit>

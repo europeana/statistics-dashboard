@@ -409,7 +409,8 @@
             [queryParams]="{
               country: country
             }"
-            ><span i18n="@@countrySectionLinkCountry">View all data</span>&nbsp;{{ country }}</a
+            ><span i18n="@@countrySectionLinkCountry">View all data</span
+            >&nbsp;{{ country }}</a
           >
         </div>
 
@@ -443,7 +444,12 @@
         </div>
 
         <a class="appendice-toggle" (click)="toggleAppendice()">
-          <span>@if (appendiceExpanded) { Hide data } @else { Show data }</span>
+          <span *ngIf="appendiceExpanded" i18n="@@toggleTargetDataLabelHide"
+            >Hide data</span
+          >
+          <span *ngIf="!appendiceExpanded" i18n="@@toggleTargetDataLabelShow"
+            >Show data</span
+          >
           <span class="save"></span>
         </a>
 
