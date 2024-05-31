@@ -103,10 +103,7 @@
           'top.px': isTopPin ? countryPinValue || 10 : countryPinValue
         }"
       >
-        <a
-          (click)="toggleCountry(country)"
-          style="position: relative; display: flex"
-        >
+        <a (click)="toggleCountry(country)">
           <span>{{ country | renameCountry }} </span>
           <span class="save" [ngClass]="{ saved: isPinned }"></span>
         </a>

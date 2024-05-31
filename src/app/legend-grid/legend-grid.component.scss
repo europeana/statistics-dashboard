@@ -101,6 +101,7 @@ li {
   }
   a {
     color: $gray-med;
+    display: flex;
     position: relative;
     margin: 0 0.4em 0 2em;
     white-space: nowrap;
@@ -218,12 +219,6 @@ li {
       }
     }
   }
-}
-
-.stick-right .series-column {
-  // TODO border trick...
-
-  //border-left-color: transparent;
 }
 
 .perma-pin:hover,
