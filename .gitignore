@@ -1,5 +1,4 @@
-.angular
-/.angular
+/.angular/cache
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 npm-debug.log
 .DS_Store

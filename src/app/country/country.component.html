@@ -162,7 +162,8 @@
             percent:
               latestCountryData[valName] === 0
                 ? 0
-                : countryTotal / latestCountryData[valName],
+                : (latestCountryData[valName] / latestCountryData['total']) *
+                  100,
             isPowerLevel: true
           }
         "

@@ -17,7 +17,13 @@ import {
   TargetMetaData,
   TargetMetaDataRaw
 } from '../_models';
-import { countryTargetData, ISOCountryCodes, targetData } from '../_data';
+import {
+  countryTargetData,
+  ISOCountryCodes,
+  slovenianData,
+  slovenianTargetData,
+  targetData
+} from '../_data';
 import { Cache } from '../_helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -109,9 +115,6 @@ export class APIService {
    **/
   loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
     return of(targetData);
-    //return this.http.get<Array<TargetMetaDataRaw>>(
-    //  `${environment.serverAPI}/target-metadata`
-    //);
   }
 
   /**
@@ -146,6 +149,7 @@ export class APIService {
           interim: item.interim
         });
 
+        res['SI'] = slovenianTargetData;
         return res;
       },
       {}
@@ -184,6 +188,7 @@ export class APIService {
           },
           {}
         );
+        res['SI'] = slovenianData;
         return res;
       })
     );
