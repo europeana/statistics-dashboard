@@ -50,6 +50,7 @@ export class MockLineComponent {
       TargetFieldName.TOTAL
     ].forEach((fName: TargetFieldName) => {
       ob[`${code}${fName}`] = new MockSeries();
+      ob[`${code}${fName}`].fill = am4core.color('#fff');
     });
     return ob;
   }, {}) as unknown as IHash<am4charts.LineSeries>;

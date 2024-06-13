@@ -179,6 +179,28 @@ describe('LegendGridComponent', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should hide ranges by column', () => {
+    component.targetMetaData = mockTargetMetaData;
+    component.countryCode = 'FR';
+    component.pinnedCountries = { FR: 0 };
+    expect(Object.keys(component.hiddenColumnRanges).length).toBeFalsy();
+    component.hideRangesByColumn(TargetFieldName.THREE_D);
+    expect(Object.keys(component.hiddenColumnRanges).length).toBeTruthy();
+  });
+
+  it('should show ranges by column', () => {
+    component.targetMetaData = mockTargetMetaData;
+    component.countryCode = 'FR';
+    component.pinnedCountries = { FR: 0 };
+    component.hiddenColumnRanges = { THREE_D: { FR: [0] } };
+    component.lineChart.allSeriesData['FR' + '3D'] = {
+      fill: 'xxx',
+      hide: jasmine.createSpy()
+    } as unknown as am4charts.LineSeries;
+    component.showHiddenRangesByColumn(TargetFieldName.THREE_D);
+    expect(Object.keys(component.hiddenColumnRanges).length).toBeFalsy();
+  });
+
   it('should toggle the range', () => {
     const colour = component.lineChart.chart.colors.list[0];
 
@@ -320,6 +342,10 @@ describe('LegendGridComponent', () => {
     expect(component.toggleCountry).toHaveBeenCalledTimes(5);
     tick(component.timeoutAnimation);
     expect(component.toggleCountry).toHaveBeenCalledTimes(5);
+
+    component.countryCode = undefined;
+    tick(component.timeoutAnimation);
+    expect(component.countryCode).toBeFalsy();
   }));
 
   it('should sort the pins', () => {
@@ -331,5 +357,11 @@ describe('LegendGridComponent', () => {
     expect(testArray[0]).toEqual('NL');
     expect(testArray[1]).toEqual('IT');
     expect(testArray[testArray.length - 1]).toEqual('CH');
+  });
+
+  it('should fire the unpin event', () => {
+    spyOn(component.unpinColumn, 'emit');
+    component.fireUnpinColumn(TargetFieldName.THREE_D);
+    expect(component.unpinColumn.emit).toHaveBeenCalled();
   });
 });

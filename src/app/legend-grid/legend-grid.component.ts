@@ -116,6 +116,10 @@ export class LegendGridComponent {
   _targetMetaData: IHash<IHashArray<TargetMetaData>>;
 
   @Input() set countryCode(countryCode: string) {
+    if (this.lineChart) {
+      this.lineChart.chart.colors.reset();
+    }
+
     let timeout = 0;
 
     // remove old chart lines
