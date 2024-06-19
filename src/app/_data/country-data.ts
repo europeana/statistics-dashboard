@@ -1,7 +1,6 @@
 import {
   IHash,
   IHashArray,
-  TargetData,
   TargetCountryData,
   TargetFieldName,
   TargetMetaData,
