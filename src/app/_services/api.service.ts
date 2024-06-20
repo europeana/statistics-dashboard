@@ -108,6 +108,8 @@ export class APIService {
    * @return [TargetMetaDataRaw]
    **/
   loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
+    console.log('Fake result for loadTargetMetaData()');
+    console.log(JSON.stringify(targetData, null, 4));
     return of(targetData);
   }
 
@@ -160,6 +162,8 @@ export class APIService {
   }
 
   loadCountryData(): Observable<Array<TargetCountryData>> {
+    console.log('Fake result for loadCountryData()');
+    console.log(JSON.stringify(countryTargetData, null, 4));
     return of(countryTargetData);
   }
 
