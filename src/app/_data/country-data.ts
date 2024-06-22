@@ -10,51 +10,51 @@ import { ISOCountryCodes } from './static-data';
 
 const dateTicks: Array<string> = [];
 const targetCountries = [
-  'AL',
-  'AT',
-  'AZ',
-  'BY',
-  'BE',
-  'BA',
-  'BG',
-  'HR',
-  'CY',
-  'CZ',
-  'DK',
-  'EE',
-  'FI',
-  'FR',
-  'GE',
-  'DE',
-  'GR',
-  'HU',
-  'IS',
-  'IE',
-  'IL',
-  'IT',
-  'LV',
-  'LT',
-  'LU',
-  'MT',
-  'ME',
-  'MD',
-  'NL',
-  'MK',
-  'NO',
-  'PL',
-  'PT',
-  'RO',
-  'RU',
-  'RS',
-  'SK',
-  'SI',
-  'ES',
-  'SE',
-  'CH',
-  'TR',
-  'UA',
-  'GB',
-  'USA'
+  'Albania',
+  'Austria',
+  'Azerbaijan',
+  'Belarus',
+  'Belgium',
+  'Bosnia and Herzegovina',
+  'Bulgaria',
+  'Croatia',
+  'Cyprus',
+  'Czech Republic',
+  'Denmark',
+  'Estonia',
+  'Finland',
+  'France',
+  'Georgia',
+  'Germany',
+  'Greece',
+  'Hungary',
+  'Iceland',
+  'Ireland',
+  'Israel',
+  'Italy',
+  'Latvia',
+  'Lithuania',
+  'Luxembourg',
+  'Malta',
+  'Montenegro',
+  'Moldova',
+  'Netherlands',
+  'North Macedonia',
+  'Norway',
+  'Poland',
+  'Portugal',
+  'Romania',
+  'Russia',
+  'Serbia',
+  'Slovakia',
+  'Slovenia',
+  'Spain',
+  'Sweden',
+  'Switzerland',
+  'Turkey',
+  'Ukraine',
+  'United Kingdom',
+  'United States of America'
 ];
 
 for (let i = 0; i < 24; i++) {
@@ -136,9 +136,13 @@ const fnCountryTargetData = (): Array<TargetCountryData> => {
   const tgtDataRef = reduceTargetMetaData(targetData);
 
   targetCountries.forEach((country: string) => {
-    const countryName = Object.keys(ISOCountryCodes).find(
-      (key) => ISOCountryCodes[key] === country
-    );
+    const countryName = country;
+    const countryCode = ISOCountryCodes[country];
+
+    if (!countryCode) {
+      console.log('missing code for ' + country);
+    }
+
     const countryRandom = Math.max(1.5, (countryName.length * 12) % 5);
 
     const baseValue3D =
@@ -163,7 +167,7 @@ const fnCountryTargetData = (): Array<TargetCountryData> => {
       valueHQ -= 1 * (random2 * random1 * 5);
 
       const resultItem = {
-        country,
+        country: countryName,
         date: dateTicks[dateTicks.length - (dateTickIndex + 1)],
         three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
         hq: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),

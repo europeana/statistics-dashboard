@@ -20,6 +20,8 @@ import {
 import { countryTargetData, ISOCountryCodes, targetData } from '../_data';
 import { Cache } from '../_helpers';
 
+const USE_FAKE = true;
+
 @Injectable({ providedIn: 'root' })
 export class APIService {
   private readonly countries = new Cache(() => this.loadCountryData());
@@ -98,19 +100,36 @@ export class APIService {
    *
    * Expected back-end format:
    *  {
-   *    "country": "DE",
+   *    "country": "Germany",
    *    "label": "2025",
    *    "value": 370,
    *    "interim": true,
-   *    "targetType": "three_d" | "hq"
+   *    "targetType": "three_d" | "hq" | "total"
    *  }...
    *
    * @return [TargetMetaDataRaw]
    **/
-  loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
-    console.log('Fake result for loadTargetMetaData()');
-    console.log(JSON.stringify(targetData, null, 4));
-    return of(targetData);
+  private loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
+    let res: Observable<Array<TargetMetaDataRaw>>;
+
+    if (USE_FAKE) {
+      res = of(targetData);
+    } else {
+      res = this.http.get<Array<TargetMetaDataRaw>>(
+        this.replaceDoubleSlashes(
+          `${environment.serverAPI}/statistics/europeana/targets`
+        )
+      );
+    }
+
+    return res.pipe(
+      map((targetData: Array<TargetMetaDataRaw>) => {
+        return targetData.map((tmd: TargetMetaDataRaw) => {
+          tmd.country = ISOCountryCodes[tmd.country];
+          return tmd;
+        });
+      })
+    );
   }
 
   /**
@@ -128,7 +147,6 @@ export class APIService {
     return rows.reduce(
       (res: IHash<IHashArray<TargetMetaData>>, item: TargetMetaDataRaw) => {
         const country = item.country;
-
         if (!res[country]) {
           res[country] = {};
         }
@@ -162,9 +180,28 @@ export class APIService {
   }
 
   loadCountryData(): Observable<Array<TargetCountryData>> {
-    console.log('Fake result for loadCountryData()');
-    console.log(JSON.stringify(countryTargetData, null, 4));
-    return of(countryTargetData);
+    let res: Observable<Array<TargetCountryData>>;
+
+    if (USE_FAKE) {
+      console.log('FAKE result for loadCountryData()');
+      res = of(countryTargetData);
+    } else {
+      console.log('REAL result for loadCountryData()');
+
+      res = this.http.get<Array<TargetCountryData>>(
+        this.replaceDoubleSlashes(
+          `${environment.serverAPI}/statistics/europeana/target/country/all`
+        )
+      );
+    }
+    return res.pipe(
+      map((rows: Array<TargetCountryData>) => {
+        rows.forEach((row: TargetCountryData) => {
+          row.country = ISOCountryCodes[row.country] || row.country;
+        });
+        return rows;
+      })
+    );
   }
 
   /** getCountryData
