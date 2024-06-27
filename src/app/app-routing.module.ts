@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
-import { CountryComponent } from './country/country.component';
 import {
   MatomoRouterModule,
   MatomoRouteDataInterceptor
