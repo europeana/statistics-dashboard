@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
@@ -17,10 +17,8 @@ import {
   TargetMetaData,
   TargetMetaDataRaw
 } from '../_models';
-import { countryTargetData, ISOCountryCodes, targetData } from '../_data';
+import { ISOCountryCodes } from '../_data';
 import { Cache } from '../_helpers';
-
-const USE_FAKE = true;
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
@@ -110,26 +108,20 @@ export class APIService {
    * @return [TargetMetaDataRaw]
    **/
   private loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
-    let res: Observable<Array<TargetMetaDataRaw>>;
-
-    if (USE_FAKE) {
-      res = of(targetData);
-    } else {
-      res = this.http.get<Array<TargetMetaDataRaw>>(
+    return this.http
+      .get<Array<TargetMetaDataRaw>>(
         this.replaceDoubleSlashes(
           `${environment.serverAPI}/statistics/europeana/targets`
         )
+      )
+      .pipe(
+        map((targetData: Array<TargetMetaDataRaw>) => {
+          return targetData.map((tmd: TargetMetaDataRaw) => {
+            tmd.country = ISOCountryCodes[tmd.country];
+            return tmd;
+          });
+        })
       );
-    }
-
-    return res.pipe(
-      map((targetData: Array<TargetMetaDataRaw>) => {
-        return targetData.map((tmd: TargetMetaDataRaw) => {
-          tmd.country = ISOCountryCodes[tmd.country];
-          return tmd;
-        });
-      })
-    );
   }
 
   /**
@@ -180,20 +172,12 @@ export class APIService {
   }
 
   loadCountryData(): Observable<Array<TargetCountryData>> {
-    let res: Observable<Array<TargetCountryData>>;
+    const res = this.http.get<Array<TargetCountryData>>(
+      this.replaceDoubleSlashes(
+        `${environment.serverAPI}/statistics/europeana/target/country/all`
+      )
+    );
 
-    if (USE_FAKE) {
-      console.log('FAKE result for loadCountryData()');
-      res = of(countryTargetData);
-    } else {
-      console.log('REAL result for loadCountryData()');
-
-      res = this.http.get<Array<TargetCountryData>>(
-        this.replaceDoubleSlashes(
-          `${environment.serverAPI}/statistics/europeana/target/country/all`
-        )
-      );
-    }
     return res.pipe(
       map((rows: Array<TargetCountryData>) => {
         rows.forEach((row: TargetCountryData) => {
