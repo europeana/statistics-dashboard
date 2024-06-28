@@ -331,7 +331,7 @@ label {
 
   .no-data {
     font-size: 24px;
-    ul {
+    ul:not(.target-links) {
       font-size: 14px;
       list-style: disc;
       margin: 12px 0 0 20px;
@@ -375,6 +375,55 @@ label {
       height: 10px;
       position: absolute;
       width: 14px;
+    }
+  }
+}
+
+.target-links {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  list-style: none;
+
+  &:hover {
+    .target-link {
+      opacity: 1;
+    }
+  }
+
+  .target-link {
+    align-items: center;
+    display: flex;
+    padding: 0 0 0 1em;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+
+    opacity: 0;
+
+    :last-child {
+      margin-right: 0.4rem;
+      //opacity: 0;
+      transition: opacity 0.3s linear;
+    }
+
+    :last-child:hover,
+    :first-child:hover + :last-child {
+      //opacity: 1;
+      // background-color: red;// #fff;
+    }
+  }
+
+  .target {
+    opacity: 0;
+  }
+
+  > :first-child > :first-child {
+    opacity: 1;
+
+    .target {
+      opacity: 1;
     }
   }
 }

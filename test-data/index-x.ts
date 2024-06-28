@@ -12,7 +12,7 @@ import {
   IHashArray,
   RequestFilter
 } from '../src/app/_models';
-import { facetNames } from '../src/app/_data';
+import { countryTargetData, facetNames, targetData } from '../src/app/_data';
 import { CHO, IHashBoolean } from './_models/test-models';
 import { DataGenerator } from './data-generator';
 
@@ -114,6 +114,12 @@ new (class extends TestDataServer {
       request.on('end', () => {
         this.sendResponse(response, JSON.parse(body) as BreakdownRequest);
       });
+    } else if (
+      (request.url as string) === '/statistics/europeana/target/country/all'
+    ) {
+      response.end(JSON.stringify(countryTargetData));
+    } else if ((request.url as string) === '/statistics/europeana/targets') {
+      response.end(JSON.stringify(targetData));
     } else {
       const route = request.url as string;
       const params = url.parse(route, true).query;

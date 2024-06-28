@@ -6,7 +6,14 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { DatePipe, formatDate, NgClass, NgFor, NgIf } from '@angular/common';
+import {
+  DatePipe,
+  formatDate,
+  NgClass,
+  NgFor,
+  NgIf,
+  NgTemplateOutlet
+} from '@angular/common';
 import {
   FormControl,
   FormGroup,
@@ -87,6 +94,7 @@ import { ResizeComponent } from '../resize/resize.component';
     CTZeroControlComponent,
     NgIf,
     NgFor,
+    NgTemplateOutlet,
     FilterComponent,
     IsScrollableDirective,
     CheckboxComponent,
@@ -178,6 +186,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   queryParamsRaw: Params = {};
 
   dataServerData: BreakdownResults;
+  targetLinkAvailable = false;
 
   /**
    * constructor
@@ -277,6 +286,21 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
           const params = combined.params;
           const queryParams = combined.queryParams;
+
+          this.targetLinkAvailable =
+            Object.keys(queryParams).length === 2 &&
+            !!queryParams['country'] &&
+            `${queryParams['type']}` === '3D' &&
+            queryParams['type'].length === 1;
+
+          if (!this.targetLinkAvailable) {
+            this.targetLinkAvailable =
+              !!queryParams['country'] &&
+              !!queryParams['metadataTier'] &&
+              queryParams['metadataTier'].indexOf('0') === -1 &&
+              !!queryParams['contentTier'] &&
+              queryParams['contentTier'].indexOf('1') === -1;
+          }
 
           // checkbox representation of (split) datasetId
           this.form.addControl('datasetIds', this.fb.group({}));

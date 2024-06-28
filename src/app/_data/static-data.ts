@@ -56,8 +56,6 @@ facetNamesFriendly['dates'] = $localize`:@@facetNameDates:Last Updated`;
 
 export const portalNamesFriendly = facetNamesFriendly;
 
-export const colours = ['#0a72cc', '#e11d53', '#ffae00', '#219d31'];
-
 export const DiacriticsMap = {
   A: 'AÁĂẮẶẰẲẴǍÂẤẬẦẨẪÄẠÀẢĀĄÅǺÃÆǼА',
   B: 'BḄƁʚɞБВ',
@@ -221,7 +219,7 @@ export const ISOCountryCodes = {
   Macao: 'MO',
   Mongolia: 'MN',
   'Marshall Islands': 'MH',
-  Macedonia: 'MK',
+  'North Macedonia': 'MK',
   Mauritius: 'MU',
   Malta: 'MT',
   Malawi: 'MW',
@@ -314,6 +312,7 @@ export const ISOCountryCodes = {
   'United States': 'US',
   Uruguay: 'UY',
   Mayotte: 'YT',
+  'United States of America': 'USA',
   'United States Minor Outlying Islands': 'UM',
   Lebanon: 'LB',
   'Saint Lucia': 'LC',

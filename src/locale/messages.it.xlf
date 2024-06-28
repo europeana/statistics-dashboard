@@ -56,7 +56,79 @@
       <trans-unit id="facetNameShortPluralProvider" datatype="html">
         <source>Aggregatori</source>
       </trans-unit>
+      <trans-unit id="targetCountriesTitle" datatype="html">
+        <source>Dati Target</source>
+      </trans-unit>
 
+      <trans-unit id="countryChartSummaryData" datatype="html">
+        <source> Dati </source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryTotal" datatype="html">
+        <source> Totale  <x id="INTERPOLATION" equiv-text="{{ name }}"/> conteggio record</source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryTotalShort" datatype="html">
+        <source> Totale </source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryPercentage" datatype="html">
+        <source>Percentuale corrispondente</source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
+        <source>Percentuale</source>
+      </trans-unit>
+      <trans-unit id="countryLandingDataHeader" datatype="html">
+        <source>RECORD FORNITI</source>
+      </trans-unit>
+      <trans-unit id="countryEntry3D" datatype="html">
+        <source>Dati 3D</source>
+      </trans-unit>
+      <trans-unit id="countryEntryHQ" datatype="html">
+        <source>Dati HQ</source>
+      </trans-unit>
+      <trans-unit id="countryEntryAll" datatype="html">
+        <source>Tutti Dati</source>
+      </trans-unit>
+      <trans-unit id="countryEntryType" datatype="html">
+        <source>Esplora per tipo di media</source>
+      </trans-unit>
+      <trans-unit id="countryEntryRights" datatype="html">
+        <source>Esplora per categoria di diritti</source>
+      </trans-unit>
+      <trans-unit id="countryEntryDataProvider" datatype="html">
+        <source>Esplora per aggregatore</source>
+      </trans-unit>
+      <trans-unit id="countryEntryProvider" datatype="html">
+        <source>Esplora per istituzione</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLink3D" datatype="html">
+        <source>Visualizza (dati 3D) per livello di contenuto</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkHQ" datatype="html">
+        <source>Visualizza (dati HQ) per tipo di media</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkCountry" datatype="html">
+        <source>Visualizza tutti i dati</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkType" datatype="html">
+        <source>Visualizza per tipo di media</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkRights" datatype="html">
+        <source>Visualizza per categoria di diritti</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkDataProvider" datatype="html">
+        <source>Visualizza per istituzione</source>
+      </trans-unit>
+      <trans-unit id="countrySectionLinkProvider" datatype="html">
+        <source>Visualizza per aggregatore</source>
+      </trans-unit>
+      <trans-unit id="countryTargetProgess" datatype="html">
+        <source>Paesi per vicinita' ai bersagli</source>
+      </trans-unit>
+      <trans-unit id="toggleTargetDataLabelHide" datatype="html">
+        <source>Nascondi i dati</source>
+      </trans-unit>
+      <trans-unit id="toggleTargetDataLabelShow" datatype="html">
+        <source>Mostri i dati</source>
+      </trans-unit>
       <trans-unit id="facetNameContentTier" datatype="html">
         <source>Livello di Contenuto</source>
       </trans-unit>
@@ -204,6 +276,9 @@
       <trans-unit id="gridColHeaderView" datatype="html">
         <source>Visualizza in Europeana</source>
       </trans-unit>
+      <trans-unit id="targetCountriesMenu" datatype="html">
+        <source>2025 / 2030 Bersagli</source>
+      </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source>Europeana dataset completo</source>
       </trans-unit>
@@ -248,8 +323,7 @@
         <note priority="1" from="description">landing section link metadata</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleCountries" datatype="html">
-        <source>Esplora fornendo paesi<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-      &gt;"/></source>
+        <source>Esplora fornendo paesi</source>
         <note priority="1" from="description">landing section title countries</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkCountries" datatype="html">
@@ -257,8 +331,7 @@
         <note priority="1" from="description">landing section link countries</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleType" datatype="html">
-        <source>Esplora per tipo di media<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Esplora per tipo di media</source>
         <note priority="1" from="description">landing section title type</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkType" datatype="html">
@@ -280,8 +353,7 @@
         <note priority="1" from="description">landing section link rights</note>
       </trans-unit>
       <trans-unit id="landingSectionTitleDataProvider" datatype="html">
-        <source>Esplora per istituzione<x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;info-icon&quot;&gt;"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span
-        &gt;"/></source>
+        <source>Esplora per istituzione</source>
         <note priority="1" from="description">landing section title data provider</note>
       </trans-unit>
       <trans-unit id="landingSectionLinkDataProvider" datatype="html">

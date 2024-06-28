@@ -14,6 +14,45 @@
         <br />dashboard
       </span>
     </a>
+
+    <span class="text country-link">
+      2025
+      <br />2030
+    </span>
+
+    <span
+      class="target-menu-wrapper"
+      [ngClass]="{ open: menuIsOpen }"
+      appClickAware
+      (clickOutside)="menuIsOpen = false"
+    >
+      <span class="active-country" (click)="toggleMenu($event)">
+        <span i18n="header nav opener@@targetCountriesMenu"
+          >2025 / 2030 Targets</span
+        >
+        @if(activeCountry) { - {{ activeCountry }}
+        }
+      </span>
+
+      <span class="target">
+        <span class="target-select">
+          <span
+            class="target-select-item"
+            *ngFor="let country of countryTotalMap | keyvalue"
+          >
+            <a
+              (click)="toggleMenu($event)"
+              [attr.disabled]="
+                country.key === activeCountry ? 'disabled' : null
+              "
+              [routerLink]="['/country', country.key]"
+            >
+              <span>{{ country.key }}</span>
+            </a>
+          </span>
+        </span>
+      </span>
+    </span>
   </div>
 
   <div *ngIf="showPageTitle" class="fit-to-page page-title-wrapper">

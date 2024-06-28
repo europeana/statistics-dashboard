@@ -162,24 +162,31 @@ describe('AppComponent', () => {
 
     spyOn(app, 'loadLandingData');
 
+    // load Landing
     app.onOutletLoaded(new LandingComponent());
 
     expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalled();
+    expect(app.loadLandingData).not.toHaveBeenCalled();
 
+    // load other
     app.onOutletLoaded({} as unknown as OverviewComponent);
     expect(app.showPageTitle).toBeFalsy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(1);
 
-    app.onOutletLoaded(new LandingComponent());
+    expect(app.loadLandingData).not.toHaveBeenCalled();
+
+    // load landing
+    app.getCtrlCTZero().setValue(true);
+
+    const cmp = new LandingComponent();
+    app.landingData = {};
+    app.onOutletLoaded(cmp);
     expect(app.showPageTitle).toBeTruthy();
     expect(app.loadLandingData).toHaveBeenCalledTimes(1);
+    expect(app.lastSetContentTierZeroValue).toBeTruthy();
+    expect(cmp.landingData).toBeTruthy();
 
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
-    app.lastSetContentTierZeroValue = true;
-
+    app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
     app.onOutletLoaded(new LandingComponent());
-    expect(app.showPageTitle).toBeTruthy();
     expect(app.loadLandingData).toHaveBeenCalledTimes(2);
   });
 
