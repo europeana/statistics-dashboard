@@ -1,8 +1,11 @@
 context('Statistics Dashboard', () => {
+
+  const waitTime = 1500;
+
   describe('legend grid', () => {
     beforeEach(() => {
       cy.visit('/country/France');
-      cy.wait(1500);
+      cy.wait(waitTime);
     });
 
     const numSeriesInGroup = 3;
@@ -23,7 +26,7 @@ context('Statistics Dashboard', () => {
         .find(selOpenerSeries)
         .eq(seriesIndex)
         .click(force);
-      cy.wait(1500);
+      cy.wait(waitTime);
     };
 
     it('should show the legend', () => {
@@ -37,6 +40,7 @@ context('Statistics Dashboard', () => {
         .contains('Cyprus')
         .should('have.length', 1)
         .click();
+      cy.wait(waitTime)
       cy.get(selPinnedOpener).should('have.length', 2);
     });
 
@@ -52,7 +56,7 @@ context('Statistics Dashboard', () => {
       cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
 
       cy.get(selToggleCountry).contains('Cyprus').click();
-      cy.wait(1000);
+      cy.wait(waitTime);
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
     });
@@ -70,12 +74,12 @@ context('Statistics Dashboard', () => {
 
       // Close each with country togglers
       cy.get(selToggleCountry).contains('Cyprus').click(force);
-      cy.wait(1000);
+      cy.wait(waitTime);
 
       cy.get(selPinnedOpener).should('have.length', 2);
 
       cy.get(selToggleCountry).contains('Denmark').click(force);
-      cy.wait(1000);
+      cy.wait(waitTime);
 
       cy.get(selPinnedOpener).should('have.length', 1);
 
@@ -96,13 +100,14 @@ context('Statistics Dashboard', () => {
 
       // close with country opener
       cy.get(selPinnedOpener).contains('Denmark').click();
+      cy.wait(waitTime);
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
-      cy.wait(1000);
       // open again with country opener
       cy.get(selToggleCountry).contains('Denmark').click();
+      cy.wait(waitTime);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
     });
 
@@ -147,14 +152,14 @@ context('Statistics Dashboard', () => {
 
       // hide 3d column
       cy.get(selColClose).eq(0).click(force);
-      cy.wait(1000);
+      cy.wait(waitTime);
 
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       cy.get(selIsOpen).should('have.length', 2);
 
       // restore
       cy.get(selColRestore).eq(0).click(force);
-      cy.wait(1000);
+      cy.wait(waitTime);
       cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
       cy.get(selIsOpen).should('have.length', 1 + numSeriesInGroup);
 
@@ -164,11 +169,11 @@ context('Statistics Dashboard', () => {
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       cy.get(selColClose).eq(0).click(force);
-      cy.wait(1000);
+      cy.wait(waitTime);
 
       cy.get(selIsOpen).should('have.length', 2);
       cy.get(selColRestore).eq(0).click(force);
-      cy.wait(1000);
+      cy.wait(waitTime);
 
       // confirm it did not accifentally re-enable the original 3d item
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
