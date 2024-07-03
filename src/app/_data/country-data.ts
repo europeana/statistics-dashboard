@@ -91,7 +91,7 @@ const reduceTargetMetaData = (
       }
 
       arr.push({
-        label: item.label,
+        targetYear: item.targetYear,
         value: item.value,
         interim: item.interim
       });
@@ -104,9 +104,9 @@ const reduceTargetMetaData = (
 
 export const targetData = [].concat(
   ...targetCountries.map((country: string, index: number) => {
-    const resLabel = ['2025', '2030'].map((label: string) => {
+    const resLabel = [2025, 2030].map((year: number) => {
       // make values larger for later targets
-      let value = parseInt(label) * (index + 1);
+      let value = year * (index + 1);
 
       return Object.keys(TargetFieldName).map((targetType: TargetFieldName) => {
         // make subtarget values smaller than total
@@ -115,12 +115,12 @@ export const targetData = [].concat(
         return {
           country,
           targetType: fieldName,
-          label,
-          interim: label === '2025',
+          targetYear: year,
+          interim: year === 2025,
           value:
             fieldName === TargetFieldName.TOTAL
-              ? value * (label === '2025' ? 9 : 12)
-              : label === '2025'
+              ? value * (year === 2025 ? 9 : 12)
+              : year === 2025
               ? Math.floor(value * 0.7)
               : value
         };

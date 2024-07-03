@@ -142,7 +142,7 @@ export class LineComponent implements AfterViewInit {
     range.label.fontSize = 14;
     range.label.inside = true;
     range.label.location = 0;
-    range.label.text = targetData.label;
+    range.label.text = `${targetData.targetYear}`;
     range.label.verticalCenter = 'bottom';
     range.value = targetData.value;
 

@@ -8,7 +8,7 @@ export enum TargetFieldName {
 
 interface TargetMetaDataBase {
   value: number;
-  label: string;
+  targetYear: number;
   interim?: boolean;
 }
 
