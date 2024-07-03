@@ -2,6 +2,7 @@ context('Statistics Dashboard', () => {
   describe('legend grid', () => {
     beforeEach(() => {
       cy.visit('/country/France');
+      cy.wait(1500);
     });
 
     const numSeriesInGroup = 3;
@@ -22,6 +23,7 @@ context('Statistics Dashboard', () => {
         .find(selOpenerSeries)
         .eq(seriesIndex)
         .click(force);
+      cy.wait(1500);
     };
 
     it('should show the legend', () => {
@@ -50,6 +52,7 @@ context('Statistics Dashboard', () => {
       cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
 
       cy.get(selToggleCountry).contains('Cyprus').click();
+      cy.wait(1000);
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
     });
@@ -60,6 +63,7 @@ context('Statistics Dashboard', () => {
       // Open (the first) Cyprus series
       clickSeriesOpener('Cyprus');
       cy.get(selPinnedOpener).should('have.length', 2);
+
       // Open (the first) Danish series
       clickSeriesOpener('Denmark');
       cy.get(selPinnedOpener).should('have.length', numSeriesInGroup);
@@ -77,6 +81,7 @@ context('Statistics Dashboard', () => {
 
       // Open the next Danish entry
       clickSeriesOpener('Denmark', 1);
+
       cy.get(selPinnedOpener).should('have.length', 2);
     });
 
@@ -131,38 +136,42 @@ context('Statistics Dashboard', () => {
     });
 
     it('should remove and restore pins when toggling columns', () => {
-      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
 
       // open Denmark 3D
       clickSeriesOpener('Denmark', 0);
 
-      cy.get(selIsOpen).should('have.length', 4);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
       cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
 
       // hide 3d column
       cy.get(selColClose).eq(0).click(force);
+      cy.wait(1000);
 
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       cy.get(selIsOpen).should('have.length', 2);
 
       // restore
       cy.get(selColRestore).eq(0).click(force);
+      cy.wait(1000);
       cy.get(selPinnedOpener).contains('Denmark').should('have.length', 1);
-      cy.get(selIsOpen).should('have.length', 4);
+      cy.get(selIsOpen).should('have.length', 1 + numSeriesInGroup);
 
       // now repeat with the original 3d item closed
 
       clickSeriesOpener('France', 0);
-      cy.wait(1000);
-      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       cy.get(selColClose).eq(0).click(force);
+      cy.wait(1000);
+
       cy.get(selIsOpen).should('have.length', 2);
       cy.get(selColRestore).eq(0).click(force);
+      cy.wait(1000);
 
       // confirm it did not accifentally re-enable the original 3d item
-      cy.get(selIsOpen).should('have.length', 3);
+      cy.get(selIsOpen).should('have.length', numSeriesInGroup);
     });
 
     it('should restore pins in the correct order', () => {
