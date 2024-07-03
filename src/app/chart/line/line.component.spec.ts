@@ -17,14 +17,14 @@ describe('LineComponent', () => {
       three_d: [
         {
           interim: true,
-          label: '2025',
+          targetYear: 2025,
           value: 1
         } as TargetMetaData
       ],
       hq: [
         {
           interim: true,
-          label: '2025',
+          targetYear: 2025,
           value: 2
         } as TargetMetaData
       ],
