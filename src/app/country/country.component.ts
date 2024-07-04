@@ -122,17 +122,23 @@ export class CountryComponent extends SubscriptionManager {
     }
 
     this.subs.push(
-      combineLatest([this.api.getCountryData(), this.route.params])
+      combineLatest([
+        this.api.getTargetMetaData(),
+        this.api.getCountryData(),
+        this.route.params
+      ])
         .pipe(
           map((results) => {
             return {
-              countryData: results[0],
-              params: results[1]
+              targetMetaData: results[0],
+              countryData: results[1],
+              params: results[2]
             };
           })
         )
         .subscribe({
           next: (combined) => {
+            this.targetMetaData = combined.targetMetaData;
             this.countryData = combined.countryData;
             const country = combined.params['country'];
             this.setCountryToParam(country);
@@ -142,12 +148,6 @@ export class CountryComponent extends SubscriptionManager {
             console.log(e);
           }
         })
-    );
-
-    this.subs.push(
-      this.api.getTargetMetaData().subscribe((data) => {
-        this.targetMetaData = data;
-      })
     );
 
     this.subs.push(
