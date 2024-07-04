@@ -93,7 +93,7 @@ const reduceTargetMetaData = (
       arr.push({
         targetYear: item.targetYear,
         value: item.value,
-        interim: item.interim
+        isInterim: item.isInterim
       });
 
       return res;
@@ -116,7 +116,7 @@ export const targetData = [].concat(
           country,
           targetType: fieldName,
           targetYear: year,
-          interim: year === 2025,
+          isInterim: year === 2025,
           value:
             fieldName === TargetFieldName.TOTAL
               ? value * (year === 2025 ? 9 : 12)

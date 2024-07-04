@@ -116,7 +116,7 @@ export class APIService {
       .pipe(
         map((targetData: Array<TargetMetaDataRaw>) => {
           return targetData.map((tmd: TargetMetaDataRaw) => {
-            tmd.interim = tmd.targetYear !== 2030;
+            tmd.isInterim = tmd.targetYear !== 2030;
             tmd.country = ISOCountryCodes[tmd.country];
             return tmd;
           });
@@ -152,7 +152,7 @@ export class APIService {
         arr.push({
           targetYear: item.targetYear,
           value: item.value,
-          interim: item.interim
+          isInterim: item.isInterim
         });
         return res;
       },

@@ -9,7 +9,7 @@ export enum TargetFieldName {
 interface TargetMetaDataBase {
   value: number;
   targetYear: number;
-  interim?: boolean;
+  isInterim?: boolean;
 }
 
 export interface TargetMetaDataRaw extends TargetMetaDataBase {

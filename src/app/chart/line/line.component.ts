@@ -128,7 +128,7 @@ export class LineComponent implements AfterViewInit {
     range.axisFill.fill = colour;
     range.axisFill.fillOpacity = 0.3;
 
-    if (targetData.interim) {
+    if (targetData.isInterim) {
       range.grid.strokeDasharray = '3,3';
     }
 
