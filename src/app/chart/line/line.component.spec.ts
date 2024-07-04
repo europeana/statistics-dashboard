@@ -103,7 +103,6 @@ describe('LineComponent', () => {
     component.addSeries('My Series', 'myVal', TargetFieldName.HQ, [
       {
         date: '14/12/2001',
-        label: 'xxx',
         three_d: '12',
         total: '40',
         high_quality: '10'
