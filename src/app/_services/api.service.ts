@@ -1,17 +1,33 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   BreakdownRequest,
+  BreakdownResult,
   BreakdownResults,
+  CountPercentageValue,
   GeneralResults,
-  IHash
+  GeneralResultsFormatted,
+  IHash,
+  IHashArray,
+  TargetCountryData,
+  TargetData,
+  TargetMetaData,
+  TargetMetaDataRaw
 } from '../_models';
 import { ISOCountryCodes } from '../_data';
+import { Cache } from '../_helpers';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
+  private readonly countries = new Cache(() => this.loadCountryData());
+  private readonly generalResults = new Cache(() => this.getGeneralResults());
+  public readonly generalResultsCountry = new Cache(() =>
+    this.loadGeneralResultsCountry()
+  );
+
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
   suffixRightsUrls = 'statistics/rights/urls';
@@ -44,6 +60,28 @@ export class APIService {
     );
   }
 
+  loadGeneralResultsCountry(): Observable<GeneralResults> {
+    return this.generalResults.get();
+  }
+
+  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
+    return this.generalResultsCountry.get().pipe(
+      map((data: GeneralResults) => {
+        const res: GeneralResultsFormatted = {};
+        data.allBreakdowns.forEach((br: BreakdownResult) => {
+          res[br.breakdownBy] = br.results.map((cpv: CountPercentageValue) => {
+            return {
+              name: cpv.value,
+              value: cpv.count,
+              percent: cpv.percentage
+            };
+          });
+        });
+        return res;
+      })
+    );
+  }
+
   getRightsCategoryUrls(
     rightsCategories: Array<string>
   ): Observable<Array<string>> {
@@ -52,6 +90,123 @@ export class APIService {
         `${environment.serverAPI}/${this.suffixRightsUrls}`
       ),
       { params: { rightsCategories } }
+    );
+  }
+
+  /**
+   * loadTargetMetaData
+   *
+   * Expected back-end format:
+   *  {
+   *    "country": "Germany",
+   *    "label": "2025",
+   *    "value": 370,
+   *    "targetType": "three_d" | "high_quality" | "total"
+   *  }...
+   *
+   * @return [TargetMetaDataRaw]
+   **/
+  private loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
+    return this.http
+      .get<Array<TargetMetaDataRaw>>(
+        this.replaceDoubleSlashes(
+          `${environment.serverAPI}/statistics/europeana/targets`
+        )
+      )
+      .pipe(
+        map((targetData: Array<TargetMetaDataRaw>) => {
+          return targetData.map((tmd: TargetMetaDataRaw) => {
+            tmd.isInterim = tmd.targetYear !== 2030;
+            tmd.country = ISOCountryCodes[tmd.country];
+            return tmd;
+          });
+        })
+      );
+  }
+
+  /**
+   * reduceTargetMetaData
+   *
+   * creates hash from raw target data (array) wherein item.county is used as a
+   * key to a further hash, which in turn uses item.targetType to access arrays
+   * of TargetMetaData objects
+   *
+   * @param { Array<TargetMetaDataRaw> } rows - the source data to reduce
+   **/
+  reduceTargetMetaData(
+    rows: Array<TargetMetaDataRaw>
+  ): IHash<IHashArray<TargetMetaData>> {
+    return rows.reduce(
+      (res: IHash<IHashArray<TargetMetaData>>, item: TargetMetaDataRaw) => {
+        const country = item.country;
+        if (!res[country]) {
+          res[country] = {};
+        }
+
+        let arr: Array<TargetMetaData> = res[country][item.targetType];
+        if (!arr) {
+          arr = [];
+          res[country][item.targetType] = arr;
+        }
+
+        arr.push({
+          targetYear: item.targetYear,
+          value: item.value,
+          isInterim: item.isInterim
+        });
+        return res;
+      },
+      {}
+    );
+  }
+
+  /** getTargetMetaData
+   * returns the result of loadTargetMetaData piped / mapped to reduceTargetMetaData
+   **/
+  getTargetMetaData(): Observable<IHash<IHashArray<TargetMetaData>>> {
+    return this.loadTargetMetaData().pipe(
+      map((rows: Array<TargetMetaDataRaw>) => {
+        return this.reduceTargetMetaData(rows);
+      })
+    );
+  }
+
+  loadCountryData(): Observable<Array<TargetCountryData>> {
+    const res = this.http.get<Array<TargetCountryData>>(
+      this.replaceDoubleSlashes(
+        `${environment.serverAPI}/statistics/europeana/target/country/all`
+      )
+    );
+
+    return res.pipe(
+      map((rows: Array<TargetCountryData>) => {
+        rows.forEach((row: TargetCountryData) => {
+          row.country = ISOCountryCodes[row.country] || row.country;
+        });
+        return rows;
+      })
+    );
+  }
+
+  /** getCountryData
+   * returns the result of countries (the cached loadCountryData) mapped to a hash (key: country)
+   **/
+  getCountryData(): Observable<IHash<Array<TargetData>>> {
+    return this.countries.get().pipe(
+      map((rows: Array<TargetCountryData>) => {
+        const res = rows.reduce(
+          (res: IHash<Array<TargetData>>, item: TargetCountryData) => {
+            if (!res[item.country]) {
+              res[item.country] = [];
+            }
+            const { country, ...itemNoCountry } = item;
+            res[country].push(itemNoCountry);
+            return res;
+          },
+          {}
+        );
+        return res;
+      })
     );
   }
 }

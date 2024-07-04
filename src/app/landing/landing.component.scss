@@ -92,6 +92,11 @@ $card-header-height: $card-header-pixels-line-height +
   }
 }
 
+.entry-card-multi {
+  position: relative;
+}
+
+.entry-card-multi,
 .entry-card-pair {
   width: 100%;
   @media (min-width: $bp-desktop) {
@@ -152,6 +157,17 @@ $card-header-height: $card-header-pixels-line-height +
   position: fixed;
   width: calc(100% - 8em);
   z-index: 1;
+}
+
+.target {
+  margin-left: 7px;
+  opacity: 0;
+  top: 4px;
+  transition: opacity 0.2s linear;
+}
+
+a:hover .target {
+  opacity: 1;
 }
 
 @media (min-width: $bp-desktop) {

@@ -6,6 +6,46 @@
   src: url("/assets/fonts/chevin/ChevinMedium.otf") format("opentype");
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes spinIn {
+  from {
+    transform: rotateX(90deg);
+  }
+  to {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes spinOut {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(90deg);
+  }
+}
+
+$targetAnimationDelay: 1250ms;
+$targetAnimationTime: 1750ms;
+$targetAnimationTimeSlow: 3750ms;
+
 .header,
 .logo {
   display: flex;
@@ -59,12 +99,102 @@
     }
   }
 
+  .text,
+  & + .text {
+    font-family: Chevin-Medium, serif;
+    margin-left: 14px;
+  }
+
   .text {
     display: flex;
     flex-direction: column;
-    font-family: Chevin-Medium, serif;
     font-size: 25px;
     line-height: 30px;
-    margin-left: 14px;
   }
+}
+
+.country-link {
+  animation: $targetAnimationTime spinOut $targetAnimationDelay forwards,
+    $targetAnimationTime fadeOut $targetAnimationDelay forwards;
+  color: $linkblue;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 30px;
+  margin-right: -30px;
+
+  &:hover {
+    color: darken($textcolour_link, 15%);
+  }
+}
+
+.active-country {
+  animation: $targetAnimationTime spinIn $targetAnimationDelay forwards,
+    $targetAnimationTime fadeIn $targetAnimationDelay forwards;
+  color: $linkblue;
+  cursor: pointer;
+  font-weight: 600;
+  opacity: 0;
+  padding-left: 0.4em;
+}
+
+.target-menu-wrapper {
+  align-items: center;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.target-select {
+  background-color: #fff;
+  box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
+  border-width: 0;
+  display: grid;
+
+  //font-size: 12px;
+
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  height: 0;
+  left: 4px;
+  line-height: 18px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  transition: opacity 0.1s linear;
+  top: 24px;
+  z-index: 0;
+
+  .target-select-item {
+    padding: 10px 16px;
+  }
+
+  a {
+    //color: $near-black;
+    white-space: nowrap;
+
+    &[disabled] {
+      //color: $gray-light;
+      cursor: default;
+      pointer-events: none;
+      font-weight: bold;
+    }
+  }
+}
+
+.target-menu-wrapper:hover,
+.target-menu-wrapper.open {
+  .active-country {
+    color: darken($textcolour_link, 15%);
+  }
+}
+
+.target-menu-wrapper.open {
+  .target-select {
+    border-width: 1px;
+    opacity: 1;
+    height: auto;
+  }
+}
+
+.target {
+  opacity: 0;
+  animation: $targetAnimationTimeSlow fadeIn $targetAnimationDelay forwards;
 }

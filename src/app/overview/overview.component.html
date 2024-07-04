@@ -268,10 +268,27 @@
 
         <!-- Data Area -->
         <div class="data-area">
+          <ng-template #targetLinks>
+            <!-- COUNTRY TARGET PAGE LINK -->
+            <ul *ngIf="targetLinkAvailable" class="target-links">
+              <li *ngFor="let country of queryParams['country']">
+                <a
+                  class="target"
+                  [attr.title]="country + ' 2025 / 2030 target data'"
+                  [routerLink]="['/country', country]"
+                >
+                </a>
+              </li>
+            </ul>
+          </ng-template>
+
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
 
           <!-- NO-DATA FALLBACK -->
           <div *ngIf="emptyDataset && !isLoading" class="no-data">
+            <!-- COUNTRY TARGET PAGE LINK -->
+            <ng-content *ngTemplateOutlet="targetLinks"></ng-content>
+
             <span i18n="Warn no results@@warnNoResults">No results found!</span>
             <ul>
               <li
@@ -293,6 +310,12 @@
               </li>
             </ul>
           </div>
+
+          <!-- COUNTRY TARGET PAGE LINK -->
+          <ng-container *ngIf="!emptyDataset">
+            <ng-content *ngTemplateOutlet="targetLinks"></ng-content>
+          </ng-container>
+
           <!-- CHART AND SUMMARY -->
           <div class="chart-and-summary">
             <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">
