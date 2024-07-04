@@ -170,11 +170,11 @@ const fnCountryTargetData = (): Array<TargetCountryData> => {
         country: countryName,
         date: dateTicks[dateTicks.length - (dateTickIndex + 1)],
         three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
-        hq: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),
+        high_quality: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),
         total: 0
       };
 
-      resultItem.total = Math.max(resultItem.three_d, resultItem.hq) * 12;
+      resultItem.total = Math.max(resultItem.three_d, resultItem.high_quality) * 12;
       res.push(resultItem);
     });
   });

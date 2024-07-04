@@ -21,7 +21,7 @@ describe('LineComponent', () => {
           value: 1
         } as TargetMetaData
       ],
-      hq: [
+      high_quality: [
         {
           interim: true,
           targetYear: 2025,
@@ -106,7 +106,7 @@ describe('LineComponent', () => {
         label: 'xxx',
         three_d: '12',
         total: '40',
-        hq: '10'
+        high_quality: '10'
       }
     ]);
     expect(component.allSeriesData['myVal']).toBeTruthy();

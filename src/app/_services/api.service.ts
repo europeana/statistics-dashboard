@@ -101,8 +101,7 @@ export class APIService {
    *    "country": "Germany",
    *    "label": "2025",
    *    "value": 370,
-   *    "interim": true,
-   *    "targetType": "three_d" | "hq" | "total"
+   *    "targetType": "three_d" | "high_quality" | "total"
    *  }...
    *
    * @return [TargetMetaDataRaw]

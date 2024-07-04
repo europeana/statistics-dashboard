@@ -2,7 +2,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 export enum TargetFieldName {
   THREE_D = 'three_d',
-  HQ = 'hq',
+  HQ = 'high_quality',
   TOTAL = 'total'
 }
 
@@ -34,4 +34,4 @@ export interface TargetCountryData extends TargetData {
   country: string;
 }
 
-export const TargetSeriesSuffixes = ['3D', 'hq', 'total'];
+export const TargetSeriesSuffixes = ['3D', 'high_quality', 'total'];

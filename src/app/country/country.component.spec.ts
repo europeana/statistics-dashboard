@@ -77,7 +77,7 @@ describe('CountryComponent', () => {
     const datum = {
       date: new Date().toISOString(),
       three_d: '111',
-      hq: '222',
+      high_quality: '222',
       total: '333',
       label: 'last'
     };

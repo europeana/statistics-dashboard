@@ -7,17 +7,17 @@ import { IHash, IHashArray, TargetFieldName, TargetMetaData } from '../_models';
 const mockTargetMetaData = {
   AT: {
     three_d: [],
-    hq: [],
+    high_quality: [],
     total: []
   },
   DE: {
     three_d: [],
-    hq: [],
+    high_quality: [],
     total: []
   },
   FR: {
     three_d: [],
-    hq: [],
+    high_quality: [],
     total: []
   }
 };

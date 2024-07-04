@@ -1,6 +1,6 @@
 /** AbbreviateNumberPipe
-/*
-*/
+ * Pipe numbers to short strings, i.e. 1000 ==> "1k"
+**/
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({

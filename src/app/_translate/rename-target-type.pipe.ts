@@ -8,7 +8,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 const targetTypeNames = {
   total: 'All',
   three_d: '3D',
-  hq: 'HQ'
+  high_quality: 'HQ'
 };
 
 @Pipe({

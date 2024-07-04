@@ -17,7 +17,7 @@ import { LegendGridComponent } from '.';
 const mockTargetMetaData = {
   DE: {
     three_d: [],
-    hq: []
+    high_quality: []
   },
   FR: {
     three_d: []
