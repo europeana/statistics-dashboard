@@ -1,5 +1,4 @@
 context('Statistics Dashboard', () => {
-
   const waitTime = 1500;
 
   describe('legend grid', () => {
@@ -40,7 +39,7 @@ context('Statistics Dashboard', () => {
         .contains('Cyprus')
         .should('have.length', 1)
         .click();
-      cy.wait(waitTime)
+      cy.wait(waitTime);
       cy.get(selPinnedOpener).should('have.length', 2);
     });
 

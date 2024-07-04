@@ -5,8 +5,8 @@ import {
   TargetFieldName,
   TargetMetaData,
   TargetMetaDataRaw
-} from '../_models';
-import { ISOCountryCodes } from './static-data';
+} from '../src/app/_models';
+import { ISOCountryCodes } from '../src/app/_data';
 
 const dateTicks: Array<string> = [];
 const targetCountries = [
@@ -174,7 +174,8 @@ const fnCountryTargetData = (): Array<TargetCountryData> => {
         total: 0
       };
 
-      resultItem.total = Math.max(resultItem.three_d, resultItem.high_quality) * 12;
+      resultItem.total =
+        Math.max(resultItem.three_d, resultItem.high_quality) * 12;
       res.push(resultItem);
     });
   });

@@ -12,8 +12,9 @@ import {
   IHashArray,
   RequestFilter
 } from '../src/app/_models';
-import { countryTargetData, facetNames, targetData } from '../src/app/_data';
+import { facetNames } from '../src/app/_data';
 import { CHO, IHashBoolean } from './_models/test-models';
+import { countryTargetData, targetData } from './static-country-data';
 import { DataGenerator } from './data-generator';
 
 new (class extends TestDataServer {
