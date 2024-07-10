@@ -20,7 +20,7 @@ const routes: Routes = [
         .CookiePolicyComponent
   },
   {
-    path: 'privacy-policy',
+    path: 'privacy-statement',
     loadComponent: async () =>
       (await import('./privacy-statement/privacy-statement.component'))
         .PrivacyStatementComponent

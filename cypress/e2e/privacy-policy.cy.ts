@@ -8,7 +8,7 @@ context('Statistics Dashboard', () => {
 
     it('should show the privacy statement when the user goes there directly', () => {
       cy.get(selPrivacy).should('not.exist');
-      cy.visit('/privacy-policy');
+      cy.visit('/privacy-statement');
       cy.get(selPrivacy).should('have.length', 1);
     });
 
