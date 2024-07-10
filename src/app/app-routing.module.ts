@@ -22,8 +22,8 @@ const routes: Routes = [
   {
     path: 'privacy-policy',
     loadComponent: async () =>
-      (await import('./privacy-policy/privacy-policy.component'))
-        .PrivacyPolicyComponent
+      (await import('./privacy-statement/privacy-statement.component'))
+        .PrivacyStatementComponent
   },
   {
     path: '',
