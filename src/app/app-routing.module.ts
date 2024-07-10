@@ -6,11 +6,16 @@ import {
   MatomoRouterModule,
   MatomoRouteDataInterceptor
 } from 'ngx-matomo-client';
+import { CountryComponent } from './country/country.component';
 
 const pageTitle = 'Statistics Dashboard';
 const routes: Routes = [
   {
     title: `${pageTitle} | Filters`,
+    path: 'country/:country',
+    component: CountryComponent
+  },
+  {
     path: 'data/:facet',
     component: OverviewComponent
   },

@@ -1,0 +1,213 @@
+@import "../../scss/_variables";
+@import "../../scss/functions/_icon_urls";
+@import "../../scss/functions/_replace";
+
+.appendice-grid-wrapper {
+  $timeTransition: 0.5s;
+
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows $timeTransition linear;
+
+  &.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  & > * {
+    overflow-y: hidden;
+  }
+}
+
+.appendice-toggle {
+  display: flex;
+  justify-self: flex-end;
+  flex-direction: row;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  margin: 14px 22px 0 auto;
+
+  position: relative;
+  color: $gray-med;
+  .save {
+    position: absolute;
+    left: auto;
+    right: -24px;
+    transform: rotate(90deg);
+  }
+  &:hover .save {
+    transform: rotate(0deg);
+  }
+}
+
+.column-close {
+  align-items: center;
+  align-self: flex-start;
+  display: flex;
+  white-space: nowrap;
+
+  .x {
+    margin-left: 0.6em;
+    opacity: 0;
+  }
+
+  &:hover .x {
+    opacity: 1;
+  }
+
+  &:active + .entry-card-content {
+    transform: rotate(1deg);
+  }
+}
+
+.column-close,
+.column-restore {
+  color: $gray-med;
+}
+
+.column-restore {
+  font-weight: bold;
+  position: absolute;
+  right: 1em;
+  top: 1em;
+}
+
+.entry-card,
+.entry-card-header {
+  position: relative;
+}
+
+.entry-card-multi > .entry-card:first-child:last-child {
+  width: 100%;
+}
+
+.line-and-legend {
+  position: relative;
+
+  .entry-card-multi {
+    justify-content: space-evenly;
+    & > :first-child {
+      flex-grow: 1;
+    }
+  }
+}
+
+.powerbar,
+.powerbar-charge {
+  height: 3em;
+}
+
+.powerbar {
+  position: relative;
+  background-color: transparent;
+  border: 1px solid $gray-5;
+}
+
+.powerbar-charge {
+  background-color: $stats-blue;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.powerbar-charge-label {
+  color: $stats-blue;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 150%;
+  margin-left: 1rem;
+  position: absolute;
+  top: 6px;
+
+  &.zeroed {
+    color: #fff;
+    left: 0;
+  }
+}
+
+.powerbar-label-left,
+.powerbar-label-right {
+  font-size: 20px;
+  margin: 0 0.6em;
+}
+
+.powerbar-label-left {
+  font-weight: 600;
+}
+
+.powerbar-label-right {
+  float: right;
+}
+
+.powerbar-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 1.6em 0.6em;
+  position: relative;
+
+  &:not(.labels-above) {
+    flex-direction: column-reverse;
+
+    .powerbar-target-labels {
+      margin-top: 0.6em;
+    }
+  }
+
+  &.labels-above {
+    .powerbar-target-labels {
+      margin-bottom: 0.6em;
+    }
+  }
+}
+
+.powerbar-charge-label,
+.total,
+.total-title {
+  .hide-on-triple {
+    display: inline;
+  }
+  .show-on-triple {
+    display: none;
+  }
+
+  &.triple {
+    .hide-on-triple {
+      display: none;
+    }
+
+    .show-on-triple {
+      display: inline;
+    }
+  }
+}
+
+// show only the last restore link
+.entry-card:not(:last-child):not(.line-and-legend) .column-restore {
+  display: none;
+}
+
+// prevent user from deleting everything
+.entry-card:first-child:last-child .column-close {
+  pointer-events: none;
+}
+
+.entry-card-content.entry-card-totals {
+  .totals {
+    & > :last-child {
+      display: none;
+    }
+  }
+}
+
+.entry-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  margin: 1em 0.6em;
+}
+
+.save {
+  opacity: 1;
+}
