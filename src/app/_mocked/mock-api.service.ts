@@ -5,7 +5,6 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  GeneralResultsFormatted,
   IHash,
   IHashArray,
   RequestFilter,
@@ -673,10 +672,6 @@ export class MockAPIService {
   }
 
   getCountryData(): Observable<IHash<Array<TargetData>>> {
-    return of({});
-  }
-
-  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
     return of({});
   }
 }
