@@ -3,13 +3,14 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
+import { MockHttp } from '@europeana/metis-ui-test-utils';
 import { environment } from '../../environments/environment';
-import { BreakdownResults, GeneralResults, TargetFieldName } from '../_models';
+import { GeneralResults, TargetFieldName } from '../_models';
 import { APIService } from './';
 
 describe('API Service', () => {
   let service: APIService;
-  let http: HttpTestingController;
+  let mockHttp: MockHttp;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -17,7 +18,7 @@ describe('API Service', () => {
       imports: [HttpClientTestingModule]
     }).compileComponents();
     service = TestBed.inject(APIService);
-    http = TestBed.inject(HttpTestingController);
+    mockHttp = new MockHttp(TestBed.inject(HttpTestingController));
   }));
 
   it('should load the country data from the cache', () => {
@@ -27,15 +28,15 @@ describe('API Service', () => {
       expect(res).toBeTruthy();
     });
     sub.unsubscribe();
-    http.expectOne(baseUrl);
-    http.verify();
+    mockHttp.expect('GET', baseUrl).send([{}]);
+    mockHttp.verify();
 
     expect(service.loadCountryData).toHaveBeenCalled();
     const sub2 = service.getCountryData().subscribe((res) => {
       expect(res).toBeTruthy();
     });
     sub2.unsubscribe();
-    http.verify();
+    mockHttp.verify();
     expect(service.loadCountryData).toHaveBeenCalledTimes(1);
   });
 
@@ -44,21 +45,19 @@ describe('API Service', () => {
     const sub = service.getTargetMetaData().subscribe((res) => {
       expect(res).toBeTruthy();
     });
+    mockHttp.expect('GET', baseUrl).send([{}]);
     sub.unsubscribe();
-    http.expectOne(baseUrl);
-    http.verify();
+    mockHttp.verify();
   });
 
   it('should load the breakdowns', () => {
     const baseUrl = `${environment.serverAPI}/${service.suffixFiltering}`;
-    const sub = service
-      .getBreakdowns({ filters: {} })
-      .subscribe((res: BreakdownResults) => {
-        expect(res).toBeTruthy();
-      });
+    const sub = service.getBreakdowns({ filters: {} }).subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+    mockHttp.expect('POST', baseUrl).body({ filters: {} }).send({});
+    mockHttp.verify();
     sub.unsubscribe();
-    http.expectOne(baseUrl);
-    http.verify();
   });
 
   it('should load the general results', () => {
@@ -66,9 +65,9 @@ describe('API Service', () => {
     const sub = service.getGeneralResults().subscribe((res: GeneralResults) => {
       expect(res).toBeTruthy();
     });
+    mockHttp.expect('GET', baseUrl).send({});
+    mockHttp.verify();
     sub.unsubscribe();
-    http.expectOne(baseUrl);
-    http.verify();
   });
 
   it('should load the general results with content-tier-zero', () => {
@@ -79,9 +78,9 @@ describe('API Service', () => {
       .subscribe((res: GeneralResults) => {
         expect(res).toBeTruthy();
       });
+    mockHttp.expect('GET', baseUrl).send({});
+    mockHttp.verify();
     sub.unsubscribe();
-    http.expectOne(baseUrl);
-    http.verify();
   });
 
   it('should load the ISO country codes', () => {
@@ -90,6 +89,15 @@ describe('API Service', () => {
 
   it('should load the rightsCategory urls', () => {
     expect(service.getRightsCategoryUrls(['CC0'])).toBeTruthy();
+  });
+
+  it('should load the target metadata', () => {
+    const sub = service.getTargetMetaData().subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+    mockHttp.expect('GET', '/' + service.suffixTargetsUrl).send([]);
+    mockHttp.verify();
+    sub.unsubscribe();
   });
 
   it('should reduce the target metadata', () => {
