@@ -23,11 +23,12 @@ import { combineLatest, map } from 'rxjs';
 
 import { colours, externalLinks, ISOCountryCodes } from '../_data';
 import {
-  CountryTotalInfo,
+  BreakdownResults,
+  CountPercentageValue,
   DimensionName,
-  GeneralResultsFormatted,
   IHash,
   IHashArray,
+  NamesValuePercent,
   TargetData,
   TargetFieldName,
   TargetMetaData
@@ -84,10 +85,13 @@ export class CountryComponent extends SubscriptionManager {
   public TargetFieldName = TargetFieldName;
   public colours = colours;
 
+  cardData: IHash<Array<NamesValuePercent>> = {};
+
   // Used to parameterise links to the data page
   @Input() includeCTZero = false;
   @ViewChild('lineChart') lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
+  @ViewChild('barChart') barChart: BarComponent;
 
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
@@ -97,13 +101,32 @@ export class CountryComponent extends SubscriptionManager {
   columnsEnabled: IHash<boolean> = {};
   columnToEnable?: TargetFieldName;
 
-  country: string;
-  countryCode: string;
-  countryLandingData: GeneralResultsFormatted = {};
+  _country: string;
 
+  /** country
+   *  setter is used to load tertiary level card data
+   **/
+  set country(country: string) {
+    this._country = country;
+    this.loadDimensionCardData(DimensionName.dataProvider);
+    this.loadDimensionCardData(DimensionName.provider);
+    this.loadDimensionCardData(DimensionName.rightsCategory);
+    this.loadDimensionCardData(DimensionName.type, () => {
+      if (this.barChart) {
+        this.barChart.removeAllSeries();
+        this.barChart.results = this.cardData[DimensionName.type];
+        this.barChart.ngAfterViewInit();
+      }
+    });
+  }
+
+  get country(): string {
+    return this._country;
+  }
+
+  countryCode: string;
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
-  countryTotalMap: IHash<CountryTotalInfo>;
   latestCountryData: TargetData;
   appendiceExpanded = false;
 
@@ -149,12 +172,46 @@ export class CountryComponent extends SubscriptionManager {
           }
         })
     );
+  }
+
+  /** loadDimensionCardData
+   * loads dimension card data
+   * @param { DimensionName } dimensionName
+   * @param { ()=> void } fnCallback
+   **/
+  loadDimensionCardData(
+    dimensionName: DimensionName,
+    fnCallback?: () => void
+  ): void {
+    const req = {
+      filters: {
+        contentTier: { values: ['1', '2', '3', '4'] },
+        country: { values: [this.country] }
+      }
+    };
+    req.filters[dimensionName] = { breakdown: 0 };
 
     this.subs.push(
       this.api
-        .getGeneralResultsCountry()
-        .subscribe((data: GeneralResultsFormatted) => {
-          this.countryLandingData = data;
+        .getBreakdowns(req)
+        .pipe(
+          map((br: BreakdownResults) => {
+            return br.results.breakdowns.results;
+          })
+        )
+        .subscribe((res) => {
+          this.cardData[dimensionName] = res.map(
+            (cpv: CountPercentageValue) => {
+              return {
+                name: cpv.value,
+                value: cpv.count,
+                percent: cpv.percentage
+              };
+            }
+          );
+          if (fnCallback) {
+            fnCallback();
+          }
         })
     );
   }

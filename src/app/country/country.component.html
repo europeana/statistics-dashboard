@@ -476,28 +476,24 @@
         <span class="entry-card-header" i18n="@@countryEntryType"
           >Explore by type of content</span
         >
-        <div
-          class="entry-card-content"
-          *ngIf="countryLandingData[DimensionName.type]"
-        >
+        <div class="entry-card-content" *ngIf="cardData[DimensionName.type]">
           <ng-content
             *ngTemplateOutlet="
               cardSummary;
               context: {
                 dimension: DimensionName.type,
-                name: countryLandingData[DimensionName.type][0].name,
-                value: countryLandingData[DimensionName.type][0].value,
-                percent: countryLandingData[DimensionName.type][0].percent,
+                name: cardData[DimensionName.type][0].name,
+                value: cardData[DimensionName.type][0].value,
+                percent: cardData[DimensionName.type][0].percent,
                 isPowerLevel: false
               }
             "
           ></ng-content>
-
           <app-bar-chart
+            #barChart
             chartId="typeChart"
-            [results]="countryLandingData[DimensionName.type]"
+            [results]="cardData[DimensionName.type]"
           ></app-bar-chart>
-
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
@@ -528,7 +524,7 @@
                 dataRows;
                 context: {
                   dimension: DimensionName.rightsCategory,
-                  data: countryLandingData[DimensionName.rightsCategory]
+                  data: cardData[DimensionName.rightsCategory]
                 }
               "
             ></ng-content>
@@ -560,7 +556,7 @@
                 dataRows;
                 context: {
                   dimension: DimensionName.dataProvider,
-                  data: countryLandingData[DimensionName.dataProvider]
+                  data: cardData[DimensionName.dataProvider]
                 }
               "
             ></ng-content>
@@ -595,7 +591,7 @@
                 dataRows;
                 context: {
                   dimension: DimensionName.provider,
-                  data: countryLandingData[DimensionName.provider]
+                  data: cardData[DimensionName.provider]
                 }
               "
             ></ng-content>

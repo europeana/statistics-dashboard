@@ -4,7 +4,13 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef
 } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync
+} from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 
 import { of } from 'rxjs';
@@ -12,7 +18,7 @@ import { of } from 'rxjs';
 import { APIService } from '../_services';
 import { MockAPIService, MockLineComponent } from '../_mocked';
 import { TargetFieldName } from '../_models';
-import { LineComponent } from '../chart';
+import { BarComponent, LineComponent } from '../chart';
 
 import { CountryComponent } from '.';
 
@@ -72,6 +78,19 @@ describe('CountryComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should set the country', fakeAsync(() => {
+    const barChart = {
+      removeAllSeries: jasmine.createSpy(),
+      ngAfterViewInit: jasmine.createSpy()
+    } as unknown as BarComponent;
+
+    component.barChart = barChart;
+    component.country = 'France';
+    tick(1);
+    expect(barChart.removeAllSeries).toHaveBeenCalled();
+    expect(barChart.ngAfterViewInit).toHaveBeenCalled();
+  }));
 
   it('should set the country data', () => {
     const datum = {
