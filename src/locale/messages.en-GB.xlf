@@ -185,7 +185,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="targetCountriesTitle" datatype="html">
-        <source>Target Data</source>
+        <source>Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">3</context>
@@ -224,7 +224,7 @@
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
-        <source> Percent </source>
+        <source> Percent of all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">128,130</context>

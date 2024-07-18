@@ -57,7 +57,7 @@
         <source>Aggregatori</source>
       </trans-unit>
       <trans-unit id="targetCountriesTitle" datatype="html">
-        <source>Dati Target</source>
+        <source>Dati</source>
       </trans-unit>
 
       <trans-unit id="countryChartSummaryData" datatype="html">
@@ -73,7 +73,7 @@
         <source>Percentuale corrispondente</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
-        <source>Percentuale</source>
+        <source>Percento di tutti</source>
       </trans-unit>
       <trans-unit id="countryLandingDataHeader" datatype="html">
         <source>RECORD FORNITI</source>

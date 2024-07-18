@@ -57,7 +57,13 @@
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         @if (countryLink){
         <a [routerLink]="['/country', row.name]">
-          <span>{{ row.name }}<span class="target"></span></span>
+          <span
+            >{{ row.name
+            }}<span
+              class="flag-orb"
+              [ngClass]="ISOCountryCodes[row.name]"
+            ></span
+          ></span>
         </a>
         } @else {
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
@@ -161,7 +167,7 @@
         >Explore by providing countries</span
       >
       <div class="entry-card-content">
-        <div class="entry-card-pair">
+        <div class="entry-card-pair map-section">
           <div class="map-container">
             <app-map-chart [results]="data"></app-map-chart>
           </div>

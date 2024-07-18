@@ -36,18 +36,21 @@ describe('HeaderComponent', () => {
 
   it('should toggle the menu', () => {
     const isDisabled = false;
+    const spyStopPropagation = jasmine.createSpy();
     const e = {
       target: {
         getAttribute: () => {
           return isDisabled;
         }
-      } as unknown as HTMLElement
-    };
+      } as unknown as HTMLElement,
+      stopPropagation: spyStopPropagation
+    } as unknown as MouseEvent;
     expect(component.menuIsOpen).toBeFalsy();
     component.toggleMenu(e);
     expect(component.menuIsOpen).toBeTruthy();
     component.toggleMenu(e);
     expect(component.menuIsOpen).toBeFalsy();
+    expect(spyStopPropagation).toHaveBeenCalledTimes(2);
   });
 
   it('should close the menu when activeCountry is set', () => {

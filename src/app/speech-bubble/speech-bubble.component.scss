@@ -1,0 +1,57 @@
+@import "../../scss/_variables";
+
+$arrow-height: 10px;
+$arrow-width: 5px;
+$arrow-rotation: 30deg;
+$arrow-rotation-rest: 330deg;
+
+.speech-bubble {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid $gray-5;
+  color: $gray-faint;
+  position: relative;
+
+  &::after,
+  &::before {
+    bottom: -($arrow-height - 1);
+    border-color: transparent;
+    border-bottom-width: $arrow-height;
+    border-left-width: $arrow-height;
+    border-right: $arrow-width solid #d8d8d8;
+    border-style: solid;
+    content: "";
+    position: absolute;
+    right: 11px;
+  }
+
+  &::before {
+    transform: rotate($arrow-rotation);
+  }
+
+  &::after {
+    border-right-color: #fff;
+    transform: scale(0.8) translate(2px, -2px) rotate($arrow-rotation);
+    z-index: 1;
+  }
+}
+
+.arrow-top {
+  top: $arrow-height + 2;
+  right: -3px;
+
+  &::after,
+  &::before {
+    bottom: auto;
+    top: -($arrow-height - 1);
+  }
+
+  &::before {
+    transform: rotate($arrow-rotation-rest) scaleY(-1);
+  }
+
+  &::after {
+    transform: scale(0.8) scaleY(-1) translate(2px, -2px)
+      rotate($arrow-rotation);
+  }
+}

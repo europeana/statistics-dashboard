@@ -268,18 +268,33 @@
 
         <!-- Data Area -->
         <div class="data-area">
+          <!-- Country Page Shortcut Links -->
           <ng-template #targetLinks>
-            <!-- COUNTRY TARGET PAGE LINK -->
-            <ul *ngIf="targetLinkAvailable" class="target-links">
-              <li *ngFor="let country of queryParams['country']">
-                <a
-                  class="target"
-                  [attr.title]="country + ' 2025 / 2030 target data'"
-                  [routerLink]="['/country', country]"
-                >
-                </a>
-              </li>
-            </ul>
+            <ng-container *ngIf="targetLinkAvailable">
+              <div class="country-shortcut-links-container">
+                <span
+                  class="flag-orb default opener"
+                  title="View country data"
+                ></span>
+                <app-speech-bubble [arrowTop]="true">
+                  <ul class="target-links">
+                    <li *ngFor="let country of queryParams['country']">
+                      <a
+                        [attr.title]="'View ' + country + ' country data'"
+                        [routerLink]="['/country', country]"
+                      >
+                        {{ country }}
+                        <span
+                          class="flag-orb"
+                          [ngClass]="ISOCountryCodes[country]"
+                        >
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                </app-speech-bubble>
+              </div>
+            </ng-container>
           </ng-template>
 
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>

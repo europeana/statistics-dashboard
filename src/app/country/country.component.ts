@@ -47,6 +47,7 @@ import { BarComponent, LineComponent } from '../chart';
 import { LegendGridComponent } from '../legend-grid';
 import { ResizeComponent } from '../resize';
 import { SubscriptionManager } from '../subscription-manager';
+import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
 
 @Component({
@@ -63,6 +64,7 @@ import { TruncateComponent } from '../truncate';
     ResizeComponent,
     NgIf,
     NgFor,
+    SpeechBubbleComponent,
     TruncateComponent,
     NgTemplateOutlet,
     BarComponent,
@@ -82,6 +84,7 @@ import { TruncateComponent } from '../truncate';
 export class CountryComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
+  public ISOCountryCodes = ISOCountryCodes;
   public TargetFieldName = TargetFieldName;
   public colours = colours;
 
@@ -96,6 +99,8 @@ export class CountryComponent extends SubscriptionManager {
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
   public countryCodes = ISOCountryCodes;
+
+  showTargetsData = false;
 
   columnsEnabledCount = 3;
   columnsEnabled: IHash<boolean> = {};
@@ -118,6 +123,7 @@ export class CountryComponent extends SubscriptionManager {
         this.barChart.ngAfterViewInit();
       }
     });
+    this.showTargetsData = !!this.targetMetaData[ISOCountryCodes[country]];
   }
 
   get country(): string {
@@ -226,7 +232,8 @@ export class CountryComponent extends SubscriptionManager {
     this.countryCode = ISOCountryCodes[this.country];
 
     const specificCountryData = this.countryData[this.countryCode];
-    if (specificCountryData.length) {
+
+    if (specificCountryData && specificCountryData.length) {
       this.latestCountryData =
         specificCountryData[specificCountryData.length - 1];
     }

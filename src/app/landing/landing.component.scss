@@ -159,15 +159,19 @@ $card-header-height: $card-header-pixels-line-height +
   z-index: 1;
 }
 
-.target {
-  margin-left: 7px;
-  opacity: 0;
-  top: 4px;
-  transition: opacity 0.2s linear;
-}
+.map-section {
+  .flag-orb {
+    margin-left: 7px;
+    opacity: 0;
+    top: 2px;
+    transition: opacity 0.2s linear;
+    height: 1em;
+    width: 1em;
+  }
 
-a:hover .target {
-  opacity: 1;
+  a:hover .flag-orb {
+    opacity: 1;
+  }
 }
 
 @media (min-width: $bp-desktop) {

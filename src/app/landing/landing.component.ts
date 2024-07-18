@@ -10,7 +10,7 @@ import {
 import { Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { externalLinks } from '../_data';
+import { externalLinks, ISOCountryCodes } from '../_data';
 import { DimensionName, GeneralResultsFormatted } from '../_models';
 import { RenameApiFacetPipe, RenameApiFacetShortPipe } from '../_translate';
 import { BarComponent } from '../chart';
@@ -42,6 +42,7 @@ import { TruncateComponent } from '../truncate';
 export class LandingComponent {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
+  public ISOCountryCodes = ISOCountryCodes;
 
   // Used to parameterise links to the data page
   @Input() includeCTZero = false;

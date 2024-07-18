@@ -65,6 +65,11 @@ context('Statistics Dashboard', () => {
       cy.get(selPowerBar3D).should('have.length', 2);
     });
 
+    it('should show the power bar summaries', () => {
+      const selSummary = '[e2e="power-bar-summary"]';
+      cy.get(selSummary).should('have.length', 3);
+    });
+
     it('should show the data entry point links', () => {
       const selLinkData3D = '[data-e2e=link-entry-3d]';
       const selLinkDataHQ = '[data-e2e=link-entry-hq]';
@@ -89,12 +94,11 @@ context('Statistics Dashboard', () => {
     });
 
     const selLinkHomeHeader = '[data-e2e=link-home-header]';
-    const selTarget = '.header .target';
+    const selTarget = '.header .opener';
     const selTargetMenu = '.header .target-select';
     const selTargetLink = '.header .target-select a span';
-    const selTargetLinkActive = '.header .target-select a[disabled]';
 
-    it('should open the target menu', () => {
+    it('should open the country menu', () => {
       cy.get(selTarget).should('have.length', 1);
       cy.get(selTargetMenu).should('have.length', 1);
       cy.get(selTargetMenu).should('not.be.visible');
@@ -105,15 +109,19 @@ context('Statistics Dashboard', () => {
     it('should open the country target page', () => {
       const country = 'Austria';
 
+      const selTargetLink = '.header .target-select a';
+
       cy.url().should('not.include', country);
-      cy.get(selTargetLinkActive).should('not.exist');
+      cy.get(selTargetLink).should('exist');
+      cy.get(selTargetLink).should('not.have.attr', 'disabled');
 
       cy.wait(3000);
       cy.get(selTargetLink).contains(country).click(force);
       cy.wait(3000);
 
       cy.url().should('include', country);
-      cy.get(selTargetLinkActive).should('have.length', 1);
+      cy.get(selTargetLink).should('have.attr', 'disabled');
+      //cy.get(selTargetLinkActive).should('have.length', 1);
     });
 
     it('should change the country target page', () => {
@@ -134,6 +142,22 @@ context('Statistics Dashboard', () => {
 
       cy.get(selLinkHomeHeader).click(force);
       cy.url().should('not.include', country2);
+    });
+
+    it('should show open non member-state pages', () => {
+      const country1 = 'Austria';
+      const country2 = 'Europe';
+      const country3 = 'Belgium';
+      const selEntryCard = '.entry-card';
+
+      cy.get(selTargetLink).contains(country1).click(force);
+      cy.get(selEntryCard).should('have.length', 8);
+
+      cy.get(selTargetLink).contains(country2).click(force);
+      cy.get(selEntryCard).should('have.length', 4);
+
+      cy.get(selTargetLink).contains(country3).click(force);
+      cy.get(selEntryCard).should('have.length', 8);
     });
   });
 });

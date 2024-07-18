@@ -15,36 +15,8 @@
   }
 }
 
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes spinIn {
-  from {
-    transform: rotateX(90deg);
-  }
-  to {
-    transform: rotateX(0deg);
-  }
-}
-
-@keyframes spinOut {
-  from {
-    transform: rotateX(0deg);
-  }
-  to {
-    transform: rotateX(90deg);
-  }
-}
-
 $targetAnimationDelay: 1250ms;
 $targetAnimationTime: 1750ms;
-$targetAnimationTimeSlow: 3750ms;
 
 .header,
 .logo {
@@ -113,70 +85,138 @@ $targetAnimationTimeSlow: 3750ms;
   }
 }
 
-.country-link {
-  animation: $targetAnimationTime spinOut $targetAnimationDelay forwards,
-    $targetAnimationTime fadeOut $targetAnimationDelay forwards;
-  color: $linkblue;
-  font-size: 20px;
-  font-weight: 900;
-  line-height: 30px;
-  margin-right: -30px;
+.menu-item {
+  color: $stats-blue;
 
+  align-items: center;
+  display: flex;
+  position: relative;
+
+  &:not([disabled]) > .flag-orb {
+    opacity: 0;
+  }
   &:hover {
-    color: darken($textcolour_link, 15%);
+    .flag-orb {
+      opacity: 1;
+    }
+  }
+
+  &:hover,
+  &[disabled] {
+    .first-of-letter {
+      display: none;
+    }
+  }
+
+  .flag-orb {
+    height: 0.8em;
+    width: 0.8em;
+  }
+
+  :last-child {
+    padding: 8px 16px 8px 8px;
+  }
+
+  .first-of-letter {
+    color: $linkblue;
+    font-size: 0;
+    font-weight: 900;
+    left: -8px;
+    top: 6px;
+
+    position: absolute;
+
+    &::first-letter {
+      font-size: 16px;
+      font-size: 18px;
+      padding: 0 8px;
+    }
   }
 }
 
 .active-country {
-  animation: $targetAnimationTime spinIn $targetAnimationDelay forwards,
-    $targetAnimationTime fadeIn $targetAnimationDelay forwards;
   color: $linkblue;
-  cursor: pointer;
   font-weight: 600;
+  position: absolute;
+  left: 3em;
+  white-space: nowrap;
+}
+
+.active-country,
+.flag-orb.opener {
+  animation: $targetAnimationTime fadeIn $targetAnimationDelay forwards;
   opacity: 0;
-  padding-left: 0.4em;
+}
+
+.active-country,
+.opener {
+  cursor: pointer;
+}
+
+.opener {
+  margin-left: 10px;
+  z-index: 1;
 }
 
 .target-menu-wrapper {
   align-items: center;
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
+  margin-left: 1.6em;
+  position: relative;
+}
+
+.target-select,
+.target-select-inner {
+  border-radius: 0.5em;
 }
 
 .target-select {
-  background-color: #fff;
-  box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
   border-width: 0;
-  display: grid;
+  box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
 
-  //font-size: 12px;
-
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // prevent inheritance of opener's cursor
+  cursor: default;
   height: 0;
-  left: 4px;
-  line-height: 18px;
+  left: -12em;
   opacity: 0;
   overflow: hidden;
   position: absolute;
+  top: 50px;
   transition: opacity 0.1s linear;
-  top: 24px;
-  z-index: 0;
 
-  .target-select-item {
-    padding: 10px 16px;
+  // speech bubble decoration
+  &::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+    border: 1px solid $gray-5;
+    position: absolute;
+    left: 12.25em;
+    top: -8px;
+    transform: rotate(45deg);
   }
 
   a {
-    //color: $near-black;
     white-space: nowrap;
-
     &[disabled] {
-      //color: $gray-light;
       cursor: default;
       pointer-events: none;
       font-weight: bold;
     }
   }
+}
+
+.target-select-inner {
+  background-color: #fff;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-column-gap: 1em;
+  max-height: 65vh;
+  overflow-y: auto;
+  padding: 12px 12px 12px 24px;
+  position: relative;
 }
 
 .target-menu-wrapper:hover,
@@ -191,10 +231,30 @@ $targetAnimationTimeSlow: 3750ms;
     border-width: 1px;
     opacity: 1;
     height: auto;
+    overflow: visible;
   }
 }
 
-.target {
-  opacity: 0;
-  animation: $targetAnimationTimeSlow fadeIn $targetAnimationDelay forwards;
+@media (min-width: $bp-small-3) {
+  .target-select-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: $bp-med) {
+  .target-select-inner {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (min-width: $bp-large) {
+  .target-select-inner {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (min-width: $bp-xl) {
+  .target-select-inner {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
 }
