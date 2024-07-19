@@ -5,6 +5,8 @@
 @import "variables";
 @import "functions/icon_urls";
 
+$flag-orb-dimension: 1.6rem;
+
 .country-shortcut-links-container {
   .speech-bubble {
     float: right;
@@ -32,15 +34,12 @@
   }
 }
 
-//////////////////////
-
-$dimension: 1.6rem;
-//$dimension: 12rem;
+// Flag Orbs
 
 .flag-orb {
   display: inline-block;
-  width: $dimension;
-  height: $dimension;
+  width: $flag-orb-dimension;
+  height: $flag-orb-dimension;
 }
 
 .flag-orb.default::after {
@@ -146,14 +145,6 @@ $dimension: 1.6rem;
 .USA::after {
   background-position: 40%;
 }
-
-// Flag Decoration
-/*
-.default::after {
-  background-image: svg-url-icon-flag(#{$linkblue});
-  //box-shadow: none;
-}
-*/
 
 // Austria
 .AT::after {
