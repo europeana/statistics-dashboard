@@ -140,7 +140,7 @@ export const memberStateCountryCodes = [
   'SE'
 ];
 
-export const ISOCountryCodes = {
+export const isoCountryCodes = {
   Austria: 'AT',
   Azerbaijan: 'AZ',
   Belgium: 'BE',
@@ -195,7 +195,7 @@ export const ISOCountryCodes = {
   Europe: 'EU'
 };
 
-export const ISOCountryCodesReversed = Object.entries(ISOCountryCodes).reduce(
+export const isoCountryCodesReversed = Object.entries(isoCountryCodes).reduce(
   (obj, item) => (obj[item[1]] = item[0]) && obj,
   {}
 );

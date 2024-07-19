@@ -30,7 +30,7 @@ import { environment } from '../../environments/environment';
 import {
   externalLinks,
   facetNames,
-  ISOCountryCodes,
+  isoCountryCodes,
   nonFacetFilters,
   portalNames,
   portalNamesFriendly
@@ -134,7 +134,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
   public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
-  public ISOCountryCodes = ISOCountryCodes;
+  public isoCountryCodes = isoCountryCodes;
 
   public barChartSettings = {
     prefixValueAxis: '',

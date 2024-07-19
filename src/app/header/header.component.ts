@@ -5,7 +5,7 @@ import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.compo
 import { KeyValuePipe, NgClass, NgFor } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { ISOCountryCodes } from '../_data';
+import { isoCountryCodes } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
 import { CountryTotalInfo, IHash } from '../_models';
 
@@ -29,7 +29,7 @@ export class HeaderComponent {
   @Input() includeCTZero: boolean;
   @Input() showPageTitle = false;
 
-  public ISOCountryCodes = ISOCountryCodes;
+  public isoCountryCodes = isoCountryCodes;
 
   _countryTotalMap: IHash<CountryTotalInfo>;
   countryFirstOfLetter: IHash<boolean> = {};

@@ -21,7 +21,7 @@ import {
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 
-import { colours, externalLinks, ISOCountryCodes } from '../_data';
+import { colours, externalLinks, isoCountryCodes } from '../_data';
 import {
   BreakdownResults,
   CountPercentageValue,
@@ -84,7 +84,7 @@ import { TruncateComponent } from '../truncate';
 export class CountryComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
-  public ISOCountryCodes = ISOCountryCodes;
+  public isoCountryCodes = isoCountryCodes;
   public TargetFieldName = TargetFieldName;
   public colours = colours;
 
@@ -98,7 +98,7 @@ export class CountryComponent extends SubscriptionManager {
 
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
-  public countryCodes = ISOCountryCodes;
+  public countryCodes = isoCountryCodes;
 
   showTargetsData = false;
 
@@ -123,7 +123,7 @@ export class CountryComponent extends SubscriptionManager {
         this.barChart.ngAfterViewInit();
       }
     });
-    this.showTargetsData = !!this.targetMetaData[ISOCountryCodes[country]];
+    this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
   }
 
   get country(): string {
@@ -229,7 +229,7 @@ export class CountryComponent extends SubscriptionManager {
 
   setCountryToParam(country: string): void {
     this.country = country;
-    this.countryCode = ISOCountryCodes[this.country];
+    this.countryCode = isoCountryCodes[this.country];
 
     const specificCountryData = this.countryData[this.countryCode];
 

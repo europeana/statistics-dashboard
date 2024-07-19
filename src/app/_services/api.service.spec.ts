@@ -84,7 +84,7 @@ describe('API Service', () => {
   });
 
   it('should load the ISO country codes', () => {
-    expect(service.loadISOCountryCodes()).toBeTruthy();
+    expect(service.loadIsoCountryCodes()).toBeTruthy();
   });
 
   it('should load the rightsCategory urls', () => {

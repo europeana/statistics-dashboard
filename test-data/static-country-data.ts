@@ -7,8 +7,8 @@ import {
   TargetMetaDataRaw
 } from '../src/app/_models';
 import {
-  ISOCountryCodes,
-  ISOCountryCodesReversed,
+  isoCountryCodes,
+  isoCountryCodesReversed,
   memberStateCountryCodes
 } from '../src/app/_data';
 
@@ -62,7 +62,7 @@ const reduceTargetMetaData = (
 export const targetData = [].concat(
   ...memberStateCountryCodes
     .map((countryCode: string) => {
-      return ISOCountryCodesReversed[countryCode];
+      return isoCountryCodesReversed[countryCode];
     })
     .map((country: string, index: number) => {
       const resLabel = [2025, 2030].map((year: number) => {
@@ -100,11 +100,11 @@ const fnCountryTargetData = (): Array<TargetCountryData> => {
 
   memberStateCountryCodes
     .map((countryCode: string) => {
-      return ISOCountryCodesReversed[countryCode];
+      return isoCountryCodesReversed[countryCode];
     })
     .forEach((country: string) => {
       const countryName = country;
-      const countryCode = ISOCountryCodes[country];
+      const countryCode = isoCountryCodes[country];
       const countryRandom = Math.max(1.5, (countryName.length * 12) % 5);
       const baseValue3D =
         tgtDataRef[country][TargetFieldName.THREE_D][1].value / countryRandom;
