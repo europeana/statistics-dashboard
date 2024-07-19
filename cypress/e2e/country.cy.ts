@@ -149,15 +149,17 @@ context('Statistics Dashboard', () => {
       const country3 = 'Belgium';
       const selEntryCard = '.entry-card';
       const selLink = `${selCountryLink} span`;
+      const expectCardCountNonMS = 4;
+      const expectCardCountMS = 8;
 
       cy.get(selLink).contains(country1).click(force);
-      cy.get(selEntryCard).should('have.length', 8);
+      cy.get(selEntryCard).should('have.length', expectCardCountMS);
 
       cy.get(selLink).contains(country2).click(force);
-      cy.get(selEntryCard).should('have.length', 4);
+      cy.get(selEntryCard).should('have.length', expectCardCountNonMS);
 
       cy.get(selLink).contains(country3).click(force);
-      cy.get(selEntryCard).should('have.length', 8);
+      cy.get(selEntryCard).should('have.length', expectCardCountMS);
     });
   });
 });
