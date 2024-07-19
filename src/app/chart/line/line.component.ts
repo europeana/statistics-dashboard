@@ -145,12 +145,12 @@ export class LineComponent implements AfterViewInit {
     range.label.text = `${targetData.targetYear} Target`;
     range.label.verticalCenter = 'bottom';
     range.value = targetData.value;
+    range.label.cursorOverStyle = am4core.MouseCursorStyle.pointer;
 
     const pin = range.label.createChild(am4plugins_bullets.PinBullet);
 
     pin.background.radius = 10;
     pin.background.fill = colourPin;
-    pin.cursorOverStyle = am4core.MouseCursorStyle.pointer;
     pin.image = new am4core.Image();
     pin.image.href =
       'https://upload.wikimedia.org/wikipedia/en/2/27/EU_flag_square.PNG';
@@ -168,11 +168,7 @@ export class LineComponent implements AfterViewInit {
       range.label.dx = 0;
     };
 
-    setRangeAndPinDefaults();
-
-    // toggle display of the limit floor
-    pin.events.on('hit', function () {
-      // the minimum allowed is 40% of the target
+    const fnRangeClicked = (): void => {
       const targetMargin = 40;
       if (range.endValue === range.value) {
         range.endValue = range.value * (targetMargin / 100);
@@ -184,7 +180,9 @@ export class LineComponent implements AfterViewInit {
       } else {
         setRangeAndPinDefaults();
       }
-    });
+    };
+    setRangeAndPinDefaults();
+    range.label.events.on('hit', fnRangeClicked);
   }
 
   /**
