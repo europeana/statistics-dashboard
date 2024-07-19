@@ -6,18 +6,6 @@
   src: url("/assets/fonts/chevin/ChevinMedium.otf") format("opentype");
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-$targetAnimationDelay: 1250ms;
-$targetAnimationTime: 1750ms;
-
 .header,
 .logo {
   display: flex;
@@ -137,41 +125,16 @@ $targetAnimationTime: 1750ms;
 .active-country {
   color: $linkblue;
   font-weight: 600;
-  position: absolute;
-  left: 3em;
+  margin-left: 8px;
   white-space: nowrap;
 }
 
-.active-country,
-.flag-orb.opener {
-  animation: $targetAnimationTime fadeIn $targetAnimationDelay forwards;
-  opacity: 0;
-}
-
-.active-country,
-.opener {
-  cursor: pointer;
-}
-
-.opener {
-  margin-left: 10px;
-  z-index: 1;
-}
-
-.target-menu-wrapper {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  margin-left: 1.6em;
-  position: relative;
-}
-
-.target-select,
-.target-select-inner {
+.country-select,
+.country-select-inner {
   border-radius: 0.5em;
 }
 
-.target-select {
+.country-select {
   border-width: 0;
   box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
 
@@ -208,7 +171,7 @@ $targetAnimationTime: 1750ms;
   }
 }
 
-.target-select-inner {
+.country-select-inner {
   background-color: #fff;
   display: grid;
   grid-template-columns: 1fr;
@@ -219,42 +182,52 @@ $targetAnimationTime: 1750ms;
   position: relative;
 }
 
-.target-menu-wrapper:hover,
-.target-menu-wrapper.open {
-  .active-country {
-    color: darken($textcolour_link, 15%);
-  }
-}
+.country-menu-opener {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  margin-left: 1.6em;
+  position: relative;
+  z-index: 1;
 
-.target-menu-wrapper.open {
-  .target-select {
-    border-width: 1px;
-    opacity: 1;
-    height: auto;
-    overflow: visible;
+  &:hover,
+  &.open {
+    .active-country {
+      color: darken($textcolour_link, 15%);
+    }
+  }
+
+  &.open {
+    .country-select {
+      border-width: 1px;
+      opacity: 1;
+      height: auto;
+      overflow: visible;
+    }
   }
 }
 
 @media (min-width: $bp-small-3) {
-  .target-select-inner {
+  .country-select-inner {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (min-width: $bp-med) {
-  .target-select-inner {
+  .country-select-inner {
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
 @media (min-width: $bp-large) {
-  .target-select-inner {
+  .country-select-inner {
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
 @media (min-width: $bp-xl) {
-  .target-select-inner {
+  .country-select-inner {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }

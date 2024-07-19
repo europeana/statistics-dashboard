@@ -7,6 +7,7 @@ context('Statistics Dashboard', () => {
     const selLinkHome = '[data-e2e=link-home]';
     const selCTZero = '.ct-zero input';
     const urlParamCTZero = 'content-tier-zero=true';
+    const selShortcuts = '.country-shortcut-links-container';
 
     it('should show for all urls', () => {
       facetNames.forEach((url: string) => {
@@ -58,6 +59,42 @@ context('Statistics Dashboard', () => {
       cy.get('.rm-filter input').first().click({ force: true });
       cy.get('.rm-filter').should('have.length', 0);
       cy.url().should('not.contain', filteredTypes[1]);
+    });
+
+    it('should provide shortcuts to the country page (3D)', () => {
+      const baseUrlContentTier = `/data/${DimensionName.contentTier}?country=Austria`;
+      const baseUrlProvider = `/data/${DimensionName.provider}?country=Austria`;
+
+      cy.visit(baseUrlContentTier);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlContentTier}&type=3D`);
+      cy.get(selShortcuts).should('exist');
+
+      cy.visit(baseUrlProvider);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlProvider}&type=3D`);
+      cy.get(selShortcuts).should('exist');
+    });
+
+    it('should provide shortcuts to the country page (HQ)', () => {
+      const hqParams =
+        '?contentTier=2&contentTier=3&contentTier=4&metadataTier=A&metadataTier=B&metadataTier=C';
+      const baseUrlType = `/data/${DimensionName.type}${hqParams}`;
+      const baseUrlDataProvider = `/data/${DimensionName.dataProvider}${hqParams}`;
+
+      cy.visit(baseUrlType);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlType}&country=Austria`);
+      cy.get(selShortcuts).should('exist');
+
+      cy.visit(baseUrlDataProvider);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlDataProvider}&country=Austria`);
+      cy.get(selShortcuts).should('exist');
     });
   });
 });

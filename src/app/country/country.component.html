@@ -1,7 +1,7 @@
 <main class="fit-to-page landing-page">
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="ISOCountryCodes[country]"></span>
-    <span>{{ country }}</span> <span i18n="@@targetCountriesTitle">Data</span>
+    <span>{{ country }}</span> <span i18n="@@countryPageTitle">Data</span>
   </h1>
 
   <ng-template
@@ -34,25 +34,12 @@
 
       <span class="powerbar-target-labels">
         <span class="powerbar-label-left">{{ label }}</span>
-
         <app-speech-bubble>
           <span class="show-on-powerbar-hover"
             >{{ value | abbreviateNumber }} of
           </span>
           {{ target | number }}
         </app-speech-bubble>
-
-        <!--
-        <span
-          class="powerbar-label-right"
-          title="{{ (target | number) + ' (' + label + ' target)' }}"
-        >
-          <span class="show-on-powerbar-hover"
-            >{{ value | abbreviateNumber }} of
-          </span>
-          {{ target | number }}
-        </span>
-      -->
       </span>
     </div>
   </ng-template>
@@ -446,8 +433,9 @@
     <!-- secondary content -->
 
     <div *ngIf="showTargetsData" class="entry-card double-card line-and-legend">
-      <span class="entry-card-header" i18n="@@countryTargetProgess"
-        >Countries By Target Progress</span
+      <span class="entry-card-header"
+        ><span class="pad-word-right">{{ country }}</span
+        ><span i18n="@@countryTargetProgess">Data Progression</span></span
       >
       <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
 
@@ -497,9 +485,11 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header" i18n="@@countryEntryType"
-          >Explore by type of content</span
-        >
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryType">data by content type</span>
+        </span>
+
         <div
           class="entry-card-content"
           *ngIf="cardData[DimensionName.type]?.length > 0"
@@ -535,9 +525,10 @@
         </div>
       </div>
       <div class="entry-card">
-        <span class="entry-card-header"
-          ><span i18n="@@countryEntryRights">Explore by rights category</span
-          ><a
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryRights">data by rights category</span>
+          <a
             class="info-icon"
             [href]="externalLinks.help.rights.href"
             target="_blank"
@@ -573,9 +564,10 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header" i18n="@@countryEntryDataProvider"
-          >Explore by data provider</span
-        >
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryDataProvider">data by data provider</span>
+        </span>
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content
@@ -602,9 +594,10 @@
         </div>
       </div>
       <div class="entry-card">
-        <span class="entry-card-header"
-          ><span i18n="@@countryEntryProvider">Explore by provider</span
-          ><a
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryProvider">data by provider</span>
+          <a
             class="info-icon"
             [href]="externalLinks.help.provider.href"
             target="_blank"

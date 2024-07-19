@@ -16,49 +16,51 @@
     </a>
 
     <span
-      class="target-menu-wrapper"
+      class="country-menu-opener"
+      (click)="toggleMenu($event)"
       [ngClass]="{ open: menuIsOpen }"
       appClickAware
       (clickOutside)="menuIsOpen = false"
     >
+      <span
+        [ngClass]="{
+          default: !ISOCountryCodes[activeCountry]
+        }"
+        class="flag-orb {{ ISOCountryCodes[activeCountry] }}"
+      >
+      </span>
+
       <span class="active-country" (click)="toggleMenu($event)">
         @if(activeCountry) {
         {{ activeCountry }}
         } @else { Country Pages }
       </span>
-      <span
-        [ngClass]="{
-          default: !ISOCountryCodes[activeCountry]
-        }"
-        class="flag-orb opener {{ ISOCountryCodes[activeCountry] }}"
-        (click)="toggleMenu($event)"
-      >
-        <span class="target-select">
-          <span class="target-select-inner">
-            <ng-container *ngFor="let country of countryTotalMap | keyvalue">
-              <a
-                (click)="toggleMenu($event)"
-                [attr.disabled]="
-                  country.key === activeCountry ? 'disabled' : null
-                "
-                [routerLink]="['/country', country.key]"
-                class="menu-item"
+
+      <span class="country-select">
+        <span class="country-select-inner">
+          <ng-container *ngFor="let country of countryTotalMap | keyvalue">
+            <a
+              (click)="toggleMenu($event)"
+              [attr.disabled]="
+                country.key === activeCountry ? 'disabled' : null
+              "
+              [routerLink]="['/country', country.key]"
+              class="menu-item"
+            >
+              <span
+                *ngIf="countryFirstOfLetter[country.key]"
+                class="first-of-letter"
+                >{{ country.key }}</span
               >
-                <span
-                  *ngIf="countryFirstOfLetter[country.key]"
-                  class="first-of-letter"
-                  >{{ country.key }}</span
-                >
 
-                <span
-                  class="flag-orb"
-                  [ngClass]="ISOCountryCodes[country.key]"
-                ></span>
+              <span
+                class="flag-orb"
+                [ngClass]="ISOCountryCodes[country.key]"
+              ></span>
 
-                <span>{{ country.key }}</span>
-              </a>
-            </ng-container>
-          </span>
+              <span>{{ country.key }}</span>
+            </a>
+          </ng-container>
         </span>
       </span>
     </span>
