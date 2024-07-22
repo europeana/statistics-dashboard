@@ -32,7 +32,7 @@ export class HeaderComponent {
   public isoCountryCodes = isoCountryCodes;
 
   _countryTotalMap: IHash<CountryTotalInfo>;
-  countryFirstOfLetter: IHash<boolean> = {};
+  countryFirstOfLetter: IHash<string | undefined> = {};
 
   @Input() set countryTotalMap(countryTotalMap: IHash<CountryTotalInfo>) {
     this._countryTotalMap = countryTotalMap;
@@ -42,8 +42,9 @@ export class HeaderComponent {
       .sort()
       .forEach((s: string) => {
         const firstLetter = s[0];
-        this.countryFirstOfLetter[s] = firstLetter !== lastLetter;
-        if (this.countryFirstOfLetter[s]) {
+        const match = firstLetter === lastLetter;
+        this.countryFirstOfLetter[s] = match ? undefined : firstLetter;
+        if (!match) {
           lastLetter = firstLetter;
         }
       });
@@ -63,6 +64,11 @@ export class HeaderComponent {
 
   get activeCountry(): string | undefined {
     return this._activeCountry;
+  }
+
+  closeMenu(event: MouseEvent): void {
+    this.menuIsOpen = false;
+    event.stopPropagation();
   }
 
   toggleMenu(event: MouseEvent): void {

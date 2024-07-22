@@ -91,8 +91,8 @@
 
   &:hover,
   &[disabled] {
-    .first-of-letter {
-      display: none;
+    &.first-of-letter .text::before {
+      opacity: 0;
     }
   }
 
@@ -101,23 +101,21 @@
     width: 0.8em;
   }
 
-  :last-child {
+  .text {
     padding: 8px 16px 8px 8px;
   }
 
-  .first-of-letter {
-    color: $linkblue;
-    font-size: 0;
-    font-weight: 900;
-    left: -8px;
-    top: 6px;
-
-    position: absolute;
-
-    &::first-letter {
+  &.first-of-letter .text {
+    &::before {
+      color: $linkblue;
+      content: attr(data-text);
+      font-weight: 900;
       font-size: 16px;
       font-size: 18px;
+      left: -8px;
       padding: 0 8px;
+      position: absolute;
+      top: 6px;
     }
   }
 }
@@ -229,5 +227,25 @@
 @media (min-width: $bp-xl) {
   .country-select-inner {
     grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+.active-country:hover {
+  & + .country-closer {
+    display: block;
+  }
+}
+
+.country-closer {
+  margin-left: -2px;
+  margin-top: 5px;
+  display: none;
+  padding-left: 6px;
+  height: 1.25em;
+  width: 1.25em;
+  transform: scale(0.9);
+
+  &:hover {
+    display: block;
   }
 }
