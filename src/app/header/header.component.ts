@@ -4,6 +4,8 @@ import { FormGroup } from '@angular/forms';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
 import { KeyValuePipe, NgClass, NgFor } from '@angular/common';
 import { RouterLink } from '@angular/router';
+
+import { isoCountryCodes } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
 import { CountryTotalInfo, IHash } from '../_models';
 
@@ -27,7 +29,31 @@ export class HeaderComponent {
   @Input() includeCTZero: boolean;
   @Input() showPageTitle = false;
 
-  countryTotalMap: IHash<CountryTotalInfo> = {};
+  public isoCountryCodes = isoCountryCodes;
+
+  _countryTotalMap: IHash<CountryTotalInfo>;
+  countryFirstOfLetter: IHash<string | undefined> = {};
+
+  @Input() set countryTotalMap(countryTotalMap: IHash<CountryTotalInfo>) {
+    this._countryTotalMap = countryTotalMap;
+
+    let lastLetter = '';
+    Object.keys(countryTotalMap)
+      .sort()
+      .forEach((s: string) => {
+        const firstLetter = s[0];
+        const match = firstLetter === lastLetter;
+        this.countryFirstOfLetter[s] = match ? undefined : firstLetter;
+        if (!match) {
+          lastLetter = firstLetter;
+        }
+      });
+  }
+
+  get countryTotalMap(): IHash<CountryTotalInfo> {
+    return this._countryTotalMap;
+  }
+
   menuIsOpen = false;
   _activeCountry?: string;
 
@@ -40,9 +66,15 @@ export class HeaderComponent {
     return this._activeCountry;
   }
 
-  toggleMenu(e: { target: HTMLElement }): void {
-    if (!e.target.getAttribute('disabled')) {
+  closeMenu(event: MouseEvent): void {
+    this.menuIsOpen = false;
+    event.stopPropagation();
+  }
+
+  toggleMenu(event: MouseEvent): void {
+    if (!(event.target as HTMLElement).getAttribute('disabled')) {
       this.menuIsOpen = !this.menuIsOpen;
+      event.stopPropagation();
     }
   }
 }

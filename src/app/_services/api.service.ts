@@ -14,7 +14,7 @@ import {
   TargetMetaData,
   TargetMetaDataRaw
 } from '../_models';
-import { ISOCountryCodes } from '../_data';
+import { isoCountryCodes } from '../_data';
 import { Cache } from '../_helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -29,8 +29,8 @@ export class APIService {
 
   constructor(private readonly http: HttpClient) {}
 
-  loadISOCountryCodes(): IHash<string> {
-    return ISOCountryCodes;
+  loadIsoCountryCodes(): IHash<string> {
+    return isoCountryCodes;
   }
 
   replaceDoubleSlashes(s: string): string {
@@ -90,7 +90,7 @@ export class APIService {
         map((targetData: Array<TargetMetaDataRaw>) => {
           return targetData.map((tmd: TargetMetaDataRaw) => {
             tmd.isInterim = tmd.targetYear !== 2030;
-            tmd.country = ISOCountryCodes[tmd.country];
+            tmd.country = isoCountryCodes[tmd.country];
             return tmd;
           });
         })
@@ -154,7 +154,7 @@ export class APIService {
     return res.pipe(
       map((rows: Array<TargetCountryData>) => {
         rows.forEach((row: TargetCountryData) => {
-          row.country = ISOCountryCodes[row.country] || row.country;
+          row.country = isoCountryCodes[row.country] || row.country;
         });
         return rows;
       })

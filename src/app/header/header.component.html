@@ -2,6 +2,7 @@
   <div class="header">
     <a
       class="logo"
+      title="home"
       data-e2e="link-home-header"
       routerLink="/"
       [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
@@ -15,41 +16,62 @@
       </span>
     </a>
 
-    <span class="text country-link">
-      2025
-      <br />2030
-    </span>
-
     <span
-      class="target-menu-wrapper"
+      class="country-menu-opener"
+      (click)="toggleMenu($event)"
       [ngClass]="{ open: menuIsOpen }"
       appClickAware
       (clickOutside)="menuIsOpen = false"
     >
-      <span class="active-country" (click)="toggleMenu($event)">
-        <span i18n="header nav opener@@targetCountriesMenu"
-          >2025 / 2030 Targets</span
-        >
-        @if(activeCountry) { - {{ activeCountry }}
-        }
+      <span
+        [ngClass]="{
+          default: !isoCountryCodes[activeCountry]
+        }"
+        class="flag-orb {{ isoCountryCodes[activeCountry] }}"
+      >
       </span>
 
-      <span class="target">
-        <span class="target-select">
-          <span
-            class="target-select-item"
-            *ngFor="let country of countryTotalMap | keyvalue"
-          >
+      <span class="active-country" (click)="toggleMenu($event)">
+        @if(activeCountry) {
+        {{ activeCountry }}
+        } @else { Country Pages }
+      </span>
+
+      <a
+        class="country-closer x"
+        (click)="closeMenu($event)"
+        *ngIf="activeCountry"
+        routerLink="/"
+        title="home"
+      >
+      </a>
+
+      <span class="country-select">
+        <span class="country-select-inner">
+          <ng-container *ngFor="let country of countryTotalMap | keyvalue">
             <a
               (click)="toggleMenu($event)"
               [attr.disabled]="
                 country.key === activeCountry ? 'disabled' : null
               "
               [routerLink]="['/country', country.key]"
+              class="menu-item"
+              [ngClass]="{
+                'first-of-letter': !!countryFirstOfLetter[country.key]
+              }"
             >
-              <span>{{ country.key }}</span>
+              <span
+                class="flag-orb"
+                [ngClass]="isoCountryCodes[country.key]"
+              ></span>
+
+              <span
+                class="text"
+                [attr.data-text]="countryFirstOfLetter[country.key]"
+                >{{ country.key }}</span
+              >
             </a>
-          </span>
+          </ng-container>
         </span>
       </span>
     </span>

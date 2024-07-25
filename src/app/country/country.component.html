@@ -1,26 +1,18 @@
 <main class="fit-to-page landing-page">
   <h1 class="page-title">
-    {{ country }}: <span i18n="@@targetCountriesTitle">Target Data</span>
+    <span class="flag-orb" [ngClass]="isoCountryCodes[country]"></span>
+    <span>{{ country }}</span> <span i18n="@@countryPageTitle">Data</span>
   </h1>
 
   <ng-template
     #powerLevel
     let-percent="percent"
+    let-value="value"
     let-label="label"
     let-target="target"
-    let-above="above"
     let-colourIndex="colourIndex"
   >
-    <div
-      [ngClass]="{
-        'labels-above': above
-      }"
-      class="powerbar-wrapper"
-    >
-      <span class="powerbar-target-labels">
-        <span class="powerbar-label-left">{{ label }}</span>
-        <span class="powerbar-label-right">{{ target | number }}</span>
-      </span>
+    <div class="powerbar-wrapper">
       <div class="powerbar">
         <div
           class="powerbar-charge"
@@ -39,6 +31,16 @@
           <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
         </span>
       </div>
+
+      <span class="powerbar-target-labels">
+        <span class="powerbar-label-left">{{ label }}</span>
+        <app-speech-bubble>
+          <span class="show-on-powerbar-hover"
+            >{{ value | abbreviateNumber }} of
+          </span>
+          {{ target | number }}
+        </app-speech-bubble>
+      </span>
     </div>
   </ng-template>
 
@@ -59,6 +61,7 @@
           </ng-template>
           <span
             *ngIf="isPowerLevel; else defaultCopy"
+            e2e="power-bar-summary"
             i18n="landing chart summary percentage@@countryChartSummaryData"
           >
             Data
@@ -126,7 +129,7 @@
               landing chart summary
               percentage@@countryChartSummaryPercentageShort"
           >
-            Percent
+            Percent of all
           </span>
         </span>
 
@@ -197,13 +200,12 @@
     >
   </ng-template>
 
-  <div class="container-v" *ngIf="targetMetaData">
+  <div class="container-v">
     <div class="entry-card-multi">
       <!-- 3D -->
-
       <div
         class="entry-card"
-        *ngIf="latestCountryData && columnsEnabled[TargetFieldName.THREE_D]"
+        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.THREE_D]"
       >
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
@@ -228,11 +230,14 @@
               }
             "
           ></ng-content>
+
+          <span class="powerbar-subtitle">targets</span>
+
           <ng-content
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                above: true,
+                value: latestCountryData[TargetFieldName.THREE_D],
                 percent:
                   ((latestCountryData[TargetFieldName.THREE_D] || 0) /
                     targets3D[0].value) *
@@ -247,6 +252,7 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
+                value: latestCountryData[TargetFieldName.THREE_D],
                 percent:
                   (latestCountryData[TargetFieldName.THREE_D] /
                     targets3D[1].value) *
@@ -276,7 +282,7 @@
 
       <div
         class="entry-card"
-        *ngIf="latestCountryData && columnsEnabled[TargetFieldName.HQ]"
+        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.HQ]"
       >
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
@@ -302,11 +308,13 @@
             "
           ></ng-content>
 
+          <span class="powerbar-subtitle">targets</span>
+
           <ng-content
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                above: true,
+                value: latestCountryData[TargetFieldName.HQ],
                 percent:
                   (latestCountryData[TargetFieldName.HQ] / targetsHQ[0].value) *
                   100,
@@ -321,6 +329,7 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
+                value: latestCountryData[TargetFieldName.HQ],
                 percent:
                   (latestCountryData[TargetFieldName.HQ] / targetsHQ[1].value) *
                   100,
@@ -347,10 +356,9 @@
       </div>
 
       <!-- TOTAL -->
-
       <div
         class="entry-card"
-        *ngIf="latestCountryData && columnsEnabled[TargetFieldName.TOTAL]"
+        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.TOTAL]"
       >
         <a
           class="entry-card-header column-close"
@@ -374,11 +382,14 @@
               }
             "
           ></ng-content>
+
+          <span class="powerbar-subtitle">targets</span>
+
           <ng-content
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                above: true,
+                value: latestCountryData[TargetFieldName.TOTAL],
                 percent:
                   (latestCountryData[TargetFieldName.TOTAL] /
                     targetsTOTAL[0].value) *
@@ -394,6 +405,7 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
+                value: latestCountryData[TargetFieldName.TOTAL],
                 percent:
                   (latestCountryData[TargetFieldName.TOTAL] /
                     targetsTOTAL[1].value) *
@@ -421,9 +433,10 @@
 
     <!-- secondary content -->
 
-    <div class="entry-card double-card line-and-legend">
-      <span class="entry-card-header" i18n="@@countryTargetProgess"
-        >Countries By Target Progress</span
+    <div *ngIf="showTargetsData" class="entry-card double-card line-and-legend">
+      <span class="entry-card-header"
+        ><span class="pad-word-right">{{ country }}</span
+        ><span i18n="@@countryTargetProgess">Data Progression</span></span
       >
       <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
 
@@ -473,10 +486,15 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header" i18n="@@countryEntryType"
-          >Explore by type of content</span
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryType">data by content type</span>
+        </span>
+
+        <div
+          class="entry-card-content"
+          *ngIf="cardData[DimensionName.type]?.length > 0"
         >
-        <div class="entry-card-content" *ngIf="cardData[DimensionName.type]">
           <ng-content
             *ngTemplateOutlet="
               cardSummary;
@@ -508,9 +526,10 @@
         </div>
       </div>
       <div class="entry-card">
-        <span class="entry-card-header"
-          ><span i18n="@@countryEntryRights">Explore by rights category</span
-          ><a
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryRights">data by rights category</span>
+          <a
             class="info-icon"
             [href]="externalLinks.help.rights.href"
             target="_blank"
@@ -546,9 +565,10 @@
 
     <div class="entry-card-pair">
       <div class="entry-card">
-        <span class="entry-card-header" i18n="@@countryEntryDataProvider"
-          >Explore by data provider</span
-        >
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryDataProvider">data by data provider</span>
+        </span>
         <div class="entry-card-content">
           <div class="container-h">
             <ng-content
@@ -575,9 +595,10 @@
         </div>
       </div>
       <div class="entry-card">
-        <span class="entry-card-header"
-          ><span i18n="@@countryEntryProvider">Explore by provider</span
-          ><a
+        <span class="entry-card-header">
+          <span class="pad-word-right">{{ country }}</span>
+          <span i18n="@@countryEntryProvider">data by provider</span>
+          <a
             class="info-icon"
             [href]="externalLinks.help.provider.href"
             target="_blank"

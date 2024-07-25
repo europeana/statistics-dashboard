@@ -39,7 +39,7 @@ export class MapComponent {
     private readonly zone: NgZone,
     private readonly api: APIService
   ) {
-    this.countryCodes = api.loadISOCountryCodes();
+    this.countryCodes = api.loadIsoCountryCodes();
     am4core.options.autoDispose = true;
   }
 

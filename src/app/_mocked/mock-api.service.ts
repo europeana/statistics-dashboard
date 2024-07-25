@@ -633,7 +633,7 @@ export const MockBreakdowns = {
 export class MockAPIService {
   errorMode = false;
 
-  loadISOCountryCodes(): IHash<string> {
+  loadIsoCountryCodes(): IHash<string> {
     return {
       Belgium: 'BE'
     };
