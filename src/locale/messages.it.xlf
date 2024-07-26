@@ -56,8 +56,8 @@
       <trans-unit id="facetNameShortPluralProvider" datatype="html">
         <source>Aggregatori</source>
       </trans-unit>
-      <trans-unit id="targetCountriesTitle" datatype="html">
-        <source>Dati Target</source>
+      <trans-unit id="countryPageTitle" datatype="html">
+        <source>Dati</source>
       </trans-unit>
 
       <trans-unit id="countryChartSummaryData" datatype="html">
@@ -73,7 +73,7 @@
         <source>Percentuale corrispondente</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
-        <source>Percentuale</source>
+        <source>Percento di tutti</source>
       </trans-unit>
       <trans-unit id="countryLandingDataHeader" datatype="html">
         <source>RECORD FORNITI</source>
@@ -88,16 +88,16 @@
         <source>Tutti Dati</source>
       </trans-unit>
       <trans-unit id="countryEntryType" datatype="html">
-        <source>Esplora per tipo di media</source>
+        <source>dati per tipo di media</source>
       </trans-unit>
       <trans-unit id="countryEntryRights" datatype="html">
-        <source>Esplora per categoria di diritti</source>
+        <source>dati per categoria di diritti</source>
       </trans-unit>
       <trans-unit id="countryEntryDataProvider" datatype="html">
-        <source>Esplora per aggregatore</source>
+        <source>dati per aggregatore</source>
       </trans-unit>
       <trans-unit id="countryEntryProvider" datatype="html">
-        <source>Esplora per istituzione</source>
+        <source>dati per istituzione</source>
       </trans-unit>
       <trans-unit id="countrySectionLink3D" datatype="html">
         <source>Visualizza (dati 3D) per livello di contenuto</source>
@@ -121,7 +121,7 @@
         <source>Visualizza per aggregatore</source>
       </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
-        <source>Paesi per vicinita' ai bersagli</source>
+        <source>Progressione dei dati</source>
       </trans-unit>
       <trans-unit id="toggleTargetDataLabelHide" datatype="html">
         <source>Nascondi i dati</source>

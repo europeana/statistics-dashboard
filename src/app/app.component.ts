@@ -21,7 +21,7 @@ import {
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
-import { ISOCountryCodes } from './_data';
+import { isoCountryCodes } from './_data';
 import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService } from './_services';
 import {
@@ -167,7 +167,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
               br.results.forEach((result: CountPercentageValue) => {
                 countryTotalMap[result.value] = {
                   total: result.count,
-                  code: ISOCountryCodes[result.value]
+                  code: isoCountryCodes[result.value]
                 };
               });
             }

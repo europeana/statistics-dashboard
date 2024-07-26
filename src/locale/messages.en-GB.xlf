@@ -184,8 +184,8 @@
           <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="targetCountriesTitle" datatype="html">
-        <source>Target Data</source>
+      <trans-unit id="countryPageTitle" datatype="html">
+        <source>Data</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">3</context>
@@ -224,7 +224,7 @@
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
-        <source> Percent </source>
+        <source> Percent of all</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">128,130</context>
@@ -283,7 +283,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
-        <source>Countries By Target Progress</source>
+        <source>Data Progression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">425</context>
@@ -304,7 +304,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryType" datatype="html">
-        <source>Explore by type of content</source>
+        <source>data by content type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">476</context>
@@ -318,7 +318,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryRights" datatype="html">
-        <source>Explore by rights category</source>
+        <source>data by rights category</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">515</context>
@@ -332,7 +332,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryDataProvider" datatype="html">
-        <source>Explore by data provider</source>
+        <source>data by data provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">553</context>
@@ -346,7 +346,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="countryEntryProvider" datatype="html">
-        <source>Explore by provider</source>
+        <source>data by provider</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">582</context>
@@ -543,7 +543,7 @@
         <note priority="1" from="description">Footer link text</note>
       </trans-unit>
       <trans-unit id="footerLinkTextPrivacy" datatype="html">
-        <source>Privacy Policy</source>
+        <source>Privacy Statement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/footer/footer.component.html</context>
           <context context-type="linenumber">51</context>

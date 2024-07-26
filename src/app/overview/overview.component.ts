@@ -30,6 +30,7 @@ import { environment } from '../../environments/environment';
 import {
   externalLinks,
   facetNames,
+  isoCountryCodes,
   nonFacetFilters,
   portalNames,
   portalNamesFriendly
@@ -68,6 +69,7 @@ import {
 import { APIService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
+import { SpeechBubbleComponent } from '../speech-bubble';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 import { GridSummaryComponent } from '../grid-summary';
@@ -98,6 +100,7 @@ import { ResizeComponent } from '../resize/resize.component';
     FilterComponent,
     IsScrollableDirective,
     CheckboxComponent,
+    SpeechBubbleComponent,
     ExportComponent,
     BarComponent,
     GridSummaryComponent,
@@ -131,6 +134,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
   public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
+  public isoCountryCodes = isoCountryCodes;
 
   public barChartSettings = {
     prefixValueAxis: '',
@@ -186,7 +190,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   queryParamsRaw: Params = {};
 
   dataServerData: BreakdownResults;
-  targetLinkAvailable = false;
+  countryPageShortcutsAvailable = false;
 
   /**
    * constructor
@@ -287,14 +291,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           const params = combined.params;
           const queryParams = combined.queryParams;
 
-          this.targetLinkAvailable =
+          this.countryPageShortcutsAvailable =
             Object.keys(queryParams).length === 2 &&
             !!queryParams['country'] &&
             `${queryParams['type']}` === '3D' &&
             queryParams['type'].length === 1;
 
-          if (!this.targetLinkAvailable) {
-            this.targetLinkAvailable =
+          if (!this.countryPageShortcutsAvailable) {
+            this.countryPageShortcutsAvailable =
               !!queryParams['country'] &&
               !!queryParams['metadataTier'] &&
               queryParams['metadataTier'].indexOf('0') === -1 &&

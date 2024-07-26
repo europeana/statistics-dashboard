@@ -5,7 +5,6 @@ import {
   BreakdownResults,
   DimensionName,
   GeneralResults,
-  GeneralResultsFormatted,
   IHash,
   IHashArray,
   RequestFilter,
@@ -634,7 +633,7 @@ export const MockBreakdowns = {
 export class MockAPIService {
   errorMode = false;
 
-  loadISOCountryCodes(): IHash<string> {
+  loadIsoCountryCodes(): IHash<string> {
     return {
       Belgium: 'BE'
     };
@@ -673,10 +672,6 @@ export class MockAPIService {
   }
 
   getCountryData(): Observable<IHash<Array<TargetData>>> {
-    return of({});
-  }
-
-  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
     return of({});
   }
 }

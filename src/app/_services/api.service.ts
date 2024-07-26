@@ -5,11 +5,8 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   BreakdownRequest,
-  BreakdownResult,
   BreakdownResults,
-  CountPercentageValue,
   GeneralResults,
-  GeneralResultsFormatted,
   IHash,
   IHashArray,
   TargetCountryData,
@@ -17,25 +14,23 @@ import {
   TargetMetaData,
   TargetMetaDataRaw
 } from '../_models';
-import { ISOCountryCodes } from '../_data';
+import { isoCountryCodes } from '../_data';
 import { Cache } from '../_helpers';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {
   private readonly countries = new Cache(() => this.loadCountryData());
-  private readonly generalResults = new Cache(() => this.getGeneralResults());
-  public readonly generalResultsCountry = new Cache(() =>
-    this.loadGeneralResultsCountry()
-  );
 
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
   suffixRightsUrls = 'statistics/rights/urls';
+  suffixTargetsUrl = 'statistics/europeana/targets';
+  suffixCountryTargetsUrl = 'statistics/europeana/target/country/all';
 
   constructor(private readonly http: HttpClient) {}
 
-  loadISOCountryCodes(): IHash<string> {
-    return ISOCountryCodes;
+  loadIsoCountryCodes(): IHash<string> {
+    return isoCountryCodes;
   }
 
   replaceDoubleSlashes(s: string): string {
@@ -57,28 +52,6 @@ export class APIService {
         `${environment.serverAPI}/${this.suffixGeneral}`
       ),
       { params: includeCTZero ? { 'content-tier-zero': true } : {} }
-    );
-  }
-
-  loadGeneralResultsCountry(): Observable<GeneralResults> {
-    return this.generalResults.get();
-  }
-
-  getGeneralResultsCountry(): Observable<GeneralResultsFormatted> {
-    return this.generalResultsCountry.get().pipe(
-      map((data: GeneralResults) => {
-        const res: GeneralResultsFormatted = {};
-        data.allBreakdowns.forEach((br: BreakdownResult) => {
-          res[br.breakdownBy] = br.results.map((cpv: CountPercentageValue) => {
-            return {
-              name: cpv.value,
-              value: cpv.count,
-              percent: cpv.percentage
-            };
-          });
-        });
-        return res;
-      })
     );
   }
 
@@ -110,14 +83,14 @@ export class APIService {
     return this.http
       .get<Array<TargetMetaDataRaw>>(
         this.replaceDoubleSlashes(
-          `${environment.serverAPI}/statistics/europeana/targets`
+          `${environment.serverAPI}/${this.suffixTargetsUrl}`
         )
       )
       .pipe(
         map((targetData: Array<TargetMetaDataRaw>) => {
           return targetData.map((tmd: TargetMetaDataRaw) => {
             tmd.isInterim = tmd.targetYear !== 2030;
-            tmd.country = ISOCountryCodes[tmd.country];
+            tmd.country = isoCountryCodes[tmd.country];
             return tmd;
           });
         })
@@ -174,14 +147,14 @@ export class APIService {
   loadCountryData(): Observable<Array<TargetCountryData>> {
     const res = this.http.get<Array<TargetCountryData>>(
       this.replaceDoubleSlashes(
-        `${environment.serverAPI}/statistics/europeana/target/country/all`
+        `${environment.serverAPI}/${this.suffixCountryTargetsUrl}`
       )
     );
 
     return res.pipe(
       map((rows: Array<TargetCountryData>) => {
         rows.forEach((row: TargetCountryData) => {
-          row.country = ISOCountryCodes[row.country] || row.country;
+          row.country = isoCountryCodes[row.country] || row.country;
         });
         return rows;
       })

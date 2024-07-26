@@ -268,26 +268,39 @@
 
         <!-- Data Area -->
         <div class="data-area">
-          <ng-template #targetLinks>
-            <!-- COUNTRY TARGET PAGE LINK -->
-            <ul *ngIf="targetLinkAvailable" class="target-links">
-              <li *ngFor="let country of queryParams['country']">
-                <a
-                  class="target"
-                  [attr.title]="country + ' 2025 / 2030 target data'"
-                  [routerLink]="['/country', country]"
-                >
-                </a>
-              </li>
-            </ul>
+          <!-- Country Page Shortcut Links -->
+          <ng-template #tmpCountryPageShortcuts>
+            <ng-container *ngIf="countryPageShortcutsAvailable">
+              <div class="country-shortcut-links-container">
+                <span class="flag-orb default" title="View country data"></span>
+                <app-speech-bubble [arrowTop]="true">
+                  <ul class="country-shortcuts">
+                    <li *ngFor="let country of queryParams['country']">
+                      <a [routerLink]="['/country', country]">
+                        <span>View</span>
+                        <span class="pad-word">{{ country }}</span>
+                        <span>data</span>
+                        <span
+                          class="flag-orb"
+                          [ngClass]="isoCountryCodes[country]"
+                        >
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                </app-speech-bubble>
+              </div>
+            </ng-container>
           </ng-template>
 
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
 
           <!-- NO-DATA FALLBACK -->
           <div *ngIf="emptyDataset && !isLoading" class="no-data">
-            <!-- COUNTRY TARGET PAGE LINK -->
-            <ng-content *ngTemplateOutlet="targetLinks"></ng-content>
+            <!-- COUNTRY PAGE LINKS -->
+            <ng-content
+              *ngTemplateOutlet="tmpCountryPageShortcuts"
+            ></ng-content>
 
             <span i18n="Warn no results@@warnNoResults">No results found!</span>
             <ul>
@@ -311,9 +324,11 @@
             </ul>
           </div>
 
-          <!-- COUNTRY TARGET PAGE LINK -->
+          <!-- COUNTRY PAGE LINK -->
           <ng-container *ngIf="!emptyDataset">
-            <ng-content *ngTemplateOutlet="targetLinks"></ng-content>
+            <ng-content
+              *ngTemplateOutlet="tmpCountryPageShortcuts"
+            ></ng-content>
           </ng-container>
 
           <!-- CHART AND SUMMARY -->

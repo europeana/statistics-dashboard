@@ -4,14 +4,14 @@
 /* supplies human-readable labels for countries
 */
 import { Pipe, PipeTransform } from '@angular/core';
-import { ISOCountryCodes } from '../_data';
+import { isoCountryCodes } from '../_data';
 
 @Pipe({
   name: 'renameCountry',
   standalone: true
 })
 export class RenameCountryPipe implements PipeTransform {
-  countryNames = Object.entries(ISOCountryCodes).reduce(
+  countryNames = Object.entries(isoCountryCodes).reduce(
     (obj, item) => (obj[item[1]] = item[0]) && obj,
     {}
   );
