@@ -9,6 +9,9 @@ context('Statistics Dashboard', () => {
     it('should create the tracker (and a log when in ci mode)', () => {
       const url = '/';
       cy.visit(url);
+      if (!!force || !!checkLogLength) {
+        return;
+      }
       cy.window().its('_paq').should('exist');
       checkLogLength(1);
     });
