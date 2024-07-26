@@ -1,4 +1,5 @@
 import * as url from 'url';
+import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server';
 import {
@@ -102,9 +103,14 @@ new (class extends TestDataServer {
       return;
     }
 
-    response.setHeader('Content-Type', 'application/json;charset=UTF-8');
     response.statusCode = 200;
 
+    if ((request.url as string) === '/matomo.js') {
+      fileSystem.createReadStream('test-data/fake-matomo.js').pipe(response);
+      return;
+    }
+
+    response.setHeader('Content-Type', 'application/json;charset=UTF-8');
     this.clearExclusions();
 
     if (request.method === 'POST') {

@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { OverviewComponent } from './overview/overview.component';
 import { LandingComponent } from './landing/landing.component';
 import {
-  MatomoRouterModule,
-  MatomoRouteDataInterceptor
+  MatomoRouteDataInterceptor,
+  MatomoRouterModule
 } from 'ngx-matomo-client';
 import { CountryComponent } from './country/country.component';
 
