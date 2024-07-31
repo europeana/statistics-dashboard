@@ -1,9 +1,19 @@
 .page-title-wrapper {
   background: $offwhite;
-  margin-bottom: 0;
   padding: 16px;
-  position: sticky;
-  top: 3em;
+
+  &.fit-to-page.minified {
+    &:not(.viewable) {
+      margin: 0 auto;
+      padding: 0;
+      height: 0;
+      overflow: hidden;
+    }
+  }
+
+  .page-title {
+    display: none;
+  }
 }
 
 .page-title {

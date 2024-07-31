@@ -77,7 +77,6 @@
 }
 
 .ct-zero {
-  margin-left: $spacing-s;
   .checkmarked-checkbox {
     &::before {
       background-image: svg-url-icon-eye-disabled($gray-med);
@@ -99,4 +98,8 @@
       }
     }
   }
+}
+
+.filters .ct-zero {
+  margin-left: $spacing-s;
 }

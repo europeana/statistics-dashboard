@@ -1,8 +1,7 @@
 import {
   ApplicationRef,
   ComponentRef,
-  CUSTOM_ELEMENTS_SCHEMA,
-  ElementRef
+  CUSTOM_ELEMENTS_SCHEMA
 } from '@angular/core';
 import {
   ComponentFixture,
@@ -60,7 +59,8 @@ describe('CountryComponent', () => {
           total: 1,
           code: 'FR'
         }
-      }
+      },
+      pageTitleInViewport: false
     };
 
     appRef.components.push({
@@ -70,8 +70,7 @@ describe('CountryComponent', () => {
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
 
-    component.headerRef = header as unknown as ElementRef;
-
+    component.headerRef = header;
     fixture.detectChanges();
   });
 

@@ -11,6 +11,7 @@ import {
   UpperCasePipe
 } from '@angular/common';
 import {
+  AfterViewInit,
   ApplicationRef,
   Component,
   ElementRef,
@@ -20,7 +21,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
-
 import { colours, externalLinks, isoCountryCodes } from '../_data';
 import {
   BreakdownResults,
@@ -46,6 +46,7 @@ import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent } from '../chart';
 import { LegendGridComponent } from '../legend-grid';
 import { ResizeComponent } from '../resize';
+import { CTZeroControlComponent } from '../ct-zero-control';
 import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
@@ -57,6 +58,7 @@ import { TruncateComponent } from '../truncate';
   imports: [
     AbbreviateNumberPipe,
     AppendiceSectionComponent,
+    CTZeroControlComponent,
     RouterOutlet,
     DatePipe,
     JsonPipe,
@@ -81,7 +83,10 @@ import { TruncateComponent } from '../truncate';
     RenameTargetTypePipe
   ]
 })
-export class CountryComponent extends SubscriptionManager {
+export class CountryComponent
+  extends SubscriptionManager
+  implements AfterViewInit
+{
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public isoCountryCodes = isoCountryCodes;
@@ -90,11 +95,21 @@ export class CountryComponent extends SubscriptionManager {
 
   cardData: IHash<Array<NamesValuePercent>> = {};
 
+  _includeCTZero = false;
+
+  @Input() set includeCTZero(includeCTZero: boolean) {
+    this._includeCTZero = includeCTZero;
+    this.refreshData();
+  }
+  get includeCTZero(): boolean {
+    return this._includeCTZero;
+  }
+
   // Used to parameterise links to the data page
-  @Input() includeCTZero = false;
   @ViewChild('lineChart') lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
   @ViewChild('barChart') barChart: BarComponent;
+  @ViewChild('scrollPoint') scrollPoint: ElementRef;
 
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
@@ -113,16 +128,7 @@ export class CountryComponent extends SubscriptionManager {
    **/
   set country(country: string) {
     this._country = country;
-    this.loadDimensionCardData(DimensionName.dataProvider);
-    this.loadDimensionCardData(DimensionName.provider);
-    this.loadDimensionCardData(DimensionName.rightsCategory);
-    this.loadDimensionCardData(DimensionName.type, () => {
-      if (this.barChart) {
-        this.barChart.removeAllSeries();
-        this.barChart.results = this.cardData[DimensionName.type];
-        this.barChart.ngAfterViewInit();
-      }
-    });
+    this.refreshData();
     this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
   }
 
@@ -136,7 +142,7 @@ export class CountryComponent extends SubscriptionManager {
   latestCountryData: TargetData;
   appendiceExpanded = false;
 
-  public headerRef: ElementRef;
+  @Input() headerRef: { activeCountry: string; pageTitleInViewport: boolean };
 
   constructor(private applicationRef: ApplicationRef) {
     super();
@@ -180,6 +186,46 @@ export class CountryComponent extends SubscriptionManager {
     );
   }
 
+  /** ngAfterViewInit
+   * binds the headerRef's pageTitleInViewport to an intersection observer
+   **/
+  ngAfterViewInit(): void {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // setting is made more difficult than unsetting to prevent flickering
+          if (entry.isIntersecting) {
+            if (entry.intersectionRatio > 0.15) {
+              this.headerRef.pageTitleInViewport = true;
+            }
+          } else {
+            this.headerRef.pageTitleInViewport = false;
+          }
+        });
+      },
+      {
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+      }
+    );
+    observer.observe(this.scrollPoint.nativeElement);
+  }
+
+  /** refreshData
+   * (re)loads all dimension card data and reinitialises barChart
+   **/
+  refreshData(): void {
+    this.loadDimensionCardData(DimensionName.dataProvider);
+    this.loadDimensionCardData(DimensionName.provider);
+    this.loadDimensionCardData(DimensionName.rightsCategory);
+    this.loadDimensionCardData(DimensionName.type, () => {
+      if (this.barChart) {
+        this.barChart.removeAllSeries();
+        this.barChart.results = this.cardData[DimensionName.type];
+        this.barChart.ngAfterViewInit();
+      }
+    });
+  }
+
   /** loadDimensionCardData
    * loads dimension card data
    * @param { DimensionName } dimensionName
@@ -189,9 +235,14 @@ export class CountryComponent extends SubscriptionManager {
     dimensionName: DimensionName,
     fnCallback?: () => void
   ): void {
+    const contentTierVals = ['1', '2', '3', '4'];
+
+    if (this.includeCTZero) {
+      contentTierVals.unshift('0');
+    }
     const req = {
       filters: {
-        contentTier: { values: ['1', '2', '3', '4'] },
+        contentTier: { values: contentTierVals },
         country: { values: [this.country] }
       }
     };

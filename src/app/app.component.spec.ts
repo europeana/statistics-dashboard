@@ -21,6 +21,7 @@ import {
 import { MockAPIService } from './_mocked';
 import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
+import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
 
@@ -96,6 +97,7 @@ describe('AppComponent', () => {
   it('should listen for history navigation', fakeAsync(() => {
     expect(app.lastSetContentTierZeroValue).toBeFalsy();
     app.buildForm();
+    app.countryComponentRef = {} as unknown as CountryComponent;
 
     // trigger location change does nothing
     app.updateLocation();
@@ -161,6 +163,9 @@ describe('AppComponent', () => {
     expect(app.showPageTitle).toBeFalsy();
 
     spyOn(app, 'loadLandingData');
+    spyOn(location, 'path').and.callFake(() => {
+      return '';
+    });
 
     // load Landing
     app.onOutletLoaded(new LandingComponent());
