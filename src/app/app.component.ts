@@ -234,6 +234,11 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     this.loadLandingData(this.formCTZero.value.contentTierZero);
   }
 
+  setCTZeroInputToLastSetValue(ctrlCTZero: FormControl): void {
+    this.skipLocationUpdate = true;
+    ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
+  }
+
   /** onOutletLoaded
   /* - invoked when router component loads
   /*    - handles component data binding
@@ -251,17 +256,12 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     component: LandingComponent | OverviewComponent | CountryComponent
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
-    const setCTZeroInputToLastSetValue = (): void => {
-      this.skipLocationUpdate = true;
-      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-    };
-
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
       this.landingComponentRef = component;
       this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
       if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-        setCTZeroInputToLastSetValue();
+        this.setCTZeroInputToLastSetValue(ctrlCTZero);
       } else {
         if (this.landingComponentRef && this.landingData) {
           this.landingComponentRef.landingData = this.landingData;
@@ -280,7 +280,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
 
         if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-          setCTZeroInputToLastSetValue();
+          this.setCTZeroInputToLastSetValue(ctrlCTZero);
         }
       }
     }

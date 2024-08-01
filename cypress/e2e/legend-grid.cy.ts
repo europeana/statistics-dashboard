@@ -38,7 +38,7 @@ context('Statistics Dashboard', () => {
       cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
-        .click();
+        .click(force);
       cy.wait(waitTime);
       cy.get(selPinnedOpener).should('have.length', 2);
     });
@@ -50,7 +50,7 @@ context('Statistics Dashboard', () => {
       cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
-        .click();
+        .click(force);
       cy.get(selPinnedOpener).should('have.length', 2);
       cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
       cy.get(selToggleCountry).contains('Cyprus').click(force);

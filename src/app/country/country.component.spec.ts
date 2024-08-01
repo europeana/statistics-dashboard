@@ -18,12 +18,23 @@ import { APIService } from '../_services';
 import { MockAPIService, MockLineComponent } from '../_mocked';
 import { TargetFieldName } from '../_models';
 import { BarComponent, LineComponent } from '../chart';
-
 import { CountryComponent } from '.';
 
 describe('CountryComponent', () => {
   let component: CountryComponent;
   let fixture: ComponentFixture<CountryComponent>;
+  let intersectionObserverCreated = false;
+
+  class IntersectionObserver {
+    observe(): void {
+      console.log('IntersectionObserver.observe()');
+    }
+    constructor(
+      public callback: (entries: Array<IntersectionObserverEntry>) => void
+    ) {
+      intersectionObserverCreated = true;
+    }
+  }
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
@@ -52,6 +63,11 @@ describe('CountryComponent', () => {
   }));
 
   beforeEach(() => {
+    // Supply fake IntersectionObserver to window prototype
+    (
+      window as unknown as { IntersectionObserver: unknown }
+    ).IntersectionObserver = IntersectionObserver;
+
     const header = {
       activeCountry: 'France',
       countryTotalMap: {
@@ -147,5 +163,43 @@ describe('CountryComponent', () => {
 
     component.columnsEnabled[TargetFieldName.THREE_D] = false;
     expect(component.nextColToEnable()).toEqual(TargetFieldName.THREE_D);
+  });
+
+  it('should refresh the data when the includeCTZero is set', () => {
+    spyOn(component, 'refreshData');
+    component.includeCTZero = true;
+    expect(component.refreshData).toHaveBeenCalled();
+  });
+
+  it('should the initialise the IntersectionObserver', () => {
+    expect(intersectionObserverCreated).toBeFalsy();
+    component.onInitialDataLoaded();
+    expect(intersectionObserverCreated).toBeTruthy();
+  });
+
+  it('should handle the intersectionObserverCallback', () => {
+    const ratioLow = 0.1;
+    const ratioHigh = 0.9;
+    const headerRef = component.headerRef;
+
+    expect(headerRef.pageTitleInViewport).toBeFalsy();
+
+    component.intersectionObserverCallback([
+      {
+        isIntersecting: false,
+        intersectionRatio: ratioLow
+      }
+    ]);
+
+    expect(headerRef.pageTitleInViewport).toBeFalsy();
+
+    component.intersectionObserverCallback([
+      {
+        isIntersecting: true,
+        intersectionRatio: ratioHigh
+      }
+    ]);
+
+    expect(headerRef.pageTitleInViewport).toBeTruthy();
   });
 });

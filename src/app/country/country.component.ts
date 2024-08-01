@@ -11,7 +11,6 @@ import {
   UpperCasePipe
 } from '@angular/common';
 import {
-  AfterViewInit,
   ApplicationRef,
   Component,
   ElementRef,
@@ -83,10 +82,7 @@ import { TruncateComponent } from '../truncate';
     RenameTargetTypePipe
   ]
 })
-export class CountryComponent
-  extends SubscriptionManager
-  implements AfterViewInit
-{
+export class CountryComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public isoCountryCodes = isoCountryCodes;
@@ -178,6 +174,7 @@ export class CountryComponent
             const country = combined.params['country'];
             this.setCountryToParam(country);
             this.setCountryInHeaderMenu(country);
+            this.onInitialDataLoaded();
           },
           error: (e: Error) => {
             console.log(e);
@@ -186,28 +183,32 @@ export class CountryComponent
     );
   }
 
-  /** ngAfterViewInit
-   * binds the headerRef's pageTitleInViewport to an intersection observer
+  /** intersectionObserverCallback
+   *  - callback logic for showing and hiding the page title
+   *  - setting is made more difficult than unsetting to prevent flickering
    **/
-  ngAfterViewInit(): void {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // setting is made more difficult than unsetting to prevent flickering
-          if (entry.isIntersecting) {
-            if (entry.intersectionRatio > 0.15) {
-              this.headerRef.pageTitleInViewport = true;
-            }
-          } else {
-            this.headerRef.pageTitleInViewport = false;
-          }
-        });
-      },
-      {
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+  intersectionObserverCallback(
+    entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>
+  ): void {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        if (entry.intersectionRatio > 0.4) {
+          this.headerRef.pageTitleInViewport = true;
+        }
+      } else {
+        this.headerRef.pageTitleInViewport = false;
       }
-    );
-    observer.observe(this.scrollPoint.nativeElement);
+    });
+  }
+
+  /** onInitialDataLoaded
+   * binds the headerRef's pageTitleInViewport to an intersection observer
+   * generates a threshold config option of [0, 0.1, ..., 0.9]
+   **/
+  onInitialDataLoaded(): void {
+    new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
+      threshold: [...Array(10).keys()].map((val) => (val ? val / 10 : val))
+    }).observe(this.scrollPoint.nativeElement);
   }
 
   /** refreshData

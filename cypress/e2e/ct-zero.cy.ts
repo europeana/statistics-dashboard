@@ -51,6 +51,41 @@ context('Statistics Dashboard', () => {
       });
 
       describe('country page', () => {
+        it('should (conditionally) show the control zero control', () => {
+          cy.visit(urlDefault);
+
+          cy.get(selCtrlCTZero).filter(':visible').should('exist');
+
+          cy.visit('/country/Austria');
+
+          cy.get(selCtrlCTZero).filter(':visible').should('not.exist');
+
+          cy.scrollTo('bottom');
+
+          cy.get(selCtrlCTZero).filter(':visible').should('exist');
+        });
+
+        it('should update the content when the zero control control is toggled', () => {
+          cy.visit(urlDefault);
+
+          const valDefault = '10%';
+          const valCTZero = '21.6%';
+          const sel = '.entry-card .total.triple';
+
+          cy.get(sel).contains(valDefault).should('exist');
+          cy.get(sel).contains(valCTZero).should('not.exist');
+
+          cy.get(selCtrlCTZero).click();
+
+          cy.get(sel).contains(valCTZero).should('exist');
+          cy.get(sel).contains(valDefault).should('not.exist');
+
+          cy.get(selCtrlCTZero).click();
+
+          cy.get(sel).contains(valDefault).should('exist');
+          cy.get(sel).contains(valCTZero).should('not.exist');
+        });
+
         it('should parameterise the links', () => {
           cy.visit(urlDefault);
           cy.wait(100);
