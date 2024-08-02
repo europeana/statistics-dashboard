@@ -126,6 +126,7 @@ export class CountryComponent extends SubscriptionManager {
     this._country = country;
     this.refreshCardData();
     this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
+    this.headerRef.pageTitleDynamic = this.showTargetsData;
   }
 
   get country(): string {
@@ -138,7 +139,11 @@ export class CountryComponent extends SubscriptionManager {
   latestCountryData: TargetData;
   appendiceExpanded = false;
 
-  @Input() headerRef: { activeCountry: string; pageTitleInViewport: boolean };
+  @Input() headerRef: {
+    activeCountry: string;
+    pageTitleInViewport: boolean;
+    pageTitleDynamic: boolean;
+  };
 
   constructor(private applicationRef: ApplicationRef) {
     super();
@@ -173,7 +178,7 @@ export class CountryComponent extends SubscriptionManager {
             this.countryData = combined.countryData;
             const country = combined.params['country'];
             this.setCountryToParam(country);
-            this.setCountryInHeaderMenu(country);
+            this.setHeaderData(country);
             this.onInitialDataLoaded();
           },
           error: (e: Error) => {
@@ -273,11 +278,18 @@ export class CountryComponent extends SubscriptionManager {
     );
   }
 
-  setCountryInHeaderMenu(country?: string): void {
-    (this.headerRef as unknown as { activeCountry: string }).activeCountry =
-      country;
+  /** setHeaderData
+   * @param {string?} activeCountry - optional country
+   **/
+  setHeaderData(activeCountry?: string): void {
+    this.headerRef.pageTitleDynamic = false;
+    this.headerRef.activeCountry = activeCountry;
   }
 
+  /** setCountryToParam
+   * - set instance variables
+   * @param {string} country - the country
+   **/
   setCountryToParam(country: string): void {
     this.country = country;
     this.countryCode = isoCountryCodes[this.country];
@@ -323,6 +335,6 @@ export class CountryComponent extends SubscriptionManager {
   }
 
   ngOnDestroy(): void {
-    this.setCountryInHeaderMenu();
+    this.setHeaderData();
   }
 }

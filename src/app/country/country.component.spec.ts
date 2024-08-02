@@ -70,6 +70,7 @@ describe('CountryComponent', () => {
 
     const header = {
       activeCountry: 'France',
+      pageTitleDynamic: true,
       countryTotalMap: {
         France: {
           total: 1,

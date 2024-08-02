@@ -36,6 +36,7 @@ export class HeaderComponent {
   @Input() showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
 
   @Input() pageTitleInViewport = false;
+  @Input() pageTitleDynamic = false;
 
   public isoCountryCodes = isoCountryCodes;
 
