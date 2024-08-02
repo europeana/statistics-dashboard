@@ -2,6 +2,7 @@ import { DimensionName } from '../../src/app/_models';
 
 context('Statistics Dashboard', () => {
   describe('content-tier zero', () => {
+    const force = { force: true };
     const ctZeroParam = 'content-tier-zero=true';
     const ctZeroFilterParam = DimensionName.contentTier;
     const selCtrlCTZero = '[for=ctZero]';
@@ -78,12 +79,12 @@ context('Statistics Dashboard', () => {
           cy.get(sel).contains(valDefault).should('exist');
           cy.get(sel).contains(valCTZero).should('not.exist');
 
-          cy.get(selCtrlCTZero).click();
+          cy.get(selCtrlCTZero).click(force);
 
           cy.get(sel).contains(valCTZero).should('exist');
           cy.get(sel).contains(valDefault).should('not.exist');
 
-          cy.get(selCtrlCTZero).click();
+          cy.get(selCtrlCTZero).click(force);
 
           cy.get(sel).contains(valDefault).should('exist');
           cy.get(sel).contains(valCTZero).should('not.exist');
@@ -148,12 +149,12 @@ context('Statistics Dashboard', () => {
           .contains('Content Tier')
           .should('have.length', 1);
 
-        cy.get(selFilterOpener).contains('Content Tier').click({ force: true });
+        cy.get(selFilterOpener).contains('Content Tier').click(force);
         cy.get(selFilterLabel).contains('Tier 0').should('have.length', 0);
 
-        cy.get(selCtrlCTZero).click({ force: true });
+        cy.get(selCtrlCTZero).click(force);
 
-        cy.get(selFilterOpener).contains('Content Tier').click({ force: true });
+        cy.get(selFilterOpener).contains('Content Tier').click(force);
         cy.get(selFilterLabel).contains('Tier 0').should('have.length', 1);
       });
 
@@ -163,7 +164,7 @@ context('Statistics Dashboard', () => {
         cy.get(selTotalRecords).contains('1,000').should('have.length', 1);
         cy.get(selTotalRecords).contains('819').should('have.length', 0);
 
-        cy.get(selCtrlCTZero).click({ force: true });
+        cy.get(selCtrlCTZero).click(force);
 
         cy.get(selTotalRecords).contains('1,000').should('have.length', 0);
         cy.get(selTotalRecords).contains('819').should('have.length', 1);
