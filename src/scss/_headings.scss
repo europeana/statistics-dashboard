@@ -3,11 +3,11 @@
   padding: 16px;
   display: grid;
   grid-template-rows: 1fr;
-  position: absolute;
   left: 0;
   right: 0;
 
   &.fit-to-page.minified {
+    position: absolute;
     $transition-time: 120ms;
     transition: grid-template-rows $transition-time linear,
       padding $transition-time linear, margin $transition-time linear;
