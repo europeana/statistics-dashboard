@@ -53,10 +53,12 @@ context('Statistics Dashboard', () => {
       describe('country page', () => {
         it('should (conditionally) show the control zero control', () => {
           cy.visit(urlDefault);
+          cy.wait(100);
 
           cy.get(selCtrlCTZero).filter(':visible').should('exist');
 
           cy.visit('/country/Austria');
+          cy.wait(100);
 
           cy.get(selCtrlCTZero).filter(':visible').should('not.exist');
 
@@ -67,6 +69,7 @@ context('Statistics Dashboard', () => {
 
         it('should update the content when the zero control control is toggled', () => {
           cy.visit(urlDefault);
+          cy.wait(100);
 
           const valDefault = '10%';
           const valCTZero = '21.6%';
