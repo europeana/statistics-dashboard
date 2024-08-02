@@ -25,9 +25,17 @@ import { CountryTotalInfo, IHash } from '../_models';
   ]
 })
 export class HeaderComponent {
+  // class ref needed to access static variables in the template
+  public classReference = HeaderComponent;
+  public static PAGE_TITLE_HIDDEN = 0;
+  public static PAGE_TITLE_MINIFIED = 1;
+  public static PAGE_TITLE_SHOWING = 2;
+
   @Input() form?: FormGroup;
   @Input() includeCTZero: boolean;
-  @Input() showPageTitle = false;
+  @Input() showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
+
+  @Input() pageTitleInViewport = false;
 
   public isoCountryCodes = isoCountryCodes;
 

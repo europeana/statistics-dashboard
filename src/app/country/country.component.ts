@@ -20,7 +20,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
-
 import { colours, externalLinks, isoCountryCodes } from '../_data';
 import {
   BreakdownResults,
@@ -46,6 +45,7 @@ import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent } from '../chart';
 import { LegendGridComponent } from '../legend-grid';
 import { ResizeComponent } from '../resize';
+import { CTZeroControlComponent } from '../ct-zero-control';
 import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
@@ -57,6 +57,7 @@ import { TruncateComponent } from '../truncate';
   imports: [
     AbbreviateNumberPipe,
     AppendiceSectionComponent,
+    CTZeroControlComponent,
     RouterOutlet,
     DatePipe,
     JsonPipe,
@@ -90,11 +91,21 @@ export class CountryComponent extends SubscriptionManager {
 
   cardData: IHash<Array<NamesValuePercent>> = {};
 
+  _includeCTZero = false;
+
+  @Input() set includeCTZero(includeCTZero: boolean) {
+    this._includeCTZero = includeCTZero;
+    this.refreshCardData();
+  }
+  get includeCTZero(): boolean {
+    return this._includeCTZero;
+  }
+
   // Used to parameterise links to the data page
-  @Input() includeCTZero = false;
   @ViewChild('lineChart') lineChart: LineComponent;
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
   @ViewChild('barChart') barChart: BarComponent;
+  @ViewChild('scrollPoint') scrollPoint: ElementRef;
 
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
@@ -113,16 +124,7 @@ export class CountryComponent extends SubscriptionManager {
    **/
   set country(country: string) {
     this._country = country;
-    this.loadDimensionCardData(DimensionName.dataProvider);
-    this.loadDimensionCardData(DimensionName.provider);
-    this.loadDimensionCardData(DimensionName.rightsCategory);
-    this.loadDimensionCardData(DimensionName.type, () => {
-      if (this.barChart) {
-        this.barChart.removeAllSeries();
-        this.barChart.results = this.cardData[DimensionName.type];
-        this.barChart.ngAfterViewInit();
-      }
-    });
+    this.refreshCardData();
     this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
   }
 
@@ -136,7 +138,7 @@ export class CountryComponent extends SubscriptionManager {
   latestCountryData: TargetData;
   appendiceExpanded = false;
 
-  public headerRef: ElementRef;
+  @Input() headerRef: { activeCountry: string; pageTitleInViewport: boolean };
 
   constructor(private applicationRef: ApplicationRef) {
     super();
@@ -172,12 +174,55 @@ export class CountryComponent extends SubscriptionManager {
             const country = combined.params['country'];
             this.setCountryToParam(country);
             this.setCountryInHeaderMenu(country);
+            this.onInitialDataLoaded();
           },
           error: (e: Error) => {
             console.log(e);
           }
         })
     );
+  }
+
+  /** intersectionObserverCallback
+   *  - callback logic for showing and hiding the page title
+   *  - setting is made more difficult than unsetting to prevent flickering
+   **/
+  intersectionObserverCallback(
+    entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>
+  ): void {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+        this.headerRef.pageTitleInViewport = true;
+      } else {
+        this.headerRef.pageTitleInViewport = false;
+      }
+    });
+  }
+
+  /** onInitialDataLoaded
+   * binds the headerRef's pageTitleInViewport to an intersection observer
+   * generates a threshold config option of [0, 0.1, ..., 0.9]
+   **/
+  onInitialDataLoaded(): void {
+    new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
+      threshold: [...Array(10).keys()].map((val) => (val ? val / 10 : val))
+    }).observe(this.scrollPoint.nativeElement);
+  }
+
+  /** refreshCardData
+   * (re)loads all dimension card data and reinitialises barChart
+   **/
+  refreshCardData(): void {
+    this.loadDimensionCardData(DimensionName.dataProvider);
+    this.loadDimensionCardData(DimensionName.provider);
+    this.loadDimensionCardData(DimensionName.rightsCategory);
+    this.loadDimensionCardData(DimensionName.type, () => {
+      if (this.barChart) {
+        this.barChart.removeAllSeries();
+        this.barChart.results = this.cardData[DimensionName.type];
+        this.barChart.ngAfterViewInit();
+      }
+    });
   }
 
   /** loadDimensionCardData
@@ -189,9 +234,14 @@ export class CountryComponent extends SubscriptionManager {
     dimensionName: DimensionName,
     fnCallback?: () => void
   ): void {
+    const contentTierVals = ['1', '2', '3', '4'];
+
+    if (this.includeCTZero) {
+      contentTierVals.unshift('0');
+    }
     const req = {
       filters: {
-        contentTier: { values: ['1', '2', '3', '4'] },
+        contentTier: { values: contentTierVals },
         country: { values: [this.country] }
       }
     };

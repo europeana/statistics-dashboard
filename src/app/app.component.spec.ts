@@ -21,6 +21,7 @@ import {
 import { MockAPIService } from './_mocked';
 import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
+import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
 
@@ -96,6 +97,7 @@ describe('AppComponent', () => {
   it('should listen for history navigation', fakeAsync(() => {
     expect(app.lastSetContentTierZeroValue).toBeFalsy();
     app.buildForm();
+    app.countryComponentRef = {} as unknown as CountryComponent;
 
     // trigger location change does nothing
     app.updateLocation();
@@ -161,6 +163,9 @@ describe('AppComponent', () => {
     expect(app.showPageTitle).toBeFalsy();
 
     spyOn(app, 'loadLandingData');
+    spyOn(location, 'path').and.callFake(() => {
+      return '';
+    });
 
     // load Landing
     app.onOutletLoaded(new LandingComponent());
@@ -168,13 +173,15 @@ describe('AppComponent', () => {
     expect(app.showPageTitle).toBeTruthy();
     expect(app.loadLandingData).not.toHaveBeenCalled();
 
-    // load other
-    app.onOutletLoaded({} as unknown as OverviewComponent);
+    // load overview component
+    const fakeOverviewComponent = Object.create(OverviewComponent.prototype);
+
+    app.onOutletLoaded(fakeOverviewComponent);
     expect(app.showPageTitle).toBeFalsy();
 
     expect(app.loadLandingData).not.toHaveBeenCalled();
 
-    // load landing
+    // load landing component
     app.getCtrlCTZero().setValue(true);
 
     const cmp = new LandingComponent();
@@ -188,6 +195,23 @@ describe('AppComponent', () => {
     app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
     app.onOutletLoaded(new LandingComponent());
     expect(app.loadLandingData).toHaveBeenCalledTimes(2);
+
+    // load country component
+    const fakeCountryComponent = Object.create(CountryComponent.prototype);
+
+    spyOn(app, 'setCTZeroInputToLastSetValue');
+    spyOn(fakeCountryComponent, 'refreshCardData');
+    app.onOutletLoaded(fakeCountryComponent);
+
+    expect(app.showPageTitle).toBeTruthy();
+    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
+    expect(app.setCTZeroInputToLastSetValue).not.toHaveBeenCalled();
+
+    app.lastSetContentTierZeroValue = true;
+    app.onOutletLoaded(fakeCountryComponent);
+
+    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalled();
+    expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(2);
   });
 
   it('should check if maintenance is due', () => {

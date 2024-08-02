@@ -1,4 +1,4 @@
-<main class="fit-to-page landing-page">
+<main class="fit-to-page">
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="isoCountryCodes[country]"></span>
     <span>{{ country }}</span> <span i18n="@@countryPageTitle">Data</span>
@@ -267,7 +267,6 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
             [queryParams]="{
-              'content-tier-zero': includeCTZero || undefined,
               country: country,
               type: '3D'
             }"
@@ -343,7 +342,6 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
             [queryParams]="{
-              'content-tier-zero': includeCTZero || undefined,
               country: country,
               contentTier: [2, 3, 4],
               metadataTier: ['A', 'B', 'C']
@@ -483,7 +481,11 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <!-- tertiary content -->
+
+  <div class="container-v" #scrollPoint>
     <div class="entry-card-pair">
       <div class="entry-card">
         <span class="entry-card-header">
@@ -516,7 +518,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
             [queryParams]="{
-              'content-tier-zero': includeCTZero || undefined,
+              'content-tier-zero': includeCTZero,
               country: country
             }"
             data-e2e="link-entry-type"
@@ -552,7 +554,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.rightsCategory }}"
             [queryParams]="{
-              'content-tier-zero': includeCTZero || undefined,
+              'content-tier-zero': includeCTZero,
               country: country
             }"
             data-e2e="link-entry-rights"
@@ -585,7 +587,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.dataProvider }}"
             [queryParams]="{
-              'content-tier-zero': includeCTZero || undefined,
+              'content-tier-zero': includeCTZero,
               country: country
             }"
             data-e2e="link-entry-data-provider"
@@ -621,7 +623,8 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.provider }}"
             [queryParams]="{
-              'content-tier-zero': includeCTZero || undefined,
+              'content-tier-zero': includeCTZero,
+
               country: country
             }"
             data-e2e="link-entry-provider"

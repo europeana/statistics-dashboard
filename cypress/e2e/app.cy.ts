@@ -4,6 +4,7 @@ context('Statistics Dashboard', () => {
   const urlContentTier = '/data/contentTier';
   const urlParamCTZero = 'content-tier-zero=';
   const urlParamCTZeroTrue = `?${urlParamCTZero}true`;
+  const urlCountry = '/country/Europe';
 
   describe('App General', () => {
     it('should show the feedback link (landing page / data page)', () => {
@@ -139,7 +140,7 @@ context('Statistics Dashboard', () => {
   describe('App Content Tier Zero', () => {
     const selCTZero = '#ctZero';
     const selLinkDataContentTier = '[data-e2e=link-entry-ct]';
-    const selLinkHeader = '[data-e2e=link-home-header]';
+    const selLinkHome = '[data-e2e=link-home-header]';
 
     const checkCTZeroChangesUrl = (): void => {
       cy.get(selCTZero).should('have.length', 1);
@@ -174,7 +175,7 @@ context('Statistics Dashboard', () => {
         cy.get(selCTZero).should('be.checked');
         cy.url().should('contain', urlParamCTZero);
 
-        cy.get(selLinkHeader).click(force);
+        cy.get(selLinkHome).click(force);
 
         cy.get(selCTZero).should('be.checked');
         cy.url().should('contain', urlParamCTZero);
@@ -206,7 +207,7 @@ context('Statistics Dashboard', () => {
       cy.get(selCTZero).click(force);
       cy.location('href').should('equal', `${host}${expectedHistory[3]}`);
 
-      cy.get(selLinkHeader).click(force);
+      cy.get(selLinkHome).click(force);
       cy.location('href').should('equal', `${host}${expectedHistory[4]}`);
 
       // browser back
@@ -224,6 +225,43 @@ context('Statistics Dashboard', () => {
         cy.location('href').should('equal', `${host}${expectedHistory[i]}`);
         cy.go('forward');
       }
+    });
+
+    it('the content-tier-zero setting should be retained across history test', () => {
+      cy.visit(urlCountry);
+      const expectedHistory = [
+        `${urlCountry}`,
+        `${urlCountry}${urlParamCTZeroTrue}`,
+        `${urlCountry}`
+      ];
+
+      cy.location('href').should('equal', `${host}${expectedHistory[0]}`);
+
+      cy.get(selCTZero).parent().should('not.have.class', 'checked');
+
+      cy.get(selCTZero).click(force);
+      cy.location('href').should('equal', `${host}${expectedHistory[1]}`);
+      cy.get(selCTZero).parent().should('have.class', 'checked');
+
+      cy.get(selCTZero).click(force);
+      cy.location('href').should('equal', `${host}${expectedHistory[2]}`);
+      cy.get(selCTZero).parent().should('not.have.class', 'checked');
+
+      cy.go('back');
+      cy.location('href').should('equal', `${host}${expectedHistory[1]}`);
+      cy.get(selCTZero).parent().should('have.class', 'checked');
+
+      cy.go('back');
+      cy.location('href').should('equal', `${host}${expectedHistory[0]}`);
+      cy.get(selCTZero).parent().should('not.have.class', 'checked');
+
+      cy.go('forward');
+      cy.location('href').should('equal', `${host}${expectedHistory[1]}`);
+      cy.get(selCTZero).parent().should('have.class', 'checked');
+
+      cy.go('forward');
+      cy.location('href').should('equal', `${host}${expectedHistory[2]}`);
+      cy.get(selCTZero).parent().should('not.have.class', 'checked');
     });
   });
 });

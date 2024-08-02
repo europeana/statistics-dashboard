@@ -38,7 +38,7 @@ context('Statistics Dashboard', () => {
       cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
-        .click();
+        .click(force);
       cy.wait(waitTime);
       cy.get(selPinnedOpener).should('have.length', 2);
     });
@@ -50,11 +50,10 @@ context('Statistics Dashboard', () => {
       cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
-        .click();
+        .click(force);
       cy.get(selPinnedOpener).should('have.length', 2);
       cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
-
-      cy.get(selToggleCountry).contains('Cyprus').click();
+      cy.get(selToggleCountry).contains('Cyprus').click(force);
       cy.wait(waitTime);
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
@@ -98,14 +97,14 @@ context('Statistics Dashboard', () => {
       cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
 
       // close with country opener
-      cy.get(selPinnedOpener).contains('Denmark').click();
+      cy.get(selPinnedOpener).contains('Denmark').click(force);
       cy.wait(waitTime);
       cy.get(selPinnedOpener).contains('Denmark').should('not.exist');
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
 
       // open again with country opener
-      cy.get(selToggleCountry).contains('Denmark').click();
+      cy.get(selToggleCountry).contains('Denmark').click(force);
       cy.wait(waitTime);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup + 1);
     });
