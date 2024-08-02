@@ -8,15 +8,14 @@
 
   &.dynamic {
     position: absolute;
-  }
-
-  &.fit-to-page.minified {
     &.viewable {
       $transition-time: 120ms;
       transition: grid-template-rows $transition-time linear,
         padding $transition-time linear, margin $transition-time linear;
     }
+  }
 
+  &.fit-to-page.minified {
     &:not(.viewable) {
       margin-top: 0;
       margin-bottom: 0;

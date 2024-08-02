@@ -126,7 +126,7 @@ export class CountryComponent extends SubscriptionManager {
     this._country = country;
     this.refreshCardData();
     this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
-    this.headerRef.pageTitleDynamic = this.showTargetsData;
+    this.setHeaderData(country);
   }
 
   get country(): string {
@@ -178,7 +178,6 @@ export class CountryComponent extends SubscriptionManager {
             this.countryData = combined.countryData;
             const country = combined.params['country'];
             this.setCountryToParam(country);
-            this.setHeaderData(country);
             this.onInitialDataLoaded();
           },
           error: (e: Error) => {
@@ -281,9 +280,9 @@ export class CountryComponent extends SubscriptionManager {
   /** setHeaderData
    * @param {string?} activeCountry - optional country
    **/
-  setHeaderData(activeCountry?: string): void {
-    this.headerRef.pageTitleDynamic = false;
-    this.headerRef.activeCountry = activeCountry;
+  setHeaderData(country?: string): void {
+    this.headerRef.pageTitleDynamic = country && this.showTargetsData;
+    this.headerRef.activeCountry = country;
   }
 
   /** setCountryToParam
