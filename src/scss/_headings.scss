@@ -11,12 +11,10 @@
   }
 
   &.fit-to-page.minified {
-    $transition-time: 120ms;
-    transition: grid-template-rows $transition-time linear,
-      padding $transition-time linear, margin $transition-time linear;
-
-    & > * {
-      overflow: hidden;
+    &.viewable {
+      $transition-time: 120ms;
+      transition: grid-template-rows $transition-time linear,
+        padding $transition-time linear, margin $transition-time linear;
     }
 
     &:not(.viewable) {
@@ -29,6 +27,10 @@
 
     .page-title {
       display: none;
+    }
+
+    & > * {
+      overflow: hidden;
     }
   }
 }
