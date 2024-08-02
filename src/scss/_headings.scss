@@ -6,8 +6,11 @@
   left: 0;
   right: 0;
 
-  &.fit-to-page.minified {
+  &.dynamic {
     position: absolute;
+  }
+
+  &.fit-to-page.minified {
     $transition-time: 120ms;
     transition: grid-template-rows $transition-time linear,
       padding $transition-time linear, margin $transition-time linear;
