@@ -193,7 +193,8 @@ export class CountryComponent extends SubscriptionManager {
     entries.forEach((entry) => {
       if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
         this.headerRef.pageTitleInViewport = true;
-      } else {
+      }
+      if(!entry.isIntersecting) {
         this.headerRef.pageTitleInViewport = false;
       }
     });
