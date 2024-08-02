@@ -200,7 +200,7 @@ describe('AppComponent', () => {
     const fakeCountryComponent = Object.create(CountryComponent.prototype);
 
     spyOn(app, 'setCTZeroInputToLastSetValue');
-    spyOn(fakeCountryComponent, 'refreshData');
+    spyOn(fakeCountryComponent, 'refreshCardData');
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.showPageTitle).toBeTruthy();
@@ -211,7 +211,7 @@ describe('AppComponent', () => {
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalled();
-    expect(fakeCountryComponent.refreshData).toHaveBeenCalledTimes(2);
+    expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(2);
   });
 
   it('should check if maintenance is due', () => {

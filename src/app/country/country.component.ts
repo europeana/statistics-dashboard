@@ -95,7 +95,7 @@ export class CountryComponent extends SubscriptionManager {
 
   @Input() set includeCTZero(includeCTZero: boolean) {
     this._includeCTZero = includeCTZero;
-    this.refreshData();
+    this.refreshCardData();
   }
   get includeCTZero(): boolean {
     return this._includeCTZero;
@@ -124,7 +124,7 @@ export class CountryComponent extends SubscriptionManager {
    **/
   set country(country: string) {
     this._country = country;
-    this.refreshData();
+    this.refreshCardData();
     this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
   }
 
@@ -209,10 +209,10 @@ export class CountryComponent extends SubscriptionManager {
     }).observe(this.scrollPoint.nativeElement);
   }
 
-  /** refreshData
+  /** refreshCardData
    * (re)loads all dimension card data and reinitialises barChart
    **/
-  refreshData(): void {
+  refreshCardData(): void {
     this.loadDimensionCardData(DimensionName.dataProvider);
     this.loadDimensionCardData(DimensionName.provider);
     this.loadDimensionCardData(DimensionName.rightsCategory);

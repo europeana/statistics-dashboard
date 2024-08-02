@@ -166,9 +166,9 @@ describe('CountryComponent', () => {
   });
 
   it('should refresh the data when the includeCTZero is set', () => {
-    spyOn(component, 'refreshData');
+    spyOn(component, 'refreshCardData');
     component.includeCTZero = true;
-    expect(component.refreshData).toHaveBeenCalled();
+    expect(component.refreshCardData).toHaveBeenCalled();
   });
 
   it('should the initialise the IntersectionObserver', () => {
