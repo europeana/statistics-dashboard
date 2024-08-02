@@ -196,24 +196,20 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   /**
    * handleLocationPopState
-   * capture "back" and "forward" events / sync with form data
+   * capture "back" and "forward" events and align the value of
+   * the content-tier zero control with that in the (popped) url,
+   * flagging (via skipLocationUpdate) that the value change
+   * should not trigger another url change in turn
+   *
    * @param { PopStateEvent } state - the event
    **/
   handleLocationPopState(state: PopStateEvent): void {
-    /* if there's a landing page in memory then get its form ctrl
-       and align its value with that in the (popped) url, flagging
-       (via skipLocationUpdate) that the form should not trigger
-       another url change in turn
-    */
-    if (this.landingComponentRef) {
-      const ctrlCTZero = this.getCtrlCTZero();
-      this.lastSetContentTierZeroValue =
-        `${state.url}`.indexOf('content-tier-zero=true') > -1;
-
-      if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-        this.skipLocationUpdate = true;
-        ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-      }
+    const ctrlCTZero = this.getCtrlCTZero();
+    this.lastSetContentTierZeroValue =
+      `${state.url}`.indexOf('content-tier-zero=true') > -1;
+    if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
+      this.skipLocationUpdate = true;
+      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
     }
   }
 
