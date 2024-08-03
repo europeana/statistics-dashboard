@@ -201,6 +201,7 @@ describe('AppComponent', () => {
 
     spyOn(app, 'setCTZeroInputToLastSetValue');
     spyOn(fakeCountryComponent, 'refreshCardData');
+
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.showPageTitle).toBeTruthy();
@@ -211,7 +212,13 @@ describe('AppComponent', () => {
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalled();
-    expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(2);
+    expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
+
+    fakeCountryComponent.cardData = {};
+    app.onOutletLoaded(fakeCountryComponent);
+
+    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
+    expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
   });
 
   it('should check if maintenance is due', () => {

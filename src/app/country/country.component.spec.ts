@@ -169,10 +169,24 @@ describe('CountryComponent', () => {
   it('should refresh the data when the includeCTZero is set', () => {
     spyOn(component, 'refreshCardData');
     component.includeCTZero = true;
+
+    expect(component.refreshCardData).not.toHaveBeenCalled();
+
+    component.includeCTZero = false;
+
+    expect(component.refreshCardData).not.toHaveBeenCalled();
+
+    component.cardData = { provider: [] };
+    component.includeCTZero = true;
+
     expect(component.refreshCardData).toHaveBeenCalled();
+
+    component.includeCTZero = false;
+
+    expect(component.refreshCardData).toHaveBeenCalledTimes(2);
   });
 
-  it('should the initialise the IntersectionObserver', () => {
+  it('should initialise the IntersectionObserver', () => {
     expect(intersectionObserverCreated).toBeFalsy();
     component.onInitialDataLoaded();
     expect(intersectionObserverCreated).toBeTruthy();

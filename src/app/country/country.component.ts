@@ -89,13 +89,15 @@ export class CountryComponent extends SubscriptionManager {
   public TargetFieldName = TargetFieldName;
   public colours = colours;
 
-  cardData: IHash<Array<NamesValuePercent>> = {};
+  cardData: IHash<Array<NamesValuePercent>>;
 
   _includeCTZero = false;
 
   @Input() set includeCTZero(includeCTZero: boolean) {
     this._includeCTZero = includeCTZero;
-    this.refreshCardData();
+    if (this.cardData) {
+      this.refreshCardData();
+    }
   }
   get includeCTZero(): boolean {
     return this._includeCTZero;
@@ -261,15 +263,19 @@ export class CountryComponent extends SubscriptionManager {
           })
         )
         .subscribe((res) => {
-          this.cardData[dimensionName] = res.map(
-            (cpv: CountPercentageValue) => {
-              return {
-                name: cpv.value,
-                value: cpv.count,
-                percent: cpv.percentage
-              };
-            }
-          );
+          const cardData = res.map((cpv: CountPercentageValue) => {
+            return {
+              name: cpv.value,
+              value: cpv.count,
+              percent: cpv.percentage
+            };
+          });
+
+          if (!this.cardData) {
+            this.cardData = {};
+          }
+          this.cardData[dimensionName] = cardData;
+
           if (fnCallback) {
             fnCallback();
           }
