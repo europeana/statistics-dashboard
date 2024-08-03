@@ -484,8 +484,9 @@
   </div>
 
   <!-- tertiary content -->
+  <span #scrollPoint></span>
 
-  <div class="container-v" #scrollPoint>
+  <div class="container-v" *ngIf="cardData">
     <div class="entry-card-pair">
       <div class="entry-card">
         <span class="entry-card-header">
