@@ -484,154 +484,155 @@
   </div>
 
   <!-- tertiary content -->
-  <span #scrollPoint></span>
 
-  <div class="container-v" *ngIf="cardData">
-    <div class="entry-card-pair">
-      <div class="entry-card">
-        <span class="entry-card-header">
-          <span class="pad-word-right">{{ country }}</span>
-          <span i18n="@@countryEntryType">data by content type</span>
-        </span>
+  <div #scrollPoint>
+    <div class="container-v" *ngIf="cardData">
+      <div class="entry-card-pair">
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country }}</span>
+            <span i18n="@@countryEntryType">data by content type</span>
+          </span>
 
-        <div
-          class="entry-card-content"
-          *ngIf="cardData[DimensionName.type]?.length > 0"
-        >
-          <ng-content
-            *ngTemplateOutlet="
-              cardSummary;
-              context: {
-                dimension: DimensionName.type,
-                name: cardData[DimensionName.type][0].name,
-                value: cardData[DimensionName.type][0].value,
-                percent: cardData[DimensionName.type][0].percent,
-                isPowerLevel: false
-              }
-            "
-          ></ng-content>
-          <app-bar-chart
-            #barChart
-            chartId="typeChart"
-            [results]="cardData[DimensionName.type]"
-          ></app-bar-chart>
-          <a
-            class="data-link"
-            routerLink="/data/{{ DimensionName.type }}"
-            [queryParams]="{
-              'content-tier-zero': includeCTZero,
-              country: country
-            }"
-            data-e2e="link-entry-type"
-            i18n="@@countrySectionLinkType"
-            >View by type</a
+          <div
+            class="entry-card-content"
+            *ngIf="cardData[DimensionName.type]?.length > 0"
           >
-        </div>
-      </div>
-      <div class="entry-card">
-        <span class="entry-card-header">
-          <span class="pad-word-right">{{ country }}</span>
-          <span i18n="@@countryEntryRights">data by rights category</span>
-          <a
-            class="info-icon"
-            [href]="externalLinks.help.rights.href"
-            target="_blank"
-            [title]="externalLinks.help.rights.description"
-          ></a
-        ></span>
-        <div class="entry-card-content">
-          <div class="container-h">
             <ng-content
               *ngTemplateOutlet="
-                dataRows;
+                cardSummary;
                 context: {
-                  dimension: DimensionName.rightsCategory,
-                  data: cardData[DimensionName.rightsCategory]
+                  dimension: DimensionName.type,
+                  name: cardData[DimensionName.type][0].name,
+                  value: cardData[DimensionName.type][0].value,
+                  percent: cardData[DimensionName.type][0].percent,
+                  isPowerLevel: false
                 }
               "
             ></ng-content>
+            <app-bar-chart
+              #barChart
+              chartId="typeChart"
+              [results]="cardData[DimensionName.type]"
+            ></app-bar-chart>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.type }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero,
+                country: country
+              }"
+              data-e2e="link-entry-type"
+              i18n="@@countrySectionLinkType"
+              >View by type</a
+            >
           </div>
-          <a
-            class="data-link"
-            routerLink="/data/{{ DimensionName.rightsCategory }}"
-            [queryParams]="{
-              'content-tier-zero': includeCTZero,
-              country: country
-            }"
-            data-e2e="link-entry-rights"
-            i18n="@@countrySectionLinkRights"
-            >View by rights category</a
-          >
+        </div>
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country }}</span>
+            <span i18n="@@countryEntryRights">data by rights category</span>
+            <a
+              class="info-icon"
+              [href]="externalLinks.help.rights.href"
+              target="_blank"
+              [title]="externalLinks.help.rights.description"
+            ></a
+          ></span>
+          <div class="entry-card-content">
+            <div class="container-h">
+              <ng-content
+                *ngTemplateOutlet="
+                  dataRows;
+                  context: {
+                    dimension: DimensionName.rightsCategory,
+                    data: cardData[DimensionName.rightsCategory]
+                  }
+                "
+              ></ng-content>
+            </div>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.rightsCategory }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero,
+                country: country
+              }"
+              data-e2e="link-entry-rights"
+              i18n="@@countrySectionLinkRights"
+              >View by rights category</a
+            >
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="entry-card-pair">
-      <div class="entry-card">
-        <span class="entry-card-header">
-          <span class="pad-word-right">{{ country }}</span>
-          <span i18n="@@countryEntryDataProvider">data by data provider</span>
-        </span>
-        <div class="entry-card-content">
-          <div class="container-h">
-            <ng-content
-              *ngTemplateOutlet="
-                dataRows;
-                context: {
-                  dimension: DimensionName.dataProvider,
-                  data: cardData[DimensionName.dataProvider]
-                }
-              "
-            ></ng-content>
+      <div class="entry-card-pair">
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country }}</span>
+            <span i18n="@@countryEntryDataProvider">data by data provider</span>
+          </span>
+          <div class="entry-card-content">
+            <div class="container-h">
+              <ng-content
+                *ngTemplateOutlet="
+                  dataRows;
+                  context: {
+                    dimension: DimensionName.dataProvider,
+                    data: cardData[DimensionName.dataProvider]
+                  }
+                "
+              ></ng-content>
+            </div>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.dataProvider }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero,
+                country: country
+              }"
+              data-e2e="link-entry-data-provider"
+              i18n="@@countrySectionLinkDataProvider"
+              >View by data provider</a
+            >
           </div>
-          <a
-            class="data-link"
-            routerLink="/data/{{ DimensionName.dataProvider }}"
-            [queryParams]="{
-              'content-tier-zero': includeCTZero,
-              country: country
-            }"
-            data-e2e="link-entry-data-provider"
-            i18n="@@countrySectionLinkDataProvider"
-            >View by data provider</a
-          >
         </div>
-      </div>
-      <div class="entry-card">
-        <span class="entry-card-header">
-          <span class="pad-word-right">{{ country }}</span>
-          <span i18n="@@countryEntryProvider">data by provider</span>
-          <a
-            class="info-icon"
-            [href]="externalLinks.help.provider.href"
-            target="_blank"
-            [title]="externalLinks.help.provider.description"
-          ></a
-        ></span>
-        <div class="entry-card-content">
-          <div class="container-h">
-            <ng-content
-              *ngTemplateOutlet="
-                dataRows;
-                context: {
-                  dimension: DimensionName.provider,
-                  data: cardData[DimensionName.provider]
-                }
-              "
-            ></ng-content>
-          </div>
-          <a
-            class="data-link"
-            routerLink="/data/{{ DimensionName.provider }}"
-            [queryParams]="{
-              'content-tier-zero': includeCTZero,
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country }}</span>
+            <span i18n="@@countryEntryProvider">data by provider</span>
+            <a
+              class="info-icon"
+              [href]="externalLinks.help.provider.href"
+              target="_blank"
+              [title]="externalLinks.help.provider.description"
+            ></a
+          ></span>
+          <div class="entry-card-content">
+            <div class="container-h">
+              <ng-content
+                *ngTemplateOutlet="
+                  dataRows;
+                  context: {
+                    dimension: DimensionName.provider,
+                    data: cardData[DimensionName.provider]
+                  }
+                "
+              ></ng-content>
+            </div>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.provider }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero,
 
-              country: country
-            }"
-            data-e2e="link-entry-provider"
-            i18n="@@countrySectionLinkProvider"
-            >View by provider</a
-          >
+                country: country
+              }"
+              data-e2e="link-entry-provider"
+              i18n="@@countrySectionLinkProvider"
+              >View by provider</a
+            >
+          </div>
         </div>
       </div>
     </div>
