@@ -199,3 +199,10 @@ export const isoCountryCodesReversed = Object.entries(isoCountryCodes).reduce(
   (obj, item) => (obj[item[1]] = item[0]) && obj,
   {}
 );
+
+export const eliData = {
+  eliDocNum: '32021H1970',
+  eliUrl: 'http://data.europa.eu/eli/reco/2021/1970/oj',
+  eliTitle:
+    'Commission Recommendation (EU) 2021/1970 of 10 November 2021 on a common European data space for cultural heritage'
+};

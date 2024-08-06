@@ -11,47 +11,86 @@ $arrow-rotation-rest: 330deg;
   border: 1px solid $gray-5;
   color: $gray-faint;
   position: relative;
-
   &::after,
   &::before {
-    bottom: -($arrow-height - 1);
     border-color: transparent;
-    border-bottom-width: $arrow-height;
-    border-left-width: $arrow-height;
-    border-right: $arrow-width solid #d8d8d8;
     border-style: solid;
     content: "";
     position: absolute;
+  }
+}
+
+// bottom and top
+.speech-bubble.arrow-bottom,
+.speech-bubble.arrow-top {
+  &::after,
+  &::before {
+    border-bottom-width: $arrow-height;
+    border-left-width: $arrow-height;
+    border-right: $arrow-width solid #d8d8d8;
     right: 11px;
   }
-
-  &::before {
-    transform: rotate($arrow-rotation);
-  }
-
   &::after {
     border-right-color: #fff;
-    transform: scale(0.8) translate(2px, -2px) rotate($arrow-rotation);
     z-index: 1;
   }
 }
 
-.arrow-top {
+// bottom only
+.speech-bubble.arrow-bottom {
+  &::after,
+  &::before {
+    bottom: -($arrow-height - 1);
+  }
+  &::before {
+    transform: rotate($arrow-rotation);
+  }
+  &::after {
+    transform: scale(0.8) translate(2px, -2px) rotate($arrow-rotation);
+  }
+}
+
+// top only
+.speech-bubble.arrow-top {
   top: $arrow-height + 2;
   right: -3px;
-
   &::after,
   &::before {
     bottom: auto;
     top: -($arrow-height - 1);
   }
-
   &::before {
     transform: rotate($arrow-rotation-rest) scaleY(-1);
   }
-
   &::after {
     transform: scale(0.8) scaleY(-1) translate(2px, -2px)
       rotate($arrow-rotation);
+  }
+}
+
+// left
+.speech-bubble.arrow-left {
+  left: $arrow-height + 2;
+
+  &::after,
+  &::before {
+    border-top-width: $arrow-height;
+    border-left-width: $arrow-height;
+    border-right: $arrow-width solid #d8d8d8;
+    left: 0;
+  }
+
+  &::before {
+    left: -($arrow-height - 2);
+    transform: rotate(330deg);
+    top: -($arrow-height - 2);
+  }
+
+  &::after {
+    border-right-color: #fff;
+    left: -($arrow-height - 3.5);
+    transform: scale(0.8) rotate(330deg);
+    top: -($arrow-height - 3);
+    z-index: 1;
   }
 }

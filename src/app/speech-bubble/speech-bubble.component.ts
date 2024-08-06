@@ -9,5 +9,7 @@ import { NgClass, NgIf } from '@angular/common';
   imports: [NgIf, NgClass]
 })
 export class SpeechBubbleComponent {
-  @Input() arrowTop = false;
+  @Input() arrowTopRight = false;
+  @Input() arrowTopLeft = false;
+  @Input() arrowBottomRight = false;
 }
