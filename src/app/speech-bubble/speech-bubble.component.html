@@ -1,9 +1,10 @@
-<span
+<div
   class="speech-bubble"
   [ngClass]="{
-    'arrow-top': arrowTop,
-    'arrow-bottom': !arrowTop
+    'arrow-top': arrowTopRight,
+    'arrow-bottom': arrowBottomRight,
+    'arrow-left': arrowTopLeft,
   }"
 >
   <ng-content></ng-content>
-</span>
+</div>

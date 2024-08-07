@@ -24,6 +24,11 @@
       grid-template-rows: 0fr;
     }
 
+    // save the extra space with non-MS-countries
+    &.viewable:not(.dynamic) {
+      margin-bottom: -23px;
+    }
+
     .page-title {
       display: none;
     }

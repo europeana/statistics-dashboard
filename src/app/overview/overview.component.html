@@ -273,7 +273,7 @@
             <ng-container *ngIf="countryPageShortcutsAvailable">
               <div class="country-shortcut-links-container">
                 <span class="flag-orb default" title="View country data"></span>
-                <app-speech-bubble [arrowTop]="true">
+                <app-speech-bubble [arrowTopRight]="true">
                   <ul class="country-shortcuts">
                     <li *ngFor="let country of queryParams['country']">
                       <a [routerLink]="['/country', country]">

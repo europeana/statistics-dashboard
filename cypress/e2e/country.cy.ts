@@ -70,6 +70,14 @@ context('Statistics Dashboard', () => {
       cy.get(selSummary).should('have.length', 3);
     });
 
+    it('should show the page sections', () => {
+      const selSectionHeader1 = '.country-section-header > .header-text';
+      cy.get(selSectionHeader1).should('have.length', 1);
+
+      const selSectionHeader2 = '.header-text.non-target-text';
+      cy.get(selSectionHeader2).should('have.length', 1);
+    });
+
     it('should show the data entry point links', () => {
       const selLinkData3D = '[data-e2e=link-entry-3d]';
       const selLinkDataHQ = '[data-e2e=link-entry-hq]';

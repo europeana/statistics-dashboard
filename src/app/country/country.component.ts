@@ -20,7 +20,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
-import { colours, externalLinks, isoCountryCodes } from '../_data';
+import { colours, eliData, externalLinks, isoCountryCodes } from '../_data';
 import {
   BreakdownResults,
   CountPercentageValue,
@@ -88,9 +88,11 @@ export class CountryComponent extends SubscriptionManager {
   public isoCountryCodes = isoCountryCodes;
   public TargetFieldName = TargetFieldName;
   public colours = colours;
+  public eliDocNum = eliData.eliDocNum;
+  public eliUrl = eliData.eliUrl;
+  public eliTitle = eliData.eliTitle;
 
   cardData: IHash<Array<NamesValuePercent>>;
-
   _includeCTZero = false;
 
   @Input() set includeCTZero(includeCTZero: boolean) {

@@ -1,7 +1,8 @@
 <main class="fit-to-page">
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="isoCountryCodes[country]"></span>
-    <span>{{ country }}</span> <span i18n="@@countryPageTitle">Data</span>
+    <span>{{ country }}</span>
+    <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
   </h1>
 
   <ng-template
@@ -34,7 +35,7 @@
 
       <span class="powerbar-target-labels">
         <span class="powerbar-label-left">{{ label }}</span>
-        <app-speech-bubble>
+        <app-speech-bubble [arrowBottomRight]="true">
           <span class="show-on-powerbar-hover"
             >{{ value | abbreviateNumber }} of
           </span>
@@ -199,6 +200,31 @@
       >&gt;&gt;</a
     >
   </ng-template>
+
+  <span
+    *ngIf="showTargetsData && eliUrl; let eliUrl"
+    class="country-section-header"
+  >
+    <a
+      target="_blank"
+      class="info-icon"
+      [href]="eliUrl"
+      title="ELI ref: {{ eliUrl }}"
+    ></a>
+    <span class="header-text">Target Data</span>
+    <span class="speech-bubble-wrapper">
+      <app-speech-bubble [arrowTopLeft]="true">
+        <span class="speech-bubble-content">
+          <span class="header-text"> Document title: </span>
+          <span> {{ eliTitle }} </span>
+          <span class="header-text"> Permanent link: </span>
+          <a [href]="eliUrl" target="_blank"> {{ eliUrl }} </a>
+          <span class="header-text"> Document Number: </span>
+          <span> {{ eliDocNum }} </span>
+        </span>
+      </app-speech-bubble>
+    </span>
+  </span>
 
   <div class="container-v">
     <div class="entry-card-multi">
@@ -484,6 +510,10 @@
   </div>
 
   <!-- tertiary content -->
+
+  <div *ngIf="showTargetsData" class="header-text non-target-text">
+    Non Target Data
+  </div>
 
   <div #scrollPoint>
     <div class="container-v" *ngIf="cardData">
