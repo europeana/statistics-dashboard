@@ -78,4 +78,5 @@ export interface NamesValuePercent extends NameValue {
 export interface CountryTotalInfo {
   code: string;
   total: number;
+  percentage: number;
 }

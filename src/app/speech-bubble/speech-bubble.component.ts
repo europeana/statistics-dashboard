@@ -12,4 +12,5 @@ export class SpeechBubbleComponent {
   @Input() arrowTopRight = false;
   @Input() arrowTopLeft = false;
   @Input() arrowBottomRight = false;
+  @Input() arrowBottomLeft = false;
 }

@@ -3,6 +3,19 @@
     <span class="flag-orb" [ngClass]="isoCountryCodes[country]"></span>
     <span>{{ country }}</span>
     <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
+    <ng-container
+      *ngIf="
+        headerRef &&
+          headerRef['countryTotalMap'] &&
+          headerRef['countryTotalMap'][country] &&
+          headerRef['countryTotalMap'][country]['percentage'];
+        let countryPercent
+      "
+    >
+      <span class="page-subtitle">
+        {{ countryPercent | number: "1.0-2" }}% of the Europeana dataset
+      </span>
+    </ng-container>
   </h1>
 
   <ng-template
@@ -12,14 +25,23 @@
     let-label="label"
     let-target="target"
     let-colourIndex="colourIndex"
+    let-tooltip="tooltip"
   >
     <div class="powerbar-wrapper">
-      <div class="powerbar">
+      <div class="powerbar" [attr.title]="tooltip">
         <div
           class="powerbar-charge"
           [style.backgroundColor]="colours[colourIndex]"
           [style.width]="percent + '%'"
-        ></div>
+        >
+          <div class="help-speech-bubble-wrapper arrow-inset">
+            <app-speech-bubble [arrowBottomLeft]="true">
+              <span class="help-speech-bubble-content nowrap">
+                {{ tooltip }}
+              </span>
+            </app-speech-bubble>
+          </div>
+        </div>
         <span
           class="powerbar-charge-label"
           [ngClass]="{
@@ -64,11 +86,12 @@
             *ngIf="isPowerLevel; else defaultCopy"
             e2e="power-bar-summary"
             i18n="landing chart summary percentage@@countryChartSummaryData"
+            class="help-opener"
           >
             Data
           </span>
         </span>
-        <span class="total bold">{{ name }}</span>
+        <span class="total bold">{{ name | renameTargetType }}</span>
       </span>
       <span class="container-v">
         <span
@@ -88,16 +111,31 @@
             <span
               class="hide-on-triple"
               i18n="landing chart summary percentage@@countryChartSummaryTotal"
-              >Total {{ name }} records count</span
+              >Total {{ name | renameTargetType }} records count</span
             >
             <span
               class="show-on-triple"
               i18n="
                 landing chart summary percentage@@countryChartSummaryTotalShort"
-              >Records</span
+              >Items</span
             >
+
+            <div
+              class="help-speech-bubble-wrapper help-top"
+              [ngClass]="{
+                'arrow-inset': name !== TargetFieldName.TOTAL,
+                'arrow-outset': name === TargetFieldName.TOTAL
+              }"
+            >
+              <app-speech-bubble [arrowBottomRight]="true">
+                <span class="help-speech-bubble-content">
+                  {{ tooltipsTotal[name] }}
+                </span>
+              </app-speech-bubble>
+            </div>
           </ng-container>
         </span>
+
         <span
           class="total"
           [ngClass]="{
@@ -105,9 +143,9 @@
           }"
         >
           <span class="hide-on-triple">{{ value | number }}</span>
-          <span class="show-on-triple" [attr.title]="value | number">{{
-            value | abbreviateNumber
-          }}</span>
+          <span class="show-on-triple" [attr.title]="tooltipsTotal[name]">
+            {{ value | abbreviateNumber }}
+          </span>
         </span>
       </span>
       <span class="container-v">
@@ -130,7 +168,7 @@
               landing chart summary
               percentage@@countryChartSummaryPercentageShort"
           >
-            Percent of all
+            Percent of all items
           </span>
         </span>
 
@@ -141,7 +179,9 @@
           }"
         >
           <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
-          <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
+          <span class="show-on-triple" [attr.title]="tooltipsPercent[name]">
+            {{ percent | number: "1.0-1" }}%</span
+          >
         </span>
       </span>
     </span>
@@ -157,17 +197,27 @@
         let countryTotal
       "
     >
+      <div
+        class="help-speech-bubble-wrapper help-bottom arrow-inset"
+        *ngIf="
+          valName !== TargetFieldName.TOTAL &&
+          !!latestCountryPercentages[valName]
+        "
+      >
+        <app-speech-bubble [arrowTopRight]="true">
+          <span class="help-speech-bubble-content">
+            {{ tooltipsPercent[name] }}
+          </span>
+        </app-speech-bubble>
+      </div>
+
       <ng-content
         *ngTemplateOutlet="
           cardSummary;
           context: {
-            name: name,
+            name: valName,
             value: latestCountryData[valName],
-            percent:
-              latestCountryData[valName] === 0
-                ? 0
-                : (latestCountryData[valName] / latestCountryData['total']) *
-                  100,
+            percent: latestCountryPercentages[valName],
             isPowerLevel: true
           }
         "
@@ -201,6 +251,8 @@
     >
   </ng-template>
 
+  <!-- End of templates, beginning of content -->
+
   <span
     *ngIf="showTargetsData && eliUrl; let eliUrl"
     class="country-section-header"
@@ -211,8 +263,8 @@
       [href]="eliUrl"
       title="ELI ref: {{ eliUrl }}"
     ></a>
-    <span class="header-text">Target Data</span>
-    <span class="speech-bubble-wrapper">
+    <span class="header-text">Data Targets</span>
+    <span class="eli-speech-bubble-wrapper">
       <app-speech-bubble [arrowTopLeft]="true">
         <span class="speech-bubble-content">
           <span class="header-text"> Document title: </span>
@@ -251,7 +303,7 @@
             *ngTemplateOutlet="
               powerLevelSummary;
               context: {
-                name: '3D',
+                name: TargetFieldName.THREE_D,
                 valName: TargetFieldName.THREE_D
               }
             "
@@ -265,12 +317,11 @@
               context: {
                 value: latestCountryData[TargetFieldName.THREE_D],
                 percent:
-                  ((latestCountryData[TargetFieldName.THREE_D] || 0) /
-                    targets3D[0].value) *
-                  100,
+                  latestCountryPercentageOfTargets[TargetFieldName.THREE_D][0],
                 label: '2025',
                 target: targets3D[0].value,
-                colourIndex: 0
+                colourIndex: 0,
+                tooltip: tooltipsTargets[TargetFieldName.THREE_D][0]
               }
             "
           ></ng-content>
@@ -280,12 +331,11 @@
               context: {
                 value: latestCountryData[TargetFieldName.THREE_D],
                 percent:
-                  (latestCountryData[TargetFieldName.THREE_D] /
-                    targets3D[1].value) *
-                  100,
+                  latestCountryPercentageOfTargets[TargetFieldName.THREE_D][1],
                 label: '2030',
                 target: targets3D[1].value,
-                colourIndex: 0
+                colourIndex: 0,
+                tooltip: tooltipsTargets[TargetFieldName.THREE_D][1]
               }
             "
           ></ng-content>
@@ -327,7 +377,7 @@
             *ngTemplateOutlet="
               powerLevelSummary;
               context: {
-                name: 'HQ',
+                name: TargetFieldName.HQ,
                 valName: TargetFieldName.HQ
               }
             "
@@ -341,11 +391,11 @@
               context: {
                 value: latestCountryData[TargetFieldName.HQ],
                 percent:
-                  (latestCountryData[TargetFieldName.HQ] / targetsHQ[0].value) *
-                  100,
+                  latestCountryPercentageOfTargets[TargetFieldName.HQ][0],
                 label: '2025',
                 target: targetsHQ[0].value,
-                colourIndex: 1
+                colourIndex: 1,
+                tooltip: tooltipsTargets[TargetFieldName.HQ][0]
               }
             "
           ></ng-content>
@@ -356,11 +406,11 @@
               context: {
                 value: latestCountryData[TargetFieldName.HQ],
                 percent:
-                  (latestCountryData[TargetFieldName.HQ] / targetsHQ[1].value) *
-                  100,
+                  latestCountryPercentageOfTargets[TargetFieldName.HQ][1],
                 label: '2030',
                 target: targetsHQ[1].value,
-                colourIndex: 1
+                colourIndex: 1,
+                tooltip: tooltipsTargets[TargetFieldName.HQ][1]
               }
             "
           ></ng-content>
@@ -401,7 +451,7 @@
             *ngTemplateOutlet="
               powerLevelSummary;
               context: {
-                name: 'ALL',
+                name: TargetFieldName.TOTAL,
                 valName: TargetFieldName.TOTAL
               }
             "
@@ -415,12 +465,11 @@
               context: {
                 value: latestCountryData[TargetFieldName.TOTAL],
                 percent:
-                  (latestCountryData[TargetFieldName.TOTAL] /
-                    targetsTOTAL[0].value) *
-                  100,
+                  latestCountryPercentageOfTargets[TargetFieldName.TOTAL][0],
                 label: '2025',
                 target: targetsTOTAL[0].value,
-                colourIndex: 2
+                colourIndex: 2,
+                tooltip: tooltipsTargets[TargetFieldName.TOTAL][0]
               }
             "
           ></ng-content>
@@ -431,12 +480,11 @@
               context: {
                 value: latestCountryData[TargetFieldName.TOTAL],
                 percent:
-                  (latestCountryData[TargetFieldName.TOTAL] /
-                    targetsTOTAL[1].value) *
-                  100,
+                  latestCountryPercentageOfTargets[TargetFieldName.TOTAL][1],
                 label: '2030',
                 target: targetsTOTAL[1].value,
-                colourIndex: 2
+                colourIndex: 2,
+                tooltip: tooltipsTargets[TargetFieldName.TOTAL][1]
               }
             "
           ></ng-content>
@@ -655,7 +703,6 @@
               routerLink="/data/{{ DimensionName.provider }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero,
-
                 country: country
               }"
               data-e2e="link-entry-provider"

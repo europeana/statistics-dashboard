@@ -171,7 +171,8 @@ describe('AppComponent', () => {
     app.onOutletLoaded(new LandingComponent());
 
     expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).not.toHaveBeenCalled();
+
+    expect(app.loadLandingData).toHaveBeenCalled();
 
     // load overview component
     const fakeOverviewComponent = Object.create(OverviewComponent.prototype);
@@ -179,22 +180,23 @@ describe('AppComponent', () => {
     app.onOutletLoaded(fakeOverviewComponent);
     expect(app.showPageTitle).toBeFalsy();
 
-    expect(app.loadLandingData).not.toHaveBeenCalled();
+    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
 
     // load landing component
     app.getCtrlCTZero().setValue(true);
+    expect(app.loadLandingData).toHaveBeenCalledTimes(3);
 
     const cmp = new LandingComponent();
     app.landingData = {};
     app.onOutletLoaded(cmp);
     expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(1);
+    expect(app.loadLandingData).toHaveBeenCalledTimes(4);
     expect(app.lastSetContentTierZeroValue).toBeTruthy();
     expect(cmp.landingData).toBeTruthy();
 
     app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
     app.onOutletLoaded(new LandingComponent());
-    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
+    expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
     // load country component
     const fakeCountryComponent = Object.create(CountryComponent.prototype);
@@ -205,19 +207,19 @@ describe('AppComponent', () => {
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
-    expect(app.setCTZeroInputToLastSetValue).not.toHaveBeenCalled();
+    expect(app.loadLandingData).toHaveBeenCalledTimes(5);
+    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
 
     app.lastSetContentTierZeroValue = true;
     app.onOutletLoaded(fakeCountryComponent);
 
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalled();
+    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
     expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
 
     fakeCountryComponent.cardData = {};
     app.onOutletLoaded(fakeCountryComponent);
 
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
+    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);
     expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
   });
 

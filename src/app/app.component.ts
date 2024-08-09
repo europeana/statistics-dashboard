@@ -116,9 +116,11 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         }
 
         // load landing data if on the landing page
-        if (this.location.path().split('?')[0] === '') {
+        const path = this.location.path();
+        if (path.split('?')[0] === '' || path.split('/country')[0] === '') {
           this.loadLandingData(this.lastSetContentTierZeroValue);
-        } else {
+        }
+        if (this.countryComponentRef) {
           this.countryComponentRef.includeCTZero =
             this.lastSetContentTierZeroValue;
         }
@@ -176,7 +178,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
               br.results.forEach((result: CountPercentageValue) => {
                 countryTotalMap[result.value] = {
                   total: result.count,
-                  code: isoCountryCodes[result.value]
+                  code: isoCountryCodes[result.value],
+                  percentage: result.percentage
                 };
               });
             }
@@ -227,7 +230,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     );
     this.location.subscribe(this.handleLocationPopState.bind(this));
     this.buildForm();
-    this.loadLandingData(this.formCTZero.value.contentTierZero);
   }
 
   setCTZeroInputToLastSetValue(ctrlCTZero: FormControl): void {
@@ -256,12 +258,10 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
       this.landingComponentRef = component;
       this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
-      if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-        this.setCTZeroInputToLastSetValue(ctrlCTZero);
-      } else {
-        if (this.landingComponentRef && this.landingData) {
-          this.landingComponentRef.landingData = this.landingData;
-        }
+      this.setCTZeroInputToLastSetValue(ctrlCTZero);
+
+      if (this.landingComponentRef && this.landingData) {
+        this.landingComponentRef.landingData = this.landingData;
       }
     } else {
       this.landingComponentRef = undefined;
@@ -269,13 +269,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
       if (component instanceof OverviewComponent) {
         component.locale = this.locale;
+        if (!this.header.countryTotalMap) {
+          this.loadLandingData(this.lastSetContentTierZeroValue);
+        }
       } else if (component instanceof CountryComponent) {
         this.countryComponentRef = component;
         component.includeCTZero = this.lastSetContentTierZeroValue;
-
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
-
-        if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
+        if (!this.header.countryTotalMap) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);
         }
       }

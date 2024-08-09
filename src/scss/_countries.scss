@@ -14,7 +14,7 @@ $flag-orb-dimension: 1.6rem;
   }
 
   &:hover .speech-bubble {
-    display: block;
+    display: inline-block;
   }
 }
 
@@ -27,10 +27,43 @@ $flag-orb-dimension: 1.6rem;
     display: inline;
   }
 
-  .speech-bubble {
+  .powerbar-target-labels .speech-bubble {
     padding: 0 8px;
     top: -1px;
     float: right;
+  }
+}
+
+.eli-speech-bubble-wrapper .speech-bubble {
+  display: inline-block;
+}
+
+.help-speech-bubble-wrapper .speech-bubble {
+  padding: 4px 8px;
+}
+
+// inset / outset arrows
+.entry-card .arrow-inset .speech-bubble.arrow-top {
+  &::after,
+  &::before {
+    right: 4em;
+    left: auto;
+  }
+}
+
+.entry-card .arrow-inset .speech-bubble.arrow-bottom {
+  &::after,
+  &::before {
+    right: auto;
+    left: 6em;
+  }
+}
+
+.entry-card .arrow-outset .speech-bubble.arrow-bottom {
+  &::after,
+  &::before {
+    right: 6em;
+    left: auto;
   }
 }
 

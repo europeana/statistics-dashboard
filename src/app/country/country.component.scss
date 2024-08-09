@@ -13,12 +13,12 @@
     padding: 20px;
   }
 
-  .speech-bubble-wrapper {
+  .eli-speech-bubble-wrapper {
     display: none;
     position: absolute;
     top: 1.75rem;
     left: 0.75rem;
-    z-index: 1;
+    z-index: 2;
   }
 
   .info-icon {
@@ -40,9 +40,52 @@
     }
   }
 
-  .speech-bubble-wrapper:hover,
-  .info-icon:hover ~ .speech-bubble-wrapper {
+  .eli-speech-bubble-wrapper:hover,
+  .info-icon:hover ~ .eli-speech-bubble-wrapper {
     display: block;
+  }
+}
+
+.help-speech-bubble-content.nowrap {
+  white-space: nowrap;
+}
+
+.help-opener {
+  cursor: help;
+  &::after {
+    content: "?";
+    border: 1px solid $gray-5;
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    line-height: 1em;
+    display: inline-block;
+    text-align: center;
+    opacity: 0;
+  }
+}
+
+.help-speech-bubble-wrapper {
+  bottom: calc(100% + 8px);
+  display: none;
+  font-size: 20px;
+  position: absolute;
+  text-align: center;
+  z-index: 1;
+
+  &.help-top {
+    &.arrow-inset {
+      left: -4em;
+    }
+    &.arrow-outset {
+      right: -20px;
+    }
+  }
+
+  &.help-bottom {
+    right: 40px;
+    top: 140px;
+    white-space: nowrap;
   }
 }
 
@@ -147,13 +190,18 @@
   }
 }
 
+.pad-word-right {
+  padding-right: 0.25em;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  font-weight: normal;
+}
+
 .powerbar,
 .powerbar-charge {
   height: 3em;
-}
-
-.pad-word-right {
-  padding-right: 0.25em;
 }
 
 .powerbar {
@@ -179,6 +227,7 @@
   background-color: $stats-blue;
   display: inline-block;
   max-width: 100%;
+  position: relative;
 }
 
 .powerbar-charge-label {
@@ -246,6 +295,10 @@
   }
 }
 
+.total-title {
+  position: relative;
+}
+
 // show only the last restore link
 .entry-card:not(:last-child):not(.line-and-legend) .column-restore {
   display: none;
@@ -256,10 +309,20 @@
   pointer-events: none;
 }
 
-.entry-card-content.entry-card-totals {
-  .totals {
-    & > :last-child {
-      display: none;
+.entry-card-content {
+  .entry-card-totals {
+    .totals {
+      & > :last-child {
+        display: none;
+      }
+    }
+  }
+
+  .totals:hover {
+    // draw attention to the help
+    .help-opener::after {
+      opacity: 1;
+      transition: opacity 0.3s linear;
     }
   }
 }
@@ -275,8 +338,13 @@
   display: flex;
   align-items: center;
 
-  & > * {
+  & > *:not(:last-child) {
     margin-right: 0.4em;
+  }
+
+  :last-child {
+    position: relative;
+    top: 4px;
   }
 
   & + .country-section-header {
@@ -290,4 +358,27 @@
 
 .save {
   opacity: 1;
+}
+
+// switch on the help / dim the less-relevant content...
+
+.entry-card:has(.help-opener:hover) {
+  .total.bold,
+  .total-title.bold,
+  .powerbar-subtitle,
+  .powerbar-target-labels {
+    opacity: 0.3;
+  }
+
+  // switch on the speech bubbles
+  .help-speech-bubble-wrapper {
+    display: inline-block;
+    opacity: 1;
+  }
+}
+
+@media (min-width: $bp-desktop) {
+  .help-speech-bubble-wrapper {
+    font-size: 18px;
+  }
 }
