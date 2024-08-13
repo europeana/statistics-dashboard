@@ -46,12 +46,10 @@
   }
 }
 
-.help-speech-bubble-content.nowrap {
-  white-space: nowrap;
-}
-
 .help-opener {
   cursor: help;
+  position: relative;
+
   &::after {
     content: "?";
     border: 1px solid $gray-5;
@@ -65,27 +63,34 @@
   }
 }
 
-.help-speech-bubble-wrapper {
-  bottom: calc(100% + 8px);
-  display: none;
-  font-size: 20px;
-  position: absolute;
-  text-align: center;
-  z-index: 1;
-
-  &.help-top {
-    &.arrow-inset {
-      left: -4em;
+.entry-card {
+  .help-speech-bubble-wrapper {
+    &.help-targets {
+      bottom: calc(100% + 16px);
+      left: 0;
     }
-    &.arrow-outset {
-      right: -20px;
+
+    opacity: 0;
+    font-size: 24px;
+    position: absolute;
+    text-align: center;
+    z-index: 1;
+
+    &.help-items {
+      bottom: calc(100% + 8px);
+      right: 50%;
+      transform: translateX(50%);
+    }
+
+    &.help-percent {
+      right: 1em;
+      top: 140px;
+      white-space: nowrap;
     }
   }
 
-  &.help-bottom {
-    right: 40px;
-    top: 140px;
-    white-space: nowrap;
+  &.entry-card-total .help-speech-bubble-wrapper.help-items {
+    right: 9em;
   }
 }
 
@@ -221,6 +226,10 @@
     right: -10px;
     border-left: 1px solid transparent;
   }
+  &::before {
+    content: "";
+    opacity: 0;
+  }
 }
 
 .powerbar-charge {
@@ -261,7 +270,7 @@
 .powerbar-wrapper {
   display: flex;
   flex-direction: column-reverse;
-  margin: 0.6em 0 1em 0;
+  margin: 0.6rem 0 1em 0;
   position: relative;
 
   & + .data-link {
@@ -270,7 +279,7 @@
 
   .powerbar-target-labels {
     font-size: 20px;
-    margin-bottom: 0.6em;
+    margin-bottom: 0.6rem;
   }
 }
 
@@ -295,10 +304,6 @@
   }
 }
 
-.total-title {
-  position: relative;
-}
-
 // show only the last restore link
 .entry-card:not(:last-child):not(.line-and-legend) .column-restore {
   display: none;
@@ -316,6 +321,9 @@
         display: none;
       }
     }
+  }
+  .totals {
+    position: relative;
   }
 
   .totals:hover {
@@ -363,22 +371,128 @@
 // switch on the help / dim the less-relevant content...
 
 .entry-card:has(.help-opener:hover) {
+  $help-animation-delay: 0.325s;
+  $help-animation-time: 0.3s;
+
+  $animation-time-half: calc($help-animation-time / 2);
+  $animation-time-move: $animation-time-half;
+
+  &:not(.entry-card-total) {
+    // create space by reducing heights
+    .powerbar-charge {
+      height: 2em;
+      transition: height $animation-time-move linear $help-animation-delay;
+    }
+
+    // ...and by by re-allocating margins...
+    .powerbar-wrapper .powerbar-target-labels {
+      margin-bottom: 0;
+      opacity: 0;
+      transition: opacity $animation-time-half linear $help-animation-delay,
+        margin-bottom $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-subtitle + .powerbar-wrapper {
+      margin-top: 2.8rem;
+      transition: margin-top $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-charge-label {
+      top: 0;
+      transition: top $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-wrapper + .powerbar-wrapper {
+      margin-bottom: 0;
+      transition: margin-top $animation-time-move linear $help-animation-delay,
+        margin-bottom $animation-time-move linear $help-animation-delay;
+    }
+  }
+
+  // dim
+  .data-link,
   .total.bold,
   .total-title.bold,
-  .powerbar-subtitle,
-  .powerbar-target-labels {
+  .totals .total-title .show-on-triple,
+  .powerbar-subtitle {
     opacity: 0.3;
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+
+  // hide
+  .powerbar-subtitle {
+    opacity: 0;
+  }
+
+  // overlay
+  .powerbar::before {
+    display: block;
+    top: -2px;
+    left: -2px;
+    right: -10px;
+    bottom: -2px;
+    position: absolute;
+    background: #fff;
+    opacity: 0.7;
+    z-index: 1;
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+
+  // above overlay
+  .powerbar-charge-label .show-on-triple {
+    z-index: 2;
+    position: relative;
   }
 
   // switch on the speech bubbles
   .help-speech-bubble-wrapper {
-    display: inline-block;
     opacity: 1;
+  }
+
+  &.entry-card-total .help-speech-bubble-wrapper {
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+  &:not(.entry-card-total) .help-speech-bubble-wrapper {
+    transition: opacity $animation-time-half linear
+      calc($help-animation-time + $animation-time-half);
   }
 }
 
 @media (min-width: $bp-desktop) {
-  .help-speech-bubble-wrapper {
-    font-size: 18px;
+
+  .entry-card {
+    .help-speech-bubble-wrapper{
+      font-size: 14px;
+      &.help-targets {
+        left: -2.5em;
+      }
+    }
+  }
+
+  .entry-card {
+    .help-speech-bubble-wrapper {
+      &.help-items {
+        right: -2.5em;
+        transform: unset;
+      }
+
+      &.help-percent {
+        right: 0.25em;
+      }
+    }
+
+    &.entry-card-total .help-speech-bubble-wrapper {
+      &.help-items {
+        right: -2.5em;
+      }
+    }
+  }
+
+  @media (min-width: $bp-xxl) {
+    .entry-card {
+      .help-speech-bubble-wrapper {
+        font-size: 18px;
+      }
+    }
   }
 }

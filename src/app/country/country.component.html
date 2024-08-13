@@ -1,19 +1,19 @@
 <main class="fit-to-page">
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="isoCountryCodes[country]"></span>
-    <span>{{ country }}</span>
-    <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
     <ng-container
       *ngIf="
         headerRef &&
-          headerRef['countryTotalMap'] &&
-          headerRef['countryTotalMap'][country] &&
-          headerRef['countryTotalMap'][country]['percentage'];
-        let countryPercent
+        headerRef['countryTotalMap'] &&
+        headerRef['countryTotalMap'][country] &&
+        headerRef['countryTotalMap'][country]['percentage'] !== undefined
       "
     >
+      <span *ngIf="country">{{ country }}</span>
+      <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
       <span class="page-subtitle">
-        {{ countryPercent | number: "1.0-2" }}% of the Europeana dataset
+        {{ headerRef["countryTotalMap"][country]["percentage"] }}% of the
+        Europeana dataset
       </span>
     </ng-container>
   </h1>
@@ -34,9 +34,9 @@
           [style.backgroundColor]="colours[colourIndex]"
           [style.width]="percent + '%'"
         >
-          <div class="help-speech-bubble-wrapper arrow-inset">
-            <app-speech-bubble [arrowBottomLeft]="true">
-              <span class="help-speech-bubble-content nowrap">
+          <div class="help-speech-bubble-wrapper help-targets">
+            <app-speech-bubble [arrowBottomRight]="true">
+              <span class="help-speech-bubble-content">
                 {{ tooltip }}
               </span>
             </app-speech-bubble>
@@ -102,8 +102,12 @@
         >
           <!-- the "top" header -->
           <ng-template #defaultCopy>
-            Top
-            {{ dimension | renameApiFacetShort | lowercase }} records count
+            <span
+              i18n="landing chart summary percentage@@countryChartSummaryTop"
+            >
+              Top
+              {{ dimension | renameApiFacetShort | lowercase }} items count
+            </span>
           </ng-template>
 
           <!-- the "power-level" header -->
@@ -111,7 +115,7 @@
             <span
               class="hide-on-triple"
               i18n="landing chart summary percentage@@countryChartSummaryTotal"
-              >Total {{ name | renameTargetType }} records count</span
+              >Total {{ name | renameTargetType }} items count</span
             >
             <span
               class="show-on-triple"
@@ -119,14 +123,7 @@
                 landing chart summary percentage@@countryChartSummaryTotalShort"
               >Items</span
             >
-
-            <div
-              class="help-speech-bubble-wrapper help-top"
-              [ngClass]="{
-                'arrow-inset': name !== TargetFieldName.TOTAL,
-                'arrow-outset': name === TargetFieldName.TOTAL
-              }"
-            >
+            <div class="help-speech-bubble-wrapper help-items">
               <app-speech-bubble [arrowBottomRight]="true">
                 <span class="help-speech-bubble-content">
                   {{ tooltipsTotal[name] }}
@@ -135,7 +132,6 @@
             </div>
           </ng-container>
         </span>
-
         <span
           class="total"
           [ngClass]="{
@@ -148,7 +144,7 @@
           </span>
         </span>
       </span>
-      <span class="container-v">
+      <span class="container-v" *ngIf="name !== TargetFieldName.TOTAL">
         <span
           class="total-title"
           [ngClass]="{
@@ -198,11 +194,8 @@
       "
     >
       <div
-        class="help-speech-bubble-wrapper help-bottom arrow-inset"
-        *ngIf="
-          valName !== TargetFieldName.TOTAL &&
-          !!latestCountryPercentages[valName]
-        "
+        class="help-speech-bubble-wrapper help-percent"
+        *ngIf="valName !== TargetFieldName.TOTAL"
       >
         <app-speech-bubble [arrowTopRight]="true">
           <span class="help-speech-bubble-content">
@@ -217,7 +210,7 @@
           context: {
             name: valName,
             value: latestCountryData[valName],
-            percent: latestCountryPercentages[valName],
+            percent: latestCountryPercentages[valName] || 0,
             isPowerLevel: true
           }
         "
@@ -230,7 +223,7 @@
       <div class="container-h data-rows-title">
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
         <span i18n="landing chart header@@countryLandingDataHeader"
-          >RECORDS PROVIDED</span
+          >ITEMS PROVIDED</span
         >
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
@@ -263,15 +256,21 @@
       [href]="eliUrl"
       title="ELI ref: {{ eliUrl }}"
     ></a>
-    <span class="header-text">Data Targets</span>
+    <span class="header-text" i18n="@@countryEliOpener">Data Targets</span>
     <span class="eli-speech-bubble-wrapper">
       <app-speech-bubble [arrowTopLeft]="true">
         <span class="speech-bubble-content">
-          <span class="header-text"> Document title: </span>
+          <span class="header-text" i18n="@@countryEliTitle">
+            Document title:
+          </span>
           <span> {{ eliTitle }} </span>
-          <span class="header-text"> Permanent link: </span>
+          <span class="header-text" i18n="@@countryEliPermalink">
+            Permanent link:
+          </span>
           <a [href]="eliUrl" target="_blank"> {{ eliUrl }} </a>
-          <span class="header-text"> Document Number: </span>
+          <span class="header-text" i18n="@@countryEliDocNumber">
+            Document Number:
+          </span>
           <span> {{ eliDocNum }} </span>
         </span>
       </app-speech-bubble>
@@ -431,7 +430,7 @@
 
       <!-- TOTAL -->
       <div
-        class="entry-card"
+        class="entry-card entry-card-total"
         *ngIf="showTargetsData && columnsEnabled[TargetFieldName.TOTAL]"
       >
         <a
@@ -494,7 +493,7 @@
             [queryParams]="{
               country: country
             }"
-            ><span i18n="@@countrySectionLinkCountry">View all data</span
+            ><span i18n="@@countrySectionLinkCountry">View all data for</span
             >&nbsp;{{ country }}</a
           >
         </div>

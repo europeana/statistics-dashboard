@@ -60,14 +60,35 @@
         <source>Dati</source>
       </trans-unit>
 
+      <trans-unit id="countryEliOpener" datatype="html">
+        <source>Dati Bersagli</source>
+      </trans-unit>
+
+      <trans-unit id="countryEliTitle" datatype="html">
+        <source> Titolo Documento: </source>
+      </trans-unit>
+
+      <trans-unit id="countryEliPermalink" datatype="html">
+        <source> Link Permanente: </source>
+      </trans-unit>
+
+      <trans-unit id="countryEliDocNumber" datatype="html">
+        <source> Numero Documento: </source>
+      </trans-unit>
+
       <trans-unit id="countryChartSummaryData" datatype="html">
         <source> Dati </source>
       </trans-unit>
+
+      <trans-unit id="countryChartSummaryTop" datatype="html">
+        <source>Primi <x id="INTERPOLATION" equiv-text="{{ dimension }}"/> conteggio oggetti</source>
+      </trans-unit>
+
       <trans-unit id="countryChartSummaryTotal" datatype="html">
-        <source> Totale  <x id="INTERPOLATION" equiv-text="{{ name }}"/> conteggio record</source>
+        <source> Totale  <x id="INTERPOLATION" equiv-text="{{ name }}"/> conteggio oggetti</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryTotalShort" datatype="html">
-        <source> Totale </source>
+        <source> oggetti </source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentage" datatype="html">
         <source>Percentuale corrispondente</source>
@@ -76,7 +97,7 @@
         <source>Percento di tutti</source>
       </trans-unit>
       <trans-unit id="countryLandingDataHeader" datatype="html">
-        <source>RECORD FORNITI</source>
+        <source>OGGETTI FORNITI</source>
       </trans-unit>
       <trans-unit id="countryEntry3D" datatype="html">
         <source>Dati 3D</source>
@@ -106,7 +127,7 @@
         <source>Visualizza (dati HQ) per tipo di media</source>
       </trans-unit>
       <trans-unit id="countrySectionLinkCountry" datatype="html">
-        <source>Visualizza tutti i dati</source>
+        <source>Visualizza tutti i dati per</source>
       </trans-unit>
       <trans-unit id="countrySectionLinkType" datatype="html">
         <source>Visualizza per tipo di media</source>
@@ -249,11 +270,11 @@
       <trans-unit id="summaryTopPercentage" datatype="html">
         <source>Percentuale Primo <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/></source>
       </trans-unit>
-      <trans-unit id="summaryTotalRecords" datatype="html">
-        <source>Record Totali Dentro <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+      <trans-unit id="summaryTotalItems" datatype="html">
+        <source>Oggetti Totali Dentro <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
       </trans-unit>
       <trans-unit id="summaryTopRecordsCount" datatype="html">
-        <source>Record Conteggio del Primo <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+        <source>Oggetti Conteggio del Primo <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/></source>
       </trans-unit>
       <trans-unit id="gridSearchPlaceholder" datatype="html">
         <source>Cerca (<x id="INTERPOLATION" equiv-text="{{ gridRows.length }}"/> righe)</source>
@@ -286,13 +307,13 @@
         <source>Primo <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort | lowercase }}"/> </source>
       </trans-unit>
       <trans-unit id="landingChartSummaryCount" datatype="html">
-        <source>Primo <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort }}"/> conteggio record</source>
+        <source>Primo <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort }}"/> conteggio oggetti</source>
       </trans-unit>
       <trans-unit id="landingChartSummaryPercentage" datatype="html">
         <source>Percentuale corrispondente</source>
       </trans-unit>
       <trans-unit id="landingDataHeader" datatype="html">
-        <source>RECORD FORNITI</source>
+        <source>OGGETTI FORNITI</source>
       </trans-unit>
       <trans-unit id="landingSectionTitleEDM" datatype="html">
         <source>Esplora per qualità dei contenuti<x id="START_LINK" ctype="x-a" equiv-text="&lt;a

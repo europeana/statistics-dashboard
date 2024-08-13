@@ -73,7 +73,7 @@ export class GridComponent extends SubscriptionManager {
   public colours = colours;
   public SortBy = SortBy;
   public colHeaders = [
-    $localize`:@@gridColHeaderPrefix:Records by`,
+    $localize`:@@gridColHeaderPrefix:Items by`,
     $localize`:@@gridColHeaderCount:Count`,
     $localize`:@@gridColHeaderPercent:Percent`,
     $localize`:@@gridColHeaderView:View in Europeana`

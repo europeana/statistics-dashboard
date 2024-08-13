@@ -17,15 +17,15 @@
   <span class="total-title" i18n="@@summaryTopPercentage"
     >Top {{ summaryData.breakdownBy | renameApiFacetShort }} percentage</span
   >
-  <span class="total-title" i18n="@@summaryTotalRecords"
-    >Total records in
+  <span class="total-title" i18n="@@summaryTotalItems"
+    >Total items in
     {{ "plural_" + summaryData.breakdownBy | renameApiFacetShort }}</span
   >
   <span class="total">{{ summaryData.results[0].percentage }}%</span>
   <span class="total" data-e2e="total-records">{{ grandTotal | number }}</span>
 
   <span class="total-title" i18n="@@summaryTopRecordsCount"
-    >Top {{ summaryData.breakdownBy | renameApiFacetShort }} records count</span
+    >Top {{ summaryData.breakdownBy | renameApiFacetShort }} items count</span
   >
   <span></span>
   <span class="total">{{ summaryData.results[0].count | number }}</span>

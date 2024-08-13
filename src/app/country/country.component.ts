@@ -160,6 +160,7 @@ export class CountryComponent extends SubscriptionManager {
     activeCountry: string;
     pageTitleInViewport: boolean;
     pageTitleDynamic: boolean;
+    countryTotalMap: IHash<IHash<number | string>>;
   };
 
   constructor(private applicationRef: ApplicationRef) {
@@ -338,7 +339,7 @@ export class CountryComponent extends SubscriptionManager {
       const value = this.latestCountryData[valName];
       const fmtName = this.renameTargetTypePipe.transform(valName);
       const fmtValue = fmtNum(value, '1.0-2');
-      const itemString = `item${value > 1 ? 's' : ''}`;
+      const itemPluralString = `item${value === 1 ? '' : 's'}`;
       const abbrevValue = this.abbreviateNumberPipe.transform(value);
       const percent =
         value === 0
@@ -351,10 +352,10 @@ export class CountryComponent extends SubscriptionManager {
 
       this.tooltipsTotal[
         valName
-      ] = `${this.country} has ${fmtValue}${typeItems} ${itemString}`;
+      ] = `${this.country} has ${fmtValue}${typeItems} ${itemPluralString}`;
 
       this.tooltipsPercent[valName] =
-        fmtNum(percent) + `% of all data from ${this.country} is ${fmtName}`;
+        fmtNum(percent) + `% of the data from ${this.country} is ${fmtName}`;
 
       // percentages
       this.latestCountryPercentages[valName] = percent;
