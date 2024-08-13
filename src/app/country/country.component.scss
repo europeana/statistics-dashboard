@@ -459,9 +459,8 @@
 }
 
 @media (min-width: $bp-desktop) {
-
   .entry-card {
-    .help-speech-bubble-wrapper{
+    .help-speech-bubble-wrapper {
       font-size: 14px;
       &.help-targets {
         left: -2.5em;
@@ -488,11 +487,17 @@
     }
   }
 
-  @media (min-width: $bp-xxl) {
-    .entry-card {
-      .help-speech-bubble-wrapper {
-        font-size: 18px;
-      }
-    }
+  .percent-value {
+    align-self: flex-end;
+  }
+}
+
+@media (min-width: $bp-xxl) {
+  .percent-value {
+    align-self: flex-start;
+  }
+
+  .entry-card .help-speech-bubble-wrapper {
+    font-size: 18px;
   }
 }
