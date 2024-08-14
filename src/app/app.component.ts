@@ -115,7 +115,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           this.skipLocationUpdate = false;
         }
 
-        // load landing data if on the landing page
+        // load landing data if on country page or landing page
         const path = this.location.path();
         if (path.split('?')[0] === '' || path.split('/country')[0] === '') {
           this.loadLandingData(this.lastSetContentTierZeroValue);
@@ -238,17 +238,16 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   }
 
   /** onOutletLoaded
-  /* - invoked when router component loads
-  /*    - handles component data binding
+  /* - invoked when router component loads a component
   /*    - sets showPageTitle
-  /* - if it's the landing page (and ct-zero control value matches):
-  /*      - assigns landing data
-  /* - if ct-zero control value doesn't match:
-  /*    - updates control (triggers data reload)
-  /* - (OverviewComponent)
-  /*    - unassigns landingComponentRef
-  /*
-  /* @param { LandingComponent | OverviewComponent | CountryComponent: component } - route component
+  /* - if it's an OverviewComponent
+  /*    - sets the component locale
+  /*    - (and if countryTotalMap is unset)
+  /*      - loads the landing data
+  /* - if it's a CountryComponent or a LandingComponent:
+  /*    - updates the compenent ref and ctZero control value
+  /*    - assigns landing data
+  /* @param { LandingComponent | OverviewComponent | CountryComponent: component } - the loaded component
   */
   onOutletLoaded(
     component: LandingComponent | OverviewComponent | CountryComponent
@@ -259,16 +258,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       this.landingComponentRef = component;
       this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
       this.setCTZeroInputToLastSetValue(ctrlCTZero);
-
-      if (this.landingComponentRef && this.landingData) {
+      if (this.landingData) {
         this.landingComponentRef.landingData = this.landingData;
       }
     } else {
       this.landingComponentRef = undefined;
-      this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
-
       if (component instanceof OverviewComponent) {
         component.locale = this.locale;
+        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
         if (!this.header.countryTotalMap) {
           this.loadLandingData(this.lastSetContentTierZeroValue);
         }
