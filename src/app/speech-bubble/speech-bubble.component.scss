@@ -21,8 +21,8 @@ $arrow-rotation-rest: 330deg;
 }
 
 // bottom and top
-.speech-bubble.arrow-bottom,
-.speech-bubble.arrow-top {
+.speech-bubble.arrow-bottom-right,
+.speech-bubble.arrow-top-right {
   &::after,
   &::before {
     border-bottom-width: $arrow-height;
@@ -36,8 +36,8 @@ $arrow-rotation-rest: 330deg;
   }
 }
 
-// bottom only
-.speech-bubble.arrow-bottom {
+// bottom-right only
+.speech-bubble.arrow-bottom-right {
   &::after,
   &::before {
     bottom: -($arrow-height - 1);
@@ -51,7 +51,7 @@ $arrow-rotation-rest: 330deg;
 }
 
 // top only
-.speech-bubble.arrow-top {
+.speech-bubble.arrow-top-right {
   top: $arrow-height + 2;
   right: -3px;
   &::after,
@@ -69,7 +69,7 @@ $arrow-rotation-rest: 330deg;
 }
 
 // left
-.speech-bubble.arrow-left {
+.speech-bubble.arrow-top-left {
   left: $arrow-height + 2;
 
   &::after,

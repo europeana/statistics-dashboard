@@ -68,7 +68,7 @@ export class LandingComponent {
 
   refreshCharts(): void {
     if (this.barCharts) {
-      // Top tier records count
+      // Top tier items count
       setTimeout(() => {
         this.barCharts.toArray().forEach((bc) => {
           bc.removeAllSeries();

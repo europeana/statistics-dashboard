@@ -191,24 +191,40 @@
           <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
+
+      <trans-unit id="countryEliOpener" datatype="html">
+        <source>Data Targets</source>
+      </trans-unit>
+
+      <trans-unit id="countryEliTitle" datatype="html">
+        <source> Document Title: </source>
+      </trans-unit>
+
+      <trans-unit id="countryEliPermalink" datatype="html">
+        <source> Permanent Link: </source>
+      </trans-unit>
+
+      <trans-unit id="countryEliDocNumber" datatype="html">
+        <source> Document Number: </source>
+      </trans-unit>
+
       <trans-unit id="countryChartSummaryData" datatype="html">
         <source> Data </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">63,65</context>
-        </context-group>
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
+
+      <trans-unit id="countryChartSummaryTop" datatype="html">
+        <source>Top <x id="INTERPOLATION" equiv-text="{{ dimension }}"/> items count</source>
+        <note priority="1" from="description">landing chart summary percentage</note>
+      </trans-unit>
+
       <trans-unit id="countryChartSummaryTotal" datatype="html">
-        <source>Total <x id="INTERPOLATION" equiv-text="{{ name }}"/> records count</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/country/country.component.html</context>
-          <context context-type="linenumber">87</context>
-        </context-group>
+        <source>Total <x id="INTERPOLATION" equiv-text="{{ name }}"/> items count</source>
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
+
       <trans-unit id="countryChartSummaryTotalShort" datatype="html">
-        <source>Records</source>
+        <source>Items</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">93</context>
@@ -233,7 +249,7 @@
               percentage</note>
       </trans-unit>
       <trans-unit id="countryLandingDataHeader" datatype="html">
-        <source>RECORDS PROVIDED</source>
+        <source>ITEMS PROVIDED</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">178</context>
@@ -276,7 +292,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="countrySectionLinkCountry" datatype="html">
-        <source>View all data</source>
+        <source>View all data for</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/country/country.component.html</context>
           <context context-type="linenumber">412</context>
@@ -603,15 +619,15 @@
           <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="summaryTotalRecords" datatype="html">
-        <source>Total records in <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
+      <trans-unit id="summaryTotalItems" datatype="html">
+        <source>Total items in <x id="INTERPOLATION" equiv-text="{{ &quot;plural_&quot; + summaryData.breakdownBy | renameApiFacetShort }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
           <context context-type="linenumber">21,22</context>
         </context-group>
       </trans-unit>
       <trans-unit id="summaryTopRecordsCount" datatype="html">
-        <source>Top <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/> records count</source>
+        <source>Top <x id="INTERPOLATION" equiv-text="{{ summaryData.breakdownBy | renameApiFacetShort }}"/> items count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/grid-summary/grid-summary.component.html</context>
           <context context-type="linenumber">28</context>
@@ -642,11 +658,7 @@
         <note priority="1" from="description">Got to page</note>
       </trans-unit>
       <trans-unit id="gridColHeaderPrefix" datatype="html">
-        <source>Records by</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/grid/grid.component.ts</context>
-          <context context-type="linenumber">76</context>
-        </context-group>
+        <source>Items by</source>
       </trans-unit>
       <trans-unit id="gridColHeaderCount" datatype="html">
         <source>Count</source>
@@ -694,7 +706,7 @@
         <note priority="1" from="description">landing chart summary prefix</note>
       </trans-unit>
       <trans-unit id="landingChartSummaryCount" datatype="html">
-        <source> Top <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort | lowercase }}"/> records count</source>
+        <source> Top <x id="INTERPOLATION" equiv-text="{{ dimension | renameApiFacetShort | lowercase }}"/> items count</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
           <context context-type="linenumber">28,30</context>
@@ -710,7 +722,7 @@
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
       <trans-unit id="landingDataHeader" datatype="html">
-        <source>RECORDS PROVIDED</source>
+        <source>ITEMS PROVIDED</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/landing/landing.component.html</context>
           <context context-type="linenumber">54</context>

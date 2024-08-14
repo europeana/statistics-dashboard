@@ -1,6 +1,7 @@
 import {
   DatePipe,
   DecimalPipe,
+  formatNumber,
   JsonPipe,
   KeyValuePipe,
   LowerCasePipe,
@@ -38,6 +39,7 @@ import {
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
   RenameCountryPipe,
+  RenameTargetTypeLongPipe,
   RenameTargetTypePipe
 } from '../_translate';
 
@@ -92,6 +94,9 @@ export class CountryComponent extends SubscriptionManager {
   public eliUrl = eliData.eliUrl;
   public eliTitle = eliData.eliTitle;
 
+  renameTargetTypePipe = new RenameTargetTypeLongPipe();
+  abbreviateNumberPipe = new AbbreviateNumberPipe();
+
   cardData: IHash<Array<NamesValuePercent>>;
   _includeCTZero = false;
 
@@ -141,12 +146,21 @@ export class CountryComponent extends SubscriptionManager {
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
   latestCountryData: TargetData;
+
+  latestCountryPercentages: IHash<number> = {};
+  latestCountryPercentageOfTargets: IHash<Array<number>> = {};
+
+  tooltipsTotal: IHash<string> = {};
+  tooltipsPercent: IHash<string> = {};
+  tooltipsTargets: IHash<Array<string>> = {};
+
   appendiceExpanded = false;
 
   @Input() headerRef: {
     activeCountry: string;
     pageTitleInViewport: boolean;
     pageTitleDynamic: boolean;
+    countryTotalMap: IHash<IHash<number | string>>;
   };
 
   constructor(private applicationRef: ApplicationRef) {
@@ -180,9 +194,10 @@ export class CountryComponent extends SubscriptionManager {
           next: (combined) => {
             this.targetMetaData = combined.targetMetaData;
             this.countryData = combined.countryData;
+
             const country = combined.params['country'];
             this.setCountryToParam(country);
-            this.onInitialDataLoaded();
+            this.initialiseIntersectionObserver();
           },
           error: (e: Error) => {
             console.log(e);
@@ -208,11 +223,11 @@ export class CountryComponent extends SubscriptionManager {
     });
   }
 
-  /** onInitialDataLoaded
+  /** initialiseIntersectionObserver
    * binds the headerRef's pageTitleInViewport to an intersection observer
    * generates a threshold config option of [0, 0.1, ..., 0.9]
    **/
-  onInitialDataLoaded(): void {
+  initialiseIntersectionObserver(): void {
     new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
       threshold: [...Array(10).keys()].map((val) => (val ? val / 10 : val))
     }).observe(this.scrollPoint.nativeElement);
@@ -306,7 +321,67 @@ export class CountryComponent extends SubscriptionManager {
     if (specificCountryData && specificCountryData.length) {
       this.latestCountryData =
         specificCountryData[specificCountryData.length - 1];
+      this.generateDerivedData();
     }
+  }
+
+  /** generateDerivedData
+   *
+   * set tooltip / help texts
+   * sets template percentages
+   **/
+  generateDerivedData(): void {
+    const fmtNum = (num: number, fmt = '1.0-1'): string => {
+      return formatNumber(num, 'en-US', fmt);
+    };
+
+    Object.values(TargetFieldName).forEach((valName: string) => {
+      const value = this.latestCountryData[valName];
+      const fmtName = this.renameTargetTypePipe.transform(valName);
+      const fmtValue = fmtNum(value, '1.0-2');
+      const itemPluralString = `item${value === 1 ? '' : 's'}`;
+      const abbrevValue = this.abbreviateNumberPipe.transform(value);
+      const percent =
+        value === 0
+          ? 0
+          : (value / parseInt(this.latestCountryData['total'])) * 100;
+      const typeItems =
+        valName === TargetFieldName.TOTAL ? ` (${abbrevValue})` : ` ${fmtName}`;
+
+      // set tooltip / help texts
+
+      this.tooltipsTotal[
+        valName
+      ] = `${this.country} has ${fmtValue}${typeItems} ${itemPluralString}`;
+
+      this.tooltipsPercent[valName] =
+        fmtNum(percent) + `% of the data from ${this.country} is ${fmtName}`;
+
+      // percentages
+      this.latestCountryPercentages[valName] = percent;
+
+      const targets =
+        this.targetMetaData[this.countryCodes[this.country]][valName];
+
+      this.latestCountryPercentageOfTargets[valName] = [
+        (value || 0) / targets[0].value,
+        (value || 0) / targets[1].value
+      ].map((val: number) => {
+        return val * 100;
+      });
+
+      // tooltipsTargets
+
+      this.tooltipsTargets[valName] = targets.map(
+        (x: TargetMetaData, i: number) => {
+          const tgtVal = fmtNum(x.value);
+          const tgtPct = fmtNum(
+            this.latestCountryPercentageOfTargets[valName][i]
+          );
+          return `The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
+        }
+      );
+    });
   }
 
   toggleAppendice(): void {

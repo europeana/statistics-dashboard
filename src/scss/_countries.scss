@@ -14,7 +14,7 @@ $flag-orb-dimension: 1.6rem;
   }
 
   &:hover .speech-bubble {
-    display: block;
+    display: inline-block;
   }
 }
 
@@ -27,10 +27,73 @@ $flag-orb-dimension: 1.6rem;
     display: inline;
   }
 
-  .speech-bubble {
+  .powerbar-target-labels .speech-bubble {
     padding: 0 8px;
     top: -1px;
     float: right;
+  }
+}
+
+.eli-speech-bubble-wrapper .speech-bubble {
+  display: inline-block;
+}
+
+.help-speech-bubble-wrapper .speech-bubble {
+  padding: 4px 8px;
+  white-space: nowrap;
+  .help-speech-bubble-content {
+    color: $gray-med;
+  }
+}
+
+// inset / outset arrows
+.entry-card {
+  .help-items .speech-bubble.arrow-bottom-right {
+    &::after,
+    &::before {
+      right: 50%;
+    }
+  }
+
+  &.entry-card-total .help-items .speech-bubble.arrow-bottom-right {
+    &::after,
+    &::before {
+      right: 2em;
+    }
+  }
+
+  .help-percent .speech-bubble.arrow-top-right {
+    &::after,
+    &::before {
+      left: auto;
+      right: 6rem;
+    }
+  }
+
+  .help-targets .speech-bubble.arrow-bottom-right {
+    &::after,
+    &::before {
+      right: 50%;
+      left: auto;
+    }
+  }
+}
+
+@media (min-width: $bp-desktop) {
+  .entry-card {
+    .help-items .speech-bubble.arrow-bottom-right {
+      &::after,
+      &::before {
+        right: min(12em, 94%);
+      }
+    }
+
+    &.entry-card-total .help-items .speech-bubble.arrow-bottom-right {
+      &::after,
+      &::before {
+        right: 4em;
+      }
+    }
   }
 }
 
@@ -40,6 +103,8 @@ $flag-orb-dimension: 1.6rem;
   display: inline-block;
   width: $flag-orb-dimension;
   height: $flag-orb-dimension;
+  min-width: $flag-orb-dimension;
+  min-height: $flag-orb-dimension;
 }
 
 .flag-orb.default::after {

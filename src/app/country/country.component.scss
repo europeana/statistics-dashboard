@@ -13,12 +13,12 @@
     padding: 20px;
   }
 
-  .speech-bubble-wrapper {
+  .eli-speech-bubble-wrapper {
     display: none;
     position: absolute;
     top: 1.75rem;
     left: 0.75rem;
-    z-index: 1;
+    z-index: 2;
   }
 
   .info-icon {
@@ -40,9 +40,57 @@
     }
   }
 
-  .speech-bubble-wrapper:hover,
-  .info-icon:hover ~ .speech-bubble-wrapper {
+  .eli-speech-bubble-wrapper:hover,
+  .info-icon:hover ~ .eli-speech-bubble-wrapper {
     display: block;
+  }
+}
+
+.help-opener {
+  cursor: help;
+  position: relative;
+
+  &::after {
+    content: "?";
+    border: 1px solid $gray-5;
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    line-height: 1em;
+    display: inline-block;
+    text-align: center;
+    opacity: 0;
+  }
+}
+
+.entry-card {
+  .help-speech-bubble-wrapper {
+    &.help-targets {
+      bottom: calc(100% + 16px);
+      left: 0;
+    }
+
+    opacity: 0;
+    font-size: 24px;
+    position: absolute;
+    text-align: center;
+    z-index: 1;
+
+    &.help-items {
+      bottom: calc(100% + 8px);
+      right: 50%;
+      transform: translateX(50%);
+    }
+
+    &.help-percent {
+      right: 1em;
+      top: 140px;
+      white-space: nowrap;
+    }
+  }
+
+  &.entry-card-total .help-speech-bubble-wrapper.help-items {
+    right: 9em;
   }
 }
 
@@ -147,13 +195,18 @@
   }
 }
 
+.pad-word-right {
+  padding-right: 0.25em;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  font-weight: normal;
+}
+
 .powerbar,
 .powerbar-charge {
   height: 3em;
-}
-
-.pad-word-right {
-  padding-right: 0.25em;
 }
 
 .powerbar {
@@ -173,12 +226,17 @@
     right: -10px;
     border-left: 1px solid transparent;
   }
+  &::before {
+    content: "";
+    opacity: 0;
+  }
 }
 
 .powerbar-charge {
   background-color: $stats-blue;
   display: inline-block;
   max-width: 100%;
+  position: relative;
 }
 
 .powerbar-charge-label {
@@ -212,7 +270,7 @@
 .powerbar-wrapper {
   display: flex;
   flex-direction: column-reverse;
-  margin: 0.6em 0 1em 0;
+  margin: 0.6rem 0 1em 0;
   position: relative;
 
   & + .data-link {
@@ -221,7 +279,7 @@
 
   .powerbar-target-labels {
     font-size: 20px;
-    margin-bottom: 0.6em;
+    margin-bottom: 0.6rem;
   }
 }
 
@@ -256,10 +314,23 @@
   pointer-events: none;
 }
 
-.entry-card-content.entry-card-totals {
+.entry-card-content {
+  .entry-card-totals {
+    .totals {
+      & > :last-child {
+        display: none;
+      }
+    }
+  }
   .totals {
-    & > :last-child {
-      display: none;
+    position: relative;
+  }
+
+  .totals:hover {
+    // draw attention to the help
+    .help-opener::after {
+      opacity: 1;
+      transition: opacity 0.3s linear;
     }
   }
 }
@@ -275,8 +346,13 @@
   display: flex;
   align-items: center;
 
-  & > * {
+  & > *:not(:last-child) {
     margin-right: 0.4em;
+  }
+
+  :last-child {
+    position: relative;
+    top: 4px;
   }
 
   & + .country-section-header {
@@ -290,4 +366,138 @@
 
 .save {
   opacity: 1;
+}
+
+// switch on the help / dim the less-relevant content...
+
+.entry-card:has(.help-opener:hover) {
+  $help-animation-delay: 0.325s;
+  $help-animation-time: 0.3s;
+
+  $animation-time-half: calc($help-animation-time / 2);
+  $animation-time-move: $animation-time-half;
+
+  &:not(.entry-card-total) {
+    // create space by reducing heights
+    .powerbar-charge {
+      height: 2em;
+      transition: height $animation-time-move linear $help-animation-delay;
+    }
+
+    // ...and by by re-allocating margins...
+    .powerbar-wrapper .powerbar-target-labels {
+      margin-bottom: 0;
+      opacity: 0;
+      transition: opacity $animation-time-half linear $help-animation-delay,
+        margin-bottom $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-subtitle + .powerbar-wrapper {
+      margin-top: 2.8rem;
+      transition: margin-top $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-charge-label {
+      top: 0;
+      transition: top $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-wrapper + .powerbar-wrapper {
+      margin-bottom: 0;
+      transition: margin-top $animation-time-move linear $help-animation-delay,
+        margin-bottom $animation-time-move linear $help-animation-delay;
+    }
+  }
+
+  // dim
+  .data-link,
+  .total.bold,
+  .total-title.bold,
+  .totals .total-title .show-on-triple,
+  .powerbar-subtitle {
+    opacity: 0.3;
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+
+  // hide
+  .powerbar-subtitle {
+    opacity: 0;
+  }
+
+  // overlay
+  .powerbar::before {
+    display: block;
+    top: -2px;
+    left: -2px;
+    right: -10px;
+    bottom: -2px;
+    position: absolute;
+    background: #fff;
+    opacity: 0.7;
+    z-index: 1;
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+
+  // above overlay
+  .powerbar-charge-label .show-on-triple {
+    z-index: 2;
+    position: relative;
+  }
+
+  // switch on the speech bubbles
+  .help-speech-bubble-wrapper {
+    opacity: 1;
+  }
+
+  &.entry-card-total .help-speech-bubble-wrapper {
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+  &:not(.entry-card-total) .help-speech-bubble-wrapper {
+    transition: opacity $animation-time-half linear
+      calc($help-animation-time + $animation-time-half);
+  }
+}
+
+@media (min-width: $bp-desktop) {
+  .entry-card {
+    .help-speech-bubble-wrapper {
+      font-size: 14px;
+      &.help-targets {
+        left: -2.5em;
+      }
+    }
+  }
+
+  .entry-card {
+    .help-speech-bubble-wrapper {
+      &.help-items {
+        right: -2.5em;
+        transform: unset;
+      }
+
+      &.help-percent {
+        right: 0.25em;
+      }
+    }
+
+    &.entry-card-total .help-speech-bubble-wrapper {
+      &.help-items {
+        right: -2.5em;
+      }
+    }
+  }
+
+  .percent-value {
+    align-self: flex-end;
+  }
+}
+
+@media (min-width: $bp-xxl) {
+  .percent-value {
+    align-self: flex-start;
+  }
+
+  .entry-card .help-speech-bubble-wrapper {
+    font-size: 18px;
+  }
 }

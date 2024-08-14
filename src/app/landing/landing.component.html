@@ -26,7 +26,7 @@
           class="total-title"
           i18n="landing chart summary prefix@@landingChartSummaryCount"
         >
-          Top {{ dimension | renameApiFacetShort | lowercase }} records
+          Top {{ dimension | renameApiFacetShort | lowercase }} items
           count</span
         >
         <span class="total">{{ data.value | number }}</span>
@@ -51,7 +51,7 @@
       <div class="container-h data-rows-title">
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
         <span i18n="landing data header@@landingDataHeader"
-          >RECORDS PROVIDED</span
+          >ITEMS PROVIDED</span
         >
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">

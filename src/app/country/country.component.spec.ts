@@ -16,7 +16,7 @@ import { of } from 'rxjs';
 
 import { APIService } from '../_services';
 import { MockAPIService, MockLineComponent } from '../_mocked';
-import { TargetFieldName } from '../_models';
+import { TargetFieldName, TargetMetaData } from '../_models';
 import { BarComponent, LineComponent } from '../chart';
 import { CountryComponent } from '.';
 
@@ -119,6 +119,20 @@ describe('CountryComponent', () => {
     component.countryData = {
       FR: [datum]
     };
+    component.targetMetaData = {
+      FR: {
+        three_d: [
+          { value: 1 } as TargetMetaData,
+          { value: 2 } as TargetMetaData
+        ],
+        high_quality: [
+          { value: 1 } as TargetMetaData,
+          { value: 2 } as TargetMetaData
+        ],
+        total: [{ value: 1 } as TargetMetaData, { value: 2 } as TargetMetaData]
+      }
+    };
+
     component.setCountryToParam('France');
     expect(component.latestCountryData).toEqual(datum);
   });
@@ -188,7 +202,7 @@ describe('CountryComponent', () => {
 
   it('should initialise the IntersectionObserver', () => {
     expect(intersectionObserverCreated).toBeFalsy();
-    component.onInitialDataLoaded();
+    component.initialiseIntersectionObserver();
     expect(intersectionObserverCreated).toBeTruthy();
   });
 
