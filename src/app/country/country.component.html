@@ -345,6 +345,7 @@
               country: country,
               type: '3D'
             }"
+            (click)="resetAppCTZeroParam()"
             data-e2e="link-entry-3d"
             i18n="@@countrySectionLink3D"
             >View (3D data) by content tier</a
@@ -423,6 +424,7 @@
             }"
             data-e2e="link-entry-hq"
             i18n="@@countrySectionLinkHQ"
+            (click)="resetAppCTZeroParam()"
             >View (HQ data) by type</a
           >
         </div>
@@ -493,6 +495,7 @@
             [queryParams]="{
               country: country
             }"
+            (click)="resetAppCTZeroParam()"
             ><span i18n="@@countrySectionLinkCountry">View all data for</span
             >&nbsp;{{ country }}</a
           >
@@ -596,7 +599,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.type }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero,
+                'content-tier-zero': includeCTZero ? true : undefined,
                 country: country
               }"
               data-e2e="link-entry-type"
@@ -632,7 +635,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.rightsCategory }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero,
+                'content-tier-zero': includeCTZero ? true : undefined,
                 country: country
               }"
               data-e2e="link-entry-rights"
@@ -665,7 +668,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.dataProvider }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero,
+                'content-tier-zero': includeCTZero ? true : undefined,
                 country: country
               }"
               data-e2e="link-entry-data-provider"
@@ -701,7 +704,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.provider }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero,
+                'content-tier-zero': includeCTZero ? true : undefined,
                 country: country
               }"
               data-e2e="link-entry-provider"

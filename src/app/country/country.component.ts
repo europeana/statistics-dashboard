@@ -45,6 +45,7 @@ import {
 
 import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent } from '../chart';
+import { HeaderComponent } from '../header';
 import { LegendGridComponent } from '../legend-grid';
 import { ResizeComponent } from '../resize';
 import { CTZeroControlComponent } from '../ct-zero-control';
@@ -156,13 +157,13 @@ export class CountryComponent extends SubscriptionManager {
 
   appendiceExpanded = false;
 
-  @Input() headerRef: {
-    activeCountry: string;
-    pageTitleInViewport: boolean;
-    pageTitleDynamic: boolean;
-    countryTotalMap: IHash<IHash<number | string>>;
-  };
+  @Input() headerRef: HeaderComponent;
 
+  /** constructor
+   * gets the app-ref and obtains the header ref
+   * binds the data variables to the url
+   * initialises the intersection observer
+   **/
   constructor(private applicationRef: ApplicationRef) {
     super();
 
@@ -231,6 +232,15 @@ export class CountryComponent extends SubscriptionManager {
     new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
       threshold: [...Array(10).keys()].map((val) => (val ? val / 10 : val))
     }).observe(this.scrollPoint.nativeElement);
+  }
+
+  /** resetAppCTZeroParam
+   * - UI utility: clears "lastSetContentTierZeroValue" on app component
+   * - invoked before router navigates to overview page on (target) link click
+   **/
+  resetAppCTZeroParam(): void {
+    const rootRef = this.applicationRef.components[0].instance;
+    rootRef.setContentTierZeroValue(false);
   }
 
   /** refreshCardData
