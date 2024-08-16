@@ -276,7 +276,14 @@
                 <app-speech-bubble [arrowTopRight]="true">
                   <ul class="country-shortcuts">
                     <li *ngFor="let country of queryParams['country']">
-                      <a [routerLink]="['/country', country]">
+                      <a
+                        [routerLink]="['/country', country]"
+                        [queryParams]="{
+                          'content-tier-zero': form.value.contentTierZero
+                            ? true
+                            : undefined
+                        }"
+                      >
                         <span>View</span>
                         <span class="pad-word">{{ country }}</span>
                         <span>data</span>

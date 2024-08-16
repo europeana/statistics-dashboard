@@ -197,6 +197,25 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     );
   }
 
+  /** setContentTierZeroValue
+   *
+   * - updates lastSetContentTierZeroValue
+   * - aligns the content-tier zero control's value,
+   *   flagging (via skipLocationUpdate) that the
+   *   value change should not trigger another url
+   *
+   * @param { boolean } value - the value to set
+   **/
+  setContentTierZeroValue(value: boolean) {
+    const ctrlCTZero = this.getCtrlCTZero();
+
+    this.lastSetContentTierZeroValue = value;
+    if (value !== ctrlCTZero.value) {
+      this.skipLocationUpdate = true;
+      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
+    }
+  }
+
   /**
    * handleLocationPopState
    * capture "back" and "forward" events and align the value of
@@ -207,13 +226,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * @param { PopStateEvent } state - the event
    **/
   handleLocationPopState(state: PopStateEvent): void {
-    const ctrlCTZero = this.getCtrlCTZero();
-    this.lastSetContentTierZeroValue =
-      `${state.url}`.indexOf('content-tier-zero=true') > -1;
-    if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-      this.skipLocationUpdate = true;
-      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-    }
+    this.setContentTierZeroValue(
+      `${state.url}`.indexOf('content-tier-zero=true') > -1
+    );
   }
 
   /** ngOnInit

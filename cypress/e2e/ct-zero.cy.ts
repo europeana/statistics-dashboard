@@ -7,20 +7,30 @@ context('Statistics Dashboard', () => {
     const ctZeroFilterParam = DimensionName.contentTier;
     const selCtrlCTZero = '[for=ctZero]';
     const selFilterLabel = '.checkbox-labelled.contentTier .checkbox-label';
+    const selCountryMenu = '.country-select';
+
+    const confirmCTZeroSetting = (enabled: boolean): void => {
+      cy.get(selCtrlCTZero)
+        .contains('Disable content tier 0')
+        .should('have.length', enabled ? 1 : 0);
+      cy.get(selCtrlCTZero)
+        .contains('Enable content tier 0')
+        .should('have.length', enabled ? 0 : 1);
+    };
 
     describe('country pages', () => {
       const urlDefault = `/country/Europe`;
       const urlCTZero = `${urlDefault}?${ctZeroParam}`;
 
-      const checkCTZeroParamAbsent = (linkText: string, linkSelector = '') => {
-        cy.contains(`a${linkSelector}`, linkText)
+      const checkCTZeroParamAbsent = (linkText: string) => {
+        cy.contains('a', linkText)
           .should('exist')
           .invoke('attr', 'href')
           .should('not.contain', ctZeroParam);
       };
 
-      const checkCTZeroParamPresent = (linkText: string, linkSelector = '') => {
-        cy.contains(`a${linkSelector}`, linkText)
+      const checkCTZeroParamPresent = (linkText: string) => {
+        cy.contains('a', linkText)
           .should('exist')
           .invoke('attr', 'href')
           .should('contain', ctZeroParam);
@@ -52,6 +62,13 @@ context('Statistics Dashboard', () => {
       });
 
       describe('country page', () => {
+        const linkTexts = [
+          'View by type',
+          'View by rights category',
+          'View by data provider',
+          'View by provider'
+        ];
+
         it('should (conditionally) show the control zero control', () => {
           cy.visit(urlDefault);
           cy.wait(100);
@@ -94,13 +111,6 @@ context('Statistics Dashboard', () => {
           cy.visit(urlDefault);
           cy.wait(100);
 
-          const linkTexts = [
-            'View by type',
-            'View by rights category',
-            'View by data provider',
-            'View by provider'
-          ];
-
           linkTexts.forEach((linkText: string) => {
             checkCTZeroParamAbsent(linkText);
           });
@@ -111,6 +121,74 @@ context('Statistics Dashboard', () => {
           linkTexts.forEach((linkText: string) => {
             checkCTZeroParamPresent(linkText);
           });
+        });
+
+        it('Should (conditionally) reset the content tier zero control', () => {
+          const country = 'Belgium';
+          const url = `/country/${country}`;
+          const valPercent = '44.1%';
+          const valPercentCTZero = '11.6%';
+          const selPercent = '.total.percent-value';
+
+          const targetLinkTexts = [
+            'View (3D data) by content tier',
+            'View (HQ data) by type'
+          ];
+
+          // go to Belgium
+          cy.visit(url);
+          cy.wait(1000);
+          cy.get(selPercent).contains(valPercent).should('exist');
+          cy.get(selPercent).contains(valPercentCTZero).should('not.exist');
+          confirmCTZeroSetting(false);
+
+          // activate content tier zero
+          cy.get(selCtrlCTZero).click(force);
+          cy.wait(100);
+          cy.get(selPercent).contains(valPercent).should('not.exist');
+          cy.get(selPercent).contains(valPercentCTZero).should('exist');
+          confirmCTZeroSetting(true);
+
+          // click through to the "Type data"
+          cy.contains(linkTexts[0]).click(force);
+          cy.wait(100);
+          confirmCTZeroSetting(true);
+
+          // go back to Belgium
+          cy.go('back');
+          cy.wait(1000);
+          cy.get(selPercent).contains(valPercent).should('not.exist');
+          cy.get(selPercent).contains(valPercentCTZero).should('exist');
+          confirmCTZeroSetting(true);
+
+          // click a target link
+          cy.contains(targetLinkTexts[0]).click(force);
+          cy.wait(100);
+          checkCTZeroParamAbsent(country);
+          confirmCTZeroSetting(false);
+
+          // go back to Belgium
+          cy.go('back');
+          cy.wait(1000);
+          cy.get(selPercent).contains(valPercent).should('not.exist');
+          cy.get(selPercent).contains(valPercentCTZero).should('exist');
+
+          // click another target link
+          cy.contains(targetLinkTexts[1]).click(force);
+          cy.wait(100);
+
+          // return to Belgium (via the menu)
+          cy.contains('a', country).click(force);
+          cy.wait(100);
+
+          cy.get(selPercent).contains(valPercent).should('exist');
+          cy.get(selPercent).contains(valPercentCTZero).should('not.exist');
+
+          // return to the data page and then back to Belgium
+          cy.go(-2);
+          cy.wait(1000);
+          cy.get(selPercent).contains(valPercent).should('not.exist');
+          cy.get(selPercent).contains(valPercentCTZero).should('exist');
         });
       });
     });
@@ -123,22 +201,9 @@ context('Statistics Dashboard', () => {
 
       it('should enable and disable the control according to the url', () => {
         cy.visit(urlDefault);
-
-        cy.get(selCtrlCTZero)
-          .contains('Disable content tier 0')
-          .should('have.length', 0);
-        cy.get(selCtrlCTZero)
-          .contains('Enable content tier 0')
-          .should('have.length', 1);
-
+        confirmCTZeroSetting(false);
         cy.visit(urlCTZero);
-
-        cy.get(selCtrlCTZero)
-          .contains('Disable content tier 0')
-          .should('have.length', 1);
-        cy.get(selCtrlCTZero)
-          .contains('Enable content tier 0')
-          .should('have.length', 0);
+        confirmCTZeroSetting(true);
       });
 
       it('should enable and disable the menu item', () => {

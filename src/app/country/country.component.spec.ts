@@ -18,6 +18,7 @@ import { APIService } from '../_services';
 import { MockAPIService, MockLineComponent } from '../_mocked';
 import { TargetFieldName, TargetMetaData } from '../_models';
 import { BarComponent, LineComponent } from '../chart';
+import { HeaderComponent } from '../header';
 import { CountryComponent } from '.';
 
 describe('CountryComponent', () => {
@@ -87,7 +88,7 @@ describe('CountryComponent', () => {
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
 
-    component.headerRef = header;
+    component.headerRef = header as unknown as HeaderComponent;
     fixture.detectChanges();
   });
 
