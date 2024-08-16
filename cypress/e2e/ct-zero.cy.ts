@@ -144,14 +144,14 @@ context('Statistics Dashboard', () => {
 
           // activate content tier zero
           cy.get(selCtrlCTZero).click(force);
-          cy.wait(100);
+          cy.wait(1000);
           cy.get(selPercent).contains(valPercent).should('not.exist');
           cy.get(selPercent).contains(valPercentCTZero).should('exist');
           confirmCTZeroSetting(true);
 
           // click through to the "Type data"
           cy.contains(linkTexts[0]).click(force);
-          cy.wait(100);
+          cy.wait(1000);
           confirmCTZeroSetting(true);
 
           // go back to Belgium
@@ -163,7 +163,7 @@ context('Statistics Dashboard', () => {
 
           // click a target link
           cy.contains(targetLinkTexts[0]).click(force);
-          cy.wait(100);
+          cy.wait(1000);
           checkCTZeroParamAbsent(country);
           confirmCTZeroSetting(false);
 
@@ -175,11 +175,11 @@ context('Statistics Dashboard', () => {
 
           // click another target link
           cy.contains(targetLinkTexts[1]).click(force);
-          cy.wait(100);
+          cy.wait(1000);
 
           // return to Belgium (via the menu)
           cy.contains('a', country).click(force);
-          cy.wait(100);
+          cy.wait(1000);
 
           cy.get(selPercent).contains(valPercent).should('exist');
           cy.get(selPercent).contains(valPercentCTZero).should('not.exist');
