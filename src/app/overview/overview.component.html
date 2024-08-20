@@ -275,7 +275,11 @@
                 <span class="flag-orb default" title="View country data"></span>
                 <app-speech-bubble [arrowTopRight]="true">
                   <ul class="country-shortcuts">
-                    <li *ngFor="let countryCode of queryParams['country']">
+                    <li
+                      *ngFor="
+                        let countryCode of queryParams[DimensionName.country]
+                      "
+                    >
                       <a
                         [routerLink]="['/country', countryCode | renameCountry]"
                         [queryParams]="{
