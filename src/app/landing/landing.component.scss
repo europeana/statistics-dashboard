@@ -166,6 +166,8 @@ $card-header-height: $card-header-pixels-line-height +
     top: 2px;
     height: 1em;
     width: 1em;
+    min-height: 1em;
+    min-width: 1em;
   }
 
   a:hover .flag-orb {

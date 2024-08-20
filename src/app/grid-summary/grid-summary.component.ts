@@ -1,6 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { BreakdownResult, CountPercentageValue } from '../_models';
-import { RenameApiFacetShortPipe } from '../_translate/rename-facet-short.pipe';
+import {
+  BreakdownResult,
+  CountPercentageValue,
+  DimensionName
+} from '../_models';
+import { RenameApiFacetShortPipe, RenameCountryPipe } from '../_translate';
 import { DecimalPipe, NgIf } from '@angular/common';
 
 @Component({
@@ -8,9 +12,11 @@ import { DecimalPipe, NgIf } from '@angular/common';
   templateUrl: './grid-summary.component.html',
   styleUrls: ['./grid-summary.component.scss'],
   standalone: true,
-  imports: [NgIf, DecimalPipe, RenameApiFacetShortPipe]
+  imports: [NgIf, DecimalPipe, RenameApiFacetShortPipe, RenameCountryPipe]
 })
 export class GridSummaryComponent {
+  public DimensionName = DimensionName;
+
   _summaryData: BreakdownResult;
   @Input() grandTotal: number;
 

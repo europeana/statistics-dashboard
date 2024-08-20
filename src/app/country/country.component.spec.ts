@@ -134,7 +134,7 @@ describe('CountryComponent', () => {
       }
     };
 
-    component.setCountryToParam('France');
+    component.setCountryToParam('FR');
     expect(component.latestCountryData).toEqual(datum);
   });
 

@@ -362,6 +362,12 @@
     position: relative;
     max-width: 100%;
   }
+
+  .flag-orb {
+    $flag-dimension: 1.6rem;
+    min-width: $flag-dimension;
+    min-height: $flag-dimension;
+  }
 }
 
 .save {

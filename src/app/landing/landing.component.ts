@@ -12,7 +12,11 @@ import { RouterLink } from '@angular/router';
 
 import { externalLinks, isoCountryCodes } from '../_data';
 import { DimensionName, GeneralResultsFormatted } from '../_models';
-import { RenameApiFacetPipe, RenameApiFacetShortPipe } from '../_translate';
+import {
+  RenameApiFacetPipe,
+  RenameApiFacetShortPipe,
+  RenameCountryPipe
+} from '../_translate';
 import { BarComponent } from '../chart';
 import { MapComponent } from '../chart/map/map.component';
 import { ResizeComponent } from '../resize';
@@ -36,7 +40,8 @@ import { TruncateComponent } from '../truncate';
     LowerCasePipe,
     DecimalPipe,
     RenameApiFacetPipe,
-    RenameApiFacetShortPipe
+    RenameApiFacetShortPipe,
+    RenameCountryPipe
   ]
 })
 export class LandingComponent {

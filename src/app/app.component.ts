@@ -206,7 +206,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    *
    * @param { boolean } value - the value to set
    **/
-  setContentTierZeroValue(value: boolean) {
+  setContentTierZeroValue(value: boolean): void {
     const ctrlCTZero = this.getCtrlCTZero();
 
     this.lastSetContentTierZeroValue = value;

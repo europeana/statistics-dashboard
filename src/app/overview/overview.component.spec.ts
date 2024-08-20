@@ -62,7 +62,7 @@ describe('OverviewComponent', () => {
   const tickTimeChartDebounce = 400;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const tmpParams = {};
-  tmpParams[DimensionName.country] = 'Italy';
+  tmpParams[DimensionName.country] = 'IT';
   const queryParams = new BehaviorSubject(tmpParams as Params);
 
   let api: APIService;
@@ -337,6 +337,7 @@ describe('OverviewComponent', () => {
 
       generatedLabel = component.generateSeriesLabel();
       expect(generatedLabel.indexOf('Denmark')).toBeGreaterThan(-1);
+      expect(generatedLabel.indexOf('Iceland')).toBeGreaterThan(-1);
 
       nextParams['date-to'] = [today];
       queryParams.next(nextParams);
@@ -401,8 +402,8 @@ describe('OverviewComponent', () => {
       component.filterData = {};
       component.filterData[DimensionName.country] = [
         {
-          name: 'Scotland',
-          label: 'Scotland',
+          name: 'Ireland',
+          label: 'Ireland',
           valid: true
         }
       ];
@@ -453,7 +454,7 @@ describe('OverviewComponent', () => {
     it('should build the filters', () => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
       const ops = {};
-      ops[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+      ops[DimensionName.country] = ['IE', 'IT'];
 
       component.buildFilters(ops);
       fixture.detectChanges();
@@ -463,12 +464,7 @@ describe('OverviewComponent', () => {
     it('should build the filters (from the query parameters)', fakeAsync(() => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
       const nextParams = {};
-      nextParams[DimensionName.country] = [
-        'Scotland',
-        'Yugoslavia',
-        'Italy',
-        'Greece'
-      ];
+      nextParams[DimensionName.country] = ['Italy', 'Greece'];
       queryParams.next(nextParams);
       fixture.detectChanges();
       tick(1);

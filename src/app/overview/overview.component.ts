@@ -31,6 +31,7 @@ import {
   externalLinks,
   facetNames,
   isoCountryCodes,
+  isoCountryCodesReversed,
   nonFacetFilters,
   portalNames,
   portalNamesFriendly
@@ -65,7 +66,6 @@ import {
   NonFacetFilterNames,
   RequestFilter
 } from '../_models';
-
 import { APIService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
@@ -73,12 +73,12 @@ import { SpeechBubbleComponent } from '../speech-bubble';
 import { ExportComponent } from '../export';
 import { GridComponent } from '../grid';
 import { GridSummaryComponent } from '../grid-summary';
-import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
-import { CheckboxComponent } from '../checkbox/checkbox.component';
-import { IsScrollableDirective } from '../_directives/is-scrollable/is-scrollable.directive';
-import { FilterComponent } from '../filter/filter.component';
-import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
-import { ResizeComponent } from '../resize/resize.component';
+import { RenameApiFacetPipe, RenameCountryPipe } from '../_translate';
+import { CheckboxComponent } from '../checkbox';
+import { IsScrollableDirective } from '../_directives';
+import { FilterComponent } from '../filter';
+import { CTZeroControlComponent } from '../ct-zero-control';
+import { ResizeComponent } from '../resize';
 
 @Component({
   selector: 'app-overview',
@@ -107,7 +107,8 @@ import { ResizeComponent } from '../resize/resize.component';
     SnapshotsComponent,
     GridComponent,
     DatePipe,
-    RenameApiFacetPipe
+    RenameApiFacetPipe,
+    RenameCountryPipe
   ]
 })
 export class OverviewComponent extends SubscriptionManager implements OnInit {
@@ -134,7 +135,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   public NonFacetFilterNames = NonFacetFilterNames;
   public nonFacetFilters = nonFacetFilters;
   public tierPrefix = $localize`:@@tierPrefix@@:Tier `;
-  public isoCountryCodes = isoCountryCodes;
 
   public barChartSettings = {
     prefixValueAxis: '',
@@ -269,12 +269,15 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           map((results) => {
             const qp = results[1];
             const qpValArrays = {};
-
             Object.keys(qp).forEach((paramName: string) => {
               this.queryParamsRaw[paramName] = [];
               qpValArrays[paramName] = (
                 Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
               ).map((qpVal: string) => {
+                qpVal =
+                  paramName === DimensionName.country
+                    ? isoCountryCodes[qpVal]
+                    : qpVal;
                 this.queryParamsRaw[paramName].push(qpVal);
                 return toInputSafeName(qpVal);
               });
@@ -293,17 +296,17 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
           this.countryPageShortcutsAvailable =
             Object.keys(queryParams).length === 2 &&
-            !!queryParams['country'] &&
-            `${queryParams['type']}` === '3D' &&
-            queryParams['type'].length === 1;
+            !!queryParams[DimensionName.country] &&
+            `${queryParams[DimensionName.type]}` === '3D' &&
+            queryParams[DimensionName.type].length === 1;
 
           if (!this.countryPageShortcutsAvailable) {
             this.countryPageShortcutsAvailable =
-              !!queryParams['country'] &&
-              !!queryParams['metadataTier'] &&
-              queryParams['metadataTier'].indexOf('0') === -1 &&
-              !!queryParams['contentTier'] &&
-              queryParams['contentTier'].indexOf('1') === -1;
+              !!queryParams[DimensionName.country] &&
+              !!queryParams[DimensionName.metadataTier] &&
+              queryParams[DimensionName.metadataTier].indexOf('0') === -1 &&
+              !!queryParams[DimensionName.contentTier] &&
+              queryParams[DimensionName.contentTier].indexOf('1') === -1;
           }
 
           // checkbox representation of (split) datasetId
@@ -385,11 +388,17 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     let filterParam = Object.keys(this.queryParams)
       .map((key: string) => {
         const innerRes = [];
-        const values = this.queryParams[key];
+        let values = this.queryParams[key];
 
         // skip rights parameters
         if (key === DimensionName.rightsCategory) {
           return '';
+        }
+
+        if (key === DimensionName.country) {
+          values = values.map((val: string) => {
+            return isoCountryCodesReversed[val];
+          });
         }
 
         if (values && !Object.values(nonFacetFilters).includes(key)) {
@@ -462,6 +471,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   postProcessResult(): void {
     // initialise filterData and add checkboxes
     const dsd = this.dataServerData;
+
     if (dsd?.filteringOptions) {
       this.buildFilters(dsd.filteringOptions);
       if (dsd.results?.breakdowns) {
@@ -473,10 +483,15 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     }
   }
 
-  formatNLV(prefix: string, name: string, valid: boolean): NameLabelValid {
+  formatNLV(
+    prefix: string,
+    name: string,
+    valid: boolean,
+    isCountry: boolean
+  ): NameLabelValid {
     return {
       name: toInputSafeName(name),
-      label: prefix + name,
+      label: isCountry ? isoCountryCodesReversed[name] : prefix + name,
       valid: valid
     };
   }
@@ -509,7 +524,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         if (qpVals) {
           this.queryParamsRaw[facetName].forEach((val: string) => {
             if (!opsFromData.includes(val)) {
-              opsFromQP.push(this.formatNLV(prefix, val, false));
+              opsFromQP.push(
+                this.formatNLV(
+                  prefix,
+                  val,
+                  false,
+                  facetName === DimensionName.country
+                )
+              );
             }
           });
         }
@@ -524,7 +546,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             );
           })
           .map((op: string) => {
-            return this.formatNLV(prefix, op, true);
+            return this.formatNLV(
+              prefix,
+              op,
+              true,
+              facetName === DimensionName.country
+            );
           })
           .concat(opsFromQP);
 
@@ -657,6 +684,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         } else {
           const innerRes = [];
           this.queryParamsRaw[key].forEach((valPart: string) => {
+            valPart =
+              key === DimensionName.country
+                ? isoCountryCodesReversed[valPart]
+                : valPart;
             innerRes.push(valPart);
           });
           const friendlyKey = portalNamesFriendly[key];
@@ -682,6 +713,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       /[:".,\s()[]{}]/g,
       ''
     );
+
+    if (this.form.value.facetParameter === DimensionName.country) {
+      nvs = nvs.map((nvp: NamesValuePercent) => {
+        nvp.name = isoCountryCodesReversed[nvp.name];
+        return nvp;
+      });
+    }
+
     const rightsInfo = this.form.value.rightsCategory;
     const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
       return rightsInfo[key];
@@ -1070,11 +1109,15 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   updatePageUrl(skipLoad = false): void {
     const qp = {};
     this.getEnabledFilterNames().forEach((filterName: string) => {
-      const filterVals = this.getSetCheckboxValues(filterName).map(
-        (filterVal: string) => {
+      const filterVals = this.getSetCheckboxValues(filterName)
+        .map((filterVal: string) => {
           return fromInputSafeName(filterVal);
-        }
-      );
+        })
+        .map((filterVal: string) => {
+          return filterName === DimensionName.country
+            ? isoCountryCodesReversed[filterVal]
+            : filterVal;
+        });
 
       if (filterVals.length > 0) {
         qp[filterName] = filterVals;
@@ -1106,8 +1149,19 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     if (skipLoad) {
       this.queryParams = qp;
     }
+
+    const disabledParams = this.disabledParams;
+
+    if (disabledParams[DimensionName.country]) {
+      disabledParams[DimensionName.country] = disabledParams[
+        DimensionName.country
+      ].map((val: string) => {
+        return isoCountryCodesReversed[val];
+      });
+    }
+
     this.router.navigate([`data/${this.form.value['facetParameter']}`], {
-      queryParams: { ...qp, ...this.disabledParams }
+      queryParams: { ...qp, ...disabledParams }
     });
   }
 

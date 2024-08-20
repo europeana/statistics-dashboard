@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
 import { isoCountryCodes } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
 import { CountryTotalInfo, IHash } from '../_models';
+import { RenameCountryPipe } from '../_translate';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,7 @@ import { CountryTotalInfo, IHash } from '../_models';
     NgClass,
     NgIf,
     NgFor,
+    RenameCountryPipe,
     RouterLink
   ]
 })

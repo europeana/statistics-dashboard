@@ -88,7 +88,9 @@ import { TruncateComponent } from '../truncate';
 export class CountryComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
+
   public isoCountryCodes = isoCountryCodes;
+
   public TargetFieldName = TargetFieldName;
   public colours = colours;
   public eliDocNum = eliData.eliDocNum;
@@ -135,7 +137,7 @@ export class CountryComponent extends SubscriptionManager {
   set country(country: string) {
     this._country = country;
     this.refreshCardData();
-    this.showTargetsData = !!this.targetMetaData[isoCountryCodes[country]];
+    this.showTargetsData = !!this.targetMetaData[country];
     this.setHeaderData(country);
   }
 
@@ -143,7 +145,6 @@ export class CountryComponent extends SubscriptionManager {
     return this._country;
   }
 
-  countryCode: string;
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   countryData: IHash<Array<TargetData>> = {};
   latestCountryData: TargetData;
@@ -196,7 +197,8 @@ export class CountryComponent extends SubscriptionManager {
             this.targetMetaData = combined.targetMetaData;
             this.countryData = combined.countryData;
 
-            const country = combined.params['country'];
+            const country = isoCountryCodes[combined.params['country']];
+
             this.setCountryToParam(country);
             this.initialiseIntersectionObserver();
           },
@@ -324,9 +326,8 @@ export class CountryComponent extends SubscriptionManager {
    **/
   setCountryToParam(country: string): void {
     this.country = country;
-    this.countryCode = isoCountryCodes[this.country];
 
-    const specificCountryData = this.countryData[this.countryCode];
+    const specificCountryData = this.countryData[country];
 
     if (specificCountryData && specificCountryData.length) {
       this.latestCountryData =
@@ -370,8 +371,7 @@ export class CountryComponent extends SubscriptionManager {
       // percentages
       this.latestCountryPercentages[valName] = percent;
 
-      const targets =
-        this.targetMetaData[this.countryCodes[this.country]][valName];
+      const targets = this.targetMetaData[this.country][valName];
 
       this.latestCountryPercentageOfTargets[valName] = [
         (value || 0) / targets[0].value,
