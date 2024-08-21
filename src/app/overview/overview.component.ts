@@ -273,13 +273,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
               this.queryParamsRaw[paramName] = [];
               qpValArrays[paramName] = (
                 Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
-              ).map((qpVal: string) => {
-                qpVal =
+              ).map((qpValue: string) => {
+                qpValue =
                   paramName === DimensionName.country
-                    ? isoCountryCodes[qpVal]
-                    : qpVal;
-                this.queryParamsRaw[paramName].push(qpVal);
-                return toInputSafeName(qpVal);
+                    ? isoCountryCodes[qpValue]
+                    : qpValue;
+                this.queryParamsRaw[paramName].push(qpValue);
+                return toInputSafeName(qpValue);
               });
             });
             return {
@@ -483,7 +483,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     }
   }
 
-  formatNLV(
+  formatNameLabelValid(
     prefix: string,
     name: string,
     valid: boolean,
@@ -525,7 +525,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           this.queryParamsRaw[facetName].forEach((val: string) => {
             if (!opsFromData.includes(val)) {
               opsFromQP.push(
-                this.formatNLV(
+                this.formatNameLabelValid(
                   prefix,
                   val,
                   false,
@@ -546,7 +546,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             );
           })
           .map((op: string) => {
-            return this.formatNLV(
+            return this.formatNameLabelValid(
               prefix,
               op,
               true,
@@ -706,7 +706,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   storeSeries(
     applied: boolean,
     saved: boolean,
-    nvs: Array<NamesValuePercent>,
+    seriesValues: Array<NamesValuePercent>,
     seriesTotal: number
   ): void {
     const name = JSON.stringify(this.queryParams).replace(
@@ -715,7 +715,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     );
 
     if (this.form.value.facetParameter === DimensionName.country) {
-      nvs = nvs.map((nvp: NamesValuePercent) => {
+      seriesValues = seriesValues.map((nvp: NamesValuePercent) => {
         nvp.name = isoCountryCodesReversed[nvp.name];
         return nvp;
       });
@@ -728,11 +728,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.snapshots.snap(this.form.value.facetParameter, name, {
       name: name,
       label: this.generateSeriesLabel(),
-      data: this.iHashNumberFromNVPs(nvs),
-      dataPercent: this.iHashNumberFromNVPs(nvs, true),
+      data: this.iHashNumberFromNVPs(seriesValues),
+      dataPercent: this.iHashNumberFromNVPs(seriesValues, true),
       orderOriginal: [],
       orderPreferred: [],
-      portalUrls: this.portalUrlsFromNVPs(this.form.value.facetParameter, nvs),
+      portalUrls: this.portalUrlsFromNVPs(
+        this.form.value.facetParameter,
+        seriesValues
+      ),
       rightsFilters: rightsFilters,
       applied: applied,
       pinIndex: 0,
