@@ -518,13 +518,13 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
         // calculate filter options from the data and query params
         const opsFromData = ops[facetName];
-        const opsFromQP: Array<NameLabelValid> = [];
+        const opsFromParams: Array<NameLabelValid> = [];
         const qpVals = this.queryParams[facetName];
 
         if (qpVals) {
           this.queryParamsRaw[facetName].forEach((val: string) => {
             if (!opsFromData.includes(val)) {
-              opsFromQP.push(
+              opsFromParams.push(
                 this.formatNameLabelValid(
                   prefix,
                   val,
@@ -553,7 +553,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
               facetName === DimensionName.country
             );
           })
-          .concat(opsFromQP);
+          .concat(opsFromParams);
 
         allSortedOps.sort((op1: NameLabel, op2: NameLabel) => {
           // ensure that selected filters appear...
