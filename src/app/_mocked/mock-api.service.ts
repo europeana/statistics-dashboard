@@ -87,7 +87,7 @@ export const MockGeneralResults = {
         {
           count: 15,
           percentage: 1.5,
-          value: 'Czech Republic'
+          value: 'Czechia'
         },
         {
           count: 52,

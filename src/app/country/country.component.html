@@ -494,7 +494,7 @@
             }"
             (click)="resetAppCTZeroParam()"
             ><span i18n="@@countrySectionLinkCountry">View all data for</span
-            >&nbsp;{{ country }}</a
+            >&nbsp;{{ country | renameCountry }}</a
           >
         </div>
 
@@ -567,7 +567,7 @@
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryType">data by content type</span>
           </span>
 
@@ -607,7 +607,7 @@
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryRights">data by rights category</span>
             <a
               class="info-icon"
@@ -646,7 +646,7 @@
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryDataProvider">data by data provider</span>
           </span>
           <div class="entry-card-content">
@@ -676,7 +676,7 @@
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryProvider">data by provider</span>
             <a
               class="info-icon"

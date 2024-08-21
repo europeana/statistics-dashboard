@@ -72,7 +72,7 @@ context('Statistics Dashboard', () => {
       // assumes page of 10 entries
       const pageOneCountries = ['Belgium', 'Holy See (Vatican City State)'];
       const pageTwoCountries = ['Ireland', 'Netherlands'];
-      const pageThreeCountries = ['Iceland', 'Czech Republic'];
+      const pageThreeCountries = ['Iceland', 'Czechia'];
 
       assertRowLength(pageOneCountries, 1);
       assertRowLength(pageTwoCountries, 0);
@@ -108,12 +108,12 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.country}`);
 
       assertRowLength(['Belgium'], 1);
-      assertRowLength(['Czech Republic'], 0);
+      assertRowLength(['Czechia'], 0);
 
       cy.get(selColSortCount).click(force);
       cy.get(selColSortCount).click(force);
       assertRowLength(['Belgium'], 0);
-      assertRowLength(['Czech Republic'], 1);
+      assertRowLength(['Czechia'], 1);
 
       cy.get(selFacetSelect).select('Data Provider', force);
 
@@ -123,12 +123,12 @@ context('Statistics Dashboard', () => {
       cy.get(selFacetSelect).select('Country', force);
 
       assertRowLength(['Belgium'], 0);
-      assertRowLength(['Czech Republic'], 1);
+      assertRowLength(['Czechia'], 1);
 
       cy.get(selColSortCount).click(force);
 
       assertRowLength(['Belgium'], 1);
-      assertRowLength(['Czech Republic'], 0);
+      assertRowLength(['Czechia'], 0);
 
       cy.get(selFacetSelect).select('Data Provider', force);
 

@@ -21,7 +21,13 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
-import { colours, eliData, externalLinks, isoCountryCodes } from '../_data';
+import {
+  colours,
+  eliData,
+  externalLinks,
+  isoCountryCodes,
+  isoCountryCodesReversed
+} from '../_data';
 import {
   BreakdownResults,
   CountPercentageValue,
@@ -347,6 +353,7 @@ export class CountryComponent extends SubscriptionManager {
     };
 
     Object.values(TargetFieldName).forEach((valName: string) => {
+      const countryName = isoCountryCodesReversed[this.country];
       const value = this.latestCountryData[valName];
       const fmtName = this.renameTargetTypePipe.transform(valName);
       const fmtValue = fmtNum(value, '1.0-2');
@@ -363,10 +370,10 @@ export class CountryComponent extends SubscriptionManager {
 
       this.tooltipsTotal[
         valName
-      ] = `${this.country} has ${fmtValue}${typeItems} ${itemPluralString}`;
+      ] = `${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
 
       this.tooltipsPercent[valName] =
-        fmtNum(percent) + `% of the data from ${this.country} is ${fmtName}`;
+        fmtNum(percent) + `% of the data from ${countryName} is ${fmtName}`;
 
       // percentages
       this.latestCountryPercentages[valName] = percent;

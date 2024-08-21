@@ -172,7 +172,7 @@ export const isoCountryCodes = {
   Norway: 'NO',
   Kosovo: 'XK',
   Switzerland: 'CH',
-  'Czech Republic': 'CZ',
+  Czechia: 'CZ',
   Cyprus: 'CY',
   Slovakia: 'SK',
   Slovenia: 'SI',

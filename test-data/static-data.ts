@@ -582,7 +582,7 @@ export const STATIC_COUNTRIES = [
     dataProviders: [44, 45, 46, 47, 48, 49, 50, 51, 52]
   },
   {
-    name: 'Czech Republic',
+    name: 'Czechia',
     dataProviders: [38, 39, 40, 41, 42, 43]
   },
   {
