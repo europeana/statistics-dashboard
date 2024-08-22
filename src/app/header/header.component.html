@@ -25,15 +25,15 @@
     >
       <span
         [ngClass]="{
-          default: !isoCountryCodes[activeCountry]
+          default: !activeCountry
         }"
-        class="flag-orb {{ isoCountryCodes[activeCountry] }}"
+        class="flag-orb {{ activeCountry }}"
       >
       </span>
 
       <span class="active-country" (click)="toggleMenu($event)">
         @if(activeCountry) {
-        {{ activeCountry }}
+        {{ activeCountry | renameCountry }}
         } @else { Country Pages }
       </span>
 
@@ -55,22 +55,19 @@
               [attr.disabled]="
                 country.key === activeCountry ? 'disabled' : null
               "
-              [routerLink]="['/country', country.key]"
+              [routerLink]="['/country', country.key | renameCountry]"
               [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
               class="menu-item"
               [ngClass]="{
                 'first-of-letter': !!countryFirstOfLetter[country.key]
               }"
             >
-              <span
-                class="flag-orb"
-                [ngClass]="isoCountryCodes[country.key]"
-              ></span>
+              <span class="flag-orb" [ngClass]="country.key"></span>
 
               <span
                 class="text"
                 [attr.data-text]="countryFirstOfLetter[country.key]"
-                >{{ country.key }}</span
+                >{{ country.key | renameCountry }}</span
               >
             </a>
           </ng-container>

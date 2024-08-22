@@ -29,10 +29,6 @@ export class APIService {
 
   constructor(private readonly http: HttpClient) {}
 
-  loadIsoCountryCodes(): IHash<string> {
-    return isoCountryCodes;
-  }
-
   replaceDoubleSlashes(s: string): string {
     return s.replace(/([^:]\/)\/+/g, '$1');
   }
@@ -90,7 +86,6 @@ export class APIService {
         map((targetData: Array<TargetMetaDataRaw>) => {
           return targetData.map((tmd: TargetMetaDataRaw) => {
             tmd.isInterim = tmd.targetYear !== 2030;
-            tmd.country = isoCountryCodes[tmd.country];
             return tmd;
           });
         })
@@ -112,6 +107,7 @@ export class APIService {
     return rows.reduce(
       (res: IHash<IHashArray<TargetMetaData>>, item: TargetMetaDataRaw) => {
         const country = item.country;
+
         if (!res[country]) {
           res[country] = {};
         }

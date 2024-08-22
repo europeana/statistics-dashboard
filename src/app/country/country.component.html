@@ -1,6 +1,6 @@
 <main class="fit-to-page">
   <h1 class="page-title">
-    <span class="flag-orb" [ngClass]="isoCountryCodes[country]"></span>
+    <span class="flag-orb" [ngClass]="country"></span>
     <ng-container
       *ngIf="
         headerRef &&
@@ -9,7 +9,7 @@
         headerRef['countryTotalMap'][country]['percentage'] !== undefined
       "
     >
-      <span *ngIf="country">{{ country }}</span>
+      <span *ngIf="country">{{ country | renameCountry }}</span>
       <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
       <span class="page-subtitle">
         {{ headerRef["countryTotalMap"][country]["percentage"] }}% of the
@@ -294,7 +294,7 @@
         <div
           class="entry-card-content"
           *ngIf="
-            targetMetaData[countryCodes[country]][TargetFieldName.THREE_D];
+            targetMetaData[country][TargetFieldName.THREE_D];
             let targets3D
           "
         >
@@ -342,7 +342,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
             [queryParams]="{
-              country: country,
+              country: country | renameCountry,
               type: '3D'
             }"
             (click)="resetAppCTZeroParam()"
@@ -368,10 +368,7 @@
 
         <div
           class="entry-card-content"
-          *ngIf="
-            targetMetaData[countryCodes[country]][TargetFieldName.HQ];
-            let targetsHQ
-          "
+          *ngIf="targetMetaData[country][TargetFieldName.HQ]; let targetsHQ"
         >
           <ng-content
             *ngTemplateOutlet="
@@ -418,7 +415,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
             [queryParams]="{
-              country: country,
+              country: country | renameCountry,
               contentTier: [2, 3, 4],
               metadataTier: ['A', 'B', 'C']
             }"
@@ -444,7 +441,7 @@
         <div
           class="entry-card-content entry-card-totals"
           *ngIf="
-            targetMetaData[countryCodes[country]][TargetFieldName.TOTAL];
+            targetMetaData[country][TargetFieldName.TOTAL];
             let targetsTOTAL
           "
         >
@@ -493,11 +490,11 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
             [queryParams]="{
-              country: country
+              country: country | renameCountry
             }"
             (click)="resetAppCTZeroParam()"
             ><span i18n="@@countrySectionLinkCountry">View all data for</span
-            >&nbsp;{{ country }}</a
+            >&nbsp;{{ country | renameCountry }}</a
           >
         </div>
 
@@ -521,7 +518,7 @@
           <app-legend-grid
             #legendGrid
             [countryData]="countryData"
-            [countryCode]="countryCode"
+            [countryCode]="country"
             [targetMetaData]="targetMetaData"
             [lineChart]="lineChart"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
@@ -570,7 +567,7 @@
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryType">data by content type</span>
           </span>
 
@@ -600,7 +597,7 @@
               routerLink="/data/{{ DimensionName.type }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country
+                country: country | renameCountry
               }"
               data-e2e="link-entry-type"
               i18n="@@countrySectionLinkType"
@@ -610,7 +607,7 @@
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryRights">data by rights category</span>
             <a
               class="info-icon"
@@ -636,7 +633,7 @@
               routerLink="/data/{{ DimensionName.rightsCategory }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country
+                country: country | renameCountry
               }"
               data-e2e="link-entry-rights"
               i18n="@@countrySectionLinkRights"
@@ -649,7 +646,7 @@
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryDataProvider">data by data provider</span>
           </span>
           <div class="entry-card-content">
@@ -669,7 +666,7 @@
               routerLink="/data/{{ DimensionName.dataProvider }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country
+                country: country | renameCountry
               }"
               data-e2e="link-entry-data-provider"
               i18n="@@countrySectionLinkDataProvider"
@@ -679,7 +676,7 @@
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country }}</span>
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
             <span i18n="@@countryEntryProvider">data by provider</span>
             <a
               class="info-icon"
@@ -705,7 +702,7 @@
               routerLink="/data/{{ DimensionName.provider }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country
+                country: country | renameCountry
               }"
               data-e2e="link-entry-provider"
               i18n="@@countrySectionLinkProvider"

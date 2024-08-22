@@ -87,7 +87,7 @@ export const MockGeneralResults = {
         {
           count: 15,
           percentage: 1.5,
-          value: 'Czech Republic'
+          value: 'Czechia'
         },
         {
           count: 52,
@@ -303,19 +303,7 @@ export const MockGeneralResults = {
 export const MockBreakdowns = {
   filteringOptions: {
     contentTier: ['0', '1', '2', '3'],
-    country: [
-      'Denmark',
-      'Ireland',
-      'Norway',
-      'Finland',
-      'Germany',
-      'Portugal',
-      'Poland',
-      'Italy',
-      'Holy See (Vatican City State)',
-      'Croatia',
-      'Iceland'
-    ],
+    country: ['IT', 'IE', 'NO', 'FI', 'DE', 'PT', 'PL', 'IT', 'VA', 'HR', 'IS'],
     dataProvider: [
       'The Danish Agency for Culture',
       'University College Cork',
@@ -632,12 +620,6 @@ export const MockBreakdowns = {
 
 export class MockAPIService {
   errorMode = false;
-
-  loadIsoCountryCodes(): IHash<string> {
-    return {
-      Belgium: 'BE'
-    };
-  }
 
   getBreakdowns(br: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {

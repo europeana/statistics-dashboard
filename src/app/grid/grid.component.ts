@@ -229,6 +229,7 @@ export class GridComponent extends SubscriptionManager {
   setRows(rows: Array<TableRow>): void {
     const normalRows = [];
     const summaryRows = [];
+
     rows.forEach((tr: TableRow) => {
       if (tr.isTotal) {
         summaryRows.push(tr);

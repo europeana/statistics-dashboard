@@ -69,6 +69,11 @@ context('Statistics Dashboard', () => {
           'View by provider'
         ];
 
+        const targetLinkTexts = [
+          'View (3D data) by content tier',
+          'View (HQ data) by type'
+        ];
+
         it('should (conditionally) show the control zero control', () => {
           cy.visit(urlDefault);
           cy.wait(100);
@@ -123,17 +128,34 @@ context('Statistics Dashboard', () => {
           });
         });
 
+        it('Should maintain the content tier zero control setting', () => {
+          const country = 'Belgium';
+          const url = `/country/${country}`;
+
+          cy.visit(url);
+          cy.wait(1000);
+          cy.get(selCtrlCTZero).click(force);
+          cy.wait(1000);
+          cy.contains(targetLinkTexts[1]).click(force);
+
+          cy.wait(1000);
+          confirmCTZeroSetting(false);
+          cy.go('back');
+          cy.wait(1000);
+          confirmCTZeroSetting(true);
+
+          cy.contains(linkTexts[0]).click(force);
+          confirmCTZeroSetting(true);
+          cy.go('back');
+          confirmCTZeroSetting(true);
+        });
+
         it('Should (conditionally) reset the content tier zero control', () => {
           const country = 'Belgium';
           const url = `/country/${country}`;
           const valPercent = '44.1%';
           const valPercentCTZero = '11.6%';
           const selPercent = '.total.percent-value';
-
-          const targetLinkTexts = [
-            'View (3D data) by content tier',
-            'View (HQ data) by type'
-          ];
 
           // go to Belgium
           cy.visit(url);

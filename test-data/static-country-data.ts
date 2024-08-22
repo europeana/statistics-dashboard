@@ -60,37 +60,31 @@ const reduceTargetMetaData = (
 };
 
 export const targetData = [].concat(
-  ...memberStateCountryCodes
-    .map((countryCode: string) => {
-      return isoCountryCodesReversed[countryCode];
-    })
-    .map((country: string, index: number) => {
-      const resLabel = [2025, 2030].map((year: number) => {
-        // make values larger for later targets
-        let value = year * (index + 1);
+  ...memberStateCountryCodes.map((country: string, index: number) => {
+    const resLabel = [2025, 2030].map((year: number) => {
+      // make values larger for later targets
+      let value = year * (index + 1);
 
-        return Object.keys(TargetFieldName).map(
-          (targetType: TargetFieldName) => {
-            // make subtarget values smaller than total
-            value -= 123;
-            const fieldName = TargetFieldName[targetType];
-            return {
-              country,
-              targetType: fieldName,
-              targetYear: year,
-              isInterim: year === 2025,
-              value:
-                fieldName === TargetFieldName.TOTAL
-                  ? value * (year === 2025 ? 9 : 12)
-                  : year === 2025
-                  ? Math.floor(value * 0.7)
-                  : value
-            };
-          }
-        );
+      return Object.keys(TargetFieldName).map((targetType: TargetFieldName) => {
+        // make subtarget values smaller than total
+        value -= 123;
+        const fieldName = TargetFieldName[targetType];
+        return {
+          country,
+          targetType: fieldName,
+          targetYear: year,
+          isInterim: year === 2025,
+          value:
+            fieldName === TargetFieldName.TOTAL
+              ? value * (year === 2025 ? 9 : 12)
+              : year === 2025
+              ? Math.floor(value * 0.7)
+              : value
+        };
       });
-      return [].concat(...resLabel);
-    })
+    });
+    return [].concat(...resLabel);
+  })
 );
 
 const fnCountryTargetData = (): Array<TargetCountryData> => {
@@ -98,48 +92,43 @@ const fnCountryTargetData = (): Array<TargetCountryData> => {
   const res = [];
   const tgtDataRef = reduceTargetMetaData(targetData);
 
-  memberStateCountryCodes
-    .map((countryCode: string) => {
-      return isoCountryCodesReversed[countryCode];
-    })
-    .forEach((country: string) => {
-      const countryName = country;
-      const countryCode = isoCountryCodes[country];
-      const countryRandom = Math.max(1.5, (countryName.length * 12) % 5);
-      const baseValue3D =
-        tgtDataRef[country][TargetFieldName.THREE_D][1].value / countryRandom;
-      const basevalueHQ =
-        tgtDataRef[country][TargetFieldName.HQ][1].value / countryRandom;
+  memberStateCountryCodes.forEach((countryCode: string) => {
+    const countryName = isoCountryCodesReversed[countryCode];
+    const countryRandom = Math.max(1.5, (countryName.length * 12) % 5);
+    const baseValue3D =
+      tgtDataRef[countryCode][TargetFieldName.THREE_D][1].value / countryRandom;
+    const basevalueHQ =
+      tgtDataRef[countryCode][TargetFieldName.HQ][1].value / countryRandom;
 
-      let value3D = baseValue3D * 1.2;
-      let valueHQ = basevalueHQ * 0.9;
+    let value3D = baseValue3D * 1.2;
+    let valueHQ = basevalueHQ * 0.9;
 
-      dateTicks.forEach((dateTick: string, dateTickIndex: number) => {
-        const random1 =
-          (value3D % (numDateTicks + 1)) - (value3D % (numDateTicks / 2));
+    dateTicks.forEach((dateTick: string, dateTickIndex: number) => {
+      const random1 =
+        (value3D % (numDateTicks + 1)) - (value3D % (numDateTicks / 2));
 
-        value3D -= random1;
-        valueHQ += random1;
+      value3D -= random1;
+      valueHQ += random1;
 
-        const random2 =
-          (valueHQ % (numDateTicks + 1)) + (valueHQ % (numDateTicks / 2));
+      const random2 =
+        (valueHQ % (numDateTicks + 1)) + (valueHQ % (numDateTicks / 2));
 
-        value3D -= 0.8 * (random2 % random1);
-        valueHQ -= 1 * (random2 * random1 * 5);
+      value3D -= 0.8 * (random2 % random1);
+      valueHQ -= 1 * (random2 * random1 * 5);
 
-        const resultItem = {
-          country: countryName,
-          date: dateTicks[dateTicks.length - (dateTickIndex + 1)],
-          three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
-          high_quality: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),
-          total: 0
-        };
+      const resultItem = {
+        country: countryCode,
+        date: dateTicks[dateTicks.length - (dateTickIndex + 1)],
+        three_d: isNaN(value3D) ? 0 : Math.floor(value3D),
+        high_quality: isNaN(valueHQ) ? 0 : Math.floor(valueHQ),
+        total: 0
+      };
 
-        resultItem.total =
-          Math.max(resultItem.three_d, resultItem.high_quality) * 12;
-        res.push(resultItem);
-      });
+      resultItem.total =
+        Math.max(resultItem.three_d, resultItem.high_quality) * 12;
+      res.push(resultItem);
     });
+  });
   return res.reverse();
 };
 export const countryTargetData = fnCountryTargetData();

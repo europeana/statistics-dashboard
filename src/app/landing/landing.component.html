@@ -56,13 +56,10 @@
       </div>
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         @if (countryLink){
-        <a [routerLink]="['/country', row.name]">
+        <a [routerLink]="['/country', row.name | renameCountry]">
           <span
-            >{{ row.name
-            }}<span
-              class="flag-orb"
-              [ngClass]="isoCountryCodes[row.name]"
-            ></span
+            >{{ row.name | renameCountry
+            }}<span class="flag-orb" [ngClass]="row.name"></span
           ></span>
         </a>
         } @else {

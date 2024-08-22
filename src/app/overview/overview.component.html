@@ -275,9 +275,13 @@
                 <span class="flag-orb default" title="View country data"></span>
                 <app-speech-bubble [arrowTopRight]="true">
                   <ul class="country-shortcuts">
-                    <li *ngFor="let country of queryParams['country']">
+                    <li
+                      *ngFor="
+                        let countryCode of queryParams[DimensionName.country]
+                      "
+                    >
                       <a
-                        [routerLink]="['/country', country]"
+                        [routerLink]="['/country', countryCode | renameCountry]"
                         [queryParams]="{
                           'content-tier-zero': form.value.contentTierZero
                             ? true
@@ -285,13 +289,11 @@
                         }"
                       >
                         <span>View</span>
-                        <span class="pad-word">{{ country }}</span>
+                        <span class="pad-word">{{
+                          countryCode | renameCountry
+                        }}</span>
                         <span>data</span>
-                        <span
-                          class="flag-orb"
-                          [ngClass]="isoCountryCodes[country]"
-                        >
-                        </span>
+                        <span class="flag-orb" [ngClass]="countryCode"> </span>
                       </a>
                     </li>
                   </ul>

@@ -83,10 +83,6 @@ describe('API Service', () => {
     sub.unsubscribe();
   });
 
-  it('should load the ISO country codes', () => {
-    expect(service.loadIsoCountryCodes()).toBeTruthy();
-  });
-
   it('should load the rightsCategory urls', () => {
     expect(service.getRightsCategoryUrls(['CC0'])).toBeTruthy();
   });

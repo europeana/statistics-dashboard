@@ -1,3 +1,5 @@
+import { isoCountryCodes } from '../src/app/_data';
+
 export const STATIC_RIGHTS_CATEGORY_VALUES = [
   'CC0',
   'CC BY',
@@ -580,7 +582,7 @@ export const STATIC_COUNTRIES = [
     dataProviders: [44, 45, 46, 47, 48, 49, 50, 51, 52]
   },
   {
-    name: 'Czech Republic',
+    name: 'Czechia',
     dataProviders: [38, 39, 40, 41, 42, 43]
   },
   {
@@ -699,4 +701,9 @@ export const STATIC_COUNTRIES = [
     name: 'Ukraine',
     dataProviders: [64]
   }
-];
+].map((item) => {
+  return {
+    name: isoCountryCodes[item.name],
+    dataProviders: item.dataProviders
+  };
+});
