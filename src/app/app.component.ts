@@ -281,16 +281,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       if (component instanceof OverviewComponent) {
         component.locale = this.locale;
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
-        if (!this.header.countryTotalMap) {
-          this.loadLandingData(this.lastSetContentTierZeroValue);
-        }
       } else if (component instanceof CountryComponent) {
         this.countryComponentRef = component;
         component.includeCTZero = this.lastSetContentTierZeroValue;
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
-        if (!this.header.countryTotalMap) {
-          this.setCTZeroInputToLastSetValue(ctrlCTZero);
-        }
+      }
+      if (!this.header.countryTotalMap) {
+        this.loadLandingData(this.lastSetContentTierZeroValue);
       }
     }
   }
