@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
 
 import { isoCountryCodes } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
-import { CountryTotalInfo, IHash } from '../_models';
+import { IHash } from '../_models';
 import { RenameCountryPipe } from '../_translate';
 
 @Component({
@@ -42,10 +42,10 @@ export class HeaderComponent {
 
   public isoCountryCodes = isoCountryCodes;
 
-  _countryTotalMap: IHash<CountryTotalInfo>;
+  _countryTotalMap: IHash<number>;
   countryFirstOfLetter: IHash<string | undefined> = {};
 
-  @Input() set countryTotalMap(countryTotalMap: IHash<CountryTotalInfo>) {
+  @Input() set countryTotalMap(countryTotalMap: IHash<number>) {
     this._countryTotalMap = countryTotalMap;
 
     let lastLetter = '';
@@ -61,7 +61,7 @@ export class HeaderComponent {
       });
   }
 
-  get countryTotalMap(): IHash<CountryTotalInfo> {
+  get countryTotalMap(): IHash<number> {
     return this._countryTotalMap;
   }
 

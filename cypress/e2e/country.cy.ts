@@ -1,3 +1,5 @@
+import { isoCountryCodesReversed } from '../../src/app/_data';
+
 context('Statistics Dashboard', () => {
   const force = { force: true };
 
@@ -8,6 +10,24 @@ context('Statistics Dashboard', () => {
 
     beforeEach(() => {
       cy.visit('/country/Austria');
+    });
+
+    it('should redirect if the country is unknown', () => {
+      const host = 'http://localhost:4280';
+      cy.visit('/country/XXX');
+      cy.url().should('not.include', 'country');
+      cy.url().should('equal', `${host}/`);
+    });
+
+    it('should redirect if the country is recognised as a code', () => {
+      ['BA', 'EE', 'IT', 'PT', 'RS'].forEach((code: string) => {
+        cy.visit(`/country/${code}`);
+        cy.url().should('not.include', code);
+        cy.url().should(
+          'include',
+          encodeURIComponent(isoCountryCodesReversed[code])
+        );
+      });
     });
 
     it('should toggle the appendices', () => {

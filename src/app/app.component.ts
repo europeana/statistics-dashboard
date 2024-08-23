@@ -21,13 +21,11 @@ import {
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
-import { isoCountryCodes } from './_data';
 import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService } from './_services';
 import {
   BreakdownResult,
   CountPercentageValue,
-  CountryTotalInfo,
   GeneralResults,
   GeneralResultsFormatted
 } from './_models';
@@ -157,7 +155,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       this.landingComponentRef.isLoading = true;
     }
 
-    const countryTotalMap: { [key: string]: CountryTotalInfo } = {};
+    const countryTotalMap: { [key: string]: number } = {};
 
     this.subs.push(
       this.api
@@ -176,11 +174,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
             );
             if (br.breakdownBy === 'country') {
               br.results.forEach((result: CountPercentageValue) => {
-                countryTotalMap[result.value] = {
-                  total: result.count,
-                  code: isoCountryCodes[result.value],
-                  percentage: result.percentage
-                };
+                countryTotalMap[result.value] = result.percentage;
               });
             }
           });
@@ -231,10 +225,11 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     );
   }
 
-  /** ngOnInit
-  /* - bind queryParam events to lastSetContentTierZeroValue
-  /* - bind location back / forward events to form
-  */
+  /**
+   * ngOnInit
+   * - bind queryParam events to lastSetContentTierZeroValue
+   * - bind location back / forward events to form
+   **/
   ngOnInit(): void {
     this.subs.push(
       this.route.queryParams.subscribe((params: Params) => {
@@ -252,18 +247,19 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
   }
 
-  /** onOutletLoaded
-  /* - invoked when router component loads a component
-  /*    - sets showPageTitle
-  /* - if it's an OverviewComponent
-  /*    - sets the component locale
-  /*    - (and if countryTotalMap is unset)
-  /*      - loads the landing data
-  /* - if it's a CountryComponent or a LandingComponent:
-  /*    - updates the compenent ref and ctZero control value
-  /*    - assigns landing data
-  /* @param { LandingComponent | OverviewComponent | CountryComponent: component } - the loaded component
-  */
+  /**
+   * onOutletLoaded
+   * invoked when router component loads a component
+   *    - sets showPageTitle
+   * if it's an OverviewComponent
+   *    - sets the component locale
+   *    - (and if countryTotalMap is unset)
+   *      - loads the landing data
+   * if it's a CountryComponent or a LandingComponent:
+   *    - updates the compenent ref and ctZero control value
+   *    - assigns landing data
+   * @param { LandingComponent | OverviewComponent | CountryComponent: component } - the loaded component
+   **/
   onOutletLoaded(
     component: LandingComponent | OverviewComponent | CountryComponent
   ): void {
@@ -322,9 +318,10 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     }
   }
 
-  /** updateLocation
-  /* - toggle this.paramNameCTZero in window location
-  */
+  /**
+   * updateLocation
+   * toggle this.paramNameCTZero in window location
+   **/
   updateLocation(): void {
     const path = this.location.path().split('?')[0];
 

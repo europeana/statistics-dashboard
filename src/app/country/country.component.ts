@@ -19,7 +19,12 @@ import {
   Input,
   ViewChild
 } from '@angular/core';
-import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink,
+  RouterOutlet
+} from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import {
   colours,
@@ -125,6 +130,7 @@ export class CountryComponent extends SubscriptionManager {
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('scrollPoint') scrollPoint: ElementRef;
 
+  private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
   public countryCodes = isoCountryCodes;
@@ -203,7 +209,17 @@ export class CountryComponent extends SubscriptionManager {
             this.targetMetaData = combined.targetMetaData;
             this.countryData = combined.countryData;
 
-            const country = isoCountryCodes[combined.params['country']];
+            const countryParam = combined.params['country'];
+            const country = isoCountryCodes[countryParam];
+
+            if (!country) {
+              if (Object.values(isoCountryCodes).includes(countryParam)) {
+                const redirecCountry = isoCountryCodesReversed[countryParam];
+                this.router.navigate([`country/${redirecCountry}`]);
+              } else {
+                this.router.navigate(['/']);
+              }
+            }
 
             this.setCountryToParam(country);
             this.initialiseIntersectionObserver();
