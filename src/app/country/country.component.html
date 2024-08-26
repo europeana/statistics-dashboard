@@ -5,15 +5,13 @@
       *ngIf="
         headerRef &&
         headerRef['countryTotalMap'] &&
-        headerRef['countryTotalMap'][country] &&
-        headerRef['countryTotalMap'][country]['percentage'] !== undefined
+        headerRef['countryTotalMap'][country] !== undefined
       "
     >
       <span *ngIf="country">{{ country | renameCountry }}</span>
       <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
       <span class="page-subtitle">
-        {{ headerRef["countryTotalMap"][country]["percentage"] }}% of the
-        Europeana dataset
+        {{ headerRef["countryTotalMap"][country] }}% of the Europeana dataset
       </span>
     </ng-container>
   </h1>
@@ -184,38 +182,30 @@
   </ng-template>
 
   <ng-template #powerLevelSummary let-name="name" let-valName="valName">
-    <ng-container
-      *ngIf="
-        headerRef &&
-          headerRef['countryTotalMap'] &&
-          headerRef['countryTotalMap'][country] &&
-          headerRef['countryTotalMap'][country]['total'];
-        let countryTotal
-      "
+    <!-- include percent speech bubble if applicable -->
+    <div
+      class="help-speech-bubble-wrapper help-percent"
+      *ngIf="valName !== TargetFieldName.TOTAL"
     >
-      <div
-        class="help-speech-bubble-wrapper help-percent"
-        *ngIf="valName !== TargetFieldName.TOTAL"
-      >
-        <app-speech-bubble [arrowTopRight]="true">
-          <span class="help-speech-bubble-content">
-            {{ tooltipsPercent[name] }}
-          </span>
-        </app-speech-bubble>
-      </div>
+      <app-speech-bubble [arrowTopRight]="true">
+        <span class="help-speech-bubble-content">
+          {{ tooltipsPercent[name] }}
+        </span>
+      </app-speech-bubble>
+    </div>
 
-      <ng-content
-        *ngTemplateOutlet="
-          cardSummary;
-          context: {
-            name: valName,
-            value: latestCountryData[valName],
-            percent: latestCountryPercentages[valName] || 0,
-            isPowerLevel: true
-          }
-        "
-      ></ng-content>
-    </ng-container>
+    <!-- include cardSummary -->
+    <ng-content
+      *ngTemplateOutlet="
+        cardSummary;
+        context: {
+          name: valName,
+          value: latestCountryData[valName],
+          percent: latestCountryPercentages[valName] || 0,
+          isPowerLevel: true
+        }
+      "
+    ></ng-content>
   </ng-template>
 
   <ng-template #dataRows let-dimension="dimension" let-data="data">

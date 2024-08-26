@@ -10,10 +10,9 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
-
-import { of } from 'rxjs';
-
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { isoCountryCodesReversed } from '../_data';
 import { APIService } from '../_services';
 import { MockAPIService, MockLineComponent } from '../_mocked';
 import { TargetFieldName, TargetMetaData } from '../_models';
@@ -25,6 +24,8 @@ describe('CountryComponent', () => {
   let component: CountryComponent;
   let fixture: ComponentFixture<CountryComponent>;
   let intersectionObserverCreated = false;
+  let router: Router;
+  let routeChangeSource: BehaviorSubject<Params>;
 
   class IntersectionObserver {
     observe(): void {
@@ -38,12 +39,14 @@ describe('CountryComponent', () => {
   }
 
   const configureTestBed = (): void => {
+    routeChangeSource = new BehaviorSubject({ country: 'France' } as Params);
+
     TestBed.configureTestingModule({
       imports: [CountryComponent],
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: { params: of({ country: 'France' }) }
+          useValue: { params: routeChangeSource }
         },
         { provide: APIService, useClass: MockAPIService }
       ],
@@ -54,6 +57,7 @@ describe('CountryComponent', () => {
         add: { imports: [MockLineComponent] }
       })
       .compileComponents();
+    router = TestBed.inject(Router);
   };
 
   let appRef: ApplicationRef;
@@ -94,6 +98,24 @@ describe('CountryComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should redirect (to home)', () => {
+    spyOn(router, 'navigate');
+    ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
+      routeChangeSource.next({ country: code });
+      expect(router.navigate).toHaveBeenCalledWith(['/']);
+    });
+  });
+
+  it('should redirect (when it recognises country codes)', () => {
+    spyOn(router, 'navigate');
+    ['BE', 'DE', 'FR'].forEach((code: string) => {
+      routeChangeSource.next({ country: code });
+      expect(router.navigate).toHaveBeenCalledWith([
+        `country/${isoCountryCodesReversed[code]}`
+      ]);
+    });
   });
 
   it('should set the country', fakeAsync(() => {
@@ -199,12 +221,6 @@ describe('CountryComponent', () => {
     component.includeCTZero = false;
 
     expect(component.refreshCardData).toHaveBeenCalledTimes(2);
-  });
-
-  it('should initialise the IntersectionObserver', () => {
-    expect(intersectionObserverCreated).toBeFalsy();
-    component.initialiseIntersectionObserver();
-    expect(intersectionObserverCreated).toBeTruthy();
   });
 
   it('should handle the intersectionObserverCallback', () => {
