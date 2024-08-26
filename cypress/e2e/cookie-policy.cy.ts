@@ -1,18 +1,25 @@
 context('Statistics Dashboard', () => {
   describe('cookie policy', () => {
-    beforeEach(() => {
-      cy.visit('/');
+    const selCookiePolicy = '[data-e2e="cookie-policy"]';
+    const urlCookiePolicy = '/cookie-policy';
+
+    it('should show the country menu', () => {
+      cy.visit(urlCookiePolicy);
+      cy.get('.country-menu-opener').click();
+      cy.get('.country-select .menu-item')
+        .contains('Belgium')
+        .should('have.length', 1);
     });
 
-    const selCookiePolicy = '[data-e2e="cookie-policy"]';
-
     it('should show the cookie policy when the user goes there directly', () => {
+      cy.visit('/');
       cy.get(selCookiePolicy).should('not.exist');
       cy.visit('/cookie-policy');
       cy.get(selCookiePolicy).should('have.length', 1);
     });
 
     it('should show the cookie policy when the user clicks the footer link', () => {
+      cy.visit('/');
       cy.get(selCookiePolicy).should('not.exist');
       cy.get('a')
         .contains('Cookies Policy')
@@ -22,6 +29,7 @@ context('Statistics Dashboard', () => {
     });
 
     it('should show the cookie policy from the consent manager', () => {
+      cy.visit('/');
       const selCmLink = '.eu-cm a';
       cy.get(selCookiePolicy).should('not.exist');
       cy.get(selCmLink).should('not.exist');
