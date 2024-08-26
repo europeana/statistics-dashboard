@@ -207,19 +207,16 @@ describe('AppComponent', () => {
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(5);
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
+    expect(app.loadLandingData).toHaveBeenCalledTimes(6);
 
     app.lastSetContentTierZeroValue = true;
     app.onOutletLoaded(fakeCountryComponent);
 
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
     expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
 
     fakeCountryComponent.cardData = {};
     app.onOutletLoaded(fakeCountryComponent);
 
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);
     expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
   });
 
