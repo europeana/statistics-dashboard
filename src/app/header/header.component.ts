@@ -93,12 +93,7 @@ export class HeaderComponent {
   static sortByDecodedCountryName(a: string, b: string): number {
     const aDecoded = isoCountryCodesReversed[a];
     const bDecoded = isoCountryCodesReversed[b];
-    if (aDecoded > bDecoded) {
-      return 1;
-    } else if (aDecoded < bDecoded) {
-      return -1;
-    }
-    return 0;
+    return Intl.Collator('en').compare(aDecoded, bDecoded);
   }
 
   closeMenu(event: MouseEvent): void {
