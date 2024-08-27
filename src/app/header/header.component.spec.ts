@@ -59,4 +59,11 @@ describe('HeaderComponent', () => {
     component.activeCountry = 'France';
     expect(component.menuIsOpen).toBeFalsy();
   });
+
+  it('should sort by the decoded country', () => {
+    const unsorted = ['CZ', 'HR'];
+    unsorted.sort(HeaderComponent.sortByDecodedCountryName);
+    expect(unsorted[0]).toEqual('HR');
+    expect(unsorted[1]).toEqual('CZ');
+  });
 });

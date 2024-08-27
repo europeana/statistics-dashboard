@@ -49,7 +49,12 @@
 
       <span class="country-select">
         <span class="country-select-inner">
-          <ng-container *ngFor="let country of countryTotalMap | keyvalue">
+          <ng-container
+            *ngFor="
+              let country of countryTotalMap
+                | keyvalue: classReference.sortByDecodedCountryName
+            "
+          >
             <a
               (click)="toggleMenu($event)"
               [attr.disabled]="
