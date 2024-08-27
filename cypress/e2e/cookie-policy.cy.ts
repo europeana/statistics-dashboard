@@ -13,7 +13,7 @@ context('Statistics Dashboard', () => {
 
     it('should hide the content-tier-zero control', () => {
       const selCtrlCTZero = '[for=ctZero]';
-      cy.visit(urlPrivacyStatement);
+      cy.visit(urlCookiePolicy);
       cy.get(selCtrlCTZero).should('not.exist');
     });
 
