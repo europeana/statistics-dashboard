@@ -98,6 +98,7 @@ describe('CountryComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+    expect(intersectionObserverCreated).toBeTruthy();
   });
 
   it('should redirect (to home)', () => {
