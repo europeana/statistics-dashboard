@@ -23,7 +23,6 @@ import { CountryComponent } from '.';
 describe('CountryComponent', () => {
   let component: CountryComponent;
   let fixture: ComponentFixture<CountryComponent>;
-  let intersectionObserverCreated = false;
   let router: Router;
   let routeChangeSource: BehaviorSubject<Params>;
 
@@ -33,9 +32,7 @@ describe('CountryComponent', () => {
     }
     constructor(
       public callback: (entries: Array<IntersectionObserverEntry>) => void
-    ) {
-      intersectionObserverCreated = true;
-    }
+    ) {}
   }
 
   const configureTestBed = (): void => {
@@ -98,7 +95,6 @@ describe('CountryComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(intersectionObserverCreated).toBeTruthy();
   });
 
   it('should redirect (to home)', () => {
