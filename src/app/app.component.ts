@@ -284,6 +284,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         if (!this.header.countryTotalMap) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);
         }
+      } else {
+        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       }
       if (!this.header.countryTotalMap) {
         this.loadLandingData(this.lastSetContentTierZeroValue);

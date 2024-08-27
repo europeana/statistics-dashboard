@@ -11,6 +11,12 @@ context('Statistics Dashboard', () => {
         .should('have.length', 1);
     });
 
+    it('should hide the content-tier-zero control', () => {
+      const selCtrlCTZero = '[for=ctZero]';
+      cy.visit(urlPrivacyStatement);
+      cy.get(selCtrlCTZero).should('not.exist');
+    });
+
     it('should show the privacy statement when the user goes there directly', () => {
       cy.visit('/');
       cy.get(selPrivacy).should('not.exist');
