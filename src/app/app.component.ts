@@ -29,9 +29,11 @@ import {
   GeneralResults,
   GeneralResultsFormatted
 } from './_models';
+import { CookiePolicyComponent } from './cookie-policy';
 import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
+import { PrivacyStatementComponent } from './privacy-statement';
 import { FooterComponent } from './footer/footer.component';
 import { HeaderComponent } from './header/header.component';
 
@@ -258,10 +260,15 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * if it's a CountryComponent or a LandingComponent:
    *    - updates the compenent ref and ctZero control value
    *    - assigns landing data
-   * @param { LandingComponent | OverviewComponent | CountryComponent: component } - the loaded component
+   * @param { LandingComponent | OverviewComponent | CountryComponent| PrivacyStatementComponent | CookiePolicyComponent: component } - the loaded component
    **/
   onOutletLoaded(
-    component: LandingComponent | OverviewComponent | CountryComponent
+    component:
+      | LandingComponent
+      | OverviewComponent
+      | CountryComponent
+      | PrivacyStatementComponent
+      | CookiePolicyComponent
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
     if (component instanceof LandingComponent) {
@@ -284,6 +291,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         if (!this.header.countryTotalMap) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);
         }
+      } else {
+        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       }
       if (!this.header.countryTotalMap) {
         this.loadLandingData(this.lastSetContentTierZeroValue);

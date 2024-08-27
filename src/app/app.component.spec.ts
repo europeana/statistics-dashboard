@@ -21,9 +21,11 @@ import {
 import { MockAPIService } from './_mocked';
 import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
+import { CookiePolicyComponent } from './cookie-policy';
 import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
+import { PrivacyStatementComponent } from './privacy-statement';
 
 describe('AppComponent', () => {
   let app: AppComponent;
@@ -198,6 +200,16 @@ describe('AppComponent', () => {
     app.onOutletLoaded(new LandingComponent());
     expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
+    // load privacy statement component
+    app.onOutletLoaded(new PrivacyStatementComponent());
+
+    expect(app.loadLandingData).toHaveBeenCalledTimes(6);
+
+    // load cookie policy component
+    app.onOutletLoaded(new CookiePolicyComponent());
+
+    expect(app.loadLandingData).toHaveBeenCalledTimes(7);
+
     // load country component
     const fakeCountryComponent = Object.create(CountryComponent.prototype);
 
@@ -207,7 +219,7 @@ describe('AppComponent', () => {
     app.onOutletLoaded(fakeCountryComponent);
 
     expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(6);
+    expect(app.loadLandingData).toHaveBeenCalledTimes(8);
     expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
 
     app.lastSetContentTierZeroValue = true;
