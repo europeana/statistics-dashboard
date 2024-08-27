@@ -67,42 +67,42 @@ export const MockGeneralResults = {
         {
           count: 61,
           percentage: 6.1,
-          value: 'Austria'
+          value: 'AT'
         },
         {
           count: 95,
           percentage: 9.5,
-          value: 'Belgium'
+          value: 'BE'
         },
         {
           count: 95,
           percentage: 9.5,
-          value: 'Bulgaria'
+          value: 'BG'
         },
         {
           count: 96,
           percentage: 9.6,
-          value: 'Croatia'
+          value: 'HR'
         },
         {
           count: 15,
           percentage: 1.5,
-          value: 'Czechia'
+          value: 'CZ'
         },
         {
           count: 52,
           percentage: 5.2,
-          value: 'Denmark'
+          value: 'DK'
         },
         {
           count: 50,
           percentage: 5,
-          value: 'Estonia'
+          value: 'EE'
         },
         {
           count: 51,
           percentage: 5.1,
-          value: 'Europe'
+          value: 'EU'
         }
       ]
     },
