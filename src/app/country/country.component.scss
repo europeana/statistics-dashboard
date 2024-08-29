@@ -64,17 +64,47 @@
 }
 
 .entry-card {
+  .main-speech-bubble-wrapper,
   .help-speech-bubble-wrapper {
+    font-size: 24px;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .main-speech-bubble-wrapper {
+    cursor: help;
+    left: 1em;
+    max-width: calc(100% - 2em);
+    position: absolute;
+    top: -0.25em;
+    transform: translateY(calc(1em - 100%));
+    z-index: 1;
+
+    &::after {
+      // hover area
+      content: "";
+      display: block;
+      height: 4.5rem;
+      position: absolute;
+      top: 100%;
+      width: 100%;
+    }
+
+    &:hover {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .help-speech-bubble-wrapper {
+    position: absolute;
+    text-align: center;
+    z-index: 1;
+
     &.help-targets {
       bottom: calc(100% + 16px);
       left: 0;
     }
-
-    opacity: 0;
-    font-size: 24px;
-    position: absolute;
-    text-align: center;
-    z-index: 1;
 
     &.help-items {
       bottom: calc(100% + 8px);
@@ -124,12 +154,9 @@
   display: flex;
   justify-self: flex-end;
   flex-direction: row;
-
   font-size: 14px;
   font-weight: 600;
-
   margin: 14px 22px 0 auto;
-
   position: relative;
   color: $gray-med;
   .save {
@@ -375,13 +402,18 @@
 }
 
 // switch on the help / dim the less-relevant content...
-
-.entry-card:has(.help-opener:hover) {
+.entry-card:has(.help-opener:hover, .main-speech-bubble-wrapper:hover) {
   $help-animation-delay: 0.325s;
   $help-animation-time: 0.3s;
 
   $animation-time-half: calc($help-animation-time / 2);
   $animation-time-move: $animation-time-half;
+
+  .powerbar-wrapper .powerbar-target-labels {
+    opacity: 0;
+    transition: opacity $animation-time-half linear $help-animation-delay,
+      margin-bottom $animation-time-move linear $help-animation-delay;
+  }
 
   &:not(.entry-card-total) {
     // create space by reducing heights
@@ -393,9 +425,6 @@
     // ...and by by re-allocating margins...
     .powerbar-wrapper .powerbar-target-labels {
       margin-bottom: 0;
-      opacity: 0;
-      transition: opacity $animation-time-half linear $help-animation-delay,
-        margin-bottom $animation-time-move linear $help-animation-delay;
     }
 
     .powerbar-subtitle + .powerbar-wrapper {
@@ -452,29 +481,54 @@
 
   // switch on the speech bubbles
   .help-speech-bubble-wrapper {
+    visibility: visible;
     opacity: 1;
   }
 
-  &.entry-card-total .help-speech-bubble-wrapper {
-    transition: opacity $help-animation-time linear $help-animation-delay;
+  .main-speech-bubble-wrapper {
+    opacity: 1;
+    visibility: visible;
   }
-  &:not(.entry-card-total) .help-speech-bubble-wrapper {
+
+  &.entry-card-total {
+    .help-speech-bubble-wrapper,
+    .main-speech-bubble-wrapper {
+      transition: opacity $help-animation-time linear $help-animation-delay;
+    }
+  }
+  &:not(.entry-card-total) .help-speech-bubble-wrapper,
+  .main-speech-bubble-wrapper {
     transition: opacity $animation-time-half linear
       calc($help-animation-time + $animation-time-half);
   }
 }
 
+// maintain hover on the main when passing over a help
+.entry-card:has(.main-speech-bubble-wrapper:hover) {
+  .help-speech-bubble-wrapper {
+    z-index: 0;
+  }
+}
+
+// media queries
+
+@media (min-width: $bp-med) {
+  .entry-card .main-speech-bubble-wrapper::after {
+    // hover area
+    height: 4.5rem;
+  }
+}
+
 @media (min-width: $bp-desktop) {
   .entry-card {
+    .main-speech-bubble-wrapper,
     .help-speech-bubble-wrapper {
       font-size: 14px;
       &.help-targets {
         left: -2.5em;
       }
     }
-  }
 
-  .entry-card {
     .help-speech-bubble-wrapper {
       &.help-items {
         right: -2.5em;
@@ -491,6 +545,15 @@
         right: -2.5em;
       }
     }
+
+    .main-speech-bubble-wrapper {
+      left: 0em;
+      max-width: calc(100% + 2em);
+      &::after {
+        // hover area
+        height: 5em;
+      }
+    }
   }
 
   .percent-value {
@@ -503,7 +566,14 @@
     align-self: flex-start;
   }
 
-  .entry-card .help-speech-bubble-wrapper {
-    font-size: 18px;
+  .entry-card {
+    .main-speech-bubble-wrapper,
+    .help-speech-bubble-wrapper {
+      font-size: 16px;
+    }
+    .main-speech-bubble-wrapper::after {
+      // hover area
+      height: 4.375em;
+    }
   }
 }

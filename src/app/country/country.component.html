@@ -276,11 +276,21 @@
       >
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
+          [attr.title]="
+            targetDescriptions[TargetFieldName.THREE_D] | stripMarkup
+          "
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.THREE_D)"
           ><span i18n="@@countryEntry3D">3D Data</span><span class="x"></span
         ></a>
-
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.THREE_D]"
+            ></span>
+          </app-speech-bubble>
+        </span>
         <div
           class="entry-card-content"
           *ngIf="
@@ -298,7 +308,7 @@
             "
           ></ng-content>
 
-          <span class="powerbar-subtitle">targets</span>
+          <span class="powerbar-subtitle">progress</span>
 
           <ng-content
             *ngTemplateOutlet="
@@ -353,9 +363,17 @@
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.HQ)"
+          [attr.title]="targetDescriptions[TargetFieldName.HQ] | stripMarkup"
           ><span i18n="@@countryEntryHQ">HQ Data</span><span class="x"></span
         ></a>
-
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.HQ]"
+            ></span>
+          </app-speech-bubble>
+        </span>
         <div
           class="entry-card-content"
           *ngIf="targetMetaData[country][TargetFieldName.HQ]; let targetsHQ"
@@ -370,7 +388,7 @@
             "
           ></ng-content>
 
-          <span class="powerbar-subtitle">targets</span>
+          <span class="powerbar-subtitle">progress</span>
 
           <ng-content
             *ngTemplateOutlet="
@@ -425,9 +443,17 @@
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.TOTAL)"
+          [attr.title]="targetDescriptions[TargetFieldName.TOTAL] | stripMarkup"
           ><span i18n="@@countryEntryAll">All Data</span><span class="x"></span
         ></a>
-
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.TOTAL]"
+            ></span>
+          </app-speech-bubble>
+        </span>
         <div
           class="entry-card-content entry-card-totals"
           *ngIf="
@@ -445,7 +471,7 @@
             "
           ></ng-content>
 
-          <span class="powerbar-subtitle">targets</span>
+          <span class="powerbar-subtitle">progress</span>
 
           <ng-content
             *ngTemplateOutlet="
