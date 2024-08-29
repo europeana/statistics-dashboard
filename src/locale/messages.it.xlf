@@ -297,9 +297,6 @@
       <trans-unit id="gridColHeaderView" datatype="html">
         <source>Visualizza in Europeana</source>
       </trans-unit>
-      <trans-unit id="targetCountriesMenu" datatype="html">
-        <source>2025 / 2030 Bersagli</source>
-      </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source>Europeana dataset completo</source>
       </trans-unit>
