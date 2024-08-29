@@ -416,6 +416,27 @@
           <context context-type="linenumber">725</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="countryHelpTotal" datatype="html">
+        <source><x id="PH" equiv-text="countryName"/> has <x id="PH_1" equiv-text="fmtValue"/><x id="PH_2" equiv-text="typeItems"/> <x id="PH_3" equiv-text="itemPluralString"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.ts</context>
+          <context context-type="linenumber">392</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="countryHelpPercent" datatype="html">
+        <source><x id="PH" equiv-text="fmtNum(percent)"/>% of the data from <x id="PH_1" equiv-text="countryName"/> is <x id="PH_2" equiv-text="fmtName"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.ts</context>
+          <context context-type="linenumber">396</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="countryHelpTarget" datatype="html">
+        <source>The <x id="PH" equiv-text="x.targetYear"/> target (<x id="PH_1" equiv-text="tgtVal"/>) is <x id="PH_2" equiv-text="tgtPct"/>% complete</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/country/country.component.ts</context>
+          <context context-type="linenumber">418</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="ctrlLabelEnableCTZero" datatype="html">
         <source> Enable content tier 0 </source>
         <context-group purpose="location">

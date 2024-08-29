@@ -389,11 +389,11 @@ export class CountryComponent extends SubscriptionManager {
 
       this.tooltipsTotal[
         valName
-      ] = `${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
+      ] = $localize`:@@countryHelpTotal:${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
 
-
-    this.tooltipsPercent[valName] =
-      $localize`:@@countryHelpPercent:${fmtNum(percent)}% of the data from ${countryName} is ${fmtName}`;
+      this.tooltipsPercent[valName] = $localize`:@@countryHelpPercent:${fmtNum(
+        percent
+      )}% of the data from ${countryName} is ${fmtName}`;
 
       // percentages
       this.latestCountryPercentages[valName] = percent;
@@ -415,7 +415,7 @@ export class CountryComponent extends SubscriptionManager {
           const tgtPct = fmtNum(
             this.latestCountryPercentageOfTargets[valName][i]
           );
-          return `The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
+          return $localize`:@@countryHelpTarget:The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
         }
       );
     });

@@ -150,6 +150,15 @@
       <trans-unit id="countrySectionLinkProvider" datatype="html">
         <source>Visualizza per aggregatore</source>
       </trans-unit>
+      <trans-unit id="countryHelpTotal" datatype="html">
+        <source><x id="PH" equiv-text="countryName"/> ha <x id="PH_1" equiv-text="fmtValue"/><x id="PH_2" equiv-text="typeItems"/> <x id="PH_3" equiv-text="itemPluralString"/></source>
+      </trans-unit>
+      <trans-unit id="countryHelpPercent" datatype="html">
+        <source><x id="PH" equiv-text="fmtNum(percent)"/>% dei dati da <x id="PH_1" equiv-text="countryName"/> è <x id="PH_2" equiv-text="fmtName"/></source>
+      </trans-unit>
+      <trans-unit id="countryHelpTarget" datatype="html">
+        <source>Il bersaglio per <x id="PH" equiv-text="x.targetYear"/> (<x id="PH_1" equiv-text="tgtVal"/>) è <x id="PH_2" equiv-text="tgtPct"/>% completo</source>
+      </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Progressione dei dati</source>
       </trans-unit>
