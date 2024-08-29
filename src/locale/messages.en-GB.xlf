@@ -209,7 +209,7 @@
       </trans-unit>
 
       <trans-unit id="countryChartSummaryData" datatype="html">
-        <source> Data </source>
+        <source> Target </source>
         <note priority="1" from="description">landing chart summary percentage</note>
       </trans-unit>
 

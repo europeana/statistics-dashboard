@@ -77,7 +77,7 @@
       </trans-unit>
 
       <trans-unit id="countryChartSummaryData" datatype="html">
-        <source> Dati </source>
+        <source> Bersaglio </source>
       </trans-unit>
 
       <trans-unit id="countryChartSummaryTop" datatype="html">
