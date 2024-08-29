@@ -119,7 +119,7 @@
               class="show-on-triple"
               i18n="
                 landing chart summary percentage@@countryChartSummaryTotalShort"
-              >Items</span
+              >Current Items</span
             >
             <div class="help-speech-bubble-wrapper help-items">
               <app-speech-bubble [arrowBottomRight]="true">
@@ -152,17 +152,22 @@
           <span
             class="hide-on-triple"
             i18n="
-              landing chart summary percentage@@countryChartSummaryPercentage"
-          >
-            Corresponding percentage
-          </span>
-          <span
-            class="show-on-triple"
-            i18n="
               landing chart summary
-              percentage@@countryChartSummaryPercentageShort"
+              percentage@@countryChartSummaryPercentageNonTriple"
           >
-            Percent of all items
+            Percent of all country items
+          </span>
+          <span class="show-on-triple">
+            <span
+              class="xxl-only"
+              i18n="landing chart summary@@countryChartSummaryPercentage"
+              >Percent of all country items</span
+            >
+            <span
+              class="xxl-fallback"
+              i18n="landing chart summary@@countryChartSummaryPercentageShort"
+              >Percent of all</span
+            >
           </span>
         </span>
 

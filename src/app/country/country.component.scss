@@ -510,6 +510,10 @@
   }
 }
 
+.xxl-only {
+  display: none;
+}
+
 // media queries
 
 @media (min-width: $bp-med) {
@@ -575,5 +579,15 @@
       // hover area
       height: 4.375em;
     }
+  }
+
+  // show the longer translations...
+  .xxl-only {
+    display: inline;
+  }
+
+  // ...and hide the shorter translations
+  .xxl-fallback {
+    display: none;
   }
 }
