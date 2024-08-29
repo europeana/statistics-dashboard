@@ -86,6 +86,27 @@
           <context context-type="linenumber">108</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="targetDescriptions3D" datatype="html">
+        <source>Digital objects found in <x id="PH" equiv-text="tooltipLink"/> conforming to content tier 1 and higher which consist of three dimensions (such as 3D models or landscapes).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="targetDescriptionsHQ" datatype="html">
+        <source>Digital objects found in <x id="PH" equiv-text="tooltipLink"/> which conform to content tiers 2, 3 or 4 and metadata tiers A, B or C according to the Europeana Publishing Framework.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="targetDescriptionsTOTAL" datatype="html">
+        <source>All digital objects found in <x id="PH" equiv-text="tooltipLink"/> conforming to content tier 1 and higher.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_data/static-data.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="facetNameShortContentTier" datatype="html">
         <source>Tier</source>
         <context-group purpose="location">

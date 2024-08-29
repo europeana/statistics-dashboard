@@ -391,8 +391,9 @@ export class CountryComponent extends SubscriptionManager {
         valName
       ] = `${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
 
-      this.tooltipsPercent[valName] =
-        fmtNum(percent) + `% of the data from ${countryName} is ${fmtName}`;
+
+    this.tooltipsPercent[valName] =
+      $localize`:@@countryHelpPercent:${fmtNum(percent)}% of the data from ${countryName} is ${fmtName}`;
 
       // percentages
       this.latestCountryPercentages[valName] = percent;
