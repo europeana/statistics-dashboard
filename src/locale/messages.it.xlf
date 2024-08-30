@@ -14,6 +14,15 @@
       <trans-unit id="tooltipHelpRights" datatype="html">
         <source>Documentazione sulla dichiarazione dei diritti</source>
       </trans-unit>
+      <trans-unit id="targetDescriptions3D" datatype="html">
+        <source>Oggetti digitali trovati a <x id="PH" equiv-text="tooltipLink"/> che conformono al livello di contenuto 1 e di più, che hanno tre dimensioni (tipo modelli 3D o un paesaggio).</source>
+      </trans-unit>
+      <trans-unit id="targetDescriptionsHQ" datatype="html">
+        <source>Oggetti digitali trovati a <x id="PH" equiv-text="tooltipLink"/> che conformono ai livelli di contenuto 2, 3 o 4 e ao livelli di metadati A, B or C secondo la Europeana Publishing Framework.</source>
+      </trans-unit>
+      <trans-unit id="targetDescriptionsTOTAL" datatype="html">
+        <source>Oggetti digitali trovati a <x id="PH" equiv-text="tooltipLink"/> che conformono ai livelli di contenuto 1 e di più.</source>
+      </trans-unit>
       <trans-unit id="facetNameShortContentTier" datatype="html">
         <source>Livello</source>
       </trans-unit>
@@ -77,24 +86,29 @@
       </trans-unit>
 
       <trans-unit id="countryChartSummaryData" datatype="html">
-        <source> Dati </source>
+        <source> Bersaglio </source>
       </trans-unit>
 
       <trans-unit id="countryChartSummaryTop" datatype="html">
         <source>Primi <x id="INTERPOLATION" equiv-text="{{ dimension }}"/> conteggio oggetti</source>
       </trans-unit>
-
+      <trans-unit id="countryChartSummaryTotalLong" datatype="html">
+        <source> oggetti attuali</source>
+      </trans-unit>
       <trans-unit id="countryChartSummaryTotal" datatype="html">
-        <source> Totale  <x id="INTERPOLATION" equiv-text="{{ name }}"/> conteggio oggetti</source>
+        <source> oggetti attuali</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryTotalShort" datatype="html">
-        <source> oggetti </source>
+        <source> oggetti</source>
+      </trans-unit>
+      <trans-unit id="countryChartSummaryPercentageNonTriple" datatype="html">
+        <source> Percento di tutti del paese </source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentage" datatype="html">
-        <source>Percentuale corrispondente</source>
+        <source>Pct. di tutti del paese</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
-        <source>Percento di tutti</source>
+        <source>Pct. di tutti </source>
       </trans-unit>
       <trans-unit id="countryLandingDataHeader" datatype="html">
         <source>OGGETTI FORNITI</source>
@@ -140,6 +154,15 @@
       </trans-unit>
       <trans-unit id="countrySectionLinkProvider" datatype="html">
         <source>Visualizza per aggregatore</source>
+      </trans-unit>
+      <trans-unit id="countryHelpTotal" datatype="html">
+        <source><x id="PH" equiv-text="countryName"/> ha <x id="PH_1" equiv-text="fmtValue"/><x id="PH_2" equiv-text="typeItems"/> <x id="PH_3" equiv-text="itemPluralString"/></source>
+      </trans-unit>
+      <trans-unit id="countryHelpPercent" datatype="html">
+        <source><x id="PH" equiv-text="fmtNum(percent)"/>% dei dati da <x id="PH_1" equiv-text="countryName"/> è <x id="PH_2" equiv-text="fmtName"/></source>
+      </trans-unit>
+      <trans-unit id="countryHelpTarget" datatype="html">
+        <source>Il bersaglio per <x id="PH" equiv-text="x.targetYear"/> (<x id="PH_1" equiv-text="tgtVal"/>) è <x id="PH_2" equiv-text="tgtPct"/>% completo</source>
       </trans-unit>
       <trans-unit id="countryTargetProgess" datatype="html">
         <source>Progressione dei dati</source>
@@ -296,9 +319,6 @@
       </trans-unit>
       <trans-unit id="gridColHeaderView" datatype="html">
         <source>Visualizza in Europeana</source>
-      </trans-unit>
-      <trans-unit id="targetCountriesMenu" datatype="html">
-        <source>2025 / 2030 Bersagli</source>
       </trans-unit>
       <trans-unit id="landingPageTitle" datatype="html">
         <source>Europeana dataset completo</source>

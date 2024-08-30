@@ -38,11 +38,23 @@ $flag-orb-dimension: 1.6rem;
   display: inline-block;
 }
 
+.main-speech-bubble-wrapper,
+.help-speech-bubble-wrapper {
+  .speech-bubble {
+    padding: 4px 8px;
+    .help-speech-bubble-content {
+      color: $gray-med;
+    }
+  }
+}
+
 .help-speech-bubble-wrapper .speech-bubble {
-  padding: 4px 8px;
   white-space: nowrap;
-  .help-speech-bubble-content {
-    color: $gray-med;
+}
+
+.entry-card {
+  .main-speech-bubble-wrapper .speech-bubble {
+    display: inline-block;
   }
 }
 

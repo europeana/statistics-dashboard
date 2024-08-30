@@ -110,6 +110,16 @@ export const externalLinks = {
   }
 };
 
+const tooltipLink = `<a target="_blank" href="${externalLinks.europeana}">Europeana.eu</a>`;
+
+export const targetDescriptions = {
+  // eslint-disable-next-line max-len
+  three_d: $localize`:@@targetDescriptions3D:Digital objects found in ${tooltipLink} conforming to content tier 1 and higher which consist of three dimensions (such as 3D models or landscapes).`,
+  // eslint-disable-next-line max-len
+  high_quality: $localize`:@@targetDescriptionsHQ:Digital objects found in ${tooltipLink} which conform to content tiers 2, 3 or 4 and metadata tiers A, B or C according to the Europeana Publishing Framework.`,
+  total: $localize`:@@targetDescriptionsTOTAL:All digital objects found in ${tooltipLink} conforming to content tier 1 and higher.`
+};
+
 export const memberStateCountryCodes = [
   'AT',
   'BE',

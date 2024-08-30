@@ -260,7 +260,11 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * if it's a CountryComponent or a LandingComponent:
    *    - updates the compenent ref and ctZero control value
    *    - assigns landing data
-   * @param { LandingComponent | OverviewComponent | CountryComponent| PrivacyStatementComponent | CookiePolicyComponent: component } - the loaded component
+   *
+   * @param { LandingComponent | OverviewComponent |
+   *   CountryComponent| PrivacyStatementComponent |
+   *   CookiePolicyComponent: component } - the loaded component
+   *
    **/
   onOutletLoaded(
     component:

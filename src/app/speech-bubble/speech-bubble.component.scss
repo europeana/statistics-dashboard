@@ -21,6 +21,7 @@ $arrow-rotation-rest: 330deg;
 }
 
 // bottom and top
+.speech-bubble.arrow-bottom-left,
 .speech-bubble.arrow-bottom-right,
 .speech-bubble.arrow-top-right {
   &::after,
@@ -28,11 +29,30 @@ $arrow-rotation-rest: 330deg;
     border-bottom-width: $arrow-height;
     border-left-width: $arrow-height;
     border-right: $arrow-width solid #d8d8d8;
-    right: 11px;
   }
   &::after {
     border-right-color: #fff;
     z-index: 1;
+  }
+}
+
+.speech-bubble.arrow-bottom-right,
+.speech-bubble.arrow-top-right {
+  &::after,
+  &::before {
+    right: 11px;
+  }
+}
+
+// bottom-left only
+.speech-bubble.arrow-bottom-left {
+  &::after,
+  &::before {
+    left: 11px;
+    bottom: -11px;
+  }
+  &::after {
+    transform: scale(0.8) translate(2px, -2px);
   }
 }
 

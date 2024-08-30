@@ -31,7 +31,8 @@ import {
   eliData,
   externalLinks,
   isoCountryCodes,
-  isoCountryCodesReversed
+  isoCountryCodesReversed,
+  targetDescriptions
 } from '../_data';
 import {
   BreakdownResults,
@@ -51,7 +52,8 @@ import {
   RenameApiFacetShortPipe,
   RenameCountryPipe,
   RenameTargetTypeLongPipe,
-  RenameTargetTypePipe
+  RenameTargetTypePipe,
+  StripMarkupPipe
 } from '../_translate';
 
 import { AppendiceSectionComponent } from '../appendice-section';
@@ -93,7 +95,8 @@ import { TruncateComponent } from '../truncate';
     RenameCountryPipe,
     RenameApiFacetPipe,
     RenameApiFacetShortPipe,
-    RenameTargetTypePipe
+    RenameTargetTypePipe,
+    StripMarkupPipe
   ]
 })
 export class CountryComponent extends SubscriptionManager {
@@ -107,6 +110,7 @@ export class CountryComponent extends SubscriptionManager {
   public eliDocNum = eliData.eliDocNum;
   public eliUrl = eliData.eliUrl;
   public eliTitle = eliData.eliTitle;
+  public targetDescriptions = targetDescriptions;
 
   renameTargetTypePipe = new RenameTargetTypeLongPipe();
   abbreviateNumberPipe = new AbbreviateNumberPipe();
@@ -348,7 +352,6 @@ export class CountryComponent extends SubscriptionManager {
    **/
   setCountryToParam(country: string): void {
     this.country = country;
-
     const specificCountryData = this.countryData[country];
 
     if (specificCountryData && specificCountryData.length) {
@@ -386,10 +389,11 @@ export class CountryComponent extends SubscriptionManager {
 
       this.tooltipsTotal[
         valName
-      ] = `${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
+      ] = $localize`:@@countryHelpTotal:${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
 
-      this.tooltipsPercent[valName] =
-        fmtNum(percent) + `% of the data from ${countryName} is ${fmtName}`;
+      this.tooltipsPercent[valName] = $localize`:@@countryHelpPercent:${fmtNum(
+        percent
+      )}% of the data from ${countryName} is ${fmtName}`;
 
       // percentages
       this.latestCountryPercentages[valName] = percent;
@@ -411,7 +415,7 @@ export class CountryComponent extends SubscriptionManager {
           const tgtPct = fmtNum(
             this.latestCountryPercentageOfTargets[valName][i]
           );
-          return `The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
+          return $localize`:@@countryHelpTarget:The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
         }
       );
     });

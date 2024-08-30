@@ -67,7 +67,7 @@
 
   <ng-template
     #cardSummary
-    let-name="name"
+    let-valName="valName"
     let-dimension="dimension"
     let-percent="percent"
     let-value="value"
@@ -86,10 +86,10 @@
             i18n="landing chart summary percentage@@countryChartSummaryData"
             class="help-opener"
           >
-            Data
+            Target
           </span>
         </span>
-        <span class="total bold">{{ name | renameTargetType }}</span>
+        <span class="total bold">{{ valName | renameTargetType }}</span>
       </span>
       <span class="container-v">
         <span
@@ -112,19 +112,29 @@
           <ng-container *ngIf="isPowerLevel; else defaultCopy">
             <span
               class="hide-on-triple"
-              i18n="landing chart summary percentage@@countryChartSummaryTotal"
-              >Total {{ name | renameTargetType }} items count</span
-            >
-            <span
-              class="show-on-triple"
               i18n="
-                landing chart summary percentage@@countryChartSummaryTotalShort"
-              >Items</span
+                landing chart summary percentage@@countryChartSummaryTotalLong"
+              >Current items</span
             >
+            <span class="show-on-triple">
+              <span
+                class="xxl-only"
+                i18n="
+                  landing chart summary percentage@@countryChartSummaryTotal"
+                >Current Items</span
+              >
+              <span
+                class="xxl-fallback"
+                i18n="
+                  landing chart summary
+                  percentage@@countryChartSummaryTotalShort"
+                >Items</span
+              >
+            </span>
             <div class="help-speech-bubble-wrapper help-items">
               <app-speech-bubble [arrowBottomRight]="true">
                 <span class="help-speech-bubble-content">
-                  {{ tooltipsTotal[name] }}
+                  {{ tooltipsTotal[valName] }}
                 </span>
               </app-speech-bubble>
             </div>
@@ -137,12 +147,12 @@
           }"
         >
           <span class="hide-on-triple">{{ value | number }}</span>
-          <span class="show-on-triple" [attr.title]="tooltipsTotal[name]">
+          <span class="show-on-triple" [attr.title]="tooltipsTotal[valName]">
             {{ value | abbreviateNumber }}
           </span>
         </span>
       </span>
-      <span class="container-v" *ngIf="name !== TargetFieldName.TOTAL">
+      <span class="container-v" *ngIf="valName !== TargetFieldName.TOTAL">
         <span
           class="total-title"
           [ngClass]="{
@@ -152,17 +162,22 @@
           <span
             class="hide-on-triple"
             i18n="
-              landing chart summary percentage@@countryChartSummaryPercentage"
-          >
-            Corresponding percentage
-          </span>
-          <span
-            class="show-on-triple"
-            i18n="
               landing chart summary
-              percentage@@countryChartSummaryPercentageShort"
+              percentage@@countryChartSummaryPercentageNonTriple"
           >
-            Percent of all items
+            Percent of all country items
+          </span>
+          <span class="show-on-triple">
+            <span
+              class="xxl-only"
+              i18n="landing chart summary@@countryChartSummaryPercentage"
+              >Pct. of country items</span
+            >
+            <span
+              class="xxl-fallback"
+              i18n="landing chart summary@@countryChartSummaryPercentageShort"
+              >Pct. of all</span
+            >
           </span>
         </span>
 
@@ -173,7 +188,7 @@
           }"
         >
           <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
-          <span class="show-on-triple" [attr.title]="tooltipsPercent[name]">
+          <span class="show-on-triple" [attr.title]="tooltipsPercent[valName]">
             {{ percent | number: "1.0-1" }}%</span
           >
         </span>
@@ -199,7 +214,7 @@
       *ngTemplateOutlet="
         cardSummary;
         context: {
-          name: valName,
+          valName: valName,
           value: latestCountryData[valName],
           percent: latestCountryPercentages[valName] || 0,
           isPowerLevel: true
@@ -276,11 +291,21 @@
       >
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
+          [attr.title]="
+            targetDescriptions[TargetFieldName.THREE_D] | stripMarkup
+          "
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.THREE_D)"
           ><span i18n="@@countryEntry3D">3D Data</span><span class="x"></span
         ></a>
-
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.THREE_D]"
+            ></span>
+          </app-speech-bubble>
+        </span>
         <div
           class="entry-card-content"
           *ngIf="
@@ -298,7 +323,7 @@
             "
           ></ng-content>
 
-          <span class="powerbar-subtitle">targets</span>
+          <span class="powerbar-subtitle">progress</span>
 
           <ng-content
             *ngTemplateOutlet="
@@ -353,9 +378,17 @@
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.HQ)"
+          [attr.title]="targetDescriptions[TargetFieldName.HQ] | stripMarkup"
           ><span i18n="@@countryEntryHQ">HQ Data</span><span class="x"></span
         ></a>
-
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.HQ]"
+            ></span>
+          </app-speech-bubble>
+        </span>
         <div
           class="entry-card-content"
           *ngIf="targetMetaData[country][TargetFieldName.HQ]; let targetsHQ"
@@ -370,7 +403,7 @@
             "
           ></ng-content>
 
-          <span class="powerbar-subtitle">targets</span>
+          <span class="powerbar-subtitle">progress</span>
 
           <ng-content
             *ngTemplateOutlet="
@@ -425,9 +458,17 @@
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.TOTAL)"
+          [attr.title]="targetDescriptions[TargetFieldName.TOTAL] | stripMarkup"
           ><span i18n="@@countryEntryAll">All Data</span><span class="x"></span
         ></a>
-
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.TOTAL]"
+            ></span>
+          </app-speech-bubble>
+        </span>
         <div
           class="entry-card-content entry-card-totals"
           *ngIf="
@@ -445,7 +486,7 @@
             "
           ></ng-content>
 
-          <span class="powerbar-subtitle">targets</span>
+          <span class="powerbar-subtitle">progress</span>
 
           <ng-content
             *ngTemplateOutlet="
@@ -570,7 +611,7 @@
                 cardSummary;
                 context: {
                   dimension: DimensionName.type,
-                  name: cardData[DimensionName.type][0].name,
+                  valName: cardData[DimensionName.type][0].name,
                   value: cardData[DimensionName.type][0].value,
                   percent: cardData[DimensionName.type][0].percent,
                   isPowerLevel: false
