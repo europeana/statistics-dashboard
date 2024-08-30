@@ -524,6 +524,11 @@
 }
 
 @media (min-width: $bp-desktop) {
+  // the "total" card is narrower than the others (unless a card is hidden)
+  .entry-card + .entry-card + .entry-card-total {
+    width: 40%;
+  }
+
   .entry-card-multi .entry-card {
     .main-speech-bubble-wrapper,
     .help-speech-bubble-wrapper {
@@ -544,14 +549,8 @@
       }
     }
 
-    &.entry-card-total {
-      width: 40%;
-
-      .help-speech-bubble-wrapper {
-        &.help-items {
-          right: -2.5em;
-        }
-      }
+    &.entry-card-total .help-speech-bubble-wrapper.help-items {
+      right: -2.5em;
     }
 
     .main-speech-bubble-wrapper {
@@ -574,6 +573,11 @@
     align-self: flex-start;
   }
 
+  // the "total" card can now be as wide as the others
+  .entry-card + .entry-card + .entry-card-total {
+    width: 50%;
+  }
+
   .entry-card-multi .entry-card {
     .main-speech-bubble-wrapper,
     .help-speech-bubble-wrapper {
@@ -582,10 +586,6 @@
     .main-speech-bubble-wrapper::after {
       // hover area
       height: 4.375em;
-    }
-
-    &.entry-card-total {
-      width: 50%;
     }
   }
 

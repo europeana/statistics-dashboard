@@ -105,10 +105,10 @@
         <source> Percento di tutti del paese </source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentage" datatype="html">
-        <source>Percentuale di tutti del paese</source>
+        <source>Pct. di tutti del paese</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageShort" datatype="html">
-        <source>Percento di tutti </source>
+        <source>Pct. di tutti </source>
       </trans-unit>
       <trans-unit id="countryLandingDataHeader" datatype="html">
         <source>OGGETTI FORNITI</source>
