@@ -517,14 +517,14 @@
 // media queries
 
 @media (min-width: $bp-med) {
-  .entry-card .main-speech-bubble-wrapper::after {
+  .entry-card-multi .entry-card .main-speech-bubble-wrapper::after {
     // hover area
     height: 4.5rem;
   }
 }
 
 @media (min-width: $bp-desktop) {
-  .entry-card {
+  .entry-card-multi .entry-card {
     .main-speech-bubble-wrapper,
     .help-speech-bubble-wrapper {
       font-size: 14px;
@@ -544,9 +544,13 @@
       }
     }
 
-    &.entry-card-total .help-speech-bubble-wrapper {
-      &.help-items {
-        right: -2.5em;
+    &.entry-card-total {
+      width: 40%;
+
+      .help-speech-bubble-wrapper {
+        &.help-items {
+          right: -2.5em;
+        }
       }
     }
 
@@ -570,7 +574,7 @@
     align-self: flex-start;
   }
 
-  .entry-card {
+  .entry-card-multi .entry-card {
     .main-speech-bubble-wrapper,
     .help-speech-bubble-wrapper {
       font-size: 16px;
@@ -578,6 +582,10 @@
     .main-speech-bubble-wrapper::after {
       // hover area
       height: 4.375em;
+    }
+
+    &.entry-card-total {
+      width: 50%;
     }
   }
 

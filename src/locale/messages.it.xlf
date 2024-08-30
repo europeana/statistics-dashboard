@@ -92,12 +92,14 @@
       <trans-unit id="countryChartSummaryTop" datatype="html">
         <source>Primi <x id="INTERPOLATION" equiv-text="{{ dimension }}"/> conteggio oggetti</source>
       </trans-unit>
-
+      <trans-unit id="countryChartSummaryTotalLong" datatype="html">
+        <source> oggetti attuali</source>
+      </trans-unit>
       <trans-unit id="countryChartSummaryTotal" datatype="html">
-        <source> Totale  <x id="INTERPOLATION" equiv-text="{{ name }}"/> conteggio oggetti</source>
+        <source> oggetti attuali</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryTotalShort" datatype="html">
-        <source> oggetti attuali </source>
+        <source> oggetti</source>
       </trans-unit>
       <trans-unit id="countryChartSummaryPercentageNonTriple" datatype="html">
         <source> Percento di tutti del paese </source>

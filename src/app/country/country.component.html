@@ -67,7 +67,7 @@
 
   <ng-template
     #cardSummary
-    let-name="name"
+    let-valName="valName"
     let-dimension="dimension"
     let-percent="percent"
     let-value="value"
@@ -89,7 +89,7 @@
             Target
           </span>
         </span>
-        <span class="total bold">{{ name | renameTargetType }}</span>
+        <span class="total bold">{{ valName | renameTargetType }}</span>
       </span>
       <span class="container-v">
         <span
@@ -112,19 +112,29 @@
           <ng-container *ngIf="isPowerLevel; else defaultCopy">
             <span
               class="hide-on-triple"
-              i18n="landing chart summary percentage@@countryChartSummaryTotal"
-              >Total {{ name | renameTargetType }} items count</span
-            >
-            <span
-              class="show-on-triple"
               i18n="
-                landing chart summary percentage@@countryChartSummaryTotalShort"
-              >Current Items</span
+                landing chart summary percentage@@countryChartSummaryTotalLong"
+              >Current items</span
             >
+            <span class="show-on-triple">
+              <span
+                class="xxl-only"
+                i18n="
+                  landing chart summary percentage@@countryChartSummaryTotal"
+                >Current Items</span
+              >
+              <span
+                class="xxl-fallback"
+                i18n="
+                  landing chart summary
+                  percentage@@countryChartSummaryTotalShort"
+                >Items</span
+              >
+            </span>
             <div class="help-speech-bubble-wrapper help-items">
               <app-speech-bubble [arrowBottomRight]="true">
                 <span class="help-speech-bubble-content">
-                  {{ tooltipsTotal[name] }}
+                  {{ tooltipsTotal[valName] }}
                 </span>
               </app-speech-bubble>
             </div>
@@ -137,12 +147,12 @@
           }"
         >
           <span class="hide-on-triple">{{ value | number }}</span>
-          <span class="show-on-triple" [attr.title]="tooltipsTotal[name]">
+          <span class="show-on-triple" [attr.title]="tooltipsTotal[valName]">
             {{ value | abbreviateNumber }}
           </span>
         </span>
       </span>
-      <span class="container-v" *ngIf="name !== TargetFieldName.TOTAL">
+      <span class="container-v" *ngIf="valName !== TargetFieldName.TOTAL">
         <span
           class="total-title"
           [ngClass]="{
@@ -178,7 +188,7 @@
           }"
         >
           <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
-          <span class="show-on-triple" [attr.title]="tooltipsPercent[name]">
+          <span class="show-on-triple" [attr.title]="tooltipsPercent[valName]">
             {{ percent | number: "1.0-1" }}%</span
           >
         </span>
@@ -204,7 +214,7 @@
       *ngTemplateOutlet="
         cardSummary;
         context: {
-          name: valName,
+          valName: valName,
           value: latestCountryData[valName],
           percent: latestCountryPercentages[valName] || 0,
           isPowerLevel: true
@@ -601,7 +611,7 @@
                 cardSummary;
                 context: {
                   dimension: DimensionName.type,
-                  name: cardData[DimensionName.type][0].name,
+                  valName: cardData[DimensionName.type][0].name,
                   value: cardData[DimensionName.type][0].value,
                   percent: cardData[DimensionName.type][0].percent,
                   isPowerLevel: false
