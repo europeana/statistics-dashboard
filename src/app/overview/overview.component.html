@@ -268,10 +268,49 @@
 
         <!-- Data Area -->
         <div class="data-area">
+          <!-- Country Page Shortcut Links -->
+          <ng-template #tmpCountryPageShortcuts>
+            <ng-container *ngIf="countryPageShortcutsAvailable">
+              <div class="country-shortcut-links-container">
+                <span class="flag-orb default" title="View country data"></span>
+                <app-speech-bubble [arrowTopRight]="true">
+                  <ul class="country-shortcuts">
+                    <li
+                      *ngFor="
+                        let countryCode of queryParams[DimensionName.country]
+                      "
+                    >
+                      <a
+                        [routerLink]="['/country', countryCode | renameCountry]"
+                        [queryParams]="{
+                          'content-tier-zero': form.value.contentTierZero
+                            ? true
+                            : undefined
+                        }"
+                      >
+                        <span>View</span>
+                        <span class="pad-word">{{
+                          countryCode | renameCountry
+                        }}</span>
+                        <span>data</span>
+                        <span class="flag-orb" [ngClass]="countryCode"> </span>
+                      </a>
+                    </li>
+                  </ul>
+                </app-speech-bubble>
+              </div>
+            </ng-container>
+          </ng-template>
+
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
 
           <!-- NO-DATA FALLBACK -->
           <div *ngIf="emptyDataset && !isLoading" class="no-data">
+            <!-- COUNTRY PAGE LINKS -->
+            <ng-content
+              *ngTemplateOutlet="tmpCountryPageShortcuts"
+            ></ng-content>
+
             <span i18n="Warn no results@@warnNoResults">No results found!</span>
             <ul>
               <li
@@ -293,6 +332,14 @@
               </li>
             </ul>
           </div>
+
+          <!-- COUNTRY PAGE LINK -->
+          <ng-container *ngIf="!emptyDataset">
+            <ng-content
+              *ngTemplateOutlet="tmpCountryPageShortcuts"
+            ></ng-content>
+          </ng-container>
+
           <!-- CHART AND SUMMARY -->
           <div class="chart-and-summary">
             <div class="chart-wrapper" [ngClass]="{ hidden: emptyDataset }">

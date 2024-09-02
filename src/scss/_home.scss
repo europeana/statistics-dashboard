@@ -5,13 +5,25 @@
 }
 
 .fit-to-page {
-  margin: 0;
+  $default-margin-size: 32px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+
   @media (min-width: $bp-small-3) {
-    margin: 0 32px 32px 32px;
+    margin-top: 0;
+    margin-right: $default-margin-size;
+    margin-bottom: $default-margin-size;
+    margin-left: $default-margin-size;
   }
 
   @media (min-width: $bp-xl) {
-    margin: 0 auto 32px auto;
+    margin-top: 0;
+    margin-right: auto;
+    margin-bottom: $default-margin-size;
+    margin-left: auto;
+
     max-width: $max-width;
     width: 80%;
   }

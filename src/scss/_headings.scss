@@ -1,9 +1,42 @@
 .page-title-wrapper {
   background: $offwhite;
-  margin-bottom: 0;
   padding: 16px;
-  position: sticky;
-  top: 3em;
+  display: grid;
+  grid-template-rows: 1fr;
+  left: 0;
+  right: 0;
+
+  &.dynamic {
+    position: absolute;
+    &.viewable {
+      $transition-time: 120ms;
+      transition: grid-template-rows $transition-time linear,
+        padding $transition-time linear, margin $transition-time linear;
+    }
+  }
+
+  &.fit-to-page.minified {
+    &:not(.viewable) {
+      margin-top: 0;
+      margin-bottom: 0;
+      padding: 0 16px;
+      overflow: hidden;
+      grid-template-rows: 0fr;
+    }
+
+    // save the extra space with non-MS-countries
+    &.viewable:not(.dynamic) {
+      margin-bottom: -23px;
+    }
+
+    .page-title {
+      display: none;
+    }
+
+    & > * {
+      overflow: hidden;
+    }
+  }
 }
 
 .page-title {

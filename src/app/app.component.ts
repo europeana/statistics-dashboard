@@ -29,8 +29,11 @@ import {
   GeneralResults,
   GeneralResultsFormatted
 } from './_models';
+import { CookiePolicyComponent } from './cookie-policy';
+import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
+import { PrivacyStatementComponent } from './privacy-statement';
 import { FooterComponent } from './footer/footer.component';
 import { HeaderComponent } from './header/header.component';
 
@@ -53,12 +56,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   formCTZero: FormGroup<{ contentTierZero: FormControl<boolean> }>;
   landingData: GeneralResultsFormatted;
   landingComponentRef: LandingComponent;
+  countryComponentRef: CountryComponent;
   paramNameCTZero = 'content-tier-zero';
-  showPageTitle: boolean;
+  showPageTitle: number;
   lastSetContentTierZeroValue = false;
   skipLocationUpdate = false;
   maintenanceInfo?: MaintenanceItem = undefined;
 
+  @ViewChild('header') header: HeaderComponent;
   @ViewChild('consentContainer', { read: ViewContainerRef })
   consentContainer: ViewContainerRef;
 
@@ -109,7 +114,16 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         } else {
           this.skipLocationUpdate = false;
         }
-        this.loadLandingData(this.lastSetContentTierZeroValue);
+
+        // load landing data if on country page or landing page
+        const path = this.location.path();
+        if (path.split('?')[0] === '' || path.split('/country')[0] === '') {
+          this.loadLandingData(this.lastSetContentTierZeroValue);
+        }
+        if (this.countryComponentRef) {
+          this.countryComponentRef.includeCTZero =
+            this.lastSetContentTierZeroValue;
+        }
       })
     );
   }
@@ -131,13 +145,20 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     return this.formCTZero.get('contentTierZero') as FormControl;
   }
 
-  /** loadLandingData
-  /* - loads the general breakdown data
-  /* - sets data on landingComponentRef
-  /* @param { boolean: includeCTZero } - request content-tier-zero
-  */
+  /*** loadLandingData
+   * - resets local landingData object
+   * - loads the general breakdown data / reconstructs local object
+   * - sets landingComponentRef landingData to local object
+   * - derives countryTotalMap data and assigns to header component
+   * @param { boolean: includeCTZero } - request content-tier-zero
+   ***/
   loadLandingData(includeCTZero: boolean): void {
-    this.landingComponentRef.isLoading = true;
+    if (this.landingComponentRef) {
+      this.landingComponentRef.isLoading = true;
+    }
+
+    const countryTotalMap: { [key: string]: number } = {};
+
     this.subs.push(
       this.api
         .getGeneralResults(includeCTZero)
@@ -153,36 +174,64 @@ export class AppComponent extends SubscriptionManager implements OnInit {
                 };
               }
             );
+            if (br.breakdownBy === 'country') {
+              br.results.forEach((result: CountPercentageValue) => {
+                countryTotalMap[result.value] = result.percentage;
+              });
+            }
           });
-          this.landingComponentRef.includeCTZero = includeCTZero;
-          this.landingComponentRef.landingData = this.landingData;
-          this.landingComponentRef.isLoading = false;
+
+          if (this.landingComponentRef) {
+            this.landingComponentRef.includeCTZero = includeCTZero;
+            this.landingComponentRef.landingData = this.landingData;
+            this.landingComponentRef.isLoading = false;
+          }
+
+          // assign country data
+          this.header.countryTotalMap = countryTotalMap;
         })
     );
   }
 
-  /**
-   * handleLocationPopState
-   * capture "back" and "forward" events / sync with form data
-   * @param { PopStateEvent } state - the event
+  /** setContentTierZeroValue
+   *
+   * - updates lastSetContentTierZeroValue
+   * - aligns the content-tier zero control's value,
+   *   flagging (via skipLocationUpdate) that the
+   *   value change should not trigger another url
+   *
+   * @param { boolean } value - the value to set
    **/
-  handleLocationPopState(state: PopStateEvent): void {
-    if (this.landingComponentRef) {
-      const ctrlCTZero = this.getCtrlCTZero();
-      this.lastSetContentTierZeroValue =
-        `${state.url}`.indexOf('content-tier-zero=true') > -1;
+  setContentTierZeroValue(value: boolean): void {
+    const ctrlCTZero = this.getCtrlCTZero();
 
-      if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-        this.skipLocationUpdate = true;
-        ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-      }
+    this.lastSetContentTierZeroValue = value;
+    if (value !== ctrlCTZero.value) {
+      this.skipLocationUpdate = true;
+      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
     }
   }
 
-  /** ngOnInit
-  /* - bind queryParam events to lastSetContentTierZeroValue
-  /* - bind location back / forward events to form
-  */
+  /**
+   * handleLocationPopState
+   * capture "back" and "forward" events and align the value of
+   * the content-tier zero control with that in the (popped) url,
+   * flagging (via skipLocationUpdate) that the value change
+   * should not trigger another url change in turn
+   *
+   * @param { PopStateEvent } state - the event
+   **/
+  handleLocationPopState(state: PopStateEvent): void {
+    this.setContentTierZeroValue(
+      `${state.url}`.indexOf('content-tier-zero=true') > -1
+    );
+  }
+
+  /**
+   * ngOnInit
+   * - bind queryParam events to lastSetContentTierZeroValue
+   * - bind location back / forward events to form
+   **/
   ngOnInit(): void {
     this.subs.push(
       this.route.queryParams.subscribe((params: Params) => {
@@ -192,47 +241,66 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       })
     );
     this.location.subscribe(this.handleLocationPopState.bind(this));
+    this.buildForm();
   }
 
-  /** onOutletLoaded
-  /* - invoked when router component loads
-  /*    - handles component data binding (since @Input() is unavailable in router-outlet)
-  /*    - sets showPageTitle
-  /* - if it's the landing page (first visit):
-  /*      - builds the form
-  /*      - loads the landing data
-  /*    - sets landingComponentRef data
-  /*    - and if it's the first arrival it:
-  /* - (subsequent vist)
-  /*    - reassigns existing landing data to landingComponentRef unless stale
-  /*    - triggers data reload if form data is stale
-  /* - (OverviewComponent)
-  /*    - unassigns landingComponentRef
-  /*
-  /* @param { LandingComponent | OverviewComponent: component } - route component
-  */
-  onOutletLoaded(component: LandingComponent | OverviewComponent): void {
+  setCTZeroInputToLastSetValue(ctrlCTZero: FormControl): void {
+    this.skipLocationUpdate = true;
+    ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
+  }
+
+  /**
+   * onOutletLoaded
+   * invoked when router component loads a component
+   *    - sets showPageTitle
+   * if it's an OverviewComponent
+   *    - sets the component locale
+   *    - (and if countryTotalMap is unset)
+   *      - loads the landing data
+   * if it's a CountryComponent or a LandingComponent:
+   *    - updates the compenent ref and ctZero control value
+   *    - assigns landing data
+   *
+   * @param { LandingComponent | OverviewComponent |
+   *   CountryComponent| PrivacyStatementComponent |
+   *   CookiePolicyComponent: component } - the loaded component
+   *
+   **/
+  onOutletLoaded(
+    component:
+      | LandingComponent
+      | OverviewComponent
+      | CountryComponent
+      | PrivacyStatementComponent
+      | CookiePolicyComponent
+  ): void {
+    const ctrlCTZero = this.getCtrlCTZero();
     if (component instanceof LandingComponent) {
-      this.showPageTitle = true;
+      this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
       this.landingComponentRef = component;
       this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
-
-      if (!this.formCTZero) {
-        this.buildForm();
-        this.loadLandingData(this.formCTZero.value.contentTierZero);
-      } else {
-        const ctrlCTZero = this.getCtrlCTZero();
-        if (this.lastSetContentTierZeroValue !== ctrlCTZero.value) {
-          this.skipLocationUpdate = true;
-          ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
-        } else {
-          this.landingComponentRef.landingData = this.landingData;
-        }
+      this.setCTZeroInputToLastSetValue(ctrlCTZero);
+      if (this.landingData) {
+        this.landingComponentRef.landingData = this.landingData;
       }
     } else {
-      component.locale = this.locale;
       this.landingComponentRef = undefined;
-      this.showPageTitle = false;
+      if (component instanceof OverviewComponent) {
+        component.locale = this.locale;
+        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
+      } else if (component instanceof CountryComponent) {
+        this.countryComponentRef = component;
+        component.includeCTZero = this.lastSetContentTierZeroValue;
+        this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
+        if (!this.header.countryTotalMap) {
+          this.setCTZeroInputToLastSetValue(ctrlCTZero);
+        }
+      } else {
+        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
+      }
+      if (!this.header.countryTotalMap) {
+        this.loadLandingData(this.lastSetContentTierZeroValue);
+      }
     }
   }
 
@@ -263,14 +331,17 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     }
   }
 
-  /** updateLocation
-  /* - track form state in window location
-  */
+  /**
+   * updateLocation
+   * toggle this.paramNameCTZero in window location
+   **/
   updateLocation(): void {
+    const path = this.location.path().split('?')[0];
+
     if (this.formCTZero.value.contentTierZero) {
-      this.location.go(`/?${this.paramNameCTZero}=true`);
+      this.location.go(`${path}?${this.paramNameCTZero}=true`);
     } else {
-      this.location.go('/');
+      this.location.go(path);
     }
   }
 }

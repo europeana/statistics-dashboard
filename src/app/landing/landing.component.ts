@@ -10,16 +10,19 @@ import {
 import { Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { externalLinks } from '../_data';
+import { externalLinks, isoCountryCodes } from '../_data';
 import { DimensionName, GeneralResultsFormatted } from '../_models';
-import { RenameApiFacetPipe, RenameApiFacetShortPipe } from '../_translate';
+import {
+  RenameApiFacetPipe,
+  RenameApiFacetShortPipe,
+  RenameCountryPipe
+} from '../_translate';
 import { BarComponent } from '../chart';
 import { MapComponent } from '../chart/map/map.component';
 import { ResizeComponent } from '../resize';
 import { TruncateComponent } from '../truncate';
 
 @Component({
-  selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
   standalone: true,
@@ -37,12 +40,14 @@ import { TruncateComponent } from '../truncate';
     LowerCasePipe,
     DecimalPipe,
     RenameApiFacetPipe,
-    RenameApiFacetShortPipe
+    RenameApiFacetShortPipe,
+    RenameCountryPipe
   ]
 })
 export class LandingComponent {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
+  public isoCountryCodes = isoCountryCodes;
 
   // Used to parameterise links to the data page
   @Input() includeCTZero = false;
@@ -68,7 +73,7 @@ export class LandingComponent {
 
   refreshCharts(): void {
     if (this.barCharts) {
-      // Top tier records count
+      // Top tier items count
       setTimeout(() => {
         this.barCharts.toArray().forEach((bc) => {
           bc.removeAllSeries();

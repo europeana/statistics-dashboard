@@ -177,9 +177,9 @@ describe('FilterComponent', () => {
       return res;
     };
 
-    createFormControls(DimensionName.country, ['xxx', 'yyy', 'zzz']);
+    createFormControls(DimensionName.country, ['BE', 'DE', 'IT']);
     expect(component.getSetCheckboxValues(DimensionName.country)).toEqual(
-      'xxx, yyy, zzz'
+      'Belgium, Germany, Italy'
     );
 
     component.tierPrefix = 'Tier ';

@@ -1,0 +1,116 @@
+@import "../../scss/_variables";
+
+$arrow-height: 10px;
+$arrow-width: 5px;
+$arrow-rotation: 30deg;
+$arrow-rotation-rest: 330deg;
+
+.speech-bubble {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid $gray-5;
+  color: $gray-faint;
+  position: relative;
+  &::after,
+  &::before {
+    border-color: transparent;
+    border-style: solid;
+    content: "";
+    position: absolute;
+  }
+}
+
+// bottom and top
+.speech-bubble.arrow-bottom-left,
+.speech-bubble.arrow-bottom-right,
+.speech-bubble.arrow-top-right {
+  &::after,
+  &::before {
+    border-bottom-width: $arrow-height;
+    border-left-width: $arrow-height;
+    border-right: $arrow-width solid #d8d8d8;
+  }
+  &::after {
+    border-right-color: #fff;
+    z-index: 1;
+  }
+}
+
+.speech-bubble.arrow-bottom-right,
+.speech-bubble.arrow-top-right {
+  &::after,
+  &::before {
+    right: 11px;
+  }
+}
+
+// bottom-left only
+.speech-bubble.arrow-bottom-left {
+  &::after,
+  &::before {
+    left: 11px;
+    bottom: -11px;
+  }
+  &::after {
+    transform: scale(0.8) translate(2px, -2px);
+  }
+}
+
+// bottom-right only
+.speech-bubble.arrow-bottom-right {
+  &::after,
+  &::before {
+    bottom: -($arrow-height - 1);
+  }
+  &::before {
+    transform: rotate($arrow-rotation);
+  }
+  &::after {
+    transform: scale(0.8) translate(2px, -2px) rotate($arrow-rotation);
+  }
+}
+
+// top only
+.speech-bubble.arrow-top-right {
+  top: $arrow-height + 2;
+  right: -3px;
+  &::after,
+  &::before {
+    bottom: auto;
+    top: -($arrow-height - 1);
+  }
+  &::before {
+    transform: rotate($arrow-rotation-rest) scaleY(-1);
+  }
+  &::after {
+    transform: scale(0.8) scaleY(-1) translate(2px, -2px)
+      rotate($arrow-rotation);
+  }
+}
+
+// left
+.speech-bubble.arrow-top-left {
+  left: $arrow-height + 2;
+
+  &::after,
+  &::before {
+    border-top-width: $arrow-height;
+    border-left-width: $arrow-height;
+    border-right: $arrow-width solid #d8d8d8;
+    left: 0;
+  }
+
+  &::before {
+    left: -($arrow-height - 2);
+    transform: rotate(330deg);
+    top: -($arrow-height - 2);
+  }
+
+  &::after {
+    border-right-color: #fff;
+    left: -($arrow-height - 3.5);
+    transform: scale(0.8) rotate(330deg);
+    top: -($arrow-height - 3);
+    z-index: 1;
+  }
+}

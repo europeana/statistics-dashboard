@@ -7,6 +7,7 @@ import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
 
+import { isoCountryCodes } from '../../_data';
 import { APIService } from '../../_services';
 import { IHash, NameValue } from '../../_models';
 
@@ -39,7 +40,7 @@ export class MapComponent {
     private readonly zone: NgZone,
     private readonly api: APIService
   ) {
-    this.countryCodes = api.loadISOCountryCodes();
+    this.countryCodes = isoCountryCodes;
     am4core.options.autoDispose = true;
   }
 

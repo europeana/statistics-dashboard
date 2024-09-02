@@ -1,4 +1,5 @@
 import * as url from 'url';
+import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server';
 import {
@@ -14,6 +15,7 @@ import {
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
 import { CHO, IHashBoolean } from './_models/test-models';
+import { countryTargetData, targetData } from './static-country-data';
 import { DataGenerator } from './data-generator';
 
 new (class extends TestDataServer {
@@ -101,9 +103,14 @@ new (class extends TestDataServer {
       return;
     }
 
-    response.setHeader('Content-Type', 'application/json;charset=UTF-8');
     response.statusCode = 200;
 
+    if ((request.url as string) === '/matomo.js') {
+      fileSystem.createReadStream('test-data/fake-matomo.js').pipe(response);
+      return;
+    }
+
+    response.setHeader('Content-Type', 'application/json;charset=UTF-8');
     this.clearExclusions();
 
     if (request.method === 'POST') {
@@ -114,6 +121,12 @@ new (class extends TestDataServer {
       request.on('end', () => {
         this.sendResponse(response, JSON.parse(body) as BreakdownRequest);
       });
+    } else if (
+      (request.url as string) === '/statistics/europeana/target/country/all'
+    ) {
+      response.end(JSON.stringify(countryTargetData));
+    } else if ((request.url as string) === '/statistics/europeana/targets') {
+      response.end(JSON.stringify(targetData));
     } else {
       const route = request.url as string;
       const params = url.parse(route, true).query;

@@ -1,5 +1,11 @@
-import { Component } from '@angular/core';
-import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
+import { Component, Input } from '@angular/core';
+import {
+  DimensionName,
+  FmtTableData,
+  SortBy,
+  SortInfo,
+  TableRow
+} from '../_models';
 
 @Component({
   standalone: true,
@@ -7,6 +13,10 @@ import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
   template: ''
 })
 export class MockGridComponent {
+  @Input() facet: DimensionName;
+  @Input() isVisible: boolean;
+  @Input() tierPrefix: string;
+
   sortInfo: SortInfo = {
     by: SortBy.name,
     dir: -1

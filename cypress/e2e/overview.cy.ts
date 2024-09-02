@@ -7,6 +7,7 @@ context('Statistics Dashboard', () => {
     const selLinkHome = '[data-e2e=link-home]';
     const selCTZero = '.ct-zero input';
     const urlParamCTZero = 'content-tier-zero=true';
+    const selShortcuts = '.country-shortcut-links-container';
 
     it('should show for all urls', () => {
       facetNames.forEach((url: string) => {
@@ -58,6 +59,51 @@ context('Statistics Dashboard', () => {
       cy.get('.rm-filter input').first().click({ force: true });
       cy.get('.rm-filter').should('have.length', 0);
       cy.url().should('not.contain', filteredTypes[1]);
+    });
+
+    it('should provide shortcuts to the country page (3D)', () => {
+      const paramCountry = '?country=Austria';
+      const baseUrlContentTier = `/data/${DimensionName.contentTier}${paramCountry}`;
+      const baseUrlProvider = `/data/${DimensionName.provider}${paramCountry}`;
+      const paramType = '&type=3D';
+
+      // filter in the "contentTier" dimension
+
+      cy.visit(baseUrlContentTier);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlContentTier}${paramType}`);
+      cy.get(selShortcuts).should('exist');
+
+      // filter in the "provider" dimension
+
+      cy.visit(baseUrlProvider);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlProvider}${paramType}`);
+      cy.get(selShortcuts).should('exist');
+    });
+
+    it('should provide shortcuts to the country page (HQ)', () => {
+      const paramCountry = '&country=Austria';
+      const paramsHQ =
+        '?contentTier=2&contentTier=3&contentTier=4&metadataTier=A&metadataTier=B&metadataTier=C';
+      const baseUrlType = `/data/${DimensionName.type}${paramsHQ}`;
+      const baseUrlDataProvider = `/data/${DimensionName.dataProvider}${paramsHQ}`;
+
+      // filter in the "type" dimension
+      cy.visit(baseUrlType);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlType}${paramCountry}`);
+      cy.get(selShortcuts).should('exist');
+
+      // filter in the "dataProvider" dimension
+      cy.visit(baseUrlDataProvider);
+      cy.get(selShortcuts).should('not.exist');
+
+      cy.visit(`${baseUrlDataProvider}${paramCountry}`);
+      cy.get(selShortcuts).should('exist');
     });
   });
 });

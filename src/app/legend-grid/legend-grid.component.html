@@ -1,0 +1,179 @@
+<div class="legend-grid-wrapper">
+  <ng-template
+    #legendItemSeries
+    let-targetType="targetType"
+    let-series="series"
+    let-country="country"
+  >
+    <ul>
+      <li>
+        <a
+          (click)="toggleSeries(country, targetType, series)"
+          [ngClass]="{
+            'rolled-up': !series || series.isHidden || series.isHiding
+          }"
+          class="legend-item-series-toggle"
+        >
+          <span
+            class="marker"
+            [ngStyle]="{
+              backgroundColor:
+                series && !(series.isHidden || series.isHiding)
+                  ? series.fill
+                  : undefined,
+              borderColor:
+                series && (series.isHidden || series.isHiding)
+                  ? series.fill
+                  : undefined
+            }"
+          >
+          </span>
+          <span>
+            {{ targetType | renameTargetType }}
+          </span>
+          <span
+            class="target-total right"
+            *ngIf="countryData[country]"
+            [ngClass]="{ 'pad-right': targetType === TargetFieldName.HQ }"
+          >
+            {{
+              countryData[country][countryData[country].length - 1][targetType]
+                | number
+            }}
+          </span>
+        </a>
+      </li>
+      <li
+        class="roll-down-wrapper"
+        *ngIf="series && targetMetaData[country]"
+        [ngClass]="{ 'is-open': !(series.isHidden || series.isHiding) }"
+      >
+        <ul class="roll-down">
+          <li
+            class="indented"
+            [ngStyle]="{ color: series.fill }"
+            [ngClass]="{ bulleted: data.range }"
+            *ngFor="
+              let data of targetMetaData[country][targetType];
+              let i = index
+            "
+          >
+            <a
+              class="legend-item-target-toggle"
+              title="target for {{ data.targetYear }} (show / hide marker)"
+              (click)="
+                toggleRange(
+                  country,
+                  targetType,
+                  i,
+                  data.range ? undefined : series.fill
+                )
+              "
+            >
+              {{ data.targetYear }}
+              <span class="target-total range-value">{{
+                data.value | number
+              }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </ng-template>
+
+  <span
+    class="legend-grid scrollable-downwards"
+    (scroll)="gridScroll()"
+    #legendGrid
+  >
+    <ng-template
+      #countryBlock
+      let-country="country"
+      let-countryPinValue="countryPinValue"
+      let-isPinned="isPinned"
+      let-isTopPin="isTopPin"
+    >
+      <!-- offset the top by 10 if zero and is top -->
+      <span
+        class="legend-item-country-toggle"
+        [ngClass]="{
+          'stick-left': isPinned,
+          'perma-pin-left': isTopPin
+        }"
+        [ngStyle]="{
+          'top.px': isTopPin ? countryPinValue || 10 : countryPinValue
+        }"
+      >
+        <a (click)="toggleCountry(country)">
+          <span>{{ country | renameCountry }} </span>
+          <span class="save" [ngClass]="{ saved: isPinned }"></span>
+        </a>
+      </span>
+
+      <!-- offset the top by 10 if zero -->
+      <span
+        class="legend-grid-inner"
+        [ngClass]="{
+          'stick-right': isPinned
+        }"
+        [ngStyle]="{
+          'top.px': countryPinValue || 10
+        }"
+      >
+        <ng-container
+          *ngFor="
+            let enabled of [columnEnabled3D, columnEnabledHQ, columnEnabledALL];
+            let i = index
+          "
+          class="series-column"
+        >
+          <span *ngIf="enabled">
+            <span [ngClass]="{ 'top-pin': isTopPin }">
+              <ng-content
+                *ngTemplateOutlet="
+                  legendItemSeries;
+                  context: {
+                    series:
+                      lineChart.allSeriesData[
+                        country + TargetSeriesSuffixes[i]
+                      ],
+                    targetType: TargetFieldName[seriesValueNames[i]],
+                    country: country
+                  }
+                "
+              ></ng-content>
+
+              <ng-container *ngIf="isTopPin">
+                <span class="perma-pin">
+                  <a
+                    class="x"
+                    *ngIf="columnsEnabledCount > 1"
+                    (click)="
+                      fireUnpinColumn(TargetFieldName[seriesValueNames[i]])
+                    "
+                  ></a>
+                </span>
+              </ng-container>
+            </span>
+          </span>
+        </ng-container>
+      </span>
+    </ng-template>
+
+    <ng-container *ngFor="let country of targetCountries">
+      <ng-content
+        *ngTemplateOutlet="
+          countryBlock;
+          context: {
+            country: country,
+            countryPinValue: pinnedCountries[country],
+            isTopPin: pinnedCountries[country] === 0,
+            isPinned: pinnedCountries[country] > -1
+          }
+        "
+      ></ng-content>
+    </ng-container>
+
+    <span class="scrollable-indicator"></span>
+  </span>
+</div>

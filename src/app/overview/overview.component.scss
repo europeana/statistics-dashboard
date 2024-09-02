@@ -81,6 +81,10 @@ $width-left-col: 200px;
   justify-content: space-between;
 }
 
+.pad-word {
+  padding: 0 0.25em;
+}
+
 .rm-filter {
   align-items: center;
   background-color: $stats-blue;
@@ -331,7 +335,7 @@ label {
 
   .no-data {
     font-size: 24px;
-    ul {
+    ul:not(.country-shortcuts) {
       font-size: 14px;
       list-style: disc;
       margin: 12px 0 0 20px;
@@ -376,6 +380,39 @@ label {
       position: absolute;
       width: 14px;
     }
+  }
+}
+
+.country-shortcut-links-container {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.country-shortcuts {
+  padding: 8px;
+  font-size: 14px;
+
+  a {
+    align-items: center;
+    color: $linkblue;
+    display: flex;
+    justify-content: flex-end;
+    line-height: 1.8rem;
+
+    &:not(:hover) .flag-orb::after {
+      background-image: svg-url-icon-flag(#{$linkblue});
+      opacity: 0.2;
+    }
+  }
+
+  .flag-orb {
+    height: 12px;
+    width: 12px;
+    margin-left: 8px;
   }
 }
 

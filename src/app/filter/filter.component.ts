@@ -7,6 +7,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { isoCountryCodesReversed } from '../_data';
 import { getFormValueList } from '../_helpers';
 import {
   DimensionName,
@@ -121,7 +122,14 @@ export class FilterComponent {
   /* @param {DimensionName} filterName - the form value key
   */
   getSetCheckboxValues(filterName: DimensionName): string {
-    return getFormValueList(this.form, filterName)
+    let result = getFormValueList(this.form, filterName);
+
+    if (filterName === 'country') {
+      result = result.map((s: string) => {
+        return isoCountryCodesReversed[s];
+      });
+    }
+    return result
       .map((s: string) => {
         let prefix = '';
         if (
