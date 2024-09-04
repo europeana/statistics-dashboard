@@ -99,6 +99,16 @@ export class LineComponent implements AfterViewInit {
       this.chart.paddingRight = this.padding.rightDefault;
     }
 
+    // optionally disable the axes
+    let disabled = true;
+    this.valueAxis.series.each(function (series) {
+      if (!series.isHiding && !series.isHidden) {
+        disabled = false;
+      }
+    });
+    this.valueAxis.disabled = disabled;
+    this.dateAxis.disabled = disabled;
+
     return allRemovals;
   }
 
@@ -188,7 +198,7 @@ export class LineComponent implements AfterViewInit {
   /**
    * addSeries
    * adds a LineSeries object to the chart / stores ref to this.allSeriesData
-   * adds the (renmed) series data to the chart data
+   * adds the (renamed) series data to the chart data
    * @param { string } axisLabel - axis label
    * @param { string } seriesValueY - unique per-series per-country series key
    * @param { TargetFieldName } valueY
@@ -207,8 +217,23 @@ export class LineComponent implements AfterViewInit {
     series.tooltipText = `${axisLabel} {${seriesValueY}}`;
     series.tooltip.pointerOrientation = 'vertical';
     series.tooltip.getFillFromObject = true;
+    series.events.on('shown', () => {
+      this.dateAxis.disabled = false;
+      this.valueAxis.disabled = false;
+    });
 
     const chartData = this.chart.data;
+
+    seriesData.sort((a: TargetData, b: TargetData) => {
+      const dateA = Date.parse(a.date);
+      const dateB = Date.parse(b.date);
+      if (dateA > dateB) {
+        return 1;
+      } else if (dateB > dateA) {
+        return -1;
+      }
+      return 0;
+    });
 
     seriesData.forEach((sd: TargetData, rowIndex: number) => {
       const val = sd[valueY];
