@@ -145,8 +145,8 @@
     grid-template-rows: 1fr;
   }
 
-  * {
-    overflow: hidden;
+  & > * {
+    overflow-y: hidden;
   }
 }
 
