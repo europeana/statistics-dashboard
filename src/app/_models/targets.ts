@@ -19,6 +19,7 @@ export interface TargetMetaDataRaw extends TargetMetaDataBase {
 
 export interface TargetMetaData extends TargetMetaDataBase {
   range?: am4charts.ValueAxisDataItem;
+  rangeFakeSeries?: am4charts.LineSeries;
 }
 
 type TargetFieldNameType = {
