@@ -89,6 +89,17 @@ export class LineComponent implements AfterViewInit {
               this.valueAxis.axisRanges.removeValue(td.range);
               td.range.dispose();
               delete td.range;
+
+              // remove the fake series: this will restore the valueAxis zoom (if needed)
+              if (td.rangeFakeSeries) {
+                td.rangeFakeSeries.hide();
+                setTimeout(() => {
+                  if (td.rangeFakeSeries) {
+                    td.rangeFakeSeries.dispose();
+                    delete td.rangeFakeSeries;
+                  }
+                }, 1500);
+              }
             }
           });
         }
@@ -127,7 +138,9 @@ export class LineComponent implements AfterViewInit {
 
   /** createRange
    * creates and styles a (pinned) axisRange
-   * assigns reference for open / closing behaviour
+   * creates and adds a (fake) lineSeries
+   * assigns range reference for open / closing behaviour
+   * assigns rangeFakeSeries reference for disposal
    **/
   createRange(targetData: TargetMetaData, colour: am4core.Color): void {
     const colourPin = am4core.color('#0c529c'); // eu-flag colour
@@ -181,7 +194,8 @@ export class LineComponent implements AfterViewInit {
     const fnRangeClicked = (): void => {
       const targetMargin = 40;
       if (range.endValue === range.value) {
-        range.endValue = range.value * (targetMargin / 100);
+        range.endValue = (range.value / 100) * (100 - targetMargin);
+
         pin.background.pointerAngle = 90;
         pin.dx = defaultPinDx + 100;
         pin.dy = defaultPinDy - 3;
@@ -193,6 +207,14 @@ export class LineComponent implements AfterViewInit {
     };
     setRangeAndPinDefaults();
     range.label.events.on('hit', fnRangeClicked);
+
+    // add fake series: this forces the valueAxis to zoom (if needed)
+    const fakeSeries = this.addSeries('X', 'X', 'X' as TargetFieldName, [
+      {
+        X: range.value
+      } as unknown as TargetData
+    ]);
+    targetData.rangeFakeSeries = fakeSeries;
   }
 
   /**
@@ -203,13 +225,14 @@ export class LineComponent implements AfterViewInit {
    * @param { string } seriesValueY - unique per-series per-country series key
    * @param { TargetFieldName } valueY
    * @param { Array<TargetData> } seriesData:
+   * @return am4charts.LineSeries
    **/
   addSeries(
     axisLabel: string,
     seriesValueY: string,
     valueY: TargetFieldName,
     seriesData: Array<TargetData>
-  ): void {
+  ): am4charts.LineSeries {
     const series = this.chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueY = seriesValueY;
     series.dataFields.dateX = 'date';
@@ -243,6 +266,7 @@ export class LineComponent implements AfterViewInit {
       chartData[rowIndex][seriesValueY] = val;
     });
     this.allSeriesData[seriesValueY] = series;
+    return series;
   }
 
   /** drawChart
