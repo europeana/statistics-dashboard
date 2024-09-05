@@ -590,7 +590,7 @@
   <!-- tertiary content -->
 
   <div *ngIf="showTargetsData" class="header-text non-target-text">
-    Explore items for {{ country }}
+    Explore items for {{ country | renameCountry }}
   </div>
 
   <div #scrollPoint>
