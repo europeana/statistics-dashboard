@@ -121,6 +121,7 @@ $window-size: $row-height;
   grid-column: 1 / calc($appendice-grid-num-cols + 1);
   grid-template-columns: subgrid;
   max-height: $grid-height;
+  overflow-x: hidden;
   overflow-y: auto;
   padding-top: $window-size;
 

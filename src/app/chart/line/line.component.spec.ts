@@ -63,6 +63,12 @@ describe('LineComponent', () => {
           // eslint-disable-next-line @typescript-eslint/no-empty-function
           dispose: () => {}
         } as unknown as am4charts.ValueAxisDataItem;
+        ob.rangeFakeSeries = {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          dispose: () => {},
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          hide: () => {}
+        } as unknown as am4charts.LineSeries;
       });
     });
 

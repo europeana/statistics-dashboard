@@ -537,7 +537,7 @@
 
     <div *ngIf="showTargetsData" class="entry-card double-card line-and-legend">
       <span class="entry-card-header"
-        ><span class="pad-word-right">{{ country }}</span
+        ><span class="pad-word-right">{{ country | renameCountry }}</span
         ><span i18n="@@countryTargetProgess">Data Progression</span></span
       >
       <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
