@@ -194,7 +194,8 @@ export class LineComponent implements AfterViewInit {
     const fnRangeClicked = (): void => {
       const targetMargin = 40;
       if (range.endValue === range.value) {
-        range.endValue = range.value * (targetMargin / 100);
+        range.endValue = (range.value / 100) * (100 - targetMargin);
+
         pin.background.pointerAngle = 90;
         pin.dx = defaultPinDx + 100;
         pin.dy = defaultPinDy - 3;
