@@ -22,6 +22,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
 import {
+  CountryHistoryRequest,
   IHash,
   IHashArray,
   TargetData,
@@ -165,6 +166,9 @@ export class LegendGridComponent {
   @Input() lineChart: LineComponent;
 
   @Output() unpinColumn: EventEmitter<TargetFieldName> = new EventEmitter();
+  @Output() onLoadHistory: EventEmitter<CountryHistoryRequest> =
+    new EventEmitter();
+
   @ViewChild('legendGrid') legendGrid: ElementRef;
 
   // country names mapped to pin offset
@@ -340,6 +344,24 @@ export class LegendGridComponent {
   toggleCountry(country: string): void {
     const countrySeries = this.getCountrySeries(country);
     if (countrySeries.length === 0) {
+      this.onLoadHistory.emit({
+        country: country,
+        fnCallback: (res) => {
+          // append to existing countryData
+          this.countryData[country] = this.countryData[country].concat(res);
+          this.lineChart.sortSeriesData(res);
+
+          // append to graph series data
+          for (let i = 0; i < TargetSeriesSuffixes.length; i++) {
+            this.lineChart.addSeriesData(
+              country + TargetSeriesSuffixes[i],
+              TargetFieldName[this.seriesValueNames[i]],
+              res
+            );
+          }
+        }
+      });
+
       this.addSeriesSetAndPin(country, this.countryData[country]);
     } else {
       const hasVisible =
@@ -489,7 +511,6 @@ export class LegendGridComponent {
         countryPinIndex = Object.keys(this.pinnedCountries).indexOf(country);
       }
       this.resetChartColors(countryPinIndex, typeIndex);
-
       this.lineChart.addSeries(
         country + this.seriesSuffixesFmt[typeIndex],
         country + TargetSeriesSuffixes[typeIndex],

@@ -97,6 +97,13 @@ describe('CountryComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should load the history', () => {
+    const country = 'DE';
+    const fnCallback = jasmine.createSpy();
+    component.loadHistory({ country: country, fnCallback: fnCallback });
+    expect(fnCallback).toHaveBeenCalled();
+  });
+
   it('should redirect (to home)', () => {
     spyOn(router, 'navigate');
     ['xxx', 'yyy', 'zzz'].forEach((code: string) => {

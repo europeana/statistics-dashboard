@@ -118,6 +118,21 @@ describe('LineComponent', () => {
     expect(component.chart.data.length).toBeTruthy();
   });
 
+  it('should add the series data', () => {
+    const country = 'DE';
+    const date = new Date().toISOString();
+    component.chart.data = [];
+    component.addSeriesData(country, TargetFieldName.THREE_D, [
+      {
+        three_d: '1',
+        high_quality: '2',
+        total: '5',
+        date: `${date}`
+      }
+    ]);
+    expect(Object.keys(component.chart.data).length).toBeGreaterThan(0);
+  });
+
   /*
   it('should toggle the grid lines', () => {
     expect(component.valueAxis.renderer.grid.template.disabled).toBeTruthy();

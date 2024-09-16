@@ -10,7 +10,11 @@ import {
 import * as am4charts from '@amcharts/amcharts4/charts';
 
 import { MockLineComponent } from '../_mocked';
-import { TargetFieldName, TargetSeriesSuffixes } from '../_models';
+import {
+  TargetCountryData,
+  TargetFieldName,
+  TargetSeriesSuffixes
+} from '../_models';
 import { LineComponent } from '../chart';
 import { LegendGridComponent } from '.';
 
@@ -231,9 +235,13 @@ describe('LegendGridComponent', () => {
     component.targetMetaData = mockTargetMetaData;
 
     spyOn(component, 'togglePin');
-    spyOn(component, 'addSeriesSetAndPin').and.callFake(() => {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-    });
+    spyOn(component, 'addSeriesSetAndPin');
+    spyOn(component.onLoadHistory, 'emit').and.callFake(
+      (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
+        component.countryData = { DE: [] };
+        req.fnCallback([]);
+      }
+    );
 
     component.toggleCountry('FR');
     expect(component.togglePin).toHaveBeenCalled();
@@ -244,6 +252,7 @@ describe('LegendGridComponent', () => {
     component.toggleCountry('DE');
     expect(component.togglePin).toHaveBeenCalledTimes(3);
 
+    expect(component.onLoadHistory.emit).not.toHaveBeenCalled();
     expect(component.addSeriesSetAndPin).not.toHaveBeenCalled();
 
     spyOn(component, 'getCountrySeries').and.callFake(() => {
@@ -253,6 +262,7 @@ describe('LegendGridComponent', () => {
 
     expect(component.togglePin).toHaveBeenCalledTimes(3);
     expect(component.addSeriesSetAndPin).toHaveBeenCalled();
+    expect(component.onLoadHistory.emit).toHaveBeenCalled();
   });
 
   it('should toggle the series', () => {

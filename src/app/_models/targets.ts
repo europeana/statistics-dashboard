@@ -35,3 +35,8 @@ export interface TargetCountryData extends TargetData {
 }
 
 export const TargetSeriesSuffixes = ['3D', 'high_quality', 'total'];
+
+export interface CountryHistoryRequest {
+  country: string;
+  fnCallback: (result: Array<TargetCountryData>) => void;
+}
