@@ -26,6 +26,7 @@ import {
   IHash,
   IHashArray,
   TargetData,
+  TargetCountryData,
   TargetFieldName,
   TargetMetaData,
   TargetSeriesSuffixes
@@ -346,17 +347,16 @@ export class LegendGridComponent {
     if (countrySeries.length === 0) {
       this.onLoadHistory.emit({
         country: country,
-        fnCallback: (res) => {
+        fnCallback: (data: Array<TargetCountryData>) => {
           // append to existing countryData
-          this.countryData[country] = this.countryData[country].concat(res);
-          this.lineChart.sortSeriesData(res);
-
+          this.countryData[country] = this.countryData[country].concat(data);
+          this.lineChart.sortSeriesData(data);
           // append to graph series data
           for (let i = 0; i < TargetSeriesSuffixes.length; i++) {
             this.lineChart.addSeriesData(
               country + TargetSeriesSuffixes[i],
               TargetFieldName[this.seriesValueNames[i]],
-              res
+              data
             );
           }
         }
