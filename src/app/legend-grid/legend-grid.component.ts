@@ -25,8 +25,8 @@ import {
   CountryHistoryRequest,
   IHash,
   IHashArray,
-  TargetData,
   TargetCountryData,
+  TargetData,
   TargetFieldName,
   TargetMetaData,
   TargetSeriesSuffixes

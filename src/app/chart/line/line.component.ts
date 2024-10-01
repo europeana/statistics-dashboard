@@ -223,7 +223,6 @@ export class LineComponent implements AfterViewInit {
    * @param { Array<TargetData> } seriesData:
    **/
   sortSeriesData(seriesData: Array<TargetData>): void {
-    const chartData = this.chart.data;
     seriesData.sort((a: TargetData, b: TargetData) => {
       const dateA = Date.parse(a.date);
       const dateB = Date.parse(b.date);
