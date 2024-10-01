@@ -124,7 +124,35 @@ new (class extends TestDataServer {
     } else if (
       (request.url as string) === '/statistics/europeana/target/country/all'
     ) {
-      response.end(JSON.stringify(countryTargetData));
+      const collected = [];
+      // take only the latest from each country
+      const result = countryTargetData
+        .reverse()
+        .filter((item: { country: string }) => {
+          if (collected.includes(item.country)) {
+            return false;
+          } else {
+            collected.push(item.country);
+            return true;
+          }
+        });
+      response.end(JSON.stringify(result));
+    } else if (
+      (request.url as string).includes(
+        '/statistics/europeana/target/country/historical'
+      )
+    ) {
+      // load specific country history
+      const route = request.url as string;
+      const params = url.parse(route, true).query;
+      const country = params['country'];
+      response.end(
+        JSON.stringify(
+          countryTargetData.filter((item: { country: string }) => {
+            return item.country === country;
+          })
+        )
+      );
     } else if ((request.url as string) === '/statistics/europeana/targets') {
       response.end(JSON.stringify(targetData));
     } else {

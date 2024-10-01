@@ -37,10 +37,12 @@ import {
 import {
   BreakdownResults,
   CountPercentageValue,
+  CountryHistoryRequest,
   DimensionName,
   IHash,
   IHashArray,
   NamesValuePercent,
+  TargetCountryData,
   TargetData,
   TargetFieldName,
   TargetMetaData
@@ -359,6 +361,20 @@ export class CountryComponent extends SubscriptionManager {
         specificCountryData[specificCountryData.length - 1];
       this.generateDerivedData();
     }
+  }
+
+  /** loadHistory
+   *
+   * @param {CountryHistoryRequest} request - the data request
+   **/
+  loadHistory(request: CountryHistoryRequest): void {
+    this.subs.push(
+      this.api
+        .loadCountryData(request.country)
+        .subscribe((data: Array<TargetCountryData>) => {
+          request.fnCallback(data);
+        })
+    );
   }
 
   /** generateDerivedData

@@ -218,6 +218,47 @@ export class LineComponent implements AfterViewInit {
   }
 
   /**
+   * sortSeriesData
+   * sorts seriesData by date
+   * @param { Array<TargetData> } seriesData:
+   **/
+  sortSeriesData(seriesData: Array<TargetData>): void {
+    const chartData = this.chart.data;
+    seriesData.sort((a: TargetData, b: TargetData) => {
+      const dateA = Date.parse(a.date);
+      const dateB = Date.parse(b.date);
+      if (dateA > dateB) {
+        return 1;
+      } else if (dateB > dateA) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
+  /**
+   * addSeriesData
+   * sorts seriesData by date
+   * extracts series values to chart
+   * @param { string } seriesValueY - unique per-series per-country series key
+   * @param { Array<TargetData> } seriesData:
+   **/
+  addSeriesData(
+    seriesValueY: string,
+    valueY: TargetFieldName,
+    seriesData: Array<TargetData>
+  ): void {
+    const chartData = this.chart.data;
+    seriesData.forEach((sd: TargetData, rowIndex: number) => {
+      const val = sd[valueY];
+      if (rowIndex >= chartData.length) {
+        chartData.push(sd);
+      }
+      chartData[rowIndex][seriesValueY] = val;
+    });
+  }
+
+  /**
    * addSeries
    * adds a LineSeries object to the chart / stores ref to this.allSeriesData
    * adds the (renamed) series data to the chart data
@@ -244,27 +285,7 @@ export class LineComponent implements AfterViewInit {
       this.dateAxis.disabled = false;
       this.valueAxis.disabled = false;
     });
-
-    const chartData = this.chart.data;
-
-    seriesData.sort((a: TargetData, b: TargetData) => {
-      const dateA = Date.parse(a.date);
-      const dateB = Date.parse(b.date);
-      if (dateA > dateB) {
-        return 1;
-      } else if (dateB > dateA) {
-        return -1;
-      }
-      return 0;
-    });
-
-    seriesData.forEach((sd: TargetData, rowIndex: number) => {
-      const val = sd[valueY];
-      if (rowIndex >= chartData.length) {
-        chartData.push(sd);
-      }
-      chartData[rowIndex][seriesValueY] = val;
-    });
+    this.addSeriesData(seriesValueY, valueY, seriesData);
     this.allSeriesData[seriesValueY] = series;
     return series;
   }

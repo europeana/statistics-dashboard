@@ -87,6 +87,10 @@ export class MockLineComponent {
     console.log('MockLineComponent addSeries');
   }
 
+  addSeriesData(_, __, ___): void {
+    console.log('MockLineComponent addSeriesData');
+  }
+
   removeRange(
     country: string,
     specificValueName?: string,
@@ -115,6 +119,10 @@ export class MockLineComponent {
 
   hideRange(_: string, __: number): void {
     console.log('MockLineComponent hideRange');
+  }
+
+  sortSeriesData(_): void {
+    console.log('MockLineComponent sortSeriesData');
   }
 
   toggleCursor(): void {

@@ -26,6 +26,7 @@ export class APIService {
   suffixRightsUrls = 'statistics/rights/urls';
   suffixTargetsUrl = 'statistics/europeana/targets';
   suffixCountryTargetsUrl = 'statistics/europeana/target/country/all';
+  suffixCountryHistoricalUrl = 'statistics/europeana/target/country/historical';
 
   constructor(private readonly http: HttpClient) {}
 
@@ -140,11 +141,23 @@ export class APIService {
     );
   }
 
-  loadCountryData(): Observable<Array<TargetCountryData>> {
+  /**
+   * loadCountryData
+   *   loads shallow data:
+   *   - all countries latest
+   *   or deep data
+   *   - single country historical
+   *
+   * @param { string? } country - flags deep load
+   **/
+  loadCountryData(country?: string): Observable<Array<TargetCountryData>> {
+    let url = `${this.suffixCountryTargetsUrl}`;
+    if (country) {
+      url = `${this.suffixCountryHistoricalUrl}?country=${country}`;
+    }
+
     const res = this.http.get<Array<TargetCountryData>>(
-      this.replaceDoubleSlashes(
-        `${environment.serverAPI}/${this.suffixCountryTargetsUrl}`
-      )
+      this.replaceDoubleSlashes(`${environment.serverAPI}/${url}`)
     );
 
     return res.pipe(

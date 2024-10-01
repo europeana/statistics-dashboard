@@ -556,6 +556,7 @@
             [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
             [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
             (unpinColumn)="toggleColumn($event)"
+            (onLoadHistory)="loadHistory($event)"
           ></app-legend-grid>
         </div>
 
