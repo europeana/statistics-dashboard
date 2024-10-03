@@ -8,8 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag_name }}
-
+          ref: ${{ github.event.inputs.tag_name || github.ref_name }}
       - name: Get Project LCOV
         uses: actions/download-artifact@master
         with:
