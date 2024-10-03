@@ -338,7 +338,15 @@
 
 // prevent user from deleting everything
 .entry-card:first-child:last-child .column-close {
-  pointer-events: none;
+  cursor: default;
+  &:active {
+    // this prevents clicks from completing
+    // it's applied on the active state to preserve the tooltip
+    pointer-events: none;
+  }
+  &:hover .x {
+    opacity: 0;
+  }
 }
 
 .entry-card-content {
