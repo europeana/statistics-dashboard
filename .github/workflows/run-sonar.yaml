@@ -2,7 +2,6 @@ name: '- helper (sonar)'
 on: workflow_call
 jobs:
   run-sonar:
-    if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
