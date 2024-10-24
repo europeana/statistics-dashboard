@@ -47,8 +47,7 @@
       ></span>
 
       <span
-        class="cell-live"
-        [ngClass]="{ 'cell-line': !!headerValue }"
+        class="cell-live cell-line"
         [attr.style]="'border-left-color: ' + colour"
       >
         {{ headerValue | number }}
