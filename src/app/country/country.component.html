@@ -215,7 +215,7 @@
         cardSummary;
         context: {
           valName: valName,
-          value: latestCountryData[valName],
+          value: latestCountryData[valName] || 0,
           percent: latestCountryPercentages[valName] || 0,
           isPowerLevel: true
         }
