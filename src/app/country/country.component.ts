@@ -389,7 +389,7 @@ export class CountryComponent extends SubscriptionManager {
 
     Object.values(TargetFieldName).forEach((valName: string) => {
       const countryName = isoCountryCodesReversed[this.country];
-      const value = this.latestCountryData[valName];
+      const value = this.latestCountryData[valName] || 0;
       const fmtName = this.renameTargetTypePipe.transform(valName);
       const fmtValue = fmtNum(value, '1.0-2');
       const itemPluralString = `item${value === 1 ? '' : 's'}`;
@@ -417,8 +417,8 @@ export class CountryComponent extends SubscriptionManager {
       const targets = this.targetMetaData[this.country][valName];
 
       this.latestCountryPercentageOfTargets[valName] = [
-        (value || 0) / targets[0].value,
-        (value || 0) / targets[1].value
+        value / targets[0].value,
+        value / targets[1].value
       ].map((val: number) => {
         return val * 100;
       });
