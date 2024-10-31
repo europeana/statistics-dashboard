@@ -8,10 +8,11 @@ context('Statistics Dashboard', () => {
 
   describe('App General', () => {
     it('should show the feedback link (landing page / data page)', () => {
+      const selFeedback = '#europeana-feedback-widget';
       cy.visit('/');
-      cy.get('[data-e2e=user-assistance]').should('have.length', 1);
+      cy.get(selFeedback).should('have.length', 1);
       cy.visit(urlContentTier);
-      cy.get('[data-e2e=user-assistance]').should('have.length', 1);
+      cy.get(selFeedback).should('have.length', 1);
     });
   });
 
