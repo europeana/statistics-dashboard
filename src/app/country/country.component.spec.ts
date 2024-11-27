@@ -130,6 +130,7 @@ describe('CountryComponent', () => {
 
     component.barChart = barChart;
     component.country = 'France';
+    component.includeCTZero = false;
     tick(1);
     expect(barChart.removeAllSeries).toHaveBeenCalled();
     expect(barChart.ngAfterViewInit).toHaveBeenCalled();
@@ -209,6 +210,7 @@ describe('CountryComponent', () => {
 
   it('should refresh the data when the includeCTZero is set', () => {
     spyOn(component, 'refreshCardData');
+    component.country = undefined;
     component.includeCTZero = true;
 
     expect(component.refreshCardData).not.toHaveBeenCalled();
@@ -217,14 +219,14 @@ describe('CountryComponent', () => {
 
     expect(component.refreshCardData).not.toHaveBeenCalled();
 
-    component.cardData = { provider: [] };
-    component.includeCTZero = true;
-
+    component.country = 'FR';
     expect(component.refreshCardData).toHaveBeenCalled();
 
-    component.includeCTZero = false;
-
+    component.includeCTZero = true;
     expect(component.refreshCardData).toHaveBeenCalledTimes(2);
+
+    component.includeCTZero = false;
+    expect(component.refreshCardData).toHaveBeenCalledTimes(3);
   });
 
   it('should handle the intersectionObserverCallback', () => {

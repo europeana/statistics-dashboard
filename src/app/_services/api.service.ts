@@ -20,6 +20,7 @@ import { Cache } from '../_helpers';
 @Injectable({ providedIn: 'root' })
 export class APIService {
   private readonly countries = new Cache(() => this.loadCountryData());
+  private readonly targetMetaData = new Cache(() => this.loadTargetMetaData());
 
   suffixGeneral = 'statistics/europeana/general';
   suffixFiltering = 'statistics/filtering';
@@ -134,7 +135,7 @@ export class APIService {
    * returns the result of loadTargetMetaData piped / mapped to reduceTargetMetaData
    **/
   getTargetMetaData(): Observable<IHash<IHashArray<TargetMetaData>>> {
-    return this.loadTargetMetaData().pipe(
+    return this.targetMetaData.get().pipe(
       map((rows: Array<TargetMetaDataRaw>) => {
         return this.reduceTargetMetaData(rows);
       })
