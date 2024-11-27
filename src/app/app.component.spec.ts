@@ -161,7 +161,7 @@ describe('AppComponent', () => {
     expect(app.landingComponentRef.landingData).toBeTruthy();
   }));
 
-  it('should handle the outlet load', () => {
+  it('should handle the outlet load', waitForAsync(async () => {
     expect(app.showPageTitle).toBeFalsy();
 
     spyOn(app, 'loadLandingData');
@@ -169,71 +169,70 @@ describe('AppComponent', () => {
       return '';
     });
 
-    // load Landing
-    app.onOutletLoaded(new LandingComponent());
+    await TestBed.runInInjectionContext(() => {
+      app.onOutletLoaded(new LandingComponent());
+      expect(app.showPageTitle).toBeTruthy();
+      expect(app.loadLandingData).toHaveBeenCalled();
 
-    expect(app.showPageTitle).toBeTruthy();
+      // load overview component
+      const fakeOverviewComponent = Object.create(OverviewComponent.prototype);
 
-    expect(app.loadLandingData).toHaveBeenCalled();
+      app.onOutletLoaded(fakeOverviewComponent);
+      expect(app.showPageTitle).toBeFalsy();
 
-    // load overview component
-    const fakeOverviewComponent = Object.create(OverviewComponent.prototype);
+      expect(app.loadLandingData).toHaveBeenCalledTimes(2);
 
-    app.onOutletLoaded(fakeOverviewComponent);
-    expect(app.showPageTitle).toBeFalsy();
+      // load landing component
+      app.getCtrlCTZero().setValue(true);
+      expect(app.loadLandingData).toHaveBeenCalledTimes(3);
 
-    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
+      const cmp = new LandingComponent();
+      app.landingData = {};
+      app.onOutletLoaded(cmp);
+      expect(app.showPageTitle).toBeTruthy();
+      expect(app.loadLandingData).toHaveBeenCalledTimes(4);
+      expect(app.lastSetContentTierZeroValue).toBeTruthy();
+      expect(cmp.landingData).toBeTruthy();
 
-    // load landing component
-    app.getCtrlCTZero().setValue(true);
-    expect(app.loadLandingData).toHaveBeenCalledTimes(3);
+      app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
+      app.onOutletLoaded(new LandingComponent());
+      expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
-    const cmp = new LandingComponent();
-    app.landingData = {};
-    app.onOutletLoaded(cmp);
-    expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(4);
-    expect(app.lastSetContentTierZeroValue).toBeTruthy();
-    expect(cmp.landingData).toBeTruthy();
+      // load privacy statement component
+      app.onOutletLoaded(new PrivacyStatementComponent());
 
-    app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
-    app.onOutletLoaded(new LandingComponent());
-    expect(app.loadLandingData).toHaveBeenCalledTimes(5);
+      expect(app.loadLandingData).toHaveBeenCalledTimes(6);
 
-    // load privacy statement component
-    app.onOutletLoaded(new PrivacyStatementComponent());
+      // load cookie policy component
+      app.onOutletLoaded(new CookiePolicyComponent());
 
-    expect(app.loadLandingData).toHaveBeenCalledTimes(6);
+      expect(app.loadLandingData).toHaveBeenCalledTimes(7);
 
-    // load cookie policy component
-    app.onOutletLoaded(new CookiePolicyComponent());
+      // load country component
+      const fakeCountryComponent = Object.create(CountryComponent.prototype);
 
-    expect(app.loadLandingData).toHaveBeenCalledTimes(7);
+      spyOn(app, 'setCTZeroInputToLastSetValue');
+      spyOn(fakeCountryComponent, 'refreshCardData');
 
-    // load country component
-    const fakeCountryComponent = Object.create(CountryComponent.prototype);
+      app.onOutletLoaded(fakeCountryComponent);
 
-    spyOn(app, 'setCTZeroInputToLastSetValue');
-    spyOn(fakeCountryComponent, 'refreshCardData');
+      expect(app.showPageTitle).toBeTruthy();
+      expect(app.loadLandingData).toHaveBeenCalledTimes(8);
+      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
 
-    app.onOutletLoaded(fakeCountryComponent);
+      app.lastSetContentTierZeroValue = true;
+      app.onOutletLoaded(fakeCountryComponent);
 
-    expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(8);
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
+      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
+      expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
 
-    app.lastSetContentTierZeroValue = true;
-    app.onOutletLoaded(fakeCountryComponent);
+      fakeCountryComponent._country = 'FR';
+      app.onOutletLoaded(fakeCountryComponent);
 
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
-    expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
-
-    fakeCountryComponent.cardData = {};
-    app.onOutletLoaded(fakeCountryComponent);
-
-    expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);
-    expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
-  });
+      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);
+      expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
+    });
+  }));
 
   it('should check if maintenance is due', () => {
     app.landingComponentRef = {
