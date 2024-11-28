@@ -12,6 +12,7 @@ import {
   UpperCasePipe
 } from '@angular/common';
 import {
+  AfterViewInit,
   ApplicationRef,
   Component,
   ElementRef,
@@ -101,7 +102,10 @@ import { TruncateComponent } from '../truncate';
     StripMarkupPipe
   ]
 })
-export class CountryComponent extends SubscriptionManager {
+export class CountryComponent
+  extends SubscriptionManager
+  implements AfterViewInit
+{
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
 
@@ -118,15 +122,15 @@ export class CountryComponent extends SubscriptionManager {
   abbreviateNumberPipe = new AbbreviateNumberPipe();
 
   cardData: IHash<Array<NamesValuePercent>>;
-  _includeCTZero = false;
+  _includeCTZero?: boolean;
 
   @Input() set includeCTZero(includeCTZero: boolean) {
     this._includeCTZero = includeCTZero;
-    if (this.cardData) {
+    if (this.country) {
       this.refreshCardData();
     }
   }
-  get includeCTZero(): boolean {
+  get includeCTZero(): boolean | undefined {
     return this._includeCTZero;
   }
 
@@ -154,13 +158,19 @@ export class CountryComponent extends SubscriptionManager {
    **/
   set country(country: string) {
     this._country = country;
-    this.refreshCardData();
+    if (typeof this.includeCTZero === 'boolean') {
+      this.refreshCardData();
+    }
     this.showTargetsData = !!this.targetMetaData[country];
     this.setHeaderData(country);
   }
 
   get country(): string {
     return this._country;
+  }
+
+  ngAfterViewInit(): void {
+    this.initialiseIntersectionObserver();
   }
 
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
@@ -226,9 +236,7 @@ export class CountryComponent extends SubscriptionManager {
                 this.router.navigate(['/']);
               }
             }
-
             this.setCountryToParam(country);
-            this.initialiseIntersectionObserver();
           },
           error: (e: Error) => {
             console.log(e);
@@ -332,7 +340,6 @@ export class CountryComponent extends SubscriptionManager {
             this.cardData = {};
           }
           this.cardData[dimensionName] = cardData;
-
           if (fnCallback) {
             fnCallback();
           }
