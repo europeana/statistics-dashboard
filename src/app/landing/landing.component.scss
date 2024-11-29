@@ -7,6 +7,20 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
+.map-navigation-link {
+  &[disabled] {
+    cursor: default;
+    pointer-events: none;
+  }
+  &:not([disabled]) {
+    opacity: 0.5;
+    transition: opacity 0.2s linear;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
 .app-truncate {
   overflow: hidden;
 }
@@ -125,19 +139,31 @@ $card-header-height: $card-header-pixels-line-height +
   & + .data-rows {
     width: 100%;
   }
+  height: 275px;
 }
 
 .record-list {
   align-items: center;
-  border-top: 1px solid $gray-5;
   padding: 4px 0;
 
-  &:last-child {
-    border-bottom: 1px solid $gray-5;
+  &.summary {
+    justify-content: flex-end;
   }
 
-  :first-child {
-    flex-grow: 1;
+  a {
+    color: unset;
+  }
+
+  &:not(.summary) {
+    border-top: 1px solid $gray-5;
+
+    &:last-child {
+      border-bottom: 1px solid $gray-5;
+    }
+
+    :first-child {
+      flex-grow: 1;
+    }
   }
 
   .numeric {
@@ -161,15 +187,32 @@ $card-header-height: $card-header-pixels-line-height +
 
 .map-section {
   .flag-orb {
-    margin-left: 7px;
-    opacity: 0;
-    top: 2px;
     height: 1em;
+    top: 2px;
     width: 1em;
   }
 
-  a:hover .flag-orb {
-    opacity: 1;
+  .link-select-country,
+  .link-open-country {
+    color: unset;
+  }
+
+  .link-open-country {
+    .flag-orb {
+      margin-right: 1rem;
+    }
+  }
+
+  .link-select-country {
+    .flag-orb {
+      opacity: 0;
+      margin-left: 7px;
+    }
+    &:hover {
+      .flag-orb {
+        opacity: 1;
+      }
+    }
   }
 }
 

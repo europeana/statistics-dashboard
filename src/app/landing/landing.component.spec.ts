@@ -1,3 +1,4 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, QueryList } from '@angular/core';
 import {
   ComponentFixture,
@@ -7,6 +8,8 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MockAPIService } from '../_mocked';
+import { APIService } from '../_services';
 import { BarComponent } from '../chart';
 import { LandingComponent } from '.';
 
@@ -16,8 +19,19 @@ describe('LandingComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, ReactiveFormsModule, LandingComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      imports: [
+        FormsModule,
+        HttpClientTestingModule,
+        ReactiveFormsModule,
+        LandingComponent
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        {
+          provide: APIService,
+          useClass: MockAPIService
+        }
+      ]
     }).compileComponents();
   };
 
@@ -36,9 +50,9 @@ describe('LandingComponent', () => {
   });
 
   it('should have data', () => {
-    expect(component.hasData()).toBeFalsy();
+    expect(component.hasLandingData()).toBeFalsy();
     component.landingData = { contentTier: [] };
-    expect(component.hasData()).toBeTruthy();
+    expect(component.hasLandingData()).toBeTruthy();
   });
 
   it('should refresh the charts when the data changes', () => {

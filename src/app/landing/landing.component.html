@@ -1,8 +1,8 @@
 <main
   class="fit-to-page landing-page"
   [ngClass]="{
-    'loading-modal': isLoading && !hasData(),
-    loading: isLoading && hasData()
+    'loading-modal': isLoading && !hasLandingData(),
+    loading: isLoading && hasLandingData()
   }"
 >
   <app-resize (sizeChanged)="refreshCharts()"></app-resize>
@@ -49,25 +49,132 @@
   >
     <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
       <div class="container-h data-rows-title">
+        <!-- Selected Country Header -->
+
+        @if (countryLink && mapChart && mapChart.selectedCountry) {
+        <span>
+          {{ mapChart.selectedCountry | renameCountry | uppercase }}
+        </span>
+        <a
+          class="x"
+          data-e2e="close-map-selection"
+          (click)="mapChart.countryClick(mapChart.selectedCountry)"
+        ></a>
+        } @else {
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
         <span i18n="landing data header@@landingDataHeader"
           >ITEMS PROVIDED</span
         >
+        }
       </div>
+
+      <!-- Selected Country Navigation -->
+      @if (countryLink){ @if(mapChart && mapChart.selectedCountry){
+      <div
+        container-h
+        record-list
+        *ngFor="
+          let navCountry of [
+            mapChart.selectedCountryPrev,
+            mapChart.selectedCountry,
+            mapChart.selectedCountryNext
+          ]
+        "
+        class="container-h record-list"
+      >
+        <a
+          class="map-navigation-link"
+          (click)="mapChart.countryMorph(navCountry)"
+          [attr.disabled]="
+            navCountry === mapChart.selectedCountry ? 'disabled' : null
+          "
+        >
+          {{ navCountry | renameCountry }}
+        </a>
+
+        @if(navCountry === mapChart.selectedCountry){
+        <span class="numeric">{{
+          landingData[dimension][mapChart.selectedIndex].value | number
+        }}</span>
+        }
+      </div>
+
+      <!-- country data -->
+
+      @if(countryData && countryData[mapChart.selectedCountry]){
+      <div class="container-h record-list summary">
+        <b>3D</b>
+        <span>
+          {{
+            countryData[mapChart.selectedCountry][0]["three_d"] || 0 | number
+          }}
+        </span>
+      </div>
+      <div class="container-h record-list summary">
+        <b>HQ</b>
+        <span>
+          {{
+            countryData[mapChart.selectedCountry][0]["high_quality"] || 0
+              | number
+          }}
+        </span>
+      </div>
+      }
+      <div class="container-h record-list summary">
+        <a
+          class="link-open-country"
+          [routerLink]="['/country', mapChart.selectedCountry | renameCountry]"
+        >
+          <span class="flag-orb" [ngClass]="mapChart.selectedCountry"></span>
+          <span>View {{ mapChart.selectedCountry | renameCountry }} Data</span>
+        </a>
+      </div>
+
+      @if(targetMetaData){
+      <div style="text-align: right">
+        <!--
+        @if(targetMetaData[mapChart.selectedCountry]){
+        <ng-container
+          *ngFor="let targetType of ['three_d', 'high_quality', 'total']"
+        >
+          <b>{{ targetType }}</b
+          >:
+          <ng-container
+            *ngFor="
+              let target of targetMetaData[mapChart.selectedCountry][targetType]
+            "
+          >
+            {{ target["targetYear"] }}
+            =
+            {{ target["value"] }}
+            <br />
+          </ng-container>
+        </ng-container>
+        }
+        -->
+      </div>
+      } } @else {
+
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
-        @if (countryLink){
-        <a [routerLink]="['/country', row.name | renameCountry]">
+        <a
+          class="link-select-country"
+          (click)="mapChart.countryClick(row.name)"
+        >
           <span
             >{{ row.name | renameCountry
             }}<span class="flag-orb" [ngClass]="row.name"></span
           ></span>
         </a>
-        } @else {
-        <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
-        }
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
+      } } @else {
+      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+        <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
+        <span class="numeric">{{ row.value | number }}</span>
+        <span class="numeric">{{ row.percent }}%</span>
+      </div>
+      }
     </div>
   </ng-template>
 
@@ -166,8 +273,13 @@
       <div class="entry-card-content">
         <div class="entry-card-pair map-section">
           <div class="map-container">
-            <app-map-chart [results]="data"></app-map-chart>
+            <app-map-chart
+              [results]="data"
+              (mapCountrySet)="onMapCountrySet($event)"
+              #mapChart
+            ></app-map-chart>
           </div>
+
           <ng-content
             *ngTemplateOutlet="
               dataRows;

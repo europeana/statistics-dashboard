@@ -1,5 +1,6 @@
 import {
   DecimalPipe,
+  JsonPipe,
   LowerCasePipe,
   NgClass,
   NgFor,
@@ -7,19 +8,34 @@ import {
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
-import { Component, Input, QueryList, ViewChildren } from '@angular/core';
+import {
+  Component,
+  inject,
+  Input,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
-
 import { externalLinks, isoCountryCodes } from '../_data';
-import { DimensionName, GeneralResultsFormatted } from '../_models';
+import {
+  DimensionName,
+  GeneralResultsFormatted,
+  IHash,
+  IHashArray,
+  TargetData,
+  TargetMetaData
+} from '../_models';
+import { APIService } from '../_services';
 import {
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
   RenameCountryPipe
 } from '../_translate';
-import { BarComponent } from '../chart';
-import { MapComponent } from '../chart/map/map.component';
+
+import { BarComponent, MapComponent } from '../chart';
 import { ResizeComponent } from '../resize';
+import { SubscriptionManager } from '../subscription-manager';
 import { TruncateComponent } from '../truncate';
 
 @Component({
@@ -41,10 +57,11 @@ import { TruncateComponent } from '../truncate';
     DecimalPipe,
     RenameApiFacetPipe,
     RenameApiFacetShortPipe,
-    RenameCountryPipe
+    RenameCountryPipe,
+    JsonPipe
   ]
 })
-export class LandingComponent {
+export class LandingComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public isoCountryCodes = isoCountryCodes;
@@ -54,10 +71,14 @@ export class LandingComponent {
 
   // Used to re-draw bar-charts
   @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
+  @ViewChild(MapComponent) mapChart: MapComponent;
 
   barColour = '#0771ce';
   isLoading: boolean;
   _landingData: GeneralResultsFormatted = {};
+  targetMetaData: IHash<IHashArray<TargetMetaData>>;
+  targetData: IHash<IHashArray<TargetMetaData>>;
+  countryData: IHash<Array<TargetData>>;
 
   @Input() set landingData(results: GeneralResultsFormatted) {
     this._landingData = results;
@@ -67,7 +88,36 @@ export class LandingComponent {
     return this._landingData;
   }
 
-  hasData(): boolean {
+  private readonly api = inject(APIService);
+
+  constructor() {
+    super();
+  }
+
+  onMapCountrySet(): void {
+    if (!this.targetMetaData) {
+      this.subs.push(
+        this.api
+          .getTargetMetaData()
+          .subscribe((targetMetaData: IHash<IHashArray<TargetMetaData>>) => {
+            this.targetMetaData = targetMetaData;
+          })
+      );
+    }
+
+    if (!this.countryData) {
+      this.subs.push(
+        this.api
+          .getCountryData()
+          .subscribe((countryData: IHash<Array<TargetData>>) => {
+            this.countryData = countryData;
+            console.log('loaded countryData', countryData);
+          })
+      );
+    }
+  }
+
+  hasLandingData(): boolean {
     return Object.keys(this.landingData).length > 0;
   }
 

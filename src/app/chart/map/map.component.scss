@@ -1,5 +1,10 @@
-#mapChart {
-  height: 100%;
-  min-height: 275px;
+#mapChart,
+#mapChartHidden {
+  height: 275px;
   width: 100%;
+}
+
+#mapChartHidden {
+  margin-top: -100%;
+  visibility: hidden;
 }
