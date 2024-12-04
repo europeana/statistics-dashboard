@@ -17,24 +17,27 @@ import {
   ViewChildren
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { externalLinks, isoCountryCodes } from '../_data';
+import { externalLinks, isoCountryCodes, targetDescriptions } from '../_data';
 import {
   DimensionName,
   GeneralResultsFormatted,
   IHash,
   IHashArray,
   TargetData,
+  TargetFieldName,
   TargetMetaData
 } from '../_models';
 import { APIService } from '../_services';
 import {
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
-  RenameCountryPipe
+  RenameCountryPipe,
+  RenameTargetTypePipe
 } from '../_translate';
 
 import { BarComponent, MapComponent } from '../chart';
 import { ResizeComponent } from '../resize';
+import { SpeechBubbleComponent } from '../speech-bubble';
 import { SubscriptionManager } from '../subscription-manager';
 import { TruncateComponent } from '../truncate';
 
@@ -58,6 +61,8 @@ import { TruncateComponent } from '../truncate';
     RenameApiFacetPipe,
     RenameApiFacetShortPipe,
     RenameCountryPipe,
+    RenameTargetTypePipe,
+    SpeechBubbleComponent,
     JsonPipe
   ]
 })
@@ -65,6 +70,8 @@ export class LandingComponent extends SubscriptionManager {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public isoCountryCodes = isoCountryCodes;
+  public TargetFieldName = TargetFieldName;
+  public targetDescriptions = targetDescriptions;
 
   // Used to parameterise links to the data page
   @Input() includeCTZero = false;
@@ -78,6 +85,7 @@ export class LandingComponent extends SubscriptionManager {
   _landingData: GeneralResultsFormatted = {};
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   targetData: IHash<IHashArray<TargetMetaData>>;
+  targetExpanded: TargetFieldName | undefined;
   countryData: IHash<Array<TargetData>>;
 
   @Input() set landingData(results: GeneralResultsFormatted) {
@@ -94,7 +102,11 @@ export class LandingComponent extends SubscriptionManager {
     super();
   }
 
-  onMapCountrySet(): void {
+  prefixClass(className: string): string {
+    return 'help-' + className;
+  }
+
+  tapTargetDataLoad(targetType: TargetFieldName): TargetFieldName {
     if (!this.targetMetaData) {
       this.subs.push(
         this.api
@@ -104,14 +116,16 @@ export class LandingComponent extends SubscriptionManager {
           })
       );
     }
+    return targetType;
+  }
 
+  onMapCountrySet(): void {
     if (!this.countryData) {
       this.subs.push(
         this.api
           .getCountryData()
           .subscribe((countryData: IHash<Array<TargetData>>) => {
             this.countryData = countryData;
-            console.log('loaded countryData', countryData);
           })
       );
     }

@@ -7,11 +7,43 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
-.map-navigation-link {
-  &[disabled] {
-    cursor: default;
-    pointer-events: none;
+$list-item-pad-height: 4px;
+
+$boxed-width: 2.5em;
+
+a[disabled] {
+  cursor: default;
+  pointer-events: none;
+}
+
+.map-help-target {
+  min-width: 24em;
+  max-width: 24em;
+  opacity: 0;
+  position: absolute;
+  right: -3em;
+  text-align: center;
+  visibility: hidden;
+  transition: opacity 0.3s linear;
+  z-index: 1;
+
+  &:hover {
+    opacity: 1;
+    visibility: visible;
   }
+
+  &.help-total {
+    top: -4.5em;
+  }
+  &.help-high_quality {
+    top: -8em;
+  }
+  &.help-three_d {
+    top: -6em;
+  }
+}
+
+.map-navigation-link {
   &:not([disabled]) {
     opacity: 0.5;
     transition: opacity 0.2s linear;
@@ -20,6 +52,20 @@ $card-header-height: $card-header-pixels-line-height +
     }
   }
 }
+
+.record-list:has(.map-navigation-link) {
+  border-top: 0;
+}
+
+/*
+.record-list:has(.map-navigation-link[disabled]) + .record-list {
+  border-top: 0;
+  :first-child {
+    flex-grow: 0;
+//    background: pink;
+  }
+}
+*/
 
 .app-truncate {
   overflow: hidden;
@@ -31,6 +77,31 @@ $card-header-height: $card-header-pixels-line-height +
 
 .container-h {
   justify-content: space-between;
+}
+
+.country-list {
+  $scrollbar-width: 16px;
+
+  margin-right: -$scrollbar-width;
+
+  // TODO map constants.
+  $map-height: 275px;
+  max-height: calc($map-height - 4em);
+  overflow: auto;
+
+  & > * {
+    width: calc(100% - $scrollbar-width);
+  }
+
+  &.hidden {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  .numeric {
+    margin-left: 6px;
+    min-width: 6em;
+  }
 }
 
 .data-link {
@@ -48,6 +119,7 @@ $card-header-height: $card-header-pixels-line-height +
 .data-rows {
   font-size: 12px;
   width: 100%;
+  position: relative;
 }
 
 .data-rows-title {
@@ -101,6 +173,7 @@ $card-header-height: $card-header-pixels-line-height +
   }
   a.info-icon {
     &::after {
+      // shorten line
       left: 18px;
     }
   }
@@ -142,47 +215,230 @@ $card-header-height: $card-header-pixels-line-height +
   height: 275px;
 }
 
+// for the negative z-index to work on the pseudo-element the grandparent's needs set!
+:has(> .boxed) {
+  z-index: 0;
+}
+
+$boxed-colour: red;
+//$boxed-colour: $gray-5;
+$dash-length: 2em;
+$dimension-thin-line: 1px; //0.675px;
+
+.boxed {
+  display: inline-block;
+  margin: 0px $dash-length;
+  min-width: $boxed-width;
+  position: relative;
+  text-align: right;
+
+  &::after,
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+  }
+
+  &::before {
+    background-color: $boxed-colour;
+    height: $dimension-thin-line;
+    left: calc(-1px - $dash-length);
+    right: calc(-1px - $dash-length);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: -1;
+  }
+
+  // add vertical line to edge of last on row
+  &:last-child::after {
+    background-color: $boxed-colour;
+    right: calc(-1px - $dash-length);
+    top: calc(-1px - $list-item-pad-height);
+    bottom: calc(-1px - $list-item-pad-height);
+    width: $dimension-thin-line;
+  }
+
+  &:has(.info-icon) {
+    margin-left: -3.5em;
+    z-index: -1;
+    .info-icon {
+      background-color: #fff;
+      margin-left: -1.5em;
+      margin-right: -1em;
+    }
+  }
+
+  & > .boxed-inner {
+    border: 1px solid $boxed-colour;
+    background-color: $white;
+    padding: 2px $list-item-pad-height;
+  }
+}
+
+// top box
+.record-list:has(.boxed) {
+  // vertical line: connect deep downwards / stop connecting upwards
+  .boxed:last-child::after {
+    top: 50%;
+    bottom: -3em;
+  }
+}
+
+// give country link space on narrow viewports
+.data-rows:has(.link-open-country) {
+  padding-bottom: 4em;
+
+  @media (min-width: $bp-desktop) {
+    padding-bottom: 4em;
+  }
+}
+
+// anchor country link to the bottom
+.record-list:has(.link-open-country) {
+  flex-grow: 1;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+// expanded element
+.target-expanded {
+  :first-child.numeric {
+    margin-right: 2em;
+  }
+
+  .boxed:last-child {
+    padding-right: 1.5em; // match
+    padding-right: 2.5em; // indent
+    &::before {
+      //prevent horizontal line running to the right
+      right: 50%;
+    }
+  }
+}
+
+.target-summary {
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1em;
+
+  // the last has "nothing in front of me that isn't expanded"
+  &:not(:has(~ .target-summary:not(.target-expanded))) {
+    // the last has nothing connected below: hide vertical line
+    & ~ .target-expanded .boxed:last-child::after {
+      display: none;
+    }
+
+    // the last box
+    .boxed:last-child::after {
+      bottom: 50%;
+    }
+  }
+}
+
+// country-specific numeric styling
+.target-summary,
+.record-list:has(.map-navigation-link) {
+  .numeric {
+    //border-bottom: 2px solid $gray-med;
+    margin-right: 6px;
+  }
+}
+
+//  experiment for further drop-down
+/*
+.target-expanded {
+
+  .boxed{
+    padding-bottom: 4em;
+
+    &:last-child::before {
+      top: 3em;
+      right: calc(4em + 1px);
+    }
+
+    // connect vertically from inner
+    .boxed-inner{
+        position: relative;
+        &::before {
+          content: '';
+          background: red;
+          width: 1px;
+          height: calc(1.5em - 1px);
+          right: 1.5em;//calc(50% - 1.5em);
+          position: absolute;
+          top: 100%;
+        }
+    }
+  }
+}
+*/
+// end experiment for further drop-down
+
 .record-list {
   align-items: center;
-  padding: 4px 0;
+  border-top: 1px solid $gray-5;
 
-  &.summary {
-    justify-content: flex-end;
+  &:last-child {
+    border-bottom: 1px solid $gray-5;
   }
+
+  :first-child {
+    flex-grow: 1;
+  }
+}
+
+.record-list,
+.target-summary {
+  padding: $list-item-pad-height 0;
+  position: relative;
 
   a {
     color: unset;
   }
 
-  &:not(.summary) {
-    border-top: 1px solid $gray-5;
+  a.info-icon {
+    cursor: help;
+    margin-right: 1em;
 
-    &:last-child {
-      border-bottom: 1px solid $gray-5;
-    }
-
-    :first-child {
-      flex-grow: 1;
+    &:hover {
+      // allow hovering over the gap!
+      &::after {
+        content: "";
+        display: block;
+        width: 3em;
+        height: 4em;
+        position: relative;
+        transform: translate(-50%, -75%);
+      }
     }
   }
+
+  &:has(a.info-icon:hover) {
+    .map-help-target {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  // TODO fade in with this?
+  /*
+  & > :not(.numeric) {
+    visibility: hidden;
+  }
+  */
 
   .numeric {
-    margin-left: 6px;
     text-align: right;
-    min-width: 6em;
   }
-}
 
-.splash-map {
-  border: 1px solid $near-black;
-  font-size: 22px;
-  height: calc(100% - 8em);
-  margin: 4em;
-  overflow: hidden;
-  padding: 1.5em;
-  position: fixed;
-  width: calc(100% - 8em);
-  z-index: 1;
+  .target-active {
+    font-weight: bold;
+
+    &.numeric {
+      border-bottom: 1px solid $boxed-colour;
+    }
+  }
 }
 
 .map-section {

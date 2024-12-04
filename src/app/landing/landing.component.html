@@ -42,16 +42,26 @@
     </span>
   </ng-template>
 
+  <ng-template #tmpSpeechBubble let-targetType="targetType">
+    <div class="map-help-target" [ngClass]="prefixClass(targetType)">
+      <app-speech-bubble [arrowBottomRight]="true">
+        <span
+          class="help-speech-bubble-content"
+          [innerHTML]="targetDescriptions[targetType]"
+        ></span>
+      </app-speech-bubble>
+    </div>
+  </ng-template>
+
   <ng-template
     #dataRows
     let-dimension="facetName"
-    let-countryLink="countryLink"
+    let-isCountryCard="isCountryCard"
   >
     <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
       <div class="container-h data-rows-title">
         <!-- Selected Country Header -->
-
-        @if (countryLink && mapChart && mapChart.selectedCountry) {
+        @if (isCountryCard && mapChart && mapChart.selectedCountry) {
         <span>
           {{ mapChart.selectedCountry | renameCountry | uppercase }}
         </span>
@@ -61,6 +71,7 @@
           (click)="mapChart.countryClick(mapChart.selectedCountry)"
         ></a>
         } @else {
+        <!-- Generic Dimension Header -->
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
         <span i18n="landing data header@@landingDataHeader"
           >ITEMS PROVIDED</span
@@ -68,11 +79,10 @@
         }
       </div>
 
+      @if (isCountryCard){
       <!-- Selected Country Navigation -->
-      @if (countryLink){ @if(mapChart && mapChart.selectedCountry){
+      @if(mapChart && mapChart.selectedCountry){
       <div
-        container-h
-        record-list
         *ngFor="
           let navCountry of [
             mapChart.selectedCountryPrev,
@@ -92,35 +102,134 @@
           {{ navCountry | renameCountry }}
         </a>
 
-        @if(navCountry === mapChart.selectedCountry){
-        <span class="numeric">{{
-          landingData[dimension][mapChart.selectedIndex].value | number
-        }}</span>
-        }
+        <!-- end nav - what follows is right-aligned -->
+
+        @if(navCountry === mapChart.selectedCountry){ @if(countryData &&
+        countryData[mapChart.selectedCountry]){
+
+        <span
+          class="numeric"
+          [ngClass]="{
+            'target-active': targetExpanded === undefined
+          }"
+        >
+          {{
+            countryData[mapChart.selectedCountry][0][TargetFieldName.TOTAL]
+              | number
+          }}
+        </span>
+
+        <span class="boxed">
+          <a
+            class="boxed-inner"
+            [ngClass]="{
+              'target-active': !targetExpanded
+            }"
+            (click)="targetExpanded = undefined"
+            [attr.disabled]="targetExpanded ? null : 'disabled'"
+          >
+            {{ TargetFieldName.TOTAL | renameTargetType }}</a
+          >
+          <ng-content
+            *ngTemplateOutlet="
+              tmpSpeechBubble;
+              context: {
+                targetType: TargetFieldName.TOTAL
+              }
+            "
+          ></ng-content>
+        </span>
+
+        <span class="boxed">
+          <a class="info-icon"></a>
+        </span>
+
+        } @else if(data[mapChart.selectedIndex]){
+        <span class="numeric">
+          {{ data[mapChart.selectedIndex].value | number }}
+        </span>
+        } }
       </div>
 
       <!-- country data -->
 
       @if(countryData && countryData[mapChart.selectedCountry]){
-      <div class="container-h record-list summary">
-        <b>3D</b>
-        <span>
-          {{
-            countryData[mapChart.selectedCountry][0]["three_d"] || 0 | number
-          }}
-        </span>
-      </div>
-      <div class="container-h record-list summary">
-        <b>HQ</b>
-        <span>
-          {{
-            countryData[mapChart.selectedCountry][0]["high_quality"] || 0
-              | number
-          }}
-        </span>
-      </div>
+      <ng-template #tmpTargetSummary let-targetType="targetType">
+        <div class="container-h target-summary">
+          <span
+            class="numeric"
+            [ngClass]="{
+              'target-active': targetExpanded === targetType
+            }"
+          >
+            {{
+              countryData[mapChart.selectedCountry][0][targetType] || 0 | number
+            }}
+          </span>
+
+          <span class="boxed">
+            <a
+              class="boxed-inner"
+              (click)="
+                targetExpanded =
+                  targetExpanded === targetType
+                    ? undefined
+                    : tapTargetDataLoad(targetType)
+              "
+              [ngClass]="{
+                'target-active': targetExpanded === targetType
+              }"
+              >{{ targetType | renameTargetType }}</a
+            >
+
+            <ng-content
+              *ngTemplateOutlet="
+                tmpSpeechBubble;
+                context: {
+                  targetType: targetType
+                }
+              "
+            ></ng-content>
+          </span>
+          <span class="boxed">
+            <a class="info-icon"></a>
+          </span>
+        </div>
+
+        @if(targetExpanded === targetType && targetMetaData &&
+        targetMetaData[mapChart.selectedCountry]){
+        <div
+          *ngFor="let theYear of [2025, 2030]; let i = index"
+          class="container-h target-summary target-expanded"
+        >
+          <span class="numeric">
+            {{
+              targetMetaData[mapChart.selectedCountry][targetType][i].value
+                | number
+            }}
+          </span>
+          <span class="boxed"
+            ><span class="boxed-inner">target {{ theYear }} Target</span></span
+          >
+        </div>
+        }
+      </ng-template>
+
+      <ng-container
+        *ngFor="let targetType of [TargetFieldName.THREE_D, TargetFieldName.HQ]"
+      >
+        <ng-content
+          *ngTemplateOutlet="
+            tmpTargetSummary;
+            context: {
+              targetType: targetType
+            }
+          "
+        ></ng-content>
+      </ng-container>
       }
-      <div class="container-h record-list summary">
+
+      <div class="container-h record-list">
         <a
           class="link-open-country"
           [routerLink]="['/country', mapChart.selectedCountry | renameCountry]"
@@ -130,45 +239,31 @@
         </a>
       </div>
 
-      @if(targetMetaData){
-      <div style="text-align: right">
-        <!--
-        @if(targetMetaData[mapChart.selectedCountry]){
-        <ng-container
-          *ngFor="let targetType of ['three_d', 'high_quality', 'total']"
-        >
-          <b>{{ targetType }}</b
-          >:
-          <ng-container
-            *ngFor="
-              let target of targetMetaData[mapChart.selectedCountry][targetType]
-            "
-          >
-            {{ target["targetYear"] }}
-            =
-            {{ target["value"] }}
-            <br />
-          </ng-container>
-        </ng-container>
-        }
-        -->
-      </div>
-      } } @else {
+      <!--  END mapChart && mapChart.selectedCountry -->
 
-      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
-        <a
-          class="link-select-country"
-          (click)="mapChart.countryClick(row.name)"
-        >
-          <span
-            >{{ row.name | renameCountry
-            }}<span class="flag-orb" [ngClass]="row.name"></span
-          ></span>
-        </a>
-        <span class="numeric">{{ row.value | number }}</span>
-        <span class="numeric">{{ row.percent }}%</span>
+      }
+
+      <div
+        class="country-list"
+        [ngClass]="{
+          hidden: mapChart && mapChart.selectedCountry
+        }"
+      >
+        <div *ngFor="let row of data" class="container-h record-list">
+          <a
+            class="link-select-country"
+            (click)="mapChart.countryClick(row.name)"
+          >
+            <span
+              >{{ row.name | renameCountry
+              }}<span class="flag-orb" [ngClass]="row.name"></span
+            ></span>
+          </a>
+          <span class="numeric">{{ row.value | number }}</span>
+          <span class="numeric">{{ row.percent }}%</span>
+        </div>
       </div>
-      } } @else {
+      } @else {
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
@@ -283,7 +378,7 @@
           <ng-content
             *ngTemplateOutlet="
               dataRows;
-              context: { facetName: DimensionName.country, countryLink: true }
+              context: { facetName: DimensionName.country, isCountryCard: true }
             "
           ></ng-content>
         </div>

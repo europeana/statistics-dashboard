@@ -40,6 +40,37 @@ export class MapComponent {
   _selectedCountry?: string;
   selectedIndex: number;
 
+  _isAnimating = false;
+
+  set isAnimating(isAnimating: boolean) {
+    console.log('set isAnimating(' + isAnimating + ')');
+
+    if (isAnimating === this.isAnimating) {
+      console.log('set returns early same val ' + isAnimating);
+      return;
+    }
+
+    this._isAnimating = isAnimating;
+    if (this.isAnimating) {
+      this.chart.events.disableType('hit');
+      this.chart.seriesContainer.events.disableType('hit');
+      this.chart.chartContainer.background.events.disableType('hit');
+      this.polygonSeries.mapPolygons.template.events.disableType('hit');
+
+      this.chart.seriesContainer.draggable = false;
+      console.log(' - set drag off');
+    } else {
+      this.chart.events.enableType('hit');
+      this.chart.seriesContainer.events.enableType('hit');
+      this.chart.chartContainer.background.events.enableType('hit');
+      this.polygonSeries.mapPolygons.template.events.enableType('hit');
+    }
+  }
+
+  get isAnimating(): boolean {
+    return this._isAnimating;
+  }
+
   get selectedCountry(): string {
     return this._selectedCountry;
   }
@@ -137,7 +168,13 @@ export class MapComponent {
     this.polygonSeries.events.once('datavalidated', () => {
       if (countries.length === 1) {
         this.zoomToCountries(countries, ZoomLevel.SINGLE, 0);
+
+        console.log('SCI disables drag');
+        this.chart.seriesContainer.draggable = false;
       } else {
+        console.log('SCI enables drag');
+        this.chart.seriesContainer.draggable = true;
+
         this.selectedCountry = undefined;
         this.zoomToCountries(this.boundingCountries, ZoomLevel.MULTIPLE, 0);
       }
@@ -149,6 +186,10 @@ export class MapComponent {
    * assumes single-country mode
    **/
   countryMorph(newCountry: string): void {
+    if (this.isAnimating) {
+      return;
+    }
+
     const oldCountry = this.polygonSeries.include[0];
     if (this.polygonSeriesHidden.include.length === 1) {
       console.log('countryMorph exit: animating!');
@@ -163,22 +204,32 @@ export class MapComponent {
       return;
     }
 
+    console.log('countryMorph sets animating to true...');
+    this.isAnimating = true;
+
     // curtail the hidden map to include only the
     this.polygonSeriesHidden.data = [];
     this.polygonSeriesHidden.include = [newCountry];
     this.selectedCountry = newCountry;
 
     this.polygonSeriesHidden.events.once('validated', () => {
+      console.log('countryMorph hidden once validated...');
+
       const polyHidden = this.polygonSeriesHidden.mapPolygons.getIndex(0);
       const poly = this.polygonSeries.getPolygonById(oldCountry);
+
       const morphAnimationEnded = (): void => {
         // reset the hidden / update the actual
         this.polygonSeriesHidden.data = [];
         this.polygonSeriesHidden.include = this.mapCountries;
         setTimeout(() => {
+          console.log(
+            'morphAnimationEnded (setTimeout) call sci ' + newCountry
+          );
           this.setCountryInclusion([newCountry]);
         });
       };
+
       if (poly) {
         const morphAnimation = polyHidden
           ? poly.polygon.morpher.morphToPolygon(
@@ -187,7 +238,9 @@ export class MapComponent {
             )
           : poly.polygon.morpher.morphToCircle(1, this.animationTime);
         morphAnimation.events.on('animationended', morphAnimationEnded);
+        //morphAnimation.events.on('animationstopped', morphAnimationEnded);
       } else {
+        console.log('WE HABE NO POLY ' + newCountry + ' / ' + oldCountry);
         morphAnimationEnded();
       }
     });
@@ -198,11 +251,23 @@ export class MapComponent {
    * toggles selected setCountryInclusion with (optional animation)
    **/
   countryClick(country: string): void {
+    if (this.isAnimating) {
+      console.log('return countryClick isAnimating');
+      return;
+    }
+
     const singleMode = this.polygonSeries.include.length === 1;
     if (singleMode) {
+      console.log('countryClick RESET to all because single...');
+
       // revert back to full map
       this.setCountryInclusion(this.mapCountries);
+      // will invoke zoomTo with instant effect
     } else {
+      console.log('countryClick sets animating to true...');
+
+      this.isAnimating = true;
+
       // set selection and zoom
       this.legend.hide();
       this.selectedCountry = country;
@@ -211,10 +276,12 @@ export class MapComponent {
         ZoomLevel.INTERMEDIATE,
         this.animationTime
       );
-      animation.events.on('animationended', () => {
-        // remove other countries
+
+      const fn = (): void => {
         this.setCountryInclusion([country]);
-      });
+      };
+      //animation.events.on('animationstopped', fn);
+      animation.events.on('animationended', fn);
     }
   }
 
@@ -231,6 +298,7 @@ export class MapComponent {
     const chartHidden = am4core.create('mapChartHidden', am4maps.MapChart);
     this.chart = chart;
     this.chartHidden = chartHidden;
+    this.chart.seriesContainer.resizable = false;
 
     // Set map definition
     chart.geodata = am4geodata_worldHigh;
@@ -266,6 +334,8 @@ export class MapComponent {
     polygonSeries.data = this.filterResultsData();
     polygonSeriesHidden.include = this.mapCountries;
 
+    polygonSeries.cursorOverStyle = am4core.MouseCursorStyle.pointer;
+
     // Make map load polygon data (state shapes and names) from GeoJSON
     polygonSeries.useGeodata = true;
     polygonSeriesHidden.useGeodata = true;
@@ -277,6 +347,11 @@ export class MapComponent {
       min: this.chart.colors.getIndex(1).brighten(1),
       max: this.chart.colors.getIndex(1).brighten(-0.3)
     });
+
+    this.chart.events.disableType('doublehit');
+    this.chart.seriesContainer.events.disableType('doublehit');
+    this.chart.chartContainer.background.events.disableType('doublehit');
+    this.polygonSeries.mapPolygons.template.events.disableType('doublehit');
 
     // add legend
     const legend = this.chart.createChild(am4maps.HeatLegend);
@@ -291,7 +366,7 @@ export class MapComponent {
     legend.marginRight = am4core.percent(4);
     legend.background.fillOpacity = 0.05;
     legend.padding(5, 5, 5, 5);
-    legend.events.on('hit', () => {
+    legend.events.on('up', () => {
       this.zoomToCountries();
     });
 
@@ -325,9 +400,6 @@ export class MapComponent {
       hlMaxRange.value = hlMax;
       hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
     });
-
-    //chart.seriesContainer.draggable = false;
-    //chart.seriesContainer.resizable = false;
 
     this.chart.maxZoomLevel = 24;
     this.chartHidden.maxZoomLevel = 24;
@@ -386,16 +458,22 @@ export class MapComponent {
     const aspectRatioChart = this.chart.pixelWidth / this.chart.pixelHeight;
 
     let zoomLevel: number;
-    let zoomLevelSingle = 0.8;
-    let zoomLevelMultiple = 3;
+    const zoomLevelSingle = 0.8;
+    const zoomLevelMultiple = 3;
 
-    let [north, south, east, west] = this.getBoundingCoords(zoomTo);
+    const [north, south, east, west] = this.getBoundingCoords(zoomTo);
 
     if (zoomLevelIn === ZoomLevel.SINGLE) {
+      //console.log('aspectRatioChart single ' + aspectRatioChart);
+
       zoomLevel = zoomLevelSingle;
       if (aspectRatioChart > 2.4) {
         console.log('correct single');
         zoomLevel = 0.75;
+      }
+      if (aspectRatioChart > 3.4) {
+        console.log('correct single ++');
+        zoomLevel = 0.725;
       }
     } else if (zoomLevelIn === ZoomLevel.MULTIPLE) {
       zoomLevel = zoomLevelMultiple;
@@ -403,6 +481,33 @@ export class MapComponent {
       const selectionHeight = north - south;
       const aspectRatioSelection = (east - west) / selectionHeight;
 
+      //aspectRatioChart = this.chart.pixelWidth / this.chart.pixelHeight;
+      const aspectRatioCombined =
+        this.chart.pixelWidth /
+        (east - west) /
+        (this.chart.pixelHeight / selectionHeight);
+
+      console.log('aspectRatioChart\t\t' + aspectRatioChart.toFixed(2));
+      console.log('aspectRatioSelection\t\t' + aspectRatioSelection.toFixed(2));
+      console.log('aspectRatioCombined\t\t' + aspectRatioCombined.toFixed(2));
+
+      /*
+
+      // SLOVAKIA
+      aspectRatioChart		  3.498181818181818
+      aspectRatioSelection	3.0945371279031675
+      aspectRatioCombined		1.130437824332118
+
+      // TURKEY
+      aspectRatioChart		  3.498181818181818
+      aspectRatioSelection	3.0055379493581755
+      aspectRatioCombined		1.1639120440747872
+
+      the fact that slovakia is fine and turkey is not means it's more to do with size!
+      */
+
+      /*
+      //
       const getRatio = (tgt: number, val: number, rec = 0): number => {
         const half = val / 2;
         if (tgt > val) {
@@ -410,17 +515,36 @@ export class MapComponent {
         }
         if (tgt > half) {
           return Math.max(rec, 1) + ((val / tgt) % 1);
+          //return Math.max(rec, 1) + ((val / tgt) % 1);
         }
         return getRatio(tgt, half, rec + 1);
       };
 
       zoomLevel = getRatio(selectionHeight, this.mapHeight);
-      zoomLevel = zoomLevelSingle * zoomLevel;
+      //zoomLevel = zoomLevelSingle * zoomLevel;
       // zoomLevel -= aspectRatioSelection / aspectRatioChart;
-      zoomLevel -= aspectRatioChart / aspectRatioSelection;
-      zoomLevel = Math.max(1, zoomLevel);
+      let finalSutraction = aspectRatioChart / aspectRatioSelection;
+      let finalSutractionAlt = Math.min(aspectRatioChart, aspectRatioSelection) / aspectRatioChart;
+      //zoomLevel -= finalSutraction;
+
+      console.log('aspectRatioChart: ' + aspectRatioChart + '\nspectRatioSelection = ' + aspectRatioSelection + '...');
+
+      */
+      //console.log('... = finalSutraction = ' + finalSutraction.toFixed(2));
+      //console.log('... = finalSutractionAlt = ' + finalSutractionAlt.toFixed(2));
+      //console.log('... = zoomLevel to subtract from = ' + zoomLevel.toFixed(2));
+
+      //zoomLevel -= finalSutractionAlt;
+      zoomLevel = 1;
+
+      //  zoomLevel = zoomLevel / finalSutraction;//Math.min(aspectRatioSelection, aspectRatioChart);
+
+      //zoomLevel -= aspectRatioChart;// / aspectRatioSelection;
+      //    zoomLevel -= Math.max(aspectRatioSelection, aspectRatioChart);
+      //  zoomLevel = Math.max(1, zoomLevel);
     }
-    return this.chart.zoomToRectangle(
+
+    const res = this.chart.zoomToRectangle(
       north,
       east,
       south,
@@ -429,5 +553,25 @@ export class MapComponent {
       true,
       duration
     );
+
+    if (duration === 0) {
+      console.log('zoomTo empty duration falsifies');
+      this.isAnimating = false;
+    }
+    //this.isAnimating = false;
+
+    res.events.on('animationstopped', () => {
+      if (this.isAnimating) {
+        console.log('zoomTo animationstopped');
+        this.isAnimating = false;
+      }
+    });
+
+    res.events.on('animationended', () => {
+      console.log('zoomTo animationended');
+      this.isAnimating = false;
+    });
+
+    return res;
   }
 }
