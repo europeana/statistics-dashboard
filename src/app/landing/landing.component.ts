@@ -43,7 +43,7 @@ import { TruncateComponent } from '../truncate';
 
 @Component({
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss'],
+  styleUrls: ['./landing.component.scss', './country-section.scss'],
   standalone: true,
   imports: [
     NgClass,

@@ -1,13 +1,5 @@
 @import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
-@import "../../scss/functions/_replace";
 
-$card-header-pixels-line-height: 24px;
-$card-header-pixels-margin-bottom: 12px;
-$card-header-height: $card-header-pixels-line-height +
-  $card-header-pixels-margin-bottom;
-
-/*
 $list-item-pad-height: 4px;
 $boxed-width: 2.5em;
 //$boxed-colour: red;
@@ -20,205 +12,11 @@ $boxed-dash-length-less-one: 4em;
 //$boxed-dash-length-less-one: 1em;
 
 $boxed-time: 0.3s;
-*/
 
-a[disabled] {
-  cursor: default;
-  pointer-events: none;
-}
-
-.map-help-target {
-  min-width: 24em;
-  max-width: 24em;
-  opacity: 0;
-  position: absolute;
-  right: -3em;
-  text-align: center;
-  visibility: hidden;
-  transition: opacity 0.3s linear;
-  z-index: 1;
-
-  &:hover {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  &.help-total {
-    top: -4.5em;
-  }
-  &.help-high_quality {
-    top: -8em;
-  }
-  &.help-three_d {
-    top: -6em;
-  }
-}
-
-.map-navigation-link {
-  &:not([disabled]) {
-    opacity: 0.5;
-    transition: opacity 0.2s linear;
-    &:hover {
-      opacity: 1;
-    }
-  }
-}
-
-/*
 .record-list:has(.map-navigation-link) {
   border-top: 0;
 }
-*/
 
-.app-truncate {
-  overflow: hidden;
-}
-
-.app-bar-chart {
-  height: 100%;
-}
-
-.container-h {
-  justify-content: space-between;
-}
-
-.country-list {
-  $scrollbar-width: 16px;
-
-  margin-right: -$scrollbar-width;
-
-  // TODO map constants.
-  $map-height: 275px;
-  max-height: calc($map-height - 4em);
-  overflow: auto;
-
-  & > * {
-    width: calc(100% - $scrollbar-width);
-  }
-
-  &.hidden {
-    position: absolute;
-    visibility: hidden;
-  }
-
-  .numeric {
-    margin-left: 6px;
-    min-width: 6em;
-  }
-}
-
-.data-link {
-  color: $stats-blue;
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 14px 0 0 auto;
-
-  &::after {
-    content: " >";
-  }
-}
-
-.data-rows {
-  font-size: 12px;
-  width: 100%;
-  position: relative;
-}
-
-.data-rows-title {
-  color: $gray-faint;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 9px 0 14px 0;
-}
-
-.entry-card {
-  padding: 18px 12px;
-  width: 100%;
-
-  @media (min-width: $bp-desktop) {
-    padding: 16px;
-  }
-}
-
-.entry-card-content {
-  background: $white;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  height: calc(100% - #{$card-header-height});
-  justify-content: space-between;
-  padding: 26px 25px 20px 25px;
-}
-
-.entry-card-header {
-  align-items: center;
-  display: flex;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: $card-header-pixels-line-height;
-  margin-bottom: $card-header-pixels-margin-bottom;
-  position: relative;
-  text-transform: uppercase;
-
-  .info-icon {
-    &::after {
-      background-image: svg-url-icon-spinner(#{$gray-light});
-      content: "";
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      opacity: 0;
-      left: 0;
-      top: -50%;
-      transition: opacity $transition-duration ease-in-out;
-    }
-  }
-  a.info-icon {
-    &::after {
-      // shorten line
-      left: 18px;
-    }
-  }
-}
-
-.entry-card-multi {
-  position: relative;
-}
-
-.entry-card-multi,
-.entry-card-pair {
-  width: 100%;
-  @media (min-width: $bp-desktop) {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    .entry-card {
-      width: 50%;
-    }
-  }
-}
-
-.loading .entry-card-header {
-  .info-icon {
-    &::after {
-      opacity: 1;
-    }
-  }
-}
-
-.map-container {
-  width: 100%;
-  max-width: 100%;
-
-  & + .data-rows {
-    width: 100%;
-  }
-  height: 275px;
-}
-
-/*
 // for the negative z-index to work on the pseudo-element the grandparent's needs set!
 :has(> .boxed) {
   z-index: 0;
@@ -311,7 +109,7 @@ a[disabled] {
     &:last-child {
       //$dash-less-one: $boxed-dash-length -1em;
       //min-width: calc(40% + $dash-less-one);
-//      min-width: calc(40% + $boxed-dash-length);
+      //      min-width: calc(40% + $boxed-dash-length);
       min-width: calc(40% + $boxed-dash-length-less-one);
 
       //min-width: calc(40% + 1em);
@@ -335,7 +133,7 @@ a[disabled] {
   // the target year
   .boxed:last-child {
     padding-right: $boxed-dash-length;
-//    margin-left: 3em;
+    //    margin-left: 3em;
     margin-left: calc($boxed-dash-length + 0.5em);
 
     &::before {
@@ -363,20 +161,7 @@ a[disabled] {
     }
   }
 }
-*/
-.record-list {
-  align-items: center;
-  border-top: 1px solid $gray-5;
 
-  &:last-child {
-    border-bottom: 1px solid $gray-5;
-  }
-
-  :first-child {
-    flex-grow: 1;
-  }
-}
-/*
 .record-list,
 .target-summary {
   padding: $list-item-pad-height 0;
@@ -431,50 +216,5 @@ a[disabled] {
     &.numeric {
       border-bottom: 1px solid $boxed-colour;
     }
-  }
-}
-*/
-.map-section {
-  .flag-orb {
-    height: 1em;
-    top: 2px;
-    width: 1em;
-  }
-
-  .link-select-country,
-  .link-open-country {
-    color: unset;
-  }
-
-  .link-open-country {
-    .flag-orb {
-      margin-right: 1rem;
-    }
-  }
-
-  .link-select-country {
-    .flag-orb {
-      opacity: 0;
-      margin-left: 7px;
-    }
-    &:hover {
-      .flag-orb {
-        opacity: 1;
-      }
-    }
-  }
-}
-
-@media (min-width: $bp-desktop) {
-  .double-card .data-rows {
-    margin-left: 2em;
-  }
-
-  .map-container {
-    max-width: 50%;
-  }
-
-  .map-container + .data-rows {
-    width: 50%;
   }
 }

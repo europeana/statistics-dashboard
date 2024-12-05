@@ -196,23 +196,25 @@
           </span>
         </div>
 
-        @if(targetExpanded === targetType && targetMetaData &&
-        targetMetaData[mapChart.selectedCountry]){
         <div
           *ngFor="let theYear of [2025, 2030]; let i = index"
           class="container-h target-summary target-expanded"
+          [ngClass]="{
+            'is-open': targetExpanded === targetType
+          }"
         >
           <span class="numeric">
+            @if(targetMetaData && targetMetaData[mapChart.selectedCountry]){
             {{
               targetMetaData[mapChart.selectedCountry][targetType][i].value
                 | number
             }}
+            }
           </span>
           <span class="boxed"
-            ><span class="boxed-inner">target {{ theYear }} Target</span></span
+            ><span class="boxed-inner">target {{ theYear }}</span></span
           >
         </div>
-        }
       </ng-template>
 
       <ng-container
