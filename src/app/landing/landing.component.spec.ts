@@ -1,5 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, QueryList } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import {
   ComponentFixture,
   fakeAsync,
@@ -28,6 +29,10 @@ describe('LandingComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
+          provide: ActivatedRoute,
+          useValue: {}
+        },
+        {
           provide: APIService,
           useClass: MockAPIService
         }
@@ -51,13 +56,14 @@ describe('LandingComponent', () => {
 
   it('should have data', () => {
     expect(component.hasLandingData()).toBeFalsy();
-    component.landingData = { contentTier: [] };
+    component.landingData = { contentTier: [], country: [] };
     expect(component.hasLandingData()).toBeTruthy();
   });
 
   it('should refresh the charts when the data changes', () => {
     spyOn(component, 'refreshCharts');
-    component.landingData = { contentTier: [] };
+    component.landingData = { contentTier: [], country: [] };
+    fixture.detectChanges();
     expect(component.refreshCharts).toHaveBeenCalled();
   });
 

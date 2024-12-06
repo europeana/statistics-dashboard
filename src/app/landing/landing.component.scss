@@ -7,21 +7,6 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
-/*
-$list-item-pad-height: 4px;
-$boxed-width: 2.5em;
-//$boxed-colour: red;
-//$boxed-colour: $gray-lightest;
-$boxed-colour: $gray-5;
-
-$boxed-dash-length: 5em;
-$boxed-dash-length-less-one: 4em;
-//$boxed-dash-length: 2em;
-//$boxed-dash-length-less-one: 1em;
-
-$boxed-time: 0.3s;
-*/
-
 a[disabled] {
   cursor: default;
   pointer-events: none;
@@ -64,12 +49,6 @@ a[disabled] {
   }
 }
 
-/*
-.record-list:has(.map-navigation-link) {
-  border-top: 0;
-}
-*/
-
 .app-truncate {
   overflow: hidden;
 }
@@ -80,31 +59,6 @@ a[disabled] {
 
 .container-h {
   justify-content: space-between;
-}
-
-.country-list {
-  $scrollbar-width: 16px;
-
-  margin-right: -$scrollbar-width;
-
-  // TODO map constants.
-  $map-height: 275px;
-  max-height: calc($map-height - 4em);
-  overflow: auto;
-
-  & > * {
-    width: calc(100% - $scrollbar-width);
-  }
-
-  &.hidden {
-    position: absolute;
-    visibility: hidden;
-  }
-
-  .numeric {
-    margin-left: 6px;
-    min-width: 6em;
-  }
 }
 
 .data-link {
@@ -218,152 +172,6 @@ a[disabled] {
   height: 275px;
 }
 
-/*
-// for the negative z-index to work on the pseudo-element the grandparent's needs set!
-:has(> .boxed) {
-  z-index: 0;
-}
-
-.boxed {
-  display: inline-block;
-  margin: 0px $boxed-dash-length;
-  min-width: $boxed-width;
-  position: relative;
-  text-align: right;
-  transition: min-width linear $boxed-time;
-
-  &::after,
-  &::before {
-    content: "";
-    display: block;
-    position: absolute;
-  }
-
-  &::before {
-    background-color: $boxed-colour;
-    height: 1px;
-    left: calc(-1px - $boxed-dash-length);
-    right: calc(-1px - $boxed-dash-length);
-    top: 50%;
-    transform: translateY(-50%);
-    transition: left $boxed-time linear;
-    z-index: -1;
-  }
-
-  // add vertical line to edge of last on row
-  &:last-child::after {
-    background-color: $boxed-colour;
-    bottom: calc(-1px - $list-item-pad-height);
-    right: calc(-1px - $boxed-dash-length);
-    top: calc(-1px - $list-item-pad-height);
-    width: 1px;
-  }
-
-  // force narrow box
-  &:has(.info-icon) {
-    margin-left: -3.5em;
-    z-index: -1;
-    .info-icon {
-      background-color: #fff;
-      margin-left: -1.5em;
-      margin-right: -1em;
-    }
-  }
-
-  & > .boxed-inner {
-    border: 1px solid $boxed-colour;
-    background-color: $white;
-    padding: 2px $list-item-pad-height;
-  }
-}
-
-// top box
-.record-list:has(.boxed) {
-  // vertical line: connect deep downwards / stop connecting upwards
-  .boxed:last-child::after {
-    top: 50%;
-    bottom: -3em;
-  }
-}
-
-// give country link space on narrow viewports
-.data-rows:has(.link-open-country) {
-  padding-bottom: 4em;
-
-  @media (min-width: $bp-desktop) {
-    padding-bottom: 4em;
-  }
-}
-
-// anchor country link to the bottom
-.record-list:has(.link-open-country) {
-  flex-grow: 1;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
-
-// expand horizontal lines on the target and target years
-:not(.target-expanded):has(+ .target-expanded.is-open),
-.target-expanded.is-open {
-  .numeric + .boxed {
-    min-width: 40%;
-    &:last-child {
-      //$dash-less-one: $boxed-dash-length -1em;
-      //min-width: calc(40% + $dash-less-one);
-//      min-width: calc(40% + $boxed-dash-length);
-      min-width: calc(40% + $boxed-dash-length-less-one);
-
-      //min-width: calc(40% + 1em);
-    }
-  }
-}
-
-// expanded element
-.target-expanded {
-  &:not(.is-open) {
-    height: 0;
-    max-height: 0;
-    overflow: hidden;
-    padding: 0;
-    .boxed:last-child::before {
-      // target year horizontal line
-      left: 0;
-    }
-  }
-
-  // the target year
-  .boxed:last-child {
-    padding-right: $boxed-dash-length;
-//    margin-left: 3em;
-    margin-left: calc($boxed-dash-length + 0.5em);
-
-    &::before {
-      // prevent horizontal line running to the right
-      right: $boxed-dash-length;
-    }
-  }
-}
-
-.target-summary {
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 1em;
-
-  // the last has "nothing in front of me that isn't expanded"
-  &:not(:has(~ .target-summary:not(.target-expanded))) {
-    // the last has nothing connected below: hide vertical line
-    & ~ .target-expanded .boxed:last-child::after {
-      display: none;
-    }
-
-    // the last box
-    .boxed:last-child::after {
-      bottom: 50%;
-    }
-  }
-}
-*/
 .record-list {
   align-items: center;
   border-top: 1px solid $gray-5;
@@ -376,64 +184,7 @@ a[disabled] {
     flex-grow: 1;
   }
 }
-/*
-.record-list,
-.target-summary {
-  padding: $list-item-pad-height 0;
-  position: relative;
 
-  a {
-    color: unset;
-  }
-
-  a.info-icon {
-    cursor: help;
-    margin-right: 1em;
-
-    &:hover {
-      // allow hovering over the gap!
-      &::after {
-        content: "";
-        display: block;
-        width: 3em;
-        height: 4em;
-        position: relative;
-        transform: translate(-50%, -75%);
-      }
-    }
-  }
-
-  &:has(a.info-icon:hover) {
-    .map-help-target {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
-
-  // TODO fade in with this?
-
-  //& > :not(.numeric) {
-  //  visibility: hidden;
-  //}
-
-  .numeric {
-    text-align: right;
-  }
-
-  &:not(.target-expanded) {
-    .numeric {
-      margin-right: 6px;
-    }
-  }
-
-  .target-active {
-    font-weight: bold;
-    &.numeric {
-      border-bottom: 1px solid $boxed-colour;
-    }
-  }
-}
-*/
 .map-section {
   .flag-orb {
     height: 1em;

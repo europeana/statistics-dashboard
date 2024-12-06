@@ -3,8 +3,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
-
-import { IHash, NameValue } from '../../_models';
+import { IdValue, IHash } from '../../_models';
 
 enum ZoomLevel {
   SINGLE = 'SINGLE',
@@ -19,9 +18,10 @@ enum ZoomLevel {
   standalone: true
 })
 export class MapComponent {
-  @Output() mapCountrySet = new EventEmitter<string | undefined>();
+  @Output() mapCountrySet = new EventEmitter<void>();
 
-  _results: Array<NameValue>;
+  _mapData: Array<IdValue>;
+
   chart: am4maps.MapChart;
   chartHidden: am4maps.MapChart;
   polygonSeries: am4maps.MapPolygonSeries;
@@ -43,10 +43,10 @@ export class MapComponent {
   _isAnimating = false;
 
   set isAnimating(isAnimating: boolean) {
-    console.log('set isAnimating(' + isAnimating + ')');
+    this.log('set isAnimating(' + isAnimating + ')');
 
     if (isAnimating === this.isAnimating) {
-      console.log('set returns early same val ' + isAnimating);
+      this.log('set returns early same val ' + isAnimating);
       return;
     }
 
@@ -58,7 +58,7 @@ export class MapComponent {
       this.polygonSeries.mapPolygons.template.events.disableType('hit');
 
       this.chart.seriesContainer.draggable = false;
-      console.log(' - set drag off');
+      this.log(' - set drag off');
     } else {
       this.chart.events.enableType('hit');
       this.chart.seriesContainer.events.enableType('hit');
@@ -89,16 +89,14 @@ export class MapComponent {
     this.selectedCountryPrev = this.mapCountries[indexPrev];
 
     // emit output
-    this.mapCountrySet.emit(selectedCountry);
+    this.mapCountrySet.emit();
   }
 
-  // TODO rename results
-  // generate unique list of countries than includes the bounding countries
-  @Input() set results(results: Array<NameValue>) {
+  @Input() set mapData(mapData: Array<IdValue>) {
     this.mapCountries = Object.keys(
-      results
-        .map((item: NameValue) => {
-          return item.name;
+      mapData
+        .map((item: IdValue) => {
+          return item.id;
         })
         .concat(this.boundingCountries)
         .reduce((ob: IHash<boolean>, name) => {
@@ -107,13 +105,28 @@ export class MapComponent {
         }, {})
     );
 
-    this._results = results;
+    this._mapData = mapData;
     this.updateData();
-    am4core.options.autoDispose = true;
   }
 
-  get results(): Array<NameValue> {
-    return this._results;
+  get mapData(): Array<IdValue> {
+    return this._mapData;
+  }
+
+  mapSeriesIndex = 0;
+  colours = ['#0a72cc', '#00ff00'].map((val) => am4core.color(val));
+  legends: Array<string> = [];
+
+  dataSwitch(mapSeriesIndex: number): void {
+    this.mapSeriesIndex = mapSeriesIndex;
+    console.log(
+      'MAP dataSwitch(), mapSeriesIndex now = ' + this.mapSeriesIndex
+    );
+    this.updateData();
+    this.updateHeatRules();
+    const colour = this.colours[this.mapSeriesIndex];
+    this.legend.maxColor = colour.brighten(1);
+    this.legend.minColor = colour.brighten(-0.3);
   }
 
   constructor() {
@@ -124,11 +137,14 @@ export class MapComponent {
    *
    **/
   updateData(): void {
-    if (!this.polygonSeries || !this.results) {
+    if (!this.polygonSeries || !this.mapData) {
       return;
     }
-    this.polygonSeries.data = this.filterResultsData();
-    this.polygonSeriesHidden.data = this.filterResultsData();
+    const data = this.filterResultsData();
+    this.polygonSeries.data = data;
+    this.polygonSeriesHidden.data = data;
+    //this.polygonSeries.data = this.filterResultsData();
+    //this.polygonSeriesHidden.data = this.filterResultsData();
   }
 
   /** ngAfterViewInit
@@ -141,19 +157,22 @@ export class MapComponent {
   /** filterResultsData
    * filters mapped data
    **/
-  filterResultsData(
-    countries = this.mapCountries
-  ): Array<{ id: string; value: number }> {
-    return this.results
-      .filter((nv: NameValue) => {
-        return countries.includes(nv.name);
-      })
-      .map((nv: NameValue) => {
-        return {
-          id: nv.name,
-          value: nv.value
-        };
-      });
+  filterResultsData(countries = this.mapCountries): Array<IdValue> {
+    //console.log('filterResultsData, this.mapDataX = ' + this.mapDataX + '\n\t' + this.mapSeriesIndex);
+    //console.log(' this.mapDataX = ' + this.mapDataX[this.mapSeriesIndex]);
+    return (
+      this.mapData //X[this.mapSeriesIndex]
+        .filter((nv: IdValue) => {
+          return countries.includes(nv.id);
+        })
+        // this map looks redundant, but it clears out MapPolygon data
+        .map((nv: IdValue) => {
+          return {
+            id: nv.id,
+            value: nv.value
+          };
+        })
+    );
   }
 
   /** setCountryInclusion
@@ -169,10 +188,10 @@ export class MapComponent {
       if (countries.length === 1) {
         this.zoomToCountries(countries, ZoomLevel.SINGLE, 0);
 
-        console.log('SCI disables drag');
+        this.log('SCI disables drag');
         this.chart.seriesContainer.draggable = false;
       } else {
-        console.log('SCI enables drag');
+        this.log('SCI enables drag');
         this.chart.seriesContainer.draggable = true;
 
         this.selectedCountry = undefined;
@@ -192,19 +211,19 @@ export class MapComponent {
 
     const oldCountry = this.polygonSeries.include[0];
     if (this.polygonSeriesHidden.include.length === 1) {
-      console.log('countryMorph exit: animating!');
+      this.log('countryMorph exit: animating!');
       return;
     }
     if (this.polygonSeries.include.length > 1) {
-      console.log('countryMorph exit: not in single country mode');
+      this.log('countryMorph exit: not in single country mode');
       return;
     }
     if (oldCountry === newCountry) {
-      console.log('countryMorph exit: old and new are the same: ' + oldCountry);
+      this.log('countryMorph exit: old and new are the same: ' + oldCountry);
       return;
     }
 
-    console.log('countryMorph sets animating to true...');
+    this.log('countryMorph sets animating to true...');
     this.isAnimating = true;
 
     // curtail the hidden map to include only the
@@ -213,7 +232,7 @@ export class MapComponent {
     this.selectedCountry = newCountry;
 
     this.polygonSeriesHidden.events.once('validated', () => {
-      console.log('countryMorph hidden once validated...');
+      this.log('countryMorph hidden once validated...');
 
       const polyHidden = this.polygonSeriesHidden.mapPolygons.getIndex(0);
       const poly = this.polygonSeries.getPolygonById(oldCountry);
@@ -223,9 +242,7 @@ export class MapComponent {
         this.polygonSeriesHidden.data = [];
         this.polygonSeriesHidden.include = this.mapCountries;
         setTimeout(() => {
-          console.log(
-            'morphAnimationEnded (setTimeout) call sci ' + newCountry
-          );
+          this.log('morphAnimationEnded (setTimeout) call sci ' + newCountry);
           this.setCountryInclusion([newCountry]);
         });
       };
@@ -238,12 +255,15 @@ export class MapComponent {
             )
           : poly.polygon.morpher.morphToCircle(1, this.animationTime);
         morphAnimation.events.on('animationended', morphAnimationEnded);
-        //morphAnimation.events.on('animationstopped', morphAnimationEnded);
       } else {
-        console.log('WE HABE NO POLY ' + newCountry + ' / ' + oldCountry);
+        this.log('WE HAVE NO POLY ' + newCountry + ' / ' + oldCountry);
         morphAnimationEnded();
       }
     });
+  }
+
+  log(s: string): void {
+    console.log(s);
   }
 
   /** countryClick
@@ -252,19 +272,19 @@ export class MapComponent {
    **/
   countryClick(country: string): void {
     if (this.isAnimating) {
-      console.log('return countryClick isAnimating');
+      this.log('return countryClick isAnimating');
       return;
     }
 
     const singleMode = this.polygonSeries.include.length === 1;
     if (singleMode) {
-      console.log('countryClick RESET to all because single...');
+      this.log('countryClick RESET to all because single...');
 
       // revert back to full map
       this.setCountryInclusion(this.mapCountries);
       // will invoke zoomTo with instant effect
     } else {
-      console.log('countryClick sets animating to true...');
+      this.log('countryClick sets animating to true...');
 
       this.isAnimating = true;
 
@@ -280,9 +300,25 @@ export class MapComponent {
       const fn = (): void => {
         this.setCountryInclusion([country]);
       };
-      //animation.events.on('animationstopped', fn);
       animation.events.on('animationended', fn);
     }
+  }
+
+  /** updateHeatRules
+   *
+   * adds or removes series' heatRules
+   **/
+  updateHeatRules(): void {
+    if (this.polygonSeries.heatRules.length) {
+      this.polygonSeries.heatRules.pop();
+    }
+    const colour = this.colours[this.mapSeriesIndex];
+    this.polygonSeries.heatRules.push({
+      property: 'fill',
+      target: this.polygonSeries.mapPolygons.template,
+      min: colour.brighten(1),
+      max: colour.brighten(-0.3)
+    });
   }
 
   /** drawChart
@@ -292,6 +328,7 @@ export class MapComponent {
     const countryClick = this.countryClick.bind(this);
 
     am4core.useTheme(am4themes_animated);
+    am4core.options.autoDispose = true;
 
     // Create map instance
     const chart = am4core.create('mapChart', am4maps.MapChart);
@@ -340,13 +377,8 @@ export class MapComponent {
     polygonSeries.useGeodata = true;
     polygonSeriesHidden.useGeodata = true;
 
-    // add heat rules
-    polygonSeries.heatRules.push({
-      property: 'fill',
-      target: this.polygonSeries.mapPolygons.template,
-      min: this.chart.colors.getIndex(1).brighten(1),
-      max: this.chart.colors.getIndex(1).brighten(-0.3)
-    });
+    // add / update heat rules
+    this.updateHeatRules();
 
     this.chart.events.disableType('doublehit');
     this.chart.seriesContainer.events.disableType('doublehit');
@@ -433,6 +465,7 @@ export class MapComponent {
       this.mapHeight = n - s;
       this.mapWidth = e - w;
       this.zoomToCountries();
+      chart.series.template.fill = am4core.color('#ffee00');
     });
   }
 
@@ -464,15 +497,15 @@ export class MapComponent {
     const [north, south, east, west] = this.getBoundingCoords(zoomTo);
 
     if (zoomLevelIn === ZoomLevel.SINGLE) {
-      //console.log('aspectRatioChart single ' + aspectRatioChart);
+      //this.log('aspectRatioChart single ' + aspectRatioChart);
 
       zoomLevel = zoomLevelSingle;
       if (aspectRatioChart > 2.4) {
-        console.log('correct single');
+        this.log('correct single');
         zoomLevel = 0.75;
       }
       if (aspectRatioChart > 3.4) {
-        console.log('correct single ++');
+        this.log('correct single ++');
         zoomLevel = 0.725;
       }
     } else if (zoomLevelIn === ZoomLevel.MULTIPLE) {
@@ -487,9 +520,9 @@ export class MapComponent {
         (east - west) /
         (this.chart.pixelHeight / selectionHeight);
 
-      console.log('aspectRatioChart\t\t' + aspectRatioChart.toFixed(2));
-      console.log('aspectRatioSelection\t\t' + aspectRatioSelection.toFixed(2));
-      console.log('aspectRatioCombined\t\t' + aspectRatioCombined.toFixed(2));
+      this.log('aspectRatioChart\t\t' + aspectRatioChart.toFixed(2));
+      this.log('aspectRatioSelection\t\t' + aspectRatioSelection.toFixed(2));
+      this.log('aspectRatioCombined\t\t' + aspectRatioCombined.toFixed(2));
 
       /*
 
@@ -527,12 +560,12 @@ export class MapComponent {
       let finalSutractionAlt = Math.min(aspectRatioChart, aspectRatioSelection) / aspectRatioChart;
       //zoomLevel -= finalSutraction;
 
-      console.log('aspectRatioChart: ' + aspectRatioChart + '\nspectRatioSelection = ' + aspectRatioSelection + '...');
+      this.log('aspectRatioChart: ' + aspectRatioChart + '\nspectRatioSelection = ' + aspectRatioSelection + '...');
 
       */
-      //console.log('... = finalSutraction = ' + finalSutraction.toFixed(2));
-      //console.log('... = finalSutractionAlt = ' + finalSutractionAlt.toFixed(2));
-      //console.log('... = zoomLevel to subtract from = ' + zoomLevel.toFixed(2));
+      //this.log('... = finalSutraction = ' + finalSutraction.toFixed(2));
+      //this.log('... = finalSutractionAlt = ' + finalSutractionAlt.toFixed(2));
+      //this.log('... = zoomLevel to subtract from = ' + zoomLevel.toFixed(2));
 
       //zoomLevel -= finalSutractionAlt;
       zoomLevel = 1;
@@ -555,20 +588,20 @@ export class MapComponent {
     );
 
     if (duration === 0) {
-      console.log('zoomTo empty duration falsifies');
+      this.log('zoomTo empty duration falsifies');
       this.isAnimating = false;
     }
     //this.isAnimating = false;
 
     res.events.on('animationstopped', () => {
       if (this.isAnimating) {
-        console.log('zoomTo animationstopped');
+        this.log('zoomTo animationstopped');
         this.isAnimating = false;
       }
     });
 
     res.events.on('animationended', () => {
-      console.log('zoomTo animationended');
+      this.log('zoomTo animationended');
       this.isAnimating = false;
     });
 

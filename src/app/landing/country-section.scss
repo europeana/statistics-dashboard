@@ -14,7 +14,7 @@ $boxed-dash-length-less-one: 4em;
 $boxed-time: 0.3s;
 
 .record-list:has(.map-navigation-link) {
-  border-top: 0;
+  border-top-color: transparent;
 }
 
 // for the negative z-index to work on the pseudo-element the grandparent's needs set!
@@ -72,6 +72,40 @@ $boxed-time: 0.3s;
     border: 1px solid $boxed-colour;
     background-color: $white;
     padding: 2px $list-item-pad-height;
+  }
+}
+
+.country-list {
+  $scrollbar-width: 16px;
+
+  margin-right: -$scrollbar-width;
+
+  // TODO map constants.
+  $map-height: 275px;
+  max-height: calc($map-height - 4em);
+  overflow: auto;
+
+  & > * {
+    width: calc(100% - $scrollbar-width);
+  }
+
+  &.hidden {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  .numeric {
+    margin-left: 6px;
+    min-width: 6em;
+  }
+}
+
+.derived-series-menu {
+  & > * {
+    display: none;
+  }
+  &:hover > * {
+    display: block;
   }
 }
 

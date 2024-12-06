@@ -21,7 +21,7 @@ describe('MapComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
-    component.results = [];
+    component.mapData = [];
     fixture.detectChanges();
   });
 
@@ -31,7 +31,7 @@ describe('MapComponent', () => {
 
   it('should update the data', () => {
     expect(component.polygonSeries.data.length).toEqual(0);
-    component.results = [{ name: 'Italy', value: 1881 }];
+    component.mapData = [{ id: 'Italy', value: 1881 }];
     component.updateData();
     expect(component.polygonSeries.data.length).toEqual(1);
   });

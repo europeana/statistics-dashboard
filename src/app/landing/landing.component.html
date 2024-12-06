@@ -62,17 +62,63 @@
       <div class="container-h data-rows-title">
         <!-- Selected Country Header -->
         @if (isCountryCard && mapChart && mapChart.selectedCountry) {
-        <span>
-          {{ mapChart.selectedCountry | renameCountry | uppercase }}
+        <span style="position: relative; display: flex; align-items: center">
+          {{ dimension | renameApiFacet | uppercase }}:
+          {{ mapChart.selectedCountry | renameCountry }}
         </span>
         <a
           class="x"
           data-e2e="close-map-selection"
-          (click)="mapChart.countryClick(mapChart.selectedCountry)"
+          (click)="closeMapSelection()"
         ></a>
         } @else {
         <!-- Generic Dimension Header -->
-        <span>{{ dimension | renameApiFacet | uppercase }}</span>
+        <span
+          >{{ dimension | renameApiFacet | uppercase }}
+
+          @if(isCountryCard){
+          <span class="derived-series-menu">
+            (derived series)
+
+            <span
+              style="
+                position: absolute;
+                left: 3em;
+                z-index: 1;
+                background-color: #fff;
+              "
+            >
+              <span
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding: 4px;
+                "
+                *ngFor="
+                  let targetType of [
+                    TargetFieldName.THREE_D,
+                    TargetFieldName.HQ,
+                    TargetFieldName.TOTAL
+                  ]
+                "
+              >
+                {{ targetType }}
+                <span
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    padding-left: 4px;
+                  "
+                >
+                  <a (click)="dataSwitch(targetType, 0)">2025</a>
+                  <a (click)="dataSwitch(targetType, 1)">2030</a>
+                </span>
+              </span>
+            </span>
+          </span>
+          }
+        </span>
+
         <span i18n="landing data header@@landingDataHeader"
           >ITEMS PROVIDED</span
         >
@@ -80,6 +126,7 @@
       </div>
 
       @if (isCountryCard){
+
       <!-- Selected Country Navigation -->
       @if(mapChart && mapChart.selectedCountry){
       <div
@@ -101,6 +148,22 @@
         >
           {{ navCountry | renameCountry }}
         </a>
+        <span
+          *ngIf="navCountry === mapChart.selectedCountry"
+          style="margin-left: 0.3em; align-self: center; flex-basis: 100%"
+        >
+          <a
+            style="
+              transform: scale(0.75) translateY(0.25em);
+              display: inline-block;
+            "
+            class="x"
+            data-e2e="close-map-selection"
+            (click)="closeMapSelection()"
+          ></a>
+        </span>
+        <!--
+        -->
 
         <!-- end nav - what follows is right-aligned -->
 
@@ -150,6 +213,7 @@
         </span>
         } }
       </div>
+      <!-- End Selected Country Navigation -->
 
       <!-- country data -->
 
@@ -245,12 +309,15 @@
 
       }
 
+      <!-- country data rows -->
+
       <div
         class="country-list"
         [ngClass]="{
           hidden: mapChart && mapChart.selectedCountry
         }"
       >
+        <!--
         <div *ngFor="let row of data" class="container-h record-list">
           <a
             class="link-select-country"
@@ -264,8 +331,27 @@
           <span class="numeric">{{ row.value | number }}</span>
           <span class="numeric">{{ row.percent }}%</span>
         </div>
+        -->
+
+        <!--new way omits percentages!-->
+        <div *ngFor="let row of mapData" class="container-h record-list">
+          <a
+            class="link-select-country"
+            (click)="mapChart.countryClick(row.id)"
+          >
+            <span
+              >{{ row.id | renameCountry
+              }}<span class="flag-orb" [ngClass]="row.id"></span
+            ></span>
+          </a>
+          <span class="numeric">{{ row.value | number }}</span>
+          <span class="numeric">{{ row.percent }}%</span>
+        </div>
       </div>
       } @else {
+
+      <!-- generic data rows -->
+
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
@@ -368,11 +454,11 @@
         >Explore by providing countries</span
       >
       <div class="entry-card-content">
-        <div class="entry-card-pair map-section">
+        <div class="entry-card-pair map-section" *ngIf="!!mapData">
           <div class="map-container">
             <app-map-chart
-              [results]="data"
-              (mapCountrySet)="onMapCountrySet($event)"
+              [mapData]="mapData"
+              (mapCountrySet)="tapCountryDataLoad()"
               #mapChart
             ></app-map-chart>
           </div>
