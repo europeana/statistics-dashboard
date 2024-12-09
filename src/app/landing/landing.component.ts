@@ -1,6 +1,7 @@
 import {
   DecimalPipe,
   JsonPipe,
+  KeyValuePipe,
   LowerCasePipe,
   NgClass,
   NgFor,
@@ -43,6 +44,13 @@ import { SpeechBubbleComponent } from '../speech-bubble';
 import { SubscriptionManager } from '../subscription-manager';
 import { TruncateComponent } from '../truncate';
 
+type VisibleHeatMap = {
+  [key in
+    | TargetFieldName.THREE_D
+    | TargetFieldName.HQ
+    | TargetFieldName.TOTAL]: number;
+};
+
 @Component({
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss', './country-section.scss'],
@@ -56,6 +64,7 @@ import { TruncateComponent } from '../truncate';
     NgTemplateOutlet,
     BarComponent,
     RouterLink,
+    KeyValuePipe,
     MapComponent,
     UpperCasePipe,
     LowerCasePipe,
@@ -91,7 +100,9 @@ export class LandingComponent extends SubscriptionManager {
   countryData: IHash<Array<TargetData>>;
   allProgressSeries: IHashArray<Array<IdValue>> = {};
   mapData: Array<IdValue>;
-  mapSeriesIndex = 0;
+  mapMenuIsOpen = false;
+  //  mapSeriesIndex?: number;
+  visibleHeatMap?: VisibleHeatMap;
 
   @Input() set landingData(results: GeneralResultsFormatted) {
     this._landingData = results;
@@ -116,8 +127,33 @@ export class LandingComponent extends SubscriptionManager {
     super();
   }
 
+  // template utility
+  getCountryRows(
+    defaultResult: Array<NameValue>
+  ): Array<IdValue> | Array<NameValue> {
+    if (this.visibleHeatMap) {
+      const key = Object.keys(this.visibleHeatMap)[0];
+      return this.allProgressSeries[key][this.visibleHeatMap[key]];
+    }
+    return defaultResult;
+  }
+
   closeMapSelection(): void {
     this.mapChart.countryClick(this.mapChart.selectedCountry);
+  }
+
+  /**
+   * mapMenuOpenerClicked
+   *
+   * toggles mapMenuIsOpen
+   * triggers data load if needed
+   **/
+  mapMenuOpenerClicked(): void {
+    this.mapMenuIsOpen = !this.mapMenuIsOpen;
+    if (this.mapMenuIsOpen) {
+      this.tapCountryDataLoad();
+      this.tapTargetDataLoad();
+    }
   }
 
   /**
@@ -133,8 +169,7 @@ export class LandingComponent extends SubscriptionManager {
           const value = this.countryData[country][0][targetType];
           const target =
             this.targetMetaData[country][targetType][targetIndex].value;
-          const progress = (parseInt(value) / target) * 100;
-
+          const progress = value ? (parseInt(value) / target) * 100 : 0;
           this.allProgressSeries[targetType][targetIndex].push({
             id: country,
             value: progress
@@ -144,11 +179,35 @@ export class LandingComponent extends SubscriptionManager {
     });
   }
 
+  /**
+   * sortDerivedSeries
+   *
+   **/
+  sortDerivedSeries(): void {
+    Object.values(TargetFieldName).forEach((targetType: TargetFieldName) => {
+      [0, 1].forEach((targetIndex: number) => {
+        this.allProgressSeries[targetType][targetIndex].sort(
+          (itemA: IdValue, itemB: IdValue) => {
+            if (itemA.value > itemB.value) {
+              return -1;
+            } else if (itemA.value < itemB.value) {
+              return 1;
+            }
+            return 0;
+          }
+        );
+      });
+    });
+  }
+
+  dataSwitchClear(): void {
+    this.mapChart.mapData = this.mapData;
+    this.visibleHeatMap = undefined;
+    this.mapChart.setColourScheme();
+    this.mapMenuIsOpen = false;
+  }
+
   dataSwitch(seriesTargetType: TargetFieldName, targetIndex: number): void {
-    console.log('dataSwitch()');
-
-    // TODO do generation when menu is opened
-
     // ensure targetMetaData has loaded
     this.tapTargetDataLoad(undefined, () => {
       // ensure targetCountryData has loaded
@@ -156,18 +215,28 @@ export class LandingComponent extends SubscriptionManager {
         // ensure derived series have been generated
         if (Object.keys(this.allProgressSeries).length === 0) {
           this.buildDerivedSeries();
+          this.sortDerivedSeries();
         }
 
         this.mapChart.mapData =
           this.allProgressSeries[seriesTargetType][targetIndex];
 
-        this.mapSeriesIndex += 1;
-        if (this.mapSeriesIndex > 1) {
-          this.mapSeriesIndex = 0;
-        }
-        this.mapChart.dataSwitch(this.mapSeriesIndex);
+        const vhm = [seriesTargetType].reduce(
+          (ob: VisibleHeatMap, tType: TargetFieldName) => {
+            ob[tType] = targetIndex;
+            return ob;
+          },
+          {} as VisibleHeatMap
+        );
+        this.visibleHeatMap = vhm;
+
+        this.mapChart.setColourScheme(
+          this.mapChart.colourSchemeTargets[seriesTargetType][targetIndex]
+        );
       });
     });
+
+    this.mapMenuIsOpen = false;
   }
 
   prefixClass(className: string): string {

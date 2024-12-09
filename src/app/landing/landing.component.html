@@ -71,58 +71,73 @@
           data-e2e="close-map-selection"
           (click)="closeMapSelection()"
         ></a>
-        } @else {
-        <!-- Generic Dimension Header -->
-        <span
-          >{{ dimension | renameApiFacet | uppercase }}
+        } @else { @if(isCountryCard){
 
-          @if(isCountryCard){
-          <span class="derived-series-menu">
-            (derived series)
+        <span style="display: flex">
+          <span>{{ dimension | renameApiFacet | uppercase }}</span>
 
-            <span
-              style="
-                position: absolute;
-                left: 3em;
-                z-index: 1;
-                background-color: #fff;
-              "
+          <span>
+            <a
+              class="derived-series-menu-opener flag-orb default"
+              (click)="mapMenuOpenerClicked()"
             >
-              <span
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  padding: 4px;
-                "
-                *ngFor="
-                  let targetType of [
-                    TargetFieldName.THREE_D,
-                    TargetFieldName.HQ,
-                    TargetFieldName.TOTAL
-                  ]
-                "
-              >
-                {{ targetType }}
+            </a>
+            <span
+              class="derived-series-menu"
+              [ngClass]="{ hidden: !mapMenuIsOpen }"
+            >
+              <span class="derived-series-menu-inner">
                 <span
                   style="
                     display: flex;
-                    flex-direction: column;
-                    padding-left: 4px;
+                    justify-content: space-between;
+                    padding: 4px;
+                  "
+                  *ngFor="
+                    let targetType of [
+                      TargetFieldName.THREE_D,
+                      TargetFieldName.HQ,
+                      TargetFieldName.TOTAL
+                    ]
                   "
                 >
-                  <a (click)="dataSwitch(targetType, 0)">2025</a>
-                  <a (click)="dataSwitch(targetType, 1)">2030</a>
+                  {{ targetType | renameTargetType }}
+                  <span
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      padding-left: 4px;
+                    "
+                  >
+                    <a (click)="dataSwitch(targetType, 0)">2025</a>
+                    <a (click)="dataSwitch(targetType, 1)">2030</a>
+                  </span>
                 </span>
+                <a *ngIf="visibleHeatMap" (click)="dataSwitchClear()">Clear</a>
               </span>
             </span>
           </span>
-          }
         </span>
-
+        @if(visibleHeatMap){
+        <span class="container-h">
+          <span *ngFor="let vhr of visibleHeatMap | keyvalue"
+            >Progress {{ vhr.key | renameTargetType }}
+            {{ vhr.value ? 2030 : 2025 }}</span
+          >
+          <a class="x" (click)="dataSwitchClear()"></a>
+        </span>
+        }@else{
         <span i18n="landing data header@@landingDataHeader"
           >ITEMS PROVIDED</span
         >
-        }
+        } } @else {
+        <!--not a country -->
+        <span>{{ dimension | renameApiFacet | uppercase }} </span>
+        <span i18n="landing data header@@landingDataHeader"
+          >ITEMS PROVIDED</span
+        >
+
+        } }
       </div>
 
       @if (isCountryCard){
@@ -158,7 +173,6 @@
               display: inline-block;
             "
             class="x"
-            data-e2e="close-map-selection"
             (click)="closeMapSelection()"
           ></a>
         </span>
@@ -317,31 +331,17 @@
           hidden: mapChart && mapChart.selectedCountry
         }"
       >
-        <!--
-        <div *ngFor="let row of data" class="container-h record-list">
+        <div
+          *ngFor="let row of getCountryRows(data)"
+          class="container-h record-list"
+        >
           <a
             class="link-select-country"
-            (click)="mapChart.countryClick(row.name)"
+            (click)="mapChart.countryClick(row.id ?? row.name)"
           >
             <span
-              >{{ row.name | renameCountry
-              }}<span class="flag-orb" [ngClass]="row.name"></span
-            ></span>
-          </a>
-          <span class="numeric">{{ row.value | number }}</span>
-          <span class="numeric">{{ row.percent }}%</span>
-        </div>
-        -->
-
-        <!--new way omits percentages!-->
-        <div *ngFor="let row of mapData" class="container-h record-list">
-          <a
-            class="link-select-country"
-            (click)="mapChart.countryClick(row.id)"
-          >
-            <span
-              >{{ row.id | renameCountry
-              }}<span class="flag-orb" [ngClass]="row.id"></span
+              >{{ row.id ?? row.name | renameCountry
+              }}<span class="flag-orb" [ngClass]="row.id ?? row.name"></span
             ></span>
           </a>
           <span class="numeric">{{ row.value | number }}</span>

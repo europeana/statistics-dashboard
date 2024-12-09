@@ -3,13 +3,32 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
-import { IdValue, IHash } from '../../_models';
+import { IdValue, IHash, TargetFieldName } from '../../_models';
+import {
+  colourHeatmapBlue,
+  colourHeatmapRed,
+  colourHeatmapYellow,
+  colourStatsBlue
+} from '../../_data';
 
 enum ZoomLevel {
   SINGLE = 'SINGLE',
   MULTIPLE = 'MULTIPLE',
   INTERMEDIATE = 'INTERMEDIATE'
 }
+
+interface MapColourScheme {
+  base: am4core.Color;
+  highlight: am4core.Color;
+  outline: am4core.Color;
+}
+
+type ColourSchemeMap = {
+  [key in
+    | TargetFieldName.THREE_D
+    | TargetFieldName.HQ
+    | TargetFieldName.TOTAL]: Array<MapColourScheme>;
+};
 
 @Component({
   selector: 'app-map-chart',
@@ -27,6 +46,7 @@ export class MapComponent {
   polygonSeries: am4maps.MapPolygonSeries;
   polygonSeriesHidden: am4maps.MapPolygonSeries;
   legend: am4maps.HeatLegend;
+  hs: am4core.SpriteState<am4core.IPolygonProperties, am4core.IPolygonAdapters>;
 
   mapHeight: number;
   mapWidth: number;
@@ -88,7 +108,6 @@ export class MapComponent {
     this.selectedCountryNext = this.mapCountries[indexNext];
     this.selectedCountryPrev = this.mapCountries[indexPrev];
 
-    // emit output
     this.mapCountrySet.emit();
   }
 
@@ -113,24 +132,78 @@ export class MapComponent {
     return this._mapData;
   }
 
-  mapSeriesIndex = 0;
-  colours = ['#0a72cc', '#00ff00'].map((val) => am4core.color(val));
-  legends: Array<string> = [];
-
-  dataSwitch(mapSeriesIndex: number): void {
-    this.mapSeriesIndex = mapSeriesIndex;
-    console.log(
-      'MAP dataSwitch(), mapSeriesIndex now = ' + this.mapSeriesIndex
-    );
-    this.updateData();
-    this.updateHeatRules();
-    const colour = this.colours[this.mapSeriesIndex];
-    this.legend.maxColor = colour.brighten(1);
-    this.legend.minColor = colour.brighten(-0.3);
-  }
+  colourSchemeTargets: ColourSchemeMap;
+  colourSchemeDefault: MapColourScheme;
 
   constructor() {
     am4core.options.autoDispose = true;
+
+    const cst = Object.values(TargetFieldName).reduce(
+      (ob: ColourSchemeMap, tType: TargetFieldName) => {
+        ob[tType] = [];
+        return ob;
+      },
+      {} as ColourSchemeMap
+    );
+
+    const colourHighlightYellow = '#ffcb5c';
+
+    cst[TargetFieldName.THREE_D].push({
+      base: am4core.color(colourHeatmapBlue),
+      highlight: am4core.color(colourHeatmapBlue),
+      outline: am4core.color(colourHeatmapYellow)
+    });
+    cst[TargetFieldName.THREE_D].push({
+      base: am4core.color(colourHeatmapBlue),
+      highlight: am4core.color(colourHeatmapYellow),
+      outline: am4core.color(colourHeatmapYellow)
+    });
+
+    cst[TargetFieldName.HQ].push({
+      base: am4core.color(colourHeatmapRed),
+      highlight: am4core.color(colourHeatmapRed),
+      outline: am4core.color(colourHeatmapYellow)
+    });
+    cst[TargetFieldName.HQ].push({
+      base: am4core.color(colourHeatmapRed),
+      highlight: am4core.color(colourHeatmapYellow),
+      outline: am4core.color(colourHeatmapYellow)
+    });
+
+    cst[TargetFieldName.TOTAL].push({
+      base: am4core.color(colourHeatmapYellow),
+      highlight: am4core.color(colourHeatmapYellow),
+      outline: am4core.color(colourHeatmapYellow)
+    });
+    cst[TargetFieldName.TOTAL].push({
+      base: am4core.color(colourHeatmapYellow),
+      highlight: am4core.color(colourHeatmapYellow),
+      outline: am4core.color(colourHeatmapYellow)
+    });
+
+    this.colourSchemeTargets = cst;
+    this.colourSchemeDefault = {
+      base: am4core.color(colourStatsBlue),
+      highlight: am4core.color(colourStatsBlue),
+      outline: am4core.color(colourHighlightYellow)
+    };
+  }
+
+  /* setColourScheme
+   *
+   * updates
+   *  - heat rules
+   *  - legend
+   **/
+  setColourScheme(scheme = this.colourSchemeDefault): void {
+    //console.log('MAP setColourScheme(), scheme = ' + scheme);
+    this.updateHeatRules(scheme.base);
+
+    this.legend.maxColor = scheme.base.brighten(1);
+    this.legend.minColor = scheme.base.brighten(-0.3);
+
+    this.hs.properties.fill = scheme.highlight;
+    this.hs.properties.stroke = scheme.outline;
   }
 
   /** updateData
@@ -158,10 +231,8 @@ export class MapComponent {
    * filters mapped data
    **/
   filterResultsData(countries = this.mapCountries): Array<IdValue> {
-    //console.log('filterResultsData, this.mapDataX = ' + this.mapDataX + '\n\t' + this.mapSeriesIndex);
-    //console.log(' this.mapDataX = ' + this.mapDataX[this.mapSeriesIndex]);
     return (
-      this.mapData //X[this.mapSeriesIndex]
+      this.mapData
         .filter((nv: IdValue) => {
           return countries.includes(nv.id);
         })
@@ -308,11 +379,12 @@ export class MapComponent {
    *
    * adds or removes series' heatRules
    **/
-  updateHeatRules(): void {
+  updateHeatRules(colour: am4core.Color): void {
+    //  updateHeatRules(colourIndex = 0): void {
     if (this.polygonSeries.heatRules.length) {
       this.polygonSeries.heatRules.pop();
     }
-    const colour = this.colours[this.mapSeriesIndex];
+    //const colour = this.mapColours[colourIndex];
     this.polygonSeries.heatRules.push({
       property: 'fill',
       target: this.polygonSeries.mapPolygons.template,
@@ -378,7 +450,7 @@ export class MapComponent {
     polygonSeriesHidden.useGeodata = true;
 
     // add / update heat rules
-    this.updateHeatRules();
+    //    this.updateHeatRules(this.colourSchemeDefault.base);
 
     this.chart.events.disableType('doublehit');
     this.chart.seriesContainer.events.disableType('doublehit');
@@ -450,14 +522,12 @@ export class MapComponent {
     polygonTemplate.nonScalingStroke = true;
     polygonTemplate.strokeWidth = 0.5;
 
-    // Create hover state and set alternative fill color
-    const hs = polygonTemplate.states.create('hover');
-
-    hs.properties.fill = am4core.color('#0a72cc'); // $stats-blue
-    hs.properties.strokeWidth = 2.5;
-    hs.properties.stroke = am4core.color('#ffcb5c'); // $eu-yellow
+    // Create hover state
+    this.hs = polygonTemplate.states.create('hover');
+    this.hs.properties.strokeWidth = 2.5;
 
     this.updateData();
+    this.setColourScheme();
 
     chart.zoomLevel = 1;
     chart.events.on('ready', () => {

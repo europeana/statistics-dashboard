@@ -11,7 +11,19 @@ const pinkLight = '#FFCCFF';
 
 const yellowLight = '#FFC171';
 
-const primarySequence = ['#0A72CC', '#E11D53', '#FFAE00'];
+export const colourStatsBlue = '#0A72CC';
+
+const colour3dBlue = colourStatsBlue;
+const colourHqRed = '#E11D53';
+const colourTotalYellow = '#FFAE00';
+
+export const colourHeatmapBlue = '#1676aa'; // eu-blue
+export const colourHeatmapRed = colourHqRed;
+export const colourHeatmapYellow = colourTotalYellow;
+
+const primarySequence = [colour3dBlue, colourHqRed, colourTotalYellow];
+//const primarySequence = ['#0A72CC', '#E11D53', '#FFAE00'];
+
 const secondarySequence = [greenForest, pinkLight, blue];
 const tertiarySequence = [pinkBright, blueLight, green];
 const lastSequence = [yellowLight, greenLight, pinkLilac];
