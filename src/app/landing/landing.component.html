@@ -87,12 +87,7 @@
               [ngClass]="{ hidden: !mapMenuIsOpen }"
             >
               <span class="derived-series-menu-inner">
-                <span
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 4px;
-                  "
+                <ng-container
                   *ngFor="
                     let targetType of [
                       TargetFieldName.THREE_D,
@@ -101,19 +96,31 @@
                     ]
                   "
                 >
-                  {{ targetType | renameTargetType }}
-                  <span
-                    style="
-                      display: flex;
-                      flex-direction: column;
-                      padding-left: 4px;
-                    "
-                  >
-                    <a (click)="dataSwitch(targetType, 0)">2025</a>
-                    <a (click)="dataSwitch(targetType, 1)">2030</a>
+                  <span>
+                    {{ targetType | renameTargetType }}
                   </span>
-                </span>
-                <a *ngIf="visibleHeatMap" (click)="dataSwitchClear()">Clear</a>
+                  <ng-container
+                    *ngFor="let targetYear of ['2025', '2030']; let i = index"
+                  >
+                    <a
+                      class="menu-item"
+                      (click)="showHeatmap(targetType, i)"
+                      [ngStyle]="{
+                        borderColor:
+                          visibleHeatMap && visibleHeatMap[targetType] === i
+                            ? mapChart.colourScheme.base.hex
+                            : 'transparent'
+                      }"
+                      >{{ targetYear }}
+                    </a>
+                  </ng-container>
+                </ng-container>
+                <a
+                  *ngIf="visibleHeatMap"
+                  class="map-series-menu-clear-link"
+                  (click)="clearHeatmap()"
+                  >Clear</a
+                >
               </span>
             </span>
           </span>
@@ -121,10 +128,10 @@
         @if(visibleHeatMap){
         <span class="container-h">
           <span *ngFor="let vhr of visibleHeatMap | keyvalue"
-            >Progress {{ vhr.key | renameTargetType }}
+            >{{ vhr.key | renameTargetType }}
             {{ vhr.value ? 2030 : 2025 }}</span
           >
-          <a class="x" (click)="dataSwitchClear()"></a>
+          <a class="x" (click)="clearHeatmap()"></a>
         </span>
         }@else{
         <span i18n="landing data header@@landingDataHeader"

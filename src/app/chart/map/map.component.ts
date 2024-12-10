@@ -40,7 +40,6 @@ export class MapComponent {
   @Output() mapCountrySet = new EventEmitter<void>();
 
   _mapData: Array<IdValue>;
-
   chart: am4maps.MapChart;
   chartHidden: am4maps.MapChart;
   polygonSeries: am4maps.MapPolygonSeries;
@@ -112,20 +111,22 @@ export class MapComponent {
   }
 
   @Input() set mapData(mapData: Array<IdValue>) {
-    this.mapCountries = Object.keys(
-      mapData
-        .map((item: IdValue) => {
-          return item.id;
-        })
-        .concat(this.boundingCountries)
-        .reduce((ob: IHash<boolean>, name) => {
-          ob[name] = true;
-          return ob;
-        }, {})
-    );
-
+    // set country set based on original data
+    if (this.mapCountries.length === 0) {
+      this.mapCountries = Object.keys(
+        mapData
+          .map((item: IdValue) => {
+            return item.id;
+          })
+          .concat(this.boundingCountries)
+          .reduce((ob: IHash<boolean>, name) => {
+            ob[name] = true;
+            return ob;
+          }, {})
+      );
+    }
     this._mapData = mapData;
-    this.updateData();
+    this.updatePolygonData();
   }
 
   get mapData(): Array<IdValue> {
@@ -134,6 +135,8 @@ export class MapComponent {
 
   colourSchemeTargets: ColourSchemeMap;
   colourSchemeDefault: MapColourScheme;
+
+  _colourScheme: MapColourScheme;
 
   constructor() {
     am4core.options.autoDispose = true;
@@ -189,35 +192,39 @@ export class MapComponent {
     };
   }
 
-  /* setColourScheme
+  /* setter colourScheme
    *
    * updates
    *  - heat rules
    *  - legend
+   *  - hover state
    **/
-  setColourScheme(scheme = this.colourSchemeDefault): void {
-    //console.log('MAP setColourScheme(), scheme = ' + scheme);
-    this.updateHeatRules(scheme.base);
+  set colourScheme(colourScheme: MapColourScheme) {
+    this._colourScheme = colourScheme;
 
-    this.legend.maxColor = scheme.base.brighten(1);
-    this.legend.minColor = scheme.base.brighten(-0.3);
+    this.updateHeatRules(colourScheme.base);
 
-    this.hs.properties.fill = scheme.highlight;
-    this.hs.properties.stroke = scheme.outline;
+    this.legend.maxColor = colourScheme.base.brighten(1);
+    this.legend.minColor = colourScheme.base.brighten(-0.3);
+
+    this.hs.properties.fill = colourScheme.highlight;
+    this.hs.properties.stroke = colourScheme.outline;
   }
 
-  /** updateData
+  get colourScheme(): MapColourScheme {
+    return this._colourScheme;
+  }
+
+  /** updatePolygonData
    *
    **/
-  updateData(): void {
+  updatePolygonData(): void {
     if (!this.polygonSeries || !this.mapData) {
       return;
     }
     const data = this.filterResultsData();
     this.polygonSeries.data = data;
     this.polygonSeriesHidden.data = data;
-    //this.polygonSeries.data = this.filterResultsData();
-    //this.polygonSeriesHidden.data = this.filterResultsData();
   }
 
   /** ngAfterViewInit
@@ -334,7 +341,7 @@ export class MapComponent {
   }
 
   log(s: string): void {
-    console.log(s);
+    //console.log(s);
   }
 
   /** countryClick
@@ -349,11 +356,8 @@ export class MapComponent {
 
     const singleMode = this.polygonSeries.include.length === 1;
     if (singleMode) {
-      this.log('countryClick RESET to all because single...');
-
-      // revert back to full map
+      // revert back to full map (will invoke zoomTo with instant effect)
       this.setCountryInclusion(this.mapCountries);
-      // will invoke zoomTo with instant effect
     } else {
       this.log('countryClick sets animating to true...');
 
@@ -380,17 +384,24 @@ export class MapComponent {
    * adds or removes series' heatRules
    **/
   updateHeatRules(colour: am4core.Color): void {
-    //  updateHeatRules(colourIndex = 0): void {
     if (this.polygonSeries.heatRules.length) {
       this.polygonSeries.heatRules.pop();
     }
-    //const colour = this.mapColours[colourIndex];
     this.polygonSeries.heatRules.push({
       property: 'fill',
       target: this.polygonSeries.mapPolygons.template,
       min: colour.brighten(1),
       max: colour.brighten(-0.3)
     });
+  }
+
+  /** setPercentMode
+   * @param { boolean } percent - sets tooltip behaviour
+   **/
+  setPercentMode(usePercent: boolean): void {
+    const polygonTemplate = this.polygonSeries.mapPolygons.template;
+    const suffix = usePercent ? ' %' : '';
+    polygonTemplate.tooltipText = '{name}: {value}' + suffix;
   }
 
   /** drawChart
@@ -448,9 +459,6 @@ export class MapComponent {
     // Make map load polygon data (state shapes and names) from GeoJSON
     polygonSeries.useGeodata = true;
     polygonSeriesHidden.useGeodata = true;
-
-    // add / update heat rules
-    //    this.updateHeatRules(this.colourSchemeDefault.base);
 
     this.chart.events.disableType('doublehit');
     this.chart.seriesContainer.events.disableType('doublehit');
@@ -518,7 +526,8 @@ export class MapComponent {
 
     // Configure series tooltip
     const polygonTemplate = polygonSeries.mapPolygons.template;
-    polygonTemplate.tooltipText = '{name}: {value}';
+
+    this.setPercentMode(false);
     polygonTemplate.nonScalingStroke = true;
     polygonTemplate.strokeWidth = 0.5;
 
@@ -526,8 +535,8 @@ export class MapComponent {
     this.hs = polygonTemplate.states.create('hover');
     this.hs.properties.strokeWidth = 2.5;
 
-    this.updateData();
-    this.setColourScheme();
+    this.updatePolygonData();
+    this.colourScheme = this.colourSchemeDefault;
 
     chart.zoomLevel = 1;
     chart.events.on('ready', () => {

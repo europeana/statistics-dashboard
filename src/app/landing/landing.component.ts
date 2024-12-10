@@ -6,6 +6,7 @@ import {
   NgClass,
   NgFor,
   NgIf,
+  NgStyle,
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
@@ -61,6 +62,7 @@ type VisibleHeatMap = {
     NgIf,
     NgFor,
     TruncateComponent,
+    NgStyle,
     NgTemplateOutlet,
     BarComponent,
     RouterLink,
@@ -101,7 +103,6 @@ export class LandingComponent extends SubscriptionManager {
   allProgressSeries: IHashArray<Array<IdValue>> = {};
   mapData: Array<IdValue>;
   mapMenuIsOpen = false;
-  //  mapSeriesIndex?: number;
   visibleHeatMap?: VisibleHeatMap;
 
   @Input() set landingData(results: GeneralResultsFormatted) {
@@ -169,7 +170,9 @@ export class LandingComponent extends SubscriptionManager {
           const value = this.countryData[country][0][targetType];
           const target =
             this.targetMetaData[country][targetType][targetIndex].value;
-          const progress = value ? (parseInt(value) / target) * 100 : 0;
+          const progress = value
+            ? parseFloat(((parseInt(value) / target) * 100).toFixed(2))
+            : 0;
           this.allProgressSeries[targetType][targetIndex].push({
             id: country,
             value: progress
@@ -200,14 +203,26 @@ export class LandingComponent extends SubscriptionManager {
     });
   }
 
-  dataSwitchClear(): void {
+  /** clearHeatmap
+   * restore the default data in the map component
+   * set colours and unset percentage mode in the map component
+   * reset visibleHeatMap variable
+   **/
+  clearHeatmap(): void {
     this.mapChart.mapData = this.mapData;
+    this.mapChart.colourScheme = this.mapChart.colourSchemeDefault;
+    this.mapChart.setPercentMode(false);
+
     this.visibleHeatMap = undefined;
-    this.mapChart.setColourScheme();
     this.mapMenuIsOpen = false;
   }
 
-  dataSwitch(seriesTargetType: TargetFieldName, targetIndex: number): void {
+  /** showHeatmap
+   * overwrite the data in the map component with derived target-progress series
+   * set colours and percentage mode in the map component
+   * set visibleHeatMap variable
+   **/
+  showHeatmap(seriesTargetType: TargetFieldName, targetIndex: number): void {
     // ensure targetMetaData has loaded
     this.tapTargetDataLoad(undefined, () => {
       // ensure targetCountryData has loaded
@@ -221,6 +236,8 @@ export class LandingComponent extends SubscriptionManager {
         this.mapChart.mapData =
           this.allProgressSeries[seriesTargetType][targetIndex];
 
+        this.mapChart.setPercentMode(true);
+
         const vhm = [seriesTargetType].reduce(
           (ob: VisibleHeatMap, tType: TargetFieldName) => {
             ob[tType] = targetIndex;
@@ -229,10 +246,8 @@ export class LandingComponent extends SubscriptionManager {
           {} as VisibleHeatMap
         );
         this.visibleHeatMap = vhm;
-
-        this.mapChart.setColourScheme(
-          this.mapChart.colourSchemeTargets[seriesTargetType][targetIndex]
-        );
+        this.mapChart.colourScheme =
+          this.mapChart.colourSchemeTargets[seriesTargetType][targetIndex];
       });
     });
 

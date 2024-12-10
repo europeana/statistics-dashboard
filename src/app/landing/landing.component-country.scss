@@ -3,8 +3,8 @@
 $list-item-pad-height: 4px;
 $boxed-width: 2.5em;
 //$boxed-colour: red;
-//$boxed-colour: $gray-5;
-$boxed-colour: $gray-lightest;
+$boxed-colour: $gray-5;
+//$boxed-colour: $gray-lightest;
 
 $boxed-dash-length: 2em;
 $boxed-dash-length-less-one: 1em;
@@ -118,7 +118,6 @@ $boxed-time: 0.3s;
 
   a {
     color: unset;
-    margin-left: 1.6em;
   }
 }
 
@@ -130,6 +129,27 @@ $boxed-time: 0.3s;
   padding: 4px;
   top: -0.5em;
   z-index: 1;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  & > span {
+    grid-column: 1;
+    margin-right: 1.4em;
+  }
+  & > a {
+    grid-column: 2;
+  }
+
+  .menu-item {
+    border: 3px solid transparent;
+  }
+
+  .map-series-menu-clear-link {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    text-align: center;
+    margin-top: 0.4em;
+  }
 }
 
 .derived-series-menu-opener {
