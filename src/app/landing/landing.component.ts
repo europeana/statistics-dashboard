@@ -93,6 +93,7 @@ export class LandingComponent extends SubscriptionManager {
   @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
   @ViewChild(MapComponent) mapChart: MapComponent;
 
+  singleCountryMode = false;
   barColour = '#0771ce';
   isLoading: boolean;
   _landingData: GeneralResultsFormatted = {};
@@ -103,7 +104,21 @@ export class LandingComponent extends SubscriptionManager {
   allProgressSeries: IHashArray<Array<IdValue>> = {};
   mapData: Array<IdValue>;
   mapMenuIsOpen = false;
-  visibleHeatMap?: VisibleHeatMap;
+  heatmapActivated = false;
+  _visibleHeatMap?: VisibleHeatMap;
+
+  get visibleHeatMap(): VisibleHeatMap | undefined {
+    return this._visibleHeatMap;
+  }
+
+  set visibleHeatMap(visibleHeatMap: VisibleHeatMap) {
+    if (!this.visibleHeatMap && visibleHeatMap) {
+      this.heatmapActivated = true;
+    } else {
+      this.heatmapActivated = false;
+    }
+    this._visibleHeatMap = visibleHeatMap;
+  }
 
   @Input() set landingData(results: GeneralResultsFormatted) {
     this._landingData = results;
@@ -141,6 +156,22 @@ export class LandingComponent extends SubscriptionManager {
 
   closeMapSelection(): void {
     this.mapChart.countryClick(this.mapChart.selectedCountry);
+  }
+
+  /**
+   * onMapCountrySet
+   * reacts to mapChart events by loading data
+   **/
+  onMapCountrySet(singleCountryMode: boolean): void {
+    this.singleCountryMode = singleCountryMode;
+    this.tapCountryDataLoad();
+
+    if (this.visibleHeatMap) {
+      const vhm = this.visibleHeatMap;
+      setTimeout(() => {
+        this.targetExpanded = Object.keys(vhm)[0] as TargetFieldName;
+      }, 250);
+    }
   }
 
   /**
@@ -201,6 +232,22 @@ export class LandingComponent extends SubscriptionManager {
         );
       });
     });
+  }
+
+  getDerivedSeriesValue(
+    targetType: TargetFieldName,
+    targetIndex: number,
+    id: string
+  ): number {
+    const idVal = this.allProgressSeries[targetType][targetIndex].find(
+      (idVal: IdValue) => {
+        return idVal.id === id;
+      }
+    );
+    if (idVal) {
+      return idVal.value;
+    }
+    return 0;
   }
 
   /** clearHeatmap

@@ -37,7 +37,7 @@ type ColourSchemeMap = {
   standalone: true
 })
 export class MapComponent {
-  @Output() mapCountrySet = new EventEmitter<void>();
+  @Output() mapCountrySet = new EventEmitter<boolean>();
 
   _mapData: Array<IdValue>;
   chart: am4maps.MapChart;
@@ -107,7 +107,7 @@ export class MapComponent {
     this.selectedCountryNext = this.mapCountries[indexNext];
     this.selectedCountryPrev = this.mapCountries[indexPrev];
 
-    this.mapCountrySet.emit();
+    this.mapCountrySet.emit(!!selectedCountry);
   }
 
   @Input() set mapData(mapData: Array<IdValue>) {
@@ -341,7 +341,7 @@ export class MapComponent {
   }
 
   log(s: string): void {
-    //console.log(s);
+    console.log(s);
   }
 
   /** countryClick

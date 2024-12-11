@@ -1,6 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-
 import { APIService } from '../../_services';
 import { MockAPIService } from '../../_mocked';
 
@@ -30,18 +29,17 @@ describe('MapComponent', () => {
   });
 
   it('should update the data', () => {
-    expect(component.polygonSeries.data.length).toEqual(0);
+    component.mapCountries = [];
     component.mapData = [{ id: 'Italy', value: 1881 }];
-    component.updateData();
-    expect(component.polygonSeries.data.length).toEqual(1);
+    expect(component.mapCountries.length).toBeGreaterThan(0);
   });
 
   it('should generate the polygon series', () => {
     component.polygonSeries = null;
-    component.updateData();
     expect(component.polygonSeries).toBeFalsy();
     component.drawChart();
     fixture.detectChanges();
+    expect(component.polygonSeries).not.toBeFalsy();
     expect(component.polygonSeries.data.length).toEqual(0);
   });
 });

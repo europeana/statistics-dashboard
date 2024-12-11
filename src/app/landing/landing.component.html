@@ -7,6 +7,10 @@
 >
   <app-resize (sizeChanged)="refreshCharts()"></app-resize>
 
+  <ng-template #titleItemsProvided>
+    <span i18n="landing data header@@landingDataHeader">ITEMS PROVIDED</span>
+  </ng-template>
+
   <ng-template #chartSummary let-dimension="facetName">
     <span
       class="container-h totals"
@@ -53,6 +57,77 @@
     </div>
   </ng-template>
 
+  <ng-template #tmpMapLayerMenu>
+    <span class="container-h">
+      <span style="position: relative">
+        <a
+          class="derived-series-menu-opener flag-orb default"
+          title="show target progress"
+          (click)="mapMenuOpenerClicked()"
+          [ngClass]="{
+            open: mapMenuIsOpen,
+            active: !!visibleHeatMap
+          }"
+          [ngStyle]="{
+            color:
+              visibleHeatMap && mapChart
+                ? mapChart.colourScheme.base.hex
+                : 'unset'
+          }"
+        >
+        </a>
+        <span
+          class="derived-series-menu"
+          [ngClass]="{ hidden: !mapMenuIsOpen }"
+        >
+          <ul class="derived-series-menu-inner">
+            <ng-container
+              *ngFor="
+                let targetType of [
+                  TargetFieldName.THREE_D,
+                  TargetFieldName.HQ,
+                  TargetFieldName.TOTAL
+                ]
+              "
+            >
+              <li>
+                {{ targetType | renameTargetType }}
+              </li>
+              <li
+                class="menu-item"
+                *ngFor="let targetYear of ['2025', '2030']; let i = index"
+                [ngStyle]="{
+                  borderColor:
+                    visibleHeatMap && visibleHeatMap[targetType] === i
+                      ? mapChart.colourScheme.base.hex
+                      : 'transparent'
+                }"
+              >
+                <a (click)="showHeatmap(targetType, i)">{{ targetYear }} </a>
+              </li>
+            </ng-container>
+            <li class="map-series-menu-clear-link" *ngIf="visibleHeatMap">
+              <a (click)="clearHeatmap()">clear</a>
+            </li>
+          </ul>
+        </span>
+      </span>
+
+      <!-- layer label
+      -->
+      @if(visibleHeatMap) {
+      <span class="container-h">
+        <span *ngFor="let vhr of visibleHeatMap | keyvalue"
+          >{{ vhr.key | renameTargetType }} {{ vhr.value ? 2030 : 2025 }}</span
+        >
+        <a class="x" title="remove target layer" (click)="clearHeatmap()"></a>
+      </span>
+      } @else { @if(!singleCountryMode) {
+      <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
+      } }
+    </span>
+  </ng-template>
+
   <ng-template
     #dataRows
     let-dimension="facetName"
@@ -60,92 +135,43 @@
   >
     <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
       <div class="container-h data-rows-title">
-        <!-- Selected Country Header -->
-        @if (isCountryCard && mapChart && mapChart.selectedCountry) {
-        <span style="position: relative; display: flex; align-items: center">
-          {{ dimension | renameApiFacet | uppercase }}:
-          {{ mapChart.selectedCountry | renameCountry }}
-        </span>
-        <a
-          class="x"
-          data-e2e="close-map-selection"
-          (click)="closeMapSelection()"
-        ></a>
-        } @else { @if(isCountryCard){
+        <!-- Begin Map Toolbar Contents-->
 
-        <span style="display: flex">
-          <span>{{ dimension | renameApiFacet | uppercase }}</span>
+        @if (isCountryCard){
 
-          <span>
-            <a
-              class="derived-series-menu-opener flag-orb default"
-              (click)="mapMenuOpenerClicked()"
-            >
-            </a>
-            <span
-              class="derived-series-menu"
-              [ngClass]="{ hidden: !mapMenuIsOpen }"
-            >
-              <span class="derived-series-menu-inner">
-                <ng-container
-                  *ngFor="
-                    let targetType of [
-                      TargetFieldName.THREE_D,
-                      TargetFieldName.HQ,
-                      TargetFieldName.TOTAL
-                    ]
-                  "
-                >
-                  <span>
-                    {{ targetType | renameTargetType }}
-                  </span>
-                  <ng-container
-                    *ngFor="let targetYear of ['2025', '2030']; let i = index"
-                  >
-                    <a
-                      class="menu-item"
-                      (click)="showHeatmap(targetType, i)"
-                      [ngStyle]="{
-                        borderColor:
-                          visibleHeatMap && visibleHeatMap[targetType] === i
-                            ? mapChart.colourScheme.base.hex
-                            : 'transparent'
-                      }"
-                      >{{ targetYear }}
-                    </a>
-                  </ng-container>
-                </ng-container>
-                <a
-                  *ngIf="visibleHeatMap"
-                  class="map-series-menu-clear-link"
-                  (click)="clearHeatmap()"
-                  >Clear</a
-                >
-              </span>
-            </span>
-          </span>
-        </span>
-        @if(visibleHeatMap){
+        <!-- show selected country with close bar -->
+        @if (mapChart && mapChart.selectedCountry) {
         <span class="container-h">
-          <span *ngFor="let vhr of visibleHeatMap | keyvalue"
-            >{{ vhr.key | renameTargetType }}
-            {{ vhr.value ? 2030 : 2025 }}</span
-          >
-          <a class="x" (click)="clearHeatmap()"></a>
+          <span>
+            {{ dimension | renameApiFacet | uppercase }}
+          </span>
+          <span> : {{ mapChart.selectedCountry | renameCountry }} </span>
+          <a
+            class="x country-closer"
+            data-e2e="close-map-selection"
+            title="close country"
+            (click)="closeMapSelection()"
+          ></a>
         </span>
-        }@else{
-        <span i18n="landing data header@@landingDataHeader"
-          >ITEMS PROVIDED</span
-        >
-        } } @else {
-        <!--not a country -->
-        <span>{{ dimension | renameApiFacet | uppercase }} </span>
-        <span i18n="landing data header@@landingDataHeader"
-          >ITEMS PROVIDED</span
-        >
+        } @else {
+        <span>
+          {{ dimension | renameApiFacet | uppercase }}
+        </span>
+        }
 
-        } }
+        <ng-content *ngTemplateOutlet="tmpMapLayerMenu"></ng-content>
+
+        <!-- End Map Toolbar Contents-->
+        }@else{
+
+        <!--not a country -->
+
+        <span>{{ dimension | renameApiFacet | uppercase }} </span>
+        <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
+        }
       </div>
+
+      <!-- end of menu bar -->
 
       @if (isCountryCard){
 
@@ -170,21 +196,13 @@
         >
           {{ navCountry | renameCountry }}
         </a>
+
         <span
           *ngIf="navCountry === mapChart.selectedCountry"
-          style="margin-left: 0.3em; align-self: center; flex-basis: 100%"
+          class="map-navigation-close-country-link-wrapper"
         >
-          <a
-            style="
-              transform: scale(0.75) translateY(0.25em);
-              display: inline-block;
-            "
-            class="x"
-            (click)="closeMapSelection()"
-          ></a>
+          <a class="x" title="close country" (click)="closeMapSelection()"></a>
         </span>
-
-        <!-- end nav - what follows is right-aligned -->
 
         <!-- country selection -->
 
@@ -197,10 +215,7 @@
             'target-active': targetExpanded === undefined
           }"
         >
-          {{
-            countryData[mapChart.selectedCountry][0][TargetFieldName.TOTAL]
-              | number
-          }}
+          {{ data[mapChart.selectedIndex].value | number }}
         </span>
 
         <span class="boxed">
@@ -212,20 +227,8 @@
             (click)="targetExpanded = undefined"
             [attr.disabled]="targetExpanded ? null : 'disabled'"
           >
-            {{ TargetFieldName.TOTAL | renameTargetType }}</a
-          >
-          <ng-content
-            *ngTemplateOutlet="
-              tmpSpeechBubble;
-              context: {
-                targetType: TargetFieldName.TOTAL
-              }
-            "
-          ></ng-content>
-        </span>
-
-        <span class="boxed">
-          <a class="info-icon"></a>
+            <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
+          </a>
         </span>
 
         } @else if(data[mapChart.selectedIndex]){
@@ -234,7 +237,6 @@
         </span>
         } }
       </div>
-      <!-- end country selection -->
 
       <!-- selected country display -->
 
@@ -288,6 +290,25 @@
             'is-open': targetExpanded === targetType
           }"
         >
+          <span
+            class="boxed"
+            *ngIf="visibleHeatMap && visibleHeatMap[targetType] === i"
+          >
+            <span
+              class="boxed-inner target-highlight"
+              [ngStyle]="
+                visibleHeatMap &&
+                visibleHeatMap[targetType] === i && {
+                  borderColor: mapChart.colourScheme.base.hex
+                }
+              "
+            >
+              {{
+                getDerivedSeriesValue(targetType, i, mapChart.selectedCountry)
+              }}%
+            </span>
+          </span>
+
           <span class="numeric">
             @if(targetMetaData && targetMetaData[mapChart.selectedCountry]){
             {{
@@ -297,13 +318,19 @@
             }
           </span>
           <span class="boxed"
-            ><span class="boxed-inner">target {{ theYear }}</span></span
+            ><span class="boxed-inner">target {{ theYear }} </span></span
           >
         </div>
       </ng-template>
 
       <ng-container
-        *ngFor="let targetType of [TargetFieldName.THREE_D, TargetFieldName.HQ]"
+        *ngFor="
+          let targetType of [
+            TargetFieldName.THREE_D,
+            TargetFieldName.HQ,
+            TargetFieldName.TOTAL
+          ]
+        "
       >
         <ng-content
           *ngTemplateOutlet="
@@ -353,8 +380,12 @@
           </a>
 
           @if(visibleHeatMap){
-          <span class="numeric b4-shrink">{{ row.value | number }}</span>
-          <span class="numeric shrink">%</span>
+          <span class="numeric">{{ row.value | number }}</span>
+          <span
+            class="numeric shrink"
+            [ngClass]="{ 'shrink-animation': heatmapActivated }"
+            >%</span
+          >
           }@else {
           <span class="numeric">{{ row.value | number }}</span>
           <span class="numeric">{{ row.percent | number }}%</span>
@@ -471,7 +502,7 @@
           <div class="map-container">
             <app-map-chart
               [mapData]="mapData"
-              (mapCountrySet)="tapCountryDataLoad()"
+              (mapCountrySet)="onMapCountrySet($event)"
               #mapChart
             ></app-map-chart>
           </div>

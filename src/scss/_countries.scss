@@ -67,7 +67,7 @@ $flag-orb-dimension: 1.6rem;
 }
 
 .flag-orb.default::after {
-  background-image: svg-url-icon-flag(#{$linkblue});
+  background-image: svg-url-icon-flag($linkblue);
 }
 
 .open > .flag-orb.default,
