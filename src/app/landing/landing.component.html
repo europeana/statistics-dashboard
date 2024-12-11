@@ -183,10 +183,10 @@
             (click)="closeMapSelection()"
           ></a>
         </span>
-        <!--
-        -->
 
         <!-- end nav - what follows is right-aligned -->
+
+        <!-- country selection -->
 
         @if(navCountry === mapChart.selectedCountry){ @if(countryData &&
         countryData[mapChart.selectedCountry]){
@@ -234,9 +234,9 @@
         </span>
         } }
       </div>
-      <!-- End Selected Country Navigation -->
+      <!-- end country selection -->
 
-      <!-- country data -->
+      <!-- selected country display -->
 
       @if(countryData && countryData[mapChart.selectedCountry]){
       <ng-template #tmpTargetSummary let-targetType="targetType">
@@ -316,6 +316,8 @@
       </ng-container>
       }
 
+      <!-- end selected country display -->
+
       <div class="container-h record-list">
         <a
           class="link-open-country"
@@ -325,8 +327,6 @@
           <span>View {{ mapChart.selectedCountry | renameCountry }} Data</span>
         </a>
       </div>
-
-      <!--  END mapChart && mapChart.selectedCountry -->
 
       }
 
@@ -351,8 +351,14 @@
               }}<span class="flag-orb" [ngClass]="row.id ?? row.name"></span
             ></span>
           </a>
+
+          @if(visibleHeatMap){
+          <span class="numeric b4-shrink">{{ row.value | number }}</span>
+          <span class="numeric shrink">%</span>
+          }@else {
           <span class="numeric">{{ row.value | number }}</span>
-          <span class="numeric">{{ row.percent }}%</span>
+          <span class="numeric">{{ row.percent | number }}%</span>
+          }
         </div>
       </div>
       } @else {

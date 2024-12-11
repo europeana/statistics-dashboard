@@ -10,6 +10,7 @@ $boxed-dash-length: 2em;
 $boxed-dash-length-less-one: 1em;
 
 $boxed-time: 0.3s;
+$numeric-min-width: 6em;
 
 .map-navigation-link {
   white-space: nowrap;
@@ -104,8 +105,26 @@ $boxed-time: 0.3s;
   }
 
   .numeric {
-    margin-left: 6px;
-    min-width: 6em;
+    $numeric-margin-left: 6px;
+
+    margin-left: $numeric-margin-left;
+    min-width: $numeric-min-width;
+
+    &.shrink {
+      @keyframes shrink {
+        0% {
+          min-width: calc($numeric-min-width + $numeric-margin-left);
+          margin-left: $numeric-margin-left;
+        }
+        100% {
+          min-width: 0;
+          margin-left: -$numeric-margin-left;
+        }
+      }
+      animation: shrink 1s 1;
+      margin-left: -$numeric-margin-left;
+      min-width: 0;
+    }
   }
 }
 
