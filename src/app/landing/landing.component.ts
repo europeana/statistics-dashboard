@@ -29,7 +29,8 @@ import {
   NameValue,
   TargetData,
   TargetFieldName,
-  TargetMetaData
+  TargetMetaData,
+  VisibleHeatMap
 } from '../_models';
 import { APIService } from '../_services';
 import {
@@ -44,13 +45,6 @@ import { ResizeComponent } from '../resize';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { SubscriptionManager } from '../subscription-manager';
 import { TruncateComponent } from '../truncate';
-
-type VisibleHeatMap = {
-  [key in
-    | TargetFieldName.THREE_D
-    | TargetFieldName.HQ
-    | TargetFieldName.TOTAL]: number;
-};
 
 @Component({
   templateUrl: './landing.component.html',
@@ -143,7 +137,11 @@ export class LandingComponent extends SubscriptionManager {
     super();
   }
 
-  // template utility
+  /**
+   * getCountryRows
+   * @param { Array<NameValue> } defaultResult - the default return value
+   * template utility for overriding data result with a derived heatmap result
+   **/
   getCountryRows(
     defaultResult: Array<NameValue>
   ): Array<IdValue> | Array<NameValue> {
@@ -152,6 +150,33 @@ export class LandingComponent extends SubscriptionManager {
       return this.allProgressSeries[key][this.visibleHeatMap[key]];
     }
     return defaultResult;
+  }
+
+  /**
+   * getDerivedSeriesValue
+   *
+   * template utility for looking up data value
+   *
+   * @param { TargetFieldName } targetType - used to index the data series
+   * @param { number } targetIndex - used to index the data series
+   * @param { string } id - the id to match on
+   *
+   * @returns the indexed value
+   **/
+  getDerivedSeriesValue(
+    targetType: TargetFieldName,
+    targetIndex: number,
+    id: string
+  ): number {
+    const idVal = this.allProgressSeries[targetType][targetIndex].find(
+      (idVal: IdValue) => {
+        return idVal.id === id;
+      }
+    );
+    if (idVal) {
+      return idVal.value;
+    }
+    return 0;
   }
 
   closeMapSelection(): void {
@@ -231,22 +256,6 @@ export class LandingComponent extends SubscriptionManager {
     });
   }
 
-  getDerivedSeriesValue(
-    targetType: TargetFieldName,
-    targetIndex: number,
-    id: string
-  ): number {
-    const idVal = this.allProgressSeries[targetType][targetIndex].find(
-      (idVal: IdValue) => {
-        return idVal.id === id;
-      }
-    );
-    if (idVal) {
-      return idVal.value;
-    }
-    return 0;
-  }
-
   /** clearHeatmap
    * restore the default data in the map component
    * set colours and unset percentage mode in the map component
@@ -267,7 +276,6 @@ export class LandingComponent extends SubscriptionManager {
    * set visibleHeatMap variable
    **/
   showHeatmap(seriesTargetType: TargetFieldName, targetIndex: number): void {
-
     if (Object.keys(this.allProgressSeries).length === 0) {
       this.buildDerivedSeries();
       this.sortDerivedSeries();

@@ -656,12 +656,18 @@ export const mockCountryData: IHash<Array<TargetData>> = {
 };
 
 const genericTargetMetaData = {
-  three_d: [{ value: 1 } as TargetMetaData, { value: 2 } as TargetMetaData],
-  high_quality: [
-    { value: 1 } as TargetMetaData,
-    { value: 2 } as TargetMetaData
+  three_d: [
+    { value: 1, targetYear: 2025 },
+    { value: 2, targetYear: 2030 }
   ],
-  total: [{ value: 1 } as TargetMetaData, { value: 2 } as TargetMetaData]
+  high_quality: [
+    { value: 1, targetYear: 2025 },
+    { value: 2, targetYear: 2030 }
+  ],
+  total: [
+    { value: 1, targetYear: 2025 },
+    { value: 2, targetYear: 2030 }
+  ]
 };
 
 export const mockTargetMetaData = {

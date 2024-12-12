@@ -260,19 +260,21 @@ export class MapComponent {
    * optionally resets the selectedCountry.
    **/
   setCountryInclusion(countries: Array<string>): void {
+    const singleCountry = countries.length === 1;
+
+    if (!singleCountry) {
+      this.selectedCountry = undefined;
+    }
+
     this.polygonSeries.include = countries;
     this.polygonSeries.data = this.filterResultsData();
+    this.chart.seriesContainer.draggable = !singleCountry;
+
     this.polygonSeries.events.once('datavalidated', () => {
-      if (countries.length === 1) {
+      if (singleCountry) {
         this.zoomToCountries(countries, ZoomLevel.SINGLE, 0);
-
-        this.log('SCI disables drag');
-        this.chart.seriesContainer.draggable = false;
       } else {
-        this.log('SCI enables drag');
-        this.chart.seriesContainer.draggable = true;
-
-        this.selectedCountry = undefined;
+        //this.selectedCountry = undefined;
         this.zoomToCountries(this.boundingCountries, ZoomLevel.MULTIPLE, 0);
       }
     });

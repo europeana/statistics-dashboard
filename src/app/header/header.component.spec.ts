@@ -53,6 +53,16 @@ describe('HeaderComponent', () => {
     expect(spyStopPropagation).toHaveBeenCalledTimes(2);
   });
 
+  it('should close the menu', () => {
+    const spyStopPropagation = jasmine.createSpy();
+    component.menuIsOpen = true;
+    component.closeMenu({
+      stopPropagation: spyStopPropagation
+    } as unknown as MouseEvent);
+    expect(component.menuIsOpen).toBeFalsy();
+    expect(spyStopPropagation).toHaveBeenCalled();
+  });
+
   it('should close the menu when activeCountry is set', () => {
     component.menuIsOpen = true;
     expect(component.menuIsOpen).toBeTruthy();

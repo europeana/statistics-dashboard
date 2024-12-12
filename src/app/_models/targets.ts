@@ -6,6 +6,13 @@ export enum TargetFieldName {
   TOTAL = 'total'
 }
 
+export type VisibleHeatMap = {
+  [key in
+    | TargetFieldName.THREE_D
+    | TargetFieldName.HQ
+    | TargetFieldName.TOTAL]: number;
+};
+
 interface TargetMetaDataBase {
   value: number;
   targetYear: number;
