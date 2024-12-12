@@ -165,12 +165,9 @@ export class LandingComponent extends SubscriptionManager {
   onMapCountrySet(singleCountryMode: boolean): void {
     this.singleCountryMode = singleCountryMode;
     this.tapCountryDataLoad();
-
     if (this.visibleHeatMap) {
       const vhm = this.visibleHeatMap;
-      setTimeout(() => {
-        this.targetExpanded = Object.keys(vhm)[0] as TargetFieldName;
-      }, 250);
+      this.targetExpanded = Object.keys(vhm)[0] as TargetFieldName;
     }
   }
 
@@ -270,33 +267,31 @@ export class LandingComponent extends SubscriptionManager {
    * set visibleHeatMap variable
    **/
   showHeatmap(seriesTargetType: TargetFieldName, targetIndex: number): void {
-    // ensure targetMetaData has loaded
-    this.tapTargetDataLoad(undefined, () => {
-      // ensure targetCountryData has loaded
-      this.tapCountryDataLoad(() => {
-        // ensure derived series have been generated
-        if (Object.keys(this.allProgressSeries).length === 0) {
-          this.buildDerivedSeries();
-          this.sortDerivedSeries();
-        }
 
-        this.mapChart.mapData =
-          this.allProgressSeries[seriesTargetType][targetIndex];
+    if (Object.keys(this.allProgressSeries).length === 0) {
+      this.buildDerivedSeries();
+      this.sortDerivedSeries();
+    }
 
-        this.mapChart.setPercentMode(true);
+    this.mapChart.mapData =
+      this.allProgressSeries[seriesTargetType][targetIndex];
 
-        const vhm = [seriesTargetType].reduce(
-          (ob: VisibleHeatMap, tType: TargetFieldName) => {
-            ob[tType] = targetIndex;
-            return ob;
-          },
-          {} as VisibleHeatMap
-        );
-        this.visibleHeatMap = vhm;
-        this.mapChart.colourScheme =
-          this.mapChart.colourSchemeTargets[seriesTargetType][targetIndex];
-      });
-    });
+    this.mapChart.setPercentMode(true);
+
+    const vhm = [seriesTargetType].reduce(
+      (ob: VisibleHeatMap, tType: TargetFieldName) => {
+        ob[tType] = targetIndex;
+        return ob;
+      },
+      {} as VisibleHeatMap
+    );
+    this.visibleHeatMap = vhm;
+    this.mapChart.colourScheme =
+      this.mapChart.colourSchemeTargets[seriesTargetType][targetIndex];
+
+    if (this.singleCountryMode) {
+      this.targetExpanded = seriesTargetType;
+    }
 
     this.mapMenuIsOpen = false;
   }
