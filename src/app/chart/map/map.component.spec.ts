@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import * as am4core from '@amcharts/amcharts4/core';
+import * as am4maps from '@amcharts/amcharts4/maps';
 
 import { APIService } from '../../_services';
 import { MockAPIService } from '../../_mocked';
@@ -84,7 +85,6 @@ describe('MapComponent', () => {
     component.polygonSeries = null;
     expect(component.polygonSeries).toBeFalsy();
     component.drawChart();
-    fixture.detectChanges();
     expect(component.polygonSeries).not.toBeFalsy();
     expect(component.polygonSeries.data.length).toEqual(0);
   });
@@ -103,6 +103,36 @@ describe('MapComponent', () => {
     expect(component.colourScheme.base.hex).toEqual(colour);
 
     expect(component.updateHeatRules).toHaveBeenCalled();
+  });
+
+  it('should add tooltips to the countries', () => {
+    const clicked = {
+      dataItem: { dataContext: { id: 'IT' } }
+    } as unknown as am4maps.MapPolygon;
+    let res = component.mapTooltipAdapter('default', clicked);
+    expect(res).toEqual('{name}');
+
+    component.mapData = [{ id: 'IT', value: 1881 }];
+    res = component.mapTooltipAdapter('default', clicked);
+    expect(res).toEqual('{name}: 1,881');
+
+    component.mapPercentMode = true;
+    res = component.mapTooltipAdapter('default', clicked);
+    expect(res).toEqual('{name}: 1,881%');
+  });
+
+  it('should handle clicks on the country', () => {
+    component.drawChart();
+    expect(component.selectedCountry).toBeFalsy();
+
+    const country = 'IT';
+    component._isAnimating = true;
+    component.countryClick(country);
+    component._isAnimating = false;
+    expect(component.selectedCountry).toBeFalsy();
+
+    component.countryClick(country);
+    expect(component.selectedCountry).toEqual(country);
   });
 
   it('should track which countries are shown', () => {

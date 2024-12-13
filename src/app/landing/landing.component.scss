@@ -12,6 +12,10 @@ a[disabled] {
   pointer-events: none;
 }
 
+.relative {
+  position: relative;
+}
+
 .map-help-target {
   min-width: 24em;
   max-width: 24em;
@@ -163,7 +167,7 @@ a[disabled] {
   & + .data-rows {
     width: 100%;
   }
-  height: 275px;
+  height: $map-height;
 }
 
 .record-list {
@@ -174,7 +178,7 @@ a[disabled] {
     border-bottom: 1px solid $gray-5;
   }
 
-  :first-child {
+  :first-child:not(.map-navigation-link) {
     flex-grow: 1;
   }
 }

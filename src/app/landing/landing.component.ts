@@ -19,6 +19,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ClickAwareDirective } from '../_directives';
 import { externalLinks, isoCountryCodes, targetDescriptions } from '../_data';
 import {
   DimensionName,
@@ -51,6 +52,7 @@ import { TruncateComponent } from '../truncate';
   styleUrls: ['./landing.component.scss', './landing.component-country.scss'],
   standalone: true,
   imports: [
+    ClickAwareDirective,
     NgClass,
     ResizeComponent,
     NgIf,
@@ -264,9 +266,13 @@ export class LandingComponent extends SubscriptionManager {
   clearHeatmap(): void {
     this.mapChart.mapData = this.mapData;
     this.mapChart.colourScheme = this.mapChart.colourSchemeDefault;
-    this.mapChart.setPercentMode(false);
+    this.mapChart.setMapPercentMode(false);
 
     this.visibleHeatMap = undefined;
+    this.closeMapMenu();
+  }
+
+  closeMapMenu(): void {
     this.mapMenuIsOpen = false;
   }
 
@@ -284,7 +290,7 @@ export class LandingComponent extends SubscriptionManager {
     this.mapChart.mapData =
       this.allProgressSeries[seriesTargetType][targetIndex];
 
-    this.mapChart.setPercentMode(true);
+    this.mapChart.setMapPercentMode(true);
 
     const vhm = [seriesTargetType].reduce(
       (ob: VisibleHeatMap, tType: TargetFieldName) => {

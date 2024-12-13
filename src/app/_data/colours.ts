@@ -22,7 +22,6 @@ export const colourHeatmapRed = colourHqRed;
 export const colourHeatmapYellow = colourTotalYellow;
 
 const primarySequence = [colour3dBlue, colourHqRed, colourTotalYellow];
-//const primarySequence = ['#0A72CC', '#E11D53', '#FFAE00'];
 
 const secondarySequence = [greenForest, pinkLight, blue];
 const tertiarySequence = [pinkBright, blueLight, green];

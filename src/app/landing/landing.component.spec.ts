@@ -9,6 +9,7 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import * as am4core from '@amcharts/amcharts4/core';
 
 import {
@@ -17,9 +18,7 @@ import {
   mockTargetMetaData
 } from '../_mocked';
 import { APIService } from '../_services';
-
 import { TargetFieldName, VisibleHeatMap } from '../_models';
-
 import { BarComponent, MapComponent } from '../chart';
 import { LandingComponent } from '.';
 
@@ -252,6 +251,20 @@ describe('LandingComponent', () => {
     expect(component.prefixClass(name)).toEqual(`help-${name}`);
   });
 
+  it('should handle the country being set', () => {
+    spyOn(component, 'tapCountryDataLoad');
+    expect(component.singleCountryMode).toBeFalsy();
+    component.onMapCountrySet(true);
+    expect(component.singleCountryMode).toBeTruthy();
+    expect(component.tapCountryDataLoad).toHaveBeenCalled();
+    expect(component.targetExpanded).toBeFalsy();
+
+    component.visibleHeatMap = { three_d: 0 } as VisibleHeatMap;
+    component.onMapCountrySet(true);
+    expect(component.tapCountryDataLoad).toHaveBeenCalledTimes(2);
+    expect(component.targetExpanded).toEqual(TargetFieldName.THREE_D);
+  });
+
   it('should clear the heatmap', () => {
     component.mapChart = {
       colourSchemeDefault: {
@@ -259,7 +272,7 @@ describe('LandingComponent', () => {
         highlight: { hex: '#fffff' } as am4core.Color,
         outline: { hex: '#fffff' } as am4core.Color
       },
-      setPercentMode: jasmine.createSpy()
+      setMapPercentMode: jasmine.createSpy()
     } as unknown as MapComponent;
 
     component.clearHeatmap();
@@ -274,7 +287,7 @@ describe('LandingComponent', () => {
     const colour = '#ffffff' as unknown as am4core.Color;
     component.mapChart = {
       mapData: [],
-      setPercentMode: jasmine.createSpy(),
+      setMapPercentMode: jasmine.createSpy(),
       colourSchemeTargets: {
         total: [
           {

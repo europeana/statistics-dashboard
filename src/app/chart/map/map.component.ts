@@ -42,6 +42,7 @@ export class MapComponent {
   _mapData: Array<IdValue>;
   chart: am4maps.MapChart;
   chartHidden: am4maps.MapChart;
+  mapPercentMode = false;
   polygonSeries: am4maps.MapPolygonSeries;
   polygonSeriesHidden: am4maps.MapPolygonSeries;
   legend: am4maps.HeatLegend;
@@ -62,10 +63,7 @@ export class MapComponent {
   _isAnimating = false;
 
   set isAnimating(isAnimating: boolean) {
-    this.log('set isAnimating(' + isAnimating + ')');
-
     if (isAnimating === this.isAnimating) {
-      this.log('set returns early same val ' + isAnimating);
       return;
     }
 
@@ -75,9 +73,7 @@ export class MapComponent {
       this.chart.seriesContainer.events.disableType('hit');
       this.chart.chartContainer.background.events.disableType('hit');
       this.polygonSeries.mapPolygons.template.events.disableType('hit');
-
       this.chart.seriesContainer.draggable = false;
-      this.log(' - set drag off');
     } else {
       this.chart.events.enableType('hit');
       this.chart.seriesContainer.events.enableType('hit');
@@ -291,19 +287,15 @@ export class MapComponent {
 
     const oldCountry = this.polygonSeries.include[0];
     if (this.polygonSeriesHidden.include.length === 1) {
-      this.log('countryMorph exit: animating!');
       return;
     }
     if (this.polygonSeries.include.length > 1) {
-      this.log('countryMorph exit: not in single country mode');
       return;
     }
     if (oldCountry === newCountry) {
-      this.log('countryMorph exit: old and new are the same: ' + oldCountry);
       return;
     }
 
-    this.log('countryMorph sets animating to true...');
     this.isAnimating = true;
 
     // curtail the hidden map to include only the
@@ -312,8 +304,6 @@ export class MapComponent {
     this.selectedCountry = newCountry;
 
     this.polygonSeriesHidden.events.once('validated', () => {
-      this.log('countryMorph hidden once validated...');
-
       const polyHidden = this.polygonSeriesHidden.mapPolygons.getIndex(0);
       const poly = this.polygonSeries.getPolygonById(oldCountry);
 
@@ -322,7 +312,6 @@ export class MapComponent {
         this.polygonSeriesHidden.data = [];
         this.polygonSeriesHidden.include = this.mapCountries;
         setTimeout(() => {
-          this.log('morphAnimationEnded (setTimeout) call sci ' + newCountry);
           this.setCountryInclusion([newCountry]);
         });
       };
@@ -336,14 +325,9 @@ export class MapComponent {
           : poly.polygon.morpher.morphToCircle(1, this.animationTime);
         morphAnimation.events.on('animationended', morphAnimationEnded);
       } else {
-        this.log('WE HAVE NO POLY ' + newCountry + ' / ' + oldCountry);
         morphAnimationEnded();
       }
     });
-  }
-
-  log(s: string): void {
-    console.log(s);
   }
 
   /** countryClick
@@ -352,7 +336,6 @@ export class MapComponent {
    **/
   countryClick(country: string): void {
     if (this.isAnimating) {
-      this.log('return countryClick isAnimating');
       return;
     }
 
@@ -361,8 +344,6 @@ export class MapComponent {
       // revert back to full map (will invoke zoomTo with instant effect)
       this.setCountryInclusion(this.mapCountries);
     } else {
-      this.log('countryClick sets animating to true...');
-
       this.isAnimating = true;
 
       // set selection and zoom
@@ -397,13 +378,35 @@ export class MapComponent {
     });
   }
 
-  /** setPercentMode
-   * @param { boolean } percent - sets tooltip behaviour
+  /** mapTooltipAdapter
+   * customises map item tooltip
    **/
-  setPercentMode(usePercent: boolean): void {
-    const polygonTemplate = this.polygonSeries.mapPolygons.template;
-    const suffix = usePercent ? ' %' : '';
-    polygonTemplate.tooltipText = '{name}: {value}' + suffix;
+  mapTooltipAdapter(html: string, ev: am4maps.MapPolygon): string {
+    const mapData = this.mapData;
+    const ctxtId = ev.dataItem.dataContext['id'];
+    const dataItem = mapData.find((item) => {
+      return item['id'] === ctxtId;
+    });
+    if (!dataItem) {
+      return '{name}';
+    } else {
+      const suffix = this.mapPercentMode ? '%' : '';
+      return (
+        '{name}: ' + Number(dataItem.value).toLocaleString('en-GB') + suffix
+      );
+    }
+  }
+
+  /** setMapPercentMode
+   * @param { boolean } usePercent
+   * sets the variable and adapter for tooltip behaviour
+   **/
+  setMapPercentMode(usePercent: boolean): void {
+    this.mapPercentMode = usePercent;
+    this.polygonSeries.mapPolygons.template.adapter.add(
+      'tooltipHTML',
+      this.mapTooltipAdapter.bind(this)
+    );
   }
 
   /** drawChart
@@ -529,7 +532,7 @@ export class MapComponent {
     // Configure series tooltip
     const polygonTemplate = polygonSeries.mapPolygons.template;
 
-    this.setPercentMode(false);
+    this.setMapPercentMode(false);
     polygonTemplate.nonScalingStroke = true;
     polygonTemplate.strokeWidth = 0.5;
 
@@ -578,84 +581,17 @@ export class MapComponent {
     const [north, south, east, west] = this.getBoundingCoords(zoomTo);
 
     if (zoomLevelIn === ZoomLevel.SINGLE) {
-      //this.log('aspectRatioChart single ' + aspectRatioChart);
-
       zoomLevel = zoomLevelSingle;
       if (aspectRatioChart > 2.4) {
-        this.log('correct single');
         zoomLevel = 0.75;
       }
       if (aspectRatioChart > 3.4) {
-        this.log('correct single ++');
         zoomLevel = 0.725;
       }
     } else if (zoomLevelIn === ZoomLevel.MULTIPLE) {
       zoomLevel = zoomLevelMultiple;
     } else {
-      const selectionHeight = north - south;
-      const aspectRatioSelection = (east - west) / selectionHeight;
-
-      //aspectRatioChart = this.chart.pixelWidth / this.chart.pixelHeight;
-      const aspectRatioCombined =
-        this.chart.pixelWidth /
-        (east - west) /
-        (this.chart.pixelHeight / selectionHeight);
-
-      this.log('aspectRatioChart\t\t' + aspectRatioChart.toFixed(2));
-      this.log('aspectRatioSelection\t\t' + aspectRatioSelection.toFixed(2));
-      this.log('aspectRatioCombined\t\t' + aspectRatioCombined.toFixed(2));
-
-      /*
-
-      // SLOVAKIA
-      aspectRatioChart		  3.498181818181818
-      aspectRatioSelection	3.0945371279031675
-      aspectRatioCombined		1.130437824332118
-
-      // TURKEY
-      aspectRatioChart		  3.498181818181818
-      aspectRatioSelection	3.0055379493581755
-      aspectRatioCombined		1.1639120440747872
-
-      the fact that slovakia is fine and turkey is not means it's more to do with size!
-      */
-
-      /*
-      //
-      const getRatio = (tgt: number, val: number, rec = 0): number => {
-        const half = val / 2;
-        if (tgt > val) {
-          return 0;
-        }
-        if (tgt > half) {
-          return Math.max(rec, 1) + ((val / tgt) % 1);
-          //return Math.max(rec, 1) + ((val / tgt) % 1);
-        }
-        return getRatio(tgt, half, rec + 1);
-      };
-
-      zoomLevel = getRatio(selectionHeight, this.mapHeight);
-      //zoomLevel = zoomLevelSingle * zoomLevel;
-      // zoomLevel -= aspectRatioSelection / aspectRatioChart;
-      let finalSutraction = aspectRatioChart / aspectRatioSelection;
-      let finalSutractionAlt = Math.min(aspectRatioChart, aspectRatioSelection) / aspectRatioChart;
-      //zoomLevel -= finalSutraction;
-
-      this.log('aspectRatioChart: ' + aspectRatioChart + '\nspectRatioSelection = ' + aspectRatioSelection + '...');
-
-      */
-      //this.log('... = finalSutraction = ' + finalSutraction.toFixed(2));
-      //this.log('... = finalSutractionAlt = ' + finalSutractionAlt.toFixed(2));
-      //this.log('... = zoomLevel to subtract from = ' + zoomLevel.toFixed(2));
-
-      //zoomLevel -= finalSutractionAlt;
       zoomLevel = 1;
-
-      //  zoomLevel = zoomLevel / finalSutraction;//Math.min(aspectRatioSelection, aspectRatioChart);
-
-      //zoomLevel -= aspectRatioChart;// / aspectRatioSelection;
-      //    zoomLevel -= Math.max(aspectRatioSelection, aspectRatioChart);
-      //  zoomLevel = Math.max(1, zoomLevel);
     }
 
     const res = this.chart.zoomToRectangle(
@@ -669,20 +605,15 @@ export class MapComponent {
     );
 
     if (duration === 0) {
-      this.log('zoomTo empty duration falsifies');
       this.isAnimating = false;
     }
-    //this.isAnimating = false;
-
     res.events.on('animationstopped', () => {
       if (this.isAnimating) {
-        this.log('zoomTo animationstopped');
         this.isAnimating = false;
       }
     });
 
     res.events.on('animationended', () => {
-      this.log('zoomTo animationended');
       this.isAnimating = false;
     });
 

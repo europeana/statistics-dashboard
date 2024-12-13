@@ -129,8 +129,6 @@ $numeric-min-width: 6em;
 
   margin-right: -$scrollbar-width;
 
-  // TODO map constants.
-  $map-height: 275px;
   max-height: calc($map-height - 4em);
   overflow: auto;
 
@@ -171,12 +169,24 @@ $numeric-min-width: 6em;
 
 .derived-series-menu {
   position: absolute;
-  background-color: $white;
-  border: 1px solid $gray-5;
+  box-shadow: 0 2px 6px 0 rgba(26, 26, 26, 0.25);
   font-weight: normal;
   right: 2.6em;
   top: -0.4em;
   z-index: 1;
+
+  &::before {
+    background-color: #fff;
+    border: 1px solid #d8d8d8;
+    content: "";
+    height: 10px;
+    position: absolute;
+    right: -6px;
+    top: 12px;
+    transform: rotate(45deg);
+    width: 10px;
+    z-index: -1;
+  }
 
   &.hidden {
     display: none;
@@ -187,7 +197,14 @@ $numeric-min-width: 6em;
   }
 }
 
+.derived-series-menu,
 .derived-series-menu-inner {
+  border-radius: 4px;
+}
+
+.derived-series-menu-inner {
+  background-color: $white;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-column-gap: 1em;
@@ -231,11 +248,11 @@ $numeric-min-width: 6em;
     &.active,
     &.open {
       &::after {
-        //background-image: svg-url-icon-flag($gray-med);
         background-image: svg-url-icon-flag($gray-faint);
       }
     }
     &.active::after {
+      // picks up the color of the selected item
       box-shadow: 0 1px 1px 0;
     }
   }
@@ -370,12 +387,6 @@ $numeric-min-width: 6em;
       visibility: visible;
     }
   }
-
-  // TODO fade in with this?
-
-  //& > :not(.numeric) {
-  //  visibility: hidden;
-  //}
 
   .numeric {
     text-align: right;

@@ -58,8 +58,8 @@
   </ng-template>
 
   <ng-template #tmpMapLayerMenu>
-    <span class="container-h">
-      <span style="position: relative">
+    <span class="container-h relative">
+      <span class="relative" appClickAware (clickOutside)="closeMapMenu()">
         <a
           class="derived-series-menu-opener flag-orb default"
           title="show target progress"

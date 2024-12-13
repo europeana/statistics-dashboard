@@ -1,6 +1,8 @@
+@import "../../../scss/_variables";
+
 #mapChart,
 #mapChartHidden {
-  height: 275px;
+  height: $map-height;
   width: 100%;
 }
 
