@@ -66,6 +66,11 @@ export interface NameLabelValid extends NameLabel {
   valid: boolean;
 }
 
+export interface IdValue {
+  id: string;
+  value: number;
+}
+
 export interface NameValue {
   name: string;
   value: number;

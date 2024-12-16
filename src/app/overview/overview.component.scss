@@ -404,7 +404,7 @@ label {
     line-height: 1.8rem;
 
     &:not(:hover) .flag-orb::after {
-      background-image: svg-url-icon-flag(#{$linkblue});
+      background-image: svg-url-icon-flag($linkblue);
       opacity: 0.2;
     }
   }

@@ -1,5 +1,12 @@
-#mapChart {
-  height: 100%;
-  min-height: 275px;
+@import "../../../scss/_variables";
+
+#mapChart,
+#mapChartHidden {
+  height: $map-height;
   width: 100%;
+}
+
+#mapChartHidden {
+  margin-top: -100%;
+  visibility: hidden;
 }

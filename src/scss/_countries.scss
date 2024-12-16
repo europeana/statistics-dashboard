@@ -58,57 +58,6 @@ $flag-orb-dimension: 1.6rem;
   }
 }
 
-// inset / outset arrows
-.entry-card {
-  .help-items .speech-bubble.arrow-bottom-right {
-    &::after,
-    &::before {
-      right: 50%;
-    }
-  }
-
-  &.entry-card-total .help-items .speech-bubble.arrow-bottom-right {
-    &::after,
-    &::before {
-      right: 2em;
-    }
-  }
-
-  .help-percent .speech-bubble.arrow-top-right {
-    &::after,
-    &::before {
-      left: auto;
-      right: 6rem;
-    }
-  }
-
-  .help-targets .speech-bubble.arrow-bottom-right {
-    &::after,
-    &::before {
-      right: 50%;
-      left: auto;
-    }
-  }
-}
-
-@media (min-width: $bp-desktop) {
-  .entry-card {
-    .help-items .speech-bubble.arrow-bottom-right {
-      &::after,
-      &::before {
-        right: min(12em, 94%);
-      }
-    }
-
-    &.entry-card-total .help-items .speech-bubble.arrow-bottom-right {
-      &::after,
-      &::before {
-        right: 4em;
-      }
-    }
-  }
-}
-
 // Flag Orbs
 
 .flag-orb {
@@ -118,7 +67,7 @@ $flag-orb-dimension: 1.6rem;
 }
 
 .flag-orb.default::after {
-  background-image: svg-url-icon-flag(#{$linkblue});
+  background-image: svg-url-icon-flag($linkblue);
 }
 
 .open > .flag-orb.default,

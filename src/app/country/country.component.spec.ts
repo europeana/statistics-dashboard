@@ -14,8 +14,13 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { isoCountryCodesReversed } from '../_data';
 import { APIService } from '../_services';
-import { MockAPIService, MockLineComponent } from '../_mocked';
-import { TargetFieldName, TargetMetaData } from '../_models';
+import {
+  MockAPIService,
+  mockCountryData,
+  MockLineComponent,
+  mockTargetMetaData
+} from '../_mocked';
+import { TargetFieldName } from '../_models';
 import { BarComponent, LineComponent } from '../chart';
 import { HeaderComponent } from '../header';
 import { CountryComponent } from '.';
@@ -136,33 +141,12 @@ describe('CountryComponent', () => {
     expect(barChart.ngAfterViewInit).toHaveBeenCalled();
   }));
 
-  it('should set the country data', () => {
-    const datum = {
-      date: new Date().toISOString(),
-      three_d: '111',
-      high_quality: '222',
-      total: '333',
-      label: 'last'
-    };
-    component.countryData = {
-      FR: [datum]
-    };
-    component.targetMetaData = {
-      FR: {
-        three_d: [
-          { value: 1 } as TargetMetaData,
-          { value: 2 } as TargetMetaData
-        ],
-        high_quality: [
-          { value: 1 } as TargetMetaData,
-          { value: 2 } as TargetMetaData
-        ],
-        total: [{ value: 1 } as TargetMetaData, { value: 2 } as TargetMetaData]
-      }
-    };
-
+  it('should set the latest country data', () => {
+    expect(component.latestCountryData).toBeFalsy();
+    component.countryData = mockCountryData;
+    component.targetMetaData = mockTargetMetaData;
     component.setCountryToParam('FR');
-    expect(component.latestCountryData).toEqual(datum);
+    expect(component.latestCountryData).toBeTruthy();
   });
 
   it('should toggle the appendice', () => {

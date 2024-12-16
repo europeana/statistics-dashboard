@@ -7,6 +7,42 @@ $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
 
+a[disabled] {
+  cursor: default;
+  pointer-events: none;
+}
+
+.relative {
+  position: relative;
+}
+
+.map-help-target {
+  min-width: 24em;
+  max-width: 24em;
+  opacity: 0;
+  position: absolute;
+  right: -3em;
+  text-align: center;
+  visibility: hidden;
+  transition: opacity 0.3s linear;
+  z-index: 1;
+
+  &:hover {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &.help-total {
+    top: -4.5em;
+  }
+  &.help-high_quality {
+    top: -8em;
+  }
+  &.help-three_d {
+    top: -6em;
+  }
+}
+
 .app-truncate {
   overflow: hidden;
 }
@@ -17,6 +53,7 @@ $card-header-height: $card-header-pixels-line-height +
 
 .container-h {
   justify-content: space-between;
+  align-items: center;
 }
 
 .data-link {
@@ -34,6 +71,7 @@ $card-header-height: $card-header-pixels-line-height +
 .data-rows {
   font-size: 12px;
   width: 100%;
+  position: relative;
 }
 
 .data-rows-title {
@@ -41,6 +79,9 @@ $card-header-height: $card-header-pixels-line-height +
   font-size: 14px;
   font-weight: 600;
   padding: 9px 0 14px 0;
+  .x {
+    margin-left: 0.6em;
+  }
 }
 
 .entry-card {
@@ -87,6 +128,7 @@ $card-header-height: $card-header-pixels-line-height +
   }
   a.info-icon {
     &::after {
+      // shorten line
       left: 18px;
     }
   }
@@ -125,51 +167,49 @@ $card-header-height: $card-header-pixels-line-height +
   & + .data-rows {
     width: 100%;
   }
+  height: $map-height;
 }
 
 .record-list {
   align-items: center;
   border-top: 1px solid $gray-5;
-  padding: 4px 0;
 
   &:last-child {
     border-bottom: 1px solid $gray-5;
   }
 
-  :first-child {
+  :first-child:not(.map-navigation-link) {
     flex-grow: 1;
   }
-
-  .numeric {
-    margin-left: 6px;
-    text-align: right;
-    min-width: 6em;
-  }
-}
-
-.splash-map {
-  border: 1px solid $near-black;
-  font-size: 22px;
-  height: calc(100% - 8em);
-  margin: 4em;
-  overflow: hidden;
-  padding: 1.5em;
-  position: fixed;
-  width: calc(100% - 8em);
-  z-index: 1;
 }
 
 .map-section {
-  .flag-orb {
-    margin-left: 7px;
-    opacity: 0;
-    top: 2px;
-    height: 1em;
-    width: 1em;
+  .link-select-country,
+  .link-open-country {
+    color: unset;
+    .flag-orb {
+      height: 1em;
+      top: 2px;
+      width: 1em;
+    }
   }
 
-  a:hover .flag-orb {
-    opacity: 1;
+  .link-open-country {
+    .flag-orb {
+      margin-right: 1rem;
+    }
+  }
+
+  .link-select-country {
+    .flag-orb {
+      opacity: 0;
+      margin-left: 7px;
+    }
+    &:hover {
+      .flag-orb {
+        opacity: 1;
+      }
+    }
   }
 }
 
