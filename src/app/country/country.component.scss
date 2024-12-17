@@ -59,7 +59,6 @@
     line-height: 1em;
     display: inline-block;
     text-align: center;
-    opacity: 0;
   }
 }
 
@@ -359,14 +358,6 @@
   }
   .totals {
     position: relative;
-  }
-
-  .totals:hover {
-    // draw attention to the help
-    .help-opener::after {
-      opacity: 1;
-      transition: opacity 0.3s linear;
-    }
   }
 }
 
