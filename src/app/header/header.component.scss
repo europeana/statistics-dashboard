@@ -139,7 +139,8 @@
   // prevent inheritance of opener's cursor
   cursor: default;
   height: 0;
-  left: -12em;
+
+  left: -1em;
   opacity: 0;
   overflow: hidden;
   position: absolute;
@@ -154,7 +155,7 @@
     background-color: #fff;
     border: 1px solid $gray-5;
     position: absolute;
-    left: 12.25em;
+    left: 1.25em;
     top: -8px;
     transform: rotate(45deg);
   }
@@ -203,30 +204,6 @@
       height: auto;
       overflow: visible;
     }
-  }
-}
-
-@media (min-width: $bp-small-3) {
-  .country-select-inner {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: $bp-med) {
-  .country-select-inner {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
-@media (min-width: $bp-large) {
-  .country-select-inner {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
-@media (min-width: $bp-xl) {
-  .country-select-inner {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }
 
