@@ -38,33 +38,6 @@ describe('MapComponent', () => {
     expect(component.mapCountries.length).toBeGreaterThan(0);
   });
 
-  it('should track if animating', () => {
-    component.mapData = [{ id: 'IT', value: 1881 }];
-
-    spyOn(component.chart.events, 'enableType');
-    spyOn(component.chart.events, 'disableType');
-
-    component.isAnimating = true;
-
-    expect(component.chart.events.disableType).toHaveBeenCalled();
-    expect(component.chart.events.enableType).not.toHaveBeenCalled();
-
-    component.isAnimating = true;
-
-    expect(component.chart.events.disableType).toHaveBeenCalledTimes(1);
-    expect(component.chart.events.enableType).not.toHaveBeenCalled();
-
-    component.isAnimating = false;
-
-    expect(component.chart.events.disableType).toHaveBeenCalledTimes(1);
-    expect(component.chart.events.enableType).toHaveBeenCalled();
-
-    component.isAnimating = false;
-
-    expect(component.chart.events.disableType).toHaveBeenCalledTimes(1);
-    expect(component.chart.events.enableType).toHaveBeenCalledTimes(1);
-  });
-
   it('should track the selected country', () => {
     component.mapData = [{ id: 'IT', value: 1881 }];
 

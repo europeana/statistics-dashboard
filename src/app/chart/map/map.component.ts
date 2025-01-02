@@ -3,6 +3,11 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
+
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+
+import { SubscriptionManager } from '../../subscription-manager';
 import { IdValue, IHash, TargetFieldName } from '../../_models';
 import {
   colourHeatmapBlue,
@@ -36,7 +41,7 @@ type ColourSchemeMap = {
   styleUrls: ['./map.component.scss'],
   standalone: true
 })
-export class MapComponent {
+export class MapComponent extends SubscriptionManager {
   @Output() mapCountrySet = new EventEmitter<boolean>();
 
   _mapData: Array<IdValue>;
@@ -47,6 +52,7 @@ export class MapComponent {
   polygonSeriesHidden: am4maps.MapPolygonSeries;
   legend: am4maps.HeatLegend;
   hs: am4core.SpriteState<am4core.IPolygonProperties, am4core.IPolygonAdapters>;
+  sprites: Array<am4core.Sprite> = [];
 
   mapHeight: number;
   mapWidth: number;
@@ -60,26 +66,13 @@ export class MapComponent {
   _selectedCountry?: string;
   selectedIndex: number;
 
+  dragEndSubject = new Subject<boolean>();
+  countryClickSubject = new Subject<string>();
+
   _isAnimating = false;
 
   set isAnimating(isAnimating: boolean) {
-    if (isAnimating === this.isAnimating) {
-      return;
-    }
-
     this._isAnimating = isAnimating;
-    if (this.isAnimating) {
-      this.chart.events.disableType('hit');
-      this.chart.seriesContainer.events.disableType('hit');
-      this.chart.chartContainer.background.events.disableType('hit');
-      this.polygonSeries.mapPolygons.template.events.disableType('hit');
-      this.chart.seriesContainer.draggable = false;
-    } else {
-      this.chart.events.enableType('hit');
-      this.chart.seriesContainer.events.enableType('hit');
-      this.chart.chartContainer.background.events.enableType('hit');
-      this.polygonSeries.mapPolygons.template.events.enableType('hit');
-    }
   }
 
   get isAnimating(): boolean {
@@ -131,10 +124,12 @@ export class MapComponent {
 
   colourSchemeTargets: ColourSchemeMap;
   colourSchemeDefault: MapColourScheme;
-
   _colourScheme: MapColourScheme;
 
+  isDragging = false;
+
   constructor() {
+    super();
     am4core.options.autoDispose = true;
 
     const cst = Object.values(TargetFieldName).reduce(
@@ -186,6 +181,21 @@ export class MapComponent {
       highlight: am4core.color(colourStatsBlue),
       outline: am4core.color(colourHighlightYellow)
     };
+
+    this.subs.push(
+      this.countryClickSubject
+        .pipe(debounceTime(250))
+        .subscribe((clickedId: string) => {
+          this.countryClick(clickedId);
+        })
+    );
+
+    this.subs.push(
+      this.dragEndSubject.pipe(debounceTime(350)).subscribe(() => {
+        this.isDragging = false;
+        this.isAnimating = false;
+      })
+    );
   }
 
   /* setter colourScheme
@@ -260,17 +270,18 @@ export class MapComponent {
 
     if (!singleCountry) {
       this.selectedCountry = undefined;
+      this.chart.seriesContainer.draggable = true;
+    } else {
+      this.chart.seriesContainer.draggable = false;
     }
 
     this.polygonSeries.include = countries;
     this.polygonSeries.data = this.filterResultsData();
-    this.chart.seriesContainer.draggable = !singleCountry;
 
     this.polygonSeries.events.once('datavalidated', () => {
       if (singleCountry) {
         this.zoomToCountries(countries, ZoomLevel.SINGLE, 0);
       } else {
-        //this.selectedCountry = undefined;
         this.zoomToCountries(this.boundingCountries, ZoomLevel.MULTIPLE, 0);
       }
     });
@@ -338,8 +349,13 @@ export class MapComponent {
     if (this.isAnimating) {
       return;
     }
+    if (this.isDragging) {
+      this.dragEndSubject.next(true);
+      return;
+    }
 
     const singleMode = this.polygonSeries.include.length === 1;
+
     if (singleMode) {
       // revert back to full map (will invoke zoomTo with instant effect)
       this.setCountryInclusion(this.mapCountries);
@@ -349,16 +365,16 @@ export class MapComponent {
       // set selection and zoom
       this.legend.hide();
       this.selectedCountry = country;
+
       const animation = this.zoomToCountries(
         [country],
         ZoomLevel.INTERMEDIATE,
         this.animationTime
       );
 
-      const fn = (): void => {
+      animation.events.on('animationended', (): void => {
         this.setCountryInclusion([country]);
-      };
-      animation.events.on('animationended', fn);
+      });
     }
   }
 
@@ -409,12 +425,17 @@ export class MapComponent {
     );
   }
 
+  setZoomLevels(): void {
+    this.chart.maxZoomLevel = 24;
+    this.chartHidden.maxZoomLevel = 24;
+    this.chart.minZoomLevel = 0.2;
+    this.chartHidden.minZoomLevel = 0.2;
+  }
+
   /** drawChart
    *
    **/
   drawChart(): void {
-    const countryClick = this.countryClick.bind(this);
-
     am4core.useTheme(am4themes_animated);
     am4core.options.autoDispose = true;
 
@@ -428,16 +449,6 @@ export class MapComponent {
     // Set map definition
     chart.geodata = am4geodata_worldHigh;
     chartHidden.geodata = am4geodata_worldHigh;
-
-    chart.events.on('over', () => {
-      if (this.polygonSeries.include.length > 1) {
-        this.legend.show();
-      }
-    });
-
-    chart.events.on('out', () => {
-      this.legend.hide();
-    });
 
     // Set projection
 
@@ -465,11 +476,6 @@ export class MapComponent {
     polygonSeries.useGeodata = true;
     polygonSeriesHidden.useGeodata = true;
 
-    this.chart.events.disableType('doublehit');
-    this.chart.seriesContainer.events.disableType('doublehit');
-    this.chart.chartContainer.background.events.disableType('doublehit');
-    this.polygonSeries.mapPolygons.template.events.disableType('doublehit');
-
     // add legend
     const legend = this.chart.createChild(am4maps.HeatLegend);
     this.legend = legend;
@@ -486,8 +492,6 @@ export class MapComponent {
     legend.events.on('up', () => {
       this.zoomToCountries();
     });
-
-    //legend.tooltipText = 'home';
 
     // Set up custom heat map legend labels using axis ranges
     const minRange = legend.valueAxis.axisRanges.create();
@@ -518,15 +522,25 @@ export class MapComponent {
       hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
     });
 
-    this.chart.maxZoomLevel = 24;
-    this.chartHidden.maxZoomLevel = 24;
-    this.chart.minZoomLevel = 0.2;
-    this.chartHidden.minZoomLevel = 0.2;
+    polygonSeries.events.on('rangechangestarted', () => {
+      console.log('GENERIC END?');
+    });
 
-    // Bind to country click
-    polygonSeries.mapPolygons.template.events.on('hit', function (ev) {
+    polygonSeries.events.on('rangechangeended', () => {
+      console.log('GENERIC START?');
+    });
+
+    polygonSeries.events.on('startendchanged', () => {
+      console.log('GENERIC startendchanged?');
+    });
+
+    this.setZoomLevels();
+
+    // Bind series to country click
+
+    polygonSeries.mapPolygons.template.events.on('hit', (ev) => {
       const clickedId = ev.target.dataItem.dataContext['id'];
-      countryClick(clickedId);
+      this.countryClickSubject.next(clickedId);
     });
 
     // Configure series tooltip
@@ -543,13 +557,45 @@ export class MapComponent {
     this.updatePolygonData();
     this.colourScheme = this.colourSchemeDefault;
 
+    this.sprites = [
+      chart,
+      chart.seriesContainer,
+      chart.chartContainer.background,
+      polygonSeries.mapPolygons.template
+    ];
+
+    this.sprites.forEach((sprite: am4core.Sprite) => {
+      sprite.events.disableType('doublehit');
+      sprite.events.disableType('swipe');
+    });
+
     chart.zoomLevel = 1;
+
+    chart.events.on('over', () => {
+      if (this.polygonSeries.include.length > 1) {
+        this.legend.show();
+      }
+    });
+
+    chart.events.on('out', () => {
+      this.legend.hide();
+    });
+
     chart.events.on('ready', () => {
       const [n, s, e, w] = this.getBoundingCoords(this.mapCountries);
       this.mapHeight = n - s;
       this.mapWidth = e - w;
       this.zoomToCountries();
       chart.series.template.fill = am4core.color('#ffee00');
+    });
+
+    chart.seriesContainer.events.on('dragstart', () => {
+      this.isDragging = true;
+      this.isAnimating = true;
+    });
+
+    chart.seriesContainer.events.on('dragstop', () => {
+      this.dragEndSubject.next(true);
     });
   }
 
@@ -594,6 +640,9 @@ export class MapComponent {
       zoomLevel = 1;
     }
 
+    // pre-zoom to re-validate the position
+    this.chart.zoomLevel = this.chart.zoomLevel * 1.01;
+
     const res = this.chart.zoomToRectangle(
       north,
       east,
@@ -607,10 +656,9 @@ export class MapComponent {
     if (duration === 0) {
       this.isAnimating = false;
     }
+
     res.events.on('animationstopped', () => {
-      if (this.isAnimating) {
-        this.isAnimating = false;
-      }
+      this.isAnimating = false;
     });
 
     res.events.on('animationended', () => {
