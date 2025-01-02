@@ -1,5 +1,11 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync
+} from '@angular/core/testing';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
@@ -94,16 +100,37 @@ describe('MapComponent', () => {
     expect(res).toEqual('{name}: 1,881%');
   });
 
+  it('should debounce clicks on the country', fakeAsync(() => {
+    spyOn(component, 'countryClick');
+    component.countryClickSubject.next('IT');
+    tick(250);
+    expect(component.countryClick).toHaveBeenCalled();
+  }));
+
+  it('should debounce dragging', fakeAsync(() => {
+    component.isDragging = true;
+    component.dragEndSubject.next(true);
+    tick(350);
+    expect(component.isDragging).toBeFalsy();
+  }));
+
   it('should handle clicks on the country', () => {
     component.drawChart();
     expect(component.selectedCountry).toBeFalsy();
 
     const country = 'IT';
-    component._isAnimating = true;
+    component.isAnimating = true;
+    component.isDragging = true;
+
     component.countryClick(country);
-    component._isAnimating = false;
+    component.isAnimating = false;
+
     expect(component.selectedCountry).toBeFalsy();
 
+    component.countryClick(country);
+    expect(component.selectedCountry).toBeFalsy();
+
+    component.isDragging = false;
     component.countryClick(country);
     expect(component.selectedCountry).toEqual(country);
   });
