@@ -522,18 +522,6 @@ export class MapComponent extends SubscriptionManager {
       hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
     });
 
-    polygonSeries.events.on('rangechangestarted', () => {
-      console.log('GENERIC END?');
-    });
-
-    polygonSeries.events.on('rangechangeended', () => {
-      console.log('GENERIC START?');
-    });
-
-    polygonSeries.events.on('startendchanged', () => {
-      console.log('GENERIC startendchanged?');
-    });
-
     this.setZoomLevels();
 
     // Bind series to country click

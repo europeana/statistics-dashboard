@@ -140,6 +140,9 @@ describe('MapComponent', () => {
     component.isDragging = false;
     component.isAnimating = false;
     component.polygonSeries = {
+      getPolygonById: (_: string) => {
+        return null;
+      },
       include: {
         length: 1
       }
