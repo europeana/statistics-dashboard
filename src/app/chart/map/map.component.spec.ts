@@ -115,6 +115,8 @@ describe('MapComponent', () => {
   }));
 
   it('should handle clicks on the country', () => {
+    spyOn(component, 'setCountryInclusion');
+
     component.drawChart();
     expect(component.selectedCountry).toBeFalsy();
 
@@ -133,6 +135,18 @@ describe('MapComponent', () => {
     component.isDragging = false;
     component.countryClick(country);
     expect(component.selectedCountry).toEqual(country);
+    expect(component.setCountryInclusion).not.toHaveBeenCalled();
+
+    component.isDragging = false;
+    component.isAnimating = false;
+    component.polygonSeries = {
+      include: {
+        length: 1
+      }
+    } as unknown as am4maps.MapPolygonSeries;
+
+    component.countryClick(country);
+    expect(component.setCountryInclusion).toHaveBeenCalled();
   });
 
   it('should track which countries are shown', () => {
