@@ -52,6 +52,27 @@ describe('LineComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should enable the axes', () => {
+    component.valueAxis.disabled = true;
+    component.dateAxis.disabled = true;
+    component.addSeries('My Series', 'myVal', TargetFieldName.HQ, [
+      {
+        date: '14/12/2001',
+        three_d: '12',
+        total: '40',
+        high_quality: '10'
+      }
+    ]);
+
+    expect(component.valueAxis.disabled).toBeTruthy();
+    expect(component.dateAxis.disabled).toBeTruthy();
+
+    component.enableAxes();
+
+    expect(component.valueAxis.disabled).toBeFalsy();
+    expect(component.dateAxis.disabled).toBeFalsy();
+  });
+
   it('should remove the range', () => {
     component.targetMetaData = structuredClone(mockTargetMetaData);
 

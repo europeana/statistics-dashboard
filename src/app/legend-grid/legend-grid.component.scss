@@ -24,14 +24,28 @@ li {
   }
 }
 
-.bulleted {
-  list-style: disc;
-}
-
-.indented {
+.target-toggle {
   margin-left: 1rem;
-  &::marker {
-    color: inherit;
+  position: relative;
+
+  &::before {
+    border-radius: 50%;
+    border-width: 2px;
+    border-style: solid;
+    content: "";
+    display: block;
+    left: -12px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+  }
+
+  &.active::before {
+    width: 0;
+    height: 0;
+    border-width: 4px;
   }
 }
 

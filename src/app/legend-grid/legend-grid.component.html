@@ -50,9 +50,9 @@
       >
         <ul class="roll-down">
           <li
-            class="indented"
+            class="target-toggle"
             [ngStyle]="{ color: series.fill }"
-            [ngClass]="{ bulleted: data.range }"
+            [ngClass]="{ active: data.range }"
             *ngFor="
               let data of targetMetaData[country][targetType];
               let i = index
