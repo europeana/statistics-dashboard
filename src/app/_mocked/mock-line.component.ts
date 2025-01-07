@@ -75,6 +75,9 @@ export class MockLineComponent {
       next: () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
       }
+    },
+    invalidateData(): void {
+      console.log('MockLineComponent chart.invalidateData');
     }
   } as unknown as am4charts.XYChart;
   dateAxis: am4charts.DateAxis;
