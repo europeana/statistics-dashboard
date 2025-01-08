@@ -28,7 +28,6 @@ li {
   margin-left: 1rem;
   position: relative;
   &::before {
-    border-radius: 50%;
     border-width: 2px;
     border-style: solid;
     content: "";
