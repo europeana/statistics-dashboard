@@ -110,7 +110,10 @@ export class LineComponent implements AfterViewInit {
       this.chart.paddingRight = this.padding.rightDefault;
     }
 
-    // optionally disable the axes
+    return allRemovals;
+  }
+
+  enableAxes(): void {
     let disabled = true;
     this.valueAxis.series.each(function (series) {
       if (!series.isHiding && !series.isHidden) {
@@ -119,8 +122,6 @@ export class LineComponent implements AfterViewInit {
     });
     this.valueAxis.disabled = disabled;
     this.dateAxis.disabled = disabled;
-
-    return allRemovals;
   }
 
   showRange(

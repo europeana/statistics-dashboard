@@ -117,6 +117,10 @@ export class MockLineComponent {
     console.log('MockLineComponent showRange');
   }
 
+  enableAxes(): void {
+    console.log('MockLineComponent enableAxes');
+  }
+
   hideRange(_: string, __: number): void {
     console.log('MockLineComponent hideRange');
   }

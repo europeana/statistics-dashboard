@@ -137,16 +137,10 @@ export class LegendGridComponent {
     }
 
     // set new country
-
     this._countryCode = countryCode;
     setTimeout(() => {
       this.toggleCountry(this.countryCode);
-      this.toggleRange(
-        this.countryCode,
-        TargetFieldName.THREE_D,
-        0,
-        this.lineChart.chart.colors.getIndex(0)
-      );
+      this.lineChart.enableAxes();
     }, timeout);
   }
 

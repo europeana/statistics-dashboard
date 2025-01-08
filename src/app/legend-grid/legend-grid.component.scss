@@ -24,14 +24,36 @@ li {
   }
 }
 
-.bulleted {
-  list-style: disc;
-}
-
-.indented {
+.target-toggle {
   margin-left: 1rem;
-  &::marker {
-    color: inherit;
+  position: relative;
+
+  &::before {
+    border-radius: 50%;
+    border-width: 2px;
+    border-style: solid;
+    content: "";
+    display: block;
+    left: -12px;
+    opacity: 0.5;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+  }
+
+  &.active,
+  &:hover {
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &.active::before {
+    width: 0;
+    height: 0;
+    border-width: 4px;
   }
 }
 
