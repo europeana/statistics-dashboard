@@ -345,6 +345,7 @@ export class LegendGridComponent {
           // append to existing countryData
           this.countryData[country] = this.countryData[country].concat(data);
           this.lineChart.sortSeriesData(data);
+
           // append to graph series data
           for (let i = 0; i < TargetSeriesSuffixes.length; i++) {
             this.lineChart.addSeriesData(
@@ -353,6 +354,7 @@ export class LegendGridComponent {
               data
             );
           }
+          this.lineChart.chart.invalidateData();
         }
       });
 
@@ -511,7 +513,6 @@ export class LegendGridComponent {
         TargetFieldName[this.seriesValueNames[typeIndex]],
         this.countryData[country]
       );
-
       if (visibleSiblingCount === 0) {
         this.togglePin(country);
       }
