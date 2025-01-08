@@ -27,7 +27,6 @@ li {
 .target-toggle {
   margin-left: 1rem;
   position: relative;
-
   &::before {
     border-radius: 50%;
     border-width: 2px;
@@ -36,6 +35,7 @@ li {
     display: block;
     left: -12px;
     opacity: 0.5;
+    pointer-events: none;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -141,10 +141,12 @@ li {
 }
 
 .legend-item-target-toggle {
+  display: flex;
   font-size: 12px;
   max-width: 8em;
   min-width: 8em;
-  display: flex;
+  margin-left: -1rem;
+  padding-left: 1rem;
   justify-content: space-between;
 }
 
