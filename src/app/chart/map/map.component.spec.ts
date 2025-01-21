@@ -30,7 +30,6 @@ describe('MapComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
-    component.animationTime = 0;
     component.mapData = [];
     fixture.detectChanges();
   });
