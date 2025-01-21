@@ -447,6 +447,12 @@ export class MapComponent extends SubscriptionManager {
   showGlobe(): void {
     this.chart.hide();
     this.chartGlobe.show();
+    this.animateLatitude();
+  }
+
+  animateLatitude(): void {
+    this.chartGlobe.deltaLatitude = -45;
+    this.chartGlobe.animate({ property: 'deltaLatitude', to: 0 }, 5000, am4core.ease.circleOut );
   }
 
   /** drawChart
@@ -608,11 +614,13 @@ export class MapComponent extends SubscriptionManager {
       this.chartGlobe = chartGlobe;
       this.hideGlobe();
 
+      chartGlobe.deltaLongitude = -45;
       chartGlobe.projection = new am4maps.projections.Orthographic();
       chartGlobe.series.push(new am4maps.MapPolygonSeries()).useGeodata = true;
       chartGlobe.seriesContainer.resizable = false;
       chartGlobe.seriesContainer.draggable = false;
-      chartGlobe.animate({ property: 'deltaLongitude', to: 100000 }, 20000000);
+
+      chartGlobe.animate({ property: 'deltaLongitude', to: 100050 }, 20000000);
       setTimeout(() => {
         chartGlobe.geodata = am4geodata_worldHigh;
         const label = chartGlobe.chartAndLegendContainer.createChild(

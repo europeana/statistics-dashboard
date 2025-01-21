@@ -56,12 +56,14 @@ describe('MapComponent', () => {
       hide: jasmine.createSpy()
     } as unknown as am4maps.MapChart;
     component.chartGlobe = {
-      show: jasmine.createSpy()
+      show: jasmine.createSpy(),
+      animate: jasmine.createSpy()
     } as unknown as am4maps.MapChart;
 
     component.showGlobe();
     expect(component.chart.hide).toHaveBeenCalled();
     expect(component.chartGlobe.show).toHaveBeenCalled();
+    expect(component.chartGlobe.animate).toHaveBeenCalled();
   });
 
   it('should update the data', () => {
