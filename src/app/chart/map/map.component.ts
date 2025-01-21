@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output
+} from '@angular/core';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -41,7 +47,7 @@ type ColourSchemeMap = {
   styleUrls: ['./map.component.scss'],
   standalone: true
 })
-export class MapComponent extends SubscriptionManager {
+export class MapComponent extends SubscriptionManager implements OnDestroy {
   @Output() mapCountrySet = new EventEmitter<boolean>();
 
   _mapData: Array<IdValue>;
@@ -72,6 +78,7 @@ export class MapComponent extends SubscriptionManager {
   countryClickSubject = new Subject<string>();
 
   _isAnimating = false;
+  isDestroying = false;
 
   set isAnimating(isAnimating: boolean) {
     this._isAnimating = isAnimating;
@@ -137,7 +144,6 @@ export class MapComponent extends SubscriptionManager {
 
   constructor() {
     super();
-    am4core.options.autoDispose = true;
 
     const cst = Object.values(TargetFieldName).reduce(
       (ob: ColourSchemeMap, tType: TargetFieldName) => {
@@ -203,6 +209,13 @@ export class MapComponent extends SubscriptionManager {
         this.isAnimating = false;
       })
     );
+  }
+
+  /* ngOnDestroy
+   * track component destruction to help clean-up
+   **/
+  ngOnDestroy(): void {
+    this.isDestroying = true;
   }
 
   /* setter colourScheme
@@ -454,7 +467,7 @@ export class MapComponent extends SubscriptionManager {
     this.chartGlobe.deltaLatitude = -45;
     this.chartGlobe.animate(
       { property: 'deltaLatitude', to: 0 },
-      5000,
+      12000,
       am4core.ease.circleOut
     );
   }
@@ -598,6 +611,9 @@ export class MapComponent extends SubscriptionManager {
     });
 
     chart.events.on('ready', () => {
+      if (this.isDestroying) {
+        return;
+      }
       const [n, s, e, w] = this.getBoundingCoords(this.mapCountries);
       this.mapHeight = n - s;
       this.mapWidth = e - w;
@@ -615,6 +631,9 @@ export class MapComponent extends SubscriptionManager {
     });
 
     chartGlobe.events.on('ready', () => {
+      if (this.isDestroying) {
+        return;
+      }
       this.chartGlobe = chartGlobe;
       this.hideGlobe();
 
@@ -625,7 +644,11 @@ export class MapComponent extends SubscriptionManager {
       chartGlobe.seriesContainer.draggable = false;
 
       chartGlobe.animate({ property: 'deltaLongitude', to: 100050 }, 20000000);
+
       setTimeout(() => {
+        if (this.isDestroying) {
+          return;
+        }
         chartGlobe.geodata = am4geodata_worldHigh;
         const label = chartGlobe.chartAndLegendContainer.createChild(
           am4core.Label

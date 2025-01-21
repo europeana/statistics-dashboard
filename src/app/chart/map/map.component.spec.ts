@@ -61,6 +61,7 @@ describe('MapComponent', () => {
     } as unknown as am4maps.MapChart;
 
     component.showGlobe();
+
     expect(component.chart.hide).toHaveBeenCalled();
     expect(component.chartGlobe.show).toHaveBeenCalled();
     expect(component.chartGlobe.animate).toHaveBeenCalled();
@@ -138,8 +139,9 @@ describe('MapComponent', () => {
   it('should debounce clicks on the country', fakeAsync(() => {
     spyOn(component, 'countryClick');
     component.countryClickSubject.next('IT');
-    tick(250);
+    tick(component.animationTime);
     expect(component.countryClick).toHaveBeenCalled();
+    tick(component.animationTime);
   }));
 
   it('should debounce dragging', fakeAsync(() => {
