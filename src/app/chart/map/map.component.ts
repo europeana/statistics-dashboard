@@ -452,7 +452,11 @@ export class MapComponent extends SubscriptionManager {
 
   animateLatitude(): void {
     this.chartGlobe.deltaLatitude = -45;
-    this.chartGlobe.animate({ property: 'deltaLatitude', to: 0 }, 5000, am4core.ease.circleOut );
+    this.chartGlobe.animate(
+      { property: 'deltaLatitude', to: 0 },
+      5000,
+      am4core.ease.circleOut
+    );
   }
 
   /** drawChart
