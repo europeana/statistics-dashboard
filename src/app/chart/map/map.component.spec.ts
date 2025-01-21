@@ -30,12 +30,39 @@ describe('MapComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
+    component.animationTime = 0;
     component.mapData = [];
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should hide the globe', () => {
+    component.chart = {
+      show: jasmine.createSpy()
+    } as unknown as am4maps.MapChart;
+    component.chartGlobe = {
+      hide: jasmine.createSpy()
+    } as unknown as am4maps.MapChart;
+
+    component.hideGlobe();
+    expect(component.chart.show).toHaveBeenCalled();
+    expect(component.chartGlobe.hide).toHaveBeenCalled();
+  });
+
+  it('should show the globe', () => {
+    component.chart = {
+      hide: jasmine.createSpy()
+    } as unknown as am4maps.MapChart;
+    component.chartGlobe = {
+      show: jasmine.createSpy()
+    } as unknown as am4maps.MapChart;
+
+    component.showGlobe();
+    expect(component.chart.hide).toHaveBeenCalled();
+    expect(component.chartGlobe.show).toHaveBeenCalled();
   });
 
   it('should update the data', () => {
@@ -45,6 +72,8 @@ describe('MapComponent', () => {
   });
 
   it('should track the selected country', () => {
+    spyOn(component, 'hideGlobe');
+    spyOn(component, 'showGlobe');
     component.mapData = [{ id: 'IT', value: 1881 }];
 
     spyOn(component.mapCountrySet, 'emit');
@@ -58,6 +87,11 @@ describe('MapComponent', () => {
     component.selectedCountry = undefined;
 
     expect(component.mapCountrySet.emit).toHaveBeenCalledWith(false);
+    expect(component.hideGlobe).toHaveBeenCalled();
+    expect(component.showGlobe).not.toHaveBeenCalled();
+
+    component.selectedCountry = component.countryUnknown;
+    expect(component.showGlobe).toHaveBeenCalled();
   });
 
   it('should generate the polygon series', () => {
@@ -116,6 +150,7 @@ describe('MapComponent', () => {
 
   it('should handle clicks on the country', () => {
     spyOn(component, 'setCountryInclusion');
+    spyOn(component, 'hideGlobe');
 
     component.drawChart();
     expect(component.selectedCountry).toBeFalsy();
@@ -150,9 +185,11 @@ describe('MapComponent', () => {
 
     component.countryClick(country);
     expect(component.setCountryInclusion).toHaveBeenCalled();
+    expect(component.hideGlobe).toHaveBeenCalled();
   });
 
   it('should track which countries are shown', () => {
+    spyOn(component, 'hideGlobe');
     component.mapData = [{ id: 'IT', value: 1881 }];
     spyOn(component.polygonSeries.events, 'once');
 
@@ -161,9 +198,11 @@ describe('MapComponent', () => {
 
     expect(component.polygonSeries.events.once).toHaveBeenCalled();
     expect(component.selectedCountry).toBeFalsy();
+    expect(component.hideGlobe).toHaveBeenCalled();
   });
 
   it('should morph', () => {
+    spyOn(component, 'hideGlobe');
     component.mapData = [{ id: 'IT', value: 1881 }];
     component.setCountryInclusion(['IT', 'DE']);
 
@@ -187,5 +226,6 @@ describe('MapComponent', () => {
     component.countryMorph('DE');
 
     expect(component.selectedCountry).toEqual('DE');
+    expect(component.hideGlobe).toHaveBeenCalledTimes(2);
   });
 });
