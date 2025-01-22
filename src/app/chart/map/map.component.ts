@@ -1,10 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -47,7 +41,7 @@ type ColourSchemeMap = {
   styleUrls: ['./map.component.scss'],
   standalone: true
 })
-export class MapComponent extends SubscriptionManager implements OnDestroy {
+export class MapComponent extends SubscriptionManager {
   @Output() mapCountrySet = new EventEmitter<boolean>();
 
   _mapData: Array<IdValue>;
@@ -78,7 +72,6 @@ export class MapComponent extends SubscriptionManager implements OnDestroy {
   countryClickSubject = new Subject<string>();
 
   _isAnimating = false;
-  isDestroying = false;
 
   set isAnimating(isAnimating: boolean) {
     this._isAnimating = isAnimating;
@@ -209,13 +202,6 @@ export class MapComponent extends SubscriptionManager implements OnDestroy {
         this.isAnimating = false;
       })
     );
-  }
-
-  /* ngOnDestroy
-   * track component destruction to help clean-up
-   **/
-  ngOnDestroy(): void {
-    this.isDestroying = true;
   }
 
   /* setter colourScheme
@@ -485,6 +471,7 @@ export class MapComponent extends SubscriptionManager implements OnDestroy {
     const chartGlobe = am4core.create('mapChartGlobe', am4maps.MapChart);
     this.chart = chart;
     this.chartHidden = chartHidden;
+    this.chartGlobe = chartGlobe;
     this.chart.seriesContainer.resizable = false;
 
     // Set map definition
@@ -611,9 +598,6 @@ export class MapComponent extends SubscriptionManager implements OnDestroy {
     });
 
     chart.events.on('ready', () => {
-      if (this.isDestroying) {
-        return;
-      }
       const [n, s, e, w] = this.getBoundingCoords(this.mapCountries);
       this.mapHeight = n - s;
       this.mapWidth = e - w;
@@ -631,10 +615,6 @@ export class MapComponent extends SubscriptionManager implements OnDestroy {
     });
 
     chartGlobe.events.on('ready', () => {
-      if (this.isDestroying) {
-        return;
-      }
-      this.chartGlobe = chartGlobe;
       this.hideGlobe();
 
       chartGlobe.deltaLongitude = -45;
@@ -646,9 +626,6 @@ export class MapComponent extends SubscriptionManager implements OnDestroy {
       chartGlobe.animate({ property: 'deltaLongitude', to: 100050 }, 20000000);
 
       setTimeout(() => {
-        if (this.isDestroying) {
-          return;
-        }
         chartGlobe.geodata = am4geodata_worldHigh;
         const label = chartGlobe.chartAndLegendContainer.createChild(
           am4core.Label

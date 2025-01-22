@@ -27,9 +27,20 @@ describe('MapComponent', () => {
     }).compileComponents();
   }));
 
+  const getFakeChart = (): am4maps.MapChart => {
+    return {
+      show: () => {},
+      hide: () => {},
+      zoomToRectangle: () => {},
+      animate: () => {}
+    } as unknown as am4maps.MapChart;
+  };
+
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
+    component.chart = getFakeChart();
+    component.chartGlobe = getFakeChart();
     component.mapData = [];
     fixture.detectChanges();
   });
@@ -39,29 +50,19 @@ describe('MapComponent', () => {
   });
 
   it('should hide the globe', () => {
-    component.chart = {
-      show: jasmine.createSpy()
-    } as unknown as am4maps.MapChart;
-    component.chartGlobe = {
-      hide: jasmine.createSpy()
-    } as unknown as am4maps.MapChart;
-
+    spyOn(component.chart, 'show');
+    spyOn(component.chartGlobe, 'hide');
     component.hideGlobe();
     expect(component.chart.show).toHaveBeenCalled();
     expect(component.chartGlobe.hide).toHaveBeenCalled();
   });
 
   it('should show the globe', () => {
-    component.chart = {
-      hide: jasmine.createSpy()
-    } as unknown as am4maps.MapChart;
-    component.chartGlobe = {
-      show: jasmine.createSpy(),
-      animate: jasmine.createSpy()
-    } as unknown as am4maps.MapChart;
+    spyOn(component.chart, 'hide');
+    spyOn(component.chartGlobe, 'show');
+    spyOn(component.chartGlobe, 'animate');
 
     component.showGlobe();
-
     expect(component.chart.hide).toHaveBeenCalled();
     expect(component.chartGlobe.show).toHaveBeenCalled();
     expect(component.chartGlobe.animate).toHaveBeenCalled();
@@ -230,5 +231,37 @@ describe('MapComponent', () => {
 
     expect(component.selectedCountry).toEqual('DE');
     expect(component.hideGlobe).toHaveBeenCalledTimes(2);
+  });
+
+  it('should detect chart series container events', () => {
+    component.drawChart();
+
+    const spyDragStart = jasmine.createSpy();
+    const spyDragStop = jasmine.createSpy();
+
+    component.chart.seriesContainer.events.on('dragstart', spyDragStart);
+    component.chart.seriesContainer.events.on('dragstop', spyDragStop);
+
+    component.chart.seriesContainer.dispatchImmediately('dragstart');
+    expect(spyDragStart).toHaveBeenCalled();
+
+    component.chart.seriesContainer.dispatchImmediately('dragstop');
+    expect(spyDragStop).toHaveBeenCalled();
+  });
+
+  it('should detect chart events', () => {
+    component.drawChart();
+
+    const spyOut = jasmine.createSpy();
+    const spyOver = jasmine.createSpy();
+
+    component.chart.events.on('out', spyOut);
+    component.chart.events.on('over', spyOver);
+
+    component.chart.dispatchImmediately('out');
+    expect(spyOut).toHaveBeenCalled();
+
+    component.chart.dispatchImmediately('over');
+    expect(spyOver).toHaveBeenCalled();
   });
 });
