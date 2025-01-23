@@ -1,9 +1,17 @@
 @import "../../../scss/_variables";
 
 #mapChart,
+#mapChartGlobe,
 #mapChartHidden {
   height: $map-height;
   width: 100%;
+}
+
+#mapChartGlobe {
+  left: 0;
+  right: 0;
+  min-height: $map-height;
+  position: absolute;
 }
 
 #mapChartHidden {

@@ -47,6 +47,7 @@ export class MapComponent extends SubscriptionManager {
   _mapData: Array<IdValue>;
   chart: am4maps.MapChart;
   chartHidden: am4maps.MapChart;
+  chartGlobe: am4maps.MapChart;
   mapPercentMode = false;
   polygonSeries: am4maps.MapPolygonSeries;
   polygonSeriesHidden: am4maps.MapPolygonSeries;
@@ -59,6 +60,7 @@ export class MapComponent extends SubscriptionManager {
 
   animationTime = 750;
   boundingCountries = ['IS', 'TR', 'ES', 'NO'];
+  countryUnknown = 'EU';
   mapCountries = [];
 
   selectedCountryNext?: string;
@@ -96,6 +98,11 @@ export class MapComponent extends SubscriptionManager {
     this.selectedCountryNext = this.mapCountries[indexNext];
     this.selectedCountryPrev = this.mapCountries[indexPrev];
 
+    if (selectedCountry === this.countryUnknown) {
+      this.showGlobe();
+    } else {
+      this.hideGlobe();
+    }
     this.mapCountrySet.emit(!!selectedCountry);
   }
 
@@ -130,7 +137,6 @@ export class MapComponent extends SubscriptionManager {
 
   constructor() {
     super();
-    am4core.options.autoDispose = true;
 
     const cst = Object.values(TargetFieldName).reduce(
       (ob: ColourSchemeMap, tType: TargetFieldName) => {
@@ -432,6 +438,26 @@ export class MapComponent extends SubscriptionManager {
     this.chartHidden.minZoomLevel = 0.2;
   }
 
+  hideGlobe(): void {
+    this.chart.show();
+    this.chartGlobe.hide();
+  }
+
+  showGlobe(): void {
+    this.chart.hide();
+    this.chartGlobe.show();
+    this.animateLatitude();
+  }
+
+  animateLatitude(): void {
+    this.chartGlobe.deltaLatitude = -45;
+    this.chartGlobe.animate(
+      { property: 'deltaLatitude', to: 0 },
+      12000,
+      am4core.ease.circleOut
+    );
+  }
+
   /** drawChart
    *
    **/
@@ -442,8 +468,10 @@ export class MapComponent extends SubscriptionManager {
     // Create map instance
     const chart = am4core.create('mapChart', am4maps.MapChart);
     const chartHidden = am4core.create('mapChartHidden', am4maps.MapChart);
+    const chartGlobe = am4core.create('mapChartGlobe', am4maps.MapChart);
     this.chart = chart;
     this.chartHidden = chartHidden;
+    this.chartGlobe = chartGlobe;
     this.chart.seriesContainer.resizable = false;
 
     // Set map definition
@@ -584,6 +612,31 @@ export class MapComponent extends SubscriptionManager {
 
     chart.seriesContainer.events.on('dragstop', () => {
       this.dragEndSubject.next(true);
+    });
+
+    chartGlobe.events.on('ready', () => {
+      this.hideGlobe();
+
+      chartGlobe.deltaLongitude = -45;
+      chartGlobe.projection = new am4maps.projections.Orthographic();
+      chartGlobe.series.push(new am4maps.MapPolygonSeries()).useGeodata = true;
+      chartGlobe.seriesContainer.resizable = false;
+      chartGlobe.seriesContainer.draggable = false;
+
+      chartGlobe.animate({ property: 'deltaLongitude', to: 100050 }, 20000000);
+
+      setTimeout(() => {
+        chartGlobe.geodata = am4geodata_worldHigh;
+        const label = chartGlobe.chartAndLegendContainer.createChild(
+          am4core.Label
+        );
+        label.text = 'location unknown';
+        label.fontSize = 20;
+        label.fontWeight = 'bold';
+        label.align = 'center';
+        label.fill = am4core.color('#4d4d4d');
+        label.padding(110, 0, 0, 0);
+      }, this.animationTime);
     });
   }
 
