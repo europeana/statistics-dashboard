@@ -12,7 +12,6 @@ describe('API Service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [],
     providers: [APIService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
 }).compileComponents();
     service = TestBed.inject(APIService);

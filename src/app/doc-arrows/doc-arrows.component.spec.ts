@@ -53,6 +53,7 @@ describe('DocArrowsComponent', () => {
               remove: (_: string): void => {}
             },
             parentNode: {
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
               removeChild: (_: unknown): void => {}
             }
           };
