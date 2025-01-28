@@ -1,6 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import {
-  async,
   ComponentFixture,
   fakeAsync,
   TestBed
@@ -33,14 +32,11 @@ describe('IsScrollableDirective', () => {
   let btnBack: DebugElement;
   let testComponent: TestIsScrollableDirectiveComponent;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [IsScrollableDirective, TestIsScrollableDirectiveComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(TestIsScrollableDirectiveComponent);
     testComponent = fixture.componentInstance;
     fixture.detectChanges();

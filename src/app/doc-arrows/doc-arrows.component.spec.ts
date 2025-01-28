@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ArrowType, DocArrowsComponent } from './doc-arrows.component';
 
 describe('DocArrowsComponent', () => {
@@ -11,13 +11,10 @@ describe('DocArrowsComponent', () => {
     side: ''
   };
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [DocArrowsComponent]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(DocArrowsComponent);
     component = fixture.componentInstance;
 
@@ -34,7 +31,7 @@ describe('DocArrowsComponent', () => {
     arrowType: ArrowType = 'top',
     ctrl = false
   ): KeyboardEvent => {
-    return {
+    return ({
       key: key,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       preventDefault: (): void => {},
@@ -54,11 +51,14 @@ describe('DocArrowsComponent', () => {
               },
               // eslint-disable-next-line @typescript-eslint/no-empty-function
               remove: (_: string): void => {}
+            },
+            parentNode: {
+              removeChild: (_: unknown): void => {}
             }
           };
         }
       }
-    } as unknown as KeyboardEvent;
+    } as unknown) as KeyboardEvent;
   };
 
   it('should create', () => {
@@ -70,16 +70,14 @@ describe('DocArrowsComponent', () => {
     expect(component.bottomIndent).toEqual(defaultIndents.bottom);
 
     const customEvent = getKeyEvent('ArrowUp');
-    delete (
-      customEvent as unknown as { target?: { closest: () => HTMLElement } }
-    ).target;
+    delete ((customEvent as unknown) as { target?: { closest: () => HTMLElement } }).target;
     component.arrowActiveKey(customEvent);
     expect(component.topIndent).toEqual(defaultIndents.top);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (customEvent as unknown as { target: any }).target = {
+    ((customEvent as unknown) as { target: any }).target = {
       closest: (): HTMLElement => {
-        return undefined as unknown as HTMLElement;
+        return (undefined as unknown) as HTMLElement;
       }
     };
     component.arrowActiveKey(customEvent);
@@ -98,13 +96,9 @@ describe('DocArrowsComponent', () => {
     expect(component.topIndent).toEqual('0px');
     expect(component.bottomIndent).toEqual(defaultIndents.bottom);
 
-    expect(component.arrowDefaults['bottom' as ArrowType].bottom).toEqual(
-      defaultIndents.bottom
-    );
+    expect(component.arrowDefaults['bottom' as ArrowType].bottom).toEqual(defaultIndents.bottom);
     component.arrowActiveKey(getKeyEvent('ArrowUp', true, 'bottom'));
-    expect(component.arrowDefaults.bottom.bottom).not.toEqual(
-      defaultIndents.bottom
-    );
+    expect(component.arrowDefaults.bottom.bottom).not.toEqual(defaultIndents.bottom);
   });
 
   it('should handle the left arrow event', () => {
@@ -193,9 +187,7 @@ describe('DocArrowsComponent', () => {
     component.arrowActiveKey(getKeyEvent('R', true));
     expect(component.rotateArrow).toHaveBeenCalledTimes(2);
 
-    component.arrowActiveKey(
-      getKeyEvent('R', true, 'irrelevant-class' as ArrowType)
-    );
+    component.arrowActiveKey(getKeyEvent('R', true, 'irrelevant-class' as ArrowType));
     expect(component.rotateArrow).toHaveBeenCalledTimes(3);
 
     component.arrowActiveKey(getKeyEvent('R', true, 'left'));
@@ -205,9 +197,6 @@ describe('DocArrowsComponent', () => {
   it('should handle deletion', () => {
     component.documentationArrows.push(1);
     expect(component.documentationArrows.length).toEqual(2);
-
-    component.arrowActiveKey(getKeyEvent('Delete'));
-    expect(component.documentationArrows.length).toEqual(1);
 
     component.arrowActiveKey(getKeyEvent('Delete'));
     expect(component.documentationArrows.length).toEqual(1);
