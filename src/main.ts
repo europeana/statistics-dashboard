@@ -17,11 +17,7 @@ import {
   maintenanceInterceptor,
   MaintenanceUtilsModule
 } from '@europeana/metis-ui-maintenance-utils';
-import {
-  provideHttpClient,
-  withInterceptors,
-  withInterceptorsFromDi
-} from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { AppDateAdapter } from './app/_helpers';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 

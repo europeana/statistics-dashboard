@@ -7,7 +7,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -26,6 +26,7 @@ import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
 import { PrivacyStatementComponent } from './privacy-statement';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('AppComponent', () => {
   let app: AppComponent;
@@ -39,24 +40,23 @@ describe('AppComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        RouterTestingModule.withRoutes([
-          { path: './data', component: AppComponent },
-          { path: './', component: LandingComponent }
-        ])
-      ],
-      providers: [
+    imports: [RouterTestingModule.withRoutes([
+            { path: './data', component: AppComponent },
+            { path: './', component: LandingComponent }
+        ])],
+    providers: [
         {
-          provide: ActivatedRoute,
-          useValue: { params: params, queryParams: queryParams }
+            provide: ActivatedRoute,
+            useValue: { params: params, queryParams: queryParams }
         },
         {
-          provide: APIService,
-          useClass: MockAPIService
-        }
-      ]
-    }).compileComponents();
+            provide: APIService,
+            useClass: MockAPIService
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {
