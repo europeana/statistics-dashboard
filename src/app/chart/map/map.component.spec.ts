@@ -29,9 +29,13 @@ describe('MapComponent', () => {
 
   const getFakeChart = (): am4maps.MapChart => {
     return {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       show: () => {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       hide: () => {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       zoomToRectangle: () => {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       animate: () => {}
     } as unknown as am4maps.MapChart;
   };

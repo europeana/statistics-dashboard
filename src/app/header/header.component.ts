@@ -13,7 +13,6 @@ import { RenameCountryPipe } from '../_translate';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  standalone: true,
   imports: [
     ClickAwareDirective,
     CTZeroControlComponent,

@@ -26,7 +26,6 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
   selector: 'app-filter',
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss'],
-  standalone: true,
   imports: [
     NgIf,
     ClickAwareDirective,

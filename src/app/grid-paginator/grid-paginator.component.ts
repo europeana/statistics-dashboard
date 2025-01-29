@@ -6,7 +6,6 @@ import { NgClass, NgIf } from '@angular/common';
   selector: 'app-grid-paginator',
   templateUrl: './grid-paginator.component.html',
   styleUrls: ['./grid-paginator.component.scss'],
-  standalone: true,
   imports: [NgIf, NgClass]
 })
 export class GridPaginatorComponent {

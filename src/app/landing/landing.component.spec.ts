@@ -21,7 +21,10 @@ import { APIService } from '../_services';
 import { TargetFieldName, VisibleHeatMap } from '../_models';
 import { BarComponent, MapComponent } from '../chart';
 import { LandingComponent } from '.';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -35,23 +38,21 @@ describe('LandingComponent', () => {
 
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [FormsModule,
-        ReactiveFormsModule,
-        LandingComponent],
-    providers: [
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [FormsModule, ReactiveFormsModule, LandingComponent],
+      providers: [
         {
-            provide: ActivatedRoute,
-            useValue: {}
+          provide: ActivatedRoute,
+          useValue: {}
         },
         {
-            provide: APIService,
-            useClass: MockAPIService
+          provide: APIService,
+          useClass: MockAPIService
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
-    ]
-}).compileComponents();
+      ]
+    }).compileComponents();
     api = TestBed.get(APIService);
   };
 

@@ -23,7 +23,6 @@ import {
   selector: 'app-snapshots',
   templateUrl: './snapshots.component.html',
   styleUrls: ['./snapshots.component.scss'],
-  standalone: true,
   imports: [NgIf, NgClass, NgStyle, NgFor, NgTemplateOutlet]
 })
 export class SnapshotsComponent {

@@ -41,7 +41,6 @@ import { HeaderComponent } from './header/header.component';
   selector: 'app-root',
   styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html',
-  standalone: true,
   imports: [
     NgIf,
     MaintenanceUtilsModule,

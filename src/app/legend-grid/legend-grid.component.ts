@@ -39,7 +39,6 @@ import { LineComponent } from '../chart';
   templateUrl: './legend-grid.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./legend-grid.component.scss'],
-  standalone: true,
   imports: [
     DatePipe,
     DecimalPipe,

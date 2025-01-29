@@ -1,9 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed
-} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { IsScrollableDirective } from '.';
 
@@ -21,8 +17,7 @@ import { IsScrollableDirective } from '.';
       <a class="fwd" (click)="scrollInfo.fwd()">FWD</a>
     </div>
   `,
-  styles: ['.scrollable{ width: 100px; max-width: 100px; }'],
-  standalone: true
+  styles: ['.scrollable{ width: 100px; max-width: 100px; }']
 })
 class TestIsScrollableDirectiveComponent {}
 

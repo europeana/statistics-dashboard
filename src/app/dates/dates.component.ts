@@ -20,7 +20,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   selector: 'app-dates',
   templateUrl: './dates.component.html',
   styleUrls: ['./dates.component.scss'],
-  standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,

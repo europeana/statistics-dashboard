@@ -72,7 +72,6 @@ import { TruncateComponent } from '../truncate';
 @Component({
   templateUrl: './country.component.html',
   styleUrls: ['../landing/landing.component.scss', './country.component.scss'],
-  standalone: true,
   imports: [
     AbbreviateNumberPipe,
     AppendiceSectionComponent,

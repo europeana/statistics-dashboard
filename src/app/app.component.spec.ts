@@ -26,7 +26,10 @@ import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
 import { PrivacyStatementComponent } from './privacy-statement';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('AppComponent', () => {
   let app: AppComponent;
@@ -40,23 +43,25 @@ describe('AppComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [RouterTestingModule.withRoutes([
-            { path: './data', component: AppComponent },
-            { path: './', component: LandingComponent }
-        ])],
-    providers: [
+      imports: [
+        RouterTestingModule.withRoutes([
+          { path: './data', component: AppComponent },
+          { path: './', component: LandingComponent }
+        ])
+      ],
+      providers: [
         {
-            provide: ActivatedRoute,
-            useValue: { params: params, queryParams: queryParams }
+          provide: ActivatedRoute,
+          useValue: { params: params, queryParams: queryParams }
         },
         {
-            provide: APIService,
-            useClass: MockAPIService
+          provide: APIService,
+          useClass: MockAPIService
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
-    ]
-}).compileComponents();
+      ]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

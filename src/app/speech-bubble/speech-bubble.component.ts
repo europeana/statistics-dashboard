@@ -5,7 +5,6 @@ import { NgClass, NgIf } from '@angular/common';
   selector: 'app-speech-bubble',
   templateUrl: './speech-bubble.component.html',
   styleUrls: ['./speech-bubble.component.scss'],
-  standalone: true,
   imports: [NgIf, NgClass]
 })
 export class SpeechBubbleComponent {

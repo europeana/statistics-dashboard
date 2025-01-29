@@ -26,7 +26,6 @@ import {
   selector: 'app-line-chart',
   templateUrl: './line.component.html',
   styleUrls: ['./line.component.scss'],
-  standalone: true,
   imports: [NgIf, NgFor]
 })
 export class LineComponent implements AfterViewInit {

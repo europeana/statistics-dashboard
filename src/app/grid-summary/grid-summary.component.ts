@@ -11,7 +11,6 @@ import { DecimalPipe, NgIf } from '@angular/common';
   selector: 'app-grid-summary',
   templateUrl: './grid-summary.component.html',
   styleUrls: ['./grid-summary.component.scss'],
-  standalone: true,
   imports: [NgIf, DecimalPipe, RenameApiFacetShortPipe, RenameCountryPipe]
 })
 export class GridSummaryComponent {

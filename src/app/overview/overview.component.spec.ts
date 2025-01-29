@@ -46,7 +46,10 @@ import { BarComponent } from '../chart';
 import { GridComponent } from '../grid';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
@@ -74,49 +77,51 @@ describe('OverviewComponent', () => {
     params.next({});
 
     TestBed.configureTestingModule({
-    schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    imports: [FormsModule,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [
+        FormsModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
-            {
-                path: `data/${DimensionName.contentTier}`,
-                component: OverviewComponent
-            },
-            {
-                path: `data/${DimensionName.country}`,
-                component: OverviewComponent
-            },
-            {
-                path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}`,
-                component: OverviewComponent
-            },
-            {
-                path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}&${DimensionName.type}=VIDEO}`,
-                component: OverviewComponent
-            },
-            { path: `data/${DimensionName.type}`, component: OverviewComponent }
+          {
+            path: `data/${DimensionName.contentTier}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.country}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}`,
+            component: OverviewComponent
+          },
+          {
+            path: `data/${DimensionName.contentTier}?${DimensionName.type}=TEXT}&${DimensionName.type}=VIDEO}`,
+            component: OverviewComponent
+          },
+          { path: `data/${DimensionName.type}`, component: OverviewComponent }
         ]),
         IsScrollableDirective,
         MatDialogModule,
         OverviewComponent,
-        SnapshotsComponent],
-    providers: [
+        SnapshotsComponent
+      ],
+      providers: [
         {
-            provide: APIService,
-            useClass: errorMode ? MockAPIServiceErrors : MockAPIService
+          provide: APIService,
+          useClass: errorMode ? MockAPIServiceErrors : MockAPIService
         },
         {
-            provide: ActivatedRoute,
-            useValue: { params: params, queryParams: queryParams }
+          provide: ActivatedRoute,
+          useValue: { params: params, queryParams: queryParams }
         },
         {
-            provide: RenameApiFacetPipe,
-            useValue: createMockPipe('renameApiFacet')
+          provide: RenameApiFacetPipe,
+          useValue: createMockPipe('renameApiFacet')
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
-    ]
-})
+      ]
+    })
       .overrideComponent(OverviewComponent, {
         remove: { imports: [BarComponent, GridComponent] },
         add: { imports: [MockBarComponent, MockGridComponent] }

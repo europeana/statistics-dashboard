@@ -50,7 +50,6 @@ import { TruncateComponent } from '../truncate';
 @Component({
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss', './landing.component-country.scss'],
-  standalone: true,
   imports: [
     ClickAwareDirective,
     NgClass,
