@@ -11,7 +11,7 @@ jobs:
           ref: ${{ github.event.inputs.tag_name }}
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.19.0'
+          node-version: '18.19.1'
       - run: npm install
       - name: Run Cypress Tests
         run: |
@@ -32,7 +32,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18.19.0'
+          node-version: '18.19.1'
 
       - run: npm install
 
