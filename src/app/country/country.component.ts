@@ -1,5 +1,4 @@
 import {
-  DatePipe,
   DecimalPipe,
   formatNumber,
   LowerCasePipe,

@@ -1,6 +1,5 @@
 import {
   DecimalPipe,
-  JsonPipe,
   KeyValuePipe,
   LowerCasePipe,
   NgClass,
@@ -70,8 +69,7 @@ import { TruncateComponent } from '../truncate';
     RenameApiFacetShortPipe,
     RenameCountryPipe,
     RenameTargetTypePipe,
-    SpeechBubbleComponent,
-    JsonPipe
+    SpeechBubbleComponent
   ]
 })
 export class LandingComponent extends SubscriptionManager {
