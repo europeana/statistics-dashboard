@@ -2,8 +2,6 @@ import {
   DatePipe,
   DecimalPipe,
   formatNumber,
-  JsonPipe,
-  KeyValuePipe,
   LowerCasePipe,
   NgClass,
   NgFor,
@@ -63,8 +61,6 @@ import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent } from '../chart';
 import { HeaderComponent } from '../header';
 import { LegendGridComponent } from '../legend-grid';
-import { ResizeComponent } from '../resize';
-import { CTZeroControlComponent } from '../ct-zero-control';
 import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
@@ -75,19 +71,14 @@ import { TruncateComponent } from '../truncate';
   imports: [
     AbbreviateNumberPipe,
     AppendiceSectionComponent,
-    CTZeroControlComponent,
     RouterOutlet,
-    DatePipe,
-    JsonPipe,
     NgClass,
-    ResizeComponent,
     NgIf,
     NgFor,
     SpeechBubbleComponent,
     TruncateComponent,
     NgTemplateOutlet,
     BarComponent,
-    KeyValuePipe,
     LineComponent,
     LegendGridComponent,
     RouterLink,
