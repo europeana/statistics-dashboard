@@ -67,6 +67,7 @@ jobs:
           node-version: '18.19.1'
       - run: npm install
       - run: npm run dist-localised
+      - run: mv dist/statistics-dashboard/browser/* dist/statistics-dashboard
       - uses: actions/upload-artifact@master
         with:
           name: dist
