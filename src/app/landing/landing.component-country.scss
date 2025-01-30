@@ -1,13 +1,9 @@
-@import "../../scss/functions/_icon_urls";
-@import "../../scss/_variables";
+@use "../../scss/functions/icon_urls";
+@use "../../scss/variables";
 
 $list-item-pad-height: 4px;
 $boxed-width: 2.5em;
-//$boxed-width: 3.5em;
-//$boxed-colour: red;
-$boxed-colour: $gray-5;
-//$boxed-colour: $gray-lightest;
-
+$boxed-colour: variables.$gray-5;
 $boxed-dash-length: 3em;
 $boxed-dash-length-less-one: 2em;
 
@@ -110,7 +106,7 @@ $numeric-min-width: 6em;
 
   & > .boxed-inner {
     border: 1px solid $boxed-colour;
-    background-color: $white;
+    background-color: variables.$white;
     padding: 2px $list-item-pad-height;
 
     &.target-highlight {
@@ -129,7 +125,7 @@ $numeric-min-width: 6em;
 
   margin-right: -$scrollbar-width;
 
-  max-height: calc($map-height - 4em);
+  max-height: calc(variables.$map-height - 4em);
   overflow: auto;
 
   & > * {
@@ -146,18 +142,19 @@ $numeric-min-width: 6em;
 
     margin-left: $numeric-margin-left;
     min-width: $numeric-min-width;
+    animation: none;
 
-    &.shrink-animation {
-      @keyframes shrink {
-        0% {
-          min-width: calc($numeric-min-width + $numeric-margin-left);
-          margin-left: $numeric-margin-left;
-        }
-        100% {
-          min-width: 0;
-          margin-left: -$numeric-margin-left;
-        }
+    @keyframes shrink {
+      0% {
+        min-width: calc($numeric-min-width + $numeric-margin-left);
+        margin-left: $numeric-margin-left;
       }
+      100% {
+        min-width: 0;
+        margin-left: -$numeric-margin-left;
+      }
+    }
+    &.shrink-animation {
       animation: shrink 1s 1;
     }
     &.shrink {
@@ -203,7 +200,7 @@ $numeric-min-width: 6em;
 }
 
 .derived-series-menu-inner {
-  background-color: $white;
+  background-color: variables.$white;
 
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -248,7 +245,7 @@ $numeric-min-width: 6em;
     &.active,
     &.open {
       &::after {
-        background-image: svg-url-icon-flag($gray-faint);
+        background-image: icon_urls.svg-url-icon-flag(variables.$gray-faint);
       }
     }
     &.active::after {
@@ -274,7 +271,7 @@ $numeric-min-width: 6em;
 .data-rows:has(.link-open-country) {
   padding-bottom: 4em;
 
-  @media (min-width: $bp-desktop) {
+  @media (min-width: variables.$bp-desktop) {
     padding-bottom: 4em;
   }
 }
@@ -347,7 +344,7 @@ $numeric-min-width: 6em;
 .data-rows-title .x {
   &::after,
   &::before {
-    background-color: $gray-faint;
+    background-color: variables.$gray-faint;
   }
 }
 

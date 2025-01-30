@@ -1,4 +1,4 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 $appendice-grid-num-cols: 14;
 $row-height: 1.6rem;
@@ -125,7 +125,7 @@ $window-size: $row-height;
   overflow-y: auto;
   padding-top: $window-size;
 
-  @media (min-width: $bp-xxl) {
+  @media (min-width: variables.$bp-xxl) {
     font-size: 14px;
   }
 }

@@ -1,10 +1,10 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 .dates {
   margin: 10px 0 0 0;
 }
 
 .errors {
-  color: $eu-red;
+  color: variables.$eu-red;
   margin-left: 20px;
 }

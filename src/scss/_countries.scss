@@ -2,8 +2,9 @@
   Materials for country-related content and styles that cross component encapsulation
 */
 
-@import "variables";
-@import "functions/icon_urls";
+@use "sass:color";
+@use "variables";
+@use "functions/icon_urls";
 
 $flag-orb-dimension: 1.6rem;
 
@@ -43,7 +44,7 @@ $flag-orb-dimension: 1.6rem;
   .speech-bubble {
     padding: 4px 8px;
     .help-speech-bubble-content {
-      color: $gray-med;
+      color: variables.$gray-med;
     }
   }
 }
@@ -67,13 +68,15 @@ $flag-orb-dimension: 1.6rem;
 }
 
 .flag-orb.default::after {
-  background-image: svg-url-icon-flag($linkblue);
+  background-image: icon_urls.svg-url-icon-flag(variables.$linkblue);
 }
 
 .open > .flag-orb.default,
 :hover > .flag-orb.default {
   &::after {
-    background-image: svg-url-icon-flag(darken($textcolour_link, 15%));
+    background-image: icon_urls.svg-url-icon-flag(
+      color.adjust(variables.$textcolour_link, $lightness: -15%)
+    );
   }
 }
 

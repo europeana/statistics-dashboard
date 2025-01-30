@@ -1,3 +1,6 @@
+@use "sass:meta";
+@use "variables";
+
 @use "sass:math";
 
 /* MIXINS
@@ -29,7 +32,7 @@
   @if $keyword {
     font-size: $keyword;
   } @else {
-    font-size: $decimal-size * $base-font-multiplier * 16px;
+    font-size: $decimal-size * variables.$base-font-multiplier * 16px;
   }
   font-size: $decimal-size * 1rem;
 }
@@ -57,6 +60,6 @@
   }
 }
 
-@import "mixins/transform";
-@import "mixins/placeholder";
-@import "mixins/flexbox";
+@include meta.load-css("mixins/transform");
+@include meta.load-css("mixins/placeholder");
+@include meta.load-css("mixins/flexbox");

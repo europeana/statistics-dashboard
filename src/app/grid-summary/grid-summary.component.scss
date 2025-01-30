@@ -1,4 +1,4 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 .summary-grid {
   column-gap: 4px;
@@ -17,7 +17,7 @@
   text-overflow: ellipsis;
 }
 
-@media (min-width: $bp-xxl) {
+@media (min-width: variables.$bp-xxl) {
   .total.label {
     max-width: 170px;
     width: 170px;

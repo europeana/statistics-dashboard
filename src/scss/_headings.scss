@@ -1,5 +1,7 @@
+@use "variables";
+
 .page-title-wrapper {
-  background: $offwhite;
+  background: variables.$offwhite;
   padding: 16px;
   display: grid;
   grid-template-rows: 1fr;
@@ -42,5 +44,5 @@
 .page-title {
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: $spacing-xs;
+  margin-bottom: variables.$spacing-xs;
 }

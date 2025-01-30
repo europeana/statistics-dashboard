@@ -1,4 +1,4 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 .compare-data {
   display: flex;
@@ -6,7 +6,7 @@
 }
 
 .compare-data-link {
-  color: $gray-faint;
+  color: variables.$gray-faint;
   font-size: 14px;
 
   .legend-square {
@@ -19,7 +19,7 @@
 
   &:not(.applied) {
     .legend-square {
-      border: 1px solid $gray-faint;
+      border: 1px solid variables.$gray-faint;
     }
   }
 
@@ -50,7 +50,7 @@
 }
 
 .snapshots {
-  margin: 0 0 $spacing-m 16px;
+  margin: 0 0 variables.$spacing-m 16px;
 
   .comparison-list {
     display: inline-flex;

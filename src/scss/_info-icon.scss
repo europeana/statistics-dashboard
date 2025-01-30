@@ -1,15 +1,15 @@
-@import "functions/_icon_urls";
-@import "_variables";
+@use "functions/_icon_urls";
+@use "_variables";
 
 a.info-icon {
-  background-image: svg-url-icon-info(#b7b7b7);
+  background-image: icon_urls.svg-url-icon-info(#b7b7b7);
   background-repeat: no-repeat;
 
   &.disabled {
-    background-image: svg-url-icon-info($gray-5);
+    background-image: icon_urls.svg-url-icon-info(variables.$gray-5);
   }
   &:hover {
-    background-image: svg-url-icon-info($gray-light);
+    background-image: icon_urls.svg-url-icon-info(variables.$gray-light);
   }
 
   // click-target accessibility
@@ -26,7 +26,7 @@ a.info-icon {
 .info-icon {
   display: inline-block;
   height: 12px;
-  margin-left: $spacing-xs;
+  margin-left: variables.$spacing-xs;
   position: relative;
   width: 12px;
 }

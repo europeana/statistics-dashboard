@@ -1,5 +1,5 @@
-@import "functions/_icon_urls";
-@import "_variables";
+@use "functions/_icon_urls";
+@use "_variables";
 
 .dataset-name,
 .icon {
@@ -12,18 +12,18 @@
 .filters,
 .rm-filters {
   .container-h {
-    padding: $spacing-s 0;
+    padding: variables.$spacing-s 0;
     .icon {
       align-self: flex-start;
       position: relative;
-      top: $spacing-xs;
+      top: variables.$spacing-xs;
     }
   }
 
   .filter-title {
-    color: $gray-faint;
+    color: variables.$gray-faint;
     &.disabled {
-      color: $gray-5;
+      color: variables.$gray-5;
       cursor: default;
       pointer-events: none;
     }
@@ -31,19 +31,19 @@
 
   .icon {
     display: block;
-    height: $width-icon-filter;
-    margin-left: $spacing-s;
-    min-width: $width-icon-filter;
+    height: variables.$width-icon-filter;
+    margin-left: variables.$spacing-s;
+    min-width: variables.$width-icon-filter;
   }
 }
 
 .filters {
   .checkbox-labelled:not(.chartFormat):hover {
-    background-color: $offwhite;
+    background-color: variables.$offwhite;
   }
 
   .info-icon {
-    margin-left: $spacing-s;
+    margin-left: variables.$spacing-s;
   }
 }
 
@@ -51,12 +51,12 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  margin-bottom: $spacing-m;
+  margin-bottom: variables.$spacing-m;
 
   .rm-filter {
     border-radius: 24px;
-    color: $white;
-    padding: $spacing-xs $spacing-s;
+    color: variables.$white;
+    padding: variables.$spacing-xs variables.$spacing-s;
     &:not(:last-child) {
       margin-right: 24px;
     }
@@ -71,7 +71,7 @@
   .contentTier {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-content-tier($white);
+        background-image: icon_urls.svg-url-icon-content-tier(variables.$white);
       }
     }
   }
@@ -79,7 +79,7 @@
   .metadataTier {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-metadata($white);
+        background-image: icon_urls.svg-url-icon-metadata(variables.$white);
       }
     }
   }
@@ -87,7 +87,7 @@
   .country {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-flag($white);
+        background-image: icon_urls.svg-url-icon-flag(variables.$white);
       }
     }
   }
@@ -95,7 +95,9 @@
   .dataProvider {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-data-provider($white);
+        background-image: icon_urls.svg-url-icon-data-provider(
+          variables.$white
+        );
       }
     }
   }
@@ -103,7 +105,7 @@
   .datasetIds {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-dataset-id($white);
+        background-image: icon_urls.svg-url-icon-dataset-id(variables.$white);
       }
     }
   }
@@ -111,7 +113,9 @@
   .provider {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-content-provider($white);
+        background-image: icon_urls.svg-url-icon-content-provider(
+          variables.$white
+        );
       }
     }
   }
@@ -119,7 +123,7 @@
   .rightsCategory {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-rights($white);
+        background-image: icon_urls.svg-url-icon-rights(variables.$white);
       }
     }
   }
@@ -127,7 +131,7 @@
   .type {
     .checkmarked-checkbox {
       &::before {
-        background-image: svg-url-icon-types($white);
+        background-image: icon_urls.svg-url-icon-types(variables.$white);
       }
     }
   }
@@ -136,124 +140,130 @@
 // Icons
 
 .filter-icon-home {
-  background-image: svg-url-icon-home($gray-med);
+  background-image: icon_urls.svg-url-icon-home(variables.$gray-med);
 }
 
 .filter-icon-dataset {
-  background-image: svg-url-icon-dataset-id($gray-med);
+  background-image: icon_urls.svg-url-icon-dataset-id(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-dataset {
-    background-image: svg-url-icon-dataset-id($gray-5);
+    background-image: icon_urls.svg-url-icon-dataset-id(variables.$gray-5);
   }
 
   &.open .filter-icon-dataset {
-    background-image: svg-url-icon-dataset-id($grey-3);
+    background-image: icon_urls.svg-url-icon-dataset-id(variables.$grey-3);
   }
 }
 
 .filter-icon-contentTier {
-  background-image: svg-url-icon-content-tier($gray-med);
+  background-image: icon_urls.svg-url-icon-content-tier(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-contentTier {
-    background-image: svg-url-icon-content-tier($gray-5);
+    background-image: icon_urls.svg-url-icon-content-tier(variables.$gray-5);
   }
   &.open .filter-icon-contentTier {
-    background-image: svg-url-icon-content-tier($grey-3);
+    background-image: icon_urls.svg-url-icon-content-tier(variables.$grey-3);
   }
 }
 
 .filter-icon-country {
-  background-image: svg-url-icon-flag($gray-med);
+  background-image: icon_urls.svg-url-icon-flag(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-country {
-    background-image: svg-url-icon-flag($gray-5);
+    background-image: icon_urls.svg-url-icon-flag(variables.$gray-5);
   }
   &.open .filter-icon-country {
-    background-image: svg-url-icon-flag($grey-3);
+    background-image: icon_urls.svg-url-icon-flag(variables.$grey-3);
   }
 }
 
 .filter-icon-dataProvider {
-  background-image: svg-url-icon-data-provider($gray-med);
+  background-image: icon_urls.svg-url-icon-data-provider(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-dataProvider {
-    background-image: svg-url-icon-data-provider($gray-5);
+    background-image: icon_urls.svg-url-icon-data-provider(variables.$gray-5);
   }
   &.open .filter-icon-dataProvider {
-    background-image: svg-url-icon-data-provider($grey-3);
+    background-image: icon_urls.svg-url-icon-data-provider(variables.$grey-3);
   }
 }
 
 .filter-icon-dates {
-  background-image: svg-url-icon-calendar($gray-med);
+  background-image: icon_urls.svg-url-icon-calendar(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-dates {
-    background-image: svg-url-icon-calendar($gray-5);
+    background-image: icon_urls.svg-url-icon-calendar(variables.$gray-5);
   }
   &.open .filter-icon-dates {
-    background-image: svg-url-icon-calendar($grey-3);
+    background-image: icon_urls.svg-url-icon-calendar(variables.$grey-3);
   }
 }
 
 .filter-icon-metadataTier {
-  background-image: svg-url-icon-metadata($gray-med);
+  background-image: icon_urls.svg-url-icon-metadata(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-metadataTier {
-    background-image: svg-url-icon-metadata($gray-5);
+    background-image: icon_urls.svg-url-icon-metadata(variables.$gray-5);
   }
   &.open .filter-icon-metadataTier {
-    background-image: svg-url-icon-metadata($grey-3);
+    background-image: icon_urls.svg-url-icon-metadata(variables.$grey-3);
   }
 }
 
 .filter-icon-provider {
-  background-image: svg-url-icon-content-provider($gray-med);
+  background-image: icon_urls.svg-url-icon-content-provider(
+    variables.$gray-med
+  );
 }
 
 .disabled {
   .filter-icon-provider {
-    background-image: svg-url-icon-content-provider($gray-5);
+    background-image: icon_urls.svg-url-icon-content-provider(
+      variables.$gray-5
+    );
   }
   &.open .filter-icon-provider {
-    background-image: svg-url-icon-content-provider($grey-3);
+    background-image: icon_urls.svg-url-icon-content-provider(
+      variables.$grey-3
+    );
   }
 }
 
 .filter-icon-rightsCategory {
-  background-image: svg-url-icon-rights($gray-med);
+  background-image: icon_urls.svg-url-icon-rights(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-rightsCategory {
-    background-image: svg-url-icon-rights($gray-5);
+    background-image: icon_urls.svg-url-icon-rights(variables.$gray-5);
   }
   &.open .filter-icon-rightsCategory {
-    background-image: svg-url-icon-rights($grey-3);
+    background-image: icon_urls.svg-url-icon-rights(variables.$grey-3);
   }
 }
 
 .filter-icon-type {
-  background-image: svg-url-icon-types($gray-med);
+  background-image: icon_urls.svg-url-icon-types(variables.$gray-med);
 }
 
 .disabled {
   .filter-icon-type {
-    background-image: svg-url-icon-types($gray-5);
+    background-image: icon_urls.svg-url-icon-types(variables.$gray-5);
   }
   &.open .filter-icon-type {
-    background-image: svg-url-icon-types($grey-3);
+    background-image: icon_urls.svg-url-icon-types(variables.$grey-3);
   }
 }
 
@@ -263,7 +273,7 @@
 
 .mat-form-field-appearance-outline.mat-form-field-invalid
   .mat-form-field-outline {
-  color: $eu-red;
+  color: variables.$eu-red;
 }
 
 // today
@@ -272,7 +282,7 @@
     .mat-calendar-body-cell-content:not(
         .mat-calendar-body-selected
       ).mat-focus-indicator {
-      background-color: $offwhite;
+      background-color: variables.$offwhite;
     }
   }
 }

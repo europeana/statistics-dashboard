@@ -1,6 +1,6 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
-$disabled-colour: $gray-5;
+$disabled-colour: variables.$gray-5;
 $forced-space: 10px;
 $timeTransitionRollDown: 0.25s;
 
@@ -121,7 +121,7 @@ li {
     font-weight: bold;
   }
   a {
-    color: $gray-med;
+    color: variables.$gray-med;
     display: flex;
     position: relative;
     margin: 0 0.4em 0 2em;
@@ -131,7 +131,7 @@ li {
 
 .legend-item-series-toggle,
 .legend-item-target-toggle {
-  color: $gray-med;
+  color: variables.$gray-med;
   white-space: nowrap;
 
   &.rolled-up {
@@ -233,7 +233,7 @@ li {
     &:hover {
       &::after,
       &::before {
-        background: $gray-med;
+        background: variables.$gray-med;
       }
     }
   }
@@ -285,7 +285,7 @@ ul:hover ~ .perma-pin {
   }
 }
 
-@media (min-width: $bp-desktop) {
+@media (min-width: variables.$bp-desktop) {
   .legend-grid-wrapper {
     margin-top: -10px;
   }

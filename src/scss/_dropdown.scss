@@ -1,17 +1,17 @@
-@import "variables";
+@use "variables";
 
 .dropdown {
   margin: 0;
 
   > .menu-opener {
-    border: 1px solid $offwhite;
+    border: 1px solid variables.$offwhite;
     padding-right: 1.125rem;
     position: relative;
 
     &::after {
       border-left: 0.25rem solid transparent;
       border-right: 0.25rem solid transparent;
-      border-top: 0.25rem solid $gray-light;
+      border-top: 0.25rem solid variables.$gray-light;
       content: "";
       height: 0;
       margin-top: -0.125rem;
@@ -22,13 +22,13 @@
     }
 
     &:hover::after {
-      border-top-color: $eu-jade;
+      border-top-color: variables.$eu-jade;
     }
   }
 
   .dropdown-wrapper {
     &::before {
-      border-bottom: 10px solid $gray-lightest;
+      border-bottom: 10px solid variables.$gray-lightest;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
       content: "";
@@ -41,7 +41,7 @@
     }
 
     &::after {
-      border-bottom: 8px solid $white;
+      border-bottom: 8px solid variables.$white;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
       content: "";
@@ -55,7 +55,7 @@
   }
 
   .dropdown-content {
-    background: $white;
+    background: variables.$white;
     box-shadow: rgba(77, 77, 77, 0.3) 0 1px 4px;
     left: 1rem;
     max-height: 10rem;

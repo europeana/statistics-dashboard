@@ -1,6 +1,6 @@
 @use "sass:string";
 
-@import "../_variables";
+@use "../_variables";
 
 @function str-replace($string, $search, $replace: "") {
   $index: string.index($string, $search);

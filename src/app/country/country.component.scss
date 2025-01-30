@@ -1,4 +1,4 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 .country-section-header {
   line-height: 24px;
@@ -52,7 +52,7 @@
 
   &::after {
     content: "?";
-    border: 1px solid $gray-5;
+    border: 1px solid variables.$gray-5;
     border-radius: 50%;
     width: 1em;
     height: 1em;
@@ -124,7 +124,7 @@
 }
 
 .header-text {
-  color: $gray-med;
+  color: variables.$gray-med;
   font-weight: 600;
   text-transform: uppercase;
 
@@ -157,7 +157,7 @@
   font-weight: 600;
   margin: 14px 22px 0 auto;
   position: relative;
-  color: $gray-med;
+  color: variables.$gray-med;
   .save {
     position: absolute;
     left: auto;
@@ -191,7 +191,7 @@
 
 .column-close,
 .column-restore {
-  color: $gray-med;
+  color: variables.$gray-med;
 }
 
 .column-restore {
@@ -238,14 +238,14 @@
 .powerbar {
   position: relative;
   background-color: transparent;
-  border: 1px solid $gray-5;
+  border: 1px solid variables.$gray-5;
   margin: 0 16px 0 8px;
 
   &::after {
     content: "";
     display: block;
     position: absolute;
-    border: 1px solid $gray-5;
+    border: 1px solid variables.$gray-5;
     width: 8px;
     height: 1em;
     top: calc(1em - 2px);
@@ -259,14 +259,14 @@
 }
 
 .powerbar-charge {
-  background-color: $stats-blue;
+  background-color: variables.$stats-blue;
   display: inline-block;
   max-width: 100%;
   position: relative;
 }
 
 .powerbar-charge-label {
-  color: $stats-blue;
+  color: variables.$stats-blue;
   font-size: 22px;
   font-weight: bold;
   line-height: 150%;
@@ -515,14 +515,14 @@
 
 // media queries
 
-@media (min-width: $bp-med) {
+@media (min-width: variables.$bp-med) {
   .entry-card-multi .entry-card .main-speech-bubble-wrapper::after {
     // hover area
     height: 4.5rem;
   }
 }
 
-@media (min-width: $bp-desktop) {
+@media (min-width: variables.$bp-desktop) {
   // the "total" card is narrower than the others (unless a card is hidden)
   .entry-card + .entry-card + .entry-card-total {
     width: 40%;
@@ -567,7 +567,7 @@
   }
 }
 
-@media (min-width: $bp-xxl) {
+@media (min-width: variables.$bp-xxl) {
   .percent-value {
     align-self: flex-start;
   }
