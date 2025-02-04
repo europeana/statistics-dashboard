@@ -1,4 +1,4 @@
-@import "variables";
+@use "variables";
 
 .data-rows .text-outer {
   font-weight: 600;
@@ -11,20 +11,20 @@
   margin-left: 0;
   margin-right: 0;
 
-  @media (min-width: $bp-small-3) {
+  @media (min-width: variables.$bp-small-3) {
     margin-top: 0;
     margin-right: $default-margin-size;
     margin-bottom: $default-margin-size;
     margin-left: $default-margin-size;
   }
 
-  @media (min-width: $bp-xl) {
+  @media (min-width: variables.$bp-xl) {
     margin-top: 0;
     margin-right: auto;
     margin-bottom: $default-margin-size;
     margin-left: auto;
 
-    max-width: $max-width;
+    max-width: variables.$max-width;
     width: 80%;
   }
 }

@@ -34,7 +34,6 @@ import {
   selector: 'app-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
-  standalone: true,
   imports: [
     NgIf,
     NgClass,

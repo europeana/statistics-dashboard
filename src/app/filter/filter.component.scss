@@ -1,7 +1,7 @@
-@import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
+@use "../../scss/variables";
+@use "../../scss/functions/icon_urls";
 
-$total-height: #{$filter-row-height * 5};
+$total-height: variables.$filter-row-height * 5;
 $total-width: 268px;
 
 .load-more-item {
@@ -16,7 +16,7 @@ $total-width: 268px;
     font-size: 14px;
     font-style: italic;
     font-weight: bold;
-    padding-left: $spacing-xs;
+    padding-left: variables.$spacing-xs;
     transform: translateY(8px);
 
     &:hover {
@@ -26,11 +26,11 @@ $total-width: 268px;
 }
 
 .checkbox-filter {
-  border-bottom: 1px solid $gray-5;
-  margin: 0 $spacing-s $spacing-xs $spacing-s;
+  border-bottom: 1px solid variables.$gray-5;
+  margin: 0 variables.$spacing-s variables.$spacing-xs variables.$spacing-s;
 
   .icon {
-    background: svg-url-icon-search("#333") center no-repeat;
+    background: icon_urls.svg-url-icon-search("#333") center no-repeat;
     margin-left: 0;
     top: 0;
   }
@@ -39,14 +39,14 @@ $total-width: 268px;
     border: 0;
     box-shadow: none;
     font-size: 14px;
-    margin-left: $spacing-s;
+    margin-left: variables.$spacing-s;
     width: 100%;
   }
 }
 
 .checkboxes {
-  background: $white;
-  border-radius: 0 0 $spacing-s $spacing-s;
+  background: variables.$white;
+  border-radius: 0 0 variables.$spacing-s variables.$spacing-s;
   box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
   min-width: $total-width;
   padding-bottom: 16px;
@@ -57,7 +57,7 @@ $total-width: 268px;
 .checkboxes-list {
   display: flex;
   flex-direction: column;
-  margin-left: $spacing-s;
+  margin-left: variables.$spacing-s;
   max-height: $total-height;
   overflow: hidden;
   overflow-y: auto;
@@ -74,18 +74,18 @@ $total-width: 268px;
   position: relative;
 
   &::after {
-    color: $gray-med;
+    color: variables.$gray-med;
     content: "⌄";
     font-size: 20px;
     height: 16px;
     line-height: 6px;
     position: absolute;
-    right: $spacing-s;
+    right: variables.$spacing-s;
     top: 14px;
   }
 
   &.open {
-    background-color: $gray-5;
+    background-color: variables.$gray-5;
     color: #000;
 
     &::after {
@@ -94,12 +94,12 @@ $total-width: 268px;
   }
 
   &.disabled::after {
-    color: $gray-5;
+    color: variables.$gray-5;
   }
 }
 
 .opener-name {
-  margin: 0 $spacing-s;
+  margin: 0 variables.$spacing-s;
   white-space: nowrap;
 }
 
@@ -109,13 +109,13 @@ $total-width: 268px;
 
 .selection {
   display: inline-block;
-  margin: 0 30px 0 $spacing-s;
+  margin: 0 30px 0 variables.$spacing-s;
   position: relative;
   top: 5px;
 }
 
 .selection + .opener-name {
-  color: $stats-blue;
+  color: variables.$stats-blue;
   font-size: 8px;
   font-weight: 600;
   line-height: 8px;
@@ -127,11 +127,11 @@ $total-width: 268px;
 
 .filter-title.disabled {
   .selection + .opener-name {
-    color: $gray-5;
+    color: variables.$gray-5;
   }
   &.open {
     .selection + .opener-name {
-      color: $gray-med;
+      color: variables.$gray-med;
     }
   }
 }

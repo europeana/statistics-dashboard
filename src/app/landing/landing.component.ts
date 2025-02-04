@@ -1,6 +1,5 @@
 import {
   DecimalPipe,
-  JsonPipe,
   KeyValuePipe,
   LowerCasePipe,
   NgClass,
@@ -50,7 +49,6 @@ import { TruncateComponent } from '../truncate';
 @Component({
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss', './landing.component-country.scss'],
-  standalone: true,
   imports: [
     ClickAwareDirective,
     NgClass,
@@ -71,8 +69,7 @@ import { TruncateComponent } from '../truncate';
     RenameApiFacetShortPipe,
     RenameCountryPipe,
     RenameTargetTypePipe,
-    SpeechBubbleComponent,
-    JsonPipe
+    SpeechBubbleComponent
   ]
 })
 export class LandingComponent extends SubscriptionManager {

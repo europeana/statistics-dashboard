@@ -6,7 +6,6 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -25,9 +24,7 @@ import {
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line.component.html',
-  styleUrls: ['./line.component.scss'],
-  standalone: true,
-  imports: [NgIf, NgFor]
+  styleUrls: ['./line.component.scss']
 })
 export class LineComponent implements AfterViewInit {
   allSeriesData: IHash<am4charts.LineSeries> = {};

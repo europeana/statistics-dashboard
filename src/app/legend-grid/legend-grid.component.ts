@@ -1,8 +1,5 @@
 import {
-  DatePipe,
   DecimalPipe,
-  JsonPipe,
-  KeyValuePipe,
   NgClass,
   NgFor,
   NgIf,
@@ -39,18 +36,13 @@ import { LineComponent } from '../chart';
   templateUrl: './legend-grid.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./legend-grid.component.scss'],
-  standalone: true,
   imports: [
-    DatePipe,
     DecimalPipe,
-    JsonPipe,
     NgClass,
     NgIf,
     NgFor,
     NgTemplateOutlet,
     NgStyle,
-    KeyValuePipe,
-    LineComponent,
     RenameCountryPipe,
     RenameTargetTypePipe
   ]

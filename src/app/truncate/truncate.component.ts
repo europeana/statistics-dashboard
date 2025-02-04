@@ -7,7 +7,6 @@ import { ResizeComponent } from '../resize/resize.component';
   selector: 'app-truncate',
   templateUrl: './truncate.component.html',
   styleUrls: ['./truncate.component.scss'],
-  standalone: true,
   imports: [ResizeComponent, NgClass, HighlightMatchPipe]
 })
 export class TruncateComponent implements OnInit {

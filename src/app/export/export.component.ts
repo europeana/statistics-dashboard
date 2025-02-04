@@ -7,7 +7,6 @@ import { NgClass } from '@angular/common';
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  standalone: true,
   imports: [NgClass]
 })
 export class ExportComponent {

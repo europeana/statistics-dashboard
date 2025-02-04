@@ -1,12 +1,16 @@
 import {
-  HttpClientTestingModule,
-  HttpTestingController
+  HttpTestingController,
+  provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { MockHttp } from '@europeana/metis-ui-test-utils';
 import { environment } from '../../environments/environment';
 import { GeneralResults, TargetFieldName } from '../_models';
 import { APIService } from './';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('API Service', () => {
   let service: APIService;
@@ -14,8 +18,11 @@ describe('API Service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [APIService],
-      imports: [HttpClientTestingModule]
+      providers: [
+        APIService,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+      ]
     }).compileComponents();
     service = TestBed.inject(APIService);
     mockHttp = new MockHttp(TestBed.inject(HttpTestingController));

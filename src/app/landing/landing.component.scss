@@ -1,6 +1,5 @@
-@import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
-@import "../../scss/functions/_replace";
+@use "../../scss/variables";
+@use "../../scss/functions/icon_urls";
 
 $card-header-pixels-line-height: 24px;
 $card-header-pixels-margin-bottom: 12px;
@@ -57,7 +56,7 @@ a[disabled] {
 }
 
 .data-link {
-  color: $stats-blue;
+  color: variables.$stats-blue;
   display: inline-block;
   font-size: 14px;
   font-weight: 600;
@@ -75,7 +74,7 @@ a[disabled] {
 }
 
 .data-rows-title {
-  color: $gray-faint;
+  color: variables.$gray-faint;
   font-size: 14px;
   font-weight: 600;
   padding: 9px 0 14px 0;
@@ -88,13 +87,13 @@ a[disabled] {
   padding: 18px 12px;
   width: 100%;
 
-  @media (min-width: $bp-desktop) {
+  @media (min-width: variables.$bp-desktop) {
     padding: 16px;
   }
 }
 
 .entry-card-content {
-  background: $white;
+  background: variables.$white;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -115,7 +114,7 @@ a[disabled] {
 
   .info-icon {
     &::after {
-      background-image: svg-url-icon-spinner(#{$gray-light});
+      background-image: icon_urls.svg-url-icon-spinner(variables.$gray-light);
       content: "";
       position: absolute;
       width: 22px;
@@ -123,7 +122,7 @@ a[disabled] {
       opacity: 0;
       left: 0;
       top: -50%;
-      transition: opacity $transition-duration ease-in-out;
+      transition: opacity variables.$transition-duration ease-in-out;
     }
   }
   a.info-icon {
@@ -141,7 +140,7 @@ a[disabled] {
 .entry-card-multi,
 .entry-card-pair {
   width: 100%;
-  @media (min-width: $bp-desktop) {
+  @media (min-width: variables.$bp-desktop) {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -168,15 +167,15 @@ a[disabled] {
   & + .data-rows {
     width: 100%;
   }
-  height: $map-height;
+  height: variables.$map-height;
 }
 
 .record-list {
   align-items: center;
-  border-top: 1px solid $gray-5;
+  border-top: 1px solid variables.$gray-5;
 
   &:last-child {
-    border-bottom: 1px solid $gray-5;
+    border-bottom: 1px solid variables.$gray-5;
   }
 
   :first-child:not(.map-navigation-link) {
@@ -214,7 +213,7 @@ a[disabled] {
   }
 }
 
-@media (min-width: $bp-desktop) {
+@media (min-width: variables.$bp-desktop) {
   .double-card .data-rows {
     margin-left: 2em;
   }

@@ -1,11 +1,11 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 .active {
   font-weight: 600;
 }
 
 .paginator {
-  color: $gray-med;
+  color: variables.$gray-med;
   display: flex;
   flex-direction: row;
 }
@@ -27,7 +27,7 @@
   }
 
   &.disabled {
-    color: $gray-faint;
+    color: variables.$gray-faint;
     pointer-events: none;
   }
 }

@@ -85,7 +85,6 @@ import { ResizeComponent } from '../resize';
   templateUrl: './overview.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./overview.component.scss'],
-  standalone: true,
   imports: [
     FormsModule,
     ReactiveFormsModule,

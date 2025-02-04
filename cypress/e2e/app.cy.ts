@@ -23,6 +23,7 @@ context('Statistics Dashboard', () => {
       const selFilterOpener = '.filter-opener';
       const selFilterValueLabel = `${selFilter} .checkbox-label`;
       const selFilterRemove = '.rm-filter .checkbox-label';
+      const waitInterval = 500;
 
       cy.visit(urlContentTier);
       cy.location('href').should('equal', baseUrl);
@@ -108,6 +109,7 @@ context('Statistics Dashboard', () => {
 
       // go forward (re-add Country)
       cy.go('forward');
+      cy.wait(waitInterval);
 
       cy.get(selFilterRemove).contains('Belgium').should('exist');
       cy.get(selFilterRemove).contains('IMAGE').should('not.exist');
@@ -116,6 +118,7 @@ context('Statistics Dashboard', () => {
       // go forward (re-add Tier 0)
 
       cy.go('forward');
+      cy.wait(waitInterval);
 
       cy.get(selFilterRemove).contains('Belgium').should('exist');
       cy.get(selFilterRemove).contains('Tier 0').should('exist');
@@ -127,6 +130,7 @@ context('Statistics Dashboard', () => {
 
       // go forward (re-add IMAGE)
       cy.go('forward');
+      cy.wait(waitInterval);
 
       cy.get(selFilterRemove).contains('Belgium').should('exist');
       cy.get(selFilterRemove).contains('Tier 0').should('exist');

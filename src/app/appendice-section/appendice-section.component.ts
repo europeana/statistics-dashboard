@@ -19,7 +19,6 @@ import { AbbreviateNumberPipe, RenameCountryPipe } from '../_translate';
     RenameCountryPipe
   ],
   selector: 'app-appendice-section',
-  standalone: true,
   styleUrls: ['./appendice-section.component.scss'],
   templateUrl: './appendice-section.component.html'
 })

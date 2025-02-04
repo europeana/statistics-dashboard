@@ -1,10 +1,10 @@
-@import "functions/_icon_urls";
-@import "checkboxes";
-@import "variables";
-@import "dialog";
-@import "home";
-@import "filters";
-@import "info-icon";
+@use "functions/_icon_urls";
+@use "checkboxes";
+@use "variables";
+@use "dialog";
+@use "home";
+@use "filters";
+@use "info-icon";
 body,
 html {
   scroll-behavior: smooth;
@@ -18,9 +18,9 @@ html {
 }
 
 body {
-  background: $offwhite;
-  color: $textcolour_body;
-  font: 16px / 1.6 $font-primary;
+  background: variables.$offwhite;
+  color: variables.$textcolour_body;
+  font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
   word-break: normal;
   word-wrap: break-word;
@@ -74,29 +74,29 @@ body {
 
 /* dashboard wrapper */
 .dashboard-wrapper {
-  background-color: $offwhite;
+  background-color: variables.$offwhite;
   display: inline-block;
   width: 100%;
 }
 
 .export-icon {
-  background-image: svg-url-icon-share($gray-med);
+  background-image: icon_urls.svg-url-icon-share(variables.$gray-med);
   background-repeat: no-repeat;
 }
 
 .icon-clear {
-  background-image: svg-url-icon-x($near-black);
+  background-image: icon_urls.svg-url-icon-x(variables.$near-black);
   display: inline-block;
   height: 32px;
   left: 0;
   opacity: 0.3;
   position: absolute;
-  transition: filter $transition-duration ease-in-out,
-    opacity $transition-duration ease-in-out;
+  transition: filter variables.$transition-duration ease-in-out,
+    opacity variables.$transition-duration ease-in-out;
   width: 32px;
 
   &:hover {
-    background-image: svg-url-icon-x($eu-red);
+    background-image: icon_urls.svg-url-icon-x(variables.$eu-red);
     opacity: 1;
 
     // highlight items to remove
@@ -121,7 +121,7 @@ body {
 }
 
 .loading-modal::after {
-  background-image: svg-url-icon-spinner(#{$stats-blue});
+  background-image: icon_urls.svg-url-icon-spinner(#{variables.$stats-blue});
   background-position: center;
   background-repeat: no-repeat;
   transform: scale(5);
@@ -143,7 +143,7 @@ body {
 .fixed-modal-content {
   padding: 2em;
   position: relative;
-  background: $white;
+  background: variables.$white;
   max-width: 25em;
   margin: 30vh auto 0 auto;
 }
@@ -196,7 +196,7 @@ body {
   margin-bottom: 16px;
 }
 
-@media (min-width: $bp-small-3) {
+@media (min-width: variables.$bp-small-3) {
   .dashboard-wrapper {
     padding: 0 1.2rem;
     .statistics-dashboard {
@@ -205,13 +205,13 @@ body {
   }
 }
 
-@media (min-width: $bp-xl) {
+@media (min-width: variables.$bp-xl) {
   .dashboard-wrapper .statistics-dashboard {
     display: flex;
     .statistics-dashboard-right {
       flex-grow: 1;
-      padding-left: $spacing-l;
-      padding-right: $spacing-l;
+      padding-left: variables.$spacing-l;
+      padding-right: variables.$spacing-l;
     }
   }
 }
@@ -239,7 +239,7 @@ body {
 
   &::before,
   &::after {
-    background: $gray-med;
+    background: variables.$gray-med;
     content: "";
     display: block;
     height: 2px;

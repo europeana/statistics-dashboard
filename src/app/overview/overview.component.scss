@@ -1,5 +1,5 @@
-@import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
+@use "../../scss/variables";
+@use "../../scss/functions/icon_urls";
 
 $filter-scroll-w: 30px;
 $width-left-col: 200px;
@@ -11,12 +11,12 @@ $width-left-col: 200px;
 }
 
 .date-removal {
-  color: $gray-med;
-  margin-right: $spacing-s;
+  color: variables.$gray-med;
+  margin-right: variables.$spacing-s;
 
   &.set {
     .when-set {
-      color: $gray-med;
+      color: variables.$gray-med;
       display: flex;
     }
     .when-unset {
@@ -42,26 +42,26 @@ $width-left-col: 200px;
       display: flex;
       align-items: center;
       &::after {
-        background: $gray-5;
+        background: variables.$gray-5;
         content: "";
         display: block;
         height: 32px;
-        margin-left: $spacing-s;
+        margin-left: variables.$spacing-s;
         width: 1px;
       }
     }
   }
 
   .separator {
-    margin: $spacing-s;
+    margin: variables.$spacing-s;
   }
 
   .when-set,
   .when-unset {
-    background: $gray-5;
+    background: variables.$gray-5;
     font-size: 9px;
     margin-right: 10px;
-    padding: $spacing-xs;
+    padding: variables.$spacing-xs;
     white-space: nowrap;
   }
 
@@ -71,9 +71,9 @@ $width-left-col: 200px;
 }
 
 .filter-icon-home {
-  margin-left: $spacing-s;
+  margin-left: variables.$spacing-s;
   & + .filter-title {
-    margin-left: $spacing-s;
+    margin-left: variables.$spacing-s;
   }
 }
 
@@ -87,7 +87,7 @@ $width-left-col: 200px;
 
 .rm-filter {
   align-items: center;
-  background-color: $stats-blue;
+  background-color: variables.$stats-blue;
   cursor: pointer;
   display: flex;
 
@@ -95,7 +95,7 @@ $width-left-col: 200px;
     transform: translate(-2px, 0px) scale(0.75);
     &::after,
     &::before {
-      background: $white;
+      background: variables.$white;
     }
   }
 }
@@ -106,7 +106,7 @@ $width-left-col: 200px;
 
 .rm-filter-nav {
   align-items: center;
-  background: $offwhite;
+  background: variables.$offwhite;
   bottom: 0;
   display: flex;
   justify-content: flex-end;
@@ -117,7 +117,11 @@ $width-left-col: 200px;
   width: $filter-scroll-w;
 
   &::before {
-    background: linear-gradient(90deg, transparent 0%, $offwhite 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      variables.$offwhite 100%
+    );
     height: 100%;
     left: -$filter-scroll-w;
     pointer-events: none;
@@ -133,7 +137,7 @@ $width-left-col: 200px;
 
 .rm-filter-nav-next,
 .rm-filter-nav-prev {
-  color: $gray-5;
+  color: variables.$gray-5;
   cursor: default;
   font-size: 30px;
   transform: translateY(-4px);
@@ -162,7 +166,7 @@ $width-left-col: 200px;
 }
 
 .rm-filters {
-  margin-top: $spacing-m;
+  margin-top: variables.$spacing-m;
 }
 
 input[type="checkbox"] {
@@ -176,26 +180,26 @@ input[type="checkbox"] {
 }
 
 .errors {
-  color: $eu-red;
+  color: variables.$eu-red;
 }
 
 .dataset-name {
   background: transparent;
   border: 0;
   box-shadow: none;
-  margin-right: $spacing-s;
+  margin-right: variables.$spacing-s;
 
   &[type="text"] {
-    margin: 0 0 0 $spacing-s;
+    margin: 0 0 0 variables.$spacing-s;
     padding: 0;
     width: 100%;
   }
 }
 
 .dataset-name-wrapper {
-  border: 1px solid $gray-5;
-  border-radius: $spacing-s;
-  margin-top: $spacing-s;
+  border: 1px solid variables.$gray-5;
+  border-radius: variables.$spacing-s;
+  margin-top: variables.$spacing-s;
 
   &.container-h .icon {
     align-self: center;
@@ -213,7 +217,7 @@ input[type="checkbox"] {
   margin-top: 36px;
   text-align: right;
   .export-opener-link {
-    color: $stats-blue;
+    color: variables.$stats-blue;
     font-size: 14px;
     text-transform: uppercase;
   }
@@ -225,7 +229,7 @@ input[type="checkbox"] {
   margin: 0.4em 0.7em;
 
   .table-footer-total {
-    border-bottom: 1px solid $grey-3;
+    border-bottom: 1px solid variables.$grey-3;
     display: inline-block;
     margin-bottom: 0.4em;
   }
@@ -246,7 +250,7 @@ label {
 }
 
 .applied-filter-summary {
-  color: $grey-3;
+  color: variables.$grey-3;
   font-size: 0.7em;
   font-style: italic;
   list-style: none;
@@ -255,22 +259,22 @@ label {
   // apply custom bullets
   li::before {
     content: "\2022";
-    color: $grey-3;
+    color: variables.$grey-3;
     display: inline-block;
     font-weight: bold;
     margin-left: -1em;
-    transition: color $transition-duration ease-in-out;
+    transition: color variables.$transition-duration ease-in-out;
     width: 0.85em;
   }
 }
 
 .filters-header {
-  color: $grey-3;
+  color: variables.$grey-3;
   font-size: 12px;
   font-weight: bold;
   line-height: 38px;
   text-transform: uppercase;
-  margin-left: $spacing-s;
+  margin-left: variables.$spacing-s;
 }
 
 .filter-select {
@@ -278,7 +282,7 @@ label {
   margin: auto;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: $bp-small;
+  width: variables.$bp-small;
 }
 
 .filters {
@@ -298,7 +302,7 @@ label {
 .chart-wrapper {
   flex-grow: 1;
   height: 300px;
-  margin: 0 (-$spacing-s);
+  margin: 0 variables.$spacing-s * -1;
   max-width: 100%;
 
   &.hidden {
@@ -310,15 +314,15 @@ label {
 }
 
 .data-area {
-  background-color: $white;
-  border-radius: $spacing-m;
+  background-color: variables.$white;
+  border-radius: variables.$spacing-m;
   padding: 20px 26px;
   position: relative;
 
   .load-bar {
-    background: $stats-blue;
-    border-top-left-radius: $spacing-m;
-    border-top-right-radius: $spacing-m;
+    background: variables.$stats-blue;
+    border-top-left-radius: variables.$spacing-m;
+    border-top-right-radius: variables.$spacing-m;
     height: 5px;
     position: absolute;
     right: 0;
@@ -350,7 +354,7 @@ label {
 .facet-param {
   border: 0;
   background: none;
-  border-bottom: 1px dashed $near-black;
+  border-bottom: 1px dashed variables.$near-black;
   cursor: pointer;
   font-weight: 600;
   text-indent: 0;
@@ -361,19 +365,20 @@ label {
 }
 
 .header-data {
-  color: $near-black;
+  color: variables.$near-black;
   font-size: 18px;
   font-weight: 600;
   margin-right: auto;
 }
 
 .date.warn {
-  color: $gray-med;
+  color: variables.$gray-med;
   position: relative;
   &:hover {
     color: transparent;
     &::before {
-      background: svg-url-icon-warning($stats-blue) 0px 0px / 10px no-repeat;
+      background: icon_urls.svg-url-icon-warning(variables.$stats-blue) 0px 0px /
+        10px no-repeat;
       content: "";
       display: inline-block;
       height: 10px;
@@ -398,13 +403,13 @@ label {
 
   a {
     align-items: center;
-    color: $linkblue;
+    color: variables.$linkblue;
     display: flex;
     justify-content: flex-end;
     line-height: 1.8rem;
 
     &:not(:hover) .flag-orb::after {
-      background-image: svg-url-icon-flag($linkblue);
+      background-image: icon_urls.svg-url-icon-flag(variables.$linkblue);
       opacity: 0.2;
     }
   }
@@ -416,7 +421,7 @@ label {
   }
 }
 
-@media (min-width: $bp-xl) {
+@media (min-width: variables.$bp-xl) {
   .statistics-dashboard {
     flex-direction: row;
   }
@@ -431,7 +436,7 @@ label {
   }
 }
 
-@media (min-width: $bp-xxl) {
+@media (min-width: variables.$bp-xxl) {
   .chart-and-summary {
     flex-direction: row;
   }

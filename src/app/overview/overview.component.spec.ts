@@ -6,7 +6,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -46,6 +46,10 @@ import { BarComponent } from '../chart';
 import { GridComponent } from '../grid';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
@@ -73,9 +77,9 @@ describe('OverviewComponent', () => {
     params.next({});
 
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         FormsModule,
-        HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
           {
@@ -113,9 +117,10 @@ describe('OverviewComponent', () => {
         {
           provide: RenameApiFacetPipe,
           useValue: createMockPipe('renameApiFacet')
-        }
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+      ]
     })
       .overrideComponent(OverviewComponent, {
         remove: { imports: [BarComponent, GridComponent] },

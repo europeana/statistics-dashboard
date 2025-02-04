@@ -1,4 +1,4 @@
-@import "../../scss/_variables";
+@use "../../scss/variables";
 
 $arrow-height: 10px;
 $arrow-width: 5px;
@@ -8,8 +8,8 @@ $arrow-rotation-rest: 330deg;
 .speech-bubble {
   background-color: #fff;
   border-radius: 8px;
-  border: 1px solid $gray-5;
-  color: $gray-faint;
+  border: 1px solid variables.$gray-5;
+  color: variables.$gray-faint;
   position: relative;
   &::after,
   &::before {

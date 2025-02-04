@@ -48,8 +48,8 @@
           }"
           [style.color]="percent < 35 ? colours[colourIndex] : undefined"
         >
-          <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
-          <span class="show-on-triple">{{ percent | number: "1.0-1" }}%</span>
+          <span class="hide-on-triple">{{ percent | number : "1.0-2" }}%</span>
+          <span class="show-on-triple">{{ percent | number : "1.0-1" }}%</span>
         </span>
       </div>
 
@@ -187,9 +187,9 @@
             triple: columnsEnabledCount === 3
           }"
         >
-          <span class="hide-on-triple">{{ percent | number: "1.0-2" }}%</span>
+          <span class="hide-on-triple">{{ percent | number : "1.0-2" }}%</span>
           <span class="show-on-triple" [attr.title]="tooltipsPercent[valName]">
-            {{ percent | number: "1.0-1" }}%</span
+            {{ percent | number : "1.0-1" }}%</span
           >
         </span>
       </span>

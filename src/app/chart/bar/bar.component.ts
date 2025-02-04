@@ -30,7 +30,6 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-bar-chart',
   templateUrl: './bar.component.html',
   styleUrls: ['./bar.component.scss'],
-  standalone: true,
   imports: [NgIf, FormsModule, NgClass]
 })
 export class BarComponent implements AfterViewInit {

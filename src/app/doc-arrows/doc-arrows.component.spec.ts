@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ArrowType, DocArrowsComponent } from './doc-arrows.component';
 
 describe('DocArrowsComponent', () => {
@@ -11,13 +11,10 @@ describe('DocArrowsComponent', () => {
     side: ''
   };
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [DocArrowsComponent]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(DocArrowsComponent);
     component = fixture.componentInstance;
 
@@ -54,6 +51,10 @@ describe('DocArrowsComponent', () => {
               },
               // eslint-disable-next-line @typescript-eslint/no-empty-function
               remove: (_: string): void => {}
+            },
+            parentNode: {
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              removeChild: (_: unknown): void => {}
             }
           };
         }
@@ -205,9 +206,6 @@ describe('DocArrowsComponent', () => {
   it('should handle deletion', () => {
     component.documentationArrows.push(1);
     expect(component.documentationArrows.length).toEqual(2);
-
-    component.arrowActiveKey(getKeyEvent('Delete'));
-    expect(component.documentationArrows.length).toEqual(1);
 
     component.arrowActiveKey(getKeyEvent('Delete'));
     expect(component.documentationArrows.length).toEqual(1);

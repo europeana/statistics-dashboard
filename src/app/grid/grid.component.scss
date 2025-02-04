@@ -1,5 +1,5 @@
-@import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
+@use "../../scss/variables";
+@use "../../scss/functions/icon_urls";
 
 $series-colour-width: 3px;
 $space-cell-v: 7px;
@@ -10,7 +10,7 @@ label[for="maxPageSize"] {
 }
 
 .cell-header {
-  border-top: 1px solid $gray-5;
+  border-top: 1px solid variables.$gray-5;
   position: relative;
 
   &.active {
@@ -46,7 +46,7 @@ a {
 }
 
 .cell-name {
-  border-right: 1px solid $gray-5;
+  border-right: 1px solid variables.$gray-5;
   font-weight: 600;
 
   &.highlighting-terms {
@@ -55,13 +55,13 @@ a {
 }
 
 .cell-prefix {
-  padding: $space-cell-v $spacing-s $space-cell-v 0;
+  padding: $space-cell-v variables.$spacing-s $space-cell-v 0;
 }
 
 .cell-series,
 .cell-first-wide,
 .cell-wide {
-  border-right: 1px solid $gray-5;
+  border-right: 1px solid variables.$gray-5;
 }
 
 .data-grid {
@@ -102,7 +102,7 @@ a {
       padding: $space-cell-v 8px;
     }
     &:not(.cell-header, .navigation-controls, .search-control) {
-      border-bottom: 1px solid $gray-5;
+      border-bottom: 1px solid variables.$gray-5;
     }
   }
 }
@@ -118,7 +118,7 @@ a {
 
 .go-to,
 .max-page-size {
-  border-bottom: 1px solid $gray-5;
+  border-bottom: 1px solid variables.$gray-5;
 }
 
 .go-to {
@@ -130,14 +130,14 @@ a {
 }
 
 .highlight {
-  background-color: $offwhite;
+  background-color: variables.$offwhite;
 }
 
 .link-out {
   height: 12px;
   &::after {
     content: "";
-    background-image: svg-url-icon-external($gray-faint);
+    background-image: svg-url-icon-external(variables.$gray-faint);
     background-repeat: no-repeat;
     background-position: center;
     display: inline-block;
@@ -147,7 +147,7 @@ a {
 }
 
 .max-page-size {
-  color: $gray-med;
+  color: variables.$gray-med;
   font-size: 10px;
   margin-right: 4px;
   padding: 0;
@@ -158,7 +158,7 @@ a {
 }
 
 .navigation-controls {
-  color: $gray-med;
+  color: variables.$gray-med;
   font-size: 11px;
   justify-content: flex-end;
   .conditional-controls {
@@ -175,17 +175,17 @@ a {
 }
 
 .search-control {
-  color: $gray-faint;
+  color: variables.$gray-faint;
   font-size: 11px;
 }
 
 .search-control,
 .navigation-controls {
-  border-top: 1px solid $gray-5;
+  border-top: 1px solid variables.$gray-5;
 }
 
 .search-icon {
-  background: svg-url-icon-search($gray-faint) center no-repeat;
+  background: svg-url-icon-search(variables.$gray-faint) center no-repeat;
   display: inline-block;
   width: 16px;
   height: 16px;

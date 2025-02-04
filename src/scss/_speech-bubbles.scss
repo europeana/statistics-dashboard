@@ -1,3 +1,5 @@
+@use "variables";
+
 /*
   Arrow position information for cross-component speech-bubbles
 */
@@ -37,7 +39,7 @@
   }
 }
 
-@media (min-width: $bp-desktop) {
+@media (min-width: variables.$bp-desktop) {
   .entry-card {
     .help-items .speech-bubble.arrow-bottom-right {
       &::after,
