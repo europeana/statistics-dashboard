@@ -323,34 +323,41 @@ export class LegendGridComponent {
     }
   }
 
+  /** loadCountryChartData
+   * loads entries to countryData and updates corresponding chart series
+   * @param { string } country - the country to load
+   **/
+  loadCountryChartData(country: string): void {
+    this.onLoadHistory.emit({
+      country: country,
+      fnCallback: (data: Array<TargetCountryData>) => {
+        // append to existing countryData
+        this.countryData[country] = this.countryData[country].concat(data);
+        this.lineChart.sortSeriesData(data);
+
+        // append to graph series data
+        for (let i = 0; i < TargetSeriesSuffixes.length; i++) {
+          this.lineChart.addSeriesData(
+            country + TargetSeriesSuffixes[i],
+            TargetFieldName[this.seriesValueNames[i]],
+            data
+          );
+        }
+        this.lineChart.chart.invalidateData();
+      }
+    });
+  }
+
   /** toggleCountry
    * shows existing (hidden) data or loads and creates series
    * @param { string } country - the target series
-   * @return boolean
    **/
   toggleCountry(country: string): void {
     const countrySeries = this.getCountrySeries(country);
+
     if (countrySeries.length === 0) {
-      this.onLoadHistory.emit({
-        country: country,
-        fnCallback: (data: Array<TargetCountryData>) => {
-          // append to existing countryData
-          this.countryData[country] = this.countryData[country].concat(data);
-          this.lineChart.sortSeriesData(data);
-
-          // append to graph series data
-          for (let i = 0; i < TargetSeriesSuffixes.length; i++) {
-            this.lineChart.addSeriesData(
-              country + TargetSeriesSuffixes[i],
-              TargetFieldName[this.seriesValueNames[i]],
-              data
-            );
-          }
-          this.lineChart.chart.invalidateData();
-        }
-      });
-
       this.addSeriesSetAndPin(country, this.countryData[country]);
+      this.loadCountryChartData(country);
     } else {
       const hasVisible =
         countrySeries.filter((series: am4charts.LineSeries) => {
@@ -493,6 +500,10 @@ export class LegendGridComponent {
         }
       ).length;
 
+      if (this.countryData[country].length < 2) {
+        this.loadCountryChartData(country);
+      }
+
       let countryPinIndex: number = undefined;
 
       if (visibleSiblingCount > 0) {
@@ -525,6 +536,7 @@ export class LegendGridComponent {
           visCount += 1;
         }
       });
+
       // we can unpin (it will be 0 on animation completion)
       if (visCount === 1) {
         this.togglePin(country);
