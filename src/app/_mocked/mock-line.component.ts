@@ -68,13 +68,11 @@ export class MockLineComponent {
       getIndex: (i: number): am4core.Color => {
         return this._colours[i];
       },
-      reset: (): void => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-      },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      reset: (): void => {},
       list: this._colours,
-      next: () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-      }
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      next: () => {}
     },
     invalidateData(): void {
       console.log('MockLineComponent chart.invalidateData');

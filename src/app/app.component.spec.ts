@@ -73,7 +73,6 @@ describe('AppComponent', () => {
       clear: (): void => {},
       createComponent: () => {
         return {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           setInput: (): void => void {}
         };
       }

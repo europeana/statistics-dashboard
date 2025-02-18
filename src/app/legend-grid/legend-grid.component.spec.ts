@@ -268,12 +268,10 @@ describe('LegendGridComponent', () => {
   it('should toggle the series', () => {
     const seriesItemHidden = {
       isHidden: true,
-      show: () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-      },
-      hide: () => {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-      }
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      show: () => {},
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      hide: () => {}
     } as unknown as am4charts.LineSeries;
 
     const seriesItemShowing = {
@@ -320,9 +318,8 @@ describe('LegendGridComponent', () => {
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
     component.targetMetaData = mockTargetMetaData;
 
-    spyOn(component, 'toggleCountry').and.callFake(() => {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-    });
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    spyOn(component, 'toggleCountry').and.callFake(() => {});
 
     // set initial code and a pinned country
     component.countryCode = 'FR';
