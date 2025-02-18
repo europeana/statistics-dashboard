@@ -1,6 +1,4 @@
-@use "sass:meta";
 @use "variables";
-
 @use "sass:math";
 
 /* MIXINS
@@ -47,19 +45,3 @@
   -o-transition: $transition-property $transition-time $method;
   transition: $transition-property $transition-time $method;
 }
-
-/* SVG background with png fallback
-   Needs svg test or modernizr to add .no-svg to the html element to trigger fallback
-*/
-@mixin svg-bg-with-fallback($file_name) {
-  background-repeat: no-repeat;
-  background-image: inline-image("#{$file_name}.svg", image/svg\+ xml);
-
-  html.no-svg & {
-    background-image: image-url("#{$file_name}.png");
-  }
-}
-
-@include meta.load-css("mixins/transform");
-@include meta.load-css("mixins/placeholder");
-@include meta.load-css("mixins/flexbox");

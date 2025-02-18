@@ -127,7 +127,7 @@
           "
           class="series-column"
         >
-          <span *ngIf="enabled">
+          <ng-container *ngIf="enabled">
             <span [ngClass]="{ 'top-pin': isTopPin }">
               <ng-content
                 *ngTemplateOutlet="
@@ -155,7 +155,7 @@
                 </span>
               </ng-container>
             </span>
-          </span>
+          </ng-container>
         </ng-container>
       </span>
     </ng-template>
