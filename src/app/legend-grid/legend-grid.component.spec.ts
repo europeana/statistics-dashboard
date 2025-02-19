@@ -190,19 +190,25 @@ describe('LegendGridComponent', () => {
     expect(Object.keys(component.hiddenColumnRanges).length).toBeFalsy();
     component.hideRangesByColumn(TargetFieldName.THREE_D);
     expect(Object.keys(component.hiddenColumnRanges).length).toBeTruthy();
+    component.hideRangesByColumn(TargetFieldName.TOTAL);
+    expect(Object.keys(component.hiddenColumnRanges).length).toBeTruthy();
   });
 
   it('should show ranges by column', () => {
     component.targetMetaData = mockTargetMetaData;
     component.countryCode = 'FR';
     component.pinnedCountries = { FR: 0 };
-    component.hiddenColumnRanges = { THREE_D: { FR: [0] } };
+    component.hiddenColumnRanges = { THREE_D: { FR: [0] }, HQ: { FR: [0] } };
     component.lineChart.allSeriesData['FR' + '3D'] = {
       fill: 'xxx',
       hide: jasmine.createSpy()
     } as unknown as am4charts.LineSeries;
+
+    expect(Object.keys(component.hiddenColumnRanges).length).toEqual(2);
     component.showHiddenRangesByColumn(TargetFieldName.THREE_D);
-    expect(Object.keys(component.hiddenColumnRanges).length).toBeFalsy();
+    expect(Object.keys(component.hiddenColumnRanges).length).toEqual(1);
+    component.showHiddenRangesByColumn();
+    expect(Object.keys(component.hiddenColumnRanges).length).toEqual(0);
   });
 
   it('should toggle the range', () => {
@@ -266,6 +272,8 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the series', () => {
+    component.countryData = { DE: [], FR: [] };
+
     const seriesItemHidden = {
       isHidden: true,
       show: () => {
