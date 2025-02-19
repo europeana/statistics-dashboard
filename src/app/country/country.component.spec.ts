@@ -150,16 +150,11 @@ describe('CountryComponent', () => {
   });
 
   it('should toggle the appendice', () => {
-    const spyToggleCursor = jasmine.createSpy();
-    component.lineChart = {
-      toggleCursor: spyToggleCursor
-    } as unknown as LineComponent;
     expect(component.appendiceExpanded).toBeFalsy();
     component.toggleAppendice();
     expect(component.appendiceExpanded).toBeTruthy();
     component.toggleAppendice();
     expect(component.appendiceExpanded).toBeFalsy();
-    expect(spyToggleCursor).toHaveBeenCalledTimes(2);
   });
 
   it('should toggle the column', () => {

@@ -329,6 +329,10 @@ export class LineComponent implements AfterViewInit {
     valueAxis.renderer.labels.template.fontSize = 14;
     this.valueAxis.renderer.grid.template.disabled = true;
     this.dateAxis.renderer.grid.template.disabled = true;
+
+    const cursor = new am4charts.XYCursor();
+    this.chart.cursor = cursor;
+    cursor.xAxis = this.dateAxis;
   }
 
   toggleGridlines(): void {
@@ -341,17 +345,6 @@ export class LineComponent implements AfterViewInit {
       this.dateAxis.renderer.grid.template.disabled = true;
     }
     this.chart.invalidateData();
-  }
-
-  toggleCursor(): void {
-    if (this.chart.cursor) {
-      this.chart.cursor.dispose();
-      this.chart.cursor = undefined;
-    } else {
-      const cursor = new am4charts.XYCursor();
-      this.chart.cursor = cursor;
-      cursor.xAxis = this.dateAxis;
-    }
   }
 
   toggleScrollbar(): void {

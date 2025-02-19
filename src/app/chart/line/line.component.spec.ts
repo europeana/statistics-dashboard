@@ -164,14 +164,6 @@ describe('LineComponent', () => {
   });
   */
 
-  it('should toggle the cursor', () => {
-    expect(component.chart.cursor).toBeFalsy();
-    component.toggleCursor();
-    expect(component.chart.cursor).toBeTruthy();
-    component.toggleCursor();
-    expect(component.chart.cursor).toBeFalsy();
-  });
-
   it('should toggle the scrollbar', () => {
     expect(component.chart.scrollbarX).toBeFalsy();
     component.toggleScrollbar();
