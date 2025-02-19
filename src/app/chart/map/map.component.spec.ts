@@ -109,6 +109,23 @@ describe('MapComponent', () => {
     expect(component.polygonSeries.data.length).toEqual(0);
   });
 
+  it('should update the heat rules', () => {
+    component.polygonSeries = {
+      heatRules: [],
+      mapPolygons: {
+        template: {}
+      }
+    } as unknown as am4maps.MapPolygonSeries;
+
+    component.updateHeatRules(am4core.color('#F00'));
+    expect(component.polygonSeries.heatRules.length).toBeTruthy();
+    expect(`${component.polygonSeries.heatRules[0].min}`).toEqual('#ff1919');
+    expect(`${component.polygonSeries.heatRules[0].max}`).toEqual('#ba0000');
+    component.updateHeatRules(am4core.color('#00F'));
+    expect(`${component.polygonSeries.heatRules[0].min}`).toEqual('#1919ff');
+    expect(`${component.polygonSeries.heatRules[0].max}`).toEqual('#0000ba');
+  });
+
   it('should update the heat rules when the colour scheme is set', () => {
     spyOn(component, 'updateHeatRules');
     const colour = '#ffffff';
