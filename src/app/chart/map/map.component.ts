@@ -237,6 +237,10 @@ export class MapComponent extends SubscriptionManager {
     const data = this.filterResultsData();
     this.polygonSeries.data = data;
     this.polygonSeriesHidden.data = data;
+    this.polygonSeries.events.once(
+      'datavalidated',
+      this.synchroniseLegend.bind(this)
+    );
   }
 
   /** ngAfterViewInit
@@ -458,6 +462,22 @@ export class MapComponent extends SubscriptionManager {
     );
   }
 
+  /** synchroniseLegend
+   *
+   **/
+  synchroniseLegend(): void {
+    const heatLegend = this.legend;
+    const hlMin = heatLegend.series.dataItem.values.value.low;
+    const hlMinRange = heatLegend.valueAxis.axisRanges.getIndex(0);
+    hlMinRange.value = hlMin;
+    hlMinRange.label.text = '' + heatLegend.numberFormatter.format(hlMin);
+
+    const hlMax = heatLegend.series.dataItem.values.value.high;
+    const hlMaxRange = heatLegend.valueAxis.axisRanges.getIndex(1);
+    hlMaxRange.value = hlMax;
+    hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
+  }
+
   /** drawChart
    *
    **/
@@ -522,33 +542,30 @@ export class MapComponent extends SubscriptionManager {
     });
 
     // Set up custom heat map legend labels using axis ranges
+
     const minRange = legend.valueAxis.axisRanges.create();
     minRange.label.horizontalCenter = 'left';
 
     const maxRange = legend.valueAxis.axisRanges.create();
     maxRange.label.horizontalCenter = 'right';
 
+    // Bind labels to percent setting
+
+    const fnPct = (val: string) => {
+      return this.mapPercentMode ? `${val}%` : val;
+    };
+
+    minRange.label.adapter.add('text', fnPct);
+    maxRange.label.adapter.add('text', fnPct);
+
     // Blank out internal heat legend value axis labels
+
     legend.valueAxis.renderer.labels.template.adapter.add(
       'text',
       function (_: string) {
         return '';
       }
     );
-
-    // Update heat legend value labels
-    polygonSeries.events.once('datavalidated', function (ev) {
-      const heatLegend = ev.target.map.getKey('mapLegend');
-      const hlMin = heatLegend.series.dataItem.values.value.low;
-      const hlMinRange = heatLegend.valueAxis.axisRanges.getIndex(0);
-      hlMinRange.value = hlMin;
-      hlMinRange.label.text = '' + heatLegend.numberFormatter.format(hlMin);
-
-      const hlMax = heatLegend.series.dataItem.values.value.high;
-      const hlMaxRange = heatLegend.valueAxis.axisRanges.getIndex(1);
-      hlMaxRange.value = hlMax;
-      hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
-    });
 
     this.setZoomLevels();
 
