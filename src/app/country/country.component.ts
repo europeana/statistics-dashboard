@@ -435,7 +435,6 @@ export class CountryComponent
 
   toggleAppendice(): void {
     this.appendiceExpanded = !this.appendiceExpanded;
-    this.lineChart.toggleCursor();
   }
 
   /** nextColToEnable
