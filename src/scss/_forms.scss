@@ -1,4 +1,3 @@
-@use "mixins/placeholder";
 @use "variables";
 
 fieldset {
@@ -43,7 +42,7 @@ input[type="checkbox"]:focus {
 }
 
 input[type="text"] {
-  @include placeholder.placeholder {
+  placeholder: {
     color: variables.$gray-faint;
     opacity: 1;
   }
@@ -52,7 +51,7 @@ input[type="text"] {
 input[type="text"] {
   &.disabled,
   &:focus {
-    @include placeholder.placeholder {
+    placeholder: {
       color: variables.$gray-5;
     }
   }

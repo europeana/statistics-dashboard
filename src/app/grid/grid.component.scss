@@ -137,7 +137,7 @@ a {
   height: 12px;
   &::after {
     content: "";
-    background-image: svg-url-icon-external(variables.$gray-faint);
+    background-image: icon_urls.svg-url-icon-external(variables.$gray-faint);
     background-repeat: no-repeat;
     background-position: center;
     display: inline-block;
@@ -185,7 +185,8 @@ a {
 }
 
 .search-icon {
-  background: svg-url-icon-search(variables.$gray-faint) center no-repeat;
+  background: icon_urls.svg-url-icon-search(variables.$gray-faint) center
+    no-repeat;
   display: inline-block;
   width: 16px;
   height: 16px;
