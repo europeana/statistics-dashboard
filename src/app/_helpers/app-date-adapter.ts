@@ -7,6 +7,7 @@ export class AppDateAdapter extends NativeDateAdapter {
   public static readonly preferredFormat = 'DD/MM/YYYY';
 
   // used to display dates closed and open
+  // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
   format(date: Date, displayFormat: Object): string {
     const options: Intl.DateTimeFormatOptions = {
       weekday: 'short',
