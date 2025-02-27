@@ -4,6 +4,7 @@
 $list-item-pad-height: 4px;
 $boxed-width: 2.5em;
 $boxed-colour: variables.$gray-5;
+$disabled-colour: variables.$gray-5;
 $boxed-dash-length: 3em;
 $boxed-dash-length-less-one: 2em;
 
@@ -253,6 +254,13 @@ $numeric-min-width: 6em;
       box-shadow: 0 1px 1px 0;
     }
   }
+
+  &.default[disabled] {
+    color: $disabled-colour;
+    &::after {
+      background-image: icon_urls.svg-url-icon-flag($disabled-colour);
+    }
+  }
 }
 
 // top box
@@ -341,10 +349,22 @@ $numeric-min-width: 6em;
   }
 }
 
-.data-rows-title .x {
-  &::after,
-  &::before {
-    background-color: variables.$gray-faint;
+.data-rows-title {
+  &:has([disabled]) span {
+    color: $disabled-colour;
+  }
+  .x {
+    &::after,
+    &::before {
+      background-color: variables.$gray-faint;
+    }
+    &[disabled] {
+      pointer-events: none;
+      &::after,
+      &::before {
+        background-color: $disabled-colour;
+      }
+    }
   }
 }
 
