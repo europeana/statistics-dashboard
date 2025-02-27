@@ -343,7 +343,7 @@ export class LegendGridComponent {
             data
           );
         }
-        this.lineChart.chart.invalidateData();
+        this.lineChart.chart.invalidateRawData();
       }
     });
   }
