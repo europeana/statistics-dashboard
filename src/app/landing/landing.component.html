@@ -57,10 +57,11 @@
     </div>
   </ng-template>
 
-  <ng-template #tmpMapLayerMenu>
+  <ng-template #tmpMapLayerMenu let-menuDisabled="menuDisabled">
     <span class="container-h relative">
       <span class="relative" appClickAware (clickOutside)="closeMapMenu()">
         <a
+          [attr.disabled]="menuDisabled"
           class="derived-series-menu-opener flag-orb default"
           title="show target progress"
           (click)="mapMenuOpenerClicked()"
@@ -70,7 +71,7 @@
           }"
           [ngStyle]="{
             color:
-              visibleHeatMap && mapChart
+              visibleHeatMap && mapChart && !menuDisabled
                 ? mapChart.colourScheme.base.hex
                 : 'unset'
           }"
@@ -119,7 +120,12 @@
         <span *ngFor="let vhr of visibleHeatMap | keyvalue"
           >{{ vhr.key | renameTargetType }} {{ vhr.value ? 2030 : 2025 }}</span
         >
-        <a class="x" title="remove target layer" (click)="clearHeatmap()"></a>
+        <a
+          class="x"
+          [attr.disabled]="menuDisabled"
+          title="remove target layer"
+          (click)="clearHeatmap()"
+        ></a>
       </span>
       } @else { @if(!singleCountryMode) {
       <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
@@ -158,7 +164,19 @@
         </span>
         }
 
-        <ng-content *ngTemplateOutlet="tmpMapLayerMenu"></ng-content>
+        <ng-content
+          *ngTemplateOutlet="
+            tmpMapLayerMenu;
+            context: {
+              menuDisabled:
+                !countryData ||
+                !mapChart.selectedCountry ||
+                (countryData && countryData[mapChart.selectedCountry])
+                  ? null
+                  : 'disabled'
+            }
+          "
+        ></ng-content>
 
         <!-- End Map Toolbar Contents-->
         }@else{

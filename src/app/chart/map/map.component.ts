@@ -551,7 +551,7 @@ export class MapComponent extends SubscriptionManager {
 
     // Bind labels to percent setting
 
-    const fnPct = (val: string) => {
+    const fnPct = (val: string): string => {
       return this.mapPercentMode ? `${val}%` : val;
     };
 
