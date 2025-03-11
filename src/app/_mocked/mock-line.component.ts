@@ -76,6 +76,9 @@ export class MockLineComponent {
     },
     invalidateData(): void {
       console.log('MockLineComponent chart.invalidateData');
+    },
+    invalidateRawData(): void {
+      console.log('MockLineComponent chart.invalidateRawData');
     }
   } as unknown as am4charts.XYChart;
   dateAxis: am4charts.DateAxis;
