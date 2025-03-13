@@ -136,8 +136,4 @@ export class MockLineComponent {
   toggleCursor(): void {
     console.log('MockLineComponent toggleCursor');
   }
-
-  toggleGridlines(): void {
-    console.log('MockLineComponent toggleGridlines');
-  }
 }

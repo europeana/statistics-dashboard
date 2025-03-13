@@ -353,18 +353,6 @@ export class LineComponent implements AfterViewInit {
     });
   }
 
-  toggleGridlines(): void {
-    // disable grid lines
-    if (this.dateAxis.renderer.grid.template.disabled) {
-      this.valueAxis.renderer.grid.template.disabled = false;
-      this.dateAxis.renderer.grid.template.disabled = false;
-    } else {
-      this.valueAxis.renderer.grid.template.disabled = true;
-      this.dateAxis.renderer.grid.template.disabled = true;
-    }
-    this.chart.invalidateData();
-  }
-
   toggleScrollbar(): void {
     if (this.chart.scrollbarX) {
       this.chart.scrollbarX.dispose();

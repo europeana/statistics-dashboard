@@ -178,13 +178,14 @@ export class CountryComponent
   @Input() headerRef: HeaderComponent;
 
   /** constructor
+   * binds the lineChartReady service to variable
    * gets the app-ref and obtains the header ref
    * binds the data variables to the url
    * initialises the intersection observer
    **/
   constructor(
-    private applicationRef: ApplicationRef,
-    private lineService: LineService
+    private readonly applicationRef: ApplicationRef,
+    private readonly lineService: LineService
   ) {
     super();
 

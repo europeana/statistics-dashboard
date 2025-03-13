@@ -5,7 +5,6 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 
 import { TargetFieldName, TargetMetaData } from '../../_models';
-
 import { LineComponent } from './line.component';
 
 describe('LineComponent', () => {
@@ -142,27 +141,51 @@ describe('LineComponent', () => {
   it('should add the series data', () => {
     const country = 'DE';
     const date = new Date().toISOString();
-    component.chart.data = [];
-    component.addSeriesData(country, TargetFieldName.THREE_D, [
+    const seriesData = [
       {
         three_d: '1',
         high_quality: '2',
         total: '5',
         date: `${date}`
       }
-    ]);
+    ];
+    component.chart.data = [];
+    component.chart.invalidateData = jasmine.createSpy();
+    component.addSeriesData(country, TargetFieldName.THREE_D, seriesData, true);
     expect(Object.keys(component.chart.data).length).toBeGreaterThan(0);
+    expect(component.chart.invalidateData).not.toHaveBeenCalled();
+
+    component.allSeriesData[country] = {
+      dataItems: { length: 1 }
+    } as unknown as am4charts.LineSeries;
+    component.addSeriesData(country, TargetFieldName.THREE_D, seriesData, true);
+    expect(component.chart.invalidateData).toHaveBeenCalled();
   });
 
-  /*
-  it('should toggle the grid lines', () => {
-    expect(component.valueAxis.renderer.grid.template.disabled).toBeTruthy();
-    component.toggleGridlines();
-    expect(component.valueAxis.renderer.grid.template.disabled).toBeFalsy();
-    component.toggleGridlines();
-    expect(component.valueAxis.renderer.grid.template.disabled).toBeTruthy();
+  it('should sort the series data', () => {
+    const date = new Date();
+    const date2 = new Date();
+    const date3 = new Date();
+    date2.setDate(date.getDate() + 1);
+    date3.setDate(date.getDate() - 1);
+
+    const data = [date3, date2, date, date, date3].map((dateVal: Date) => {
+      return {
+        three_d: '3',
+        high_quality: '2',
+        total: '1',
+        date: `${dateVal}`
+      };
+    });
+
+    component.sortSeriesData(data);
+
+    expect(data[0].date).toEqual(`${date3}`);
+    expect(data[1].date).toEqual(`${date3}`);
+    expect(data[2].date).toEqual(`${date}`);
+    expect(data[3].date).toEqual(`${date}`);
+    expect(data[4].date).toEqual(`${date2}`);
   });
-  */
 
   it('should toggle the scrollbar', () => {
     expect(component.chart.scrollbarX).toBeFalsy();
