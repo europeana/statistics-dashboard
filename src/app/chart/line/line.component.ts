@@ -21,6 +21,8 @@ import {
   TargetMetaData
 } from '../../_models';
 
+import { LineService } from './line.service';
+
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line.component.html',
@@ -43,7 +45,8 @@ export class LineComponent implements AfterViewInit {
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId,
-    private readonly zone: NgZone
+    private readonly zone: NgZone,
+    private readonly lineService: LineService
   ) {
     am4core.options.autoDispose = true;
   }
@@ -235,15 +238,15 @@ export class LineComponent implements AfterViewInit {
 
   /**
    * addSeriesData
-   * sorts seriesData by date
-   * extracts series values to chart
+   * writes series data as entry into chart data, appending as necessary
    * @param { string } seriesValueY - unique per-series per-country series key
    * @param { Array<TargetData> } seriesData:
    **/
   addSeriesData(
     seriesValueY: string,
     valueY: TargetFieldName,
-    seriesData: Array<TargetData>
+    seriesData: Array<TargetData>,
+    refresh = false
   ): void {
     const chartData = this.chart.data;
     seriesData.forEach((sd: TargetData, rowIndex: number) => {
@@ -253,6 +256,15 @@ export class LineComponent implements AfterViewInit {
       }
       chartData[rowIndex][seriesValueY] = val;
     });
+
+    if (refresh) {
+      // catch case where 'shown' has already fired with a single dataItem
+      const series = this.allSeriesData[seriesValueY];
+      if (series && series.dataItems.length === 1) {
+        this.chart.invalidateData();
+        return;
+      }
+    }
   }
 
   /**
@@ -278,12 +290,15 @@ export class LineComponent implements AfterViewInit {
     series.tooltipText = `${axisLabel} {${seriesValueY}}`;
     series.tooltip.pointerOrientation = 'vertical';
     series.tooltip.getFillFromObject = true;
+
     series.events.on('shown', () => {
       this.dateAxis.disabled = false;
       this.valueAxis.disabled = false;
     });
+
     this.addSeriesData(seriesValueY, valueY, seriesData);
     this.allSeriesData[seriesValueY] = series;
+
     return series;
   }
 
@@ -297,7 +312,6 @@ export class LineComponent implements AfterViewInit {
     const chart = am4core.create('lineChart', am4charts.XYChart);
     this.chart = chart;
     chart.seriesContainer.zIndex = -1;
-
     chart.paddingTop = this.padding.top;
     chart.paddingBottom = this.padding.bottom;
     chart.paddingLeft = this.padding.left;
@@ -333,6 +347,10 @@ export class LineComponent implements AfterViewInit {
     const cursor = new am4charts.XYCursor();
     this.chart.cursor = cursor;
     cursor.xAxis = this.dateAxis;
+
+    chart.events.on('datavalidated', () => {
+      this.lineService.setLineChartReady();
+    });
   }
 
   toggleGridlines(): void {

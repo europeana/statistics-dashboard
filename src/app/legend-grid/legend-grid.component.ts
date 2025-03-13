@@ -333,6 +333,8 @@ export class LegendGridComponent {
       fnCallback: (data: Array<TargetCountryData>) => {
         // append to existing countryData
         this.countryData[country] = this.countryData[country].concat(data);
+
+        // sort it
         this.lineChart.sortSeriesData(data);
 
         // append to graph series data
@@ -340,7 +342,8 @@ export class LegendGridComponent {
           this.lineChart.addSeriesData(
             country + TargetSeriesSuffixes[i],
             TargetFieldName[this.seriesValueNames[i]],
-            data
+            data,
+            true
           );
         }
         this.lineChart.chart.invalidateRawData();

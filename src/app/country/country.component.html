@@ -546,7 +546,9 @@
         <div class="entry-card-multi">
           <app-line-chart #lineChart [targetMetaData]="targetMetaData">
           </app-line-chart>
+
           <app-legend-grid
+            *ngIf="lineChartIsInitialised"
             #legendGrid
             [countryData]="countryData"
             [countryCode]="country"
@@ -578,7 +580,6 @@
             [targetMetaData]="targetMetaData"
             [countryData]="countryData"
             [colourMap]="lineChart.allSeriesData"
-            [pinnedCountries]="legendGrid.pinnedCountries"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
             [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
             [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"

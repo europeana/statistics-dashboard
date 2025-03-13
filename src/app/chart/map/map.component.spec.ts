@@ -270,7 +270,7 @@ describe('MapComponent', () => {
     expect(spyDragStop).toHaveBeenCalled();
   });
 
-  it('should detect chart events', () => {
+  it('should detect chart events', fakeAsync(() => {
     component.drawChart();
 
     const spyOut = jasmine.createSpy();
@@ -284,5 +284,6 @@ describe('MapComponent', () => {
 
     component.chart.dispatchImmediately('over');
     expect(spyOver).toHaveBeenCalled();
-  });
+    tick(component.animationTime);
+  }));
 });
