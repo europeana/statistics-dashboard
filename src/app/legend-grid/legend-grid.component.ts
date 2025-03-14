@@ -310,10 +310,10 @@ export class LegendGridComponent {
   /** resetChartColors
    * aligns the chart's internal color index with the visible series count
    **/
-  resetChartColors(countryPinIndex?: number, seriesIndex?: number): void {
-    if (countryPinIndex === undefined) {
-      countryPinIndex = Object.keys(this.pinnedCountries).length;
-    }
+  resetChartColors(seriesIndex: number, countryPinIndex: number): void {
+    countryPinIndex = countryPinIndex
+      ? countryPinIndex
+      : Object.keys(this.pinnedCountries).length;
     const skips = countryPinIndex * 3 + (seriesIndex || 0);
     if (skips) {
       this.lineChart.chart.colors.reset();
@@ -323,30 +323,25 @@ export class LegendGridComponent {
     }
   }
 
+  loadCountryChartDataCallback(
+    data: Array<TargetCountryData>,
+    country: string,
+    seriesTypes = []
+  ): void {
+    this.lineChart.sortSeriesData(data);
+    this.addSeriesSetAndPin(country, data, seriesTypes);
+  }
+
   /** loadCountryChartData
    * loads entries to countryData and updates corresponding chart series
    * @param { string } country - the country to load
    **/
-  loadCountryChartData(country: string): void {
+  loadCountryChartData(country: string, seriesTypes = []): void {
     this.onLoadHistory.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
-        // append to existing countryData
         this.countryData[country] = this.countryData[country].concat(data);
-
-        // sort it
-        this.lineChart.sortSeriesData(data);
-
-        // append to graph series data
-        for (let i = 0; i < TargetSeriesSuffixes.length; i++) {
-          this.lineChart.addSeriesData(
-            country + TargetSeriesSuffixes[i],
-            TargetFieldName[this.seriesValueNames[i]],
-            data,
-            true
-          );
-        }
-        this.lineChart.chart.invalidateRawData();
+        this.loadCountryChartDataCallback(data, country, seriesTypes);
       }
     });
   }
@@ -359,8 +354,11 @@ export class LegendGridComponent {
     const countrySeries = this.getCountrySeries(country);
 
     if (countrySeries.length === 0) {
-      this.addSeriesSetAndPin(country, this.countryData[country]);
-      this.loadCountryChartData(country);
+      this.loadCountryChartData(country, [
+        TargetFieldName.THREE_D,
+        TargetFieldName.HQ,
+        TargetFieldName.TOTAL
+      ]);
     } else {
       const hasVisible =
         countrySeries.filter((series: am4charts.LineSeries) => {
@@ -383,25 +381,38 @@ export class LegendGridComponent {
     }
   }
 
-  addSeriesSetAndPin(country: string, data: Array<TargetData>): void {
-    this.resetChartColors();
-
-    // add pin
-    this.togglePin(country);
-
+  /***
+   * addSeriesSetAndPin
+   *
+   *
+   ***/
+  addSeriesSetAndPin(
+    country: string,
+    data: Array<TargetData>,
+    types: Array<TargetFieldName> = []
+  ): void {
     // add relevant series
     [this.columnEnabled3D, this.columnEnabledHQ, this.columnEnabledALL].forEach(
       (colEnabled: boolean, i: number) => {
         if (colEnabled) {
-          this.lineChart.addSeries(
-            country + this.seriesSuffixesFmt[i],
-            country + TargetSeriesSuffixes[i],
-            TargetFieldName[this.seriesValueNames[i]],
-            data
-          );
+          const typeFromIndex = TargetFieldName[this.seriesValueNames[i]];
+          if (types.includes(typeFromIndex)) {
+            this.resetChartColors(i, this.pinnedCountries[country]);
+            this.lineChart.addSeries(
+              country + this.seriesSuffixesFmt[i],
+              country + TargetSeriesSuffixes[i],
+              typeFromIndex,
+              data
+            );
+          }
         }
       }
     );
+
+    // add pin
+    if (!(country in this.pinnedCountries)) {
+      this.togglePin(country);
+    }
   }
 
   toggleRange(
@@ -461,7 +472,7 @@ export class LegendGridComponent {
 
     // re-assign pin values
     Object.keys(this.pinnedCountries).forEach((key: string, i: number) => {
-      this.pinnedCountries[key] = i * LegendGridComponent.itemHeight;
+      this.pinnedCountries[key] = i; // * LegendGridComponent.itemHeight;
     });
 
     // re-order targetCountries, putting the pinned items first
@@ -492,35 +503,17 @@ export class LegendGridComponent {
     type: TargetFieldName,
     series?: am4charts.LineSeries
   ): void {
-    const typeIndex = Object.values(TargetFieldName).indexOf(type);
-
     if (!series) {
-      // create from existing data
-
-      const visibleSiblingCount = this.getCountrySeries(country).filter(
-        (series: am4charts.LineSeries) => {
-          return !series.isHidden;
-        }
-      ).length;
-
       if (this.countryData[country].length < 2) {
-        this.loadCountryChartData(country);
-      }
-
-      let countryPinIndex: number = undefined;
-
-      if (visibleSiblingCount > 0) {
-        countryPinIndex = Object.keys(this.pinnedCountries).indexOf(country);
-      }
-      this.resetChartColors(countryPinIndex, typeIndex);
-      this.lineChart.addSeries(
-        country + this.seriesSuffixesFmt[typeIndex],
-        country + TargetSeriesSuffixes[typeIndex],
-        TargetFieldName[this.seriesValueNames[typeIndex]],
-        this.countryData[country]
-      );
-      if (visibleSiblingCount === 0) {
-        this.togglePin(country);
+        // load data and create
+        this.loadCountryChartData(country, [type]);
+      } else {
+        // create from existing data
+        const data = this.countryData[country].map((cd) => {
+          cd['country'] = country;
+          return cd as TargetCountryData;
+        });
+        this.loadCountryChartDataCallback(data, country, [type]);
       }
     } else if (series.isHidden) {
       series.show();

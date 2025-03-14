@@ -245,8 +245,7 @@ export class LineComponent implements AfterViewInit {
   addSeriesData(
     seriesValueY: string,
     valueY: TargetFieldName,
-    seriesData: Array<TargetData>,
-    refresh = false
+    seriesData: Array<TargetData>
   ): void {
     const chartData = this.chart.data;
     seriesData.forEach((sd: TargetData, rowIndex: number) => {
@@ -256,15 +255,6 @@ export class LineComponent implements AfterViewInit {
       }
       chartData[rowIndex][seriesValueY] = val;
     });
-
-    if (refresh) {
-      // catch case where 'shown' has already fired with a single dataItem
-      const series = this.allSeriesData[seriesValueY];
-      if (series && series.dataItems.length === 1) {
-        this.chart.invalidateData();
-        return;
-      }
-    }
   }
 
   /**

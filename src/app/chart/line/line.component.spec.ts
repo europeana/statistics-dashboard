@@ -151,15 +151,9 @@ describe('LineComponent', () => {
     ];
     component.chart.data = [];
     component.chart.invalidateData = jasmine.createSpy();
-    component.addSeriesData(country, TargetFieldName.THREE_D, seriesData, true);
+    component.addSeriesData(country, TargetFieldName.THREE_D, seriesData);
     expect(Object.keys(component.chart.data).length).toBeGreaterThan(0);
     expect(component.chart.invalidateData).not.toHaveBeenCalled();
-
-    component.allSeriesData[country] = {
-      dataItems: { length: 1 }
-    } as unknown as am4charts.LineSeries;
-    component.addSeriesData(country, TargetFieldName.THREE_D, seriesData, true);
-    expect(component.chart.invalidateData).toHaveBeenCalled();
   });
 
   it('should sort the series data', () => {
