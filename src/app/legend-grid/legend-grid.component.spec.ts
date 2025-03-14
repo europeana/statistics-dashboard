@@ -225,12 +225,13 @@ describe('LegendGridComponent', () => {
 
   it('should addSeriesSetAndPin', () => {
     component.targetMetaData = mockTargetMetaData;
+
+    const data = mockTargetMetaData['FR'][TargetFieldName.THREE_D];
     spyOn(component.lineChart, 'addSeries');
-    component.addSeriesSetAndPin(
-      'FR',
-      mockTargetMetaData['FR'][TargetFieldName.THREE_D],
-      [TargetFieldName.THREE_D]
-    );
+
+    component.addSeriesSetAndPin('FR', data);
+    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(0);
+    component.addSeriesSetAndPin('FR', data, [TargetFieldName.THREE_D]);
     expect(component.lineChart.addSeries).toHaveBeenCalledTimes(1);
   });
 
@@ -381,5 +382,11 @@ describe('LegendGridComponent', () => {
     spyOn(component.unpinColumn, 'emit');
     component.fireUnpinColumn(TargetFieldName.THREE_D);
     expect(component.unpinColumn.emit).toHaveBeenCalled();
+  });
+
+  it('should load the country chart data', () => {
+    spyOn(component.onLoadHistory, 'emit');
+    component.loadCountryChartData('DE');
+    expect(component.onLoadHistory.emit).toHaveBeenCalled();
   });
 });

@@ -281,15 +281,12 @@ export class LineComponent implements AfterViewInit {
     series.tooltipText = `${axisLabel} {${seriesValueY}}`;
     series.tooltip.pointerOrientation = 'vertical';
     series.tooltip.getFillFromObject = true;
-
     series.events.on('shown', () => {
       this.dateAxis.disabled = false;
       this.valueAxis.disabled = false;
     });
-
     this.addSeriesData(seriesValueY, valueY, seriesData);
     this.allSeriesData[seriesValueY] = series;
-
     return series;
   }
 
