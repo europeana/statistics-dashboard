@@ -101,7 +101,9 @@
           'perma-pin-left': isTopPin
         }"
         [ngStyle]="{
-          'top.px': isTopPin ? 10 : countryPinValue * classReference.itemHeight
+          'top.px': isPinned
+            ? countryPinValue * classReference.itemHeight || 10
+            : null
         }"
       >
         <a (click)="toggleCountry(country)">
@@ -117,7 +119,9 @@
           'stick-right': isPinned
         }"
         [ngStyle]="{
-          'top.px': countryPinValue * classReference.itemHeight || 10
+          'top.px': isPinned
+            ? countryPinValue * classReference.itemHeight || 10
+            : null
         }"
       >
         <ng-container
