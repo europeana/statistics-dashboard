@@ -1,5 +1,6 @@
 import {
   DecimalPipe,
+  LowerCasePipe,
   NgClass,
   NgFor,
   NgIf,
@@ -38,6 +39,7 @@ import { LineComponent } from '../chart';
   styleUrls: ['./legend-grid.component.scss'],
   imports: [
     DecimalPipe,
+    LowerCasePipe,
     NgClass,
     NgIf,
     NgFor,
@@ -325,15 +327,6 @@ export class LegendGridComponent {
     }
   }
 
-  loadCountryChartDataCallback(
-    data: Array<TargetCountryData>,
-    country: string,
-    seriesTypes = []
-  ): void {
-    this.lineChart.sortSeriesData(data);
-    this.addSeriesSetAndPin(country, data, seriesTypes);
-  }
-
   /** loadCountryChartData
    * loads entries to countryData and updates corresponding chart series
    * @param { string } country - the country to load
@@ -343,7 +336,7 @@ export class LegendGridComponent {
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
         this.countryData[country] = this.countryData[country].concat(data);
-        this.loadCountryChartDataCallback(data, country, seriesTypes);
+        this.addSeriesSetAndPin(country, data, seriesTypes);
       }
     });
   }
@@ -386,19 +379,23 @@ export class LegendGridComponent {
   /***
    * addSeriesSetAndPin
    *
-   *
+   * @param { string } country
+   * @param { Array<TargetData> } data
+   * @param { Array<TargetFieldName> } seriesToAdd
    ***/
   addSeriesSetAndPin(
     country: string,
     data: Array<TargetData>,
-    types: Array<TargetFieldName> = []
+    seriesToAdd: Array<TargetFieldName> = []
   ): void {
+    this.lineChart.sortSeriesData(data);
+
     // add relevant series
     [this.columnEnabled3D, this.columnEnabledHQ, this.columnEnabledALL].forEach(
       (colEnabled: boolean, i: number) => {
         if (colEnabled) {
           const typeFromIndex = TargetFieldName[this.seriesValueNames[i]];
-          if (types.includes(typeFromIndex)) {
+          if (seriesToAdd.includes(typeFromIndex)) {
             this.resetChartColors(i, this.pinnedCountries[country]);
             this.lineChart.addSeries(
               country + this.seriesSuffixesFmt[i],
@@ -515,7 +512,7 @@ export class LegendGridComponent {
           cd['country'] = country;
           return cd as TargetCountryData;
         });
-        this.loadCountryChartDataCallback(data, country, [type]);
+        this.addSeriesSetAndPin(country, data, [type]);
       }
     } else if (series.isHidden) {
       series.show();

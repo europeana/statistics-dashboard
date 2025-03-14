@@ -240,7 +240,8 @@ export class LineComponent implements AfterViewInit {
    * addSeriesData
    * writes series data as entry into chart data, appending as necessary
    * @param { string } seriesValueY - unique per-series per-country series key
-   * @param { Array<TargetData> } seriesData:
+   * @param { string } valueY - the data key
+   * @param { Array<TargetData> } seriesData
    **/
   addSeriesData(
     seriesValueY: string,

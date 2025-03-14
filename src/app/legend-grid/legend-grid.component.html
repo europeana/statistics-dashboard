@@ -60,7 +60,9 @@
           >
             <a
               class="legend-item-target-toggle"
-              title="target for {{ data.targetYear }} (show / hide marker)"
+              title="target for {{ data.targetYear }} / {{
+                targetType | renameTargetType | lowercase
+              }} data (show / hide marker)"
               (click)="
                 toggleRange(
                   country,
