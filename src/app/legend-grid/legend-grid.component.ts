@@ -51,6 +51,9 @@ export class LegendGridComponent {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
   timeoutAnimation = 800;
+
+  // class ref needed to access static variables in the template
+  public classReference = LegendGridComponent;
   static itemHeight = 84.5;
 
   _columnEnabled3D = true;
@@ -311,9 +314,8 @@ export class LegendGridComponent {
    * aligns the chart's internal color index with the visible series count
    **/
   resetChartColors(seriesIndex: number, countryPinIndex: number): void {
-    countryPinIndex = countryPinIndex
-      ? countryPinIndex
-      : Object.keys(this.pinnedCountries).length;
+    countryPinIndex =
+      countryPinIndex || Object.keys(this.pinnedCountries).length;
     const skips = countryPinIndex * 3 + (seriesIndex || 0);
     if (skips) {
       this.lineChart.chart.colors.reset();
