@@ -1,4 +1,9 @@
-<main class="fit-to-page">
+<main
+  class="fit-to-page"
+  [ngClass]="{
+    'loading-modal': !targetMetaData
+  }"
+>
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="country"></span>
     <ng-container
