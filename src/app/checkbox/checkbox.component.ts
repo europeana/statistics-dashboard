@@ -60,18 +60,10 @@ export class CheckboxComponent implements ControlValueAccessor {
   }
 
   onEscapeKey(): void {
-    console.log('escapeKeyPressed');
     this.escapeKeyPressed.emit();
   }
 
   onSpaceKey(): void {
-    console.log(
-      'onSpaceKey - we want to restore focus from this (eventually using baseInput): ' +
-        this.group +
-        ', ' +
-        this.controlName
-    );
-
     this.keySelectionMade.emit({
       group: this.group,
       controlName: this.controlName

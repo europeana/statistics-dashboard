@@ -8,11 +8,7 @@ import {
   ViewChild,
   ViewChildren
 } from '@angular/core';
-import {
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { isoCountryCodesReversed } from '../_data';
 import { getFormValueList } from '../_helpers';
 import {
