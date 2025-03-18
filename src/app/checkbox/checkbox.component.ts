@@ -1,9 +1,11 @@
 import {
   Component,
+  ElementRef,
   EventEmitter,
   forwardRef,
   Input,
-  Output
+  Output,
+  ViewChild
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -13,6 +15,8 @@ import {
   UntypedFormGroup
 } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
+
+import { InputDescription } from '../_models';
 
 @Component({
   selector: 'app-checkbox',
@@ -32,7 +36,12 @@ export class CheckboxComponent implements ControlValueAccessor {
   @Input() group: string;
   @Input() controlName: string;
 
+  @ViewChild('baseInput') baseInput: ElementRef;
+
   @Output() valueChanged: EventEmitter<boolean> = new EventEmitter();
+  @Output() escapeKeyPressed: EventEmitter<boolean> = new EventEmitter();
+  @Output() keySelectionMade: EventEmitter<InputDescription> =
+    new EventEmitter();
 
   writeValue(): void {
     // unimplemented
@@ -48,5 +57,24 @@ export class CheckboxComponent implements ControlValueAccessor {
 
   onChange(): void {
     this.valueChanged.emit();
+  }
+
+  onEscapeKey(): void {
+    console.log('escapeKeyPressed');
+    this.escapeKeyPressed.emit();
+  }
+
+  onSpaceKey(): void {
+    console.log(
+      'onSpaceKey - we want to restore focus from this (eventually using baseInput): ' +
+        this.group +
+        ', ' +
+        this.controlName
+    );
+
+    this.keySelectionMade.emit({
+      group: this.group,
+      controlName: this.controlName
+    });
   }
 }

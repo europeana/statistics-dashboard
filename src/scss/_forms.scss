@@ -20,6 +20,16 @@ textarea {
   margin: 0;
 }
 
+a,
+button,
+input,
+select,
+textarea {
+  &:focus-visible {
+    outline: 1px solid variables.$eu-light-orange;
+  }
+}
+
 input,
 textarea {
   border: 1px solid variables.$gray-light;

@@ -101,6 +101,9 @@ $total-width: 268px;
 .opener-name {
   margin: 0 variables.$spacing-s;
   white-space: nowrap;
+  &:focus-visible {
+    outline: 1px solid variables.$eu-light-orange;
+  }
 }
 
 .opener-name-container {

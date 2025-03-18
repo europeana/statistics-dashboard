@@ -7,9 +7,12 @@
     [formGroupName]="group"
   >
     <input
+      #baseInput
       class="checkbox"
       type="checkbox"
       (change)="onChange()"
+      (keyup.esc)="onEscapeKey()"
+      (keyup.Space)="onSpaceKey()"
       [formControlName]="controlName"
     />
   </span>

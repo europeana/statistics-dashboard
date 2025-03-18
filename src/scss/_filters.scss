@@ -38,8 +38,17 @@
 }
 
 .filters {
-  .checkbox-labelled:not(.chartFormat):hover {
-    background-color: variables.$offwhite;
+  .checkbox-labelled:not(.chartFormat) {
+    &:has(:focus),
+    &:hover {
+      background-color: variables.$offwhite;
+    }
+    &:has(:focus) {
+      .checkmarked-checkbox::before {
+        border: 1px solid variables.$eu-light-orange;
+        background-position: -0.5px;
+      }
+    }
   }
 
   .info-icon {
