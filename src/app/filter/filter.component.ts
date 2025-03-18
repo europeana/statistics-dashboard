@@ -9,7 +9,6 @@ import {
   ViewChildren
 } from '@angular/core';
 import {
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule
