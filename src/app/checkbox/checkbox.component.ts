@@ -42,6 +42,7 @@ export class CheckboxComponent implements ControlValueAccessor {
   @Output() escapeKeyPressed: EventEmitter<boolean> = new EventEmitter();
   @Output() keySelectionMade: EventEmitter<InputDescription> =
     new EventEmitter();
+  @Output() tabKeyPressed: EventEmitter<Event> = new EventEmitter();
 
   writeValue(): void {
     // unimplemented
@@ -61,6 +62,10 @@ export class CheckboxComponent implements ControlValueAccessor {
 
   onEscapeKey(): void {
     this.escapeKeyPressed.emit();
+  }
+
+  onTabKey(event: KeyboardEvent): void {
+    this.tabKeyPressed.emit(event);
   }
 
   onSpaceKey(): void {

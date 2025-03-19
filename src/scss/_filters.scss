@@ -39,14 +39,19 @@
 
 .filters {
   .checkbox-labelled:not(.chartFormat) {
+    .checkmarked-checkbox::before {
+      border: 2px solid transparent;
+      box-sizing: border-box;
+      bottom: -0.5px;
+    }
+
     &:has(:focus),
     &:hover {
       background-color: variables.$offwhite;
     }
     &:has(:focus) {
       .checkmarked-checkbox::before {
-        border: 1px solid variables.$eu-light-orange;
-        background-position: -0.5px;
+        border-color: variables.$focus-highlight-colour;
       }
     }
   }

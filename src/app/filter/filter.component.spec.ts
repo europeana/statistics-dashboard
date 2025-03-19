@@ -294,6 +294,60 @@ describe('FilterComponent', () => {
     expect(component.opener.nativeElement.focus).toHaveBeenCalled();
   });
 
+  it('should bind to the blur', () => {
+    spyOn(component, 'hide');
+    const genCB = (): CheckboxComponent => {
+      return {
+        baseInput: {
+          nativeElement: {
+            focus: jasmine.createSpy()
+          }
+        }
+      } as unknown as CheckboxComponent;
+    };
+
+    const cb1 = genCB();
+    const cb2 = genCB();
+
+    component.checkboxes = {
+      first: cb1,
+      last: cb2
+    } as unknown as QueryList<CheckboxComponent>;
+
+    let event = {
+      target: {},
+      preventDefault: jasmine.createSpy()
+    } as unknown as KeyboardEvent;
+
+    component.onFilterBlurred(event);
+
+    expect(cb1.baseInput.nativeElement.focus).not.toHaveBeenCalled();
+    expect(cb2.baseInput.nativeElement.focus).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+
+    event = {
+      target: cb2.baseInput.nativeElement,
+      preventDefault: jasmine.createSpy()
+    } as unknown as KeyboardEvent;
+
+    component.onFilterBlurred(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(cb1.baseInput.nativeElement.focus).toHaveBeenCalled();
+    expect(component.hide).not.toHaveBeenCalled();
+
+    // make the first and last the same
+    component.checkboxes = {
+      first: cb2,
+      last: cb2
+    } as unknown as QueryList<CheckboxComponent>;
+
+    component.onFilterBlurred(event);
+
+    expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    expect(component.hide).toHaveBeenCalled();
+  });
+
   it('should load more', () => {
     spyOn(component.filterTermChanged, 'emit');
 

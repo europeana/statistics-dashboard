@@ -101,6 +101,25 @@ export class FilterComponent {
     this.valueChanged.emit(true);
   }
 
+  /** onFilterBlurred
+   *
+   * receives notification from a checkbox that the tab key was hit
+   * creates focus trap
+   **/
+  onFilterBlurred(event: KeyboardEvent): void {
+    const first = this.checkboxes.first.baseInput.nativeElement;
+    const last = this.checkboxes.last.baseInput.nativeElement;
+
+    if (last === event.target) {
+      if (first === last) {
+        this.hide();
+      } else {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
   /** onFilterEscaped
    *
    * receives notification from a checkbox that the escape key was hit

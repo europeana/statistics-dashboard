@@ -358,6 +358,9 @@ label {
   cursor: pointer;
   font-weight: 600;
   text-indent: 0;
+  &:focus-visible {
+    border-bottom: 0.5px dashed transparent;
+  }
 }
 
 .facet-param-text {
