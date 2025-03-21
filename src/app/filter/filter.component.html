@@ -13,6 +13,7 @@
   <li>
     <a
       (click)="toggle()"
+      (keydown.enter)="toggle()"
       class="filter-opener filter-title"
       [ngClass]="{
         open: state.visible,
@@ -27,7 +28,12 @@
               {{ setVals }}
             </span>
           </ng-container>
-          <span class="opener-name">
+          <span
+            #opener
+            class="opener-name"
+            tabindex="0"
+            (keydown.esc)="onFilterEscaped()"
+          >
             {{ group | renameApiFacet }}
           </span>
         </span>
@@ -44,7 +50,7 @@
   <ng-container *ngIf="state.visible">
     <ng-container *ngIf="optionSet; else dates">
       <li class="checkboxes">
-        <ul>
+        <ul tabindex="-1">
           <li class="checkbox-filter container-h">
             <span class="icon"></span>
             <input
@@ -57,10 +63,10 @@
             />
           </li>
         </ul>
-        <ul class="checkboxes-list">
+        <ul class="checkboxes-list" tabindex="-1">
           <li>
-            <ul *ngFor="let option of optionSet.options">
-              <li>
+            <ul *ngFor="let option of optionSet.options" tabindex="-1">
+              <li tabindex="-1">
                 <app-checkbox
                   [form]="form"
                   [controlName]="option.name"
@@ -69,6 +75,9 @@
                   "
                   [group]="group"
                   (valueChanged)="changed()"
+                  (escapeKeyPressed)="onFilterEscaped()"
+                  (tabKeyPressed)="onFilterBlurred($event)"
+                  (keySelectionMade)="onKeySelectionMade($event)"
                 ></app-checkbox>
               </li>
             </ul>

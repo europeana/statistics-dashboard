@@ -79,3 +79,8 @@ export interface NameValue {
 export interface NamesValuePercent extends NameValue {
   percent: number;
 }
+
+export interface InputDescription {
+  controlName: string;
+  group: string;
+}

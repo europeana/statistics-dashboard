@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, QueryList } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -15,7 +15,7 @@ import {
 import { toInputSafeName } from '../_helpers';
 import { DimensionName } from '../_models';
 import { RenameApiFacetPipe } from '../_translate';
-
+import { CheckboxComponent } from '../checkbox';
 import { FilterComponent } from '.';
 
 describe('FilterComponent', () => {
@@ -53,7 +53,12 @@ describe('FilterComponent', () => {
       dateFrom: [''],
       dateTo: ['']
     });
-    fixture.detectChanges();
+
+    component.opener = {
+      nativeElement: {
+        focus: jasmine.createSpy()
+      }
+    } as unknown as ElementRef;
   });
 
   it('should enable when options are added', () => {
@@ -159,6 +164,29 @@ describe('FilterComponent', () => {
     expect(component.hide).toHaveBeenCalled();
   });
 
+  it('should reapply the focus', fakeAsync(() => {
+    const spyFocus = jasmine.createSpy();
+    component.inputToFocus = { group: '', controlName: '' };
+    component.checkboxes = {
+      find: (_: CheckboxComponent) => {
+        return {
+          baseInput: {
+            nativeElement: {
+              focus: spyFocus
+            }
+          }
+        } as unknown as CheckboxComponent;
+      }
+    } as unknown as QueryList<CheckboxComponent>;
+    component.optionSet = {
+      options: [{ name: 'option_1', label: 'option_1' }]
+    };
+    expect(spyFocus).not.toHaveBeenCalled();
+    tick();
+    expect(spyFocus).toHaveBeenCalled();
+    expect(component.inputToFocus).toBeFalsy();
+  }));
+
   it('should get the values', () => {
     const createFormControls = (
       grp: DimensionName,
@@ -252,6 +280,73 @@ describe('FilterComponent', () => {
     expect(component.state.visible).toBeTruthy();
     expect(hasCalledFocus).toBeTruthy();
   }));
+
+  it('should bind to the key selection', () => {
+    expect(component.inputToFocus).toBeFalsy();
+    component.onKeySelectionMade({ controlName: '', group: '' });
+    expect(component.inputToFocus).toBeTruthy();
+  });
+
+  it('should bind to the key selection', () => {
+    spyOn(component, 'hide');
+    component.onFilterEscaped();
+    expect(component.hide).toHaveBeenCalled();
+    expect(component.opener.nativeElement.focus).toHaveBeenCalled();
+  });
+
+  it('should bind to the blur', () => {
+    spyOn(component, 'hide');
+    const genCB = (): CheckboxComponent => {
+      return {
+        baseInput: {
+          nativeElement: {
+            focus: jasmine.createSpy()
+          }
+        }
+      } as unknown as CheckboxComponent;
+    };
+
+    const cb1 = genCB();
+    const cb2 = genCB();
+
+    component.checkboxes = {
+      first: cb1,
+      last: cb2
+    } as unknown as QueryList<CheckboxComponent>;
+
+    let event = {
+      target: {},
+      preventDefault: jasmine.createSpy()
+    } as unknown as KeyboardEvent;
+
+    component.onFilterBlurred(event);
+
+    expect(cb1.baseInput.nativeElement.focus).not.toHaveBeenCalled();
+    expect(cb2.baseInput.nativeElement.focus).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+
+    event = {
+      target: cb2.baseInput.nativeElement,
+      preventDefault: jasmine.createSpy()
+    } as unknown as KeyboardEvent;
+
+    component.onFilterBlurred(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(cb1.baseInput.nativeElement.focus).toHaveBeenCalled();
+    expect(component.hide).not.toHaveBeenCalled();
+
+    // make the first and last the same
+    component.checkboxes = {
+      first: cb2,
+      last: cb2
+    } as unknown as QueryList<CheckboxComponent>;
+
+    component.onFilterBlurred(event);
+
+    expect(event.preventDefault).toHaveBeenCalledTimes(1);
+    expect(component.hide).toHaveBeenCalled();
+  });
 
   it('should load more', () => {
     spyOn(component.filterTermChanged, 'emit');

@@ -92,6 +92,9 @@ $total-width: 268px;
       transform: rotate(180deg);
     }
   }
+  &:not(.open):has(:focus-visible) .selection {
+    top: 8px;
+  }
 
   &.disabled::after {
     color: variables.$gray-5;
@@ -101,10 +104,27 @@ $total-width: 268px;
 .opener-name {
   margin: 0 variables.$spacing-s;
   white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid variables.$focus-highlight-colour;
+  }
+}
+
+.opener-name,
+.selection {
+  transition: top 50ms linear;
 }
 
 .opener-name-container {
   position: relative;
+
+  &:has(:focus-visible) .selection {
+    outline: 2px solid variables.$focus-highlight-colour;
+  }
+  .selection + .opener-name:focus-visible {
+    outline: 0;
+    top: -6px;
+  }
 }
 
 .selection {

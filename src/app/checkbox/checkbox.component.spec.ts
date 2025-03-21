@@ -42,4 +42,22 @@ describe('CheckboxComponent', () => {
     component.onChange();
     expect(component.valueChanged.emit).toHaveBeenCalled();
   });
+
+  it('should handle the escape key', () => {
+    spyOn(component.escapeKeyPressed, 'emit');
+    component.onEscapeKey();
+    expect(component.escapeKeyPressed.emit).toHaveBeenCalled();
+  });
+
+  it('should handle the space key', () => {
+    spyOn(component.keySelectionMade, 'emit');
+    component.onSpaceKey();
+    expect(component.keySelectionMade.emit).toHaveBeenCalled();
+  });
+
+  it('should handle the tab key', () => {
+    spyOn(component.tabKeyPressed, 'emit');
+    component.onTabKey({} as unknown as KeyboardEvent);
+    expect(component.tabKeyPressed.emit).toHaveBeenCalled();
+  });
 });
