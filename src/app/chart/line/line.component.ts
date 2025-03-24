@@ -21,6 +21,8 @@ import {
   TargetMetaData
 } from '../../_models';
 
+import { LineService } from './line.service';
+
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line.component.html',
@@ -43,7 +45,8 @@ export class LineComponent implements AfterViewInit {
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId,
-    private readonly zone: NgZone
+    private readonly zone: NgZone,
+    private readonly lineService: LineService
   ) {
     am4core.options.autoDispose = true;
   }
@@ -235,10 +238,10 @@ export class LineComponent implements AfterViewInit {
 
   /**
    * addSeriesData
-   * sorts seriesData by date
-   * extracts series values to chart
+   * writes series data as entry into chart data, appending as necessary
    * @param { string } seriesValueY - unique per-series per-country series key
-   * @param { Array<TargetData> } seriesData:
+   * @param { string } valueY - the data key
+   * @param { Array<TargetData> } seriesData
    **/
   addSeriesData(
     seriesValueY: string,
@@ -297,7 +300,6 @@ export class LineComponent implements AfterViewInit {
     const chart = am4core.create('lineChart', am4charts.XYChart);
     this.chart = chart;
     chart.seriesContainer.zIndex = -1;
-
     chart.paddingTop = this.padding.top;
     chart.paddingBottom = this.padding.bottom;
     chart.paddingLeft = this.padding.left;
@@ -333,18 +335,10 @@ export class LineComponent implements AfterViewInit {
     const cursor = new am4charts.XYCursor();
     this.chart.cursor = cursor;
     cursor.xAxis = this.dateAxis;
-  }
 
-  toggleGridlines(): void {
-    // disable grid lines
-    if (this.dateAxis.renderer.grid.template.disabled) {
-      this.valueAxis.renderer.grid.template.disabled = false;
-      this.dateAxis.renderer.grid.template.disabled = false;
-    } else {
-      this.valueAxis.renderer.grid.template.disabled = true;
-      this.dateAxis.renderer.grid.template.disabled = true;
-    }
-    this.chart.invalidateData();
+    chart.events.on('datavalidated', () => {
+      this.lineService.setLineChartReady();
+    });
   }
 
   toggleScrollbar(): void {

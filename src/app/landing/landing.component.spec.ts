@@ -15,6 +15,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
   MockAPIService,
   mockCountryData,
+  MockMapComponent,
   mockTargetMetaData
 } from '../_mocked';
 import { APIService } from '../_services';
@@ -52,7 +53,12 @@ describe('LandingComponent', () => {
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
       ]
-    }).compileComponents();
+    })
+      .overrideComponent(LandingComponent, {
+        remove: { imports: [MapComponent] },
+        add: { imports: [MockMapComponent] }
+      })
+      .compileComponents();
     api = TestBed.get(APIService);
   };
 

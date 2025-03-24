@@ -141,12 +141,8 @@ describe('LegendGridComponent', () => {
     component.togglePin('AU');
     fixture.detectChanges();
 
-    expect(component.pinnedCountries['DE']).toEqual(
-      0 * LegendGridComponent.itemHeight
-    );
-    expect(component.pinnedCountries['FR']).toEqual(
-      1 * LegendGridComponent.itemHeight
-    );
+    expect(component.pinnedCountries['DE']).toEqual(0);
+    expect(component.pinnedCountries['FR']).toEqual(1);
     expect(Object.keys(component.pinnedCountries).length).toEqual(2);
 
     component.togglePin('DE');
@@ -229,12 +225,14 @@ describe('LegendGridComponent', () => {
 
   it('should addSeriesSetAndPin', () => {
     component.targetMetaData = mockTargetMetaData;
+
+    const data = mockTargetMetaData['FR'][TargetFieldName.THREE_D];
     spyOn(component.lineChart, 'addSeries');
-    component.addSeriesSetAndPin(
-      'FR',
-      mockTargetMetaData['FR'][TargetFieldName.THREE_D]
-    );
-    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(3);
+
+    component.addSeriesSetAndPin('FR', data);
+    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(0);
+    component.addSeriesSetAndPin('FR', data, [TargetFieldName.THREE_D]);
+    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(1);
   });
 
   it('should toggle the country', () => {
@@ -272,7 +270,18 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the series', () => {
-    component.countryData = { DE: [], FR: [] };
+    const date = new Date().toISOString();
+    component.countryData = {
+      FR: [],
+      DE: [date, date, date].map((date) => {
+        return {
+          date: date,
+          three_d: '100',
+          high_quality: '200',
+          total: '300'
+        };
+      })
+    };
 
     const seriesItemHidden = {
       isHidden: true,
@@ -287,40 +296,35 @@ describe('LegendGridComponent', () => {
       isHidden: false
     } as unknown as am4charts.LineSeries;
 
-    const seriesArray = [seriesItemShowing];
-
-    spyOn(component, 'getCountrySeries').and.callFake((_) => {
-      return seriesArray;
-    });
     spyOn(component, 'togglePin');
     spyOn(component.lineChart, 'addSeries');
+    spyOn(component, 'loadCountryChartData');
 
     component.pinnedCountries['DE'] = 1;
 
+    // call when data is already loaded:
     component.toggleSeries('DE', TargetFieldName.THREE_D);
+    expect(component.loadCountryChartData).not.toHaveBeenCalled();
 
+    // call when data is not fully loaded:
+    component.toggleSeries('FR', TargetFieldName.THREE_D);
+    expect(component.loadCountryChartData).toHaveBeenCalledTimes(1);
     expect(component.lineChart.addSeries).toHaveBeenCalled();
     expect(component.togglePin).not.toHaveBeenCalled();
 
-    // swap the fake series for the hidden fake series
-    seriesArray.pop();
-    seriesArray.push(seriesItemHidden);
-
-    component.toggleSeries('DE', TargetFieldName.THREE_D);
-    expect(component.togglePin).toHaveBeenCalled();
-
-    // supply the series parameter
-    spyOn(seriesItemShowing, 'hide');
-    spyOn(seriesItemHidden, 'show');
+    // pinned countries do not toggle
+    component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemHidden);
+    expect(component.togglePin).not.toHaveBeenCalled();
 
     component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemShowing);
+    expect(component.togglePin).not.toHaveBeenCalled();
 
-    expect(seriesItemShowing.hide).toHaveBeenCalled();
-    expect(component.togglePin).toHaveBeenCalledTimes(1);
-
+    // unpinned countries do toggle
     component.toggleSeries('FR', TargetFieldName.THREE_D, seriesItemHidden);
-    expect(seriesItemHidden.show).toHaveBeenCalled();
-    expect(component.togglePin).toHaveBeenCalledTimes(2);
+    expect(component.togglePin).toHaveBeenCalled();
+
+    component.toggleSeries('FR', TargetFieldName.THREE_D, seriesItemShowing);
+    expect(component.togglePin).toHaveBeenCalled();
   });
 
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
@@ -378,5 +382,11 @@ describe('LegendGridComponent', () => {
     spyOn(component.unpinColumn, 'emit');
     component.fireUnpinColumn(TargetFieldName.THREE_D);
     expect(component.unpinColumn.emit).toHaveBeenCalled();
+  });
+
+  it('should load the country chart data', () => {
+    spyOn(component.onLoadHistory, 'emit');
+    component.loadCountryChartData('DE');
+    expect(component.onLoadHistory.emit).toHaveBeenCalled();
   });
 });

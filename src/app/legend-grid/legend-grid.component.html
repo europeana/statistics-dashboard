@@ -60,7 +60,9 @@
           >
             <a
               class="legend-item-target-toggle"
-              title="target for {{ data.targetYear }} (show / hide marker)"
+              title="target for {{ data.targetYear }} / {{
+                targetType | renameTargetType | lowercase
+              }} data (show / hide marker)"
               (click)="
                 toggleRange(
                   country,
@@ -101,7 +103,9 @@
           'perma-pin-left': isTopPin
         }"
         [ngStyle]="{
-          'top.px': isTopPin ? countryPinValue || 10 : countryPinValue
+          'top.px': isPinned
+            ? countryPinValue * classReference.itemHeight || 10
+            : null
         }"
       >
         <a (click)="toggleCountry(country)">
@@ -117,7 +121,9 @@
           'stick-right': isPinned
         }"
         [ngStyle]="{
-          'top.px': countryPinValue || 10
+          'top.px': isPinned
+            ? countryPinValue * classReference.itemHeight || 10
+            : null
         }"
       >
         <ng-container
