@@ -58,13 +58,19 @@
   </ng-template>
 
   <ng-template #tmpMapLayerMenu let-menuDisabled="menuDisabled">
-    <span class="container-h relative">
+    <span
+      class="container-h relative"
+      appOpenerFocus
+      [fnHide]="closeMapMenu.bind(this)"
+    >
       <span class="relative" appClickAware (clickOutside)="closeMapMenu()">
         <a
+          #layerOpener
           [attr.disabled]="menuDisabled"
           class="derived-series-menu-opener flag-orb default"
           title="show target progress"
           (click)="mapMenuOpenerClicked()"
+          (keydown.enter)="mapMenuOpenerClicked()"
           [ngClass]="{
             open: mapMenuIsOpen,
             active: !!visibleHeatMap
@@ -75,6 +81,7 @@
                 ? mapChart.colourScheme.base.hex
                 : 'unset'
           }"
+          tabindex="0"
         >
         </a>
         <span
@@ -104,11 +111,22 @@
                       : 'transparent'
                 }"
               >
-                <a (click)="showHeatmap(targetType, i)">{{ targetYear }} </a>
+                <a
+                  (click)="showHeatmap(targetType, i)"
+                  (keydown.enter)="showHeatmap(targetType, i)"
+                  tabindex="0"
+                  >{{ targetYear }}
+                </a>
               </li>
             </ng-container>
+
             <li class="map-series-menu-clear-link" *ngIf="visibleHeatMap">
-              <a (click)="clearHeatmap()">clear</a>
+              <a
+                (click)="clearHeatmap()"
+                (keydown.enter)="clearHeatmap()"
+                tabindex="0"
+                >clear</a
+              >
             </li>
           </ul>
         </span>
@@ -207,9 +225,11 @@
         <a
           class="map-navigation-link"
           (click)="mapChart.countryMorph(navCountry)"
+          (keydown.enter)="mapChart.countryMorph(navCountry)"
           [attr.disabled]="
             navCountry === mapChart.selectedCountry ? 'disabled' : null
           "
+          [attr.tabIndex]="navCountry === mapChart.selectedCountry ? -1 : 0"
         >
           {{ navCountry | renameCountry }}
         </a>
@@ -242,7 +262,9 @@
               'target-active': !targetExpanded
             }"
             (click)="targetExpanded = undefined"
+            (keydown.enter)="targetExpanded = undefined"
             [attr.disabled]="targetExpanded ? null : 'disabled'"
+            [attr.tabindex]="targetExpanded ? 0 : -1"
           >
             <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
           </a>
@@ -280,9 +302,16 @@
                     ? undefined
                     : tapTargetDataLoad(targetType)
               "
+              (keydown.enter)="
+                targetExpanded =
+                  targetExpanded === targetType
+                    ? undefined
+                    : tapTargetDataLoad(targetType)
+              "
               [ngClass]="{
                 'target-active': targetExpanded === targetType
               }"
+              tabindex="0"
               >{{ targetType | renameTargetType }}</a
             >
 
@@ -381,6 +410,7 @@
         [ngClass]="{
           hidden: mapChart && mapChart.selectedCountry
         }"
+        tabindex="-1"
       >
         <div
           *ngFor="let row of getCountryRows(data)"
@@ -389,6 +419,8 @@
           <a
             class="link-select-country"
             (click)="mapChart.countryClick(row.id ?? row.name)"
+            (keydown.enter)="mapChart.countryClick(row.id ?? row.name)"
+            tabindex="0"
           >
             <span
               >{{ row.id ?? row.name | renameCountry
@@ -516,8 +548,9 @@
       >
       <div class="entry-card-content">
         <div class="entry-card-pair map-section" *ngIf="!!mapData">
-          <div class="map-container">
+          <div class="map-container" tabindex="-1">
             <app-map-chart
+              tabindex="-1"
               [mapData]="mapData"
               (mapCountrySet)="onMapCountrySet($event)"
               #mapChart

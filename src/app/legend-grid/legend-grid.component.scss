@@ -54,6 +54,10 @@ li {
     height: 0;
     border-width: 4px;
   }
+
+  &:has(:focus-visible)::before {
+    color: variables.$focus-highlight-colour;
+  }
 }
 
 .legend-grid {
@@ -132,6 +136,7 @@ li {
 .legend-item-series-toggle,
 .legend-item-target-toggle {
   color: variables.$gray-med;
+  outline: 0;
   white-space: nowrap;
 
   &.rolled-up {
@@ -185,6 +190,12 @@ li {
     height: 12px;
     margin-right: 0.4em;
     width: 12px;
+  }
+
+  &:focus-visible {
+    .marker {
+      outline: 4px solid variables.$focus-highlight-colour;
+    }
   }
 }
 

@@ -91,6 +91,10 @@ $width-left-col: 200px;
   cursor: pointer;
   display: flex;
 
+  &:has(:focus-visible) {
+    outline: 3px solid variables.$focus-highlight-colour;
+  }
+
   .x {
     transform: translate(-2px, 0px) scale(0.75);
     &::after,
@@ -193,6 +197,9 @@ input[type="checkbox"] {
     margin: 0 0 0 variables.$spacing-s;
     padding: 0;
     width: 100%;
+  }
+  &:focus-visible {
+    border: 1px solid variables.$focus-highlight-colour;
   }
 }
 

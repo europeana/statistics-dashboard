@@ -8,6 +8,21 @@
   color: variables.$gray-med;
   display: flex;
   flex-direction: row;
+
+  a:focus-visible {
+    color: variables.$focus-highlight-colour;
+    outline: 0;
+    font-weight: bold;
+    font-size: 18px;
+    &.next::after {
+      border-left: 2px solid variables.$focus-highlight-colour;
+      font-size: 18px;
+    }
+    &.previous::after {
+      border-right: 2px solid variables.$focus-highlight-colour;
+      font-size: 18px;
+    }
+  }
 }
 
 .next::after {

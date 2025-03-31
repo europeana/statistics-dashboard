@@ -1,9 +1,21 @@
-<ul class="export" [ngClass]="{ active: active }">
+<ul
+  class="export"
+  [ngClass]="{ active: active }"
+  tabindex="-1"
+  appOpenerFocus
+  [fnHide]="fnHide.bind(this)"
+>
   <li class="container-h">
-    <span class="export-icon"><a #downloadAnchor></a></span
+    <span class="export-icon"><a #downloadAnchor tabindex="-1"></a></span
     ><span class="label-top" i18n="Share Report Header@@exportReportHeader"
       >Share Report</span
-    ><a class="x" (click)="toggleActive()"></a>
+    ><a
+      #closer
+      class="x"
+      (click)="toggleActive()"
+      (keydown.enter)="toggleActive()"
+      [attr.tabindex]="tabIndex"
+    ></a>
   </li>
   <li class="hr"></li>
   <li>
@@ -18,14 +30,17 @@
       value="{{ copied ? '' : currentUrl }}"
       i18n-placeholder="Copied message@@exportReportLinkCopiedMessage"
       placeholder="Copied to clipboard!"
+      [attr.tabindex]="tabIndex"
     />
   </li>
   <li class="align-right hr">
     <a
       class="copy-btn"
       (click)="copy()"
+      (keydown.enter)="copy()"
       [ngClass]="{ disabled: copied }"
       i18n="Copy Link Button@@exportReportLinkCopyButton"
+      [attr.tabindex]="tabIndex"
       >Copy link</a
     >
   </li>
@@ -36,7 +51,9 @@
     <a
       class="container-h"
       (click)="export(ExportType.PNG)"
+      (keydown.enter)="export(ExportType.PNG)"
       i18n="Download PNG@@exportReportDownloadPNG"
+      [attr.tabindex]="tabIndex"
       ><span class="icon-png"></span>Download PNG</a
     >
   </li>
@@ -44,7 +61,9 @@
     <a
       class="container-h"
       (click)="export(ExportType.PDF)"
+      (keydown.enter)="export(ExportType.PDF)"
       i18n="Download PDF@@exportReportDownloadPDF"
+      [attr.tabindex]="tabIndex"
       ><span class="icon-pdf"></span>Download PDF</a
     >
   </li>
@@ -52,7 +71,9 @@
     <a
       class="container-h"
       (click)="export(ExportType.CSV)"
+      (keydown.enter)="export(ExportType.CSV)"
       i18n="Download CSV@@exportReportDownloadCSV"
+      [attr.tabindex]="tabIndex"
       ><span class="icon-csv"></span>Download CSV</a
     >
   </li>

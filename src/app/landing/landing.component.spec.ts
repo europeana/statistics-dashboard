@@ -1,5 +1,5 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, QueryList } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, QueryList } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   ComponentFixture,
@@ -216,6 +216,22 @@ describe('LandingComponent', () => {
     } as unknown as MapComponent;
     component.closeMapSelection();
     expect(component.mapChart.countryClick).toHaveBeenCalled();
+  });
+
+  it('should close the map menu, refocussing the opener', () => {
+    component.layerOpener = {
+      nativeElement: {
+        focus: jasmine.createSpy()
+      }
+    } as unknown as ElementRef;
+
+    component.mapMenuIsOpen = true;
+    component.closeMapMenu();
+    expect(component.mapMenuIsOpen).toBeFalsy();
+    expect(component.layerOpener.nativeElement.focus).toHaveBeenCalled();
+
+    component.closeMapMenu();
+    expect(component.layerOpener.nativeElement.focus).toHaveBeenCalledTimes(1);
   });
 
   it('should tap the target data load', () => {

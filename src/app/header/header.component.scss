@@ -7,6 +7,21 @@
   src: url("/assets/fonts/chevin/ChevinMedium.otf") format("opentype");
 }
 
+a,
+.active-country {
+  &:focus-visible {
+    outline: 1px solid variables.$focus-highlight-colour;
+  }
+}
+
+.country-menu-opener {
+  &:has(:focus-visible) {
+    .country-closer {
+      opacity: 1;
+    }
+  }
+}
+
 .header,
 .logo {
   display: flex;
@@ -120,6 +135,13 @@
       top: 6px;
     }
   }
+
+  &:focus-visible {
+    outline: 0;
+    .text {
+      outline: 1px solid variables.$focus-highlight-colour;
+    }
+  }
 }
 
 .active-country {
@@ -209,22 +231,24 @@
   }
 }
 
+.active-country:focus-visible,
 .active-country:hover {
   & + .country-closer {
-    display: block;
+    opacity: 1;
   }
 }
 
 .country-closer {
   margin-left: -2px;
   margin-top: 4px;
-  display: none;
+  opacity: 0;
   padding-left: 6px;
   height: 1.25em;
   width: 1.25em;
   transform: scale(0.9);
 
+  &:focus-visible,
   &:hover {
-    display: block;
+    opacity: 1;
   }
 }

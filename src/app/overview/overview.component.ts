@@ -1,6 +1,7 @@
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  ElementRef,
   inject,
   OnInit,
   TemplateRef,
@@ -117,6 +118,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('snapshots') snapshots: SnapshotsComponent;
   @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
+  @ViewChild('exportOpenerToolbar') exportOpenerToolbar: ElementRef;
+  @ViewChild('exportOpener') exportOpener: ElementRef;
 
   private readonly api = inject(APIService);
   private readonly fb = inject(UntypedFormBuilder);
@@ -1081,6 +1084,19 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       };
     };
     setTimeout(fn, 1);
+  }
+
+  /** focusExportOpener
+  /* Focuses the exportOpenerLastUsed after a millisecond pause
+  */
+  focusExportOpener(fromToolbar: boolean): void {
+    setTimeout(() => {
+      if (fromToolbar) {
+        this.exportOpenerToolbar.nativeElement.focus();
+      } else {
+        this.exportOpener.nativeElement.focus();
+      }
+    }, 1);
   }
 
   /** enableFilters

@@ -9,10 +9,12 @@
       <li>
         <a
           (click)="toggleSeries(country, targetType, series)"
+          (keydown.enter)="toggleSeries(country, targetType, series)"
           [ngClass]="{
             'rolled-up': !series || series.isHidden || series.isHiding
           }"
           class="legend-item-series-toggle"
+          tabindex="0"
         >
           <span
             class="marker"
@@ -71,6 +73,15 @@
                   data.range ? undefined : series.fill
                 )
               "
+              (keydown.enter)="
+                toggleRange(
+                  country,
+                  targetType,
+                  i,
+                  data.range ? undefined : series.fill
+                )
+              "
+              tabindex="0"
             >
               {{ data.targetYear }}
               <span class="target-total range-value">{{
@@ -87,6 +98,7 @@
     class="legend-grid scrollable-downwards"
     (scroll)="gridScroll()"
     #legendGrid
+    tabindex="-1"
   >
     <ng-template
       #countryBlock

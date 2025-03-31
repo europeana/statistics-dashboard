@@ -1,13 +1,22 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
 import { NgClass } from '@angular/common';
+
+import { OpenerFocusDirective } from '../_directives';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  imports: [NgClass]
+  imports: [NgClass, OpenerFocusDirective]
 })
 export class ExportComponent {
   get currentUrl(): string {
@@ -16,13 +25,30 @@ export class ExportComponent {
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
+
+  @Output() onClose = new EventEmitter<boolean>();
   @ViewChild('contentRef') contentRef: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
+  @ViewChild('closer') closer: ElementRef;
+
+  openedFromToolbar = false;
 
   public ExportType = ExportType;
   active = false;
   copied = false;
   msMsgDisplay = 2000;
+  _tabIndex = -1;
+
+  set tabIndex(value: number) {
+    this._tabIndex = value;
+    if (value === 0) {
+      this.closer.nativeElement.focus();
+    }
+  }
+
+  get tabIndex(): number {
+    return this._tabIndex;
+  }
 
   constructor(
     private readonly csv: ExportCSVService,
@@ -63,7 +89,30 @@ export class ExportComponent {
     }
   }
 
-  toggleActive(): void {
+  /**
+   * fnHide
+   *
+   * connect OpenerFocusDirective to the correct opener
+   **/
+  fnHide(): void {
+    this.toggleActive(this.openedFromToolbar);
+  }
+
+  /**
+   * toggleActive
+   *
+   * @param { boolean } fromToolbar - flags if component was opened from the toolbar
+   **/
+  toggleActive(fromToolbar?: boolean): void {
+    if (typeof fromToolbar !== 'undefined') {
+      this.openedFromToolbar = fromToolbar;
+    }
+
     this.active = !this.active;
+    this.tabIndex = this.active ? 0 : -1;
+
+    if (!this.active) {
+      this.onClose.emit(this.openedFromToolbar);
+    }
   }
 }

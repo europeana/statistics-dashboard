@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { isoCountryCodesReversed } from '../_data';
+import { OpenerFocusDirective } from '../_directives';
 import { getFormValueList } from '../_helpers';
 import {
   DimensionName,
@@ -39,7 +40,8 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
     NgFor,
     CheckboxComponent,
     HighlightMatchPipe,
-    RenameApiFacetPipe
+    RenameApiFacetPipe,
+    OpenerFocusDirective
   ]
 })
 export class FilterComponent {
@@ -81,6 +83,8 @@ export class FilterComponent {
         });
         if (focusItem) {
           focusItem.baseInput.nativeElement.focus();
+        } else {
+          this.filterTerm.nativeElement.focus();
         }
         this.inputToFocus = undefined;
       });
@@ -99,35 +103,6 @@ export class FilterComponent {
 
   changed(): void {
     this.valueChanged.emit(true);
-  }
-
-  /** onFilterBlurred
-   *
-   * receives notification from a checkbox that the tab key was hit
-   * creates focus trap
-   **/
-  onFilterBlurred(event: KeyboardEvent): void {
-    const first = this.checkboxes.first.baseInput.nativeElement;
-    const last = this.checkboxes.last.baseInput.nativeElement;
-
-    if (last === event.target) {
-      if (first === last) {
-        this.hide();
-      } else {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  }
-
-  /** onFilterEscaped
-   *
-   * receives notification from a checkbox that the escape key was hit
-   * hides and focusses opener
-   **/
-  onFilterEscaped(): void {
-    this.hide();
-    this.opener.nativeElement.focus();
   }
 
   /** onKeySelectionMade

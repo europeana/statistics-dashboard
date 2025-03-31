@@ -227,14 +227,18 @@ export class CountryComponent
             const country = isoCountryCodes[countryParam];
 
             if (!country) {
+              const qp = this.includeCTZero
+                ? { queryParams: { 'content-tier-zero': 'true' } }
+                : undefined;
               if (Object.values(isoCountryCodes).includes(countryParam)) {
                 const redirecCountry = isoCountryCodesReversed[countryParam];
-                this.router.navigate([`country/${redirecCountry}`]);
+                this.router.navigate(['country', redirecCountry], qp);
               } else {
-                this.router.navigate(['/']);
+                this.router.navigate(['/'], qp);
               }
+            } else {
+              this.setCountryToParam(country);
             }
-            this.setCountryToParam(country);
           },
           error: (e: Error) => {
             console.log(e);

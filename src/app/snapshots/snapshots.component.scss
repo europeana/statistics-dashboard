@@ -33,6 +33,9 @@
   .editable {
     caret-color: transparent;
     outline: 0px solid transparent;
+    &:focus-visible {
+      outline: 1px solid variables.$focus-highlight-colour;
+    }
   }
 
   &:hover + .save,

@@ -582,6 +582,7 @@ export class MapComponent extends SubscriptionManager {
     this.setMapPercentMode(false);
     polygonTemplate.nonScalingStroke = true;
     polygonTemplate.strokeWidth = 0.5;
+    polygonTemplate.focusable = false;
 
     // Create hover state
     this.hs = polygonTemplate.states.create('hover');

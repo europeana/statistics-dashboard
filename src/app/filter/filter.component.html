@@ -3,12 +3,15 @@
   *ngIf="form && group && !state.disabled"
   [formGroup]="form"
   appClickAware
+  appOpenerFocus
+  [fnHide]="hide.bind(this)"
   [includeClicksOnClasses]="
     group + '' === 'dates'
       ? ['mat-calendar-body', 'mat-datepicker-content']
       : []
   "
   (clickOutside)="hide()"
+  tabindex="-1"
 >
   <li>
     <a
@@ -19,6 +22,7 @@
         open: state.visible,
         disabled: isDisabled()
       }"
+      [attr.inert]="isDisabled() ? true : null"
     >
       <span class="container-h">
         <span class="icon filter-icon-{{ group }}"> </span>
@@ -76,7 +80,6 @@
                   [group]="group"
                   (valueChanged)="changed()"
                   (escapeKeyPressed)="onFilterEscaped()"
-                  (tabKeyPressed)="onFilterBlurred($event)"
                   (keySelectionMade)="onKeySelectionMade($event)"
                 ></app-checkbox>
               </li>

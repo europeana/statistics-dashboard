@@ -1,3 +1,11 @@
+@use "../../scss/variables";
+
+.ct-zero:has(input:focus-visible) {
+  .checkmarked-checkbox {
+    border: 1px solid variables.$focus-highlight-colour;
+  }
+}
+
 .filter-title {
   margin-left: 8px;
   white-space: nowrap;

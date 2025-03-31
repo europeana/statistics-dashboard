@@ -111,8 +111,10 @@
       <div class="statistics-dashboard-right">
         <app-export
           #export
+          (onClose)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
+          tabindex="-1"
         ></app-export>
 
         <!-- Header -->
@@ -165,6 +167,8 @@
               <a
                 class="when-unset"
                 (click)="datesOpen()"
+                (keydown.enter)="datesOpen()"
+                tabindex="0"
                 i18n="
                   Period Summary|Summary for applied date filters@@periodSummary"
                 >Whole period</a
@@ -179,8 +183,13 @@
               <a class="date warn" (click)="showDateDisclaimer()"> * </a>
             </span>
           </ng-container>
-
-          <a (click)="export.toggleActive()" class="export-icon export-opener">
+          <a
+            #exportOpenerToolbar
+            (click)="export.toggleActive(true)"
+            (keydown.enter)="export.toggleActive(true)"
+            class="export-icon export-opener"
+            tabindex="0"
+          >
           </a>
         </div>
 
@@ -404,8 +413,11 @@
           <!-- EXPORT LINK -->
           <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
             <a
+              #exportOpener
               class="export-opener-link"
-              (click)="export.toggleActive()"
+              tabindex="0"
+              (click)="export.toggleActive(false)"
+              (keydown.enter)="export.toggleActive(false)"
               i18n="Share Report Opener@@exportReportOpenerLink"
               >Export data</a
             >

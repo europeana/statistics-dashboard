@@ -42,3 +42,8 @@
     background-image: icon_urls.svg-url-icon-external(#4d4d4d);
   }
 }
+
+.entry-card-header:has(:focus-visible) {
+  background: variables.$offwhite;
+  z-index: 12;
+}

@@ -567,7 +567,12 @@
           ></app-legend-grid>
         </div>
 
-        <a class="appendice-toggle" (click)="toggleAppendice()">
+        <a
+          class="appendice-toggle"
+          (click)="toggleAppendice()"
+          (keydown.enter)="toggleAppendice()"
+          tabindex="0"
+        >
           <span *ngIf="appendiceExpanded" i18n="@@toggleTargetDataLabelHide"
             >Hide data</span
           >
@@ -580,9 +585,11 @@
         <div
           class="appendice-grid-wrapper"
           [ngClass]="{ 'is-open': appendiceExpanded }"
+          tabindex="-1"
         >
           <app-appendice-section
             #appendice
+            tabindex="-1"
             [targetMetaData]="targetMetaData"
             [countryData]="countryData"
             [colourMap]="lineChart.allSeriesData"
