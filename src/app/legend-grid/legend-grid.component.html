@@ -14,7 +14,7 @@
             'rolled-up': !series || series.isHidden || series.isHiding
           }"
           class="legend-item-series-toggle"
-          tabindex="0"
+          tabindex="!series || series.isHidden || series.isHiding ? -1 : 0"
         >
           <span
             class="marker"
