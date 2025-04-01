@@ -730,6 +730,34 @@ describe('OverviewComponent', () => {
       expect(selected.length).toEqual(0);
     });
 
+    it('should focus the export opener', fakeAsync(() => {
+      component.exportOpener = {
+        nativeElement: {
+          focus: jasmine.createSpy()
+        }
+      };
+      component.exportOpenerToolbar = {
+        nativeElement: {
+          focus: jasmine.createSpy()
+        }
+      };
+
+      component.focusExportOpener(false);
+      tick(1);
+
+      expect(component.exportOpener.nativeElement.focus).toHaveBeenCalled();
+      expect(
+        component.exportOpenerToolbar.nativeElement.focus
+      ).not.toHaveBeenCalled();
+
+      component.focusExportOpener(true);
+      tick(1);
+
+      expect(
+        component.exportOpenerToolbar.nativeElement.focus
+      ).toHaveBeenCalled();
+    }));
+
     it('should clear the dates', fakeAsync(() => {
       expect(component.filterStates.dates.visible).toBeFalsy();
       component.form.get('dateFrom').setValue(new Date().toISOString());

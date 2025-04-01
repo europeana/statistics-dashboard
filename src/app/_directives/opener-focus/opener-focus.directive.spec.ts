@@ -1,4 +1,3 @@
-import { Input, Directive, ElementRef, HostListener } from '@angular/core';
 import { Component, DebugElement } from '@angular/core';
 import { NgIf } from '@angular/common';
 import {
@@ -20,7 +19,8 @@ import { OpenerFocusDirective } from '.';
   `
 })
 class TestOpenerFocusDirectiveComponent {
-  fnHide() {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  fnHide(): void {}
 }
 
 describe('OpenerFocusDirective', () => {

@@ -120,6 +120,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
   @ViewChild('exportOpenerToolbar') exportOpenerToolbar: ElementRef;
   @ViewChild('exportOpener') exportOpener: ElementRef;
+  @ViewChild('dateFocusControl') dateFocusControl: ElementRef;
 
   private readonly api = inject(APIService);
   private readonly fb = inject(UntypedFormBuilder);
@@ -1070,6 +1071,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.form.controls.dateTo.setValue('');
     this.updatePageUrl();
     this.datesOpen();
+    setTimeout(() => {
+      this.dateFocusControl.nativeElement.focus();
+    }, 0);
   }
 
   /** datesOpen

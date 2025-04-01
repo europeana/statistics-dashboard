@@ -4,6 +4,10 @@
 $filter-scroll-w: 30px;
 $width-left-col: 200px;
 
+[inert="true"] {
+  display: none;
+}
+
 .chart-and-summary,
 .statistics-dashboard {
   display: flex;
@@ -48,6 +52,12 @@ $width-left-col: 200px;
         height: 32px;
         margin-left: variables.$spacing-s;
         width: 1px;
+      }
+      &:focus-visible {
+        outline: 0;
+        font-size: 16px;
+        font-weight: bold;
+        color: variables.$focus-highlight-colour;
       }
     }
   }
