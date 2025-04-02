@@ -32,12 +32,7 @@
               {{ setVals }}
             </span>
           </ng-container>
-          <span
-            #opener
-            class="opener-name"
-            tabindex="0"
-            (keydown.esc)="onFilterEscaped()"
-          >
+          <span #opener class="opener-name" tabindex="0">
             {{ group | renameApiFacet }}
           </span>
         </span>
@@ -79,8 +74,6 @@
                   "
                   [group]="group"
                   (valueChanged)="changed()"
-                  (escapeKeyPressed)="onFilterEscaped()"
-                  (keySelectionMade)="onKeySelectionMade($event)"
                 ></app-checkbox>
               </li>
             </ul>
