@@ -46,7 +46,6 @@ context('Statistics Dashboard', () => {
     it('should unpin a country when closed', () => {
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
-
       cy.get(selToggleCountry)
         .contains('Cyprus')
         .should('have.length', 1)
@@ -54,7 +53,6 @@ context('Statistics Dashboard', () => {
       cy.get(selPinnedOpener).should('have.length', 2);
       cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
       cy.get(selToggleCountry).contains('Cyprus').click(force);
-      cy.wait(waitTime);
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);
     });
