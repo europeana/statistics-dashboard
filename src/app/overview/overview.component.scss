@@ -4,6 +4,10 @@
 $filter-scroll-w: 30px;
 $width-left-col: 200px;
 
+[inert="true"] {
+  display: none;
+}
+
 .chart-and-summary,
 .statistics-dashboard {
   display: flex;
@@ -49,6 +53,12 @@ $width-left-col: 200px;
         margin-left: variables.$spacing-s;
         width: 1px;
       }
+      &:focus-visible {
+        outline: 0;
+        font-size: 16px;
+        font-weight: bold;
+        color: variables.$focus-highlight-colour;
+      }
     }
   }
 
@@ -90,6 +100,10 @@ $width-left-col: 200px;
   background-color: variables.$stats-blue;
   cursor: pointer;
   display: flex;
+
+  &:has(:focus-visible) {
+    outline: 3px solid variables.$focus-highlight-colour;
+  }
 
   .x {
     transform: translate(-2px, 0px) scale(0.75);
@@ -193,6 +207,9 @@ input[type="checkbox"] {
     margin: 0 0 0 variables.$spacing-s;
     padding: 0;
     width: 100%;
+  }
+  &:focus-visible {
+    border: 1px solid variables.$focus-highlight-colour;
   }
 }
 

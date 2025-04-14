@@ -87,3 +87,7 @@ input[type="radio"] {
   margin-right: 0.3em;
   width: auto;
 }
+
+.data-area .checkmarked-checkbox:has(:focus-visible) {
+  outline: 2px solid variables.$focus-highlight-colour;
+}

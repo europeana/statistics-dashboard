@@ -1,8 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+
+import { OpenerFocusDirective } from '../_directives';
 
 import { isoCountryCodes, isoCountryCodesReversed } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
@@ -20,6 +22,7 @@ import { RenameCountryPipe } from '../_translate';
     NgClass,
     NgIf,
     NgFor,
+    OpenerFocusDirective,
     RenameCountryPipe,
     RouterLink
   ]
@@ -38,7 +41,10 @@ export class HeaderComponent {
   @Input() pageTitleInViewport = false;
   @Input() pageTitleDynamic = false;
 
+  @ViewChild('menuOpener') menuOpener: ElementRef;
+
   public isoCountryCodes = isoCountryCodes;
+  public router = inject(Router);
 
   _countryTotalMap: IHash<number>;
   countryFirstOfLetter: IHash<string | undefined> = {};
@@ -95,15 +101,32 @@ export class HeaderComponent {
     return Intl.Collator('en').compare(aDecoded, bDecoded);
   }
 
-  closeMenu(event: MouseEvent): void {
-    this.menuIsOpen = false;
+  keyNavHome(event: KeyboardEvent): void {
     event.stopPropagation();
+    this.router.navigate([`/`]);
   }
 
-  toggleMenu(event: MouseEvent): void {
+  keyNavToCountry(event: KeyboardEvent, country: string): void {
+    event.stopPropagation();
+
+    this.menuIsOpen = false;
+    this.menuOpener.nativeElement.focus();
+
+    this.router.navigate(
+      [`country`, country],
+      this.includeCTZero
+        ? { queryParams: { 'content-tier-zero': 'true' } }
+        : undefined
+    );
+  }
+
+  toggleMenu(event: MouseEvent, isKeyboardEvent = false): void {
     if (!(event.target as HTMLElement).getAttribute('disabled')) {
       this.menuIsOpen = !this.menuIsOpen;
       event.stopPropagation();
+    }
+    if (isKeyboardEvent) {
+      this.menuOpener.nativeElement.focus();
     }
   }
 }

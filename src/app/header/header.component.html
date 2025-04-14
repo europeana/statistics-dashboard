@@ -5,7 +5,9 @@
       title="home"
       data-e2e="link-home-header"
       routerLink="/"
+      (keydown.enter)="keyNavHome($event)"
       [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+      [attr.tabindex]="router.url === '/' ? -1 : 0"
     >
       <span class="icon-wrapper">
         <span class="icon"></span>
@@ -17,11 +19,15 @@
     </a>
 
     <span
+      #menuOpener
       class="country-menu-opener"
       (click)="toggleMenu($event)"
+      (keydown.enter)="toggleMenu($event, true)"
       [ngClass]="{ open: menuIsOpen }"
       appClickAware
       (clickOutside)="menuIsOpen = false"
+      appOpenerFocus
+      [fnHide]="toggleMenu.bind(this)"
     >
       <span
         [ngClass]="{
@@ -31,7 +37,7 @@
       >
       </span>
 
-      <span class="active-country" (click)="toggleMenu($event)">
+      <span class="active-country" tabindex="0">
         @if(activeCountry) {
         {{ activeCountry | renameCountry }}
         } @else { Country Pages }
@@ -39,16 +45,21 @@
 
       <a
         class="country-closer x"
-        (click)="closeMenu($event)"
         *ngIf="activeCountry"
         routerLink="/"
         [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
         title="home"
+        tabindex="0"
+        (click)="toggleMenu($event)"
       >
       </a>
 
       <span class="country-select">
-        <span class="country-select-inner">
+        <span
+          class="country-select-inner"
+          tabindex="-1"
+          (keyUp.esc)="toggleMenu($event, true)"
+        >
           <ng-container
             *ngFor="
               let country of countryTotalMap
@@ -56,19 +67,21 @@
             "
           >
             <a
+              class="menu-item"
               (click)="toggleMenu($event)"
+              (keydown.enter)="keyNavToCountry($event, country.key)"
+              (keyUp.esc)="toggleMenu($event, true)"
               [attr.disabled]="
                 country.key === activeCountry ? 'disabled' : null
               "
               [routerLink]="['/country', country.key | renameCountry]"
               [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
-              class="menu-item"
               [ngClass]="{
                 'first-of-letter': !!countryFirstOfLetter[country.key]
               }"
+              tabindex="{{ menuIsOpen ? 0 : -1 }}"
             >
               <span class="flag-orb" [ngClass]="country.key"></span>
-
               <span
                 class="text"
                 [attr.data-text]="countryFirstOfLetter[country.key]"

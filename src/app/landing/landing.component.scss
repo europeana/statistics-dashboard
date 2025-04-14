@@ -65,6 +65,9 @@ a[disabled] {
   &::after {
     content: " >";
   }
+  &:focus-visible {
+    z-index: 12;
+  }
 }
 
 .data-rows {
@@ -208,6 +211,18 @@ a[disabled] {
     &:hover {
       .flag-orb {
         opacity: 1;
+      }
+    }
+
+    &:focus-visible {
+      outline: 0;
+      z-index: 12;
+      span {
+        background: #fff;
+        border: 1px solid variables.$focus-highlight-colour;
+      }
+      .flag-orb {
+        display: none;
       }
     }
   }

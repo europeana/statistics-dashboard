@@ -190,6 +190,10 @@ $numeric-min-width: 6em;
     display: none;
   }
 
+  &:has(:focus-visible) {
+    z-index: 12;
+  }
+
   a {
     color: unset;
   }
@@ -237,6 +241,10 @@ $numeric-min-width: 6em;
 }
 
 .derived-series-menu-opener {
+  &:focus-visible,
+  &:focus-visible + .derived-series-menu {
+    z-index: 12;
+  }
   &.flag-orb {
     height: 1em;
     margin-right: 0.5em;

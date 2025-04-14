@@ -123,7 +123,7 @@ describe('CountryComponent', () => {
     spyOn(router, 'navigate');
     ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
       routeChangeSource.next({ country: code });
-      expect(router.navigate).toHaveBeenCalledWith(['/']);
+      expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
     });
   });
 
@@ -131,9 +131,23 @@ describe('CountryComponent', () => {
     spyOn(router, 'navigate');
     ['BE', 'DE', 'FR'].forEach((code: string) => {
       routeChangeSource.next({ country: code });
-      expect(router.navigate).toHaveBeenCalledWith([
-        `country/${isoCountryCodesReversed[code]}`
-      ]);
+      expect(router.navigate).toHaveBeenCalledWith(
+        ['country', isoCountryCodesReversed[code]],
+        undefined
+      );
+    });
+  });
+
+  it('should redirect (when it recognises country codes) (with ct-zero enabled)', () => {
+    component.includeCTZero = true;
+    const navOps = { queryParams: { 'content-tier-zero': 'true' } };
+    spyOn(router, 'navigate');
+    ['BE', 'DE', 'FR'].forEach((code: string) => {
+      routeChangeSource.next({ country: code });
+      expect(router.navigate).toHaveBeenCalledWith(
+        ['country', isoCountryCodesReversed[code]],
+        navOps
+      );
     });
   });
 

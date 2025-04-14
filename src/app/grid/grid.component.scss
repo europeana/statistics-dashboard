@@ -105,6 +105,10 @@ a {
       border-bottom: 1px solid variables.$gray-5;
     }
   }
+
+  :focus-visible {
+    outline: 1px solid variables.$focus-highlight-colour;
+  }
 }
 
 .go-to,

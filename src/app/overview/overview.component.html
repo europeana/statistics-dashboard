@@ -1,3 +1,47 @@
+<ng-template #dateRemoval>
+  <span
+    class="container-h date-removal"
+    [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
+    [attr.inert]="getAppliedDateRange() ? null : true"
+  >
+    <a
+      class="container-h when-set"
+      (click)="datesClear()"
+      (keydown.enter)="datesClear()"
+      tabindex="0"
+    >
+      <span>Custom</span>
+      <span class="x" data-e2e="close-date-override"></span>
+    </a>
+    <a
+      #dateFocusControl
+      class="when-unset"
+      (click)="datesOpen()"
+      (keydown.enter)="datesOpen()"
+      tabindex="0"
+      i18n="Period Summary|Summary for applied date filters@@periodSummary"
+      >Whole period</a
+    >
+    <ng-container *ngIf="getAppliedDateRange(); let dates">
+      <span class="date">
+        {{ dates[0] | date : "MMM d, y" }}
+      </span>
+      <span class="separator"> - </span>
+      <span class="date">
+        {{ dates[1] | date : "MMM d, y" }}
+      </span>
+    </ng-container>
+    <a
+      class="date warn"
+      (click)="showDateDisclaimer()"
+      (keydown.enter)="showDateDisclaimer()"
+      tabindex="0"
+    >
+      *
+    </a>
+  </span>
+</ng-template>
+
 <main>
   <form
     [formGroup]="form"
@@ -111,8 +155,10 @@
       <div class="statistics-dashboard-right">
         <app-export
           #export
+          (onClose)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
+          tabindex="-1"
         ></app-export>
 
         <!-- Header -->
@@ -153,34 +199,15 @@
             </h1>
           </ng-container>
 
-          <ng-container *ngIf="getAppliedDateRange(); let dates">
-            <span
-              class="container-h date-removal"
-              [ngClass]="{ set: form.value.dateFrom && form.value.dateTo }"
-            >
-              <a class="container-h when-set" (click)="datesClear()">
-                <span>Custom</span>
-                <span class="x" data-e2e="close-date-override"></span>
-              </a>
-              <a
-                class="when-unset"
-                (click)="datesOpen()"
-                i18n="
-                  Period Summary|Summary for applied date filters@@periodSummary"
-                >Whole period</a
-              >
-              <span class="date">
-                {{ dates[0] | date : "MMM d, y" }}
-              </span>
-              <span class="separator"> - </span>
-              <span class="date">
-                {{ dates[1] | date : "MMM d, y" }}
-              </span>
-              <a class="date warn" (click)="showDateDisclaimer()"> * </a>
-            </span>
-          </ng-container>
+          <ng-content *ngTemplateOutlet="dateRemoval"></ng-content>
 
-          <a (click)="export.toggleActive()" class="export-icon export-opener">
+          <a
+            #exportOpenerToolbar
+            (click)="export.toggleActive(true)"
+            (keydown.enter)="export.toggleActive(true)"
+            class="export-icon export-opener"
+            tabindex="0"
+          >
           </a>
         </div>
 
@@ -404,8 +431,11 @@
           <!-- EXPORT LINK -->
           <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
             <a
+              #exportOpener
               class="export-opener-link"
-              (click)="export.toggleActive()"
+              tabindex="0"
+              (click)="export.toggleActive(false)"
+              (keydown.enter)="export.toggleActive(false)"
               i18n="Share Report Opener@@exportReportOpenerLink"
               >Export data</a
             >

@@ -270,6 +270,7 @@ export class BarComponent implements AfterViewInit {
     }
     series.columns.template.fillOpacity = 1;
     series.columns.template.strokeWidth = 0;
+    series.skipFocusThreshold = 0;
     return series;
   }
 

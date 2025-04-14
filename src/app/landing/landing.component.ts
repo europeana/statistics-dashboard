@@ -11,6 +11,7 @@ import {
 } from '@angular/common';
 import {
   Component,
+  ElementRef,
   inject,
   Input,
   QueryList,
@@ -18,7 +19,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ClickAwareDirective } from '../_directives';
+import { ClickAwareDirective, OpenerFocusDirective } from '../_directives';
 import { externalLinks, isoCountryCodes, targetDescriptions } from '../_data';
 import {
   DimensionName,
@@ -51,6 +52,7 @@ import { TruncateComponent } from '../truncate';
   styleUrls: ['./landing.component.scss', './landing.component-country.scss'],
   imports: [
     ClickAwareDirective,
+    OpenerFocusDirective,
     NgClass,
     ResizeComponent,
     NgIf,
@@ -82,9 +84,9 @@ export class LandingComponent extends SubscriptionManager {
   // Used to parameterise links to the data page
   @Input() includeCTZero = false;
 
-  // Used to re-draw bar-charts
   @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
   @ViewChild(MapComponent) mapChart: MapComponent;
+  @ViewChild('layerOpener', { static: false }) layerOpener: ElementRef;
 
   singleCountryMode = false;
   barColour = '#0771ce';
@@ -269,8 +271,13 @@ export class LandingComponent extends SubscriptionManager {
     this.closeMapMenu();
   }
 
+  // this is bound to clickOutside, so should not set focus
   closeMapMenu(): void {
+    const wasAlreadyClosed = !this.mapMenuIsOpen;
     this.mapMenuIsOpen = false;
+    if (!this.mapMenuIsOpen && !wasAlreadyClosed) {
+      this.layerOpener.nativeElement.focus();
+    }
   }
 
   /** showHeatmap
@@ -304,7 +311,7 @@ export class LandingComponent extends SubscriptionManager {
       this.targetExpanded = seriesTargetType;
     }
 
-    this.mapMenuIsOpen = false;
+    this.closeMapMenu();
   }
 
   prefixClass(className: string): string {

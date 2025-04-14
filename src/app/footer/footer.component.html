@@ -43,7 +43,10 @@
       >
     </li>
     <li class="link-detail">
-      <a (click)="clickPrivacySettings()"
+      <a
+        (click)="clickPrivacySettings()"
+        (keydown.enter)="clickPrivacySettings()"
+        tabindex="0"
         ><span i18n="Footer link text@@privacySettings"
           >Privacy Settings</span
         ></a

@@ -98,7 +98,28 @@ describe('ExportComponent', () => {
 
   it('should toggle the active status', () => {
     expect(component.active).toBeFalsy();
+    expect(component.tabIndex).toEqual(-1);
+    expect(component.openedFromToolbar).toBeFalsy();
+
     component.toggleActive();
     expect(component.active).toBeTruthy();
+    expect(component.tabIndex).toEqual(0);
+    expect(component.openedFromToolbar).toBeFalsy();
+
+    component.toggleActive();
+    expect(component.active).toBeFalsy();
+    expect(component.tabIndex).toEqual(-1);
+    expect(component.openedFromToolbar).toBeFalsy();
+
+    component.toggleActive(true);
+    expect(component.active).toBeTruthy();
+    expect(component.tabIndex).toEqual(0);
+    expect(component.openedFromToolbar).toBeTruthy();
+  });
+
+  it('should suppy a custom hide function', () => {
+    spyOn(component, 'toggleActive');
+    component.fnHide();
+    expect(component.toggleActive).toHaveBeenCalled();
   });
 });
