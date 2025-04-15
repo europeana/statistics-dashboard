@@ -7,7 +7,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -21,8 +21,15 @@ import {
 import { MockAPIService } from './_mocked';
 import { APIService, ClickService } from './_services';
 import { AppComponent } from './app.component';
+import { CookiePolicyComponent } from './cookie-policy';
+import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
 import { OverviewComponent } from './overview';
+import { PrivacyStatementComponent } from './privacy-statement';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('AppComponent', () => {
   let app: AppComponent;
@@ -37,7 +44,6 @@ describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule,
         RouterTestingModule.withRoutes([
           { path: './data', component: AppComponent },
           { path: './', component: LandingComponent }
@@ -51,7 +57,9 @@ describe('AppComponent', () => {
         {
           provide: APIService,
           useClass: MockAPIService
-        }
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
       ]
     }).compileComponents();
   }));
@@ -65,7 +73,6 @@ describe('AppComponent', () => {
       clear: (): void => {},
       createComponent: () => {
         return {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           setInput: (): void => void {}
         };
       }
@@ -96,6 +103,7 @@ describe('AppComponent', () => {
   it('should listen for history navigation', fakeAsync(() => {
     expect(app.lastSetContentTierZeroValue).toBeFalsy();
     app.buildForm();
+    app.countryComponentRef = {} as unknown as CountryComponent;
 
     // trigger location change does nothing
     app.updateLocation();
@@ -157,31 +165,78 @@ describe('AppComponent', () => {
     expect(app.landingComponentRef.landingData).toBeTruthy();
   }));
 
-  it('should handle the outlet load', () => {
+  it('should handle the outlet load', waitForAsync(async () => {
     expect(app.showPageTitle).toBeFalsy();
 
     spyOn(app, 'loadLandingData');
+    spyOn(location, 'path').and.callFake(() => {
+      return '';
+    });
 
-    app.onOutletLoaded(new LandingComponent());
+    await TestBed.runInInjectionContext(() => {
+      app.onOutletLoaded(new LandingComponent());
+      expect(app.showPageTitle).toBeTruthy();
+      expect(app.loadLandingData).toHaveBeenCalled();
 
-    expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalled();
+      // load overview component
+      const fakeOverviewComponent = Object.create(OverviewComponent.prototype);
 
-    app.onOutletLoaded({} as unknown as OverviewComponent);
-    expect(app.showPageTitle).toBeFalsy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(1);
+      app.onOutletLoaded(fakeOverviewComponent);
+      expect(app.showPageTitle).toBeFalsy();
 
-    app.onOutletLoaded(new LandingComponent());
-    expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(1);
+      expect(app.loadLandingData).toHaveBeenCalledTimes(2);
 
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
-    app.lastSetContentTierZeroValue = true;
+      // load landing component
+      app.getCtrlCTZero().setValue(true);
+      expect(app.loadLandingData).toHaveBeenCalledTimes(3);
 
-    app.onOutletLoaded(new LandingComponent());
-    expect(app.showPageTitle).toBeTruthy();
-    expect(app.loadLandingData).toHaveBeenCalledTimes(2);
-  });
+      const cmp = new LandingComponent();
+      app.landingData = {};
+      app.onOutletLoaded(cmp);
+      expect(app.showPageTitle).toBeTruthy();
+      expect(app.loadLandingData).toHaveBeenCalledTimes(4);
+      expect(app.lastSetContentTierZeroValue).toBeTruthy();
+      expect(cmp.landingData).toBeTruthy();
+
+      app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
+      app.onOutletLoaded(new LandingComponent());
+      expect(app.loadLandingData).toHaveBeenCalledTimes(5);
+
+      // load privacy statement component
+      app.onOutletLoaded(new PrivacyStatementComponent());
+
+      expect(app.loadLandingData).toHaveBeenCalledTimes(6);
+
+      // load cookie policy component
+      app.onOutletLoaded(new CookiePolicyComponent());
+
+      expect(app.loadLandingData).toHaveBeenCalledTimes(7);
+
+      // load country component
+      const fakeCountryComponent = Object.create(CountryComponent.prototype);
+
+      spyOn(app, 'setCTZeroInputToLastSetValue');
+      spyOn(fakeCountryComponent, 'refreshCardData');
+
+      app.onOutletLoaded(fakeCountryComponent);
+
+      expect(app.showPageTitle).toBeTruthy();
+      expect(app.loadLandingData).toHaveBeenCalledTimes(8);
+      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
+
+      app.lastSetContentTierZeroValue = true;
+      app.onOutletLoaded(fakeCountryComponent);
+
+      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
+      expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
+
+      fakeCountryComponent._country = 'FR';
+      app.onOutletLoaded(fakeCountryComponent);
+
+      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);
+      expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
+    });
+  }));
 
   it('should check if maintenance is due', () => {
     app.landingComponentRef = {

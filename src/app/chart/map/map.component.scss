@@ -1,5 +1,20 @@
-#mapChart {
-  height: 100%;
-  min-height: 275px;
+@use "../../../scss/variables";
+
+#mapChart,
+#mapChartGlobe,
+#mapChartHidden {
+  height: variables.$map-height;
   width: 100%;
+}
+
+#mapChartGlobe {
+  left: 0;
+  right: 0;
+  min-height: variables.$map-height;
+  position: absolute;
+}
+
+#mapChartHidden {
+  margin-top: -100%;
+  visibility: hidden;
 }

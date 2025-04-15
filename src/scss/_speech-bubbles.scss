@@ -1,0 +1,77 @@
+@use "variables";
+
+/*
+  Arrow position information for cross-component speech-bubbles
+*/
+
+/* country page */
+
+// inset / outset arrows
+.entry-card {
+  .help-items .speech-bubble.arrow-bottom-right {
+    &::after,
+    &::before {
+      right: 50%;
+    }
+  }
+
+  &.entry-card-total .help-items .speech-bubble.arrow-bottom-right {
+    &::after,
+    &::before {
+      right: 2em;
+    }
+  }
+
+  .help-percent .speech-bubble.arrow-top-right {
+    &::after,
+    &::before {
+      left: auto;
+      right: 6rem;
+    }
+  }
+
+  .help-targets .speech-bubble.arrow-bottom-right {
+    &::after,
+    &::before {
+      right: 50%;
+      left: auto;
+    }
+  }
+}
+
+@media (min-width: variables.$bp-desktop) {
+  .entry-card {
+    .help-items .speech-bubble.arrow-bottom-right {
+      &::after,
+      &::before {
+        right: min(12em, 94%);
+      }
+    }
+
+    &.entry-card-total .help-items .speech-bubble.arrow-bottom-right {
+      &::after,
+      &::before {
+        right: 4em;
+      }
+    }
+  }
+}
+
+/* landing page */
+
+.record-list,
+.target-summary {
+  .map-help-target {
+    .speech-bubble {
+      display: inline-block;
+      white-space: normal;
+
+      &.arrow-bottom-right {
+        &::after,
+        &::before {
+          right: 2.25em;
+        }
+      }
+    }
+  }
+}

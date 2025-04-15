@@ -1,0 +1,303 @@
+@use "../../scss/variables";
+
+$disabled-colour: variables.$gray-5;
+$forced-space: 10px;
+$timeTransitionRollDown: 0.25s;
+
+li {
+  list-style: none;
+}
+
+.legend-grid-wrapper,
+.legend-grid,
+.legend-grid-inner {
+  font-size: 14px;
+  background: #fff;
+}
+
+.legend-grid,
+.legend-grid-inner {
+  display: grid;
+
+  & > :not(.legend-grid-inner) {
+    padding: 0.6em;
+  }
+}
+
+.target-toggle {
+  margin-left: 1rem;
+  position: relative;
+  &::before {
+    border-width: 2px;
+    border-style: solid;
+    content: "";
+    display: block;
+    left: -12px;
+    opacity: 0.5;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+  }
+
+  &.active,
+  &:hover {
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &.active::before {
+    width: 0;
+    height: 0;
+    border-width: 4px;
+  }
+
+  &:has(:focus-visible)::before {
+    color: variables.$focus-highlight-colour;
+  }
+}
+
+.legend-grid {
+  grid-template-columns: repeat(4, auto);
+  max-height: 338px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+
+  &:hover {
+    &.scrollable-downwards .scrollable-indicator {
+      opacity: 0;
+    }
+  }
+
+  &.scrollable-downwards .scrollable-indicator {
+    opacity: 1;
+  }
+
+  .scrollable-indicator {
+    opacity: 0;
+  }
+
+  .scrollable-indicator {
+    bottom: 0;
+    grid-column: 1/5;
+    height: 0px;
+    padding: 0 !important;
+    pointer-events: none;
+    position: sticky;
+    transition: opacity 0.2s linear;
+
+    &::before {
+      background: linear-gradient(0deg, #fff 0%, transparent 100%);
+      content: "";
+      display: block;
+      height: 4.5em;
+      position: absolute;
+      top: -4.5em;
+      width: 100%;
+    }
+  }
+}
+
+.legend-grid-inner {
+  grid-column: 2/5;
+  grid-template-columns: subgrid;
+  margin: 0;
+  column-gap: 4px;
+  & > * {
+    border-left: 1px solid $disabled-colour;
+  }
+}
+
+.legend-grid-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4em;
+}
+
+.legend-item-country-toggle {
+  position: relative;
+
+  &.stick-left {
+    font-weight: bold;
+  }
+  a {
+    color: variables.$gray-med;
+    display: flex;
+    position: relative;
+    margin: 0 0.4em 0 2em;
+    white-space: nowrap;
+  }
+}
+
+.legend-item-series-toggle,
+.legend-item-target-toggle {
+  color: variables.$gray-med;
+  outline: 0;
+  white-space: nowrap;
+
+  &.rolled-up {
+    color: $disabled-colour;
+  }
+}
+
+.legend-item-target-toggle {
+  display: flex;
+  font-size: 12px;
+  max-width: 9em;
+  min-width: 9em;
+  margin-left: -1em;
+  padding-left: 1em;
+  justify-content: space-between;
+}
+
+.target-total {
+  flex-grow: 1;
+  color: #777;
+  font-weight: normal;
+  margin-left: 1.4em;
+  text-align: right;
+
+  &.range-value {
+    font-style: italic;
+    margin-right: 0.4em;
+  }
+}
+
+.legend-item-series-toggle,
+.legend-item-country-toggle,
+.legend-item-target-toggle {
+  font-weight: 600;
+}
+
+.legend-item-series-toggle {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+
+  * {
+    line-height: 1.6em;
+  }
+
+  // legend marker
+  .marker {
+    border: 1px solid $disabled-colour;
+    content: "";
+    display: block;
+    height: 12px;
+    margin-right: 0.4em;
+    width: 12px;
+  }
+
+  &:focus-visible {
+    .marker {
+      outline: 4px solid variables.$focus-highlight-colour;
+    }
+  }
+}
+
+// push scrollbar away from data
+.pad-right {
+  padding-right: 0.6em;
+}
+
+.top-pin {
+  background: #fff;
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: -20px;
+  transform: translateY(-20px);
+}
+
+.perma-pin-left {
+  top: $forced-space;
+  position: relative;
+
+  // hide content scrolling below visible in the gap above
+  &::before {
+    content: "";
+    background: #fff;
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: -$forced-space;
+    height: $forced-space;
+  }
+}
+
+.perma-pin {
+  display: block;
+  height: 20px;
+  opacity: 0;
+  text-align: center;
+
+  .x {
+    display: block;
+    margin: auto;
+    &::after,
+    &::before {
+      background: #777;
+    }
+    &:hover {
+      &::after,
+      &::before {
+        background: variables.$gray-med;
+      }
+    }
+  }
+}
+
+.perma-pin:hover,
+ul:hover ~ .perma-pin {
+  opacity: 1;
+}
+
+.stick-left,
+.stick-right {
+  background-color: #fff;
+  position: sticky;
+  z-index: 1;
+}
+
+.stick-left {
+  // use transparent fade on the the last of class
+  &:not(:has(~ .stick-left)) {
+    background: linear-gradient(0deg, transparent 00%, #fff 50%);
+  }
+}
+
+.stick-right {
+  right: 0;
+  .legend-item-series-toggle {
+    font-weight: bold;
+  }
+}
+
+.roll-down-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows $timeTransitionRollDown linear,
+    margin-bottom $timeTransitionRollDown linear;
+
+  &:not(.is-open) > * {
+    grid-template-rows: 1fr;
+  }
+
+  &.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .roll-down {
+    overflow: hidden;
+    margin: 0.2em 0 0.3em 0;
+  }
+}
+
+@media (min-width: variables.$bp-desktop) {
+  .legend-grid-wrapper {
+    margin-top: -10px;
+  }
+}

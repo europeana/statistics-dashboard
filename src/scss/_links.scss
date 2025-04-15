@@ -1,9 +1,12 @@
+@use "sass:color";
+@use "variables";
+
 a {
-  color: $textcolour_link;
+  color: variables.$textcolour_link;
   text-decoration: none;
 
   &:hover {
-    color: darken($textcolour_link, 15%);
+    color: color.adjust(variables.$textcolour_link, $lightness: -15%);
     cursor: pointer;
   }
 }

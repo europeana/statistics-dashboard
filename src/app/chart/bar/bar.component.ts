@@ -30,7 +30,6 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-bar-chart',
   templateUrl: './bar.component.html',
   styleUrls: ['./bar.component.scss'],
-  standalone: true,
   imports: [NgIf, FormsModule, NgClass]
 })
 export class BarComponent implements AfterViewInit {
@@ -271,6 +270,7 @@ export class BarComponent implements AfterViewInit {
     }
     series.columns.template.fillOpacity = 1;
     series.columns.template.strokeWidth = 0;
+    series.skipFocusThreshold = 0;
     return series;
   }
 

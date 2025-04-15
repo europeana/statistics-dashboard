@@ -1,0 +1,432 @@
+@use "../../scss/functions/icon_urls";
+@use "../../scss/variables";
+
+$list-item-pad-height: 4px;
+$boxed-width: 2.5em;
+$boxed-colour: variables.$gray-5;
+$disabled-colour: variables.$gray-5;
+$boxed-dash-length: 3em;
+$boxed-dash-length-less-one: 2em;
+
+$boxed-time: 0.3s;
+$numeric-min-width: 6em;
+
+.country-closer {
+  display: none;
+}
+
+:has(> .country-closer):hover {
+  .country-closer {
+    display: block;
+    transform: scale(0.9) translateX(0.4em);
+    margin-left: 0;
+  }
+}
+
+.map-navigation-close-country-link-wrapper {
+  align-self: center;
+  margin-left: 0.3em;
+  flex-basis: 100%;
+  .x {
+    transform: scale(0.75) translateY(0.25em);
+    display: inline-block;
+  }
+}
+
+.map-navigation-link {
+  white-space: nowrap;
+  &:not([disabled]) {
+    opacity: 0.5;
+    transition: opacity 0.2s linear;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.record-list:has(.map-navigation-link) {
+  border-top-color: transparent;
+}
+
+// for the negative z-index to work on the pseudo-element the grandparent's needs set!
+:has(> .boxed) {
+  z-index: 0;
+}
+
+.boxed {
+  display: inline-block;
+  margin: 0px $boxed-dash-length;
+  min-width: $boxed-width;
+  position: relative;
+  text-align: right;
+  transition: min-width linear $boxed-time;
+  white-space: nowrap;
+
+  &::after,
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+  }
+
+  &::before {
+    background-color: $boxed-colour;
+    height: 1px;
+    left: calc(-1px - $boxed-dash-length);
+    right: calc(-1px - $boxed-dash-length);
+    top: 50%;
+    transform: translateY(-50%);
+    transition: left $boxed-time linear;
+    z-index: -1;
+  }
+
+  // add vertical line to edge of last on row
+  &:last-child::after {
+    background-color: $boxed-colour;
+    bottom: calc(-1px - $list-item-pad-height);
+    right: calc(-1px - $boxed-dash-length);
+    top: calc(-1px - $list-item-pad-height);
+    width: 1px;
+  }
+
+  // the optional target progress box
+  &:first-child::before {
+    left: 50%;
+  }
+
+  // force narrow box
+  &:has(.info-icon) {
+    margin-left: -3.5em;
+    z-index: -1;
+    .info-icon {
+      background-color: #fff;
+      margin-left: -1.5em;
+      margin-right: -1em;
+    }
+  }
+
+  & > .boxed-inner {
+    border: 1px solid $boxed-colour;
+    background-color: variables.$white;
+    padding: 2px $list-item-pad-height;
+
+    &.target-highlight {
+      border-width: 2px;
+      font-weight: bold;
+    }
+  }
+
+  & + .numeric {
+    margin-left: 6px;
+  }
+}
+
+.country-list {
+  $scrollbar-width: 16px;
+
+  margin-right: -$scrollbar-width;
+
+  max-height: calc(variables.$map-height - 4em);
+  overflow: auto;
+
+  & > * {
+    width: calc(100% - $scrollbar-width);
+  }
+
+  &.hidden {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  .numeric {
+    $numeric-margin-left: 6px;
+
+    margin-left: $numeric-margin-left;
+    min-width: $numeric-min-width;
+    animation: none;
+
+    @keyframes shrink {
+      0% {
+        min-width: calc($numeric-min-width + $numeric-margin-left);
+        margin-left: $numeric-margin-left;
+      }
+      100% {
+        min-width: 0;
+        margin-left: -$numeric-margin-left;
+      }
+    }
+    &.shrink-animation {
+      animation: shrink 1s 1;
+    }
+    &.shrink {
+      margin-left: -$numeric-margin-left;
+      min-width: 0;
+    }
+  }
+}
+
+.derived-series-menu {
+  position: absolute;
+  box-shadow: 0 2px 6px 0 rgba(26, 26, 26, 0.25);
+  font-weight: normal;
+  right: 2.6em;
+  top: -0.4em;
+  z-index: 1;
+
+  &::before {
+    background-color: #fff;
+    border: 1px solid #d8d8d8;
+    content: "";
+    height: 10px;
+    position: absolute;
+    right: -6px;
+    top: 12px;
+    transform: rotate(45deg);
+    width: 10px;
+    z-index: -1;
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  &:has(:focus-visible) {
+    z-index: 12;
+  }
+
+  a {
+    color: unset;
+  }
+}
+
+.derived-series-menu,
+.derived-series-menu-inner {
+  border-radius: 4px;
+}
+
+.derived-series-menu-inner {
+  background-color: variables.$white;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 1em;
+  padding: 4px;
+  white-space: nowrap;
+
+  & > :nth-child(3n) {
+    grid-column: 2;
+  }
+
+  .menu-item {
+    display: inline-block;
+    border: 2px solid transparent;
+    border-radius: 2px;
+    line-height: 1.4em;
+
+    & > a {
+      font-size: 10px;
+      padding: 2px;
+    }
+  }
+
+  .map-series-menu-clear-link {
+    font-weight: bold;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    margin-top: 0.6em;
+    padding: 2px;
+    text-align: center;
+    text-transform: lowercase;
+  }
+}
+
+.derived-series-menu-opener {
+  &:focus-visible,
+  &:focus-visible + .derived-series-menu {
+    z-index: 12;
+  }
+  &.flag-orb {
+    height: 1em;
+    margin-right: 0.5em;
+    top: 1.5px;
+    width: 1em;
+
+    &.active,
+    &.open {
+      &::after {
+        background-image: icon_urls.svg-url-icon-flag(variables.$gray-faint);
+      }
+    }
+    &.active::after {
+      // picks up the color of the selected item
+      box-shadow: 0 1px 1px 0;
+    }
+  }
+
+  &.default[disabled] {
+    color: $disabled-colour;
+    &::after {
+      background-image: icon_urls.svg-url-icon-flag($disabled-colour);
+    }
+  }
+}
+
+// top box
+.record-list:has(.boxed) {
+  .boxed:last-child {
+    flex-basis: 100%;
+    // vertical line: connect deep downwards / stop connecting upwards
+    &::after {
+      top: 50%;
+      bottom: -3em;
+    }
+  }
+}
+
+// give country link space on narrow viewports
+.data-rows:has(.link-open-country) {
+  padding-bottom: 4em;
+
+  @media (min-width: variables.$bp-desktop) {
+    padding-bottom: 4em;
+  }
+}
+
+// anchor country link to the bottom
+.record-list:has(.link-open-country) {
+  flex-grow: 1;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+// expand horizontal lines on the target and target years
+:not(.target-expanded):has(+ .target-expanded.is-open),
+.target-expanded.is-open {
+  .numeric + .boxed {
+    $expanded-size: 30%;
+    min-width: $expanded-size;
+    &:last-child {
+      min-width: calc($expanded-size + $boxed-dash-length-less-one);
+    }
+  }
+}
+
+// expanded element
+.target-expanded {
+  &:not(.is-open) {
+    height: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    .boxed:last-child::before {
+      // target year horizontal line
+      left: 0;
+    }
+  }
+
+  // the target year
+  .boxed:last-child {
+    padding-right: $boxed-dash-length;
+    //    margin-left: 3em;
+    margin-left: calc($boxed-dash-length + 0.5em);
+
+    &::before {
+      // prevent horizontal line running to the right
+      right: $boxed-dash-length;
+    }
+  }
+}
+
+.target-summary {
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1em;
+
+  // the last has "nothing in front of me that isn't expanded"
+  &:not(:has(~ .target-summary:not(.target-expanded))) {
+    // the last has nothing connected below: hide vertical line
+    & ~ .target-expanded .boxed:last-child::after {
+      display: none;
+    }
+
+    // the last box
+    .boxed:last-child::after {
+      bottom: 50%;
+    }
+  }
+}
+
+.data-rows-title {
+  &:has([disabled]) span {
+    color: $disabled-colour;
+  }
+  .x {
+    &::after,
+    &::before {
+      background-color: variables.$gray-faint;
+    }
+    &[disabled] {
+      pointer-events: none;
+      &::after,
+      &::before {
+        background-color: $disabled-colour;
+      }
+    }
+  }
+}
+
+.data-rows-title,
+.record-list,
+.target-summary {
+  a {
+    color: unset;
+  }
+}
+
+.record-list,
+.target-summary {
+  padding: $list-item-pad-height 0;
+  position: relative;
+
+  a.info-icon {
+    cursor: help;
+    margin-right: 1em;
+
+    &:hover {
+      // allow hovering over the gap!
+      &::after {
+        content: "";
+        display: block;
+        width: 3em;
+        height: 4em;
+        position: relative;
+        transform: translate(-50%, -75%);
+      }
+    }
+  }
+
+  &:has(a.info-icon:hover) {
+    .map-help-target {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .numeric {
+    text-align: right;
+  }
+
+  &:not(.target-expanded) {
+    .numeric {
+      margin-right: 6px;
+    }
+  }
+
+  .target-active {
+    font-weight: bold;
+    &.numeric {
+      border-bottom: 1px solid $boxed-colour;
+    }
+  }
+}

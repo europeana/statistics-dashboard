@@ -6,7 +6,11 @@ import {
   DimensionName,
   GeneralResults,
   IHash,
-  RequestFilter
+  IHashArray,
+  RequestFilter,
+  TargetCountryData,
+  TargetData,
+  TargetMetaData
 } from '../_models';
 
 const rightsCategories = [
@@ -63,42 +67,42 @@ export const MockGeneralResults = {
         {
           count: 61,
           percentage: 6.1,
-          value: 'Austria'
+          value: 'AT'
         },
         {
           count: 95,
           percentage: 9.5,
-          value: 'Belgium'
+          value: 'BE'
         },
         {
           count: 95,
           percentage: 9.5,
-          value: 'Bulgaria'
+          value: 'BG'
         },
         {
           count: 96,
           percentage: 9.6,
-          value: 'Croatia'
+          value: 'HR'
         },
         {
           count: 15,
           percentage: 1.5,
-          value: 'Czech Republic'
+          value: 'CZ'
         },
         {
           count: 52,
           percentage: 5.2,
-          value: 'Denmark'
+          value: 'DK'
         },
         {
           count: 50,
           percentage: 5,
-          value: 'Estonia'
+          value: 'EE'
         },
         {
           count: 51,
           percentage: 5.1,
-          value: 'Europe'
+          value: 'EU'
         }
       ]
     },
@@ -299,19 +303,7 @@ export const MockGeneralResults = {
 export const MockBreakdowns = {
   filteringOptions: {
     contentTier: ['0', '1', '2', '3'],
-    country: [
-      'Denmark',
-      'Ireland',
-      'Norway',
-      'Finland',
-      'Germany',
-      'Portugal',
-      'Poland',
-      'Italy',
-      'Holy See (Vatican City State)',
-      'Croatia',
-      'Iceland'
-    ],
+    country: ['IT', 'IE', 'NO', 'FI', 'DE', 'PT', 'PL', 'IT', 'VA', 'HR', 'IS'],
     dataProvider: [
       'The Danish Agency for Culture',
       'University College Cork',
@@ -626,14 +618,67 @@ export const MockBreakdowns = {
   }
 } as BreakdownResults;
 
+const now = new Date().toISOString();
+
+export const mockCountryData: IHash<Array<TargetData>> = {
+  FR: [
+    {
+      date: now,
+      three_d: '111',
+      high_quality: '222',
+      total: '333'
+    }
+  ],
+  IT: [
+    {
+      date: now,
+      three_d: '123',
+      high_quality: '234',
+      total: '345'
+    }
+  ],
+  MT: [
+    {
+      date: now,
+      three_d: '100',
+      high_quality: '200',
+      total: '300'
+    }
+  ],
+  PT: [
+    {
+      date: now,
+      three_d: '100',
+      high_quality: '200',
+      total: '300'
+    }
+  ]
+};
+
+const genericTargetMetaData = {
+  three_d: [
+    { value: 1, targetYear: 2025 },
+    { value: 2, targetYear: 2030 }
+  ],
+  high_quality: [
+    { value: 1, targetYear: 2025 },
+    { value: 2, targetYear: 2030 }
+  ],
+  total: [
+    { value: 1, targetYear: 2025 },
+    { value: 2, targetYear: 2030 }
+  ]
+};
+
+export const mockTargetMetaData = {
+  FR: genericTargetMetaData,
+  IT: genericTargetMetaData,
+  MT: genericTargetMetaData,
+  PT: genericTargetMetaData
+};
+
 export class MockAPIService {
   errorMode = false;
-
-  loadISOCountryCodes(): IHash<string> {
-    return {
-      Belgium: 'BE'
-    };
-  }
 
   getBreakdowns(br: BreakdownRequest): Observable<BreakdownResults> {
     if (this.errorMode) {
@@ -657,6 +702,18 @@ export class MockAPIService {
     rightsCategories: Array<string>
   ): Observable<Array<string>> {
     return of([`${rightsCategories[0]}/1.0`, `${rightsCategories[0]}/2.0`]);
+  }
+
+  getTargetMetaData(): Observable<IHash<IHashArray<TargetMetaData>>> {
+    return of({});
+  }
+
+  loadCountryData(): Observable<Array<TargetCountryData>> {
+    return of([]);
+  }
+
+  getCountryData(): Observable<IHash<Array<TargetData>>> {
+    return of({});
   }
 }
 

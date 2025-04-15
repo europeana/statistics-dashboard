@@ -35,6 +35,8 @@ $blue-dark: #293745;
 $linkblue: #095f90;
 $accent: $eu-blue !default;
 
+$focus-highlight-colour: $eu-light-orange;
+
 $textcolour_body: $near-black;
 $textcolour_highlight: $accent;
 $textcolour_link: $linkblue;
@@ -64,6 +66,8 @@ $brand-instagram: #ec5972;
 $stats-blue: #0a72cc;
 
 /* Layout */
+$map-height: 275px;
+
 $max-width: 1280px;
 
 $spacing-xs: 4px;

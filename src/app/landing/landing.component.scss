@@ -1,11 +1,46 @@
-@import "../../scss/_variables";
-@import "../../scss/functions/_icon_urls";
-@import "../../scss/functions/_replace";
+@use "../../scss/variables";
+@use "../../scss/functions/icon_urls";
 
 $card-header-pixels-line-height: 24px;
 $card-header-pixels-margin-bottom: 12px;
 $card-header-height: $card-header-pixels-line-height +
   $card-header-pixels-margin-bottom;
+
+a[disabled] {
+  cursor: default;
+  pointer-events: none;
+}
+
+.relative {
+  position: relative;
+}
+
+.map-help-target {
+  min-width: 24em;
+  max-width: 24em;
+  opacity: 0;
+  position: absolute;
+  right: -3em;
+  text-align: center;
+  visibility: hidden;
+  transition: opacity 0.3s linear;
+  z-index: 1;
+
+  &:hover {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &.help-total {
+    top: -4.5em;
+  }
+  &.help-high_quality {
+    top: -8em;
+  }
+  &.help-three_d {
+    top: -6em;
+  }
+}
 
 .app-truncate {
   overflow: hidden;
@@ -17,10 +52,11 @@ $card-header-height: $card-header-pixels-line-height +
 
 .container-h {
   justify-content: space-between;
+  align-items: center;
 }
 
 .data-link {
-  color: $stats-blue;
+  color: variables.$stats-blue;
   display: inline-block;
   font-size: 14px;
   font-weight: 600;
@@ -29,31 +65,38 @@ $card-header-height: $card-header-pixels-line-height +
   &::after {
     content: " >";
   }
+  &:focus-visible {
+    z-index: 12;
+  }
 }
 
 .data-rows {
   font-size: 12px;
   width: 100%;
+  position: relative;
 }
 
 .data-rows-title {
-  color: $gray-faint;
+  color: variables.$gray-faint;
   font-size: 14px;
   font-weight: 600;
   padding: 9px 0 14px 0;
+  .x {
+    margin-left: 0.6em;
+  }
 }
 
 .entry-card {
   padding: 18px 12px;
   width: 100%;
 
-  @media (min-width: $bp-desktop) {
+  @media (min-width: variables.$bp-desktop) {
     padding: 16px;
   }
 }
 
 .entry-card-content {
-  background: $white;
+  background: variables.$white;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -74,7 +117,7 @@ $card-header-height: $card-header-pixels-line-height +
 
   .info-icon {
     &::after {
-      background-image: svg-url-icon-spinner(#{$gray-light});
+      background-image: icon_urls.svg-url-icon-spinner(variables.$gray-light);
       content: "";
       position: absolute;
       width: 22px;
@@ -82,19 +125,25 @@ $card-header-height: $card-header-pixels-line-height +
       opacity: 0;
       left: 0;
       top: -50%;
-      transition: opacity $transition-duration ease-in-out;
+      transition: opacity variables.$transition-duration ease-in-out;
     }
   }
   a.info-icon {
     &::after {
+      // shorten line
       left: 18px;
     }
   }
 }
 
+.entry-card-multi {
+  position: relative;
+}
+
+.entry-card-multi,
 .entry-card-pair {
   width: 100%;
-  @media (min-width: $bp-desktop) {
+  @media (min-width: variables.$bp-desktop) {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -114,47 +163,72 @@ $card-header-height: $card-header-pixels-line-height +
 }
 
 .map-container {
-  width: 100%;
+  position: relative;
   max-width: 100%;
+  width: 100%;
 
   & + .data-rows {
     width: 100%;
   }
+  height: variables.$map-height;
 }
 
 .record-list {
   align-items: center;
-  border-top: 1px solid $gray-5;
-  padding: 4px 0;
+  border-top: 1px solid variables.$gray-5;
 
   &:last-child {
-    border-bottom: 1px solid $gray-5;
+    border-bottom: 1px solid variables.$gray-5;
   }
 
-  :first-child {
+  :first-child:not(.map-navigation-link) {
     flex-grow: 1;
   }
+}
 
-  .numeric {
-    margin-left: 6px;
-    text-align: right;
-    min-width: 6em;
+.map-section {
+  .link-select-country,
+  .link-open-country {
+    color: unset;
+    .flag-orb {
+      height: 1em;
+      top: 2px;
+      width: 1em;
+    }
+  }
+
+  .link-open-country {
+    .flag-orb {
+      margin-right: 1rem;
+    }
+  }
+
+  .link-select-country {
+    .flag-orb {
+      opacity: 0;
+      margin-left: 7px;
+    }
+    &:hover {
+      .flag-orb {
+        opacity: 1;
+      }
+    }
+
+    &:focus-visible {
+      outline: 0;
+      z-index: 12;
+      span {
+        background: #fff;
+        border: 1px solid variables.$focus-highlight-colour;
+      }
+      .flag-orb {
+        display: none;
+      }
+    }
   }
 }
 
-.splash-map {
-  border: 1px solid $near-black;
-  font-size: 22px;
-  height: calc(100% - 8em);
-  margin: 4em;
-  overflow: hidden;
-  padding: 1.5em;
-  position: fixed;
-  width: calc(100% - 8em);
-  z-index: 1;
-}
-
-@media (min-width: $bp-desktop) {
+@media (min-width: variables.$bp-desktop) {
   .double-card .data-rows {
     margin-left: 2em;
   }

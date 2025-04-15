@@ -3,6 +3,8 @@
     <ng-container *ngIf="item.current || item.saved">
       <a
         (click)="toggle(key, item.current)"
+        (keydown.enter)="toggle(key, item.current)"
+        tabindex="-1"
         class="compare-data-link"
         [ngClass]="{ applied: item.applied, current: item.current }"
         ><span
@@ -20,8 +22,10 @@
 
       <a
         (click)="toggleSaved(key, item.current)"
+        (keydown.enter)="toggleSaved(key, item.current)"
         class="save"
         [ngClass]="{ saved: item.saved }"
+        tabindex="0"
       ></a>
     </ng-container>
   </ng-template>

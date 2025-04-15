@@ -1,13 +1,17 @@
 @charset "UTF-8";
-@import "scss/reset";
-@import "scss/mixins";
-@import "scss/dropdown";
-@import "scss/forms";
-@import "scss/lists";
-@import "scss/links";
-@import "scss/headings";
-@import "scss/headings_simple";
-@import "scss/main";
+@use "scss/reset";
+@use "scss/mixins";
+@use "scss/dropdown";
+@use "scss/countries";
+@use "scss/forms";
+@use "scss/lists";
+@use "scss/links";
+@use "scss/headings";
+@use "scss/headings_simple";
+@use "scss/main";
+@use "scss/speech-bubbles";
+@use "scss/functions/icon_urls";
+@use "scss/variables";
 
 :root {
   --eu-cm-color-theme: #095f90;
@@ -20,7 +24,9 @@
   display: inline-block;
   position: relative;
   &::after {
-    background-image: svg-url-icon-external("#{$stats-blue}");
+    background-image: icon_urls.svg-url-icon-external(
+      "#{variables.$stats-blue}"
+    );
     background-repeat: no-repeat;
     background-size: cover;
     content: "";
@@ -33,6 +39,11 @@
   }
 
   &:hover::after {
-    background-image: svg-url-icon-external(#4d4d4d);
+    background-image: icon_urls.svg-url-icon-external(#4d4d4d);
   }
+}
+
+.entry-card-header:has(:focus-visible) {
+  background: variables.$offwhite;
+  z-index: 12;
 }

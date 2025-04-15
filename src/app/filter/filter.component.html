@@ -3,21 +3,26 @@
   *ngIf="form && group && !state.disabled"
   [formGroup]="form"
   appClickAware
+  appOpenerFocus
+  [fnHide]="hide.bind(this)"
   [includeClicksOnClasses]="
     group + '' === 'dates'
       ? ['mat-calendar-body', 'mat-datepicker-content']
       : []
   "
   (clickOutside)="hide()"
+  tabindex="-1"
 >
   <li>
     <a
       (click)="toggle()"
+      (keydown.enter)="toggle()"
       class="filter-opener filter-title"
       [ngClass]="{
         open: state.visible,
         disabled: isDisabled()
       }"
+      [attr.inert]="isDisabled() ? true : null"
     >
       <span class="container-h">
         <span class="icon filter-icon-{{ group }}"> </span>
@@ -27,7 +32,7 @@
               {{ setVals }}
             </span>
           </ng-container>
-          <span class="opener-name">
+          <span #opener class="opener-name" tabindex="0">
             {{ group | renameApiFacet }}
           </span>
         </span>
@@ -44,7 +49,7 @@
   <ng-container *ngIf="state.visible">
     <ng-container *ngIf="optionSet; else dates">
       <li class="checkboxes">
-        <ul>
+        <ul tabindex="-1">
           <li class="checkbox-filter container-h">
             <span class="icon"></span>
             <input
@@ -57,15 +62,15 @@
             />
           </li>
         </ul>
-        <ul class="checkboxes-list">
+        <ul class="checkboxes-list" tabindex="-1">
           <li>
-            <ul *ngFor="let option of optionSet.options">
-              <li>
+            <ul *ngFor="let option of optionSet.options" tabindex="-1">
+              <li tabindex="-1">
                 <app-checkbox
                   [form]="form"
                   [controlName]="option.name"
                   [labelText]="
-                    option.label | highlightMatch: [filterTerm.value]
+                    option.label | highlightMatch : [filterTerm.value]
                   "
                   [group]="group"
                   (valueChanged)="changed()"

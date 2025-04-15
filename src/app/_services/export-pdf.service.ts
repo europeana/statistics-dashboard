@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import * as pdfMake from 'pdfmake/build/pdfmake.js';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
-
 import { FmtTableData, TableRow } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class ExportPDFService {
+  constructor() {
+    pdfMake.addVirtualFileSystem(pdfFonts);
+  }
+
   getFillColour(rowIndex: number): string | null {
     return rowIndex % 2 === 0 ? '#CCCCCC' : null;
   }

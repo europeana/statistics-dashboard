@@ -66,6 +66,11 @@ export interface NameLabelValid extends NameLabel {
   valid: boolean;
 }
 
+export interface IdValue {
+  id: string;
+  value: number;
+}
+
 export interface NameValue {
   name: string;
   value: number;
@@ -73,4 +78,9 @@ export interface NameValue {
 
 export interface NamesValuePercent extends NameValue {
   percent: number;
+}
+
+export interface InputDescription {
+  controlName: string;
+  group: string;
 }

@@ -1,0 +1,600 @@
+@use "../../scss/variables";
+
+.country-section-header {
+  line-height: 24px;
+  margin-bottom: 12px;
+
+  .speech-bubble-content {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 1em;
+    grid-row-gap: 0.75em;
+    max-width: 42em;
+    padding: 20px;
+  }
+
+  .eli-speech-bubble-wrapper {
+    display: none;
+    position: absolute;
+    top: 1.75rem;
+    left: 0.75rem;
+    z-index: 2;
+  }
+
+  .info-icon {
+    margin-left: 0;
+    margin-right: 4px;
+    position: relative;
+    width: 14px;
+    height: 14px;
+
+    // hover area
+    &::before {
+      content: "";
+      display: block;
+      height: 2em;
+      left: 0.25em;
+      position: absolute;
+      top: 0.25em;
+      width: 2em;
+    }
+  }
+
+  .eli-speech-bubble-wrapper:hover,
+  .info-icon:hover ~ .eli-speech-bubble-wrapper {
+    display: block;
+  }
+}
+
+.help-opener {
+  cursor: help;
+  position: relative;
+
+  &::after {
+    content: "?";
+    border: 1px solid variables.$gray-5;
+    border-radius: 50%;
+    width: 1em;
+    height: 1em;
+    line-height: 1em;
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+.entry-card {
+  .main-speech-bubble-wrapper,
+  .help-speech-bubble-wrapper {
+    font-size: 24px;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .main-speech-bubble-wrapper {
+    cursor: help;
+    left: 1em;
+    max-width: calc(100% - 2em);
+    position: absolute;
+    top: -0.25em;
+    transform: translateY(calc(1em - 100%));
+    z-index: 1;
+
+    &::after {
+      // hover area
+      content: "";
+      display: block;
+      height: 4.5rem;
+      position: absolute;
+      top: 100%;
+      width: 100%;
+    }
+
+    &:hover {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .help-speech-bubble-wrapper {
+    position: absolute;
+    text-align: center;
+    z-index: 1;
+
+    &.help-targets {
+      bottom: calc(100% + 16px);
+      left: 0;
+    }
+
+    &.help-items {
+      bottom: calc(100% + 8px);
+      right: 50%;
+      transform: translateX(50%);
+    }
+
+    &.help-percent {
+      right: 1em;
+      top: 140px;
+      white-space: nowrap;
+    }
+  }
+
+  &.entry-card-total .help-speech-bubble-wrapper.help-items {
+    right: 9em;
+  }
+}
+
+.header-text {
+  color: variables.$gray-med;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.non-target-text {
+    margin: 1.6em 0 0 12px;
+  }
+}
+
+.appendice-grid-wrapper {
+  $timeTransition: 0.5s;
+
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows $timeTransition linear;
+
+  &.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  & > * {
+    overflow-y: hidden;
+  }
+}
+
+.appendice-toggle {
+  display: flex;
+  justify-self: flex-end;
+  flex-direction: row;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 14px 22px 0 auto;
+  position: relative;
+  color: variables.$gray-med;
+  .save {
+    position: absolute;
+    left: auto;
+    right: -24px;
+    transform: rotate(90deg);
+  }
+  &:hover .save {
+    transform: rotate(0deg);
+  }
+}
+
+.column-close {
+  align-items: center;
+  align-self: flex-start;
+  display: flex;
+  white-space: nowrap;
+
+  .x {
+    margin-left: 0.6em;
+    opacity: 0;
+  }
+
+  &:hover .x {
+    opacity: 1;
+  }
+
+  &:active + .entry-card-content {
+    transform: rotate(1deg);
+  }
+}
+
+.column-close,
+.column-restore {
+  color: variables.$gray-med;
+}
+
+.column-restore {
+  font-weight: bold;
+  position: absolute;
+  right: 1em;
+  top: 1em;
+}
+
+.entry-card,
+.entry-card-header {
+  position: relative;
+}
+
+.entry-card-multi > .entry-card:first-child:last-child {
+  width: 100%;
+}
+
+.line-and-legend {
+  position: relative;
+
+  .entry-card-multi {
+    justify-content: space-evenly;
+    & > :first-child {
+      flex-grow: 1;
+    }
+  }
+}
+
+.pad-word-right {
+  padding-right: 0.25em;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.powerbar,
+.powerbar-charge {
+  height: 3em;
+}
+
+.powerbar {
+  position: relative;
+  background-color: transparent;
+  border: 1px solid variables.$gray-5;
+  margin: 0 16px 0 8px;
+
+  &::after {
+    content: "";
+    display: block;
+    position: absolute;
+    border: 1px solid variables.$gray-5;
+    width: 8px;
+    height: 1em;
+    top: calc(1em - 2px);
+    right: -10px;
+    border-left: 1px solid transparent;
+  }
+  &::before {
+    content: "";
+    opacity: 0;
+  }
+}
+
+.powerbar-charge {
+  background-color: variables.$stats-blue;
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+}
+
+.powerbar-charge-label {
+  color: variables.$stats-blue;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 150%;
+  margin-left: 1rem;
+  position: absolute;
+  top: 6px;
+
+  &.zeroed {
+    color: #fff;
+    left: 0;
+  }
+}
+
+.powerbar-label-left {
+  font-weight: 600;
+  margin-left: 8px;
+  position: absolute;
+}
+
+.powerbar-subtitle {
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+.powerbar-wrapper {
+  display: flex;
+  flex-direction: column-reverse;
+  margin: 0.6rem 0 1em 0;
+  position: relative;
+
+  & + .data-link {
+    margin-top: 1.4em;
+  }
+
+  .powerbar-target-labels {
+    font-size: 20px;
+    margin-bottom: 0.6rem;
+  }
+}
+
+.powerbar-charge-label,
+.total,
+.total-title {
+  .hide-on-triple {
+    display: inline;
+  }
+  .show-on-triple {
+    display: none;
+  }
+
+  &.triple {
+    .hide-on-triple {
+      display: none;
+    }
+
+    .show-on-triple {
+      display: inline;
+    }
+  }
+}
+
+// show only the last restore link
+.entry-card:not(:last-child):not(.line-and-legend) .column-restore {
+  display: none;
+}
+
+// prevent user from deleting everything
+.entry-card:first-child:last-child .column-close {
+  cursor: default;
+  &:active {
+    // this prevents clicks from completing
+    // it's applied on the active state to preserve the tooltip
+    pointer-events: none;
+  }
+  &:hover .x {
+    opacity: 0;
+  }
+}
+
+.entry-card-content {
+  .entry-card-totals {
+    .totals {
+      & > :last-child {
+        display: none;
+      }
+    }
+  }
+  .totals {
+    position: relative;
+  }
+}
+
+.entry-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  margin: 1em 0.6em 0.75em 0.6em;
+
+  display: flex;
+  align-items: center;
+
+  & > *:not(:last-child) {
+    margin-right: 0.4em;
+  }
+
+  :last-child {
+    position: relative;
+    top: 4px;
+  }
+
+  & + .country-section-header {
+    padding-left: 21px;
+    align-items: center;
+    display: flex;
+    position: relative;
+    max-width: 100%;
+  }
+
+  .flag-orb {
+    $flag-dimension: 1.6rem;
+    min-width: $flag-dimension;
+    min-height: $flag-dimension;
+  }
+}
+
+.save {
+  opacity: 1;
+}
+
+// switch on the help / dim the less-relevant content...
+.entry-card:has(.help-opener:hover, .main-speech-bubble-wrapper:hover) {
+  $help-animation-delay: 0.325s;
+  $help-animation-time: 0.3s;
+
+  $animation-time-half: calc($help-animation-time / 2);
+  $animation-time-move: $animation-time-half;
+
+  .powerbar-wrapper .powerbar-target-labels {
+    opacity: 0;
+    transition: opacity $animation-time-half linear $help-animation-delay,
+      margin-bottom $animation-time-move linear $help-animation-delay;
+  }
+
+  &:not(.entry-card-total) {
+    // create space by reducing heights
+    .powerbar-charge {
+      height: 2em;
+      transition: height $animation-time-move linear $help-animation-delay;
+    }
+
+    // ...and by by re-allocating margins...
+    .powerbar-wrapper .powerbar-target-labels {
+      margin-bottom: 0;
+    }
+
+    .powerbar-subtitle + .powerbar-wrapper {
+      margin-top: 2.8rem;
+      transition: margin-top $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-charge-label {
+      top: 0;
+      transition: top $animation-time-move linear $help-animation-delay;
+    }
+
+    .powerbar-wrapper + .powerbar-wrapper {
+      margin-bottom: 0;
+      transition: margin-top $animation-time-move linear $help-animation-delay,
+        margin-bottom $animation-time-move linear $help-animation-delay;
+    }
+  }
+
+  // dim
+  .data-link,
+  .total.bold,
+  .total-title.bold,
+  .totals .total-title .show-on-triple,
+  .powerbar-subtitle {
+    opacity: 0.3;
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+
+  // hide
+  .powerbar-subtitle {
+    opacity: 0;
+  }
+
+  // overlay
+  .powerbar::before {
+    display: block;
+    top: -2px;
+    left: -2px;
+    right: -10px;
+    bottom: -2px;
+    position: absolute;
+    background: #fff;
+    opacity: 0.7;
+    z-index: 1;
+    transition: opacity $help-animation-time linear $help-animation-delay;
+  }
+
+  // above overlay
+  .powerbar-charge-label .show-on-triple {
+    z-index: 2;
+    position: relative;
+  }
+
+  // switch on the speech bubbles
+  .help-speech-bubble-wrapper {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .main-speech-bubble-wrapper {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &.entry-card-total {
+    .help-speech-bubble-wrapper,
+    .main-speech-bubble-wrapper {
+      transition: opacity $help-animation-time linear $help-animation-delay;
+    }
+  }
+  &:not(.entry-card-total) .help-speech-bubble-wrapper,
+  .main-speech-bubble-wrapper {
+    transition: opacity $animation-time-half linear
+      calc($help-animation-time + $animation-time-half);
+  }
+}
+
+// maintain hover on the main when passing over a help
+.entry-card:has(.main-speech-bubble-wrapper:hover) {
+  .help-speech-bubble-wrapper {
+    z-index: 0;
+  }
+}
+
+.xxl-only {
+  display: none;
+}
+
+// media queries
+
+@media (min-width: variables.$bp-med) {
+  .entry-card-multi .entry-card .main-speech-bubble-wrapper::after {
+    // hover area
+    height: 4.5rem;
+  }
+}
+
+@media (min-width: variables.$bp-desktop) {
+  // the "total" card is narrower than the others (unless a card is hidden)
+  .entry-card + .entry-card + .entry-card-total {
+    width: 40%;
+  }
+
+  .entry-card-multi .entry-card {
+    .main-speech-bubble-wrapper,
+    .help-speech-bubble-wrapper {
+      font-size: 14px;
+      &.help-targets {
+        left: -2.5em;
+      }
+    }
+
+    .help-speech-bubble-wrapper {
+      &.help-items {
+        right: -2.5em;
+        transform: unset;
+      }
+
+      &.help-percent {
+        right: 0.25em;
+      }
+    }
+
+    &.entry-card-total .help-speech-bubble-wrapper.help-items {
+      right: -2.5em;
+    }
+
+    .main-speech-bubble-wrapper {
+      left: 0em;
+      max-width: calc(100% + 2em);
+      &::after {
+        // hover area
+        height: 5em;
+      }
+    }
+  }
+
+  .percent-value {
+    align-self: flex-end;
+  }
+}
+
+@media (min-width: variables.$bp-xxl) {
+  .percent-value {
+    align-self: flex-start;
+  }
+
+  // the "total" card can now be as wide as the others
+  .entry-card + .entry-card + .entry-card-total {
+    width: 50%;
+  }
+
+  .entry-card-multi .entry-card {
+    .main-speech-bubble-wrapper,
+    .help-speech-bubble-wrapper {
+      font-size: 16px;
+    }
+    .main-speech-bubble-wrapper::after {
+      // hover area
+      height: 4.375em;
+    }
+  }
+
+  // show the longer translations...
+  .xxl-only {
+    display: inline;
+  }
+
+  // ...and hide the shorter translations
+  .xxl-fallback {
+    display: none;
+  }
+}

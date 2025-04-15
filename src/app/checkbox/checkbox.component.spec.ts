@@ -42,4 +42,10 @@ describe('CheckboxComponent', () => {
     component.onChange();
     expect(component.valueChanged.emit).toHaveBeenCalled();
   });
+
+  it('should handle the space key', () => {
+    spyOn(component.keySelectionMade, 'emit');
+    component.onSpaceKey();
+    expect(component.keySelectionMade.emit).toHaveBeenCalled();
+  });
 });

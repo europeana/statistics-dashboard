@@ -1,10 +1,10 @@
-@import "functions/_icon_urls";
-@import "checkboxes";
-@import "variables";
-@import "dialog";
-@import "home";
-@import "filters";
-@import "info-icon";
+@use "functions/_icon_urls";
+@use "checkboxes";
+@use "variables";
+@use "dialog";
+@use "home";
+@use "filters";
+@use "info-icon";
 body,
 html {
   scroll-behavior: smooth;
@@ -18,9 +18,9 @@ html {
 }
 
 body {
-  background: $offwhite;
-  color: $textcolour_body;
-  font: 16px / 1.6 $font-primary;
+  background: variables.$offwhite;
+  color: variables.$textcolour_body;
+  font: 16px / 1.6 variables.$font-primary;
   -webkit-text-size-adjust: 100%;
   word-break: normal;
   word-wrap: break-word;
@@ -74,33 +74,29 @@ body {
 
 /* dashboard wrapper */
 .dashboard-wrapper {
-  background-color: $offwhite;
+  background-color: variables.$offwhite;
   display: inline-block;
   width: 100%;
 }
 
 .export-icon {
-  background-image: svg-url-icon-share($gray-med);
+  background-image: icon_urls.svg-url-icon-share(variables.$gray-med);
   background-repeat: no-repeat;
 }
 
-.header-outer .ct-zero {
-  margin-left: 0;
-}
-
 .icon-clear {
-  background-image: svg-url-icon-x($near-black);
+  background-image: icon_urls.svg-url-icon-x(variables.$near-black);
   display: inline-block;
   height: 32px;
   left: 0;
   opacity: 0.3;
   position: absolute;
-  transition: filter $transition-duration ease-in-out,
-    opacity $transition-duration ease-in-out;
+  transition: filter variables.$transition-duration ease-in-out,
+    opacity variables.$transition-duration ease-in-out;
   width: 32px;
 
   &:hover {
-    background-image: svg-url-icon-x($eu-red);
+    background-image: icon_urls.svg-url-icon-x(variables.$eu-red);
     opacity: 1;
 
     // highlight items to remove
@@ -125,7 +121,7 @@ body {
 }
 
 .loading-modal::after {
-  background-image: svg-url-icon-spinner(#{$stats-blue});
+  background-image: icon_urls.svg-url-icon-spinner(#{variables.$stats-blue});
   background-position: center;
   background-repeat: no-repeat;
   transform: scale(5);
@@ -147,9 +143,43 @@ body {
 .fixed-modal-content {
   padding: 2em;
   position: relative;
-  background: $white;
+  background: variables.$white;
   max-width: 25em;
   margin: 30vh auto 0 auto;
+}
+
+.save,
+.saved {
+  background-position: center;
+  background-size: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns:dc='http://purl.org/dc/elements/1.1/' xmlns:cc='http://creativecommons.org/ns%23' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns%23' xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' xmlns:sodipodi='http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd' xmlns:inkscape='http://www.inkscape.org/namespaces/inkscape' viewBox='0 -256 1792 1792' id='svg2' version='1.1' inkscape:version='0.48.3.1 r9886' width='100%25' height='100%25' sodipodi:docname='pushpin_font_awesome.svg'%3E%3Cmetadata id='metadata12'%3E%3Crdf:rdf%3E%3Ccc:work rdf:about=''%3E%3Cdc:format%3Eimage/svg+xml%3C/dc:format%3E%3Cdc:type rdf:resource='http://purl.org/dc/dcmitype/StillImage'%3E%3C/dc:type%3E%3C/cc:work%3E%3C/rdf:rdf%3E%3C/metadata%3E%3Cdefs id='defs10'%3E%3C/defs%3E%3Csodipodi:namedview pagecolor='%23ffffff' bordercolor='%23666666' borderopacity='1' objecttolerance='10' gridtolerance='10' guidetolerance='10' inkscape:pageopacity='0' inkscape:pageshadow='2' inkscape:window-width='640' inkscape:window-height='480' id='namedview8' showgrid='false' inkscape:zoom='0.13169643' inkscape:cx='896' inkscape:cy='896' inkscape:window-x='0' inkscape:window-y='25' inkscape:window-maximized='0' inkscape:current-layer='svg2'%3E%3C/sodipodi:namedview%3E%3Cg transform='matrix%281,0,0,-1,318.91525,1209.4915%29' id='g4'%3E%3Cpath d='m 480,672 v 448 q 0,14 -9,23 -9,9 -23,9 -14,0 -23,-9 -9,-9 -9,-23 V 672 q 0,-14 9,-23 9,-9 23,-9 14,0 23,9 9,9 9,23 z m 672,-352 q 0,-26 -19,-45 -19,-19 -45,-19 H 659 l -51,-483 q -2,-12 -10.5,-20.5 Q 589,-256 577,-256 h -1 q -27,0 -32,27 L 468,256 H 64 Q 38,256 19,275 0,294 0,320 0,443 78.5,541.5 157,640 256,640 v 512 q -52,0 -90,38 -38,38 -38,90 0,52 38,90 38,38 90,38 h 640 q 52,0 90,-38 38,-38 38,-90 0,-52 -38,-90 -38,-38 -90,-38 V 640 q 99,0 177.5,-98.5 Q 1152,443 1152,320 z' id='path6' inkscape:connector-curvature='0' style='fill:%23828282'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  content: "";
+  height: 12px;
+  left: -24px;
+  padding: 12px;
+
+  position: absolute;
+  top: 0px;
+  transform: rotate(270deg);
+  transition: transform 20ms;
+  width: 12px;
+
+  &:hover {
+    transform: rotate(360deg);
+  }
+}
+
+:hover + .save {
+  transform: rotate(360deg);
+}
+
+.save {
+  opacity: 0;
+}
+
+.saved {
+  opacity: 1;
 }
 
 .total {
@@ -166,7 +196,7 @@ body {
   margin-bottom: 16px;
 }
 
-@media (min-width: $bp-small-3) {
+@media (min-width: variables.$bp-small-3) {
   .dashboard-wrapper {
     padding: 0 1.2rem;
     .statistics-dashboard {
@@ -175,13 +205,13 @@ body {
   }
 }
 
-@media (min-width: $bp-xl) {
+@media (min-width: variables.$bp-xl) {
   .dashboard-wrapper .statistics-dashboard {
     display: flex;
     .statistics-dashboard-right {
       flex-grow: 1;
-      padding-left: $spacing-l;
-      padding-right: $spacing-l;
+      padding-left: variables.$spacing-l;
+      padding-right: variables.$spacing-l;
     }
   }
 }
@@ -209,7 +239,7 @@ body {
 
   &::before,
   &::after {
-    background: $gray-med;
+    background: variables.$gray-med;
     content: "";
     display: block;
     height: 2px;

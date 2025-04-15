@@ -6,7 +6,7 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -46,6 +46,10 @@ import { BarComponent } from '../chart';
 import { GridComponent } from '../grid';
 import { SnapshotsComponent } from '../snapshots';
 import { OverviewComponent } from './overview.component';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
@@ -62,7 +66,7 @@ describe('OverviewComponent', () => {
   const tickTimeChartDebounce = 400;
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const tmpParams = {};
-  tmpParams[DimensionName.country] = 'Italy';
+  tmpParams[DimensionName.country] = 'IT';
   const queryParams = new BehaviorSubject(tmpParams as Params);
 
   let api: APIService;
@@ -73,9 +77,9 @@ describe('OverviewComponent', () => {
     params.next({});
 
     TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         FormsModule,
-        HttpClientTestingModule,
         ReactiveFormsModule,
         RouterTestingModule.withRoutes([
           {
@@ -113,9 +117,10 @@ describe('OverviewComponent', () => {
         {
           provide: RenameApiFacetPipe,
           useValue: createMockPipe('renameApiFacet')
-        }
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+      ]
     })
       .overrideComponent(OverviewComponent, {
         remove: { imports: [BarComponent, GridComponent] },
@@ -337,6 +342,7 @@ describe('OverviewComponent', () => {
 
       generatedLabel = component.generateSeriesLabel();
       expect(generatedLabel.indexOf('Denmark')).toBeGreaterThan(-1);
+      expect(generatedLabel.indexOf('Iceland')).toBeGreaterThan(-1);
 
       nextParams['date-to'] = [today];
       queryParams.next(nextParams);
@@ -401,8 +407,8 @@ describe('OverviewComponent', () => {
       component.filterData = {};
       component.filterData[DimensionName.country] = [
         {
-          name: 'Scotland',
-          label: 'Scotland',
+          name: 'Ireland',
+          label: 'Ireland',
           valid: true
         }
       ];
@@ -453,7 +459,7 @@ describe('OverviewComponent', () => {
     it('should build the filters', () => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
       const ops = {};
-      ops[DimensionName.country] = ['Scotland', 'Yugoslavia'];
+      ops[DimensionName.country] = ['IE', 'IT'];
 
       component.buildFilters(ops);
       fixture.detectChanges();
@@ -463,12 +469,7 @@ describe('OverviewComponent', () => {
     it('should build the filters (from the query parameters)', fakeAsync(() => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
       const nextParams = {};
-      nextParams[DimensionName.country] = [
-        'Scotland',
-        'Yugoslavia',
-        'Italy',
-        'Greece'
-      ];
+      nextParams[DimensionName.country] = ['Italy', 'Greece'];
       queryParams.next(nextParams);
       fixture.detectChanges();
       tick(1);
@@ -728,6 +729,34 @@ describe('OverviewComponent', () => {
       selected = component.getSetCheckboxValues('DOES_NOT_EXIST');
       expect(selected.length).toEqual(0);
     });
+
+    it('should focus the export opener', fakeAsync(() => {
+      component.exportOpener = {
+        nativeElement: {
+          focus: jasmine.createSpy()
+        }
+      };
+      component.exportOpenerToolbar = {
+        nativeElement: {
+          focus: jasmine.createSpy()
+        }
+      };
+
+      component.focusExportOpener(false);
+      tick(1);
+
+      expect(component.exportOpener.nativeElement.focus).toHaveBeenCalled();
+      expect(
+        component.exportOpenerToolbar.nativeElement.focus
+      ).not.toHaveBeenCalled();
+
+      component.focusExportOpener(true);
+      tick(1);
+
+      expect(
+        component.exportOpenerToolbar.nativeElement.focus
+      ).toHaveBeenCalled();
+    }));
 
     it('should clear the dates', fakeAsync(() => {
       expect(component.filterStates.dates.visible).toBeFalsy();

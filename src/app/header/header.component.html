@@ -2,9 +2,12 @@
   <div class="header">
     <a
       class="logo"
+      title="home"
       data-e2e="link-home-header"
       routerLink="/"
+      (keydown.enter)="keyNavHome($event)"
       [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+      [attr.tabindex]="router.url === '/' ? -1 : 0"
     >
       <span class="icon-wrapper">
         <span class="icon"></span>
@@ -14,10 +17,99 @@
         <br />dashboard
       </span>
     </a>
+
+    <span
+      #menuOpener
+      class="country-menu-opener"
+      (click)="toggleMenu($event)"
+      (keydown.enter)="toggleMenu($event, true)"
+      [ngClass]="{ open: menuIsOpen }"
+      appClickAware
+      (clickOutside)="menuIsOpen = false"
+      appOpenerFocus
+      [fnHide]="toggleMenu.bind(this)"
+    >
+      <span
+        [ngClass]="{
+          default: !activeCountry
+        }"
+        class="flag-orb {{ activeCountry }}"
+      >
+      </span>
+
+      <span class="active-country" tabindex="0">
+        @if(activeCountry) {
+        {{ activeCountry | renameCountry }}
+        } @else { Country Pages }
+      </span>
+
+      <a
+        class="country-closer x"
+        *ngIf="activeCountry"
+        routerLink="/"
+        [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+        title="home"
+        tabindex="0"
+        (click)="toggleMenu($event)"
+      >
+      </a>
+
+      <span class="country-select">
+        <span
+          class="country-select-inner"
+          tabindex="-1"
+          (keyUp.esc)="toggleMenu($event, true)"
+        >
+          <ng-container
+            *ngFor="
+              let country of countryTotalMap
+                | keyvalue : classReference.sortByDecodedCountryName
+            "
+          >
+            <a
+              class="menu-item"
+              (click)="toggleMenu($event)"
+              (keydown.enter)="keyNavToCountry($event, country.key)"
+              (keyUp.esc)="toggleMenu($event, true)"
+              [attr.disabled]="
+                country.key === activeCountry ? 'disabled' : null
+              "
+              [routerLink]="['/country', country.key | renameCountry]"
+              [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+              [ngClass]="{
+                'first-of-letter': !!countryFirstOfLetter[country.key]
+              }"
+              tabindex="{{ menuIsOpen ? 0 : -1 }}"
+            >
+              <span class="flag-orb" [ngClass]="country.key"></span>
+              <span
+                class="text"
+                [attr.data-text]="countryFirstOfLetter[country.key]"
+                >{{ country.key | renameCountry }}</span
+              >
+            </a>
+          </ng-container>
+        </span>
+      </span>
+    </span>
   </div>
 
-  <div *ngIf="showPageTitle" class="fit-to-page page-title-wrapper">
-    <h1 class="page-title" i18n="landing page title@@landingPageTitle">
+  <div
+    *ngIf="showPageTitle !== classReference.PAGE_TITLE_HIDDEN"
+    class="fit-to-page page-title-wrapper"
+    [ngClass]="{
+      minified: showPageTitle === classReference.PAGE_TITLE_MINIFIED,
+      viewable:
+        showPageTitle === classReference.PAGE_TITLE_MINIFIED &&
+        pageTitleInViewport,
+      dynamic: pageTitleDynamic
+    }"
+  >
+    <h1
+      *ngIf="showPageTitle === classReference.PAGE_TITLE_SHOWING"
+      class="page-title"
+      i18n="landing page title@@landingPageTitle"
+    >
       Europeana complete dataset
     </h1>
     <app-ct-zero-control *ngIf="form" [form]="form"></app-ct-zero-control>

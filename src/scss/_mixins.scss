@@ -1,3 +1,4 @@
+@use "variables";
 @use "sass:math";
 
 /* MIXINS
@@ -29,7 +30,7 @@
   @if $keyword {
     font-size: $keyword;
   } @else {
-    font-size: $decimal-size * $base-font-multiplier * 16px;
+    font-size: $decimal-size * variables.$base-font-multiplier * 16px;
   }
   font-size: $decimal-size * 1rem;
 }
@@ -44,19 +45,3 @@
   -o-transition: $transition-property $transition-time $method;
   transition: $transition-property $transition-time $method;
 }
-
-/* SVG background with png fallback
-   Needs svg test or modernizr to add .no-svg to the html element to trigger fallback
-*/
-@mixin svg-bg-with-fallback($file_name) {
-  background-repeat: no-repeat;
-  background-image: inline-image("#{$file_name}.svg", image/svg\+ xml);
-
-  html.no-svg & {
-    background-image: image-url("#{$file_name}.png");
-  }
-}
-
-@import "mixins/transform";
-@import "mixins/placeholder";
-@import "mixins/flexbox";

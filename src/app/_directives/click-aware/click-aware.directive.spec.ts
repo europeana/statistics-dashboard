@@ -1,6 +1,6 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { ViewChild } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ClickService } from '../../_services';
 import { ClickAwareDirective } from '.';
@@ -25,8 +25,7 @@ import { ClickAwareDirective } from '.';
       </div>
     </div>
   `,
-  styles: ['.collapsed{ background-color: red; }'],
-  standalone: true
+  styles: ['.collapsed{ background-color: red; }']
 })
 class TestClickAwareDirectiveComponent {
   @ViewChild('clickInfo') clickInfo: ClickAwareDirective;
@@ -43,14 +42,11 @@ describe('ClickAwareDirective', () => {
   let liveElement: DebugElement;
   let innerElement: DebugElement;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ClickAwareDirective, TestClickAwareDirectiveComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(TestClickAwareDirectiveComponent);
     deadElement = fixture.debugElement.query(By.css('.dead-zone'));
     liveElement = fixture.debugElement.query(By.css('.live-zone'));

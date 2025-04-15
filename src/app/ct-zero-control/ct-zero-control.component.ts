@@ -12,7 +12,6 @@ import { NgClass, NgIf } from '@angular/common';
   selector: 'app-ct-zero-control',
   templateUrl: './ct-zero-control.component.html',
   styleUrls: ['./ct-zero-control.component.scss'],
-  standalone: true,
   imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf]
 })
 export class CTZeroControlComponent {

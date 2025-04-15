@@ -1,0 +1,763 @@
+<main
+  class="fit-to-page"
+  [ngClass]="{
+    'loading-modal': !targetMetaData
+  }"
+>
+  <h1 class="page-title">
+    <span class="flag-orb" [ngClass]="country"></span>
+    <ng-container
+      *ngIf="
+        headerRef &&
+        headerRef['countryTotalMap'] &&
+        headerRef['countryTotalMap'][country] !== undefined
+      "
+    >
+      <span *ngIf="country">{{ country | renameCountry }}</span>
+      <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
+      <span class="page-subtitle">
+        {{ headerRef["countryTotalMap"][country] }}% of the Europeana dataset
+      </span>
+    </ng-container>
+  </h1>
+
+  <ng-template
+    #powerLevel
+    let-percent="percent"
+    let-value="value"
+    let-label="label"
+    let-target="target"
+    let-colourIndex="colourIndex"
+    let-tooltip="tooltip"
+  >
+    <div class="powerbar-wrapper">
+      <div class="powerbar" [attr.title]="tooltip">
+        <div
+          class="powerbar-charge"
+          [style.backgroundColor]="colours[colourIndex]"
+          [style.width]="percent + '%'"
+        >
+          <div class="help-speech-bubble-wrapper help-targets">
+            <app-speech-bubble [arrowBottomRight]="true">
+              <span class="help-speech-bubble-content">
+                {{ tooltip }}
+              </span>
+            </app-speech-bubble>
+          </div>
+        </div>
+        <span
+          class="powerbar-charge-label"
+          [ngClass]="{
+            zeroed: percent >= 35,
+            triple: columnsEnabledCount === 3
+          }"
+          [style.color]="percent < 35 ? colours[colourIndex] : undefined"
+        >
+          <span class="hide-on-triple">{{ percent | number : "1.0-2" }}%</span>
+          <span class="show-on-triple">{{ percent | number : "1.0-1" }}%</span>
+        </span>
+      </div>
+
+      <span class="powerbar-target-labels">
+        <span class="powerbar-label-left">{{ label }}</span>
+        <app-speech-bubble [arrowBottomRight]="true">
+          <span class="show-on-powerbar-hover"
+            >{{ value | abbreviateNumber }} of
+          </span>
+          {{ target | number }}
+        </app-speech-bubble>
+      </span>
+    </div>
+  </ng-template>
+
+  <ng-template
+    #cardSummary
+    let-valName="valName"
+    let-dimension="dimension"
+    let-percent="percent"
+    let-value="value"
+    let-isPowerLevel="isPowerLevel"
+  >
+    <span class="container-h totals">
+      <span class="container-v">
+        <span class="total-title bold">
+          <ng-template #defaultCopy>
+            Top
+            {{ dimension | renameApiFacetShort | lowercase }}
+          </ng-template>
+          <span
+            *ngIf="isPowerLevel; else defaultCopy"
+            e2e="power-bar-summary"
+            i18n="landing chart summary percentage@@countryChartSummaryData"
+            class="help-opener"
+          >
+            Target
+          </span>
+        </span>
+        <span class="total bold">{{ valName | renameTargetType }}</span>
+      </span>
+      <span class="container-v">
+        <span
+          class="total-title"
+          [ngClass]="{
+            triple: columnsEnabledCount === 3
+          }"
+        >
+          <!-- the "top" header -->
+          <ng-template #defaultCopy>
+            <span
+              i18n="landing chart summary percentage@@countryChartSummaryTop"
+            >
+              Top
+              {{ dimension | renameApiFacetShort | lowercase }} items count
+            </span>
+          </ng-template>
+
+          <!-- the "power-level" header -->
+          <ng-container *ngIf="isPowerLevel; else defaultCopy">
+            <span
+              class="hide-on-triple"
+              i18n="
+                landing chart summary percentage@@countryChartSummaryTotalLong"
+              >Current items</span
+            >
+            <span class="show-on-triple">
+              <span
+                class="xxl-only"
+                i18n="
+                  landing chart summary percentage@@countryChartSummaryTotal"
+                >Current Items</span
+              >
+              <span
+                class="xxl-fallback"
+                i18n="
+                  landing chart summary
+                  percentage@@countryChartSummaryTotalShort"
+                >Items</span
+              >
+            </span>
+            <div class="help-speech-bubble-wrapper help-items">
+              <app-speech-bubble [arrowBottomRight]="true">
+                <span class="help-speech-bubble-content">
+                  {{ tooltipsTotal[valName] }}
+                </span>
+              </app-speech-bubble>
+            </div>
+          </ng-container>
+        </span>
+        <span
+          class="total"
+          [ngClass]="{
+            triple: columnsEnabledCount === 3
+          }"
+        >
+          <span class="hide-on-triple">{{ value | number }}</span>
+          <span class="show-on-triple" [attr.title]="tooltipsTotal[valName]">
+            {{ value | abbreviateNumber }}
+          </span>
+        </span>
+      </span>
+      <span class="container-v" *ngIf="valName !== TargetFieldName.TOTAL">
+        <span
+          class="total-title"
+          [ngClass]="{
+            triple: columnsEnabledCount === 3
+          }"
+        >
+          <span
+            class="hide-on-triple"
+            i18n="
+              landing chart summary
+              percentage@@countryChartSummaryPercentageNonTriple"
+          >
+            Percent of all country items
+          </span>
+          <span class="show-on-triple">
+            <span
+              class="xxl-only"
+              i18n="landing chart summary@@countryChartSummaryPercentage"
+              >Pct. of country items</span
+            >
+            <span
+              class="xxl-fallback"
+              i18n="landing chart summary@@countryChartSummaryPercentageShort"
+              >Pct. of all</span
+            >
+          </span>
+        </span>
+
+        <span
+          class="total percent-value"
+          [ngClass]="{
+            triple: columnsEnabledCount === 3
+          }"
+        >
+          <span class="hide-on-triple">{{ percent | number : "1.0-2" }}%</span>
+          <span class="show-on-triple" [attr.title]="tooltipsPercent[valName]">
+            {{ percent | number : "1.0-1" }}%</span
+          >
+        </span>
+      </span>
+    </span>
+  </ng-template>
+
+  <ng-template #powerLevelSummary let-name="name" let-valName="valName">
+    <!-- include percent speech bubble if applicable -->
+    <div
+      class="help-speech-bubble-wrapper help-percent"
+      *ngIf="valName !== TargetFieldName.TOTAL"
+    >
+      <app-speech-bubble [arrowTopRight]="true">
+        <span class="help-speech-bubble-content">
+          {{ tooltipsPercent[name] }}
+        </span>
+      </app-speech-bubble>
+    </div>
+
+    <!-- include cardSummary -->
+    <ng-content
+      *ngTemplateOutlet="
+        cardSummary;
+        context: {
+          valName: valName,
+          value: latestCountryData[valName] || 0,
+          percent: latestCountryPercentages[valName] || 0,
+          isPowerLevel: true
+        }
+      "
+    ></ng-content>
+  </ng-template>
+
+  <ng-template #dataRows let-dimension="dimension" let-data="data">
+    <div class="container-v data-rows" *ngIf="data">
+      <div class="container-h data-rows-title">
+        <span>{{ dimension | renameApiFacet | uppercase }}</span>
+        <span i18n="landing chart header@@countryLandingDataHeader"
+          >ITEMS PROVIDED</span
+        >
+      </div>
+      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+        <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
+        <span class="numeric">{{ row.value | number }}</span>
+        <span class="numeric">{{ row.percent }}%</span>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #tmpRestoreColumn>
+    <a
+      class="column-restore"
+      (click)="toggleColumn()"
+      [attr.title]="'restore ' + (columnToEnable | renameTargetType)"
+      *ngIf="columnsEnabledCount < 3"
+      >&gt;&gt;</a
+    >
+  </ng-template>
+
+  <!-- End of templates, beginning of content -->
+
+  <span
+    *ngIf="showTargetsData && eliUrl; let eliUrl"
+    class="country-section-header"
+  >
+    <a
+      target="_blank"
+      class="info-icon"
+      [href]="eliUrl"
+      title="ELI ref: {{ eliUrl }}"
+    ></a>
+    <span class="header-text" i18n="@@countryEliOpener">Data Targets</span>
+    <span class="eli-speech-bubble-wrapper">
+      <app-speech-bubble [arrowTopLeft]="true">
+        <span class="speech-bubble-content">
+          <span class="header-text" i18n="@@countryEliTitle">
+            Document title:
+          </span>
+          <span> {{ eliTitle }} </span>
+          <span class="header-text" i18n="@@countryEliPermalink">
+            Permanent link:
+          </span>
+          <a [href]="eliUrl" target="_blank"> {{ eliUrl }} </a>
+          <span class="header-text" i18n="@@countryEliDocNumber">
+            Document Number:
+          </span>
+          <span> {{ eliDocNum }} </span>
+        </span>
+      </app-speech-bubble>
+    </span>
+  </span>
+
+  <div class="container-v">
+    <div class="entry-card-multi">
+      <!-- 3D -->
+      <div
+        class="entry-card"
+        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.THREE_D]"
+      >
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
+        <a
+          [attr.title]="
+            targetDescriptions[TargetFieldName.THREE_D] | stripMarkup
+          "
+          class="entry-card-header column-close"
+          (click)="toggleColumn(TargetFieldName.THREE_D)"
+          ><span i18n="@@countryEntry3D">3D Data</span><span class="x"></span
+        ></a>
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.THREE_D]"
+            ></span>
+          </app-speech-bubble>
+        </span>
+        <div
+          class="entry-card-content"
+          *ngIf="
+            targetMetaData[country][TargetFieldName.THREE_D];
+            let targets3D
+          "
+        >
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevelSummary;
+              context: {
+                name: TargetFieldName.THREE_D,
+                valName: TargetFieldName.THREE_D
+              }
+            "
+          ></ng-content>
+
+          <span class="powerbar-subtitle">progress</span>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                value: latestCountryData[TargetFieldName.THREE_D],
+                percent:
+                  latestCountryPercentageOfTargets[TargetFieldName.THREE_D][0],
+                label: '2025',
+                target: targets3D[0].value,
+                colourIndex: 0,
+                tooltip: tooltipsTargets[TargetFieldName.THREE_D][0]
+              }
+            "
+          ></ng-content>
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                value: latestCountryData[TargetFieldName.THREE_D],
+                percent:
+                  latestCountryPercentageOfTargets[TargetFieldName.THREE_D][1],
+                label: '2030',
+                target: targets3D[1].value,
+                colourIndex: 0,
+                tooltip: tooltipsTargets[TargetFieldName.THREE_D][1]
+              }
+            "
+          ></ng-content>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="{
+              country: country | renameCountry,
+              type: '3D'
+            }"
+            (click)="resetAppCTZeroParam()"
+            data-e2e="link-entry-3d"
+            i18n="@@countrySectionLink3D"
+            >View (3D data) by content tier</a
+          >
+        </div>
+      </div>
+
+      <!-- HQ -->
+
+      <div
+        class="entry-card"
+        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.HQ]"
+      >
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
+        <a
+          class="entry-card-header column-close"
+          (click)="toggleColumn(TargetFieldName.HQ)"
+          [attr.title]="targetDescriptions[TargetFieldName.HQ] | stripMarkup"
+          ><span i18n="@@countryEntryHQ">HQ Data</span><span class="x"></span
+        ></a>
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.HQ]"
+            ></span>
+          </app-speech-bubble>
+        </span>
+        <div
+          class="entry-card-content"
+          *ngIf="targetMetaData[country][TargetFieldName.HQ]; let targetsHQ"
+        >
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevelSummary;
+              context: {
+                name: TargetFieldName.HQ,
+                valName: TargetFieldName.HQ
+              }
+            "
+          ></ng-content>
+
+          <span class="powerbar-subtitle">progress</span>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                value: latestCountryData[TargetFieldName.HQ],
+                percent:
+                  latestCountryPercentageOfTargets[TargetFieldName.HQ][0],
+                label: '2025',
+                target: targetsHQ[0].value,
+                colourIndex: 1,
+                tooltip: tooltipsTargets[TargetFieldName.HQ][0]
+              }
+            "
+          ></ng-content>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                value: latestCountryData[TargetFieldName.HQ],
+                percent:
+                  latestCountryPercentageOfTargets[TargetFieldName.HQ][1],
+                label: '2030',
+                target: targetsHQ[1].value,
+                colourIndex: 1,
+                tooltip: tooltipsTargets[TargetFieldName.HQ][1]
+              }
+            "
+          ></ng-content>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.type }}"
+            [queryParams]="{
+              country: country | renameCountry,
+              contentTier: [2, 3, 4],
+              metadataTier: ['A', 'B', 'C']
+            }"
+            data-e2e="link-entry-hq"
+            i18n="@@countrySectionLinkHQ"
+            (click)="resetAppCTZeroParam()"
+            >View (HQ data) by type</a
+          >
+        </div>
+      </div>
+
+      <!-- TOTAL -->
+      <div
+        class="entry-card entry-card-total"
+        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.TOTAL]"
+      >
+        <a
+          class="entry-card-header column-close"
+          (click)="toggleColumn(TargetFieldName.TOTAL)"
+          [attr.title]="targetDescriptions[TargetFieldName.TOTAL] | stripMarkup"
+          ><span i18n="@@countryEntryAll">All Data</span><span class="x"></span
+        ></a>
+        <span class="main-speech-bubble-wrapper">
+          <app-speech-bubble [arrowBottomLeft]="true">
+            <span
+              class="help-speech-bubble-content"
+              [innerHTML]="targetDescriptions[TargetFieldName.TOTAL]"
+            ></span>
+          </app-speech-bubble>
+        </span>
+        <div
+          class="entry-card-content entry-card-totals"
+          *ngIf="
+            targetMetaData[country][TargetFieldName.TOTAL];
+            let targetsTOTAL
+          "
+        >
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevelSummary;
+              context: {
+                name: TargetFieldName.TOTAL,
+                valName: TargetFieldName.TOTAL
+              }
+            "
+          ></ng-content>
+
+          <span class="powerbar-subtitle">progress</span>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                value: latestCountryData[TargetFieldName.TOTAL],
+                percent:
+                  latestCountryPercentageOfTargets[TargetFieldName.TOTAL][0],
+                label: '2025',
+                target: targetsTOTAL[0].value,
+                colourIndex: 2,
+                tooltip: tooltipsTargets[TargetFieldName.TOTAL][0]
+              }
+            "
+          ></ng-content>
+
+          <ng-content
+            *ngTemplateOutlet="
+              powerLevel;
+              context: {
+                value: latestCountryData[TargetFieldName.TOTAL],
+                percent:
+                  latestCountryPercentageOfTargets[TargetFieldName.TOTAL][1],
+                label: '2030',
+                target: targetsTOTAL[1].value,
+                colourIndex: 2,
+                tooltip: tooltipsTargets[TargetFieldName.TOTAL][1]
+              }
+            "
+          ></ng-content>
+          <a
+            class="data-link"
+            routerLink="/data/{{ DimensionName.contentTier }}"
+            [queryParams]="{
+              country: country | renameCountry
+            }"
+            (click)="resetAppCTZeroParam()"
+            ><span i18n="@@countrySectionLinkCountry">View all data for</span
+            >&nbsp;{{ country | renameCountry }}</a
+          >
+        </div>
+
+        <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
+      </div>
+    </div>
+
+    <!-- secondary content -->
+
+    <div *ngIf="showTargetsData" class="entry-card double-card line-and-legend">
+      <span class="entry-card-header"
+        ><span class="pad-word-right">{{ country | renameCountry }}</span
+        ><span i18n="@@countryTargetProgess">Data Progression</span></span
+      >
+      <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
+
+      <div class="entry-card-content">
+        <div class="entry-card-multi">
+          <app-line-chart #lineChart [targetMetaData]="targetMetaData">
+          </app-line-chart>
+
+          <app-legend-grid
+            *ngIf="lineChartIsInitialised"
+            #legendGrid
+            [countryData]="countryData"
+            [countryCode]="country"
+            [targetMetaData]="targetMetaData"
+            [lineChart]="lineChart"
+            [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
+            [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
+            [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
+            (unpinColumn)="toggleColumn($event)"
+            (onLoadHistory)="loadHistory($event)"
+          ></app-legend-grid>
+        </div>
+
+        <a
+          class="appendice-toggle"
+          (click)="toggleAppendice()"
+          (keydown.enter)="toggleAppendice()"
+          tabindex="0"
+        >
+          <span *ngIf="appendiceExpanded" i18n="@@toggleTargetDataLabelHide"
+            >Hide data</span
+          >
+          <span *ngIf="!appendiceExpanded" i18n="@@toggleTargetDataLabelShow"
+            >Show data</span
+          >
+          <span class="save"></span>
+        </a>
+
+        <div
+          class="appendice-grid-wrapper"
+          [ngClass]="{ 'is-open': appendiceExpanded }"
+          tabindex="-1"
+        >
+          <app-appendice-section
+            #appendice
+            tabindex="-1"
+            [targetMetaData]="targetMetaData"
+            [countryData]="countryData"
+            [colourMap]="lineChart.allSeriesData"
+            [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
+            [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
+            [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
+          ></app-appendice-section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tertiary content -->
+
+  <div *ngIf="showTargetsData" class="header-text non-target-text">
+    Explore items for {{ country | renameCountry }}
+  </div>
+
+  <div #scrollPoint>
+    <div class="container-v" *ngIf="cardData">
+      <div class="entry-card-pair">
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span i18n="@@countryEntryType">data by content type</span>
+          </span>
+
+          <div
+            class="entry-card-content"
+            *ngIf="cardData[DimensionName.type]?.length > 0"
+          >
+            <ng-content
+              *ngTemplateOutlet="
+                cardSummary;
+                context: {
+                  dimension: DimensionName.type,
+                  valName: cardData[DimensionName.type][0].name,
+                  value: cardData[DimensionName.type][0].value,
+                  percent: cardData[DimensionName.type][0].percent,
+                  isPowerLevel: false
+                }
+              "
+            ></ng-content>
+            <app-bar-chart
+              #barChart
+              chartId="typeChart"
+              [results]="cardData[DimensionName.type]"
+            ></app-bar-chart>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.type }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero ? true : undefined,
+                country: country | renameCountry
+              }"
+              data-e2e="link-entry-type"
+              i18n="@@countrySectionLinkType"
+              >View by type</a
+            >
+          </div>
+        </div>
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span i18n="@@countryEntryRights">data by rights category</span>
+            <a
+              class="info-icon"
+              [href]="externalLinks.help.rights.href"
+              target="_blank"
+              [title]="externalLinks.help.rights.description"
+            ></a
+          ></span>
+          <div class="entry-card-content">
+            <div class="container-h">
+              <ng-content
+                *ngTemplateOutlet="
+                  dataRows;
+                  context: {
+                    dimension: DimensionName.rightsCategory,
+                    data: cardData[DimensionName.rightsCategory]
+                  }
+                "
+              ></ng-content>
+            </div>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.rightsCategory }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero ? true : undefined,
+                country: country | renameCountry
+              }"
+              data-e2e="link-entry-rights"
+              i18n="@@countrySectionLinkRights"
+              >View by rights category</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="entry-card-pair">
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span i18n="@@countryEntryDataProvider">data by data provider</span>
+          </span>
+          <div class="entry-card-content">
+            <div class="container-h">
+              <ng-content
+                *ngTemplateOutlet="
+                  dataRows;
+                  context: {
+                    dimension: DimensionName.dataProvider,
+                    data: cardData[DimensionName.dataProvider]
+                  }
+                "
+              ></ng-content>
+            </div>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.dataProvider }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero ? true : undefined,
+                country: country | renameCountry
+              }"
+              data-e2e="link-entry-data-provider"
+              i18n="@@countrySectionLinkDataProvider"
+              >View by data provider</a
+            >
+          </div>
+        </div>
+        <div class="entry-card">
+          <span class="entry-card-header">
+            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span i18n="@@countryEntryProvider">data by provider</span>
+            <a
+              class="info-icon"
+              [href]="externalLinks.help.provider.href"
+              target="_blank"
+              [title]="externalLinks.help.provider.description"
+            ></a
+          ></span>
+          <div class="entry-card-content">
+            <div class="container-h">
+              <ng-content
+                *ngTemplateOutlet="
+                  dataRows;
+                  context: {
+                    dimension: DimensionName.provider,
+                    data: cardData[DimensionName.provider]
+                  }
+                "
+              ></ng-content>
+            </div>
+            <a
+              class="data-link"
+              routerLink="/data/{{ DimensionName.provider }}"
+              [queryParams]="{
+                'content-tier-zero': includeCTZero ? true : undefined,
+                country: country | renameCountry
+              }"
+              data-e2e="link-entry-provider"
+              i18n="@@countrySectionLinkProvider"
+              >View by provider</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</main>

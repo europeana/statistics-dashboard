@@ -1,4 +1,5 @@
-@import "variables";
+@use "variables";
+@use "functions/icon_urls";
 
 .dialog-content {
   justify-content: center;
@@ -6,16 +7,16 @@
   text-align: center;
 
   button {
-    margin-top: $spacing-l;
+    margin-top: variables.$spacing-l;
     padding: 8px;
   }
 
   .warn-icon {
-    background-image: svg-url-icon-warning($stats-blue);
+    background-image: icon_urls.svg-url-icon-warning(variables.$stats-blue);
     background-position: center;
     display: block;
     height: 12px;
-    margin-right: $spacing-xs;
+    margin-right: variables.$spacing-xs;
     width: 14px;
   }
 }

@@ -46,8 +46,24 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@europeana/feedback-widget@0.2.0/dist/europeana-feedback-widget.css"
+    />
   </head>
   <body>
+    <div id="europeana-feedback-widget"></div>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@europeana/feedback-widget@0.3.0/dist/europeana-feedback-widget.js"
+      [attr.data-api-url]="feedbackUrl"
+      integrity="sha384-u9uk9KOvOrG5X4yAGn1xMj1P5YmrJWanSqij7tvI4eZTjI/UQGK98lq3e/I6XfuP"
+    ></script>
+    <style>
+      .europeana-feedback-container .btn {
+        word-wrap: normal;
+      }
+    </style>
     <app-root></app-root>
   </body>
 </html>

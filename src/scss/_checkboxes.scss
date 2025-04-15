@@ -1,4 +1,5 @@
-@import "_variables";
+@use "_variables";
+@use "functions/icon_urls";
 
 .checkboxes-list .checkbox-labelled {
   cursor: pointer;
@@ -10,8 +11,8 @@
 
 .checkbox-label {
   font-size: 14px;
-  line-height: $filter-row-height;
-  margin: 0 $spacing-s;
+  line-height: variables.$filter-row-height;
+  margin: 0 variables.$spacing-s;
   white-space: nowrap;
 
   .term-highlight {
@@ -22,7 +23,7 @@
 .chartFormat.checkbox-labelled {
   margin-left: 14px;
   .checkbox-label {
-    color: $gray-faint;
+    color: variables.$gray-faint;
     font-weight: 600;
     margin: 0 4px;
   }
@@ -37,7 +38,7 @@
   position: relative;
 
   :first-child {
-    min-width: $width-icon-filter;
+    min-width: variables.$width-icon-filter;
   }
 
   :last-child {
@@ -47,56 +48,65 @@
 }
 
 .checkmarked-checkbox {
-  height: $width-icon-filter;
+  height: variables.$width-icon-filter;
   position: relative;
-  width: $width-icon-filter;
+  width: variables.$width-icon-filter;
 
   &::before {
     bottom: 0;
-    background-image: svg-url-icon-checkbox("#000");
+    background-image: icon_urls.svg-url-icon-checkbox("#000");
     background-position: center;
     background-repeat: no-repeat;
     content: "";
     display: block;
     position: absolute;
-    min-width: $width-icon-filter;
-    height: $width-icon-filter;
+    min-width: variables.$width-icon-filter;
+    height: variables.$width-icon-filter;
   }
 
   &.checked::before {
-    background-image: svg-url-icon-checkbox-checked("#000");
+    background-image: icon_urls.svg-url-icon-checkbox-checked("#000");
   }
 }
 
 .chartFormat .checkmarked-checkbox::before {
-  background-image: svg-url-icon-checkbox($stats-blue);
+  background-image: icon_urls.svg-url-icon-checkbox(variables.$stats-blue);
 }
 
 .chartFormat .checkmarked-checkbox.checked::before {
-  background-image: svg-url-icon-checkbox-checked($stats-blue);
+  background-image: icon_urls.svg-url-icon-checkbox-checked(
+    variables.$stats-blue
+  );
 }
 
 .ct-zero {
-  margin-left: $spacing-s;
   .checkmarked-checkbox {
     &::before {
-      background-image: svg-url-icon-eye-disabled($gray-med);
+      background-image: icon_urls.svg-url-icon-eye-disabled(
+        variables.$gray-med
+      );
       bottom: -2px;
       height: 19px;
       min-width: 20px;
     }
     &.checked::before {
-      background-image: svg-url-icon-eye($gray-med);
+      background-image: icon_urls.svg-url-icon-eye(variables.$gray-med);
     }
     &.disabled {
       cursor: default;
       pointer-events: none;
       &::before {
-        background-image: svg-url-icon-eye-disabled($gray-5);
+        background-image: icon_urls.svg-url-icon-eye-disabled(
+          variables.$gray-5
+        );
       }
       &.checked::before {
-        background-image: svg-url-icon-eye($gray-5);
+        background-image: icon_urls.svg-url-icon-eye(variables.$gray-5);
       }
     }
   }
+}
+
+.filters .ct-zero {
+  margin-left: variables.$spacing-s;
 }

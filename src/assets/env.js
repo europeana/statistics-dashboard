@@ -9,5 +9,5 @@
   env.maintenanceScheduleUrl = "";
   env.maintenanceScheduleKey = "";
   env.matomoSiteId = "";
-  env.matomoHost = "";
+  env.matomoHost = "http://localhost:3001";
 })(this);
