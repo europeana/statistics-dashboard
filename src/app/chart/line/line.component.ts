@@ -254,8 +254,8 @@ export class LineComponent implements AfterViewInit {
       const val = sd[valueY];
       if (rowIndex >= chartData.length) {
         chartData.push(sd);
-      } else if (!chartData[rowIndex].date) {
-        chartData[rowIndex].date = sd.date;
+      } else {
+        chartData[rowIndex].date ??= sd.date;
       }
       chartData[rowIndex][seriesValueY] = val;
     });
