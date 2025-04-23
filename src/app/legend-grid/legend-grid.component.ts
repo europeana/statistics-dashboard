@@ -56,6 +56,8 @@ export class LegendGridComponent {
 
   // class ref needed to access static variables in the template
   public classReference = LegendGridComponent;
+  private renameCountry = new RenameCountryPipe();
+
   static itemHeight = 84.5;
 
   _columnEnabled3D = true;
@@ -181,8 +183,6 @@ export class LegendGridComponent {
       this.columnEnabledALL
     ].filter((val: boolean) => !!val).length;
   }
-
-  renameCountry = new RenameCountryPipe();
 
   /** getCountrySeries
    * @param { string } country
