@@ -56,7 +56,7 @@ export class LegendGridComponent {
 
   // class ref needed to access static variables in the template
   public classReference = LegendGridComponent;
-  private renameCountry = new RenameCountryPipe();
+  private readonly renameCountry = new RenameCountryPipe();
 
   static itemHeight = 84.5;
 
