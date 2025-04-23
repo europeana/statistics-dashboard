@@ -228,9 +228,9 @@ export class LineComponent implements AfterViewInit {
       const dateA = Date.parse(a.date);
       const dateB = Date.parse(b.date);
       if (dateA > dateB) {
-        return 1;
-      } else if (dateB > dateA) {
         return -1;
+      } else if (dateB > dateA) {
+        return 1;
       }
       return 0;
     });
@@ -249,10 +249,13 @@ export class LineComponent implements AfterViewInit {
     seriesData: Array<TargetData>
   ): void {
     const chartData = this.chart.data;
+
     seriesData.forEach((sd: TargetData, rowIndex: number) => {
       const val = sd[valueY];
       if (rowIndex >= chartData.length) {
         chartData.push(sd);
+      } else if (!chartData[rowIndex].date) {
+        chartData[rowIndex].date = sd.date;
       }
       chartData[rowIndex][seriesValueY] = val;
     });
@@ -316,6 +319,18 @@ export class LineComponent implements AfterViewInit {
     // Create date axis
     const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     this.dateAxis = dateAxis;
+
+    const setFmt = (key: am4core.TimeUnit, fmt: string): void => {
+      dateAxis.dateFormats.setKey(key, fmt);
+      dateAxis.periodChangeDateFormats.setKey(key, fmt);
+    };
+    const dateFmtBrief = 'MMM yyyy';
+
+    setFmt('day', 'MMMM dt');
+    setFmt('week', 'MM d');
+    setFmt('month', dateFmtBrief);
+    setFmt('year', dateFmtBrief);
+
     dateAxis.renderer.minGridDistance = 78;
     dateAxis.renderer.labels.template.fill = colourAxis;
     dateAxis.renderer.labels.template.dy = 16;

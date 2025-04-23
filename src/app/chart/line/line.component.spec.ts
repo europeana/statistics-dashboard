@@ -160,8 +160,8 @@ describe('LineComponent', () => {
     const date = new Date();
     const date2 = new Date();
     const date3 = new Date();
-    date2.setDate(date.getDate() + 1);
-    date3.setDate(date.getDate() - 1);
+    date2.setDate(date.getDate() - 1);
+    date3.setDate(date.getDate() + 1);
 
     const data = [date3, date2, date, date, date3].map((dateVal: Date) => {
       return {

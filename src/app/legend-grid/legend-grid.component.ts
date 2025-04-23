@@ -182,6 +182,8 @@ export class LegendGridComponent {
     ].filter((val: boolean) => !!val).length;
   }
 
+  renameCountry = new RenameCountryPipe();
+
   /** getCountrySeries
    * @param { string } country
    * @returns country mapped to the series suffix
@@ -335,8 +337,13 @@ export class LegendGridComponent {
     this.onLoadHistory.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
+        this.lineChart.sortSeriesData(data);
         this.countryData[country] = this.countryData[country].concat(data);
-        this.addSeriesSetAndPin(country, data, seriesTypes);
+        this.addSeriesSetAndPin(
+          country,
+          this.countryData[country],
+          seriesTypes
+        );
       }
     });
   }
@@ -388,7 +395,9 @@ export class LegendGridComponent {
     data: Array<TargetData>,
     seriesToAdd: Array<TargetFieldName> = []
   ): void {
-    this.lineChart.sortSeriesData(data);
+    // we keep local data descending, but send ascending data to the chart
+    const dataAscending = [...data];
+    dataAscending.reverse();
 
     // add relevant series
     [this.columnEnabled3D, this.columnEnabledHQ, this.columnEnabledALL].forEach(
@@ -398,16 +407,15 @@ export class LegendGridComponent {
           if (seriesToAdd.includes(typeFromIndex)) {
             this.resetChartColors(i, this.pinnedCountries[country]);
             this.lineChart.addSeries(
-              country + this.seriesSuffixesFmt[i],
+              this.renameCountry.transform(country) + this.seriesSuffixesFmt[i],
               country + TargetSeriesSuffixes[i],
               typeFromIndex,
-              data
+              dataAscending
             );
           }
         }
       }
     );
-
     // add pin
     if (!(country in this.pinnedCountries)) {
       this.togglePin(country);
