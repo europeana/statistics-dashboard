@@ -38,10 +38,7 @@
             *ngIf="countryData[country]"
             [ngClass]="{ 'pad-right': targetType === TargetFieldName.HQ }"
           >
-            {{
-              countryData[country][countryData[country].length - 1][targetType]
-                | number
-            }}
+            {{ countryData[country][0][targetType] | number }}
           </span>
         </a>
       </li>
