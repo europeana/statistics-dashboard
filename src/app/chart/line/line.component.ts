@@ -6,6 +6,7 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -48,7 +49,21 @@ export class LineComponent implements AfterViewInit {
     private readonly zone: NgZone,
     private readonly lineService: LineService
   ) {
-    am4core.options.autoDispose = true;
+    this.browserOnly(() => {
+      am4core.options.autoDispose = true;
+    });
+  }
+
+  /** browserOnly
+  /* function-wrapping function for running outside Angular
+  /* (this exempts the chart from change detection)
+  */
+  browserOnly(f: () => void): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.zone.runOutsideAngular((): void => {
+        f();
+      });
+    }
   }
 
   ngAfterViewInit(): void {
@@ -259,6 +274,16 @@ export class LineComponent implements AfterViewInit {
       }
       chartData[rowIndex][seriesValueY] = val;
     });
+  }
+
+  clearAllSeries(): void {
+    console.log('clear all....');
+    if (this.valueAxis.series.length) {
+      this.chart.series.removeIndex(0).dispose();
+      this.clearAllSeries();
+    } else {
+      this.chart.data = [{}];
+    }
   }
 
   /**

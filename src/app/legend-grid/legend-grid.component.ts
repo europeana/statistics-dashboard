@@ -124,8 +124,7 @@ export class LegendGridComponent {
     let timeout = 0;
 
     // remove old chart lines
-
-    if (this._countryCode) {
+    if (this.countryCode) {
       const pinned = Object.keys(this.pinnedCountries);
       if (pinned.length) {
         timeout = this.timeoutAnimation;
@@ -337,8 +336,8 @@ export class LegendGridComponent {
     this.onLoadHistory.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
-        this.lineChart.sortSeriesData(data);
         this.countryData[country] = this.countryData[country].concat(data);
+        this.lineChart.sortSeriesData(this.countryData[country]);
         this.addSeriesSetAndPin(
           country,
           this.countryData[country],
@@ -356,11 +355,25 @@ export class LegendGridComponent {
     const countrySeries = this.getCountrySeries(country);
 
     if (countrySeries.length === 0) {
-      this.loadCountryChartData(country, [
+      const countryData = this.countryData[country];
+      const seriesTypes = [
         TargetFieldName.THREE_D,
         TargetFieldName.HQ,
         TargetFieldName.TOTAL
-      ]);
+      ];
+
+      // Catch case where the legend grid was unloaded (by a non-target country)
+      // but we still have the data in memeory
+      if (countryData && countryData.length > 1) {
+        this.lineChart.clearAllSeries();
+        this.addSeriesSetAndPin(
+          country,
+          this.countryData[country],
+          seriesTypes
+        );
+      } else {
+        this.loadCountryChartData(country, seriesTypes);
+      }
     } else {
       const hasVisible =
         countrySeries.filter((series: am4charts.LineSeries) => {
