@@ -276,8 +276,12 @@ export class LineComponent implements AfterViewInit {
     });
   }
 
+  /**
+   * clearAllSeries
+   * recursively removes chart series objects
+   * resets this.chart.data
+   **/
   clearAllSeries(): void {
-    console.log('clear all....');
     if (this.valueAxis.series.length) {
       this.chart.series.removeIndex(0).dispose();
       this.clearAllSeries();

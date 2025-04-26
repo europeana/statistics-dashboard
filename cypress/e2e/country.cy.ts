@@ -4,12 +4,34 @@ context('Statistics Dashboard', () => {
   const force = { force: true };
 
   describe('Country Page', () => {
+    const selAppendiceToggle = '.appendice-toggle';
+    const selAppendiceTable = '.appendice-grid';
     const selPowerBar = '.powerbar .powerbar-charge';
     const selPowerBar3D = '.entry-card:first-child .powerbar-charge';
     const selPowerBarHQ = '.entry-card:last-child .powerbar-charge';
 
     beforeEach(() => {
       cy.visit('/country/Austria');
+    });
+
+    it('should keep the appendices open', () => {
+      const host = 'http://localhost:4280';
+      const startCountry = 'Belgium';
+      cy.visit(`/country/${startCountry}`);
+
+      cy.get(selAppendiceToggle).click(force);
+      cy.get(selAppendiceTable).filter(':visible').should('have.length', 1);
+
+      // click through to a country with no target data
+      const selCountryMenu = '.header .country-select a';
+
+      cy.get(selCountryMenu).contains('Europe').click(force);
+      cy.get(selAppendiceTable).should('not.exist');
+      cy.get(selAppendiceToggle).should('not.exist');
+
+      cy.get(selCountryMenu).contains(startCountry).click(force);
+      cy.get(selAppendiceTable).filter(':visible').should('exist');
+      cy.get(selAppendiceToggle).should('exist');
     });
 
     it('should redirect if the country is unknown', () => {
@@ -31,9 +53,6 @@ context('Statistics Dashboard', () => {
     });
 
     it('should toggle the appendices', () => {
-      const selAppendiceToggle = '.appendice-toggle';
-      const selAppendiceTable = '.appendice-grid';
-
       cy.get(selAppendiceTable).filter(':visible').should('have.length', 0);
       cy.get(selAppendiceToggle).click(force);
       cy.get(selAppendiceTable).filter(':visible').should('have.length', 1);

@@ -52,6 +52,8 @@ context('Statistics Dashboard', () => {
         .click(force);
       cy.get(selPinnedOpener).should('have.length', 2);
       cy.get(selIsOpen).should('have.length', 2 * numSeriesInGroup);
+      // allow animations to run
+      cy.wait(800);
       cy.get(selToggleCountry).contains('Cyprus').click(force);
       cy.get(selPinnedOpener).should('have.length', 1);
       cy.get(selIsOpen).should('have.length', numSeriesInGroup);

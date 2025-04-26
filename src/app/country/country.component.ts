@@ -11,6 +11,7 @@ import {
 import {
   AfterViewInit,
   ApplicationRef,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   inject,
@@ -59,7 +60,7 @@ import {
 import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent, LineService } from '../chart';
 import { HeaderComponent } from '../header';
-import { LegendGridComponent } from '../legend-grid';
+import { LegendGridComponent, LegendGridService } from '../legend-grid';
 import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
@@ -128,6 +129,7 @@ export class CountryComponent
   @ViewChild('scrollPoint') scrollPoint: ElementRef;
   @ViewChild('appendice') appendice: AppendiceSectionComponent;
 
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
@@ -174,6 +176,7 @@ export class CountryComponent
 
   appendiceExpanded = false;
   lineChartIsInitialised = false;
+  legendGridIsInitialised = false;
 
   @Input() headerRef: HeaderComponent;
 
@@ -185,13 +188,19 @@ export class CountryComponent
    **/
   constructor(
     private readonly applicationRef: ApplicationRef,
-    private readonly lineService: LineService
+    private readonly lineService: LineService,
+    private readonly legendGridService: LegendGridService
   ) {
     super();
 
     // listen for the line chart to be initialised
     lineService.lineChartReady.subscribe(() => {
       this.lineChartIsInitialised = true;
+    });
+    // listen for the legend-grid to be initialised
+    legendGridService.legendGridReady.subscribe((value: boolean) => {
+      this.legendGridIsInitialised = value;
+      this.changeDetector.detectChanges();
     });
 
     Object.values(TargetFieldName).forEach((key: string) => {
@@ -449,9 +458,6 @@ export class CountryComponent
 
   toggleAppendice(): void {
     this.appendiceExpanded = !this.appendiceExpanded;
-    if (this.appendiceExpanded) {
-      this.appendice.pinnedCountries = this.legendGrid.pinnedCountries;
-    }
   }
 
   /** nextColToEnable

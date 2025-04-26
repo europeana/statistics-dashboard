@@ -8,11 +8,14 @@ import {
   NgTemplateOutlet
 } from '@angular/common';
 import {
+  AfterContentInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
+  OnDestroy,
   Output,
   ViewChild
 } from '@angular/core';
@@ -31,6 +34,7 @@ import {
 } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
+import { LegendGridService } from '.';
 
 @Component({
   selector: 'app-legend-grid',
@@ -49,7 +53,7 @@ import { LineComponent } from '../chart';
     RenameTargetTypePipe
   ]
 })
-export class LegendGridComponent {
+export class LegendGridComponent implements AfterContentInit, OnDestroy {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
   timeoutAnimation = 800;
@@ -174,6 +178,18 @@ export class LegendGridComponent {
   public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
+
+  private readonly legendGridService = inject(LegendGridService);
+
+  // register this component's readiness via the companion service
+  ngAfterContentInit(): void {
+    this.legendGridService.setLegendGridReady(true);
+  }
+
+  // register this component's unavailability via the companion service
+  ngOnDestroy(): void {
+    this.legendGridService.setLegendGridReady(false);
+  }
 
   calculateColumnsEnabledCount(): void {
     this.columnsEnabledCount = [
