@@ -283,11 +283,11 @@ describe('LegendGridComponent', () => {
     expect(component.onLoadHistory.emit).toHaveBeenCalled();
 
     // case where existing country data is reused after component reinitialisation
+
     component.countryData = mockCountryData;
 
-    spyOn(component.lineChart, 'clearAllSeries');
     component.toggleCountry('DE');
-    expect(component.lineChart.clearAllSeries).toHaveBeenCalled();
+
     expect(component.addSeriesSetAndPin).toHaveBeenCalledTimes(2);
     expect(component.onLoadHistory.emit).toHaveBeenCalledTimes(1);
   });

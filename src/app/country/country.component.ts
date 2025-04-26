@@ -198,7 +198,10 @@ export class CountryComponent
     });
     // listen for the legend-grid to be initialised
     legendGridService.legendGridReady.subscribe((value: boolean) => {
+      // first call makes the legendgrid available
+      this.changeDetector.detectChanges();
       this.legendGridIsInitialised = value;
+      // the second call prevents ExpressionChanged the legend gris available to the view
       this.changeDetector.detectChanges();
     });
 

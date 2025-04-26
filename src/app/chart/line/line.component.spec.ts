@@ -188,26 +188,4 @@ describe('LineComponent', () => {
     component.toggleScrollbar();
     expect(component.chart.scrollbarX).toBeFalsy();
   });
-
-  it('should clear all the series', () => {
-    let seriesCount = 20;
-
-    component.valueAxis = {
-      series: new Array(
-        seriesCount
-      ) as unknown as am4core.List<am4charts.XYSeries>
-    } as unknown as am4charts.ValueAxis<am4charts.AxisRenderer>;
-
-    spyOn(component.chart.series, 'removeIndex').and.callFake(() => {
-      component.valueAxis.series.pop();
-      return {
-        dispose: () => {}
-      } as unknown as am4charts.XYSeries;
-    });
-
-    component.clearAllSeries();
-    expect(component.chart.series.removeIndex).toHaveBeenCalledTimes(
-      seriesCount
-    );
-  });
 });

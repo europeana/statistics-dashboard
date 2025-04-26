@@ -136,8 +136,4 @@ export class MockLineComponent {
   toggleCursor(): void {
     console.log('MockLineComponent toggleCursor');
   }
-
-  clearAllSeries(): void {
-    console.log('MockLineComponent clearAllSeries');
-  }
 }

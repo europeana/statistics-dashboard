@@ -22,7 +22,7 @@ import {
 } from '../_mocked';
 import { TargetFieldName } from '../_models';
 import { BarComponent, LineComponent, LineService } from '../chart';
-import { LegendGridComponent, LegendGridService } from '../legend-grid';
+import { LegendGridService } from '../legend-grid';
 import { HeaderComponent } from '../header';
 import { CountryComponent } from '.';
 

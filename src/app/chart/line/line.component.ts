@@ -277,20 +277,6 @@ export class LineComponent implements AfterViewInit {
   }
 
   /**
-   * clearAllSeries
-   * recursively removes chart series objects
-   * resets this.chart.data
-   **/
-  clearAllSeries(): void {
-    if (this.valueAxis.series.length) {
-      this.chart.series.removeIndex(0).dispose();
-      this.clearAllSeries();
-    } else {
-      this.chart.data = [{}];
-    }
-  }
-
-  /**
    * addSeries
    * adds a LineSeries object to the chart / stores ref to this.allSeriesData
    * adds the (renamed) series data to the chart data

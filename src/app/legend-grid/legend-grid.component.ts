@@ -8,7 +8,7 @@ import {
   NgTemplateOutlet
 } from '@angular/common';
 import {
-  AfterContentInit,
+  AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
@@ -53,7 +53,7 @@ import { LegendGridService } from '.';
     RenameTargetTypePipe
   ]
 })
-export class LegendGridComponent implements AfterContentInit, OnDestroy {
+export class LegendGridComponent implements AfterViewInit, OnDestroy {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
   timeoutAnimation = 800;
@@ -182,7 +182,7 @@ export class LegendGridComponent implements AfterContentInit, OnDestroy {
   private readonly legendGridService = inject(LegendGridService);
 
   // register this component's readiness via the companion service
-  ngAfterContentInit(): void {
+  ngAfterViewInit(): void {
     this.legendGridService.setLegendGridReady(true);
   }
 
@@ -381,7 +381,6 @@ export class LegendGridComponent implements AfterContentInit, OnDestroy {
       // Catch case where the legend grid was unloaded (by a non-target country)
       // but we still have the data in memeory
       if (countryData && countryData.length > 1) {
-        this.lineChart.clearAllSeries();
         this.addSeriesSetAndPin(
           country,
           this.countryData[country],
