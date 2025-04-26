@@ -127,7 +127,6 @@ export class CountryComponent
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('scrollPoint') scrollPoint: ElementRef;
-  @ViewChild('appendice') appendice: AppendiceSectionComponent;
 
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly router = inject(Router);

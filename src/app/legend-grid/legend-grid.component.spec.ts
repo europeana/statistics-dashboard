@@ -18,6 +18,20 @@ import {
 import { LineComponent } from '../chart';
 import { LegendGridComponent } from '.';
 
+const date = new Date().toISOString();
+
+const mockCountryData = {
+  FR: [],
+  DE: [date, date, date].map((date) => {
+    return {
+      date: date,
+      three_d: '100',
+      high_quality: '200',
+      total: '300'
+    };
+  })
+};
+
 const mockTargetMetaData = {
   DE: {
     three_d: [],
@@ -267,22 +281,19 @@ describe('LegendGridComponent', () => {
     expect(component.togglePin).toHaveBeenCalledTimes(3);
     expect(component.addSeriesSetAndPin).toHaveBeenCalled();
     expect(component.onLoadHistory.emit).toHaveBeenCalled();
+
+    // case where existing country data is reused after component reinitialisation
+    component.countryData = mockCountryData;
+
+    spyOn(component.lineChart, 'clearAllSeries');
+    component.toggleCountry('DE');
+    expect(component.lineChart.clearAllSeries).toHaveBeenCalled();
+    expect(component.addSeriesSetAndPin).toHaveBeenCalledTimes(2);
+    expect(component.onLoadHistory.emit).toHaveBeenCalledTimes(1);
   });
 
   it('should toggle the series', () => {
-    const date = new Date().toISOString();
-    component.countryData = {
-      FR: [],
-      DE: [date, date, date].map((date) => {
-        return {
-          date: date,
-          three_d: '100',
-          high_quality: '200',
-          total: '300'
-        };
-      })
-    };
-
+    component.countryData = mockCountryData;
     const seriesItemHidden = {
       isHidden: true,
       // eslint-disable-next-line @typescript-eslint/no-empty-function

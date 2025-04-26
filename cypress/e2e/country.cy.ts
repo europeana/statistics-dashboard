@@ -14,26 +14,6 @@ context('Statistics Dashboard', () => {
       cy.visit('/country/Austria');
     });
 
-    it('should keep the appendices open', () => {
-      const host = 'http://localhost:4280';
-      const startCountry = 'Belgium';
-      cy.visit(`/country/${startCountry}`);
-
-      cy.get(selAppendiceToggle).click(force);
-      cy.get(selAppendiceTable).filter(':visible').should('have.length', 1);
-
-      // click through to a country with no target data
-      const selCountryMenu = '.header .country-select a';
-
-      cy.get(selCountryMenu).contains('Europe').click(force);
-      cy.get(selAppendiceTable).should('not.exist');
-      cy.get(selAppendiceToggle).should('not.exist');
-
-      cy.get(selCountryMenu).contains(startCountry).click(force);
-      cy.get(selAppendiceTable).filter(':visible').should('exist');
-      cy.get(selAppendiceToggle).should('exist');
-    });
-
     it('should redirect if the country is unknown', () => {
       const host = 'http://localhost:4280';
       cy.visit('/country/XXX');
@@ -58,6 +38,26 @@ context('Statistics Dashboard', () => {
       cy.get(selAppendiceTable).filter(':visible').should('have.length', 1);
       cy.get(selAppendiceToggle).click(force);
       cy.get(selAppendiceTable).filter(':visible').should('have.length', 0);
+    });
+
+    it('should keep the appendices open', () => {
+      const host = 'http://localhost:4280';
+      const startCountry = 'Belgium';
+      cy.visit(`/country/${startCountry}`);
+
+      cy.get(selAppendiceToggle).click(force);
+      cy.get(selAppendiceTable).filter(':visible').should('have.length', 1);
+
+      // click through to a country with no target data
+      const selCountryMenu = '.header .country-select a';
+
+      cy.get(selCountryMenu).contains('Europe').click(force);
+      cy.get(selAppendiceTable).should('not.exist');
+      cy.get(selAppendiceToggle).should('not.exist');
+
+      cy.get(selCountryMenu).contains(startCountry).click(force);
+      cy.get(selAppendiceTable).filter(':visible').should('exist');
+      cy.get(selAppendiceToggle).should('exist');
     });
 
     it('should toggle the cards and columns', () => {
