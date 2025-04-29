@@ -96,25 +96,17 @@ export class LineComponent implements AfterViewInit {
             }
 
             if (td.range) {
+              td.range.value = 0;
+
               if (!allRemovals[seriesValueName]) {
                 allRemovals[seriesValueName] = {};
                 allRemovals[seriesValueName][country] = [];
               }
+
               allRemovals[seriesValueName][country].push(tdIndex);
               this.valueAxis.axisRanges.removeValue(td.range);
               td.range.dispose();
               delete td.range;
-
-              // remove the fake series: this will restore the valueAxis zoom (if needed)
-              if (td.rangeFakeSeries) {
-                td.rangeFakeSeries.hide();
-                setTimeout(() => {
-                  if (td.rangeFakeSeries) {
-                    td.rangeFakeSeries.dispose();
-                    delete td.rangeFakeSeries;
-                  }
-                }, 1500);
-              }
             }
           });
         }
@@ -223,14 +215,6 @@ export class LineComponent implements AfterViewInit {
     };
     setRangeAndPinDefaults();
     range.label.events.on('hit', fnRangeClicked);
-
-    // add fake series: this forces the valueAxis to zoom (if needed)
-    const fakeSeries = this.addSeries('X', 'X', 'X' as TargetFieldName, [
-      {
-        X: range.value
-      } as unknown as TargetData
-    ]);
-    targetData.rangeFakeSeries = fakeSeries;
   }
 
   /**
