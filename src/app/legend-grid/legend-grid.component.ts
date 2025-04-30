@@ -8,11 +8,14 @@ import {
   NgTemplateOutlet
 } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
+  OnDestroy,
   Output,
   ViewChild
 } from '@angular/core';
@@ -31,6 +34,7 @@ import {
 } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
+import { LegendGridService } from '.';
 
 @Component({
   selector: 'app-legend-grid',
@@ -49,7 +53,7 @@ import { LineComponent } from '../chart';
     RenameTargetTypePipe
   ]
 })
-export class LegendGridComponent {
+export class LegendGridComponent implements AfterViewInit, OnDestroy {
   targetCountries: Array<string>;
   targetCountriesOO: Array<string>;
   timeoutAnimation = 800;
@@ -124,8 +128,7 @@ export class LegendGridComponent {
     let timeout = 0;
 
     // remove old chart lines
-
-    if (this._countryCode) {
+    if (this.countryCode) {
       const pinned = Object.keys(this.pinnedCountries);
       if (pinned.length) {
         timeout = this.timeoutAnimation;
@@ -175,6 +178,21 @@ export class LegendGridComponent {
   public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
   public seriesValueNames = Object.keys(TargetFieldName);
   public TargetFieldName = TargetFieldName;
+
+  private readonly legendGridService = inject(LegendGridService);
+
+  // register this component's readiness via the companion service
+  ngAfterViewInit(): void {
+    this.legendGridService.setLegendGridReady(true);
+  }
+
+  // register this component's unavailability via the companion service
+  ngOnDestroy(): void {
+    this.legendGridService.setLegendGridReady(false);
+    this.targetCountries.forEach((country: string) => {
+      this.lineChart.removeRange(country);
+    });
+  }
 
   calculateColumnsEnabledCount(): void {
     this.columnsEnabledCount = [
@@ -337,8 +355,8 @@ export class LegendGridComponent {
     this.onLoadHistory.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
-        this.lineChart.sortSeriesData(data);
         this.countryData[country] = this.countryData[country].concat(data);
+        this.lineChart.sortSeriesData(this.countryData[country]);
         this.addSeriesSetAndPin(
           country,
           this.countryData[country],
@@ -356,11 +374,24 @@ export class LegendGridComponent {
     const countrySeries = this.getCountrySeries(country);
 
     if (countrySeries.length === 0) {
-      this.loadCountryChartData(country, [
+      const countryData = this.countryData[country];
+      const seriesTypes = [
         TargetFieldName.THREE_D,
         TargetFieldName.HQ,
         TargetFieldName.TOTAL
-      ]);
+      ];
+
+      // Catch case where the legend grid was unloaded (by a non-target country)
+      // but we still have the data in memeory
+      if (countryData && countryData.length > 1) {
+        this.addSeriesSetAndPin(
+          country,
+          this.countryData[country],
+          seriesTypes
+        );
+      } else {
+        this.loadCountryChartData(country, seriesTypes);
+      }
     } else {
       const hasVisible =
         countrySeries.filter((series: am4charts.LineSeries) => {

@@ -6,6 +6,7 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -48,7 +49,21 @@ export class LineComponent implements AfterViewInit {
     private readonly zone: NgZone,
     private readonly lineService: LineService
   ) {
-    am4core.options.autoDispose = true;
+    this.browserOnly(() => {
+      am4core.options.autoDispose = true;
+    });
+  }
+
+  /** browserOnly
+  /* function-wrapping function for running outside Angular
+  /* (this exempts the chart from change detection)
+  */
+  browserOnly(f: () => void): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.zone.runOutsideAngular((): void => {
+        f();
+      });
+    }
   }
 
   ngAfterViewInit(): void {
@@ -81,25 +96,17 @@ export class LineComponent implements AfterViewInit {
             }
 
             if (td.range) {
+              td.range.value = 0;
+
               if (!allRemovals[seriesValueName]) {
                 allRemovals[seriesValueName] = {};
                 allRemovals[seriesValueName][country] = [];
               }
+
               allRemovals[seriesValueName][country].push(tdIndex);
               this.valueAxis.axisRanges.removeValue(td.range);
               td.range.dispose();
               delete td.range;
-
-              // remove the fake series: this will restore the valueAxis zoom (if needed)
-              if (td.rangeFakeSeries) {
-                td.rangeFakeSeries.hide();
-                setTimeout(() => {
-                  if (td.rangeFakeSeries) {
-                    td.rangeFakeSeries.dispose();
-                    delete td.rangeFakeSeries;
-                  }
-                }, 1500);
-              }
             }
           });
         }
@@ -208,14 +215,6 @@ export class LineComponent implements AfterViewInit {
     };
     setRangeAndPinDefaults();
     range.label.events.on('hit', fnRangeClicked);
-
-    // add fake series: this forces the valueAxis to zoom (if needed)
-    const fakeSeries = this.addSeries('X', 'X', 'X' as TargetFieldName, [
-      {
-        X: range.value
-      } as unknown as TargetData
-    ]);
-    targetData.rangeFakeSeries = fakeSeries;
   }
 
   /**
