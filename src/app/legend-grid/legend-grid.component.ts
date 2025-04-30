@@ -189,6 +189,9 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   // register this component's unavailability via the companion service
   ngOnDestroy(): void {
     this.legendGridService.setLegendGridReady(false);
+    this.targetCountries.forEach((country: string) => {
+      this.lineChart.removeRange(country);
+    });
   }
 
   calculateColumnsEnabledCount(): void {

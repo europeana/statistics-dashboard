@@ -150,6 +150,7 @@ export class CountryComponent
     if (typeof this.includeCTZero === 'boolean') {
       this.refreshCardData();
     }
+    this.restoreHiddenColumns();
     this.showTargetsData = !!this.targetMetaData[country];
     this.setHeaderData(country);
   }
@@ -201,13 +202,11 @@ export class CountryComponent
       // first call makes the legendgrid available
       this.changeDetector.detectChanges();
       this.legendGridIsInitialised = value;
+
       // the second call prevents ExpressionChanged the legend gris available to the view
       this.changeDetector.detectChanges();
     });
-
-    Object.values(TargetFieldName).forEach((key: string) => {
-      this.columnsEnabled[key] = true;
-    });
+    this.restoreHiddenColumns();
 
     const rootRef = this.applicationRef.components[0].instance;
     if (rootRef) {
@@ -487,6 +486,14 @@ export class CountryComponent
     ).length;
 
     this.columnToEnable = this.nextColToEnable();
+  }
+
+  restoreHiddenColumns(): void {
+    // re-initialise the hidden columns
+    this.columnsEnabledCount = 3;
+    Object.values(TargetFieldName).forEach((key: string) => {
+      this.columnsEnabled[key] = true;
+    });
   }
 
   ngOnDestroy(): void {
