@@ -6,6 +6,7 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -48,7 +49,21 @@ export class LineComponent implements AfterViewInit {
     private readonly zone: NgZone,
     private readonly lineService: LineService
   ) {
-    am4core.options.autoDispose = true;
+    this.browserOnly(() => {
+      am4core.options.autoDispose = true;
+    });
+  }
+
+  /** browserOnly
+  /* function-wrapping function for running outside Angular
+  /* (this exempts the chart from change detection)
+  */
+  browserOnly(f: () => void): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.zone.runOutsideAngular((): void => {
+        f();
+      });
+    }
   }
 
   ngAfterViewInit(): void {
@@ -81,25 +96,17 @@ export class LineComponent implements AfterViewInit {
             }
 
             if (td.range) {
+              td.range.value = 0;
+
               if (!allRemovals[seriesValueName]) {
                 allRemovals[seriesValueName] = {};
                 allRemovals[seriesValueName][country] = [];
               }
+
               allRemovals[seriesValueName][country].push(tdIndex);
               this.valueAxis.axisRanges.removeValue(td.range);
               td.range.dispose();
               delete td.range;
-
-              // remove the fake series: this will restore the valueAxis zoom (if needed)
-              if (td.rangeFakeSeries) {
-                td.rangeFakeSeries.hide();
-                setTimeout(() => {
-                  if (td.rangeFakeSeries) {
-                    td.rangeFakeSeries.dispose();
-                    delete td.rangeFakeSeries;
-                  }
-                }, 1500);
-              }
             }
           });
         }
@@ -208,14 +215,6 @@ export class LineComponent implements AfterViewInit {
     };
     setRangeAndPinDefaults();
     range.label.events.on('hit', fnRangeClicked);
-
-    // add fake series: this forces the valueAxis to zoom (if needed)
-    const fakeSeries = this.addSeries('X', 'X', 'X' as TargetFieldName, [
-      {
-        X: range.value
-      } as unknown as TargetData
-    ]);
-    targetData.rangeFakeSeries = fakeSeries;
   }
 
   /**
@@ -228,9 +227,9 @@ export class LineComponent implements AfterViewInit {
       const dateA = Date.parse(a.date);
       const dateB = Date.parse(b.date);
       if (dateA > dateB) {
-        return 1;
-      } else if (dateB > dateA) {
         return -1;
+      } else if (dateB > dateA) {
+        return 1;
       }
       return 0;
     });
@@ -249,10 +248,13 @@ export class LineComponent implements AfterViewInit {
     seriesData: Array<TargetData>
   ): void {
     const chartData = this.chart.data;
+
     seriesData.forEach((sd: TargetData, rowIndex: number) => {
       const val = sd[valueY];
       if (rowIndex >= chartData.length) {
         chartData.push(sd);
+      } else {
+        chartData[rowIndex].date ??= sd.date;
       }
       chartData[rowIndex][seriesValueY] = val;
     });
@@ -316,6 +318,18 @@ export class LineComponent implements AfterViewInit {
     // Create date axis
     const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     this.dateAxis = dateAxis;
+
+    const setFmt = (key: am4core.TimeUnit, fmt: string): void => {
+      dateAxis.dateFormats.setKey(key, fmt);
+      dateAxis.periodChangeDateFormats.setKey(key, fmt);
+    };
+    const dateFmtBrief = 'MMM yyyy';
+
+    setFmt('day', 'MMMM dt');
+    setFmt('week', 'MM d');
+    setFmt('month', dateFmtBrief);
+    setFmt('year', dateFmtBrief);
+
     dateAxis.renderer.minGridDistance = 78;
     dateAxis.renderer.labels.template.fill = colourAxis;
     dateAxis.renderer.labels.template.dy = 16;

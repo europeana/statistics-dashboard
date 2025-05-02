@@ -18,6 +18,20 @@ import {
 import { LineComponent } from '../chart';
 import { LegendGridComponent } from '.';
 
+const date = new Date().toISOString();
+
+const mockCountryData = {
+  FR: [],
+  DE: [date, date, date].map((date) => {
+    return {
+      date: date,
+      three_d: '100',
+      high_quality: '200',
+      total: '300'
+    };
+  })
+};
+
 const mockTargetMetaData = {
   DE: {
     three_d: [],
@@ -52,6 +66,7 @@ describe('LegendGridComponent', () => {
     fixture = TestBed.createComponent(LegendGridComponent);
     component = fixture.componentInstance;
     component.lineChart = new MockLineComponent() as unknown as LineComponent;
+    component.targetCountries = [];
     fixture.detectChanges();
   });
 
@@ -267,22 +282,19 @@ describe('LegendGridComponent', () => {
     expect(component.togglePin).toHaveBeenCalledTimes(3);
     expect(component.addSeriesSetAndPin).toHaveBeenCalled();
     expect(component.onLoadHistory.emit).toHaveBeenCalled();
+
+    // case where existing country data is reused after component reinitialisation
+
+    component.countryData = mockCountryData;
+
+    component.toggleCountry('DE');
+
+    expect(component.addSeriesSetAndPin).toHaveBeenCalledTimes(2);
+    expect(component.onLoadHistory.emit).toHaveBeenCalledTimes(1);
   });
 
   it('should toggle the series', () => {
-    const date = new Date().toISOString();
-    component.countryData = {
-      FR: [],
-      DE: [date, date, date].map((date) => {
-        return {
-          date: date,
-          three_d: '100',
-          high_quality: '200',
-          total: '300'
-        };
-      })
-    };
-
+    component.countryData = mockCountryData;
     const seriesItemHidden = {
       isHidden: true,
       // eslint-disable-next-line @typescript-eslint/no-empty-function

@@ -21,9 +21,8 @@ import {
   mockTargetMetaData
 } from '../_mocked';
 import { TargetFieldName } from '../_models';
-import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent, LineService } from '../chart';
-import { LegendGridComponent } from '../legend-grid';
+import { LegendGridService } from '../legend-grid';
 import { HeaderComponent } from '../header';
 import { CountryComponent } from '.';
 
@@ -33,6 +32,7 @@ describe('CountryComponent', () => {
   let router: Router;
   let routeChangeSource: BehaviorSubject<Params>;
   let lineService: LineService;
+  let legendGridService: LegendGridService;
 
   class IntersectionObserver {
     observe(): void {
@@ -64,6 +64,7 @@ describe('CountryComponent', () => {
       .compileComponents();
     router = TestBed.inject(Router);
     lineService = TestBed.inject(LineService);
+    legendGridService = TestBed.inject(LegendGridService);
   };
 
   let appRef: ApplicationRef;
@@ -110,6 +111,12 @@ describe('CountryComponent', () => {
     expect(component.lineChartIsInitialised).toBeFalsy();
     lineService.setLineChartReady();
     expect(component.lineChartIsInitialised).toBeTruthy();
+  });
+
+  it('should listen for legend-grid initialisation', () => {
+    expect(component.legendGridIsInitialised).toBeFalsy();
+    legendGridService.setLegendGridReady(true);
+    expect(component.legendGridIsInitialised).toBeTruthy();
   });
 
   it('should load the history', () => {
@@ -174,18 +181,11 @@ describe('CountryComponent', () => {
   });
 
   it('should toggle the appendice', () => {
-    const pinnedCountries = { BE: 1 };
-    const pinnedCountriesOb = { pinnedCountries } as unknown;
-    component.legendGrid = pinnedCountriesOb as LegendGridComponent;
-    component.appendice = pinnedCountriesOb as AppendiceSectionComponent;
-
     expect(component.appendiceExpanded).toBeFalsy();
     component.toggleAppendice();
     expect(component.appendiceExpanded).toBeTruthy();
     component.toggleAppendice();
     expect(component.appendiceExpanded).toBeFalsy();
-
-    expect(component.appendice.pinnedCountries).toEqual(pinnedCountries);
   });
 
   it('should toggle the column', () => {

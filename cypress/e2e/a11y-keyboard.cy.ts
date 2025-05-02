@@ -5,7 +5,7 @@ context('Keyboard Accessibility', () => {
 
   describe('Focusable Highlights', () => {
     const checkFocusHighlights = (filter = '*') => {
-      cy.get('button, input, [tabindex="0"]')
+      cy.get('button, input, :not(g)[tabindex="0"]')
         .filter(':visible')
         .filter(filter)
         .each(($link) => {

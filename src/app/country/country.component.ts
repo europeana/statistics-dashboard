@@ -11,6 +11,7 @@ import {
 import {
   AfterViewInit,
   ApplicationRef,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   inject,
@@ -59,7 +60,7 @@ import {
 import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent, LineService } from '../chart';
 import { HeaderComponent } from '../header';
-import { LegendGridComponent } from '../legend-grid';
+import { LegendGridComponent, LegendGridService } from '../legend-grid';
 import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
@@ -126,8 +127,8 @@ export class CountryComponent
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('scrollPoint') scrollPoint: ElementRef;
-  @ViewChild('appendice') appendice: AppendiceSectionComponent;
 
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
@@ -149,6 +150,7 @@ export class CountryComponent
     if (typeof this.includeCTZero === 'boolean') {
       this.refreshCardData();
     }
+    this.restoreHiddenColumns();
     this.showTargetsData = !!this.targetMetaData[country];
     this.setHeaderData(country);
   }
@@ -174,6 +176,7 @@ export class CountryComponent
 
   appendiceExpanded = false;
   lineChartIsInitialised = false;
+  legendGridIsInitialised = false;
 
   @Input() headerRef: HeaderComponent;
 
@@ -185,7 +188,8 @@ export class CountryComponent
    **/
   constructor(
     private readonly applicationRef: ApplicationRef,
-    private readonly lineService: LineService
+    private readonly lineService: LineService,
+    private readonly legendGridService: LegendGridService
   ) {
     super();
 
@@ -193,10 +197,16 @@ export class CountryComponent
     lineService.lineChartReady.subscribe(() => {
       this.lineChartIsInitialised = true;
     });
+    // listen for the legend-grid to be initialised
+    legendGridService.legendGridReady.subscribe((value: boolean) => {
+      // first call makes the legendgrid available
+      this.changeDetector.detectChanges();
+      this.legendGridIsInitialised = value;
 
-    Object.values(TargetFieldName).forEach((key: string) => {
-      this.columnsEnabled[key] = true;
+      // the second call prevents ExpressionChanged the legend gris available to the view
+      this.changeDetector.detectChanges();
     });
+    this.restoreHiddenColumns();
 
     const rootRef = this.applicationRef.components[0].instance;
     if (rootRef) {
@@ -449,9 +459,6 @@ export class CountryComponent
 
   toggleAppendice(): void {
     this.appendiceExpanded = !this.appendiceExpanded;
-    if (this.appendiceExpanded) {
-      this.appendice.pinnedCountries = this.legendGrid.pinnedCountries;
-    }
   }
 
   /** nextColToEnable
@@ -479,6 +486,14 @@ export class CountryComponent
     ).length;
 
     this.columnToEnable = this.nextColToEnable();
+  }
+
+  restoreHiddenColumns(): void {
+    // re-initialise the hidden columns
+    this.columnsEnabledCount = 3;
+    Object.values(TargetFieldName).forEach((key: string) => {
+      this.columnsEnabled[key] = true;
+    });
   }
 
   ngOnDestroy(): void {

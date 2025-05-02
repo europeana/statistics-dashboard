@@ -83,12 +83,6 @@ describe('LineComponent', () => {
           // eslint-disable-next-line @typescript-eslint/no-empty-function
           dispose: () => {}
         } as unknown as am4charts.ValueAxisDataItem;
-        ob.rangeFakeSeries = {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          dispose: () => {},
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          hide: () => {}
-        } as unknown as am4charts.LineSeries;
       });
     });
 
@@ -160,8 +154,8 @@ describe('LineComponent', () => {
     const date = new Date();
     const date2 = new Date();
     const date3 = new Date();
-    date2.setDate(date.getDate() + 1);
-    date3.setDate(date.getDate() - 1);
+    date2.setDate(date.getDate() - 1);
+    date3.setDate(date.getDate() + 1);
 
     const data = [date3, date2, date, date, date3].map((dateVal: Date) => {
       return {

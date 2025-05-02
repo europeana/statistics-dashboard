@@ -583,6 +583,7 @@
         </a>
 
         <div
+          *ngIf="legendGridIsInitialised"
           class="appendice-grid-wrapper"
           [ngClass]="{ 'is-open': appendiceExpanded }"
           tabindex="-1"
@@ -590,6 +591,7 @@
           <app-appendice-section
             #appendice
             tabindex="-1"
+            [pinnedCountries]="legendGrid.pinnedCountries"
             [targetMetaData]="targetMetaData"
             [countryData]="countryData"
             [colourMap]="lineChart.allSeriesData"
