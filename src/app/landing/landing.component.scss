@@ -186,6 +186,16 @@ a[disabled] {
   }
 }
 
+.record-list,
+.target-summary {
+  .numeric {
+    text-align: right;
+    & + .numeric:not(.shrink) {
+      min-width: 6em;
+    }
+  }
+}
+
 .map-section {
   .link-select-country,
   .link-open-country {
