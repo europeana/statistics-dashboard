@@ -152,6 +152,7 @@ export const memberStateCountryCodes = [
 
 export const isoCountryCodes = {
   Austria: 'AT',
+  Australia: 'AU',
   Azerbaijan: 'AZ',
   Belgium: 'BE',
   Bulgaria: 'BG',

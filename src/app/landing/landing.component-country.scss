@@ -328,7 +328,6 @@ $numeric-min-width: 6em;
   // the target year
   .boxed:last-child {
     padding-right: $boxed-dash-length;
-    //    margin-left: 3em;
     margin-left: calc($boxed-dash-length + 0.5em);
 
     &::before {
@@ -416,7 +415,9 @@ $numeric-min-width: 6em;
   .numeric {
     text-align: right;
   }
+}
 
+.target-summary {
   &:not(.target-expanded) {
     .numeric {
       margin-right: 6px;
