@@ -374,10 +374,13 @@ export class CountryComponent
   setCountryToParam(country: string): void {
     this.country = country;
     const specificCountryData = this.countryData[country];
-
     if (specificCountryData && specificCountryData.length) {
-      this.latestCountryData =
-        specificCountryData[specificCountryData.length - 1];
+      this.latestCountryData = specificCountryData.reduce(function (
+        prev,
+        current
+      ) {
+        return prev && prev.date > current.date ? prev : current;
+      });
       this.generateDerivedData();
     }
   }
