@@ -8,6 +8,7 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -214,6 +215,7 @@ describe('AppComponent', () => {
 
       // load country component
       const fakeCountryComponent = Object.create(CountryComponent.prototype);
+      fakeCountryComponent.country = signal('');
 
       spyOn(app, 'setCTZeroInputToLastSetValue');
       spyOn(fakeCountryComponent, 'refreshCardData');
@@ -230,7 +232,7 @@ describe('AppComponent', () => {
       expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
       expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
 
-      fakeCountryComponent._country = 'FR';
+      fakeCountryComponent.country.set('FR');
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);

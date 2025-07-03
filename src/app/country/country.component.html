@@ -5,17 +5,17 @@
   }"
 >
   <h1 class="page-title">
-    <span class="flag-orb" [ngClass]="country"></span>
+    <span class="flag-orb" [ngClass]="country()"></span>
     <ng-container
       *ngIf="
         headerRef &&
         headerRef['countryTotalMap'] &&
-        headerRef['countryTotalMap'][country] !== undefined
+        headerRef['countryTotalMap'][country()] !== undefined
       "
     >
-      <span *ngIf="country">{{ country | renameCountry }}</span>
-      <span *ngIf="country" i18n="@@countryPageTitle">Data</span>
-      <span class="page-subtitle">
+      <span *ngIf="country(); let country">{{ country | renameCountry }}</span>
+      <span *ngIf="country(); let country" i18n="@@countryPageTitle">Data</span>
+      <span *ngIf="country(); let country" class="page-subtitle">
         {{ headerRef["countryTotalMap"][country] }}% of the Europeana dataset
       </span>
     </ng-container>
@@ -139,7 +139,7 @@
             <div class="help-speech-bubble-wrapper help-items">
               <app-speech-bubble [arrowBottomRight]="true">
                 <span class="help-speech-bubble-content">
-                  {{ tooltipsTotal[valName] }}
+                  {{ tooltipsAndTotals().tooltipsTotal[valName] }}
                 </span>
               </app-speech-bubble>
             </div>
@@ -152,7 +152,10 @@
           }"
         >
           <span class="hide-on-triple">{{ value | number }}</span>
-          <span class="show-on-triple" [attr.title]="tooltipsTotal[valName]">
+          <span
+            class="show-on-triple"
+            [attr.title]="tooltipsAndTotals().tooltipsTotal[valName]"
+          >
             {{ value | abbreviateNumber }}
           </span>
         </span>
@@ -193,7 +196,10 @@
           }"
         >
           <span class="hide-on-triple">{{ percent | number : "1.0-2" }}%</span>
-          <span class="show-on-triple" [attr.title]="tooltipsPercent[valName]">
+          <span
+            class="show-on-triple"
+            [attr.title]="tooltipsAndTotals().tooltipsPercent[valName]"
+          >
             {{ percent | number : "1.0-1" }}%</span
           >
         </span>
@@ -209,7 +215,7 @@
     >
       <app-speech-bubble [arrowTopRight]="true">
         <span class="help-speech-bubble-content">
-          {{ tooltipsPercent[name] }}
+          {{ tooltipsAndTotals().tooltipsPercent[name] }}
         </span>
       </app-speech-bubble>
     </div>
@@ -220,8 +226,8 @@
         cardSummary;
         context: {
           valName: valName,
-          value: latestCountryData[valName] || 0,
-          percent: latestCountryPercentages[valName] || 0,
+          value: latestCountryData()[valName] || 0,
+          percent: tooltipsAndTotals().latestCountryPercentages[valName] || 0,
           isPowerLevel: true
         }
       "
@@ -314,7 +320,7 @@
         <div
           class="entry-card-content"
           *ngIf="
-            targetMetaData[country][TargetFieldName.THREE_D];
+            targetMetaData[country()][TargetFieldName.THREE_D];
             let targets3D
           "
         >
@@ -334,13 +340,18 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                value: latestCountryData[TargetFieldName.THREE_D],
+                value: latestCountryData()[TargetFieldName.THREE_D],
                 percent:
-                  latestCountryPercentageOfTargets[TargetFieldName.THREE_D][0],
+                  tooltipsAndTotals().latestCountryPercentageOfTargets[
+                    TargetFieldName.THREE_D
+                  ][0],
                 label: '2025',
                 target: targets3D[0].value,
                 colourIndex: 0,
-                tooltip: tooltipsTargets[TargetFieldName.THREE_D][0]
+                tooltip:
+                  tooltipsAndTotals().tooltipsTargets[
+                    TargetFieldName.THREE_D
+                  ][0]
               }
             "
           ></ng-content>
@@ -348,13 +359,18 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                value: latestCountryData[TargetFieldName.THREE_D],
+                value: latestCountryData()[TargetFieldName.THREE_D],
                 percent:
-                  latestCountryPercentageOfTargets[TargetFieldName.THREE_D][1],
+                  tooltipsAndTotals().latestCountryPercentageOfTargets[
+                    TargetFieldName.THREE_D
+                  ][1],
                 label: '2030',
                 target: targets3D[1].value,
                 colourIndex: 0,
-                tooltip: tooltipsTargets[TargetFieldName.THREE_D][1]
+                tooltip:
+                  tooltipsAndTotals().tooltipsTargets[
+                    TargetFieldName.THREE_D
+                  ][1]
               }
             "
           ></ng-content>
@@ -362,7 +378,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
             [queryParams]="{
-              country: country | renameCountry,
+              country: country() | renameCountry,
               type: '3D'
             }"
             (click)="resetAppCTZeroParam()"
@@ -396,7 +412,7 @@
         </span>
         <div
           class="entry-card-content"
-          *ngIf="targetMetaData[country][TargetFieldName.HQ]; let targetsHQ"
+          *ngIf="targetMetaData[country()][TargetFieldName.HQ]; let targetsHQ"
         >
           <ng-content
             *ngTemplateOutlet="
@@ -414,13 +430,16 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                value: latestCountryData[TargetFieldName.HQ],
+                value: latestCountryData()[TargetFieldName.HQ],
                 percent:
-                  latestCountryPercentageOfTargets[TargetFieldName.HQ][0],
+                  tooltipsAndTotals().latestCountryPercentageOfTargets[
+                    TargetFieldName.HQ
+                  ][0],
                 label: '2025',
                 target: targetsHQ[0].value,
                 colourIndex: 1,
-                tooltip: tooltipsTargets[TargetFieldName.HQ][0]
+                tooltip:
+                  tooltipsAndTotals().tooltipsTargets[TargetFieldName.HQ][0]
               }
             "
           ></ng-content>
@@ -429,13 +448,16 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                value: latestCountryData[TargetFieldName.HQ],
+                value: latestCountryData()[TargetFieldName.HQ],
                 percent:
-                  latestCountryPercentageOfTargets[TargetFieldName.HQ][1],
+                  tooltipsAndTotals().latestCountryPercentageOfTargets[
+                    TargetFieldName.HQ
+                  ][1],
                 label: '2030',
                 target: targetsHQ[1].value,
                 colourIndex: 1,
-                tooltip: tooltipsTargets[TargetFieldName.HQ][1]
+                tooltip:
+                  tooltipsAndTotals().tooltipsTargets[TargetFieldName.HQ][1]
               }
             "
           ></ng-content>
@@ -443,7 +465,7 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
             [queryParams]="{
-              country: country | renameCountry,
+              country: country() | renameCountry,
               contentTier: [2, 3, 4],
               metadataTier: ['A', 'B', 'C']
             }"
@@ -477,7 +499,7 @@
         <div
           class="entry-card-content entry-card-totals"
           *ngIf="
-            targetMetaData[country][TargetFieldName.TOTAL];
+            targetMetaData[country()][TargetFieldName.TOTAL];
             let targetsTOTAL
           "
         >
@@ -497,13 +519,16 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                value: latestCountryData[TargetFieldName.TOTAL],
+                value: latestCountryData()[TargetFieldName.TOTAL],
                 percent:
-                  latestCountryPercentageOfTargets[TargetFieldName.TOTAL][0],
+                  tooltipsAndTotals().latestCountryPercentageOfTargets[
+                    TargetFieldName.TOTAL
+                  ][0],
                 label: '2025',
                 target: targetsTOTAL[0].value,
                 colourIndex: 2,
-                tooltip: tooltipsTargets[TargetFieldName.TOTAL][0]
+                tooltip:
+                  tooltipsAndTotals().tooltipsTargets[TargetFieldName.TOTAL][0]
               }
             "
           ></ng-content>
@@ -512,13 +537,16 @@
             *ngTemplateOutlet="
               powerLevel;
               context: {
-                value: latestCountryData[TargetFieldName.TOTAL],
+                value: latestCountryData()[TargetFieldName.TOTAL],
                 percent:
-                  latestCountryPercentageOfTargets[TargetFieldName.TOTAL][1],
+                  tooltipsAndTotals().latestCountryPercentageOfTargets[
+                    TargetFieldName.TOTAL
+                  ][1],
                 label: '2030',
                 target: targetsTOTAL[1].value,
                 colourIndex: 2,
-                tooltip: tooltipsTargets[TargetFieldName.TOTAL][1]
+                tooltip:
+                  tooltipsAndTotals().tooltipsTargets[TargetFieldName.TOTAL][1]
               }
             "
           ></ng-content>
@@ -526,11 +554,11 @@
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
             [queryParams]="{
-              country: country | renameCountry
+              country: country() | renameCountry
             }"
             (click)="resetAppCTZeroParam()"
             ><span i18n="@@countrySectionLinkCountry">View all data for</span
-            >&nbsp;{{ country | renameCountry }}</a
+            >&nbsp;{{ country() | renameCountry }}</a
           >
         </div>
 
@@ -542,7 +570,7 @@
 
     <div *ngIf="showTargetsData" class="entry-card double-card line-and-legend">
       <span class="entry-card-header"
-        ><span class="pad-word-right">{{ country | renameCountry }}</span
+        ><span class="pad-word-right">{{ country() | renameCountry }}</span
         ><span i18n="@@countryTargetProgess">Data Progression</span></span
       >
       <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
@@ -555,8 +583,8 @@
           <app-legend-grid
             *ngIf="lineChartIsInitialised"
             #legendGrid
-            [countryData]="countryData"
-            [countryCode]="country"
+            [countryData]="countryData()"
+            [countryCode]="country()"
             [targetMetaData]="targetMetaData"
             [lineChart]="lineChart"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
@@ -593,7 +621,7 @@
             tabindex="-1"
             [pinnedCountries]="legendGrid.pinnedCountries"
             [targetMetaData]="targetMetaData"
-            [countryData]="countryData"
+            [countryData]="countryData()"
             [colourMap]="lineChart.allSeriesData"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
             [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
@@ -607,7 +635,7 @@
   <!-- tertiary content -->
 
   <div *ngIf="showTargetsData" class="header-text non-target-text">
-    Explore items for {{ country | renameCountry }}
+    Explore items for {{ country() | renameCountry }}
   </div>
 
   <div #scrollPoint>
@@ -615,7 +643,7 @@
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span class="pad-word-right">{{ country() | renameCountry }}</span>
             <span i18n="@@countryEntryType">data by content type</span>
           </span>
 
@@ -645,7 +673,7 @@
               routerLink="/data/{{ DimensionName.type }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country | renameCountry
+                country: country() | renameCountry
               }"
               data-e2e="link-entry-type"
               i18n="@@countrySectionLinkType"
@@ -655,7 +683,7 @@
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span class="pad-word-right">{{ country() | renameCountry }}</span>
             <span i18n="@@countryEntryRights">data by rights category</span>
             <a
               class="info-icon"
@@ -681,7 +709,7 @@
               routerLink="/data/{{ DimensionName.rightsCategory }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country | renameCountry
+                country: country() | renameCountry
               }"
               data-e2e="link-entry-rights"
               i18n="@@countrySectionLinkRights"
@@ -694,7 +722,7 @@
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span class="pad-word-right">{{ country() | renameCountry }}</span>
             <span i18n="@@countryEntryDataProvider">data by data provider</span>
           </span>
           <div class="entry-card-content">
@@ -714,7 +742,7 @@
               routerLink="/data/{{ DimensionName.dataProvider }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country | renameCountry
+                country: country() | renameCountry
               }"
               data-e2e="link-entry-data-provider"
               i18n="@@countrySectionLinkDataProvider"
@@ -724,7 +752,7 @@
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
-            <span class="pad-word-right">{{ country | renameCountry }}</span>
+            <span class="pad-word-right">{{ country() | renameCountry }}</span>
             <span i18n="@@countryEntryProvider">data by provider</span>
             <a
               class="info-icon"
@@ -750,7 +778,7 @@
               routerLink="/data/{{ DimensionName.provider }}"
               [queryParams]="{
                 'content-tier-zero': includeCTZero ? true : undefined,
-                country: country | renameCountry
+                country: country() | renameCountry
               }"
               data-e2e="link-entry-provider"
               i18n="@@countrySectionLinkProvider"
