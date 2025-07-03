@@ -158,7 +158,7 @@ export class CountryComponent
     if (specificCountryData && specificCountryData.length) {
       const res = specificCountryData.reduce(
         (prev: TargetData, current: TargetData) => {
-          return prev && prev.date && prev.date > current.date ? prev : current;
+          return prev?.date && prev?.date > current.date ? prev : current;
         },
         {} as TargetData
       );
@@ -401,7 +401,7 @@ export class CountryComponent
     if (this.latestCountryData()) {
       Object.values(TargetFieldName).forEach((valName: string) => {
         const countryName = isoCountryCodesReversed[this.country()];
-        const value: number = this.latestCountryData()[valName] || 0;
+        const value: number = this.latestCountryData()[valName] ?? 0;
 
         const fmtName = this.renameTargetTypePipe.transform(valName);
         const fmtValue = fmtNum(value, '1.0-2');
