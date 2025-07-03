@@ -156,9 +156,12 @@ export class CountryComponent
   latestCountryData = computed(() => {
     const specificCountryData = this.countryData()[this.country()];
     if (specificCountryData && specificCountryData.length) {
-      const res = specificCountryData.reduce(function (prev, current) {
-        return prev && prev.date > current.date ? prev : current;
-      });
+      const res = specificCountryData.reduce(
+        (prev: TargetData, current: TargetData) => {
+          return prev && prev.date && prev.date > current.date ? prev : current;
+        },
+        {} as TargetData
+      );
       return res;
     }
   });
