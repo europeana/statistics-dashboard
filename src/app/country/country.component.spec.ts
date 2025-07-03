@@ -108,6 +108,35 @@ describe('CountryComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should compute the latest country data', () => {
+    expect(component.latestCountryData()).toBeFalsy();
+    component.countryData.set(mockCountryData);
+    expect(component.latestCountryData()).toBeTruthy();
+  });
+
+  it('should compute the tooltips and totals', () => {
+    expect(
+      Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+    ).toBeFalsy();
+
+    component.countryData.set(mockCountryData);
+    component.targetMetaData = mockTargetMetaData;
+    component.country.set('FR');
+
+    expect(
+      Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+    ).toBeTruthy();
+
+    const copy = { ...mockCountryData };
+    copy['FR'] = copy['FR'].reverse();
+
+    component.countryData.set(copy);
+
+    expect(
+      Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+    ).toBeTruthy();
+  });
+
   it('should react to the line chart becoming ready', () => {
     expect(component.lineChartIsInitialised).toBeFalsy();
     lineService.setLineChartReady();
