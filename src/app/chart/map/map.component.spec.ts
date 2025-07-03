@@ -11,7 +11,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 
 import { APIService } from '../../_services';
-import { MockAPIService } from '../../_mocked';
+import { MockAPIService, MockMapChart } from '../../_mocked';
 
 import { MapComponent } from './map.component';
 
@@ -27,24 +27,11 @@ describe('MapComponent', () => {
     }).compileComponents();
   }));
 
-  const getFakeChart = (): am4maps.MapChart => {
-    return {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      show: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      hide: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      zoomToRectangle: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      animate: () => {}
-    } as unknown as am4maps.MapChart;
-  };
-
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
-    component.chart = getFakeChart();
-    component.chartGlobe = getFakeChart();
+    component.chart = MockMapChart;
+    component.chartGlobe = MockMapChart;
     component.mapData = [];
     fixture.detectChanges();
   });

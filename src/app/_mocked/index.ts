@@ -1,3 +1,4 @@
+export * from './mock-am4-map-chart';
 export * from './mockpipe';
 export * from './mock-bar.component';
 export * from './mock-grid.component';
