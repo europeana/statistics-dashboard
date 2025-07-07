@@ -288,13 +288,14 @@ export class MapComponent extends SubscriptionManager {
     this.polygonSeries.include = countries;
     this.polygonSeries.data = this.filterResultsData();
 
-    this.polygonSeries.events.once('datavalidated', () => {
+    const fnDataValidated = (): void => {
       if (singleCountry) {
         this.zoomToCountries(countries, ZoomLevel.SINGLE, 0);
       } else {
         this.zoomToCountries(this.boundingCountries, ZoomLevel.MULTIPLE, 0);
       }
-    });
+    };
+    this.polygonSeries.events.once('datavalidated', fnDataValidated);
   }
 
   /** countryMorph
@@ -307,6 +308,7 @@ export class MapComponent extends SubscriptionManager {
     }
 
     const oldCountry = this.polygonSeries.include[0];
+
     if (this.polygonSeriesHidden.include.length === 1) {
       return;
     }
@@ -324,31 +326,35 @@ export class MapComponent extends SubscriptionManager {
     this.polygonSeriesHidden.include = [newCountry];
     this.selectedCountry = newCountry;
 
-    this.polygonSeriesHidden.events.once('validated', () => {
-      const polyHidden = this.polygonSeriesHidden.mapPolygons.getIndex(0);
-      const poly = this.polygonSeries.getPolygonById(oldCountry);
-
-      const morphAnimationEnded = (): void => {
-        // reset the hidden / update the actual
-        this.polygonSeriesHidden.data = [];
-        this.polygonSeriesHidden.include = this.mapCountries;
-        setTimeout(() => {
-          this.setCountryInclusion([newCountry]);
-        });
-      };
-
-      if (poly) {
-        const morphAnimation = polyHidden
-          ? poly.polygon.morpher.morphToPolygon(
-              polyHidden.polygon.points,
-              this.animationTime
-            )
-          : poly.polygon.morpher.morphToCircle(1, this.animationTime);
-        morphAnimation.events.on('animationended', morphAnimationEnded);
-      } else {
-        morphAnimationEnded();
-      }
+    this.polygonSeriesHidden.events.once('validated', (): void => {
+      this.countryMorphValidated(oldCountry, newCountry);
     });
+  }
+
+  countryMorphValidated(oldCountry: string, newCountry: string): void {
+    const polyHidden = this.polygonSeriesHidden.mapPolygons.getIndex(0);
+    const poly = this.polygonSeries.getPolygonById(oldCountry);
+
+    const morphAnimationEnded = (): void => {
+      // reset the hidden / update the actual
+      this.polygonSeriesHidden.data = [];
+      this.polygonSeriesHidden.include = this.mapCountries;
+      setTimeout(() => {
+        this.setCountryInclusion([newCountry]);
+      });
+    };
+
+    if (poly) {
+      const morphAnimation = polyHidden
+        ? poly.polygon.morpher.morphToPolygon(
+            polyHidden.polygon.points,
+            this.animationTime
+          )
+        : poly.polygon.morpher.morphToCircle(1, this.animationTime);
+      morphAnimation.events.on('animationended', morphAnimationEnded);
+    } else {
+      morphAnimationEnded();
+    }
   }
 
   /** countryClick
@@ -478,6 +484,29 @@ export class MapComponent extends SubscriptionManager {
     hlMaxRange.label.text = '' + heatLegend.numberFormatter.format(hlMax);
   }
 
+  obtainChart(id: string): am4maps.MapChart {
+    return am4core.create(id, am4maps.MapChart);
+  }
+
+  // add legend
+  addLegend(): void {
+    const legend = this.chart.createChild(am4maps.HeatLegend);
+    this.legend = legend;
+    legend.hide();
+    legend.cursorOverStyle = am4core.MouseCursorStyle.pointer;
+    legend.id = 'mapLegend';
+    legend.series = this.polygonSeries;
+    legend.align = 'left';
+    legend.valign = 'bottom';
+    legend.width = am4core.percent(35);
+    legend.marginRight = am4core.percent(4);
+    legend.background.fillOpacity = 0.05;
+    legend.padding(5, 5, 5, 5);
+    legend.events.on('up', () => {
+      this.zoomToCountries();
+    });
+  }
+
   /** drawChart
    *
    **/
@@ -485,10 +514,11 @@ export class MapComponent extends SubscriptionManager {
     am4core.useTheme(am4themes_animated);
     am4core.options.autoDispose = true;
 
-    // Create map instance
-    const chart = am4core.create('mapChart', am4maps.MapChart);
-    const chartHidden = am4core.create('mapChartHidden', am4maps.MapChart);
-    const chartGlobe = am4core.create('mapChartGlobe', am4maps.MapChart);
+    // Create map instances
+    const chart = this.obtainChart('mapChart');
+    const chartHidden = this.obtainChart('mapChartHidden');
+    const chartGlobe = this.obtainChart('mapChartGlobe');
+
     this.chart = chart;
     this.chartHidden = chartHidden;
     this.chartGlobe = chartGlobe;
@@ -524,29 +554,14 @@ export class MapComponent extends SubscriptionManager {
     polygonSeries.useGeodata = true;
     polygonSeriesHidden.useGeodata = true;
 
-    // add legend
-    const legend = this.chart.createChild(am4maps.HeatLegend);
-    this.legend = legend;
-    legend.hide();
-    legend.cursorOverStyle = am4core.MouseCursorStyle.pointer;
-    legend.id = 'mapLegend';
-    legend.series = this.polygonSeries;
-    legend.align = 'left';
-    legend.valign = 'bottom';
-    legend.width = am4core.percent(35);
-    legend.marginRight = am4core.percent(4);
-    legend.background.fillOpacity = 0.05;
-    legend.padding(5, 5, 5, 5);
-    legend.events.on('up', () => {
-      this.zoomToCountries();
-    });
+    this.addLegend();
 
     // Set up custom heat map legend labels using axis ranges
 
-    const minRange = legend.valueAxis.axisRanges.create();
+    const minRange = this.legend.valueAxis.axisRanges.create();
     minRange.label.horizontalCenter = 'left';
 
-    const maxRange = legend.valueAxis.axisRanges.create();
+    const maxRange = this.legend.valueAxis.axisRanges.create();
     maxRange.label.horizontalCenter = 'right';
 
     // Bind labels to percent setting
@@ -560,7 +575,7 @@ export class MapComponent extends SubscriptionManager {
 
     // Blank out internal heat legend value axis labels
 
-    legend.valueAxis.renderer.labels.template.adapter.add(
+    this.legend.valueAxis.renderer.labels.template.adapter.add(
       'text',
       function (_: string) {
         return '';
