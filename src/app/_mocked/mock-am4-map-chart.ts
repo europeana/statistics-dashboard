@@ -14,8 +14,97 @@ const fakeEvents = {
   once: (): void => {}
 };
 
+const fakeTemplate = {
+  adapter: fakeAdapter,
+  events: fakeEvents,
+  states: {
+    create: (): unknown => {
+      return {
+        properties: {}
+      };
+    }
+  }
+};
+
+const fakeAxis = {
+  axisRanges: {
+    create: (): unknown => {
+      return {
+        label: {
+          adapter: fakeAdapter
+        }
+      };
+    },
+    getIndex: (): unknown => {
+      return {
+        value: 0,
+        label: {
+          text: ''
+        }
+      };
+    }
+  },
+  renderer: {
+    labels: {
+      template: fakeTemplate
+    }
+  }
+};
+
+const fakeSeries = {
+  dataItem: {
+    values: {
+      value: {
+        low: 0
+      }
+    }
+  },
+  push: (): unknown => {
+    return {
+      events: fakeEvents,
+      getPolygonById: (id: string): unknown => {
+        return id === 'EU'
+          ? null
+          : {
+              polygon: {
+                morpher: {
+                  morphToPolygon: (): unknown => {
+                    return {
+                      events: fakeEvents
+                    };
+                  },
+                  morphToCircle: (): unknown => {
+                    return {
+                      events: fakeEvents
+                    };
+                  }
+                }
+              }
+            };
+      },
+      heatRules: [],
+      include: false,
+      data: [],
+
+      mapPolygons: {
+        template: fakeTemplate,
+        getIndex: (): unknown => {
+          return {
+            polygon: {}
+          };
+        }
+      },
+      tooltip: (): unknown => {
+        return {};
+      },
+      useGeodata: false
+    };
+  }
+};
+
 export const MockMapChart = {
   createChild: (): unknown => {
+    // legend
     return {
       background: {},
       events: fakeEvents,
@@ -23,59 +112,16 @@ export const MockMapChart = {
       hide: (): void => {},
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       padding: (): void => {},
-      valueAxis: {
-        axisRanges: {
-          create: (): unknown => {
-            return {
-              label: {
-                adapter: fakeAdapter
-              }
-            };
-          }
-        },
-        renderer: {
-          labels: {
-            template: {
-              adapter: fakeAdapter
-            }
-          }
-        }
+      valueAxis: fakeAxis,
+      series: fakeSeries,
+      numberFormatter: {
+        format: () => 'formatted'
       }
     };
   },
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   dispatchImmediately: (): void => {},
-  series: {
-    push: (): unknown => {
-      return {
-        events: fakeEvents,
-        getPolygonById: (): unknown => {
-          return {};
-        },
-        heatRules: [],
-        include: false,
-        data: [],
-
-        mapPolygons: {
-          template: {
-            adapter: fakeAdapter,
-            events: fakeEvents,
-            states: {
-              create: (): unknown => {
-                return {
-                  properties: {}
-                };
-              }
-            }
-          }
-        },
-        tooltip: (): unknown => {
-          return {};
-        },
-        useGeodata: false
-      };
-    }
-  },
+  series: fakeSeries,
   chartContainer: {
     background: {
       events: fakeEvents
