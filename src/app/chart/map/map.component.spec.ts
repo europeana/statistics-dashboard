@@ -11,7 +11,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 
 import { APIService } from '../../_services';
-import { MockAPIService } from '../../_mocked';
+import { MockAPIService, MockMapChart } from '../../_mocked';
 
 import { MapComponent } from './map.component';
 
@@ -27,30 +27,26 @@ describe('MapComponent', () => {
     }).compileComponents();
   }));
 
-  const getFakeChart = (): am4maps.MapChart => {
-    return {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      show: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      hide: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      zoomToRectangle: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      animate: () => {}
-    } as unknown as am4maps.MapChart;
-  };
-
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
-    component.chart = getFakeChart();
-    component.chartGlobe = getFakeChart();
+    expect(component.obtainChart('mapChart')).toBeTruthy();
+    spyOn(component, 'obtainChart').and.callFake(() => {
+      return MockMapChart;
+    });
     component.mapData = [];
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should synchronise the legend', () => {
+    component.legend = MockMapChart.createChild(am4maps.HeatLegend);
+    spyOn(component.legend.valueAxis.axisRanges, 'getIndex').and.callThrough();
+    component.synchroniseLegend();
+    expect(component.legend.valueAxis.axisRanges.getIndex).toHaveBeenCalled();
   });
 
   it('should hide the globe', () => {
@@ -226,6 +222,21 @@ describe('MapComponent', () => {
     expect(component.hideGlobe).toHaveBeenCalled();
   });
 
+  it('should validate the morph', () => {
+    component.drawChart();
+    fixture.detectChanges();
+    spyOn(component.polygonSeries, 'getPolygonById').and.callThrough();
+    spyOn(component.polygonSeriesHidden.mapPolygons, 'getIndex');
+
+    component.setCountryInclusion(['IT', 'EU']);
+    component.countryMorphValidated('EU', 'FR');
+
+    expect(component.polygonSeries.getPolygonById).toHaveBeenCalled();
+
+    component.countryMorphValidated('FR', 'DE');
+    expect(component.polygonSeries.getPolygonById).toHaveBeenCalledTimes(2);
+  });
+
   it('should morph', () => {
     spyOn(component, 'hideGlobe');
     component.mapData = [{ id: 'IT', value: 1881 }];
@@ -243,46 +254,34 @@ describe('MapComponent', () => {
 
     expect(component.selectedCountry).not.toEqual('DE');
 
+    component.isAnimating = false;
     component.setCountryInclusion(['IT']);
     component.countryMorph('IT');
     expect(component.selectedCountry).not.toEqual('DE');
+
+    spyOn(component, 'countryMorphValidated');
+    spyOn(component.polygonSeriesHidden.events, 'once').and.callFake(((
+      a: string,
+      callBack: (event: string, b: string) => void
+    ) => {
+      callBack('', '');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any);
 
     component.setCountryInclusion(['IT']);
     component.countryMorph('DE');
 
     expect(component.selectedCountry).toEqual('DE');
     expect(component.hideGlobe).toHaveBeenCalledTimes(2);
-  });
+    expect(component.countryMorphValidated).toHaveBeenCalled();
 
-  it('should detect chart series container events', () => {
-    component.drawChart();
+    component.isAnimating = false;
+    component.polygonSeriesHidden = MockMapChart.series.push(
+      new am4maps.MapPolygonSeries()
+    );
+    component.polygonSeriesHidden.include = ['FR'];
 
-    const spyDragStart = jasmine.createSpy();
-    const spyDragStop = jasmine.createSpy();
-
-    component.chart.seriesContainer.events.on('dragstart', spyDragStart);
-    component.chart.seriesContainer.events.on('dragstop', spyDragStop);
-
-    component.chart.seriesContainer.dispatchImmediately('dragstart');
-    expect(spyDragStart).toHaveBeenCalled();
-
-    component.chart.seriesContainer.dispatchImmediately('dragstop');
-    expect(spyDragStop).toHaveBeenCalled();
-  });
-
-  it('should detect chart events', () => {
-    component.drawChart();
-
-    const spyOut = jasmine.createSpy();
-    const spyOver = jasmine.createSpy();
-
-    component.chart.events.on('out', spyOut);
-    component.chart.events.on('over', spyOver);
-
-    component.chart.dispatchImmediately('out');
-    expect(spyOut).toHaveBeenCalled();
-
-    component.chart.dispatchImmediately('over');
-    expect(spyOver).toHaveBeenCalled();
+    expect(component.hideGlobe).toHaveBeenCalledTimes(2);
+    expect(component.selectedCountry).toEqual('DE');
   });
 });

@@ -100,11 +100,41 @@ describe('CountryComponent', () => {
     component = fixture.componentInstance;
 
     component.headerRef = header as unknown as HeaderComponent;
+    TestBed.flushEffects();
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should compute the latest country data', () => {
+    expect(component.latestCountryData()).toBeFalsy();
+    component.countryData.set(mockCountryData);
+    expect(component.latestCountryData()).toBeTruthy();
+  });
+
+  it('should compute the tooltips and totals', () => {
+    expect(
+      Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+    ).toBeFalsy();
+
+    component.countryData.set(mockCountryData);
+    component.targetMetaData = mockTargetMetaData;
+    component.country.set('FR');
+
+    expect(
+      Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+    ).toBeTruthy();
+
+    const copy = { ...mockCountryData };
+    copy['FR'] = copy['FR'].reverse();
+
+    component.countryData.set(copy);
+
+    expect(
+      Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+    ).toBeTruthy();
   });
 
   it('should react to the line chart becoming ready', () => {
@@ -165,7 +195,7 @@ describe('CountryComponent', () => {
     } as unknown as BarComponent;
 
     component.barChart = barChart;
-    component.country = 'France';
+    component.country.set('France');
     component.includeCTZero = false;
     tick(1);
     expect(barChart.removeAllSeries).toHaveBeenCalled();
@@ -173,11 +203,11 @@ describe('CountryComponent', () => {
   }));
 
   it('should set the latest country data', () => {
-    expect(component.latestCountryData).toBeFalsy();
-    component.countryData = mockCountryData;
+    expect(component.latestCountryData()).toBeFalsy();
+    component.countryData.set(mockCountryData);
     component.targetMetaData = mockTargetMetaData;
-    component.setCountryToParam('FR');
-    expect(component.latestCountryData).toBeTruthy();
+    component.country.set('FR');
+    expect(component.latestCountryData()).toBeTruthy();
   });
 
   it('should toggle the appendice', () => {
@@ -219,9 +249,16 @@ describe('CountryComponent', () => {
   });
 
   it('should refresh the data when the includeCTZero is set', () => {
+    component.country.set('');
+    TestBed.flushEffects();
+    fixture.detectChanges();
+
     spyOn(component, 'refreshCardData');
-    component.country = undefined;
+    expect(component.country().length).toBeFalsy();
+    expect(component.refreshCardData).not.toHaveBeenCalled();
     component.includeCTZero = true;
+
+    expect(component.country().length).toBeFalsy();
 
     expect(component.refreshCardData).not.toHaveBeenCalled();
 
@@ -229,7 +266,10 @@ describe('CountryComponent', () => {
 
     expect(component.refreshCardData).not.toHaveBeenCalled();
 
-    component.country = 'FR';
+    component.country.set('FR');
+    TestBed.flushEffects();
+    fixture.detectChanges();
+
     expect(component.refreshCardData).toHaveBeenCalled();
 
     component.includeCTZero = true;
