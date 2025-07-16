@@ -6,11 +6,69 @@ import {
   TargetMetaData,
   TargetMetaDataRaw
 } from '../src/app/_models';
-import {
-  isoCountryCodes,
-  isoCountryCodesReversed,
-  memberStateCountryCodes
-} from '../src/app/_data';
+import { memberStateCountryCodes } from '../src/app/_data';
+
+export const isoCountryCodes = {
+  Austria: 'AT',
+  Azerbaijan: 'AZ',
+  Belgium: 'BE',
+  Bulgaria: 'BG',
+  'Bosnia and Herzegovina': 'BA',
+  Belarus: 'BY',
+  Russia: 'RU',
+  Serbia: 'RS',
+  Romania: 'RO',
+  Greece: 'GR',
+  Georgia: 'GE',
+  'United Kingdom': 'GB',
+  Croatia: 'HR',
+  Hungary: 'HU',
+  Portugal: 'PT',
+  Poland: 'PL',
+  Estonia: 'EE',
+  Italy: 'IT',
+  Spain: 'ES',
+  Montenegro: 'ME',
+  Moldova: 'MD',
+  Monaco: 'MC',
+  'North Macedonia': 'MK',
+  Malta: 'MT',
+  France: 'FR',
+  Finland: 'FI',
+  'Faroe Islands': 'FO',
+  Netherlands: 'NL',
+  Norway: 'NO',
+  Kosovo: 'XK',
+  Switzerland: 'CH',
+  Czechia: 'CZ',
+  Cyprus: 'CY',
+  Slovakia: 'SK',
+  Slovenia: 'SI',
+  Sweden: 'SE',
+  Denmark: 'DK',
+  Germany: 'DE',
+  'United States of America': 'US',
+  Turkey: 'TR',
+  Liechtenstein: 'LI',
+  Latvia: 'LV',
+  Lithuania: 'LT',
+  Luxembourg: 'LU',
+  'Holy See (Vatican City State)': 'VA',
+  Andorra: 'AD',
+  Iceland: 'IS',
+  Israel: 'IL',
+  Albania: 'AL',
+  Ireland: 'IE',
+  Ukraine: 'UA',
+  Europe: 'EU'
+};
+
+export const isoCountryCodesReversed = Object.entries(isoCountryCodes)
+.filter(item => !!item)
+.reduce(
+  (obj, item) => (obj[item[1]] = item[0]) && obj,
+  {}
+);
 
 const dateTicks: Array<string> = [];
 
