@@ -52,11 +52,11 @@ export const isoCountryCodes = {
   'Congo, Democratic Republic': 'CD',
   'Cook Islands': 'CK',
   'Costa Rica': 'CR',
-  'Cote D\'Ivoire': 'CI',
+  "Cote D'Ivoire": 'CI',
   Croatia: 'HR',
   Cuba: 'CU',
   Cyprus: 'CY',
-  'Czech Republic': 'CZ',
+  Czechia: 'CZ',
   Denmark: 'DK',
   Djibouti: 'DJ',
   Dominica: 'DM',
@@ -118,7 +118,7 @@ export const isoCountryCodes = {
   'North Korea': 'KP',
   Kuwait: 'KW',
   Kyrgyzstan: 'KG',
-  'Lao People\'s Democratic Republic': 'LA',
+  "Lao People's Democratic Republic": 'LA',
   Latvia: 'LV',
   Lebanon: 'LB',
   Lesotho: 'LS',
@@ -177,11 +177,11 @@ export const isoCountryCodes = {
   Poland: 'PL',
   Portugal: 'PT',
   'Puerto Rico': 'PR',
-  'Qatar': 'QA',
-  'Reunion': 'RE',
-  'Romania': 'RO',
+  Qatar: 'QA',
+  Reunion: 'RE',
+  Romania: 'RO',
   'Russian Federation': 'RU',
-  'Rwanda': 'RW',
+  Rwanda: 'RW',
   'Saint Barthelemy': 'BL',
   'Saint Helena': 'SH',
   'Saint Kitts And Nevis': 'KN',
@@ -222,22 +222,22 @@ export const isoCountryCodes = {
   Tokelau: 'TK',
   Tonga: 'TO',
   'Trinidad And Tobago': 'TT',
-  'Tunisia': 'TN',
-  'Turkey': 'TR',
-  'Turkmenistan': 'TM',
+  Tunisia: 'TN',
+  Turkey: 'TR',
+  Turkmenistan: 'TM',
   'Turks And Caicos Islands': 'TC',
-  'Tuvalu': 'TV',
-  'Uganda': 'UG',
-  'Ukraine': 'UA',
+  Tuvalu: 'TV',
+  Uganda: 'UG',
+  Ukraine: 'UA',
   'United Arab Emirates': 'AE',
   'United Kingdom': 'GB',
   'United States': 'US',
   'United States Outlying Islands': 'UM',
-  'Uruguay': 'UY',
-  'Uzbekistan': 'UZ',
-  'Vanuatu': 'VU',
-  'Venezuela': 'VE',
-  'Vietnam': 'VN',
+  Uruguay: 'UY',
+  Uzbekistan: 'UZ',
+  Vanuatu: 'VU',
+  Venezuela: 'VE',
+  Vietnam: 'VN',
   'Virgin Islands, British': 'VG',
   'Virgin Islands, U.S.': 'VI',
   'Wallis And Futuna': 'WF',
@@ -248,12 +248,8 @@ export const isoCountryCodes = {
 
   // custom entry
   Europe: 'EU'
-
 };
 
 export const isoCountryCodesReversed = Object.entries(isoCountryCodes)
-.filter(item => !!item)
-.reduce(
-  (obj, item) => (obj[item[1]] = item[0]) && obj,
-  {}
-);
+  .filter((item) => !!item)
+  .reduce((obj, item) => (obj[item[1]] = item[0]) && obj, {});

@@ -158,7 +158,7 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 1);
 
       cy.get(selSearch).type('a');
-      cy.get(selCheckbox).should('have.length', 21);
+      cy.get(selCheckbox).should('have.length', 20);
       cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Croatia').should('have.length', 1);
 
