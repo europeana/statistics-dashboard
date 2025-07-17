@@ -64,11 +64,8 @@ export const isoCountryCodes = {
 };
 
 export const isoCountryCodesReversed = Object.entries(isoCountryCodes)
-.filter(item => !!item)
-.reduce(
-  (obj, item) => (obj[item[1]] = item[0]) && obj,
-  {}
-);
+  .filter((item) => !!item)
+  .reduce((obj, item) => (obj[item[1]] = item[0]) && obj, {});
 
 const dateTicks: Array<string> = [];
 
