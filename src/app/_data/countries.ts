@@ -252,4 +252,7 @@ export const isoCountryCodes = {
 
 export const isoCountryCodesReversed = Object.entries(isoCountryCodes)
   .filter((item) => !!item)
-  .reduce((obj, item) => (obj[item[1]] = item[0]) && obj, {});
+  .reduce((obj, item: Array<string>) => {
+    obj[item[1]] = item[0];
+    return obj;
+  }, {});

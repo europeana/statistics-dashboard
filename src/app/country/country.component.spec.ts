@@ -165,9 +165,33 @@ describe('CountryComponent', () => {
       ).toBeTruthy();
 
       const copy = { ...mockCountryData };
+
       copy['FR'] = copy['FR'].reverse();
 
       component.countryData.set(copy);
+
+      expect(
+        Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+      ).toBeTruthy();
+
+      component.country.set('ZZ');
+
+      expect(
+        Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
+      ).toBeFalsy();
+
+      copy['XX'] = copy['FR'];
+      delete copy['FR'];
+
+      const copyTarget = { ...mockTargetMetaData };
+      copyTarget['XX'] = copyTarget['FR'];
+      delete copyTarget['FR'];
+
+      console.log(JSON.stringify(copyTarget, null, 4));
+
+      component.countryData.set(copy);
+      component.targetMetaData = copyTarget;
+      component.country.set('XX');
 
       expect(
         Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
