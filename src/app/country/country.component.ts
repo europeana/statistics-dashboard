@@ -223,7 +223,15 @@ export class CountryComponent
         .subscribe({
           next: (combined) => {
             const countryParam = combined.params['country'];
-            const country = isoCountryCodes[countryParam];
+            let country = isoCountryCodes[countryParam];
+
+            if (
+              !country &&
+              Object.keys(combined.countryData).includes(countryParam) &&
+              !Object.values(isoCountryCodes).includes(countryParam)
+            ) {
+              country = countryParam;
+            }
 
             if (country) {
               this.country.set(country);
@@ -400,7 +408,8 @@ export class CountryComponent
 
     if (this.latestCountryData()) {
       Object.values(TargetFieldName).forEach((valName: string) => {
-        const countryName = isoCountryCodesReversed[this.country()];
+        const countryName =
+          isoCountryCodesReversed[this.country()] ?? this.country();
         const value: number = this.latestCountryData()[valName] ?? 0;
 
         const fmtName = this.renameTargetTypePipe.transform(valName);

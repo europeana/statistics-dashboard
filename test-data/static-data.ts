@@ -1,4 +1,4 @@
-import { isoCountryCodes } from '../src/app/_data';
+import { isoCountryCodes } from './static-country-data';
 
 export const STATIC_RIGHTS_CATEGORY_VALUES = [
   'CC0',
