@@ -1,4 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
+import { NgIf } from '@angular/common';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { IsScrollableDirective } from '.';
@@ -12,7 +13,9 @@ import { IsScrollableDirective } from '.';
         appIsScrollable
         #scrollInfo="scrollInfo"
         id="scrollInfo"
-      ></div>
+      >
+        <div></div>
+      </div>
       <a class="back" (click)="scrollInfo.back()">BACK</a>
       <a class="fwd" (click)="scrollInfo.fwd()">FWD</a>
     </div>
