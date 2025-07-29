@@ -1,5 +1,4 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { IsScrollableDirective } from '.';

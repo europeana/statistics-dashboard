@@ -30,11 +30,8 @@ export class IsScrollableDirective implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const fn = (): void => {
-      this.calc();
-    };
-    setTimeout(fn, 0);
-    //this.changeDetector.detectChanges();
+    this.calc();
+    this.changeDetector.detectChanges();
   }
 
   /** calc

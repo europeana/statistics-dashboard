@@ -88,6 +88,13 @@ export class FilterComponent {
         }
         this.inputToFocus = undefined;
       });
+    } else {
+      if (this.state && this.state.visible) {
+        const ft = this.filterTerm;
+        if (ft) {
+          ft.nativeElement.focus();
+        }
+      }
     }
   }
   @Input() state: FilterState;
@@ -187,15 +194,6 @@ export class FilterComponent {
   toggle(): void {
     this.state.visible = !this.state.visible;
     this.visibilityChanged.emit(this.group);
-    if (this.state.visible) {
-      const fn = (): void => {
-        const ft = this.filterTerm;
-        if (ft) {
-          ft.nativeElement.focus();
-        }
-      };
-      setTimeout(fn, 1);
-    }
   }
 
   /** selectOptionEnabled
