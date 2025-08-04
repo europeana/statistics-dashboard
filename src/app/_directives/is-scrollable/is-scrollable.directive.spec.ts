@@ -12,7 +12,9 @@ import { IsScrollableDirective } from '.';
         appIsScrollable
         #scrollInfo="scrollInfo"
         id="scrollInfo"
-      ></div>
+      >
+        <div></div>
+      </div>
       <a class="back" (click)="scrollInfo.back()">BACK</a>
       <a class="fwd" (click)="scrollInfo.fwd()">FWD</a>
     </div>
