@@ -237,7 +237,6 @@ describe('MapComponent', () => {
       component.polygonSeries,
       'getPolygonById'
     );
-    //spyOn(component.polygonSeriesHidden.mapPolygons, 'getIndex');
 
     component.setCountryInclusion(['IT', 'EU']);
     component.countryMorphValidated('EU', 'FR');

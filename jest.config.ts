@@ -4,7 +4,7 @@ import { createCjsPreset } from 'jest-preset-angular/presets';
 export default {
   ...createCjsPreset(),
   setupFilesAfterEnv: ['./setup-jest.ts'],
-  testEnvironment: './FixJSDOMEnvironment.ts',
+  testEnvironment: './FixJsDomEnvironment.ts',
    'transformIgnorePatterns': [
     'node_modules/^(@amcharts)',
     'node_modules/^(amcharts4)',
