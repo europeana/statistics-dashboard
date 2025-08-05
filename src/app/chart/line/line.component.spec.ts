@@ -7,6 +7,9 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { TargetFieldName, TargetMetaData } from '../../_models';
 import { LineComponent } from './line.component';
 
+class SVGPathElement extends HTMLElement {}
+window['SVGPathElement'] = SVGPathElement as any;
+
 describe('LineComponent', () => {
   let component: LineComponent;
   let fixture: ComponentFixture<LineComponent>;
@@ -86,16 +89,16 @@ describe('LineComponent', () => {
       });
     });
 
-    spyOn(component.valueAxis.axisRanges, 'removeValue');
+    const spyRemoveValue = jest.spyOn(component.valueAxis.axisRanges, 'removeValue');
 
     component.removeRange('DE', TargetFieldName.HQ);
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(1);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(1);
 
     component.removeRange('DE');
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(2);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(2);
 
     component.removeRange('DE', TargetFieldName.HQ);
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(2);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(2);
   });
 
   it('should show the range', () => {

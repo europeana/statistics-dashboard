@@ -174,12 +174,12 @@ describe('MapComponent', () => {
   }));
 
   it('should handle clicks on the country', () => {
-
     //component.drawChart();
     //fixture.detectChanges();
 
-
-    const spySetCountryInclusion = jest.spyOn(component, 'setCountryInclusion').mockImplementation(()=>{});
+    const spySetCountryInclusion = jest
+      .spyOn(component, 'setCountryInclusion')
+      .mockImplementation(() => {});
     const spyHideGlobe = jest.spyOn(component, 'hideGlobe');
 
     component.drawChart();
@@ -236,7 +236,10 @@ describe('MapComponent', () => {
   it('should validate the morph', () => {
     component.drawChart();
     fixture.detectChanges();
-    const spyGetPolygonById = jest.spyOn(component.polygonSeries, 'getPolygonById');
+    const spyGetPolygonById = jest.spyOn(
+      component.polygonSeries,
+      'getPolygonById'
+    );
     //spyOn(component.polygonSeriesHidden.mapPolygons, 'getIndex');
 
     component.setCountryInclusion(['IT', 'EU']);
@@ -249,7 +252,6 @@ describe('MapComponent', () => {
   });
 
   it('should morph', () => {
-
     component.drawChart();
     fixture.detectChanges();
 
@@ -274,15 +276,19 @@ describe('MapComponent', () => {
     component.countryMorph('IT');
     expect(component.selectedCountry).not.toEqual('DE');
 
-    const spyCountryMorphValidated = jest.spyOn(component, 'countryMorphValidated');
-    //const spyOnce =
-    jest.spyOn(component.polygonSeriesHidden.events, 'once').mockImplementation(((
-      a: string,
-      callBack: (event: string, b: string) => void
-    ) => {
-      callBack('', '');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any);
+    const spyCountryMorphValidated = jest.spyOn(
+      component,
+      'countryMorphValidated'
+    );
+    jest
+      .spyOn(component.polygonSeriesHidden.events, 'once')
+      .mockImplementation(((
+        a: string,
+        callBack: (event: string, b: string) => void
+      ) => {
+        callBack('', '');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any);
 
     component.setCountryInclusion(['IT']);
     component.countryMorph('DE');

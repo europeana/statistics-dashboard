@@ -9,6 +9,9 @@ import {
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { BarComponent } from './bar.component';
 
+class SVGPathElement extends HTMLElement {}
+window['SVGPathElement'] = SVGPathElement as any;
+
 describe('BarComponent', () => {
   let component: BarComponent;
   let fixture: ComponentFixture<BarComponent>;
@@ -96,16 +99,16 @@ describe('BarComponent', () => {
   });
 
   it('should add a series from a result', () => {
-    spyOn(component, 'addSeries');
+    const spyAddSeries = jest.spyOn(component, 'addSeries');
     component.addSeriesFromResult();
-    expect(component.addSeries).toHaveBeenCalledTimes(1);
+    expect(spyAddSeries).toHaveBeenCalledTimes(1);
     component.results = null;
     component.addSeriesFromResult();
-    expect(component.addSeries).toHaveBeenCalledTimes(1);
+    expect(spyAddSeries).toHaveBeenCalledTimes(1);
 
     component.results = testResults;
     component.addSeriesFromResult();
-    expect(component.addSeries).toHaveBeenCalledTimes(2);
+    expect(spyAddSeries).toHaveBeenCalledTimes(2);
   });
 
   it('should detect zoomabability', () => {
@@ -125,7 +128,7 @@ describe('BarComponent', () => {
   });
 
   it('should add an axis break if zoomability is high', () => {
-    spyOn(component, 'addAxisBreak');
+    const spyAddAxisBreak = jest.spyOn(component, 'addAxisBreak');
     component.preferredNumberBars = 1;
     component.results = testResults;
     component.addSeriesFromResult();
@@ -135,7 +138,7 @@ describe('BarComponent', () => {
     component.preferredNumberBars = 100;
     component.maxBarSizeRelativeRatio = 0.1;
     component.addSeriesFromResult();
-    expect(component.addAxisBreak).toHaveBeenCalled();
+    expect(spyAddAxisBreak).toHaveBeenCalled();
   });
 
   it('should round up numbers', () => {
@@ -155,7 +158,10 @@ describe('BarComponent', () => {
     component.results = testResults;
     component.addSeriesFromResult();
 
-    spyOn(component.categoryAxis, 'zoomToIndexes');
+    const spyZoomToIndexes = jest.spyOn(
+      component.categoryAxis,
+      'zoomToIndexes'
+    );
     component.zoomTop();
     tick(100);
     expect(component.categoryAxis.zoomToIndexes).not.toHaveBeenCalled();
@@ -164,7 +170,7 @@ describe('BarComponent', () => {
     component.preferredNumberBars = 1;
     component.zoomTop();
     tick(100);
-    expect(component.categoryAxis.zoomToIndexes).toHaveBeenCalled();
+    expect(spyZoomToIndexes).toHaveBeenCalled();
   }));
 
   it('should get the extra setting', () => {
