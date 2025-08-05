@@ -4,7 +4,7 @@ import { Cache } from '.';
 
 function createCacheFn(): () => Observable<number> {
   let i = 1;
-  return jasmine.createSpy().and.callFake(() => of(i++));
+  return jest.fn().mockImplementation(() => of(i++));
 }
 
 describe('single cache', () => {
@@ -42,7 +42,7 @@ describe('single cache', () => {
 
   it('should not cache an error, but clear the cache', () => {
     const error = new Error('wrong');
-    const fn = jasmine.createSpy().and.callFake(() => throwError(error));
+    const fn = jest.fn().mockImplementation(() => throwError(error));
     const cache = new Cache<number>(fn);
     new Array(3).fill(null).map(() => {
       expect(gatherError(cache.get())).toEqual(error);
