@@ -12,6 +12,19 @@ import { MockExportCSVService, MockExportPDFService } from '../_mocked';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService } from '../_services';
 
+window['URL'] = {
+  createObjectURL: (_) => {
+    return '';
+  },
+  revokeObjectURL: (_) => {}
+} as any;
+
+Object.assign(navigator, {
+  clipboard: {
+    writeText: () => {}
+  }
+});
+
 describe('ExportComponent', () => {
   let component: ExportComponent;
   let fixture: ComponentFixture<ExportComponent>;
@@ -41,7 +54,6 @@ describe('ExportComponent', () => {
         resolve(null);
       });
     };
-
     fixture.detectChanges();
   });
 
@@ -50,6 +62,7 @@ describe('ExportComponent', () => {
   });
 
   it('should copy', fakeAsync(() => {
+    jest.spyOn(navigator.clipboard, 'writeText');
     (component.contentRef.nativeElement as HTMLInputElement).value = 'some-url';
     component.copy();
     fixture.detectChanges();
@@ -62,36 +75,40 @@ describe('ExportComponent', () => {
   }));
 
   it('should export CSV', () => {
-    spyOn(exportCSV, 'download');
+    const spyDownload = jest.spyOn(exportCSV, 'download');
     const elDownload = document.createElement('a');
     document.body.append(elDownload);
     component.downloadAnchor = { nativeElement: elDownload } as ElementRef;
     component.export(ExportType.CSV);
-    expect(exportCSV.download).toHaveBeenCalled();
+    expect(spyDownload).toHaveBeenCalled();
   });
 
   it('should export PDF', () => {
-    spyOn(component, 'getChartData').and.callFake(() => {
-      return new Promise((resolve) => {
-        resolve(MockExportPDFService.imgDataURL);
-      }) as Promise<string>;
-    });
+    const spyGetChartData = jest
+      .spyOn(component, 'getChartData')
+      .mockImplementation(() => {
+        return new Promise((resolve) => {
+          resolve(MockExportPDFService.imgDataURL);
+        }) as Promise<string>;
+      });
     component.export(ExportType.PDF);
-    expect(component.getChartData).toHaveBeenCalled();
+    expect(spyGetChartData).toHaveBeenCalled();
   });
 
   it('should export PNG', () => {
-    spyOn(component, 'getChartData').and.callFake(() => {
-      return new Promise((resolve) => {
-        resolve(MockExportPDFService.imgDataURL);
-      }) as Promise<string>;
-    });
+    const spyGetChartData = jest
+      .spyOn(component, 'getChartData')
+      .mockImplementation(() => {
+        return new Promise((resolve) => {
+          resolve(MockExportPDFService.imgDataURL);
+        }) as Promise<string>;
+      });
     component.export(ExportType.PNG);
     expect(component.getChartData).toHaveBeenCalled();
   });
 
   it('should export only known types', () => {
-    spyOn(component, 'getChartData').and.callThrough();
+    const spyGetChartData = jest.spyOn(component, 'getChartData');
     component.export('XXX' as unknown as ExportType);
     expect(component.getChartData).not.toHaveBeenCalled();
   });
@@ -117,9 +134,9 @@ describe('ExportComponent', () => {
     expect(component.openedFromToolbar).toBeTruthy();
   });
 
-  it('should suppy a custom hide function', () => {
-    spyOn(component, 'toggleActive');
+  it('should supply a custom hide function', () => {
+    const spyToggleActive = jest.spyOn(component, 'toggleActive');
     component.fnHide();
-    expect(component.toggleActive).toHaveBeenCalled();
+    expect(spyToggleActive).toHaveBeenCalled();
   });
 });
