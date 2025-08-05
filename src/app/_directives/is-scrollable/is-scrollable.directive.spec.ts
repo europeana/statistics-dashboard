@@ -50,11 +50,11 @@ describe('IsScrollableDirective', () => {
 
   it('it should have scrollInfo', fakeAsync(() => {
     const cmp = fixture.debugElement.query(By.css('.cmp'));
-    const spyScrollTo = jest.spyOn(cmp.nativeElement, 'scrollTo');
+    cmp.nativeElement.scrollTo = jest.fn();
     initButtons();
     btnFwd.nativeElement.click();
-    expect(spyScrollTo).toHaveBeenCalled();
+    expect(cmp.nativeElement.scrollTo).toHaveBeenCalled();
     btnBack.nativeElement.click();
-    expect(spyScrollTo).toHaveBeenCalledTimes(2);
+    expect(cmp.nativeElement.scrollTo).toHaveBeenCalledTimes(2);
   }));
 });

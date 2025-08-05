@@ -174,12 +174,9 @@ describe('MapComponent', () => {
   }));
 
   it('should handle clicks on the country', () => {
-    //component.drawChart();
-    //fixture.detectChanges();
-
     const spySetCountryInclusion = jest
       .spyOn(component, 'setCountryInclusion')
-      .mockImplementation(() => {});
+      .mockImplementation();
     const spyHideGlobe = jest.spyOn(component, 'hideGlobe');
 
     component.drawChart();

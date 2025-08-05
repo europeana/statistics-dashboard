@@ -167,11 +167,11 @@ describe('FilterComponent', () => {
 
   it('should reapply the focus', fakeAsync(() => {
     const spyFocus = jest.fn();
-    component.inputToFocus = { group: '', controlName: '' };
+
     component.state = { disabled: false, visible: true };
     component.filterTerm = {
       nativeElement: {
-        focus: jasmine.createSpy()
+        focus: jest.fn()
       }
     };
     component.checkboxes = {

@@ -94,7 +94,7 @@ describe('AppComponent', () => {
   it('should listen for document clicks', fakeAsync(() => {
     const spyNext = jest
       .spyOn(clicks.documentClickedTarget, 'next')
-      .mockImplementation(() => {});
+      .mockImplementation();
     const el = fixture.debugElement.query(By.css('*'));
     el.nativeElement.click();
     tick(1);
@@ -178,7 +178,7 @@ describe('AppComponent', () => {
 
     const spyLoadLandingData = jest
       .spyOn(app, 'loadLandingData')
-      .mockImplementation(() => {});
+      .mockImplementation();
     const spyPath = jest.spyOn(location, 'path').mockImplementation(() => {
       return '';
     });

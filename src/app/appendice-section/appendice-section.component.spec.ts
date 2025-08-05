@@ -16,7 +16,10 @@ describe('AppendiceSectionComponent', () => {
   });
 
   it('should invoke the columns-enabled count calculation', () => {
-    const spyCalculateColumnsEnabledCount = jest.spyOn(component, 'calculateColumnsEnabledCount');
+    const spyCalculateColumnsEnabledCount = jest.spyOn(
+      component,
+      'calculateColumnsEnabledCount'
+    );
     component.columnEnabled3D = true;
     component.columnEnabled3D = false;
 

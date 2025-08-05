@@ -75,8 +75,10 @@ describe('LegendGridComponent', () => {
   });
 
   it('should show the series set', () => {
-    const showSpy = jasmine.createSpy();
-    spyOn(component, 'togglePin');
+    const showSpy = jest.fn();
+    const spyTogglePin = jest
+      .spyOn(component, 'togglePin')
+      .mockImplementation();
 
     component.hiddenSeriesSetData[0] = {
       Italy: {
@@ -86,18 +88,20 @@ describe('LegendGridComponent', () => {
 
     component.showSeriesSet(0);
     expect(showSpy).toHaveBeenCalled();
-    expect(component.togglePin).toHaveBeenCalled();
+    expect(spyTogglePin).toHaveBeenCalled();
   });
 
   it('should hide the series set', () => {
-    const hideSpy = jasmine.createSpy();
+    const hideSpy = jest.fn();
 
-    spyOn(component, 'togglePin');
+    const spyTogglePin = jest
+      .spyOn(component, 'togglePin')
+      .mockImplementation();
 
     component.hideSeriesSet(0);
 
     expect(hideSpy).not.toHaveBeenCalled();
-    expect(component.togglePin).not.toHaveBeenCalled();
+    expect(spyTogglePin).not.toHaveBeenCalled();
 
     component.pinnedCountries['FR'] = 12;
 
@@ -152,9 +156,9 @@ describe('LegendGridComponent', () => {
   it('should toggle the pin', () => {
     component.targetMetaData = mockTargetMetaData;
     component.pinnedCountries = { AU: 0, DE: 1, FR: 2 };
+    component.countryData = mockCountryData;
 
     component.togglePin('AU');
-    fixture.detectChanges();
 
     expect(component.pinnedCountries['DE']).toEqual(0);
     expect(component.pinnedCountries['FR']).toEqual(1);
@@ -187,11 +191,12 @@ describe('LegendGridComponent', () => {
   });
 
   it('should handle scrolling', () => {
-    spyOn(component.legendGrid.nativeElement.classList, 'toggle');
+    const spyToggle = jest.spyOn(
+      component.legendGrid.nativeElement.classList,
+      'toggle'
+    );
     component.gridScroll();
-    expect(
-      component.legendGrid.nativeElement.classList.toggle
-    ).toHaveBeenCalled();
+    expect(spyToggle).toHaveBeenCalled();
   });
 
   it('should hide ranges by column', () => {
@@ -212,7 +217,7 @@ describe('LegendGridComponent', () => {
     component.hiddenColumnRanges = { THREE_D: { FR: [0] }, HQ: { FR: [0] } };
     component.lineChart.allSeriesData['FR' + '3D'] = {
       fill: 'xxx',
-      hide: jasmine.createSpy()
+      hide: jest.fn()
     } as unknown as am4charts.LineSeries;
 
     expect(Object.keys(component.hiddenColumnRanges).length).toEqual(2);
@@ -225,63 +230,71 @@ describe('LegendGridComponent', () => {
   it('should toggle the range', () => {
     const colour = component.lineChart.chart.colors.list[0];
 
-    spyOn(component.lineChart, 'showRange');
-    spyOn(component.lineChart, 'removeRange');
+    const spyShowRange = jest.spyOn(component.lineChart, 'showRange');
+    const spyRemoveRange = jest.spyOn(component.lineChart, 'removeRange');
 
     component.toggleRange('FR', TargetFieldName.THREE_D, 0);
 
-    expect(component.lineChart.removeRange).toHaveBeenCalled();
-    expect(component.lineChart.showRange).not.toHaveBeenCalled();
+    expect(spyRemoveRange).toHaveBeenCalled();
+    expect(spyShowRange).not.toHaveBeenCalled();
 
     component.toggleRange('FR', TargetFieldName.THREE_D, 0, colour);
 
-    expect(component.lineChart.showRange).toHaveBeenCalled();
+    expect(spyShowRange).toHaveBeenCalled();
   });
 
   it('should addSeriesSetAndPin', () => {
     component.targetMetaData = mockTargetMetaData;
 
     const data = mockTargetMetaData['FR'][TargetFieldName.THREE_D];
-    spyOn(component.lineChart, 'addSeries');
+    const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
 
     component.addSeriesSetAndPin('FR', data);
-    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(0);
+    expect(spyAddSeries).toHaveBeenCalledTimes(0);
     component.addSeriesSetAndPin('FR', data, [TargetFieldName.THREE_D]);
-    expect(component.lineChart.addSeries).toHaveBeenCalledTimes(1);
+    expect(spyAddSeries).toHaveBeenCalledTimes(1);
   });
 
   it('should toggle the country', () => {
     component.targetMetaData = mockTargetMetaData;
 
-    spyOn(component, 'togglePin');
-    spyOn(component, 'addSeriesSetAndPin');
-    spyOn(component.onLoadHistory, 'emit').and.callFake(
-      (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
-        component.countryData = { DE: [] };
-        req.fnCallback([]);
-      }
-    );
+    const spyTogglePin = jest
+      .spyOn(component, 'togglePin')
+      .mockImplementation();
+    const spyAddSeriesSetAndPin = jest
+      .spyOn(component, 'addSeriesSetAndPin')
+      .mockImplementation();
+    const spyEmit = jest
+      .spyOn(component.onLoadHistory, 'emit')
+      .mockImplementation(
+        (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
+          component.countryData = { DE: [] };
+          req.fnCallback([]);
+        }
+      );
 
     component.toggleCountry('FR');
-    expect(component.togglePin).toHaveBeenCalled();
+    expect(spyTogglePin).toHaveBeenCalled();
 
     component.toggleCountry('FR');
-    expect(component.togglePin).toHaveBeenCalledTimes(2);
+    expect(spyTogglePin).toHaveBeenCalledTimes(2);
 
     component.toggleCountry('DE');
-    expect(component.togglePin).toHaveBeenCalledTimes(3);
+    expect(spyTogglePin).toHaveBeenCalledTimes(3);
 
-    expect(component.onLoadHistory.emit).not.toHaveBeenCalled();
-    expect(component.addSeriesSetAndPin).not.toHaveBeenCalled();
+    expect(spyEmit).not.toHaveBeenCalled();
+    expect(spyAddSeriesSetAndPin).not.toHaveBeenCalled();
 
-    spyOn(component, 'getCountrySeries').and.callFake(() => {
-      return [];
-    });
+    const spyGetCountrySeries = jest
+      .spyOn(component, 'getCountrySeries')
+      .mockImplementation(() => {
+        return [];
+      });
     component.toggleCountry('DE');
 
-    expect(component.togglePin).toHaveBeenCalledTimes(3);
-    expect(component.addSeriesSetAndPin).toHaveBeenCalled();
-    expect(component.onLoadHistory.emit).toHaveBeenCalled();
+    expect(spyTogglePin).toHaveBeenCalledTimes(3);
+    expect(spyAddSeriesSetAndPin).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
 
     // case where existing country data is reused after component reinitialisation
 
@@ -289,12 +302,14 @@ describe('LegendGridComponent', () => {
 
     component.toggleCountry('DE');
 
-    expect(component.addSeriesSetAndPin).toHaveBeenCalledTimes(2);
-    expect(component.onLoadHistory.emit).toHaveBeenCalledTimes(1);
+    expect(spyAddSeriesSetAndPin).toHaveBeenCalledTimes(2);
+    expect(spyEmit).toHaveBeenCalledTimes(1);
   });
 
   it('should toggle the series', () => {
     component.countryData = mockCountryData;
+    component.targetMetaData = mockTargetMetaData;
+
     const seriesItemHidden = {
       isHidden: true,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -308,71 +323,76 @@ describe('LegendGridComponent', () => {
       isHidden: false
     } as unknown as am4charts.LineSeries;
 
-    spyOn(component, 'togglePin');
-    spyOn(component.lineChart, 'addSeries');
-    spyOn(component, 'loadCountryChartData');
+    const spyTogglePin = jest.spyOn(component, 'togglePin');
+    const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
+    const spyLoadCountryChartData = jest.spyOn(
+      component,
+      'loadCountryChartData'
+    );
 
     component.pinnedCountries['DE'] = 1;
 
     // call when data is already loaded:
     component.toggleSeries('DE', TargetFieldName.THREE_D);
-    expect(component.loadCountryChartData).not.toHaveBeenCalled();
+    expect(spyLoadCountryChartData).not.toHaveBeenCalled();
 
     // call when data is not fully loaded:
     component.toggleSeries('FR', TargetFieldName.THREE_D);
-    expect(component.loadCountryChartData).toHaveBeenCalledTimes(1);
-    expect(component.lineChart.addSeries).toHaveBeenCalled();
-    expect(component.togglePin).not.toHaveBeenCalled();
+    expect(spyLoadCountryChartData).toHaveBeenCalledTimes(1);
+    expect(spyAddSeries).toHaveBeenCalled();
+    expect(spyTogglePin).not.toHaveBeenCalled();
 
     // pinned countries do not toggle
     component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemHidden);
-    expect(component.togglePin).not.toHaveBeenCalled();
+    expect(spyTogglePin).not.toHaveBeenCalled();
 
     component.toggleSeries('DE', TargetFieldName.THREE_D, seriesItemShowing);
-    expect(component.togglePin).not.toHaveBeenCalled();
+    expect(spyTogglePin).not.toHaveBeenCalled();
 
     // unpinned countries do toggle
     component.toggleSeries('FR', TargetFieldName.THREE_D, seriesItemHidden);
-    expect(component.togglePin).toHaveBeenCalled();
+    expect(spyTogglePin).toHaveBeenCalled();
 
     component.toggleSeries('FR', TargetFieldName.THREE_D, seriesItemShowing);
-    expect(component.togglePin).toHaveBeenCalled();
+    expect(spyTogglePin).toHaveBeenCalled();
   });
 
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
     component.targetMetaData = mockTargetMetaData;
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    spyOn(component, 'toggleCountry').and.callFake(() => {});
+    const spyToggleCountry = jest
+      .spyOn(component, 'toggleCountry')
+      .mockReturnValue(null);
 
     // set initial code and a pinned country
     component.countryCode = 'FR';
     component.pinnedCountries = { FR: 0 };
 
-    expect(component.toggleCountry).not.toHaveBeenCalled();
+    expect(spyToggleCountry).not.toHaveBeenCalled();
     tick(0);
-    expect(component.toggleCountry).toHaveBeenCalled();
+    expect(spyToggleCountry).toHaveBeenCalled();
 
     tick(component.timeoutAnimation);
-    expect(component.toggleCountry).toHaveBeenCalledTimes(1);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(1);
     component.pinnedCountries = { FR: 0 };
 
     // set again
     component.countryCode = 'DE';
 
-    expect(component.toggleCountry).toHaveBeenCalledTimes(2);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(2);
     tick(component.timeoutAnimation);
-    expect(component.toggleCountry).toHaveBeenCalledTimes(3);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(3);
     tick(component.timeoutAnimation);
-    expect(component.toggleCountry).toHaveBeenCalledTimes(3);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(3);
 
     // set again
     component.countryCode = 'FR';
-    expect(component.toggleCountry).toHaveBeenCalledTimes(4);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(4);
     tick(component.timeoutAnimation);
-    expect(component.toggleCountry).toHaveBeenCalledTimes(5);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(5);
     tick(component.timeoutAnimation);
-    expect(component.toggleCountry).toHaveBeenCalledTimes(5);
+    expect(spyToggleCountry).toHaveBeenCalledTimes(5);
 
     component.countryCode = undefined;
     tick(component.timeoutAnimation);
@@ -391,14 +411,14 @@ describe('LegendGridComponent', () => {
   });
 
   it('should fire the unpin event', () => {
-    spyOn(component.unpinColumn, 'emit');
+    const spyEmit = jest.spyOn(component.unpinColumn, 'emit');
     component.fireUnpinColumn(TargetFieldName.THREE_D);
-    expect(component.unpinColumn.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 
   it('should load the country chart data', () => {
-    spyOn(component.onLoadHistory, 'emit');
+    const spyEmit = jest.spyOn(component.onLoadHistory, 'emit');
     component.loadCountryChartData('DE');
-    expect(component.onLoadHistory.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 });
