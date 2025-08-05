@@ -168,6 +168,12 @@ describe('FilterComponent', () => {
   it('should reapply the focus', fakeAsync(() => {
     const spyFocus = jest.fn();
     component.inputToFocus = { group: '', controlName: '' };
+    component.state = { disabled: false, visible: true };
+    component.filterTerm = {
+      nativeElement: {
+        focus: jasmine.createSpy()
+      }
+    };
     component.checkboxes = {
       find: (_: CheckboxComponent) => {
         return {
@@ -184,8 +190,18 @@ describe('FilterComponent', () => {
     };
     expect(spyFocus).not.toHaveBeenCalled();
     tick();
+    expect(spyFocus).not.toHaveBeenCalled();
+    expect(spyFocus).not.toHaveBeenCalled();
+    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalled();
+
+    component.inputToFocus = { group: '', controlName: '' };
+    component.optionSet = {
+      options: [{ name: 'option_2', label: 'option_2' }]
+    };
+    tick();
     expect(spyFocus).toHaveBeenCalled();
     expect(component.inputToFocus).toBeFalsy();
+    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalledTimes(1);
   }));
 
   it('should get the values', () => {
@@ -253,7 +269,6 @@ describe('FilterComponent', () => {
   });
 
   it('should toggle', fakeAsync(() => {
-    let hasCalledFocus = false;
     component.state = { disabled: false, visible: true };
     expect(component.state.visible).toBeTruthy();
     component.toggle();
@@ -262,24 +277,9 @@ describe('FilterComponent', () => {
     component.toggle();
     tick(1);
     expect(component.state.visible).toBeTruthy();
-
-    component.filterTerm = {
-      nativeElement: {
-        focus: (): void => {
-          hasCalledFocus = true;
-        }
-      }
-    };
-
     component.toggle();
     tick(1);
     expect(component.state.visible).toBeFalsy();
-    expect(hasCalledFocus).toBeFalsy();
-
-    component.toggle();
-    tick(1);
-    expect(component.state.visible).toBeTruthy();
-    expect(hasCalledFocus).toBeTruthy();
   }));
 
   it('should bind to the key selection', () => {

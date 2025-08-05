@@ -273,21 +273,21 @@
           </div>
           <div
             class="rm-filter-nav"
-            [ngClass]="{ active: scrollInfo.canScrollFwd }"
-            *ngIf="scrollInfo.canScrollBack || scrollInfo.canScrollFwd"
+            [ngClass]="{ active: scrollInfo.canScrollFwd() }"
+            *ngIf="scrollInfo.canScrollBack() || scrollInfo.canScrollFwd()"
           >
             <a
               class="rm-filter-nav-prev"
               (click)="scrollInfo.back()"
-              [ngClass]="{ active: scrollInfo.canScrollBack }"
-              [title]="scrollInfo.canScrollBack ? 'scroll back' : ''"
+              [ngClass]="{ active: scrollInfo.canScrollBack() }"
+              [title]="scrollInfo.canScrollBack() ? 'scroll back' : ''"
               >&lsaquo;</a
             >
             <a
               class="rm-filter-nav-next"
               (click)="scrollInfo.fwd()"
-              [ngClass]="{ active: scrollInfo.canScrollFwd }"
-              [title]="scrollInfo.canScrollFwd ? 'scroll forward' : ''"
+              [ngClass]="{ active: scrollInfo.canScrollFwd() }"
+              [title]="scrollInfo.canScrollFwd() ? 'scroll forward' : ''"
               >&rsaquo;</a
             >
           </div>

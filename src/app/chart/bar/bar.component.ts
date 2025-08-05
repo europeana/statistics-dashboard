@@ -213,24 +213,20 @@ export class BarComponent implements AfterViewInit {
 
     if (anySeries && this.settings.hasScroll && this.isZoomable()) {
       anySeries.events.on('ready', (): void => {
-        const fn = (): void => {
-          const customiseGrip = (grip): void => {
-            grip.icon.disabled = true;
-            grip.background.fill = am4core.color('#0a72cc');
-            grip.background.fillOpacity = 0.8;
-          };
-          this.chart.scrollbarY = new am4core.Scrollbar();
-          customiseGrip(this.chart.scrollbarY.startGrip);
-          customiseGrip(this.chart.scrollbarY.endGrip);
-
-          this.chart.scrollbarY.background.fill = am4core.color('#0a72cc');
-          this.chart.scrollbarY.background.fillOpacity = 0.1;
-
-          this.chart.scrollbarY.thumb.background.fill =
-            am4core.color('#0a72cc');
-          this.chart.scrollbarY.thumb.background.fillOpacity = 0.2;
+        const customiseGrip = (grip): void => {
+          grip.icon.disabled = true;
+          grip.background.fill = am4core.color('#0a72cc');
+          grip.background.fillOpacity = 0.8;
         };
-        setTimeout(fn, 0);
+        this.chart.scrollbarY = new am4core.Scrollbar();
+        customiseGrip(this.chart.scrollbarY.startGrip);
+        customiseGrip(this.chart.scrollbarY.endGrip);
+
+        this.chart.scrollbarY.background.fill = am4core.color('#0a72cc');
+        this.chart.scrollbarY.background.fillOpacity = 0.1;
+
+        this.chart.scrollbarY.thumb.background.fill = am4core.color('#0a72cc');
+        this.chart.scrollbarY.thumb.background.fillOpacity = 0.2;
       });
     }
 
