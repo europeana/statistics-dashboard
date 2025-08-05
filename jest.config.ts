@@ -10,4 +10,5 @@ export default {
     'node_modules/^(amcharts4)',
     'node_modules/^(am4map)'
   ],
+  coverageReporters: ['lcov', 'html']
 } satisfies Config;
