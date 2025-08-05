@@ -22,9 +22,9 @@ describe('SubscriptionManager', () => {
   });
 
   it('should cleanup on destroy', () => {
-    spyOn(clss, 'cleanup').and.callThrough();
+    const spyCleanup = jest.spyOn(clss, 'cleanup').and.callThrough();
     clss.ngOnDestroy();
-    expect(clss.cleanup).toHaveBeenCalled();
+    expect(spyCleanup).toHaveBeenCalled();
   });
 
   it('should unsub on cleanup', () => {

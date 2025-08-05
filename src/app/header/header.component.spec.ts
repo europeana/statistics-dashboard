@@ -36,7 +36,7 @@ describe('HeaderComponent', () => {
 
   it('should toggle the menu', () => {
     const isDisabled = false;
-    const spyStopPropagation = jasmine.createSpy();
+    const spyStopPropagation = jest.fn();
     const e = {
       target: {
         getAttribute: () => {

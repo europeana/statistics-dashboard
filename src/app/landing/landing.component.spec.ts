@@ -27,6 +27,9 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 
+class SVGPathElement extends HTMLElement {}
+window['SVGPathElement'] = SVGPathElement as any;
+
 describe('LandingComponent', () => {
   let component: LandingComponent;
   let fixture: ComponentFixture<LandingComponent>;
@@ -92,10 +95,10 @@ describe('LandingComponent', () => {
   });
 
   it('should refresh the charts when the data changes', () => {
-    spyOn(component, 'refreshCharts');
+    const spyRefreshCharts = jest.spyOn(component, 'refreshCharts');
     component.landingData = { contentTier: [], country: [] };
     fixture.detectChanges();
-    expect(component.refreshCharts).toHaveBeenCalled();
+    expect(spyRefreshCharts).toHaveBeenCalled();
   });
 
   it('should refresh the charts', fakeAsync(() => {
@@ -212,7 +215,7 @@ describe('LandingComponent', () => {
 
   it('should close the map section', () => {
     component.mapChart = {
-      countryClick: jasmine.createSpy()
+      countryClick: jest.fn()
     } as unknown as MapComponent;
     component.closeMapSelection();
     expect(component.mapChart.countryClick).toHaveBeenCalled();
@@ -221,7 +224,7 @@ describe('LandingComponent', () => {
   it('should close the map menu, refocussing the opener', () => {
     component.layerOpener = {
       nativeElement: {
-        focus: jasmine.createSpy()
+        focus: jest.fn()
       }
     } as unknown as ElementRef;
 
@@ -235,37 +238,37 @@ describe('LandingComponent', () => {
   });
 
   it('should tap the target data load', () => {
-    spyOn(api, 'getTargetMetaData').and.callThrough();
-    const fnCallback = jasmine.createSpy().and.callThrough();
+    const spyGetTargetMetaData = jest.spyOn(api, 'getTargetMetaData');
+    const fnCallback = jest.fn();
 
     component.tapTargetDataLoad(TargetFieldName.TOTAL, fnCallback);
-    expect(api.getTargetMetaData).toHaveBeenCalled();
+    expect(spyGetTargetMetaData).toHaveBeenCalled();
     expect(fnCallback).toHaveBeenCalled();
 
     component.tapTargetDataLoad();
-    expect(api.getTargetMetaData).toHaveBeenCalledTimes(1);
+    expect(spyGetTargetMetaData).toHaveBeenCalledTimes(1);
 
     component.tapTargetDataLoad(TargetFieldName.TOTAL, fnCallback);
-    expect(api.getTargetMetaData).toHaveBeenCalledTimes(1);
+    expect(spyGetTargetMetaData).toHaveBeenCalledTimes(1);
     expect(fnCallback).toHaveBeenCalledTimes(2);
   });
 
   it('should tap the country data load', () => {
-    const fnCallback = jasmine.createSpy();
+    const fnCallback = jest.fn();
 
-    spyOn(api, 'getCountryData').and.callThrough();
+    const spyGetCountryData = jest.spyOn(api, 'getCountryData');
 
     component.tapCountryDataLoad(fnCallback);
-    expect(api.getCountryData).toHaveBeenCalledTimes(1);
+    expect(spyGetCountryData).toHaveBeenCalledTimes(1);
     expect(fnCallback).toHaveBeenCalled();
 
     expect(component.countryData).toBeTruthy();
 
     component.tapCountryDataLoad();
-    expect(api.getCountryData).toHaveBeenCalledTimes(1);
+    expect(spyGetCountryData).toHaveBeenCalledTimes(1);
 
     component.tapCountryDataLoad(fnCallback);
-    expect(api.getCountryData).toHaveBeenCalledTimes(1);
+    expect(spyGetCountryData).toHaveBeenCalledTimes(1);
     expect(fnCallback).toHaveBeenCalledTimes(2);
   });
 
@@ -275,16 +278,16 @@ describe('LandingComponent', () => {
   });
 
   it('should handle the country being set', () => {
-    spyOn(component, 'tapCountryDataLoad');
+    const spyTapCountryDataLoad = jest.spyOn(component, 'tapCountryDataLoad');
     expect(component.singleCountryMode).toBeFalsy();
     component.onMapCountrySet(true);
     expect(component.singleCountryMode).toBeTruthy();
-    expect(component.tapCountryDataLoad).toHaveBeenCalled();
+    expect(spyTapCountryDataLoad).toHaveBeenCalled();
     expect(component.targetExpanded).toBeFalsy();
 
     component.visibleHeatMap = { three_d: 0 } as VisibleHeatMap;
     component.onMapCountrySet(true);
-    expect(component.tapCountryDataLoad).toHaveBeenCalledTimes(2);
+    expect(spyTapCountryDataLoad).toHaveBeenCalledTimes(2);
     expect(component.targetExpanded).toEqual(TargetFieldName.THREE_D);
   });
 
@@ -295,7 +298,7 @@ describe('LandingComponent', () => {
         highlight: { hex: '#fffff' } as am4core.Color,
         outline: { hex: '#fffff' } as am4core.Color
       },
-      setMapPercentMode: jasmine.createSpy()
+      setMapPercentMode: jest.fn()
     } as unknown as MapComponent;
 
     component.clearHeatmap();
@@ -310,7 +313,7 @@ describe('LandingComponent', () => {
     const colour = '#ffffff' as unknown as am4core.Color;
     component.mapChart = {
       mapData: [],
-      setMapPercentMode: jasmine.createSpy(),
+      setMapPercentMode: jest.fn(),
       colourSchemeTargets: {
         total: [
           {

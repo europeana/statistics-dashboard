@@ -118,8 +118,8 @@ describe('GridComponent', () => {
   });
 
   it('should click the link out', fakeAsync(() => {
-    spyOn(api, 'getRightsCategoryUrls').and.callThrough();
-    spyOn(window, 'open').and.callFake(() => {
+    const spyGetRightsCategoryUrls = jest.spyOn(api, 'getRightsCategoryUrls');
+    const spyOpen = jest.spyOn(window, 'open').mockImplementation(() => {
       return { location: { href: '' } } as unknown as Window;
     });
 
@@ -136,44 +136,44 @@ describe('GridComponent', () => {
 
     // test urls for rightsCategory facet
 
-    expect(api.getRightsCategoryUrls).not.toHaveBeenCalled();
-    expect(window.open).not.toHaveBeenCalled();
+    expect(spyGetRightsCategoryUrls).not.toHaveBeenCalled();
+    expect(spyOpen).not.toHaveBeenCalled();
 
     component.facet = DimensionName.rightsCategory;
     component.loadFullLink(mockTableRow);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalled();
-    expect(window.open).not.toHaveBeenCalled();
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalled();
+    expect(spyOpen).not.toHaveBeenCalled();
 
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     component.loadFullLink(mockTableRow, true);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
-    expect(window.open).toHaveBeenCalled();
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(2);
+    expect(spyOpen).toHaveBeenCalled();
     expect(mockTableRow.portalUrlInfo.hrefRewritten).toBeTruthy();
 
     component.loadFullLink(mockTableRow, true);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(2);
-    expect(window.open).toHaveBeenCalledTimes(1);
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(2);
+    expect(spyOpen).toHaveBeenCalledTimes(1);
 
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     component.loadFullLink(mockTableRow, true);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
-    expect(window.open).toHaveBeenCalledTimes(2);
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(spyOpen).toHaveBeenCalledTimes(2);
 
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     mockTableRow.isTotal = true;
     component.loadFullLink(mockTableRow, true);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(3);
-    expect(window.open).toHaveBeenCalledTimes(2);
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(3);
+    expect(spyOpen).toHaveBeenCalledTimes(2);
 
     // test urls for rightsCategory filters
 
@@ -184,8 +184,8 @@ describe('GridComponent', () => {
     component.loadFullLink(mockTableRow, false);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(4);
-    expect(window.open).toHaveBeenCalledTimes(2);
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(4);
+    expect(spyOpen).toHaveBeenCalledTimes(2);
 
     // test normal links work correctly (normal behaviour - doesn't invoke open)
 
@@ -195,7 +195,7 @@ describe('GridComponent', () => {
     component.loadFullLink(mockTableRow, true);
     tick();
 
-    expect(window.open).toHaveBeenCalledTimes(2);
+    expect(spyOpen).toHaveBeenCalledTimes(2);
 
     // another test of the rightsCategory filter
 
@@ -205,8 +205,8 @@ describe('GridComponent', () => {
     component.loadFullLink(mockTableRow, true);
     tick();
 
-    expect(api.getRightsCategoryUrls).toHaveBeenCalledTimes(5);
-    expect(window.open).toHaveBeenCalledTimes(3);
+    expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(5);
+    expect(spyOpen).toHaveBeenCalledTimes(3);
   }));
 
   it('should get the data', () => {
@@ -229,46 +229,46 @@ describe('GridComponent', () => {
     fixture.detectChanges();
     expect(component.paginator).toBeTruthy();
     tick(1);
-    spyOn(component.paginator, 'setPage');
+    const spySetPage = jest.spyOn(component.paginator, 'setPage');
     component.goToPage({ key: '99' } as unknown as KeyboardEvent);
     component.goToPage({
       key: 'Enter',
       target: { value: 'a' }
     } as unknown as KeyboardEvent);
-    expect(component.paginator.setPage).not.toHaveBeenCalled();
+    expect(spySetPage).not.toHaveBeenCalled();
     component.goToPage({ key: '99' } as unknown as KeyboardEvent);
     component.goToPage({
       key: 'Enter',
       target: { value: '99' }
     } as unknown as KeyboardEvent);
-    expect(component.paginator.setPage).toHaveBeenCalledWith(0);
+    expect(spySetPage).toHaveBeenCalledWith(0);
   }));
 
   it('should set the page info', fakeAsync(() => {
-    spyOn(component.chartPositionChanged, 'emit');
+    const spyEmit = jest.spyOn(component.chartPositionChanged, 'emit');
     component.setPagerInfo({} as PagerInfo);
     tick();
     expect(component.pagerInfo).toBeTruthy();
-    expect(component.chartPositionChanged.emit).not.toHaveBeenCalled();
+    expect(spyEmit).not.toHaveBeenCalled();
     component.setPagerInfo({} as PagerInfo);
     tick();
     expect(component.pagerInfo).toBeTruthy();
-    expect(component.chartPositionChanged.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   }));
 
   it('should sort', () => {
-    spyOn(component, 'bumpSortState');
-    spyOn(component.refreshData, 'emit');
+    const spyBumpSortState = jest.spyOn(component, 'bumpSortState');
+    const spyEmit = jest.spyOn(component.refreshData, 'emit');
     component.sort(SortBy.count);
-    expect(component.bumpSortState).toHaveBeenCalled();
-    expect(component.refreshData.emit).toHaveBeenCalled();
+    expect(spyBumpSortState).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 
   it('should update the rows', () => {
-    spyOn(component.refreshData, 'emit');
+    const spyEmit = jest.spyOn(component.refreshData, 'emit');
     component.updateRows({ key: '' } as unknown as KeyboardEvent);
-    expect(component.refreshData.emit).not.toHaveBeenCalled();
+    expect(spyEmit).not.toHaveBeenCalled();
     component.updateRows({ key: '1' } as unknown as KeyboardEvent);
-    expect(component.refreshData.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 });
