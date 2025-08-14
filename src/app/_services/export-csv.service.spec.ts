@@ -2,13 +2,6 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 import { HeaderNameType } from '../_models';
 import { ExportCSVService } from './';
 
-window['URL'] = {
-  createObjectURL: (_) => {
-    return '';
-  },
-  revokeObjectURL: (_) => {}
-} as any;
-
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
 

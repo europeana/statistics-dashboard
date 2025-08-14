@@ -36,6 +36,7 @@ describe('API Service', () => {
       expect(res).toBeTruthy();
       sub.unsubscribe();
     });
+    expect(spyLoadCountryData).toHaveBeenCalled();
     mockHttp.expect('GET', baseUrl).send([]);
     mockHttp.verify();
   });
@@ -50,7 +51,7 @@ describe('API Service', () => {
     mockHttp.expect('GET', baseUrl).send([{}]);
     mockHttp.verify();
 
-    expect(service.loadCountryData).toHaveBeenCalled();
+    expect(spyLoadCountryData).toHaveBeenCalled();
     const sub2 = service.getCountryData().subscribe((res) => {
       expect(res).toBeTruthy();
     });

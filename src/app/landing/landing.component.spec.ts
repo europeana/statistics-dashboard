@@ -27,9 +27,6 @@ import {
   withInterceptorsFromDi
 } from '@angular/common/http';
 
-class SVGPathElement extends HTMLElement {}
-window['SVGPathElement'] = SVGPathElement as any;
-
 describe('LandingComponent', () => {
   let component: LandingComponent;
   let fixture: ComponentFixture<LandingComponent>;

@@ -9,9 +9,6 @@ import {
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { BarComponent } from './bar.component';
 
-class SVGPathElement extends HTMLElement {}
-window['SVGPathElement'] = SVGPathElement as any;
-
 describe('BarComponent', () => {
   let component: BarComponent;
   let fixture: ComponentFixture<BarComponent>;

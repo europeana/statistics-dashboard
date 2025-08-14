@@ -15,9 +15,6 @@ import { MockAPIService, MockMapChart } from '../../_mocked';
 
 import { MapComponent } from './map.component';
 
-class SVGPathElement extends HTMLElement {}
-window['SVGPathElement'] = SVGPathElement as any;
-
 describe('MapComponent', () => {
   let component: MapComponent;
   let fixture: ComponentFixture<MapComponent>;

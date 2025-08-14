@@ -12,19 +12,6 @@ import { MockExportCSVService, MockExportPDFService } from '../_mocked';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService } from '../_services';
 
-window['URL'] = {
-  createObjectURL: (_) => {
-    return '';
-  },
-  revokeObjectURL: (_) => {}
-} as any;
-
-Object.assign(navigator, {
-  clipboard: {
-    writeText: () => {}
-  }
-});
-
 describe('ExportComponent', () => {
   let component: ExportComponent;
   let fixture: ComponentFixture<ExportComponent>;
@@ -104,13 +91,13 @@ describe('ExportComponent', () => {
         }) as Promise<string>;
       });
     component.export(ExportType.PNG);
-    expect(component.getChartData).toHaveBeenCalled();
+    expect(spyGetChartData).toHaveBeenCalled();
   });
 
   it('should export only known types', () => {
     const spyGetChartData = jest.spyOn(component, 'getChartData');
     component.export('XXX' as unknown as ExportType);
-    expect(component.getChartData).not.toHaveBeenCalled();
+    expect(spyGetChartData).not.toHaveBeenCalled();
   });
 
   it('should toggle the active status', () => {

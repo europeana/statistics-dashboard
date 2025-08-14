@@ -179,7 +179,7 @@ describe('AppComponent', () => {
     const spyLoadLandingData = jest
       .spyOn(app, 'loadLandingData')
       .mockImplementation();
-    const spyPath = jest.spyOn(location, 'path').mockImplementation(() => {
+    jest.spyOn(location, 'path').mockImplementation(() => {
       return '';
     });
 

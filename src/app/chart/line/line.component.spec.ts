@@ -7,9 +7,6 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { TargetFieldName, TargetMetaData } from '../../_models';
 import { LineComponent } from './line.component';
 
-class SVGPathElement extends HTMLElement {}
-window['SVGPathElement'] = SVGPathElement as any;
-
 describe('LineComponent', () => {
   let component: LineComponent;
   let fixture: ComponentFixture<LineComponent>;

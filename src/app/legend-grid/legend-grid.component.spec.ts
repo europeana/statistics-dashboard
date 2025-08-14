@@ -285,11 +285,9 @@ describe('LegendGridComponent', () => {
     expect(spyEmit).not.toHaveBeenCalled();
     expect(spyAddSeriesSetAndPin).not.toHaveBeenCalled();
 
-    const spyGetCountrySeries = jest
-      .spyOn(component, 'getCountrySeries')
-      .mockImplementation(() => {
-        return [];
-      });
+    jest.spyOn(component, 'getCountrySeries').mockImplementation(() => {
+      return [];
+    });
     component.toggleCountry('DE');
 
     expect(spyTogglePin).toHaveBeenCalledTimes(3);
@@ -360,7 +358,6 @@ describe('LegendGridComponent', () => {
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
     component.targetMetaData = mockTargetMetaData;
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const spyToggleCountry = jest
       .spyOn(component, 'toggleCountry')
       .mockReturnValue(null);

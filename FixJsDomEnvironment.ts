@@ -1,8 +1,23 @@
 import JSDOMEnvironment from 'jest-environment-jsdom';
 
+// Mock SVGPathElement class
+class SVGPathElement {}
+
 export default class FixJsDomEnvironment extends JSDOMEnvironment {
   constructor(...args: ConstructorParameters<typeof JSDOMEnvironment>) {
     super(...args);
+
+    this.global.URL.createObjectURL = (_) => '';
+    this.global.URL.revokeObjectURL = (_) => {}
+
+    Object.defineProperty(this.global.navigator, 'clipboard', {
+      value: {
+        writeText: async () => {},
+      },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.global.SVGPathElement = SVGPathElement as any;
 
     // https://github.com/facebook/jest/blob/v29.4.3/website/versioned_docs/version-29.4/Configuration.md#testenvironment-string
     // FIXME https://github.com/jsdom/jsdom/issues/3363

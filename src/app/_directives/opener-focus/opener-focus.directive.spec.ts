@@ -57,7 +57,7 @@ describe('OpenerFocusDirective', () => {
     });
     cmp.nativeElement.dispatchEvent(event);
     tick(1);
-    expect(testComponent.fnHide).toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalled();
     expect(spyFocus1).toHaveBeenCalled();
     expect(spyFocus2).not.toHaveBeenCalled();
   }));

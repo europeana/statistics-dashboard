@@ -68,6 +68,6 @@ describe('TruncateComponent', () => {
     component.callSplitText();
     expect(component.omitCount).toEqual(0);
     tick(component.debounceMS);
-    expect(component.splitText).toHaveBeenCalledTimes(2);
+    expect(spySplitText).toHaveBeenCalledTimes(2);
   }));
 });
