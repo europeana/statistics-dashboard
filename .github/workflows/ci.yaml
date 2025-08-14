@@ -8,6 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
+          npm install
           npm run lint:ci
   run-unit:
     name: 'tests'
