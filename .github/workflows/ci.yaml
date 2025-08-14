@@ -3,7 +3,7 @@ on:
   push
 jobs:
   run-ci:
-    name: 'lint'
+    name: 'code-format-checks'
     uses: ./.github/workflows/run-lint.yaml
   run-unit:
     name: 'tests'
