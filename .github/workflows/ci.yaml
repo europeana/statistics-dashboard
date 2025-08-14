@@ -6,9 +6,15 @@ jobs:
     name: 'lint'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag_name || github.event.pull_request.head.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.19.1'
+      - run: npm install
       - run: |
-          npm install
           npm run lint:ci
   run-unit:
     name: 'tests'
