@@ -2,6 +2,12 @@ name: '* CI'
 on:
   push
 jobs:
+  run-ci:
+    name: 'lint'
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          npm run lint:ci
   run-unit:
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
