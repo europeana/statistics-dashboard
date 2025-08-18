@@ -13,9 +13,8 @@ jobs:
         with:
           name: appLcov
           path: ./lcov.info
-
       - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
