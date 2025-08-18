@@ -123,8 +123,8 @@ describe('CountryComponent', () => {
       const copy = { ...mockCountryData };
       copy[fakeCountry] = copy['FR'];
       delete copy['FR'];
-      spyOn(router, 'navigate');
-      spyOn(api, 'getCountryData').and.callFake(() => {
+      jest.spyOn(router, 'navigate');
+      jest.spyOn(api, 'getCountryData').mockImplementation(() => {
         return of(copy);
       });
 
@@ -212,13 +212,13 @@ describe('CountryComponent', () => {
 
     it('should load the history', () => {
       const country = 'DE';
-      const fnCallback = jasmine.createSpy();
+      const fnCallback = jest.fn();
       component.loadHistory({ country: country, fnCallback: fnCallback });
       expect(fnCallback).toHaveBeenCalled();
     });
 
     it('should redirect (to home)', () => {
-      spyOn(router, 'navigate');
+      jest.spyOn(router, 'navigate').mockReturnValue(null);
       ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
         routeChangeSource.next({ country: code });
         expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
@@ -226,7 +226,7 @@ describe('CountryComponent', () => {
     });
 
     it('should redirect (when it recognises country codes)', () => {
-      spyOn(router, 'navigate');
+      jest.spyOn(router, 'navigate').mockReturnValue(null);
       ['BE', 'DE', 'FR'].forEach((code: string) => {
         routeChangeSource.next({ country: code });
         expect(router.navigate).toHaveBeenCalledWith(
@@ -239,7 +239,7 @@ describe('CountryComponent', () => {
     it('should redirect (when it recognises country codes) (with ct-zero enabled)', () => {
       component.includeCTZero = true;
       const navOps = { queryParams: { 'content-tier-zero': 'true' } };
-      spyOn(router, 'navigate');
+      jest.spyOn(router, 'navigate').mockReturnValue(null);
       ['BE', 'DE', 'FR'].forEach((code: string) => {
         routeChangeSource.next({ country: code });
         expect(router.navigate).toHaveBeenCalledWith(
@@ -251,8 +251,8 @@ describe('CountryComponent', () => {
 
     it('should set the country', fakeAsync(() => {
       const barChart = {
-        removeAllSeries: jasmine.createSpy(),
-        ngAfterViewInit: jasmine.createSpy()
+        removeAllSeries: jest.fn(),
+        ngAfterViewInit: jest.fn()
       } as unknown as BarComponent;
 
       component.barChart = barChart;
@@ -314,30 +314,30 @@ describe('CountryComponent', () => {
       TestBed.flushEffects();
       fixture.detectChanges();
 
-      spyOn(component, 'refreshCardData');
+      const spyRefreshCardData = jest.spyOn(component, 'refreshCardData');
       expect(component.country().length).toBeFalsy();
-      expect(component.refreshCardData).not.toHaveBeenCalled();
+      expect(spyRefreshCardData).not.toHaveBeenCalled();
       component.includeCTZero = true;
 
       expect(component.country().length).toBeFalsy();
 
-      expect(component.refreshCardData).not.toHaveBeenCalled();
+      expect(spyRefreshCardData).not.toHaveBeenCalled();
 
       component.includeCTZero = false;
 
-      expect(component.refreshCardData).not.toHaveBeenCalled();
+      expect(spyRefreshCardData).not.toHaveBeenCalled();
 
       component.country.set('FR');
       TestBed.flushEffects();
       fixture.detectChanges();
 
-      expect(component.refreshCardData).toHaveBeenCalled();
+      expect(spyRefreshCardData).toHaveBeenCalled();
 
       component.includeCTZero = true;
-      expect(component.refreshCardData).toHaveBeenCalledTimes(2);
+      expect(spyRefreshCardData).toHaveBeenCalledTimes(2);
 
       component.includeCTZero = false;
-      expect(component.refreshCardData).toHaveBeenCalledTimes(3);
+      expect(spyRefreshCardData).toHaveBeenCalledTimes(3);
     });
 
     it('should handle the intersectionObserverCallback', () => {

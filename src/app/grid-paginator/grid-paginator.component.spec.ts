@@ -84,23 +84,23 @@ describe('GridPaginatorComponent', () => {
     component.rows = testRows.slice(0);
     fixture.detectChanges();
     expect(component.pages).toBeTruthy();
-    spyOn(component, 'setPage');
-    spyOn(component, 'calculatePages');
+    const spySetPage = jest.spyOn(component, 'setPage');
+    const spyCalculatePages = jest.spyOn(component, 'calculatePages');
     component.maxPageSize = 2;
-    expect(component.setPage).toHaveBeenCalled();
-    expect(component.calculatePages).toHaveBeenCalled();
+    expect(spySetPage).toHaveBeenCalled();
+    expect(spyCalculatePages).toHaveBeenCalled();
     expect(component.rows).toBeTruthy();
   });
 
   it('should set the page', () => {
-    spyOn(component.change, 'emit');
+    const spyChange = jest.spyOn(component.change, 'emit');
     component.rows = testRows.slice(0);
     component.setPage(1);
-    expect(component.change.emit).toHaveBeenCalled();
+    expect(spyChange).toHaveBeenCalled();
   });
 
   it('should set the page (wrapper)', () => {
-    spyOn(component.change, 'emit');
+    const spyChange = jest.spyOn(component.change, 'emit');
     component.rows = testRows.slice(0);
     component.callSetPage(
       {
@@ -110,6 +110,6 @@ describe('GridPaginatorComponent', () => {
       } as unknown as Event,
       1
     );
-    expect(component.change.emit).toHaveBeenCalled();
+    expect(spyChange).toHaveBeenCalled();
   });
 });

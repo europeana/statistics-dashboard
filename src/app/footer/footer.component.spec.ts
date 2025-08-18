@@ -29,8 +29,8 @@ describe('FooterComponent', () => {
   });
 
   it('should emit the event', () => {
-    spyOn(component.showCookieConsent, 'emit');
+    const spyEmit = jest.spyOn(component.showCookieConsent, 'emit');
     component.clickPrivacySettings();
-    expect(component.showCookieConsent.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 });

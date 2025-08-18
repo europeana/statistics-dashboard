@@ -92,13 +92,20 @@ describe('AppComponent', () => {
   });
 
   it('should listen for document clicks', fakeAsync(() => {
-    spyOn(clicks.documentClickedTarget, 'next');
+    const spyNext = jest
+      .spyOn(clicks.documentClickedTarget, 'next')
+      .mockImplementation();
     const el = fixture.debugElement.query(By.css('*'));
     el.nativeElement.click();
     tick(1);
     expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
-    app.documentClick({ target: {} as unknown as HTMLElement });
-    expect(clicks.documentClickedTarget.next).toHaveBeenCalledTimes(2);
+    app.documentClick({
+      target: {
+        nativeElement: { contains: () => false }
+      } as unknown as HTMLElement
+    });
+
+    expect(spyNext).toHaveBeenCalledTimes(2);
   }));
 
   it('should listen for history navigation', fakeAsync(() => {
@@ -169,15 +176,17 @@ describe('AppComponent', () => {
   it('should handle the outlet load', waitForAsync(async () => {
     expect(app.showPageTitle).toBeFalsy();
 
-    spyOn(app, 'loadLandingData');
-    spyOn(location, 'path').and.callFake(() => {
+    const spyLoadLandingData = jest
+      .spyOn(app, 'loadLandingData')
+      .mockImplementation();
+    jest.spyOn(location, 'path').mockImplementation(() => {
       return '';
     });
 
     await TestBed.runInInjectionContext(() => {
       app.onOutletLoaded(new LandingComponent());
       expect(app.showPageTitle).toBeTruthy();
-      expect(app.loadLandingData).toHaveBeenCalled();
+      expect(spyLoadLandingData).toHaveBeenCalled();
 
       // load overview component
       const fakeOverviewComponent = Object.create(OverviewComponent.prototype);
@@ -185,17 +194,17 @@ describe('AppComponent', () => {
       app.onOutletLoaded(fakeOverviewComponent);
       expect(app.showPageTitle).toBeFalsy();
 
-      expect(app.loadLandingData).toHaveBeenCalledTimes(2);
+      expect(spyLoadLandingData).toHaveBeenCalledTimes(2);
 
       // load landing component
       app.getCtrlCTZero().setValue(true);
-      expect(app.loadLandingData).toHaveBeenCalledTimes(3);
+      expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
       const cmp = new LandingComponent();
       app.landingData = {};
       app.onOutletLoaded(cmp);
       expect(app.showPageTitle).toBeTruthy();
-      expect(app.loadLandingData).toHaveBeenCalledTimes(4);
+      expect(spyLoadLandingData).toHaveBeenCalledTimes(4);
       expect(app.lastSetContentTierZeroValue).toBeTruthy();
       expect(cmp.landingData).toBeTruthy();
 
@@ -206,37 +215,45 @@ describe('AppComponent', () => {
       // load privacy statement component
       app.onOutletLoaded(new PrivacyStatementComponent());
 
-      expect(app.loadLandingData).toHaveBeenCalledTimes(6);
+      expect(spyLoadLandingData).toHaveBeenCalledTimes(6);
 
       // load cookie policy component
       app.onOutletLoaded(new CookiePolicyComponent());
 
-      expect(app.loadLandingData).toHaveBeenCalledTimes(7);
+      expect(spyLoadLandingData).toHaveBeenCalledTimes(7);
 
       // load country component
       const fakeCountryComponent = Object.create(CountryComponent.prototype);
       fakeCountryComponent.country = signal('');
 
-      spyOn(app, 'setCTZeroInputToLastSetValue');
-      spyOn(fakeCountryComponent, 'refreshCardData');
+      const spySetCTZero = jest.spyOn(app, 'setCTZeroInputToLastSetValue');
+      const spyRefreshCardData = jest.spyOn(
+        fakeCountryComponent,
+        'refreshCardData'
+      );
 
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(app.showPageTitle).toBeTruthy();
-      expect(app.loadLandingData).toHaveBeenCalledTimes(8);
-      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(1);
+      expect(spyLoadLandingData).toHaveBeenCalledTimes(9);
+      expect(spySetCTZero).toHaveBeenCalledTimes(1);
 
       app.lastSetContentTierZeroValue = true;
       app.onOutletLoaded(fakeCountryComponent);
 
-      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(2);
-      expect(fakeCountryComponent.refreshCardData).not.toHaveBeenCalled();
+      expect(spySetCTZero).toHaveBeenCalledTimes(2);
+      expect(spyRefreshCardData).not.toHaveBeenCalled();
+
+      jest
+        .spyOn(fakeCountryComponent, 'loadDimensionCardData')
+        .mockImplementation(() => []);
 
       fakeCountryComponent.country.set('FR');
+
       app.onOutletLoaded(fakeCountryComponent);
 
-      expect(app.setCTZeroInputToLastSetValue).toHaveBeenCalledTimes(3);
-      expect(fakeCountryComponent.refreshCardData).toHaveBeenCalledTimes(1);
+      expect(spySetCTZero).toHaveBeenCalledTimes(3);
+      expect(spyRefreshCardData).toHaveBeenCalledTimes(2);
     });
   }));
 
@@ -253,14 +270,16 @@ describe('AppComponent', () => {
       maintenanceItem: {}
     };
 
-    spyOn(maintenanceSchedules, 'loadMaintenanceItem').and.callFake(() => {
-      return of({
-        maintenanceMessage: 'Hello'
+    const spyLoadMaintenanceItem = jest
+      .spyOn(maintenanceSchedules, 'loadMaintenanceItem')
+      .mockImplementation(() => {
+        return of({
+          maintenanceMessage: 'Hello'
+        });
       });
-    });
 
     app.checkIfMaintenanceDue(maintenanceSettings);
-    expect(maintenanceSchedules.loadMaintenanceItem).toHaveBeenCalled();
+    expect(spyLoadMaintenanceItem).toHaveBeenCalled();
     expect(app.landingComponentRef.isLoading).toBeFalsy();
   });
 });

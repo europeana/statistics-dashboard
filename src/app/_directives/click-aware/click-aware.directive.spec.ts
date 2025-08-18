@@ -61,13 +61,13 @@ describe('ClickAwareDirective', () => {
   });
 
   it('should call the "documentClickListener" method when clicked', () => {
-    const onClickMock = spyOn(component, 'clicked').and.callThrough();
+    const spyClicked = jest.spyOn(component, 'clicked');
 
     deadElement.nativeElement.click();
-    expect(onClickMock).not.toHaveBeenCalled();
+    expect(spyClicked).not.toHaveBeenCalled();
 
     liveElement.nativeElement.click();
-    expect(onClickMock).toHaveBeenCalled();
+    expect(spyClicked).toHaveBeenCalled();
   });
 
   it('should detect clicks in the element', () => {

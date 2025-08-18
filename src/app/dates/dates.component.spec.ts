@@ -123,12 +123,13 @@ describe('DatesComponent', () => {
 
     expect(component.form.controls.dateTo.errors).toBeTruthy();
 
-    spyOn(component.form.controls.dateTo, 'updateValueAndValidity');
+    const spyUpdateDateTo = jest.spyOn(
+      component.form.controls.dateTo,
+      'updateValueAndValidity'
+    );
     component.dateChange();
 
-    expect(
-      component.form.controls.dateTo.updateValueAndValidity
-    ).toHaveBeenCalled();
+    expect(spyUpdateDateTo).toHaveBeenCalled();
 
     component.form.reset();
 
@@ -137,11 +138,12 @@ describe('DatesComponent', () => {
 
     expect(component.form.controls.dateFrom.errors).toBeTruthy();
 
-    spyOn(component.form.controls.dateFrom, 'updateValueAndValidity');
+    const spyUpdateDateFrom = jest.spyOn(
+      component.form.controls.dateFrom,
+      'updateValueAndValidity'
+    );
     component.dateChange();
-    expect(
-      component.form.controls.dateFrom.updateValueAndValidity
-    ).toHaveBeenCalled();
+    expect(spyUpdateDateFrom).toHaveBeenCalled();
   });
 
   it('should validate dates', () => {

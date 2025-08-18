@@ -11,7 +11,7 @@ describe('SubscriptionManager', () => {
       undef
         ? undefined
         : ({
-            unsubscribe: jasmine.createSpy('unsubscribe')
+            unsubscribe: jest.fn()
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any)
     ) as Subscription;
@@ -22,9 +22,9 @@ describe('SubscriptionManager', () => {
   });
 
   it('should cleanup on destroy', () => {
-    spyOn(clss, 'cleanup').and.callThrough();
+    const spyCleanup = jest.spyOn(clss, 'cleanup');
     clss.ngOnDestroy();
-    expect(clss.cleanup).toHaveBeenCalled();
+    expect(spyCleanup).toHaveBeenCalled();
   });
 
   it('should unsub on cleanup', () => {

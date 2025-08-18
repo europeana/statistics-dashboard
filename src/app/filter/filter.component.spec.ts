@@ -56,7 +56,7 @@ describe('FilterComponent', () => {
 
     component.opener = {
       nativeElement: {
-        focus: jasmine.createSpy()
+        focus: jest.fn()
       }
     } as unknown as ElementRef;
   });
@@ -145,6 +145,7 @@ describe('FilterComponent', () => {
         value: 'option_1'
       }
     };
+    component.state = { disabled: false, visible: false };
     expect(component.optionSet).toBeFalsy();
     component.filterOptions(evt);
     expect(component.optionSet).toBeFalsy();
@@ -155,22 +156,22 @@ describe('FilterComponent', () => {
     component.filterOptions(evt);
     expect(component.optionSet.options.length).toEqual(1);
 
-    spyOn(component, 'hide');
+    const spyHide = jest.spyOn(component, 'hide');
     component.filterOptions(evt);
-    expect(component.hide).not.toHaveBeenCalled();
+    expect(spyHide).not.toHaveBeenCalled();
 
     evt.key = 'Escape';
     component.filterOptions(evt);
-    expect(component.hide).toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalled();
   });
 
   it('should reapply the focus', fakeAsync(() => {
-    const spyFocus = jasmine.createSpy();
+    const spyFocus = jest.fn();
 
     component.state = { disabled: false, visible: true };
     component.filterTerm = {
       nativeElement: {
-        focus: jasmine.createSpy()
+        focus: jest.fn()
       }
     };
     component.checkboxes = {
@@ -255,9 +256,9 @@ describe('FilterComponent', () => {
   });
 
   it('should signal changes', () => {
-    spyOn(component.valueChanged, 'emit');
+    const spyEmit = jest.spyOn(component.valueChanged, 'emit');
     component.changed();
-    expect(component.valueChanged.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 
   it('should hide', () => {
@@ -288,13 +289,13 @@ describe('FilterComponent', () => {
   });
 
   it('should load more', () => {
-    spyOn(component.filterTermChanged, 'emit');
+    const spyEmit = jest.spyOn(component.filterTermChanged, 'emit');
 
     expect(component.pagesVisible).toEqual(1);
 
     component.loadMore();
 
-    expect(component.filterTermChanged.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
     expect(component.pagesVisible).toEqual(2);
   });
 });

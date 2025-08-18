@@ -1,7 +1,7 @@
-name: '- helper (unit testing)'
+name: '- helper (lint)'
 on: workflow_call
 jobs:
-  unit:
+  run-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -13,10 +13,4 @@ jobs:
           node-version: '18.19.1'
       - run: npm install
       - run: |
-          npm run test:dev
-      - run: |
-          cp coverage/lcov.info .
-      - uses: actions/upload-artifact@master
-        with:
-          name: appLcov
-          path: ./lcov.info
+          npm run lint:ci

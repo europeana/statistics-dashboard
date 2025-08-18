@@ -2,6 +2,9 @@ name: '* CI'
 on:
   push
 jobs:
+  run-ci:
+    name: 'code-format-checks'
+    uses: ./.github/workflows/run-lint.yaml
   run-unit:
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml

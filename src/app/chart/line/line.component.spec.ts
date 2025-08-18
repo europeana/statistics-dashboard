@@ -86,16 +86,19 @@ describe('LineComponent', () => {
       });
     });
 
-    spyOn(component.valueAxis.axisRanges, 'removeValue');
+    const spyRemoveValue = jest.spyOn(
+      component.valueAxis.axisRanges,
+      'removeValue'
+    );
 
     component.removeRange('DE', TargetFieldName.HQ);
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(1);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(1);
 
     component.removeRange('DE');
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(2);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(2);
 
     component.removeRange('DE', TargetFieldName.HQ);
-    expect(component.valueAxis.axisRanges.removeValue).toHaveBeenCalledTimes(2);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(2);
   });
 
   it('should show the range', () => {
@@ -144,7 +147,7 @@ describe('LineComponent', () => {
       }
     ];
     component.chart.data = [];
-    component.chart.invalidateData = jasmine.createSpy();
+    component.chart.invalidateData = jest.fn();
     component.addSeriesData(country, TargetFieldName.THREE_D, seriesData);
     expect(Object.keys(component.chart.data).length).toBeGreaterThan(0);
     expect(component.chart.invalidateData).not.toHaveBeenCalled();

@@ -38,14 +38,14 @@ describe('CheckboxComponent', () => {
   });
 
   it('should handle the field change', () => {
-    spyOn(component.valueChanged, 'emit');
+    const spyEmit = jest.spyOn(component.valueChanged, 'emit');
     component.onChange();
-    expect(component.valueChanged.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 
   it('should handle the space key', () => {
-    spyOn(component.keySelectionMade, 'emit');
+    const spyEmit = jest.spyOn(component.keySelectionMade, 'emit');
     component.onSpaceKey();
-    expect(component.keySelectionMade.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 });

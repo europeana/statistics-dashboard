@@ -31,18 +31,19 @@ describe('API Service', () => {
   it('should load specific country data', () => {
     const country = 'BE';
     const baseUrl = `${environment.serverAPI}/${service.suffixCountryHistoricalUrl}?country=${country}`;
-    spyOn(service, 'loadCountryData').and.callThrough();
+    const spyLoadCountryData = jest.spyOn(service, 'loadCountryData');
     const sub = service.loadCountryData(country).subscribe((res) => {
       expect(res).toBeTruthy();
       sub.unsubscribe();
     });
+    expect(spyLoadCountryData).toHaveBeenCalled();
     mockHttp.expect('GET', baseUrl).send([]);
     mockHttp.verify();
   });
 
   it('should load the country data from the cache', () => {
     const baseUrl = `${environment.serverAPI}/${service.suffixCountryTargetsUrl}`;
-    spyOn(service, 'loadCountryData').and.callThrough();
+    const spyLoadCountryData = jest.spyOn(service, 'loadCountryData');
     const sub = service.getCountryData().subscribe((res) => {
       expect(res).toBeTruthy();
     });
@@ -50,7 +51,7 @@ describe('API Service', () => {
     mockHttp.expect('GET', baseUrl).send([{}]);
     mockHttp.verify();
 
-    expect(service.loadCountryData).toHaveBeenCalled();
+    expect(spyLoadCountryData).toHaveBeenCalled();
     const sub2 = service.getCountryData().subscribe((res) => {
       expect(res).toBeTruthy();
     });

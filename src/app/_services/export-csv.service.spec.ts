@@ -50,7 +50,7 @@ describe('ExportCSVService', () => {
   });
 
   it('should download', () => {
-    const spy = jasmine.createSpy();
+    const spy = jest.fn();
     const el = {
       nativeElement: {
         click: spy
