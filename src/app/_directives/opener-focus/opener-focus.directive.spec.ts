@@ -47,23 +47,23 @@ describe('OpenerFocusDirective', () => {
   });
 
   it('it should handle the escape key', fakeAsync(() => {
-    spyOn(link1.nativeElement, 'focus');
-    spyOn(link2.nativeElement, 'focus');
+    const spyFocus1 = jest.spyOn(link1.nativeElement, 'focus');
+    const spyFocus2 = jest.spyOn(link2.nativeElement, 'focus');
 
-    spyOn(testComponent, 'fnHide');
+    const spyHide = jest.spyOn(testComponent, 'fnHide');
     fixture.detectChanges();
     const event = new KeyboardEvent('keydown', {
       key: 'Escape'
     });
     cmp.nativeElement.dispatchEvent(event);
     tick(1);
-    expect(testComponent.fnHide).toHaveBeenCalled();
-    expect(link1.nativeElement.focus).toHaveBeenCalled();
-    expect(link2.nativeElement.focus).not.toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalled();
+    expect(spyFocus1).toHaveBeenCalled();
+    expect(spyFocus2).not.toHaveBeenCalled();
   }));
 
   it('it should handle the tab key', fakeAsync(() => {
-    spyOn(link1.nativeElement, 'focus');
+    const spyFocus = jest.spyOn(link1.nativeElement, 'focus');
 
     const getTabEvent = (): KeyboardEvent => {
       return new KeyboardEvent('keydown', {
@@ -73,11 +73,11 @@ describe('OpenerFocusDirective', () => {
     };
 
     const event = getTabEvent();
-    spyOn(event, 'preventDefault');
+    const spyPreventDefault = jest.spyOn(event, 'preventDefault');
 
     link2.nativeElement.dispatchEvent(event);
 
-    expect(link1.nativeElement.focus).toHaveBeenCalled();
-    expect(event.preventDefault).toHaveBeenCalled();
+    expect(spyFocus).toHaveBeenCalled();
+    expect(spyPreventDefault).toHaveBeenCalled();
   }));
 });

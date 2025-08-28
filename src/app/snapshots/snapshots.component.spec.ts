@@ -290,30 +290,31 @@ describe('SnapshotsComponent', () => {
     component.toggleSaved('');
     expect(dscContentTier.saved).toBeTruthy();
 
-    spyOn(component.hideItem, 'emit');
+    const spyEmit = jest.spyOn(component.hideItem, 'emit');
     dscContentTier.current = true;
     component.toggleSaved('');
-    expect(component.hideItem.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
     dscContentTier.current = false;
     component.toggleSaved('');
-    expect(component.hideItem.emit).toHaveBeenCalledTimes(1);
+    expect(spyEmit).toHaveBeenCalledTimes(1);
   });
 
   it('should toggle', () => {
     initData();
     dscContentTier.applied = true;
-    spyOn(component.hideItem, 'emit');
-    spyOn(component.showItems, 'emit');
+
+    const spyEmitHide = jest.spyOn(component.hideItem, 'emit');
+    const spyEmitShow = jest.spyOn(component.showItems, 'emit');
     component.toggle('');
-    expect(component.hideItem.emit).toHaveBeenCalled();
-    expect(component.showItems.emit).not.toHaveBeenCalled();
+    expect(spyEmitHide).toHaveBeenCalled();
+    expect(spyEmitShow).not.toHaveBeenCalled();
     component.toggle('', true);
-    expect(component.hideItem.emit).toHaveBeenCalledTimes(1);
-    expect(component.showItems.emit).not.toHaveBeenCalled();
+    expect(spyEmitHide).toHaveBeenCalledTimes(1);
+    expect(spyEmitShow).not.toHaveBeenCalled();
     dscContentTier.applied = false;
     component.toggle('');
-    expect(component.hideItem.emit).toHaveBeenCalledTimes(1);
-    expect(component.showItems.emit).toHaveBeenCalled();
+    expect(spyEmitHide).toHaveBeenCalledTimes(1);
+    expect(spyEmitShow).toHaveBeenCalled();
   });
 
   it('should apply and unapply', () => {

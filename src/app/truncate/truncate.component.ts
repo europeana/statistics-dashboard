@@ -1,4 +1,12 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  Input,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
 import { NgClass } from '@angular/common';
 import { ResizeComponent } from '../resize/resize.component';
@@ -10,6 +18,8 @@ import { ResizeComponent } from '../resize/resize.component';
   imports: [ResizeComponent, NgClass, HighlightMatchPipe]
 })
 export class TruncateComponent implements OnInit {
+  private changeDetector = inject(ChangeDetectorRef);
+
   applySpace = false;
   maxRecursions = 100;
   omitCount = 0;
@@ -60,10 +70,8 @@ export class TruncateComponent implements OnInit {
     this.applySpace =
       this.textLeft.endsWith(' ') || this.textRight.startsWith(' ');
 
-    const fn = (): void => {
-      this.callSplitText(recursions);
-    };
-    setTimeout(fn, 0);
+    this.changeDetector.detectChanges();
+    this.callSplitText(recursions);
   }
 
   /** callSplitText

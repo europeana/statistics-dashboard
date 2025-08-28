@@ -134,11 +134,7 @@ describe('OverviewComponent', () => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.callFake((_) => {
-      return new Promise((resolve) => {
-        resolve(null);
-      });
-    });
+    jest.spyOn(router, 'navigate').mockReturnValue(null);
     component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
@@ -188,23 +184,23 @@ describe('OverviewComponent', () => {
     }));
 
     it('should load', fakeAsync(() => {
-      spyOn(api, 'getBreakdowns').and.callThrough();
+      const spyGetBreakdowns = jest.spyOn(api, 'getBreakdowns');
 
       params.next({ facet: DimensionName.country });
       tick(1);
       fixture.detectChanges();
-      expect(api.getBreakdowns).toHaveBeenCalledTimes(1);
+      expect(spyGetBreakdowns).toHaveBeenCalledTimes(1);
       params.next({ facet: DimensionName.type });
       tick(1);
       fixture.detectChanges();
-      expect(api.getBreakdowns).toHaveBeenCalledTimes(2);
+      expect(spyGetBreakdowns).toHaveBeenCalledTimes(2);
 
       const nextParams = {};
       nextParams[DimensionName.type] = ['SOUND', 'VIDEO'];
       queryParams.next(nextParams);
       tick(1);
       fixture.detectChanges();
-      expect(api.getBreakdowns).toHaveBeenCalledTimes(3);
+      expect(spyGetBreakdowns).toHaveBeenCalledTimes(3);
       tick(tickTimeChartDebounce);
     }));
 
@@ -240,22 +236,25 @@ describe('OverviewComponent', () => {
     });
 
     it('should post process', () => {
-      spyOn(component, 'extractSeriesServerData');
+      const spyExtractSeriesServerData = jest.spyOn(
+        component,
+        'extractSeriesServerData'
+      );
       component.dataServerData = { results: {} } as unknown as BreakdownResults;
       component.postProcessResult();
-      expect(component.extractSeriesServerData).not.toHaveBeenCalled();
+      expect(spyExtractSeriesServerData).not.toHaveBeenCalled();
       component.dataServerData = MockBreakdowns;
       component.postProcessResult();
-      expect(component.extractSeriesServerData).toHaveBeenCalled();
+      expect(spyExtractSeriesServerData).toHaveBeenCalled();
 
       component.dataServerData = structuredClone(MockBreakdowns);
       delete component.dataServerData.results;
       component.postProcessResult();
-      expect(component.extractSeriesServerData).toHaveBeenCalledTimes(1);
+      expect(spyExtractSeriesServerData).toHaveBeenCalledTimes(1);
     });
 
     it('should refresh the chart', fakeAsync(() => {
-      spyOn(component.barChart, 'drawChart');
+      const spyDrawChart = jest.spyOn(component.barChart, 'drawChart');
 
       component.refreshChart();
       component.refreshChart(true);
@@ -263,18 +262,18 @@ describe('OverviewComponent', () => {
       component.refreshChart(true, 1);
       component.refreshChart(false, 1);
 
-      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+      expect(spyDrawChart).toHaveBeenCalledTimes(2);
 
       tick(tickTimeChartDebounce);
-      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+      expect(spyDrawChart).toHaveBeenCalledTimes(2);
       tick(tickTimeChartDebounce);
       tick(tickTimeChartDebounce);
       tick(tickTimeChartDebounce);
       tick(tickTimeChartDebounce);
-      expect(component.barChart.drawChart).toHaveBeenCalledTimes(2);
+      expect(spyDrawChart).toHaveBeenCalledTimes(2);
 
       // test invocation
-      spyOn(component, 'refreshChart');
+      const spyRefreshChart = jest.spyOn(component, 'refreshChart');
 
       component.showAppliedSeriesInGridAndChart();
       component.form.controls.facetParameter.setValue(
@@ -282,7 +281,7 @@ describe('OverviewComponent', () => {
       );
       fixture.detectChanges();
       tick(tickTimeChartDebounce);
-      expect(component.refreshChart).toHaveBeenCalledWith(true, 0);
+      expect(spyRefreshChart).toHaveBeenCalledWith(true, 0);
     }));
 
     it('should get the chart data', () => {
@@ -291,11 +290,11 @@ describe('OverviewComponent', () => {
 
     it('should track changes in the chart position', () => {
       expect(component.chartPosition).toEqual(0);
-      spyOn(component.barChart, 'zoomTop');
+      const spyZoomTop = jest.spyOn(component.barChart, 'zoomTop');
       component.chartPositionChanged(component.barChart.maxNumberBars);
-      expect(component.barChart.zoomTop).not.toHaveBeenCalled();
+      expect(spyZoomTop).not.toHaveBeenCalled();
       component.chartPositionChanged(component.barChart.maxNumberBars);
-      expect(component.barChart.zoomTop).toHaveBeenCalled();
+      expect(spyZoomTop).toHaveBeenCalled();
     });
 
     it('should get the applied date range', () => {
@@ -386,7 +385,7 @@ describe('OverviewComponent', () => {
 
       queryParams.next({ any: ['thing'] });
 
-      spyOn(component, 'storeSeries');
+      const spyStoreSeries = jest.spyOn(component, 'storeSeries');
       component.extractSeriesServerData(br);
       expect(component.storeSeries).toHaveBeenCalled();
 
@@ -395,10 +394,10 @@ describe('OverviewComponent', () => {
       );
       component.extractSeriesServerData(br);
 
-      expect(component.storeSeries).toHaveBeenCalledTimes(2);
+      expect(spyStoreSeries).toHaveBeenCalledTimes(2);
 
       component.extractSeriesServerData(br);
-      expect(component.storeSeries).toHaveBeenCalledTimes(3);
+      expect(spyStoreSeries).toHaveBeenCalledTimes(3);
     });
 
     it('should filter the display data', () => {
@@ -480,25 +479,25 @@ describe('OverviewComponent', () => {
     }));
 
     it('should load the data', fakeAsync(() => {
-      spyOn(component, 'postProcessResult');
+      const spyPostProcessResult = jest.spyOn(component, 'postProcessResult');
       component.form.controls.datasetId.setValue('1');
       fixture.detectChanges();
       component.loadData();
       tick(tickTime);
 
-      expect(component.postProcessResult).toHaveBeenCalled();
+      expect(spyPostProcessResult).toHaveBeenCalled();
 
       component.form.controls.datasetId.setValue('EMPTY');
       fixture.detectChanges();
       component.loadData();
       tick(tickTime);
-      expect(component.postProcessResult).toHaveBeenCalledTimes(1);
+      expect(spyPostProcessResult).toHaveBeenCalledTimes(1);
       tick(tickTimeChartDebounce);
     }));
 
     it('should get the select options', fakeAsync(() => {
       fixture.detectChanges();
-      expect(component.filterData.length).toBeFalsy(0);
+      expect(component.filterData.length).toBeFalsy();
       component.loadData();
       tick(tickTime);
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
@@ -733,12 +732,12 @@ describe('OverviewComponent', () => {
     it('should focus the export opener', fakeAsync(() => {
       component.exportOpener = {
         nativeElement: {
-          focus: jasmine.createSpy()
+          focus: jest.fn()
         }
       };
       component.exportOpenerToolbar = {
         nativeElement: {
-          focus: jasmine.createSpy()
+          focus: jest.fn()
         }
       };
 
@@ -865,24 +864,28 @@ describe('OverviewComponent', () => {
     });
 
     it('should add the series', fakeAsync(() => {
-      spyOn(component.snapshots, 'apply').and.callFake(() => false);
-      spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
-        () => false
-      );
+      const spyApply = jest
+        .spyOn(component.snapshots, 'apply')
+        .mockReturnValue(null);
+      const spyShowAppliedSeriesInGridAndChart = jest
+        .spyOn(component, 'showAppliedSeriesInGridAndChart')
+        .mockImplementation(() => false);
       component.addSeries(['series-key']);
-      expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
-      expect(component.snapshots.apply).toHaveBeenCalled();
+      expect(spyShowAppliedSeriesInGridAndChart).toHaveBeenCalled();
+      expect(spyApply).toHaveBeenCalled();
       tick(tickTimeChartDebounce);
     }));
 
     it('should remove the series', fakeAsync(() => {
-      spyOn(component.snapshots, 'unapply').and.callFake(() => false);
-      spyOn(component, 'showAppliedSeriesInGridAndChart').and.callFake(
-        () => false
-      );
+      const spyUnapply = jest
+        .spyOn(component.snapshots, 'unapply')
+        .mockReturnValue(null);
+      const spyShowAppliedSeriesInGridAndChart = jest
+        .spyOn(component, 'showAppliedSeriesInGridAndChart')
+        .mockReturnValue(null);
       component.removeSeries('');
-      expect(component.showAppliedSeriesInGridAndChart).toHaveBeenCalled();
-      expect(component.snapshots.unapply).toHaveBeenCalled();
+      expect(spyShowAppliedSeriesInGridAndChart).toHaveBeenCalled();
+      expect(spyUnapply).toHaveBeenCalled();
       tick(tickTimeChartDebounce);
     }));
 
@@ -1024,7 +1027,7 @@ describe('OverviewComponent', () => {
     });
 
     it('should invoke the provided callback', fakeAsync(() => {
-      const spy = jasmine.createSpy();
+      const spy = jest.fn();
       component.loadData(spy);
       tick(tickTime);
       expect(spy).toHaveBeenCalled();

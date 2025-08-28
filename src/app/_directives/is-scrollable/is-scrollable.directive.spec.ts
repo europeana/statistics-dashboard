@@ -12,7 +12,9 @@ import { IsScrollableDirective } from '.';
         appIsScrollable
         #scrollInfo="scrollInfo"
         id="scrollInfo"
-      ></div>
+      >
+        <div></div>
+      </div>
       <a class="back" (click)="scrollInfo.back()">BACK</a>
       <a class="fwd" (click)="scrollInfo.fwd()">FWD</a>
     </div>
@@ -48,7 +50,7 @@ describe('IsScrollableDirective', () => {
 
   it('it should have scrollInfo', fakeAsync(() => {
     const cmp = fixture.debugElement.query(By.css('.cmp'));
-    spyOn(cmp.nativeElement, 'scrollTo');
+    cmp.nativeElement.scrollTo = jest.fn();
     initButtons();
     btnFwd.nativeElement.click();
     expect(cmp.nativeElement.scrollTo).toHaveBeenCalled();

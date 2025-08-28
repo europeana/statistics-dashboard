@@ -63,7 +63,7 @@ export class HeaderComponent {
 
     let lastLetter = '';
     Object.keys(newMap).forEach((s: string) => {
-      const decoded = isoCountryCodesReversed[s];
+      const decoded = isoCountryCodesReversed[s] ?? s;
       const firstLetter = decoded[0];
       const match = firstLetter === lastLetter;
       this.countryFirstOfLetter[s] = match ? undefined : decoded[0];

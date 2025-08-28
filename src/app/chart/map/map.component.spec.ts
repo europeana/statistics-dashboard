@@ -11,7 +11,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 
 import { APIService } from '../../_services';
-import { MockAPIService } from '../../_mocked';
+import { MockAPIService, MockMapChart } from '../../_mocked';
 
 import { MapComponent } from './map.component';
 
@@ -27,24 +27,13 @@ describe('MapComponent', () => {
     }).compileComponents();
   }));
 
-  const getFakeChart = (): am4maps.MapChart => {
-    return {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      show: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      hide: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      zoomToRectangle: () => {},
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      animate: () => {}
-    } as unknown as am4maps.MapChart;
-  };
-
   beforeEach(() => {
     fixture = TestBed.createComponent(MapComponent);
     component = fixture.componentInstance;
-    component.chart = getFakeChart();
-    component.chartGlobe = getFakeChart();
+    expect(component.obtainChart('mapChart')).toBeTruthy();
+    jest.spyOn(component, 'obtainChart').mockImplementation(() => {
+      return MockMapChart;
+    });
     component.mapData = [];
     fixture.detectChanges();
   });
@@ -53,23 +42,30 @@ describe('MapComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should synchronise the legend', () => {
+    component.legend = MockMapChart.createChild(am4maps.HeatLegend);
+    jest.spyOn(component.legend.valueAxis.axisRanges, 'getIndex');
+    component.synchroniseLegend();
+    expect(component.legend.valueAxis.axisRanges.getIndex).toHaveBeenCalled();
+  });
+
   it('should hide the globe', () => {
-    spyOn(component.chart, 'show');
-    spyOn(component.chartGlobe, 'hide');
+    const spyShow = jest.spyOn(component.chart, 'show');
+    const spyHide = jest.spyOn(component.chartGlobe, 'hide');
     component.hideGlobe();
-    expect(component.chart.show).toHaveBeenCalled();
-    expect(component.chartGlobe.hide).toHaveBeenCalled();
+    expect(spyShow).toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalled();
   });
 
   it('should show the globe', () => {
-    spyOn(component.chart, 'hide');
-    spyOn(component.chartGlobe, 'show');
-    spyOn(component.chartGlobe, 'animate');
+    const spyHide = jest.spyOn(component.chart, 'hide');
+    const spyShow = jest.spyOn(component.chartGlobe, 'show');
+    const spyAnimate = jest.spyOn(component.chartGlobe, 'animate');
 
     component.showGlobe();
-    expect(component.chart.hide).toHaveBeenCalled();
-    expect(component.chartGlobe.show).toHaveBeenCalled();
-    expect(component.chartGlobe.animate).toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalled();
+    expect(spyShow).toHaveBeenCalled();
+    expect(spyAnimate).toHaveBeenCalled();
   });
 
   it('should update the data', () => {
@@ -79,26 +75,27 @@ describe('MapComponent', () => {
   });
 
   it('should track the selected country', () => {
-    spyOn(component, 'hideGlobe');
-    spyOn(component, 'showGlobe');
+    const spyHide = jest.spyOn(component, 'hideGlobe');
+    const spyShow = jest.spyOn(component, 'showGlobe');
+
     component.mapData = [{ id: 'IT', value: 1881 }];
 
-    spyOn(component.mapCountrySet, 'emit');
+    const spyEmit = jest.spyOn(component.mapCountrySet, 'emit');
 
     expect(component.selectedCountry).toBeFalsy();
 
     component.selectedCountry = 'IT';
 
-    expect(component.mapCountrySet.emit).toHaveBeenCalledWith(true);
+    expect(spyEmit).toHaveBeenCalledWith(true);
 
     component.selectedCountry = undefined;
 
-    expect(component.mapCountrySet.emit).toHaveBeenCalledWith(false);
-    expect(component.hideGlobe).toHaveBeenCalled();
-    expect(component.showGlobe).not.toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalledWith(false);
+    expect(spyHide).toHaveBeenCalled();
+    expect(spyShow).not.toHaveBeenCalled();
 
     component.selectedCountry = component.countryUnknown;
-    expect(component.showGlobe).toHaveBeenCalled();
+    expect(spyShow).toHaveBeenCalled();
   });
 
   it('should generate the polygon series', () => {
@@ -127,7 +124,7 @@ describe('MapComponent', () => {
   });
 
   it('should update the heat rules when the colour scheme is set', () => {
-    spyOn(component, 'updateHeatRules');
+    const spyUpdateHeatRules = jest.spyOn(component, 'updateHeatRules');
     const colour = '#ffffff';
     const scheme = {
       base: am4core.color(colour),
@@ -139,7 +136,7 @@ describe('MapComponent', () => {
     component.colourScheme = scheme;
     expect(component.colourScheme.base.hex).toEqual(colour);
 
-    expect(component.updateHeatRules).toHaveBeenCalled();
+    expect(spyUpdateHeatRules).toHaveBeenCalled();
   });
 
   it('should add tooltips to the countries', () => {
@@ -159,10 +156,10 @@ describe('MapComponent', () => {
   });
 
   it('should debounce clicks on the country', fakeAsync(() => {
-    spyOn(component, 'countryClick');
+    const spyCountryClick = jest.spyOn(component, 'countryClick');
     component.countryClickSubject.next('IT');
     tick(component.animationTime);
-    expect(component.countryClick).toHaveBeenCalled();
+    expect(spyCountryClick).toHaveBeenCalled();
     tick(component.animationTime);
   }));
 
@@ -174,8 +171,10 @@ describe('MapComponent', () => {
   }));
 
   it('should handle clicks on the country', () => {
-    spyOn(component, 'setCountryInclusion');
-    spyOn(component, 'hideGlobe');
+    const spySetCountryInclusion = jest
+      .spyOn(component, 'setCountryInclusion')
+      .mockImplementation();
+    const spyHideGlobe = jest.spyOn(component, 'hideGlobe');
 
     component.drawChart();
     expect(component.selectedCountry).toBeFalsy();
@@ -195,39 +194,61 @@ describe('MapComponent', () => {
     component.isDragging = false;
     component.countryClick(country);
     expect(component.selectedCountry).toEqual(country);
-    expect(component.setCountryInclusion).not.toHaveBeenCalled();
+    expect(spySetCountryInclusion).not.toHaveBeenCalled();
 
     component.isDragging = false;
     component.isAnimating = false;
+
     component.polygonSeries = {
       getPolygonById: (_: string) => {
         return null;
       },
       include: {
         length: 1
-      }
+      },
+      tooltip: {}
     } as unknown as am4maps.MapPolygonSeries;
 
     component.countryClick(country);
-    expect(component.setCountryInclusion).toHaveBeenCalled();
-    expect(component.hideGlobe).toHaveBeenCalled();
+    expect(spySetCountryInclusion).toHaveBeenCalled();
+    expect(spyHideGlobe).toHaveBeenCalled();
   });
 
   it('should track which countries are shown', () => {
-    spyOn(component, 'hideGlobe');
+    const spyHideGlobe = jest.spyOn(component, 'hideGlobe');
     component.mapData = [{ id: 'IT', value: 1881 }];
-    spyOn(component.polygonSeries.events, 'once');
+    const spyOnce = jest.spyOn(component.polygonSeries.events, 'once');
 
     component.selectedCountry = 'DE';
     component.setCountryInclusion(['DE', 'IT']);
 
-    expect(component.polygonSeries.events.once).toHaveBeenCalled();
+    expect(spyOnce).toHaveBeenCalled();
     expect(component.selectedCountry).toBeFalsy();
-    expect(component.hideGlobe).toHaveBeenCalled();
+    expect(spyHideGlobe).toHaveBeenCalled();
+  });
+
+  it('should validate the morph', () => {
+    component.drawChart();
+    fixture.detectChanges();
+    const spyGetPolygonById = jest.spyOn(
+      component.polygonSeries,
+      'getPolygonById'
+    );
+
+    component.setCountryInclusion(['IT', 'EU']);
+    component.countryMorphValidated('EU', 'FR');
+
+    expect(spyGetPolygonById).toHaveBeenCalled();
+
+    component.countryMorphValidated('FR', 'DE');
+    expect(spyGetPolygonById).toHaveBeenCalledTimes(2);
   });
 
   it('should morph', () => {
-    spyOn(component, 'hideGlobe');
+    component.drawChart();
+    fixture.detectChanges();
+
+    const spyHide = jest.spyOn(component, 'hideGlobe');
     component.mapData = [{ id: 'IT', value: 1881 }];
     component.setCountryInclusion(['IT', 'DE']);
 
@@ -243,46 +264,39 @@ describe('MapComponent', () => {
 
     expect(component.selectedCountry).not.toEqual('DE');
 
+    component.isAnimating = false;
     component.setCountryInclusion(['IT']);
     component.countryMorph('IT');
     expect(component.selectedCountry).not.toEqual('DE');
+
+    const spyCountryMorphValidated = jest.spyOn(
+      component,
+      'countryMorphValidated'
+    );
+    jest
+      .spyOn(component.polygonSeriesHidden.events, 'once')
+      .mockImplementation(((
+        a: string,
+        callBack: (event: string, b: string) => void
+      ) => {
+        callBack('', '');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any);
 
     component.setCountryInclusion(['IT']);
     component.countryMorph('DE');
 
     expect(component.selectedCountry).toEqual('DE');
-    expect(component.hideGlobe).toHaveBeenCalledTimes(2);
-  });
+    expect(spyHide).toHaveBeenCalledTimes(2);
+    expect(spyCountryMorphValidated).toHaveBeenCalled();
 
-  it('should detect chart series container events', () => {
-    component.drawChart();
+    component.isAnimating = false;
+    component.polygonSeriesHidden = MockMapChart.series.push(
+      new am4maps.MapPolygonSeries()
+    );
+    component.polygonSeriesHidden.include = ['FR'];
 
-    const spyDragStart = jasmine.createSpy();
-    const spyDragStop = jasmine.createSpy();
-
-    component.chart.seriesContainer.events.on('dragstart', spyDragStart);
-    component.chart.seriesContainer.events.on('dragstop', spyDragStop);
-
-    component.chart.seriesContainer.dispatchImmediately('dragstart');
-    expect(spyDragStart).toHaveBeenCalled();
-
-    component.chart.seriesContainer.dispatchImmediately('dragstop');
-    expect(spyDragStop).toHaveBeenCalled();
-  });
-
-  it('should detect chart events', () => {
-    component.drawChart();
-
-    const spyOut = jasmine.createSpy();
-    const spyOver = jasmine.createSpy();
-
-    component.chart.events.on('out', spyOut);
-    component.chart.events.on('over', spyOver);
-
-    component.chart.dispatchImmediately('out');
-    expect(spyOut).toHaveBeenCalled();
-
-    component.chart.dispatchImmediately('over');
-    expect(spyOver).toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalledTimes(2);
+    expect(component.selectedCountry).toEqual('DE');
   });
 });

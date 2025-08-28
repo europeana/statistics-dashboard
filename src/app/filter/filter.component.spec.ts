@@ -56,7 +56,7 @@ describe('FilterComponent', () => {
 
     component.opener = {
       nativeElement: {
-        focus: jasmine.createSpy()
+        focus: jest.fn()
       }
     } as unknown as ElementRef;
   });
@@ -145,6 +145,7 @@ describe('FilterComponent', () => {
         value: 'option_1'
       }
     };
+    component.state = { disabled: false, visible: false };
     expect(component.optionSet).toBeFalsy();
     component.filterOptions(evt);
     expect(component.optionSet).toBeFalsy();
@@ -155,18 +156,24 @@ describe('FilterComponent', () => {
     component.filterOptions(evt);
     expect(component.optionSet.options.length).toEqual(1);
 
-    spyOn(component, 'hide');
+    const spyHide = jest.spyOn(component, 'hide');
     component.filterOptions(evt);
-    expect(component.hide).not.toHaveBeenCalled();
+    expect(spyHide).not.toHaveBeenCalled();
 
     evt.key = 'Escape';
     component.filterOptions(evt);
-    expect(component.hide).toHaveBeenCalled();
+    expect(spyHide).toHaveBeenCalled();
   });
 
   it('should reapply the focus', fakeAsync(() => {
-    const spyFocus = jasmine.createSpy();
-    component.inputToFocus = { group: '', controlName: '' };
+    const spyFocus = jest.fn();
+
+    component.state = { disabled: false, visible: true };
+    component.filterTerm = {
+      nativeElement: {
+        focus: jest.fn()
+      }
+    };
     component.checkboxes = {
       find: (_: CheckboxComponent) => {
         return {
@@ -183,8 +190,18 @@ describe('FilterComponent', () => {
     };
     expect(spyFocus).not.toHaveBeenCalled();
     tick();
+    expect(spyFocus).not.toHaveBeenCalled();
+    expect(spyFocus).not.toHaveBeenCalled();
+    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalled();
+
+    component.inputToFocus = { group: '', controlName: '' };
+    component.optionSet = {
+      options: [{ name: 'option_2', label: 'option_2' }]
+    };
+    tick();
     expect(spyFocus).toHaveBeenCalled();
     expect(component.inputToFocus).toBeFalsy();
+    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalledTimes(1);
   }));
 
   it('should get the values', () => {
@@ -239,9 +256,9 @@ describe('FilterComponent', () => {
   });
 
   it('should signal changes', () => {
-    spyOn(component.valueChanged, 'emit');
+    const spyEmit = jest.spyOn(component.valueChanged, 'emit');
     component.changed();
-    expect(component.valueChanged.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
   });
 
   it('should hide', () => {
@@ -252,7 +269,6 @@ describe('FilterComponent', () => {
   });
 
   it('should toggle', fakeAsync(() => {
-    let hasCalledFocus = false;
     component.state = { disabled: false, visible: true };
     expect(component.state.visible).toBeTruthy();
     component.toggle();
@@ -261,24 +277,9 @@ describe('FilterComponent', () => {
     component.toggle();
     tick(1);
     expect(component.state.visible).toBeTruthy();
-
-    component.filterTerm = {
-      nativeElement: {
-        focus: (): void => {
-          hasCalledFocus = true;
-        }
-      }
-    };
-
     component.toggle();
     tick(1);
     expect(component.state.visible).toBeFalsy();
-    expect(hasCalledFocus).toBeFalsy();
-
-    component.toggle();
-    tick(1);
-    expect(component.state.visible).toBeTruthy();
-    expect(hasCalledFocus).toBeTruthy();
   }));
 
   it('should bind to the key selection', () => {
@@ -288,13 +289,13 @@ describe('FilterComponent', () => {
   });
 
   it('should load more', () => {
-    spyOn(component.filterTermChanged, 'emit');
+    const spyEmit = jest.spyOn(component.filterTermChanged, 'emit');
 
     expect(component.pagesVisible).toEqual(1);
 
     component.loadMore();
 
-    expect(component.filterTermChanged.emit).toHaveBeenCalled();
+    expect(spyEmit).toHaveBeenCalled();
     expect(component.pagesVisible).toEqual(2);
   });
 });

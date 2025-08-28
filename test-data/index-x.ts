@@ -126,7 +126,7 @@ new (class extends TestDataServer {
     ) {
       const collected = [];
       // take only the latest from each country
-      const result = countryTargetData
+      const result = [...countryTargetData]
         .reverse()
         .filter((item: { country: string }) => {
           if (collected.includes(item.country)) {

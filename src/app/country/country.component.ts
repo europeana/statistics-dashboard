@@ -13,9 +13,14 @@ import {
   ApplicationRef,
   ChangeDetectorRef,
   Component,
+  computed,
+  effect,
   ElementRef,
   inject,
   Input,
+  model,
+  ModelSignal,
+  signal,
   ViewChild
 } from '@angular/core';
 import {
@@ -116,7 +121,7 @@ export class CountryComponent
 
   @Input() set includeCTZero(includeCTZero: boolean) {
     this._includeCTZero = includeCTZero;
-    if (this.country) {
+    if (this.country().length > 0) {
       this.refreshCardData();
     }
   }
@@ -140,39 +145,26 @@ export class CountryComponent
   columnsEnabled: IHash<boolean> = {};
   columnToEnable?: TargetFieldName;
 
-  _country: string;
-
-  /** country
-   *  setter is used to load tertiary level card data
-   **/
-  set country(country: string) {
-    this._country = country;
-    if (typeof this.includeCTZero === 'boolean') {
-      this.refreshCardData();
-    }
-    this.restoreHiddenColumns();
-    this.showTargetsData = !!this.targetMetaData[country];
-    this.setHeaderData(country);
-  }
-
-  get country(): string {
-    return this._country;
-  }
+  country = signal('');
 
   ngAfterViewInit(): void {
     this.initialiseIntersectionObserver();
   }
 
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
-  countryData: IHash<Array<TargetData>> = {};
-  latestCountryData: TargetData;
-
-  latestCountryPercentages: IHash<number> = {};
-  latestCountryPercentageOfTargets: IHash<Array<number>> = {};
-
-  tooltipsTotal: IHash<string> = {};
-  tooltipsPercent: IHash<string> = {};
-  tooltipsTargets: IHash<Array<string>> = {};
+  countryData: ModelSignal<IHash<Array<TargetData>>> = model({});
+  latestCountryData = computed(() => {
+    const specificCountryData = this.countryData()[this.country()];
+    if (specificCountryData && specificCountryData.length) {
+      const res = specificCountryData.reduce(
+        (prev: TargetData, current: TargetData) => {
+          return prev?.date && prev?.date > current.date ? prev : current;
+        },
+        {} as TargetData
+      );
+      return res;
+    }
+  });
 
   appendiceExpanded = false;
   lineChartIsInitialised = false;
@@ -230,13 +222,22 @@ export class CountryComponent
         )
         .subscribe({
           next: (combined) => {
-            this.targetMetaData = combined.targetMetaData;
-            this.countryData = combined.countryData;
-
             const countryParam = combined.params['country'];
-            const country = isoCountryCodes[countryParam];
+            let country = isoCountryCodes[countryParam];
 
-            if (!country) {
+            if (
+              !country &&
+              Object.keys(combined.countryData).includes(countryParam) &&
+              !Object.values(isoCountryCodes).includes(countryParam)
+            ) {
+              country = countryParam;
+            }
+
+            if (country) {
+              this.country.set(country);
+              this.targetMetaData = combined.targetMetaData;
+              this.countryData.set(combined.countryData);
+            } else {
               const qp = this.includeCTZero
                 ? { queryParams: { 'content-tier-zero': 'true' } }
                 : undefined;
@@ -246,8 +247,6 @@ export class CountryComponent
               } else {
                 this.router.navigate(['/'], qp);
               }
-            } else {
-              this.setCountryToParam(country);
             }
           },
           error: (e: Error) => {
@@ -255,6 +254,18 @@ export class CountryComponent
           }
         })
     );
+
+    effect(() => {
+      const country = this.country();
+      if (country.length) {
+        if (typeof this.includeCTZero === 'boolean') {
+          this.refreshCardData();
+        }
+        this.restoreHiddenColumns();
+        this.showTargetsData = !!this.targetMetaData[country];
+        this.setHeaderData(country);
+      }
+    });
   }
 
   /** intersectionObserverCallback
@@ -326,7 +337,7 @@ export class CountryComponent
     const req = {
       filters: {
         contentTier: { values: contentTierVals },
-        country: { values: [this.country] }
+        country: { values: [this.country()] }
       }
     };
     req.filters[dimensionName] = { breakdown: 0 };
@@ -367,21 +378,6 @@ export class CountryComponent
     this.headerRef.activeCountry = country;
   }
 
-  /** setCountryToParam
-   * - set instance variables
-   * @param {string} country - the country
-   **/
-  setCountryToParam(country: string): void {
-    this.country = country;
-    const specificCountryData = this.countryData[country];
-
-    if (specificCountryData && specificCountryData.length) {
-      this.latestCountryData =
-        specificCountryData[specificCountryData.length - 1];
-      this.generateDerivedData();
-    }
-  }
-
   /** loadHistory
    * picks up onLoadHistory request from legendGrid
    *
@@ -397,65 +393,76 @@ export class CountryComponent
     );
   }
 
-  /** generateDerivedData
-   *
-   * set tooltip / help texts
-   * sets template percentages
-   **/
-  generateDerivedData(): void {
+  tooltipsAndTotals = computed(() => {
     const fmtNum = (num: number, fmt = '1.0-1'): string => {
       return formatNumber(num, 'en-US', fmt);
     };
 
-    Object.values(TargetFieldName).forEach((valName: string) => {
-      const countryName = isoCountryCodesReversed[this.country];
-      const value = this.latestCountryData[valName] || 0;
-      const fmtName = this.renameTargetTypePipe.transform(valName);
-      const fmtValue = fmtNum(value, '1.0-2');
-      const itemPluralString = `item${value === 1 ? '' : 's'}`;
-      const abbrevValue = this.abbreviateNumberPipe.transform(value);
-      const percent =
-        value === 0
-          ? 0
-          : (value / parseInt(this.latestCountryData['total'])) * 100;
-      const typeItems =
-        valName === TargetFieldName.TOTAL ? ` (${abbrevValue})` : ` ${fmtName}`;
+    const res = {
+      tooltipsTotal: {},
+      tooltipsPercent: {},
+      tooltipsTargets: {},
+      latestCountryPercentages: {},
+      latestCountryPercentageOfTargets: {}
+    };
 
-      // set tooltip / help texts
+    if (this.latestCountryData()) {
+      Object.values(TargetFieldName).forEach((valName: string) => {
+        const countryName =
+          isoCountryCodesReversed[this.country()] ?? this.country();
+        const value: number = this.latestCountryData()[valName] ?? 0;
 
-      this.tooltipsTotal[
-        valName
-      ] = $localize`:@@countryHelpTotal:${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
+        const fmtName = this.renameTargetTypePipe.transform(valName);
+        const fmtValue = fmtNum(value, '1.0-2');
+        const itemPluralString = `item${value === 1 ? '' : 's'}`;
+        const abbrevValue = this.abbreviateNumberPipe.transform(value);
+        const percent =
+          value === 0
+            ? 0
+            : (value / parseInt(this.latestCountryData()['total'])) * 100;
 
-      this.tooltipsPercent[valName] = $localize`:@@countryHelpPercent:${fmtNum(
-        percent
-      )}% of the data from ${countryName} is ${fmtName}`;
+        const typeItems =
+          valName === TargetFieldName.TOTAL
+            ? ` (${abbrevValue})`
+            : ` ${fmtName}`;
 
-      // percentages
-      this.latestCountryPercentages[valName] = percent;
+        // set tooltip / help texts
 
-      const targets = this.targetMetaData[this.country][valName];
+        res.tooltipsTotal[
+          valName
+        ] = $localize`:@@countryHelpTotal:${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
 
-      this.latestCountryPercentageOfTargets[valName] = [
-        value / targets[0].value,
-        value / targets[1].value
-      ].map((val: number) => {
-        return val * 100;
+        res.tooltipsPercent[valName] = $localize`:@@countryHelpPercent:${fmtNum(
+          percent
+        )}% of the data from ${countryName} is ${fmtName}`;
+
+        // percentages
+        res.latestCountryPercentages[valName] = percent;
+
+        const targets = this.targetMetaData[this.country()][valName];
+
+        res.latestCountryPercentageOfTargets[valName] = [
+          value / targets[0].value,
+          value / targets[1].value
+        ].map((val: number) => {
+          return val * 100;
+        });
+
+        // tooltipsTargets
+
+        res.tooltipsTargets[valName] = targets.map(
+          (x: TargetMetaData, i: number) => {
+            const tgtVal = fmtNum(x.value);
+            const tgtPct = fmtNum(
+              res.latestCountryPercentageOfTargets[valName][i]
+            );
+            return $localize`:@@countryHelpTarget:The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
+          }
+        );
       });
-
-      // tooltipsTargets
-
-      this.tooltipsTargets[valName] = targets.map(
-        (x: TargetMetaData, i: number) => {
-          const tgtVal = fmtNum(x.value);
-          const tgtPct = fmtNum(
-            this.latestCountryPercentageOfTargets[valName][i]
-          );
-          return $localize`:@@countryHelpTarget:The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
-        }
-      );
-    });
-  }
+    }
+    return res;
+  });
 
   toggleAppendice(): void {
     this.appendiceExpanded = !this.appendiceExpanded;

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
   ElementRef,
@@ -127,6 +128,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   // Make variables available to template
   public fromCSL = fromCSL;
@@ -1071,9 +1073,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.form.controls.dateTo.setValue('');
     this.updatePageUrl();
     this.datesOpen();
-    setTimeout(() => {
-      this.dateFocusControl.nativeElement.focus();
-    }, 0);
+    this.changeDetector.detectChanges();
+    this.dateFocusControl.nativeElement.focus();
   }
 
   /** datesOpen

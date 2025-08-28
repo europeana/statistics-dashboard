@@ -102,7 +102,7 @@ context('Keyboard Accessibility', () => {
       ].forEach((filterName: string) => {
         cy.get(selOpenFilter).should('not.exist');
 
-        cy.get('.opener-name').contains(filterName).type('{enter}');
+        cy.get('.opener-name').contains(filterName).focus().type('{enter}');
         cy.get(selOpenFilter).should('exist');
 
         cy.focused().type('{esc}');

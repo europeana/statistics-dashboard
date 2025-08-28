@@ -177,30 +177,30 @@ describe('DocArrowsComponent', () => {
   });
 
   it('should handle rotation', () => {
-    spyOn(component, 'rotateArrow').and.callThrough();
+    const spyRotate = jest.spyOn(component, 'rotateArrow');
 
     component.arrowActiveKey(getKeyEvent('r', true, 'top', true));
     expect(component.rotateArrow).not.toHaveBeenCalled();
 
     component.arrowActiveKey(getKeyEvent('r', true));
-    expect(component.rotateArrow).toHaveBeenCalled();
+    expect(spyRotate).toHaveBeenCalled();
 
     component.arrowActiveKey(getKeyEvent('r', false));
-    expect(component.rotateArrow).toHaveBeenCalledTimes(1);
+    expect(spyRotate).toHaveBeenCalledTimes(1);
 
     component.arrowActiveKey(getKeyEvent('R', false));
-    expect(component.rotateArrow).toHaveBeenCalledTimes(1);
+    expect(spyRotate).toHaveBeenCalledTimes(1);
 
     component.arrowActiveKey(getKeyEvent('R', true));
-    expect(component.rotateArrow).toHaveBeenCalledTimes(2);
+    expect(spyRotate).toHaveBeenCalledTimes(2);
 
     component.arrowActiveKey(
       getKeyEvent('R', true, 'irrelevant-class' as ArrowType)
     );
-    expect(component.rotateArrow).toHaveBeenCalledTimes(3);
+    expect(spyRotate).toHaveBeenCalledTimes(3);
 
     component.arrowActiveKey(getKeyEvent('R', true, 'left'));
-    expect(component.rotateArrow).toHaveBeenCalledTimes(4);
+    expect(spyRotate).toHaveBeenCalledTimes(4);
   });
 
   it('should handle deletion', () => {

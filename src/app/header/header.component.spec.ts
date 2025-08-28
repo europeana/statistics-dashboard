@@ -36,7 +36,7 @@ describe('HeaderComponent', () => {
 
   it('should toggle the menu', () => {
     const isDisabled = false;
-    const spyStopPropagation = jasmine.createSpy();
+    const spyStopPropagation = jest.fn();
     const e = {
       target: {
         getAttribute: () => {
@@ -65,5 +65,23 @@ describe('HeaderComponent', () => {
     unsorted.sort(HeaderComponent.sortByDecodedCountryName);
     expect(unsorted[0]).toEqual('HR');
     expect(unsorted[1]).toEqual('CZ');
+  });
+
+  it('should work out the first-letter countries', () => {
+    expect(
+      Object.keys(component.countryFirstOfLetter).includes('XX')
+    ).toBeFalsy();
+    component.countryTotalMap = {
+      FR: 1,
+      FI: 1,
+      DE: 2,
+      XX: 3
+    };
+    expect(
+      Object.values(component.countryFirstOfLetter).filter((x) => !!x).length
+    ).toEqual(3);
+    expect(
+      Object.keys(component.countryFirstOfLetter).includes('XX')
+    ).toBeTruthy();
   });
 });
