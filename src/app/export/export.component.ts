@@ -37,7 +37,7 @@ export class ExportComponent {
   @ViewChild('closer') closer: ElementRef;
   @ViewChild('printableGrid') printableGrid: GridComponent;
 
-  imgDataUrl: string;
+  imgDataUrl?: string;
   printable = false;
   openedFromToolbar = false;
 
@@ -89,7 +89,11 @@ export class ExportComponent {
         this.changeDetector.detectChanges();
         this.pdf.exportPDF(
           document.querySelector('.printable-content'),
-          'xxx.pdf'
+          'overview.pdf',
+          () => {
+            this.printable = false;
+            this.imgDataUrl = undefined;
+          }
         );
       });
       this.printableGrid.setRows(gridData.tableRows);

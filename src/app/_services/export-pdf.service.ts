@@ -8,12 +8,14 @@ export class ExportPDFService {
   constructor() {
     this.pdfDoc = new jsPDF('p', 'pt', 'a4');
   }
+
   /** exportPDF
-   * temporarily sets css class 'pdf' on viewer element
-   * temporarily sets isBusy on pageData object
-   * genrates and saves pdf
    **/
-  exportPDF(elToExport: HTMLElement, fileName: string): void {
+  exportPDF(
+    elToExport: HTMLElement,
+    fileName: string,
+    callback: () => void
+  ): void {
     this.pdfDoc.html(elToExport, {
       callback: function (doc) {
         doc.setFont('helvetica', 'italic');
@@ -30,6 +32,7 @@ export class ExportPDFService {
           );
         }
         doc.save(fileName);
+        callback();
       },
       margin: [10, 10, 40, 10],
       autoPaging: 'text',

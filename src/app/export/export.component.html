@@ -1,6 +1,10 @@
 <ul
   class="export"
-  [ngClass]="{ active: active, printable: printable }"
+  [ngClass]="{
+    active: active,
+    printable: printable,
+    'loading-modal': printable
+  }"
   tabindex="-1"
   appOpenerFocus
   [fnHide]="fnHide.bind(this)"

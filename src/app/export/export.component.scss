@@ -150,14 +150,20 @@
 }
 
 .printable {
-  margin: 1rem 2rem 1rem 0;
-
-  & > li:not(.printable-content) {
-    display: none;
-  }
-
   .printable-content {
     display: block;
     width: 46rem;
+    z-index: -1;
+    position: absolute;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: #fff;
+      z-index: 0;
+    }
   }
 }
