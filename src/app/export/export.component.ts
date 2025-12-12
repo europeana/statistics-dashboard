@@ -1,7 +1,9 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   Output,
   ViewChild
@@ -11,17 +13,20 @@ import { ExportCSVService, ExportPDFService } from '../_services';
 import { NgClass } from '@angular/common';
 
 import { OpenerFocusDirective } from '../_directives';
+import { GridComponent } from '../grid';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  imports: [NgClass, OpenerFocusDirective]
+  imports: [GridComponent, NgClass, OpenerFocusDirective]
 })
 export class ExportComponent {
   get currentUrl(): string {
     return window.location.href;
   }
+
+  changeDetector = inject(ChangeDetectorRef);
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
@@ -30,7 +35,10 @@ export class ExportComponent {
   @ViewChild('contentRef') contentRef: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('closer') closer: ElementRef;
+  @ViewChild('printableGrid') printableGrid: GridComponent;
 
+  imgDataUrl: string;
+  printable = false;
   openedFromToolbar = false;
 
   public ExportType = ExportType;
@@ -66,6 +74,8 @@ export class ExportComponent {
 
   export(type: ExportType): void {
     const gridData = this.getGridData();
+    this.printable = false;
+
     if (type === ExportType.CSV) {
       const data = this.csv.csvFromTableRows(
         gridData.columns,
@@ -73,9 +83,17 @@ export class ExportComponent {
       );
       this.csv.download(data, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
+      this.printable = true;
       this.getChartData().then((imgUrl: string) => {
-        this.pdf.download(gridData, imgUrl);
+        this.imgDataUrl = imgUrl;
+        this.changeDetector.detectChanges();
+        this.pdf.exportPDF(
+          document.querySelector('.printable-content'),
+          'xxx.pdf'
+        );
       });
+      this.printableGrid.setRows(gridData.tableRows);
+      this.printableGrid.maxPageSize = gridData.tableRows.length;
     } else if (type === ExportType.PNG) {
       this.getChartData().then((imgUrl: string) => {
         const anchor = document.createElement('a');

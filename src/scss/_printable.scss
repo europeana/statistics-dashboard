@@ -1,0 +1,15 @@
+.printable-content {
+  .data-grid {
+    grid-template-columns: auto minmax(8em, 3fr) auto auto !important;
+  }
+
+  .cell-link-out,
+  .conditional-controls,
+  .cell-header,
+  .paginator,
+  .search-icon,
+  .search-control,
+  .navigation-controls {
+    display: none !important;
+  }
+}

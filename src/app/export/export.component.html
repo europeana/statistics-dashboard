@@ -1,10 +1,26 @@
 <ul
   class="export"
-  [ngClass]="{ active: active }"
+  [ngClass]="{ active: active, printable: printable }"
   tabindex="-1"
   appOpenerFocus
   [fnHide]="fnHide.bind(this)"
 >
+  <li class="printable-content">
+    <ul>
+      <li>
+        <img style="width: 100%" src="{{ imgDataUrl }}" />
+      </li>
+
+      <li>
+        <app-grid
+          #printableGrid
+          [tierPrefix]="'tierPrefix'"
+          facet="x"
+          [isVisible]="true"
+        ></app-grid>
+      </li>
+    </ul>
+  </li>
   <li class="container-h">
     <span class="export-icon"><a #downloadAnchor tabindex="-1"></a></span
     ><span class="label-top" i18n="Share Report Header@@exportReportHeader"

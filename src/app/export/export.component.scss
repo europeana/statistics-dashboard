@@ -148,3 +148,16 @@
 .pad-top {
   margin-top: 12px;
 }
+
+.printable {
+  margin: 1rem 2rem 1rem 0;
+
+  & > li:not(.printable-content) {
+    display: none;
+  }
+
+  .printable-content {
+    display: block;
+    width: 46rem;
+  }
+}
