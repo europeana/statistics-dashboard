@@ -158,6 +158,7 @@
           (onClose)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
+          [getChartTitle]="generateSeriesLabel.bind(this)"
           tabindex="-1"
         ></app-export>
 

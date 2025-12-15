@@ -1,3 +1,4 @@
+import { NgClass, NgIf } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
@@ -10,7 +11,6 @@ import {
 } from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
-import { NgClass } from '@angular/common';
 
 import { OpenerFocusDirective } from '../_directives';
 import { GridComponent } from '../grid';
@@ -19,7 +19,7 @@ import { GridComponent } from '../grid';
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  imports: [GridComponent, NgClass, OpenerFocusDirective]
+  imports: [GridComponent, NgClass, NgIf, OpenerFocusDirective]
 })
 export class ExportComponent {
   get currentUrl(): string {
@@ -30,6 +30,7 @@ export class ExportComponent {
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
+  @Input() getChartTitle: () => Promise<string>;
 
   @Output() onClose = new EventEmitter<boolean>();
   @ViewChild('contentRef') contentRef: ElementRef;
@@ -98,6 +99,8 @@ export class ExportComponent {
       });
       this.printableGrid.setRows(gridData.tableRows);
       this.printableGrid.maxPageSize = gridData.tableRows.length;
+      this.printableGrid.maxPageSize = gridData.tableRows.length;
+      this.printableGrid.truncate = false;
     } else if (type === ExportType.PNG) {
       this.getChartData().then((imgUrl: string) => {
         const anchor = document.createElement('a');

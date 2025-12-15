@@ -1,0 +1,64 @@
+@use "./functions/icon_urls";
+@use "./variables";
+
+.printable-content .logo {
+  align-items: center;
+  display: flex;
+
+  .icon {
+    background: none;
+    padding: 2px;
+  }
+
+  h1 {
+    color: variables.$stats-blue !important;
+    margin-left: 0.4em;
+  }
+}
+
+.logo {
+  .icon {
+    align-self: center;
+    background: icon_urls.svg-url-icon-europeana(#fff) center no-repeat;
+    height: 48px;
+    transform: translateX(4px);
+    width: 39px;
+    z-index: 1;
+  }
+
+  .icon-wrapper {
+    align-content: center;
+    color: variables.$white;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    width: 73px;
+    background-color: variables.$stats-blue;
+
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+    &::after {
+      border-bottom: 130px solid transparent;
+      border-left: 50px solid variables.$white;
+      content: "";
+      display: block;
+      left: -30px;
+      position: absolute;
+    }
+  }
+
+  .text,
+  & + .text {
+    font-family: Chevin-Medium, serif;
+    margin-left: 14px;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    font-size: 25px;
+    line-height: 30px;
+  }
+}

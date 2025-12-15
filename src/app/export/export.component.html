@@ -11,16 +11,24 @@
 >
   <li class="printable-content">
     <ul>
-      <li>
-        <img style="width: 100%" src="{{ imgDataUrl }}" />
+      <li *ngIf="printable" class="logo">
+        <span class="icon-wrapper">
+          <img src="/assets/images/europeana-logo-white.png" class="icon" />
+        </span>
+        <h1>{{ getChartTitle() }}</h1>
       </li>
-
+      <li *ngIf="printable">
+        <img
+          style="width: 100%; margin-top: 2rem; margin-bottom: 1rem"
+          src="{{ imgDataUrl }}"
+        />
+      </li>
       <li>
         <app-grid
           #printableGrid
           [tierPrefix]="'tierPrefix'"
           facet="x"
-          [isVisible]="true"
+          [isVisible]="printable"
         ></app-grid>
       </li>
     </ul>

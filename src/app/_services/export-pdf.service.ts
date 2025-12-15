@@ -3,12 +3,6 @@ import { jsPDF } from 'jspdf';
 
 @Injectable({ providedIn: 'root' })
 export class ExportPDFService {
-  pdfDoc: jsPDF;
-
-  constructor() {
-    this.pdfDoc = new jsPDF('p', 'pt', 'a4');
-  }
-
   /** exportPDF
    **/
   exportPDF(
@@ -16,7 +10,8 @@ export class ExportPDFService {
     fileName: string,
     callback: () => void
   ): void {
-    this.pdfDoc.html(elToExport, {
+    const pdfDoc: jsPDF = new jsPDF('p', 'pt', 'a4');
+    pdfDoc.html(elToExport, {
       callback: function (doc) {
         doc.setFont('helvetica', 'italic');
         doc.setFontSize(8);

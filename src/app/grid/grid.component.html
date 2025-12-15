@@ -162,10 +162,14 @@
             data-e2e="grid-row-name"
             [title]="row.name"
           >
+            @if(truncate){
             <app-truncate
               [text]="getPrefix() + row.name"
               [highlightText]="filterTerm"
             ></app-truncate>
+            } @else{
+            {{ getPrefix() }}{{ row.name }}
+            }
           </span>
 
           <span
