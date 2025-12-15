@@ -1,18 +1,16 @@
 @use "./functions/icon_urls";
 @use "./variables";
 
-.printable-content .logo {
-  align-items: center;
-  display: flex;
+.printable-content {
+  .logo {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
 
-  .icon {
-    background: none;
-    padding: 2px;
-  }
-
-  h1 {
-    color: variables.$stats-blue !important;
-    margin-left: 0.4em;
+    .icon {
+      background: none;
+      padding: 2px;
+    }
   }
 }
 

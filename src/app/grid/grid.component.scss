@@ -9,6 +9,12 @@ label[for="maxPageSize"] {
   white-space: nowrap;
 }
 
+table {
+  margin-top: 2em;
+  width: 46rem;
+  font-size: 1rem;
+}
+
 .cell-header {
   border-top: 1px solid variables.$gray-5;
   position: relative;

@@ -38,6 +38,7 @@
   </ng-template>
 
   <div class="data-grid" [ngClass]="{ 'with-series': isShowingSeriesInfo }">
+    @if(!printableMode){
     <span class="search-control container-h cell-first-wide">
       <span class="search-icon"></span>
       <input
@@ -114,6 +115,16 @@
 
     <span class="cell-header">{{ colHeaders[3] }}</span>
 
+    } @else {
+    <app-grid-paginator
+      style="display: none"
+      #paginator
+      [maxPageSize]="maxPageSize"
+      [rows]="gridRows"
+      (change)="setPagerInfo($event)"
+    ></app-grid-paginator>
+    }
+
     <ng-container>
       <!-- Summary rows -->
       <ng-template #labelTotal><span class="bold">Total</span></ng-template>
@@ -148,6 +159,25 @@
       <!-- Rows -->
 
       <ng-container *ngIf="pagerInfo">
+        @let prefix = getPrefix(); @if(printableMode){
+
+        <table>
+          <tr
+            *ngFor="let row of pagerInfo.pageRows; let i = index"
+            [ngClass]="{ highlight: row.highlight }"
+          >
+            <td>
+              {{ row.displayIndex }}
+            </td>
+            <td>{{ prefix }}{{ row.name }}</td>
+            <td>
+              {{ row.count | number }}
+            </td>
+            <td>{{ row.percent }}%</td>
+          </tr>
+        </table>
+        } @else{
+
         <ng-container *ngFor="let row of pagerInfo.pageRows; let i = index">
           <span [ngClass]="{ highlight: row.highlight }">
             {{ row.displayIndex }}
@@ -162,16 +192,11 @@
             data-e2e="grid-row-name"
             [title]="row.name"
           >
-            @if(truncate){
             <app-truncate
-              [text]="getPrefix() + row.name"
+              [text]="prefix + row.name"
               [highlightText]="filterTerm"
             ></app-truncate>
-            } @else{
-            {{ getPrefix() }}{{ row.name }}
-            }
           </span>
-
           <span
             *ngIf="isShowingSeriesInfo"
             class="cell-series container-h"
@@ -200,6 +225,7 @@
             *ngTemplateOutlet="linkOut; context: { row: row }"
           ></ng-content>
         </ng-container>
+        }
       </ng-container>
     </ng-container>
   </div>

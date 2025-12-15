@@ -1,16 +1,28 @@
 import { Injectable } from '@angular/core';
-import { jsPDF } from 'jspdf';
+import { JSPDFType } from '../_models';
 
 @Injectable({ providedIn: 'root' })
 export class ExportPDFService {
+  // defer loading of pdf library
+  async getJsPDF(): Promise<JSPDFType> {
+    const fontUrl =
+      '/assets/fonts/noto/NotoSans-Italic-VariableFont_wdth,wght.ttf';
+    const jsPDF = (await import('jspdf')).default;
+    const pdfDoc = new jsPDF('p', 'pt', 'a4');
+    pdfDoc.addFont(fontUrl, 'Noto Sans', 'normal');
+    pdfDoc.addFont(fontUrl, 'Noto Sans', 'bold');
+    return pdfDoc as unknown as JSPDFType;
+  }
+
   /** exportPDF
    **/
-  exportPDF(
+  async exportPDF(
     elToExport: HTMLElement,
     fileName: string,
     callback: () => void
-  ): void {
-    const pdfDoc: jsPDF = new jsPDF('p', 'pt', 'a4');
+  ): Promise<void> {
+    const pdfDoc = await this.getJsPDF();
+
     pdfDoc.html(elToExport, {
       callback: function (doc) {
         doc.setFont('helvetica', 'italic');

@@ -85,6 +85,10 @@ export class ExportComponent {
       this.csv.download(data, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
       this.printable = true;
+      this.printableGrid.setRows(gridData.tableRows);
+      this.printableGrid.maxPageSize = Math.min(500, gridData.tableRows.length); //gridData.tableRows.length;
+      this.printableGrid.printableMode = true;
+
       this.getChartData().then((imgUrl: string) => {
         this.imgDataUrl = imgUrl;
         this.changeDetector.detectChanges();
@@ -97,10 +101,6 @@ export class ExportComponent {
           }
         );
       });
-      this.printableGrid.setRows(gridData.tableRows);
-      this.printableGrid.maxPageSize = gridData.tableRows.length;
-      this.printableGrid.maxPageSize = gridData.tableRows.length;
-      this.printableGrid.truncate = false;
     } else if (type === ExportType.PNG) {
       this.getChartData().then((imgUrl: string) => {
         const anchor = document.createElement('a');

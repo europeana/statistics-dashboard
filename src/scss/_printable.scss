@@ -1,15 +1,16 @@
-.printable-content {
-  .data-grid {
-    grid-template-columns: auto minmax(8em, 3fr) auto auto !important;
-  }
+@use "./variables";
 
-  .cell-link-out,
-  .conditional-controls,
-  .cell-header,
-  .paginator,
-  .search-icon,
-  .search-control,
-  .navigation-controls {
-    display: none !important;
+.printable-content {
+  position: absolute;
+
+  .data-grid {
+    font-family: "Noto Sans", sans-serif;
+  }
+  .printable-title {
+    color: variables.$stats-blue !important;
+    font-size: 2.4em;
+    font-weight: bold;
+    margin-left: 0.4em;
+    line-height: 1;
   }
 }

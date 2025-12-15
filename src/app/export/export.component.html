@@ -9,21 +9,43 @@
   appOpenerFocus
   [fnHide]="fnHide.bind(this)"
 >
-  <li class="printable-content">
-    <ul>
-      <li *ngIf="printable" class="logo">
-        <span class="icon-wrapper">
-          <img src="/assets/images/europeana-logo-white.png" class="icon" />
+  <li>
+    <ul
+      class="printable-content"
+      style="list-style: none; padding: 0; margin: 0"
+    >
+      <li
+        *ngIf="printable"
+        style="position: relative"
+        class="xxxlogo XXXprintable-header"
+      >
+        <span class="logo">
+          <span class="icon-wrapper">
+            <img
+              src="/assets/images/europeana-logo-white.png"
+              class="icon"
+              alt="printable logo"
+            />
+          </span>
+          <span class="printable-title">
+            {{ getChartTitle() }}
+          </span>
         </span>
-        <h1>{{ getChartTitle() }}</h1>
-      </li>
-      <li *ngIf="printable">
+
         <img
-          style="width: 100%; margin-top: 2rem; margin-bottom: 1rem"
           src="{{ imgDataUrl }}"
+          alt="chart image"
+          style="
+            display: block;
+            width: 46em;
+            height: 30em;
+            margin-bottom: 1em;
+            margin-top: 4em;
+          "
         />
       </li>
-      <li>
+
+      <li class="printable-item">
         <app-grid
           #printableGrid
           [tierPrefix]="'tierPrefix'"

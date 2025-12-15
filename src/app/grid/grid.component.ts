@@ -63,7 +63,7 @@ export class GridComponent extends SubscriptionManager {
   pagerInfo: PagerInfo;
   summaryRows: Array<TableRow> = [];
   gridRows: Array<TableRow>;
-  truncate = true;
+  printableMode = false;
   isShowingSeriesInfo = false;
   sortInfo: SortInfo = {
     by: SortBy.count,
