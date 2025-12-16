@@ -10,15 +10,22 @@ label[for="maxPageSize"] {
 }
 
 table {
-  margin-top: 1rem;
-  width: variables.$print-width;
   font-size: 1rem;
+  width: variables.$print-width;
+  z-index: 1;
 
   td:first-child {
     padding-right: 0.4em;
   }
   td:last-child {
     padding-left: 0.4em;
+  }
+
+  th {
+    text-align: left;
+    &.align-right {
+      text-align: right;
+    }
   }
 }
 

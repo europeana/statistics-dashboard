@@ -162,6 +162,14 @@
         @let prefix = getPrefix(); @if(printableMode){
 
         <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Item</th>
+              <th class="text-right">Total</th>
+              <th class="text-right">Percent</th>
+            </tr>
+          </thead>
           <tr
             *ngFor="let row of pagerInfo.pageRows; let i = index"
             [ngClass]="{ highlight: row.highlight }"
