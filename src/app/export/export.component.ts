@@ -1,6 +1,5 @@
 import { NgClass, NgIf } from '@angular/common';
 import {
-  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -25,8 +24,6 @@ export class ExportComponent {
   get currentUrl(): string {
     return window.location.href;
   }
-
-  changeDetector = inject(ChangeDetectorRef);
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
@@ -91,7 +88,6 @@ export class ExportComponent {
 
       this.getChartData().then((imgUrl: string) => {
         this.imgDataUrl = imgUrl;
-        this.changeDetector.detectChanges();
         this.pdf.exportPDF(
           document.querySelector('.printable-content'),
           'overview.pdf',

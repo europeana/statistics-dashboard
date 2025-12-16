@@ -58,6 +58,10 @@ describe('ExportComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should get the current url', () => {
+    expect(component.currentUrl).toBeTruthy();
+  });
+
   it('should copy', fakeAsync(() => {
     jest.spyOn(navigator.clipboard, 'writeText');
     (component.contentRef.nativeElement as HTMLInputElement).value = 'some-url';

@@ -8,4 +8,15 @@ export class MockExportPDFService {
   download(_: FmtTableData, __: string): void {
     console.log('mock download');
   }
+
+  async exportPDF(
+    _: HTMLElement,
+    __: string,
+    callback: () => void
+  ): Promise<void> {
+    callback();
+    return new Promise((resolve) => {
+      resolve();
+    });
+  }
 }
