@@ -1,3 +1,4 @@
+import { NgClass, NgIf } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -8,15 +9,15 @@ import {
 } from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
-import { NgClass } from '@angular/common';
 
 import { OpenerFocusDirective } from '../_directives';
+import { GridComponent } from '../grid';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  imports: [NgClass, OpenerFocusDirective]
+  imports: [GridComponent, NgClass, NgIf, OpenerFocusDirective]
 })
 export class ExportComponent {
   get currentUrl(): string {
@@ -25,12 +26,16 @@ export class ExportComponent {
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
+  @Input() getChartTitle: () => Promise<string>;
 
   @Output() onClose = new EventEmitter<boolean>();
   @ViewChild('contentRef') contentRef: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('closer') closer: ElementRef;
+  @ViewChild('printableGrid') printableGrid: GridComponent;
 
+  imgDataUrl?: string;
+  printable = false;
   openedFromToolbar = false;
 
   public ExportType = ExportType;
@@ -66,6 +71,8 @@ export class ExportComponent {
 
   export(type: ExportType): void {
     const gridData = this.getGridData();
+    this.printable = false;
+
     if (type === ExportType.CSV) {
       const data = this.csv.csvFromTableRows(
         gridData.columns,
@@ -73,8 +80,21 @@ export class ExportComponent {
       );
       this.csv.download(data, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
+      this.printable = true;
+      this.printableGrid.setRows(gridData.tableRows);
+      this.printableGrid.maxPageSize = Math.min(500, gridData.tableRows.length);
+      this.printableGrid.printableMode = true;
+
       this.getChartData().then((imgUrl: string) => {
-        this.pdf.download(gridData, imgUrl);
+        this.imgDataUrl = imgUrl;
+        this.pdf.exportPDF(
+          document.querySelector('.printable-content'),
+          'overview.pdf',
+          () => {
+            this.printable = false;
+            this.imgDataUrl = undefined;
+          }
+        );
       });
     } else if (type === ExportType.PNG) {
       this.getChartData().then((imgUrl: string) => {

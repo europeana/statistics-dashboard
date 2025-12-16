@@ -48,6 +48,7 @@
   background: #fff;
   box-shadow: 0 2px 8px 0 rgba(26, 26, 26, 0.25);
   font-size: 14px;
+  overflow: hidden;
   padding: 26px 31px;
   position: fixed;
   transform: translateX(100%);
@@ -147,4 +148,35 @@
 
 .pad-top {
   margin-top: 12px;
+}
+
+.printable .printable-content {
+  display: block;
+  width: variables.$print-width;
+  z-index: -1;
+  position: absolute;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: #fff;
+    z-index: 0;
+  }
+}
+
+.chart-image {
+  display: block;
+  width: 46em;
+  height: 32em;
+  margin-bottom: 2em;
+  margin-top: 2em;
+  padding-bottom: 2em;
+}
+
+.printable-item {
+  display: block;
 }

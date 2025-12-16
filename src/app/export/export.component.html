@@ -1,10 +1,43 @@
 <ul
   class="export"
-  [ngClass]="{ active: active }"
+  [ngClass]="{
+    active: active,
+    printable: printable,
+    'loading-modal': printable
+  }"
   tabindex="-1"
   appOpenerFocus
   [fnHide]="fnHide.bind(this)"
 >
+  <li>
+    <ul class="printable-content">
+      <li *ngIf="printable" style="position: relative">
+        <span class="logo">
+          <span class="icon-wrapper">
+            <img
+              src="/assets/images/europeana-logo-white.png"
+              class="icon"
+              alt="printable logo"
+            />
+          </span>
+          <span class="printable-title">
+            {{ getChartTitle() }}
+          </span>
+        </span>
+
+        <img src="{{ imgDataUrl }}" alt="chart" class="chart-image" />
+      </li>
+
+      <li class="printable-item">
+        <app-grid
+          #printableGrid
+          [tierPrefix]="'tierPrefix'"
+          facet="x"
+          [isVisible]="printable"
+        ></app-grid>
+      </li>
+    </ul>
+  </li>
   <li class="container-h">
     <span class="export-icon"><a #downloadAnchor tabindex="-1"></a></span
     ><span class="label-top" i18n="Share Report Header@@exportReportHeader"

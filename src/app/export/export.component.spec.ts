@@ -1,3 +1,8 @@
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ElementRef } from '@angular/core';
 import {
   ComponentFixture,
@@ -6,11 +11,11 @@ import {
   tick,
   waitForAsync
 } from '@angular/core/testing';
-import { ExportComponent } from '.';
 
+import { ExportComponent } from '.';
 import { MockExportCSVService, MockExportPDFService } from '../_mocked';
 import { ExportType, FmtTableData } from '../_models';
-import { ExportCSVService } from '../_services';
+import { ExportCSVService, ExportPDFService } from '../_services';
 
 describe('ExportComponent', () => {
   let component: ExportComponent;
@@ -20,7 +25,12 @@ describe('ExportComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [ExportComponent],
-      providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        { provide: ExportCSVService, useClass: MockExportCSVService },
+        { provide: ExportPDFService, useClass: MockExportPDFService }
+      ]
     }).compileComponents();
     exportCSV = TestBed.inject(ExportCSVService);
   }));
@@ -46,6 +56,10 @@ describe('ExportComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should get the current url', () => {
+    expect(component.currentUrl).toBeTruthy();
   });
 
   it('should copy', fakeAsync(() => {
