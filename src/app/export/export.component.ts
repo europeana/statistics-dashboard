@@ -82,7 +82,7 @@ export class ExportComponent {
     } else if (type === ExportType.PDF) {
       this.printable = true;
       this.printableGrid.setRows(gridData.tableRows);
-      this.printableGrid.maxPageSize = Math.min(500, gridData.tableRows.length); //gridData.tableRows.length;
+      this.printableGrid.maxPageSize = Math.min(500, gridData.tableRows.length);
       this.printableGrid.printableMode = true;
 
       this.getChartData().then((imgUrl: string) => {
