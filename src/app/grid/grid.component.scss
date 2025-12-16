@@ -10,9 +10,16 @@ label[for="maxPageSize"] {
 }
 
 table {
-  margin-top: 2em;
-  width: 46rem;
+  margin-top: 1rem;
+  width: variables.$print-width;
   font-size: 1rem;
+
+  td:first-child {
+    padding-right: 0.4em;
+  }
+  td:last-child {
+    padding-left: 0.4em;
+  }
 }
 
 .cell-header {

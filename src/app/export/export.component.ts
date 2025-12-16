@@ -3,7 +3,6 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  inject,
   Input,
   Output,
   ViewChild

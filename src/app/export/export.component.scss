@@ -152,7 +152,7 @@
 
 .printable .printable-content {
   display: block;
-  width: 46rem;
+  width: variables.$print-width;
   z-index: -1;
   position: absolute;
 

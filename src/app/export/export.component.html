@@ -10,15 +10,8 @@
   [fnHide]="fnHide.bind(this)"
 >
   <li>
-    <ul
-      class="printable-content"
-      style="list-style: none; padding: 0; margin: 0"
-    >
-      <li
-        *ngIf="printable"
-        style="position: relative"
-        class="xxxlogo XXXprintable-header"
-      >
+    <ul class="printable-content">
+      <li *ngIf="printable" style="position: relative">
         <span class="logo">
           <span class="icon-wrapper">
             <img
