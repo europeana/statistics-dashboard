@@ -15,12 +15,12 @@ describe('ExportPDFService', () => {
 
   it('should download', () => {
     const model = {
-      columns: ['series', 'name', 'count', 'percent'],
+      columns: ['x', 'series', 'name', 'count', 'percent'],
       tableRows: [
-        { series: 'A', name: 'name', count: 0, percent: 0 } as TableRow,
-        { series: 'A', name: 'name', count: 1, percent: 2 } as TableRow,
-        { series: 'A', name: 'name', count: 2, percent: 2 } as TableRow
-      ]
+        { x: '', series: 'A', name: 'name', count: 0, percent: 0 },
+        { x: '', series: 'A', name: 'name', count: 1, percent: 2 },
+        { x: '', series: 'A', name: 'name', count: 2, percent: 2 }
+      ] as unknown as Array<TableRow>
     };
     expect(
       service.download('Title', model, MockExportPDFService.imgDataURL)
