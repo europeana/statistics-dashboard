@@ -27,7 +27,7 @@ export class ExportPDFService {
                 return {
                   text: `${s[0].toUpperCase()}${s.slice(1, s.length)}`,
                   style: 'tableHeader',
-                  alignment: index ? 'right' : 'left'
+                  alignment: index > 1 ? 'right' : 'left'
                 };
               }),
               ...tableData.tableRows.map((tr: TableRow) => {
@@ -38,8 +38,8 @@ export class ExportPDFService {
                     const suffix = index === 3 ? '%' : '';
                     result.push({
                       text: tr[`${s}`] + suffix,
-                      alignment: index ? 'right' : 'left',
-                      noWrap: true
+                      alignment: index > 1 ? 'right' : 'left',
+                      noWrap: index ? false : true
                     });
                   });
                 return result;
