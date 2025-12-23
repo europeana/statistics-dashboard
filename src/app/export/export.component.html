@@ -1,6 +1,9 @@
 <ul
   class="export"
-  [ngClass]="{ active: active }"
+  [ngClass]="{
+    active: active,
+    'loading-modal': busy
+  }"
   tabindex="-1"
   appOpenerFocus
   [fnHide]="fnHide.bind(this)"

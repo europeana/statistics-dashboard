@@ -10,42 +10,43 @@ export class ExportPDFService {
     pdfMake.addVirtualFileSystem(pdfFonts);
   }
 
-  getFillColour(rowIndex: number): string | null {
-    return rowIndex % 2 === 0 ? '#CCCCCC' : null;
-  }
-
-  download(tableData: FmtTableData, imgUrlData: string): void {
+  download(title: string, tableData: FmtTableData, imgUrlData: string): void {
     const layout = {
       content: [
-        { text: 'Tables', style: 'header' },
+        { text: title, style: 'header' },
         {
           image: imgUrlData,
-          width: 300,
+          width: 500,
           alignment: 'center'
         },
         {
           table: {
+            widths: ['auto', '*', '*', '*'],
             body: [
-              tableData.columns.slice(1).map((s: string) => {
+              tableData.columns.slice(1).map((s: string, index: number) => {
                 return {
-                  text: `${s}`,
+                  text: `${s[0].toUpperCase()}${s.slice(1, s.length)}`,
                   style: 'tableHeader',
-                  alignment: 'center'
+                  alignment: !index ? 'left' : 'right'
                 };
               }),
               ...tableData.tableRows.map((tr: TableRow) => {
                 const result = [];
-                tableData.columns.slice(1).forEach((s: string) => {
-                  result.push(tr[`${s}`]);
-                });
+                tableData.columns
+                  .slice(1)
+                  .forEach((s: string, index: number) => {
+                    const suffix = index === 3 ? '%' : '';
+                    result.push({
+                      text: tr[`${s}`] + suffix,
+                      alignment: !index ? 'left' : 'right'
+                    });
+                  });
                 return result;
               })
             ],
             margin: [0, 30]
           },
-          layout: {
-            fillColor: this.getFillColour
-          }
+          layout: 'lightHorizontalLines'
         }
       ],
       styles: {
