@@ -15,10 +15,11 @@ describe('ExportPDFService', () => {
 
   it('should download', () => {
     const model = {
-      columns: ['name', 'count', 'percent'],
+      columns: ['series', 'name', 'count', 'percent'],
       tableRows: [
-        { name: 'name', count: 1, percent: 1 } as TableRow,
-        { name: 'name', count: 2, percent: 2 } as TableRow
+        { series: 'A', name: 'name', count: 0, percent: 0 } as TableRow,
+        { series: 'A', name: 'name', count: 1, percent: 2 } as TableRow,
+        { series: 'A', name: 'name', count: 2, percent: 2 } as TableRow
       ]
     };
     expect(

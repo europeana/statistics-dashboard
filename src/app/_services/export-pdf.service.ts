@@ -21,13 +21,13 @@ export class ExportPDFService {
         },
         {
           table: {
-            widths: ['auto', '*', '*', '*'],
+            widths: ['auto', 'auto', 'auto', 'auto'],
             body: [
               tableData.columns.slice(1).map((s: string, index: number) => {
                 return {
                   text: `${s[0].toUpperCase()}${s.slice(1, s.length)}`,
                   style: 'tableHeader',
-                  alignment: !index ? 'left' : 'right'
+                  alignment: index ? 'right' : 'left'
                 };
               }),
               ...tableData.tableRows.map((tr: TableRow) => {
@@ -38,7 +38,8 @@ export class ExportPDFService {
                     const suffix = index === 3 ? '%' : '';
                     result.push({
                       text: tr[`${s}`] + suffix,
-                      alignment: !index ? 'left' : 'right'
+                      alignment: index ? 'right' : 'left',
+                      noWrap: true
                     });
                   });
                 return result;
@@ -59,6 +60,12 @@ export class ExportPDFService {
           fontSize: 12,
           color: 'black'
         }
+      },
+      footer: (currentPage, pageCount) => {
+        return {
+          text: `Page ${currentPage.toString()} of ${pageCount}`,
+          alignment: 'center'
+        };
       }
     };
     const pdfDocGenerator = pdfMake.createPdf(layout);

@@ -36,6 +36,10 @@ describe('ExportComponent', () => {
       };
     };
 
+    component.getChartTitle = (): string => {
+      return 'title';
+    };
+
     component.getChartData = (): Promise<string> => {
       return new Promise((resolve) => {
         resolve(null);
