@@ -5,7 +5,7 @@ export class MockExportPDFService {
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCA' +
     'YAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5' +
     'ErkJggg==';
-  download(_: FmtTableData, __: string): void {
+  download(_: string, __: FmtTableData, ___: string): void {
     console.log('mock download');
   }
 }

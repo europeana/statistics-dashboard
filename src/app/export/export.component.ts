@@ -25,6 +25,7 @@ export class ExportComponent {
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
+  @Input() getChartTitle: () => string;
 
   @Output() onClose = new EventEmitter<boolean>();
   @ViewChild('contentRef') contentRef: ElementRef;
@@ -35,6 +36,7 @@ export class ExportComponent {
 
   public ExportType = ExportType;
   active = false;
+  busy = false;
   copied = false;
   msMsgDisplay = 2000;
   _tabIndex = -1;
@@ -73,8 +75,10 @@ export class ExportComponent {
       );
       this.csv.download(data, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
+      this.busy = true;
       this.getChartData().then((imgUrl: string) => {
-        this.pdf.download(gridData, imgUrl);
+        this.pdf.download(this.getChartTitle(), gridData, imgUrl);
+        this.busy = false;
       });
     } else if (type === ExportType.PNG) {
       this.getChartData().then((imgUrl: string) => {

@@ -13,21 +13,17 @@ describe('ExportPDFService', () => {
     service = TestBed.inject(ExportPDFService);
   }));
 
-  it('should get the fill colour', () => {
-    expect(service.getFillColour(0)).toBeTruthy();
-    expect(service.getFillColour(1)).toBeFalsy();
-  });
-
   it('should download', () => {
     const model = {
-      columns: ['name', 'count', 'percent'],
+      columns: ['x', 'series', 'name', 'count', 'percent'],
       tableRows: [
-        { name: 'name', count: 1, percent: 1 } as TableRow,
-        { name: 'name', count: 2, percent: 2 } as TableRow
-      ]
+        { x: '', series: 'A', name: 'name', count: 0, percent: 0 },
+        { x: '', series: 'A', name: 'name', count: 1, percent: 2 },
+        { x: '', series: 'A', name: 'name', count: 2, percent: 2 }
+      ] as unknown as Array<TableRow>
     };
     expect(
-      service.download(model, MockExportPDFService.imgDataURL)
+      service.download('Title', model, MockExportPDFService.imgDataURL)
     ).toBeFalsy();
   });
 });
