@@ -440,7 +440,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* returns the (portal) url for a specific item
   */
   getUrlRow(facet: string, qfVal?: string): string {
-    const rootUrl = `${environment.serverPortal}search${this.getUrl(
+    const rootUrl = `${environment.serverPortal}/search${this.getUrl(
       facet === DimensionName.contentTier && !!qfVal
     )}`;
     if (!qfVal) {
