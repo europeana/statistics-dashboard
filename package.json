@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "clean": "rm -rf coverage && rm -rf dist",
+    "clean": "rm -rf .angular && rm -rf coverage && rm -rf dist",
     "cypress": "cypress open",
     "cypress:ci": "run-p --race start:ci cypress:run",
     "cypress:ci-accessibility": "run-p --race start:ci cypress:run-accessibility",
