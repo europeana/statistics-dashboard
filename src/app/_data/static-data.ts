@@ -90,6 +90,7 @@ export const externalLinks = {
   europeana: '//www.europeana.eu',
   pro: '//pro.europeana.eu',
   api: '//api.europeana.eu',
+  dataspace: '//www.dataspace-culturalheritage.eu',
   help: {
     contentTier: {
       href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
