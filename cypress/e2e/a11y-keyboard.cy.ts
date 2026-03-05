@@ -34,10 +34,19 @@ context('Keyboard Accessibility', () => {
       const selDatasetName = '.dataset-name';
       cy.visit('/data/contentTier');
       cy.get('#europeana-feedback-widget').invoke('remove');
-      checkFocusHighlights(`:not(${selDatasetName})`);
+      checkFocusHighlights(`:not(${selDatasetName}, .logo)`);
       cy.get(selDatasetName)
         .focus()
         .should('have.css', 'border-color', focusHighlightColour);
+
+      cy.get('a.logo')
+        .focus()
+        .then(($els) => {
+          const win = $els[0].ownerDocument.defaultView;
+          const after = win.getComputedStyle($els[0], 'after');
+          const val = after.getPropertyValue('outline-color');
+          expect(val).to.eq(focusHighlightColour);
+        });
     });
 
     it('should highlight (top-level) focusable items (country page)', () => {
