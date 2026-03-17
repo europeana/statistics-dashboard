@@ -13,8 +13,9 @@ jobs:
         with:
           name: appLcov
           path: ./lcov.info
+      - name: Set Node
+        run: echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true >> $GITHUB_ENV"
       - name: SonarQube Scan
-        run: echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true >> $GITHUB_ENV
         uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
