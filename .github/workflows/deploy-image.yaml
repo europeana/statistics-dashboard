@@ -4,7 +4,7 @@ jobs:
   deploy-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get Env File
         uses: actions/download-artifact@master
         with:
