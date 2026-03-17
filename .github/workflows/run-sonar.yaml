@@ -2,8 +2,6 @@ name: '- helper (sonar)'
 on: workflow_call
 jobs:
   run-sonar:
-    run: |
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,6 +14,8 @@ jobs:
           name: appLcov
           path: ./lcov.info
       - name: SonarQube Scan
+        run: |
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
         uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
