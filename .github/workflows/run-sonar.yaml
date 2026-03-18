@@ -17,8 +17,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true: true
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
         with:
           args:
             -Dsonar.host.url=https://sonarcloud.io
