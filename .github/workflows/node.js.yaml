@@ -1,6 +1,4 @@
 name: '* Build & Deployment'
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 run-name: |
   ${{ github.event.inputs.delete == 'true'
     && 'deleting' || github.event.inputs.run_build == 'true'
@@ -109,6 +107,7 @@ jobs:
         uses: docker/metadata-action@v5
         env:
           PROJECT_VERSION: ${{ secrets.PROJECT_VERSION }}
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
         with:
           images: europeana/statistics-dashboard
           tags: |
