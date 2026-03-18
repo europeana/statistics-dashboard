@@ -1,4 +1,7 @@
 name: '* Build & Deployment'
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true: true
 run-name: |
   ${{ github.event.inputs.delete == 'true'
     && 'deleting' || github.event.inputs.run_build == 'true'
