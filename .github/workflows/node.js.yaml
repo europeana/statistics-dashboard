@@ -125,7 +125,7 @@ jobs:
             ${{ env.TAG_ESCAPED }}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7.0.0
         with:
           context: .
           file: ./Dockerfile
