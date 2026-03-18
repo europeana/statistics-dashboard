@@ -3,9 +3,6 @@ on: workflow_call
 jobs:
   run-sonar:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -20,6 +17,8 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true: true
         with:
           args:
             -Dsonar.host.url=https://sonarcloud.io
