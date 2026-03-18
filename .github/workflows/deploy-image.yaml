@@ -16,6 +16,10 @@ jobs:
           tag=${{ github.event.inputs.tag_name || 'develop' }}
           TAG_ESCAPED=${tag//[\/]/_}
           echo TAG_ESCAPED=${TAG_ESCAPED} >> $GITHUB_ENV
+
+      - name: Set env
+        run: echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true" >> $GITHUB_ENV
+
       - name: Inject Variables
         uses: cschleiden/replace-tokens@v1
         with:
@@ -23,7 +27,7 @@ jobs:
           tokenSuffix: '}#'
           files: '["deployment/${{ github.event.inputs.deploy_environment }}/*.yaml"]'
         env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+          #FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
           APP_IMAGE: europeana/statistics-dashboard:${{ env.TAG_ESCAPED }}
           MAX_REPLICAS: '4'
           MIN_REPLICAS: '2'
