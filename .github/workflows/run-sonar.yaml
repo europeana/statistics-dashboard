@@ -1,6 +1,8 @@
 name: '- helper (sonar)'
 on: workflow_call
 jobs:
+  runs:
+    using: 'node24'
   run-sonar:
     runs-on: ubuntu-latest
     steps:
@@ -13,8 +15,6 @@ jobs:
         with:
           name: appLcov
           path: ./lcov.info
-      - name: Set Node
-        run: echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true >> $GITHUB_ENV"
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
