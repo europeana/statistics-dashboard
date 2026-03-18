@@ -1,8 +1,8 @@
 name: '- helper (sonar)'
 on: workflow_call
+runs:
+  using: 'node24'
 jobs:
-  runs:
-    using: 'node24'
   run-sonar:
     runs-on: ubuntu-latest
     steps:
