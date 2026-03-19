@@ -20,7 +20,7 @@ jobs:
         run: |
           export MIN_REPLICAS='2'
           export MAX_REPLICAS='4'
-          export UTILISATION_AVERAGE_PERCENT: '75'
+          export UTILISATION_AVERAGE_PERCENT='75'
           envsubst < deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml | tee deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
           envsubst < deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml | tee deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
           # exec "$@"
