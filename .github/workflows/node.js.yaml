@@ -107,7 +107,6 @@ jobs:
         uses: docker/metadata-action@v6.0.0
         env:
           PROJECT_VERSION: ${{ secrets.PROJECT_VERSION }}
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
         with:
           images: europeana/statistics-dashboard
           tags: |
