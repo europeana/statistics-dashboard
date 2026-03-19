@@ -16,22 +16,26 @@ jobs:
           tag=${{ github.event.inputs.tag_name || 'develop' }}
           TAG_ESCAPED=${tag//[\/]/_}
           echo TAG_ESCAPED=${TAG_ESCAPED} >> $GITHUB_ENV
-
-      - name: Set env
-        run: echo "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true" >> $GITHUB_ENV
-
       - name: Inject Variables
-        uses: cschleiden/replace-tokens@v1
-        with:
-          tokenPrefix: '#{'
-          tokenSuffix: '}#'
-          files: '["deployment/${{ github.event.inputs.deploy_environment }}/*.yaml"]'
-        env:
-          #FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-          APP_IMAGE: europeana/statistics-dashboard:${{ env.TAG_ESCAPED }}
-          MAX_REPLICAS: '4'
-          MIN_REPLICAS: '2'
-          UTILISATION_AVERAGE_PERCENT: '75'
+        run: |
+          export MIN_REPLICAS='2'
+          export MAX_REPLICAS='4'
+          export UTILISATION_AVERAGE_PERCENT: '75'
+          envsubst < deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml | tee deployment/${{ github.event.inputs.deploy_environment }}/deployment.yaml
+          envsubst < deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml | tee deployment/${{ github.event.inputs.deploy_environment }}/hpa.yaml
+          # exec "$@"
+      #- name: Inject Variables
+      #  uses: cschleiden/replace-tokens@v1
+      #  with:
+      #    tokenPrefix: '#{'
+      #    tokenSuffix: '}#'
+      #    files: '["deployment/${{ github.event.inputs.deploy_environment }}/*.yaml"]'
+      #  env:
+      #    APP_IMAGE: europeana/statistics-dashboard:${{ env.TAG_ESCAPED }}
+      #    MAX_REPLICAS: '4'
+      #    MIN_REPLICAS: '2'
+      #    UTILISATION_AVERAGE_PERCENT: '75'
+
       - name: Install IBM Cloud CLI
         run: |
           curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
