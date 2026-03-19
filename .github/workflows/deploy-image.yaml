@@ -18,6 +18,7 @@ jobs:
           echo TAG_ESCAPED=${TAG_ESCAPED} >> $GITHUB_ENV
       - name: Inject Variables
         run: |
+          export APP_IMAGE='europeana/statistics-dashboard:${{ env.TAG_ESCAPED }}'
           export MIN_REPLICAS='2'
           export MAX_REPLICAS='4'
           export UTILISATION_AVERAGE_PERCENT='75'
