@@ -27,7 +27,7 @@ export class ExportComponent {
   @Input() getChartData: () => Promise<string>;
   @Input() getChartTitle: () => string;
 
-  @Output() onClose = new EventEmitter<boolean>();
+  @Output() closeExport = new EventEmitter<boolean>();
   @ViewChild('contentRef') contentRef: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('closer') closer: ElementRef;
@@ -108,7 +108,7 @@ export class ExportComponent {
    * @param { boolean } fromToolbar - flags if component was opened from the toolbar
    **/
   toggleActive(fromToolbar?: boolean): void {
-    if (typeof fromToolbar !== 'undefined') {
+    if (fromToolbar !== undefined) {
       this.openedFromToolbar = fromToolbar;
     }
 
@@ -116,7 +116,7 @@ export class ExportComponent {
     this.tabIndex = this.active ? 0 : -1;
 
     if (!this.active) {
-      this.onClose.emit(this.openedFromToolbar);
+      this.closeExport.emit(this.openedFromToolbar);
     }
   }
 }

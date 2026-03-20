@@ -225,7 +225,7 @@ export class LandingComponent extends SubscriptionManager {
           const target =
             this.targetMetaData[country][targetType][targetIndex].value;
           const progress = value
-            ? parseFloat(((parseInt(value) / target) * 100).toFixed(2))
+            ? Number.parseFloat(((Number.parseInt(value) / target) * 100).toFixed(2))
             : 0;
           this.allProgressSeries[targetType][targetIndex].push({
             id: country,

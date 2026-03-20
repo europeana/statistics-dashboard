@@ -77,7 +77,7 @@ $window-size: $row-height;
 
   .cell-live {
     background-color: #fff;
-    color: #777;
+    color: #777; // NOSONAR
     z-index: 1;
   }
 

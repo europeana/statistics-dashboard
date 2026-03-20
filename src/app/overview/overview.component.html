@@ -155,7 +155,7 @@
       <div class="statistics-dashboard-right">
         <app-export
           #export
-          (onClose)="focusExportOpener($event)"
+          (closeExport)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
           [getChartTitle]="generateSeriesLabel.bind(this)"

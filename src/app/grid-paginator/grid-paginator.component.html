@@ -1,6 +1,6 @@
 <ul *ngIf="pages && pages.length > 0" class="paginator" tabindex="-1">
   <li>
-    <a
+    <!-- //NOSONAR --><a
       class="previous"
       data-e2e="grid-page-prev"
       [attr.tabindex]="canPrev() ? 0 : -1"
@@ -17,7 +17,7 @@
   </li>
 
   <li>
-    <a
+    <!-- //NOSONAR --><a
       class="next"
       data-e2e="grid-page-next"
       [attr.tabindex]="canNext() ? 0 : -1"

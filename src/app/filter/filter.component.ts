@@ -88,12 +88,10 @@ export class FilterComponent {
         }
         this.inputToFocus = undefined;
       });
-    } else {
-      if (this.state && this.state.visible) {
-        const ft = this.filterTerm;
-        if (ft) {
-          ft.nativeElement.focus();
-        }
+    } else if (this.state?.visible) {
+      const ft = this.filterTerm;
+      if (ft) {
+        ft.nativeElement.focus();
       }
     }
   }
