@@ -99,6 +99,15 @@ describe('LineComponent', () => {
 
     component.removeRange('DE', TargetFieldName.HQ);
     expect(spyRemoveValue).toHaveBeenCalledTimes(2);
+
+    component.removeRange('DE', TargetFieldName.HQ, 0);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(2);
+
+    component.targetMetaData['DE'][TargetFieldName.HQ] = [
+      { value: 12, targetYear: 2030 }
+    ];
+    component.removeRange('DE', TargetFieldName.HQ, 6);
+    expect(spyRemoveValue).toHaveBeenCalledTimes(2);
   });
 
   it('should show the range', () => {
