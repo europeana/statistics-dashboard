@@ -337,25 +337,6 @@ $numeric-min-width: 6em;
   }
 }
 
-.target-summary {
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 1em;
-
-  // the last has "nothing in front of me that isn't expanded"
-  &:not(:has(~ .target-summary:not(.target-expanded))) {
-    // the last has nothing connected below: hide vertical line
-    & ~ .target-expanded .boxed:last-child::after {
-      display: none;
-    }
-
-    // the last box
-    .boxed:last-child::after {
-      bottom: 50%;
-    }
-  }
-}
-
 .data-rows-title {
   &:has([disabled]) span {
     color: $disabled-colour;
@@ -380,6 +361,38 @@ $numeric-min-width: 6em;
 .target-summary {
   a {
     color: unset;
+  }
+}
+
+.target-summary {
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1em;
+
+  // the last has "nothing in front of me that isn't expanded"
+  &:not(:has(~ .target-summary:not(.target-expanded))) {
+    // the last has nothing connected below: hide vertical line
+    & ~ .target-expanded .boxed:last-child::after {
+      display: none;
+    }
+
+    // the last box
+    .boxed:last-child::after {
+      bottom: 50%;
+    }
+  }
+
+  &:not(.target-expanded) {
+    .numeric {
+      margin-right: 6px;
+    }
+  }
+
+  .target-active {
+    font-weight: bold;
+    &.numeric {
+      border-bottom: 1px solid $boxed-colour;
+    }
   }
 }
 
@@ -414,20 +427,5 @@ $numeric-min-width: 6em;
 
   .numeric {
     text-align: right;
-  }
-}
-
-.target-summary {
-  &:not(.target-expanded) {
-    .numeric {
-      margin-right: 6px;
-    }
-  }
-
-  .target-active {
-    font-weight: bold;
-    &.numeric {
-      border-bottom: 1px solid $boxed-colour;
-    }
   }
 }

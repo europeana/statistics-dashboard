@@ -383,7 +383,7 @@ export class CountryComponent
   }
 
   /** loadHistory
-   * picks up onLoadHistory request from legendGrid
+   * picks up historyLoadded request from legendGrid
    *
    * @param {CountryHistoryRequest} request - the data request
    **/

@@ -62,7 +62,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   public classReference = LegendGridComponent;
   private readonly renameCountry = new RenameCountryPipe();
 
-  static itemHeight = 84.5;
+  static readonly itemHeight = 84.5;
 
   _columnEnabled3D = true;
   _columnEnabledHQ = true;
@@ -163,7 +163,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   @Input() lineChart: LineComponent;
 
   @Output() unpinColumn: EventEmitter<TargetFieldName> = new EventEmitter();
-  @Output() onLoadHistory: EventEmitter<CountryHistoryRequest> =
+  @Output() historyLoadded: EventEmitter<CountryHistoryRequest> =
     new EventEmitter();
 
   @ViewChild('legendGrid') legendGrid: ElementRef;
@@ -207,12 +207,9 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
    * @returns country mapped to the series suffix
    **/
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
-    const res = TargetSeriesSuffixes.map((seriesSuffix: string) => {
+    return TargetSeriesSuffixes.map((seriesSuffix: string) => {
       return this.lineChart.allSeriesData[`${country}${seriesSuffix}`];
-    }).filter((x) => {
-      return x;
-    });
-    return res;
+    }).filter((x) => x);
   }
 
   /** sortPins
@@ -352,7 +349,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
    * @param { string } country - the country to load
    **/
   loadCountryChartData(country: string, seriesTypes = []): void {
-    this.onLoadHistory.emit({
+    this.historyLoadded.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
         this.countryData[country] = this.countryData[country].concat(data);
@@ -393,10 +390,9 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
         this.loadCountryChartData(country, seriesTypes);
       }
     } else {
-      const hasVisible =
-        countrySeries.filter((series: am4charts.LineSeries) => {
-          return !series.isHidden;
-        }).length > 0;
+      const hasVisible = countrySeries.some((series: am4charts.LineSeries) => {
+        return !series.isHidden;
+      });
 
       if (hasVisible) {
         countrySeries.forEach((series: am4charts.LineSeries) => {
