@@ -9,10 +9,16 @@ const filePaths = [
   'src/app/_data/countries-member-state-codes.ts'
 ];
 
+const destPath = 'test-data/src-copy';
+
+if (!fs.existsSync(destPath)){
+  fs.mkdirSync(destPath);
+}
+
 filePaths.forEach((path)=> {
   const fileName = path.split('/').pop().replace('.ts', '.mts');
 
-  fs.copyFile(path, `test-data/${fileName}`, (err) => {
+  fs.copyFile(path, `${destPath}/${fileName}`, (err) => {
     if (err) {
       throw err;
     }

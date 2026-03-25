@@ -1,11 +1,11 @@
-import { IHash, IHashArray } from "./ihash.mjs";
+import { IHash, IHashArray } from "./src-copy/ihash.mjs";
 import {
   TargetCountryData,
   TargetFieldName,
   TargetMetaData,
   TargetMetaDataRaw
-} from "./targets.mjs";
-import { memberStateCountryCodes } from "./countries-member-state-codes.mjs";
+} from "./src-copy/targets.mjs";
+import { memberStateCountryCodes } from "./src-copy/countries-member-state-codes.mjs";
 export const isoCountryCodes = {
   Austria: "AT",
   Azerbaijan: "AZ",

@@ -1,4 +1,4 @@
-import { DimensionName } from "./api.mjs";
+import { DimensionName } from "./src-copy/api.mjs";
 import {
   CHO,
   CountryDescriptor,
