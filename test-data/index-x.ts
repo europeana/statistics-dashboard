@@ -1,22 +1,28 @@
 import * as url from 'url';
 import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
-import { TestDataServer } from '../tools/test-data-server/test-data-server';
 import {
+  DimensionName,
+  TestDataServer
+} from '../tools/test-data-server/test-data-server.mjs';
+
+import { IHashArray } from './ihash.mjs';
+
+// TODO: if these imports work then why do I need to copy anything?
+import {
+  FilterOption,
+  GeneralResults,
   BreakdownRequest,
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
-  DimensionName,
-  FilterOption,
-  GeneralResults,
-  IHashArray,
   RequestFilter
-} from '../src/app/_models';
-import { facetNames } from '../src/app/_data';
+} from '../src/app/_models/stats-server';
+
+import { facetNames } from './api.mjs';
 import { CHO, IHashBoolean } from './_models/test-models';
-import { countryTargetData, targetData } from './static-country-data';
-import { DataGenerator } from './data-generator';
+import { countryTargetData, targetData } from './static-country-data.mjs';
+import { DataGenerator } from './data-generator.mjs';
 
 new (class extends TestDataServer {
   serverName = 'statistics-data-server';

@@ -1,22 +1,9 @@
-import { DimensionName, IHash, NonFacetFilterNames } from '../_models';
-
-export const facetNames: Array<DimensionName> = [
-  DimensionName.contentTier,
-  DimensionName.metadataTier,
-  DimensionName.country,
-  DimensionName.dataProvider,
-  DimensionName.provider,
-  DimensionName.rightsCategory,
-  DimensionName.type
-];
-
-const additionalFilters: IHash<string> = {};
-additionalFilters[NonFacetFilterNames.contentTierZero] = 'content-tier-zero';
-additionalFilters[NonFacetFilterNames.dateFrom] = 'date-from';
-additionalFilters[NonFacetFilterNames.dateTo] = 'date-to';
-additionalFilters[NonFacetFilterNames.datasetId] = 'dataset-id';
-
-export const nonFacetFilters = additionalFilters;
+import {
+  facetNames,
+  DimensionName,
+  IHash,
+  NonFacetFilterNames
+} from '../_models';
 
 const facetNamesPortal: IHash<string> = {};
 
@@ -120,36 +107,6 @@ export const targetDescriptions = {
   high_quality: $localize`:@@targetDescriptionsHQ:Digital objects found in ${tooltipLink} which conform to content tiers 2, 3 or 4 and metadata tiers A, B or C according to the Europeana Publishing Framework.`,
   total: $localize`:@@targetDescriptionsTOTAL:All digital objects found in ${tooltipLink} conforming to content tier 1 and higher.`
 };
-
-export const memberStateCountryCodes = [
-  'AT',
-  'BE',
-  'BG',
-  'HR',
-  'CY',
-  'CZ',
-  'DK',
-  'EE',
-  'FI',
-  'FR',
-  'DE',
-  'GR',
-  'HU',
-  'IE',
-  'IT',
-  'LV',
-  'LT',
-  'LU',
-  'MT',
-  'NL',
-  'PL',
-  'PT',
-  'RO',
-  'SK',
-  'SI',
-  'ES',
-  'SE'
-];
 
 export const eliData = {
   eliDocNum: '32021H1970',

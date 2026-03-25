@@ -1,3 +1,5 @@
+import { IHash, IHashArray } from './';
+
 export enum ExportType {
   CSV = 'CSV',
   PDF = 'PDF',
@@ -21,18 +23,6 @@ export interface FilterOptionSet {
 }
 
 export type HeaderNameType = 'name' | 'count' | 'percent';
-
-export interface IHashString {
-  [details: string]: string;
-}
-
-export interface IHash<T> {
-  [details: string]: T;
-}
-
-export interface IHashArray<T> {
-  [details: string]: Array<T>;
-}
 
 interface PortalUrlInfo {
   href: string;

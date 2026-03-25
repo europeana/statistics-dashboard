@@ -4,13 +4,14 @@ const config = {
       {
         test: /\.jsx?$|\.tsx?$/,
         use: {
-          loader: 'ts-loader'
+          loader: "ts-loader"
         }
       }
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'], modules: ['src', 'node_modules']
+    extensions: [".tsx", ".ts", ".js"],
+    modules: ["src", "node_modules"]
   }
 };
 

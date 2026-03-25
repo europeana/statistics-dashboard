@@ -19,7 +19,7 @@ import {
 import { MatDialogModule } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
-import { nonFacetFilters, portalNames } from '../_data';
+import { portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
 import { RenameApiFacetPipe } from '../_translate';
 
@@ -38,6 +38,7 @@ import {
   FilterInfo,
   NameLabel,
   NonFacetFilterNames,
+  nonFacetFilters,
   RequestFilter,
   RequestFilterRange
 } from '../_models';
