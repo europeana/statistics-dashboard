@@ -1,5 +1,3 @@
-import { IHash, IHashArray } from './';
-
 export enum ExportType {
   CSV = 'CSV',
   PDF = 'PDF',

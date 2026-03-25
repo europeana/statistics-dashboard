@@ -1,9 +1,4 @@
-import {
-  facetNames,
-  DimensionName,
-  IHash,
-  NonFacetFilterNames
-} from '../_models';
+import { DimensionName, IHash } from '../_models';
 
 const facetNamesPortal: IHash<string> = {};
 
