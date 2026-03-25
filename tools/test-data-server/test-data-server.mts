@@ -1,31 +1,5 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
-//import { CHO } from '../../test-data/_models/test-models';
-
-// TODO: remove duplicate definitions
-
-export enum DimensionName {
-  contentTier = "contentTier",
-  country = "country",
-  dataProvider = "dataProvider",
-  metadataTier = "metadataTier",
-  provider = "provider",
-  rightsCategory = "rightsCategory",
-  type = "type"
-}
-
-//export
-interface CHO {
-  datasetId: string;
-  date?: number;
-  [DimensionName.contentTier]: string;
-  [DimensionName.country]: string;
-  [DimensionName.metadataTier]: string;
-  [DimensionName.provider]: string;
-  [DimensionName.dataProvider]: string;
-  [DimensionName.type]: string;
-  [DimensionName.rightsCategory]: string;
-  exclusions: Array<string>;
-}
+import { CHO } from '../../test-data/_models/test-models';
 
 export abstract class TestDataServer {
   abstract serverName: string;

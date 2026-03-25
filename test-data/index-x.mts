@@ -1,16 +1,13 @@
 import * as url from 'url';
 import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
-import {
-  DimensionName,
-  TestDataServer
-} from '../tools/test-data-server/test-data-server.mjs';
+import { TestDataServer } from '../tools/test-data-server/test-data-server.mjs';
 
 import { IHashArray } from './ihash.mjs';
+import { DimensionName } from './api.mjs';
 
 // TODO: if these imports work then why do I need to copy anything?
 import {
-  FilterOption,
   GeneralResults,
   BreakdownRequest,
   BreakdownResult,
