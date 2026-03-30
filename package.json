@@ -47,7 +47,6 @@
     "@europeana/metis-ui-consent-management": "^20.3.18",
     "@europeana/metis-ui-maintenance-utils": "^20.3.18",
     "@europeana/metis-ui-test-utils": "^20.3.18",
-    "@typescript-eslint/eslint-plugin": "^8.24.1",
     "cypress": "^15.13.0",
     "cypress-axe": "^1.7.0",
     "eslint": "^9.20.1",
@@ -61,7 +60,6 @@
     "zone.js": "^0.15.0"
   },
   "devDependencies": {
-    "@angular-builders/jest": "^19.0.1",
     "@angular-devkit/build-angular": "^19.1.4",
     "@angular/cli": "^19.1.4",
     "@angular/compiler-cli": "^19.1.3",
