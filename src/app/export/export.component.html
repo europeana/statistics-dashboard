@@ -9,11 +9,17 @@
   [fnHide]="fnHide.bind(this)"
 >
   <li class="container-h">
-    <span class="export-icon"><a #downloadAnchor tabindex="-1"></a></span
+    <span class="export-icon"
+      ><!-- // NOSONAR --><a
+        #downloadAnchor
+        tabindex="-1"
+        aria-hidden="true"
+      ></a></span
     ><span class="label-top" i18n="Share Report Header@@exportReportHeader"
       >Share Report</span
-    ><a
+    ><!-- // NOSONAR --><a
       #closer
+      aria-label="toggle export"
       class="x"
       (click)="toggleActive()"
       (keydown.enter)="toggleActive()"

@@ -155,7 +155,7 @@
       <div class="statistics-dashboard-right">
         <app-export
           #export
-          (onClose)="focusExportOpener($event)"
+          (closeExport)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
           [getChartTitle]="generateSeriesLabel.bind(this)"
@@ -203,6 +203,7 @@
           <ng-content *ngTemplateOutlet="dateRemoval"></ng-content>
 
           <a
+            aria-label="toggle export section"
             #exportOpenerToolbar
             (click)="export.toggleActive(true)"
             (keydown.enter)="export.toggleActive(true)"

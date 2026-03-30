@@ -89,7 +89,7 @@ export class LineComponent implements AfterViewInit {
           this.targetMetaData[country][TargetFieldName[seriesValueName]];
         if (targetDataType) {
           targetDataType.forEach((td: TargetMetaData, tdIndex: number) => {
-            if (parseInt(`${specificIndex}`) > -1) {
+            if (Number.parseInt(`${specificIndex}`) > -1) {
               if (specificIndex !== tdIndex) {
                 return;
               }

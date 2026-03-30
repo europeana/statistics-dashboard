@@ -18,7 +18,7 @@ import { ResizeComponent } from '../resize/resize.component';
   imports: [ResizeComponent, NgClass, HighlightMatchPipe]
 })
 export class TruncateComponent implements OnInit {
-  private changeDetector = inject(ChangeDetectorRef);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   applySpace = false;
   maxRecursions = 100;

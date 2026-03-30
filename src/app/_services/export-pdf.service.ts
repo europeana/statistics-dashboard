@@ -56,15 +56,12 @@ export class ExportPDFService {
                       .slice(1)
                       .forEach((s: string, index: number) => {
                         const suffix = index === 3 ? '%' : '';
+                        const noWrap = !index && title.length < 20;
                         result.push({
                           color: '#4d4d4d',
                           text: tr[`${s}`] + suffix,
                           alignment: index > 1 ? 'right' : 'left',
-                          noWrap: index
-                            ? false
-                            : title.length < 20
-                            ? true
-                            : false
+                          noWrap
                         });
                       });
                     return result;
