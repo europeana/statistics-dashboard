@@ -47,6 +47,7 @@
     "@europeana/metis-ui-consent-management": "^20.3.18",
     "@europeana/metis-ui-maintenance-utils": "^20.3.18",
     "@europeana/metis-ui-test-utils": "^20.3.18",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
     "cypress": "^15.13.0",
     "cypress-axe": "^1.7.0",
     "eslint": "^9.20.1",
