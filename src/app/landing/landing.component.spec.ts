@@ -59,7 +59,7 @@ describe('LandingComponent', () => {
         add: { imports: [MockMapComponent] }
       })
       .compileComponents();
-    api = TestBed.get(APIService);
+    api = TestBed.inject(APIService);
   };
 
   beforeEach(waitForAsync(() => {

@@ -128,7 +128,7 @@ describe('OverviewComponent', () => {
         add: { imports: [MockBarComponent, MockGridComponent] }
       })
       .compileComponents();
-    api = TestBed.get(APIService);
+    api = TestBed.inject(APIService);
   };
 
   const b4Each = (): void => {
