@@ -64,7 +64,7 @@ jobs:
       - name: Build Artifact
         uses: actions/setup-node@v5
         with:
-          node-version: '18.19.1'
+          node-version: '22.12'
       - run: npm install
       - run: npm run dist-localised
       - run: mv ./dist/statistics-dashboard/browser/* ./dist/statistics-dashboard
