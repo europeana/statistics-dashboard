@@ -34,22 +34,31 @@ a,
   z-index: 12;
 }
 
+.page-title {
+  line-height: 1.2;
+  margin: 4px 0;
+}
+
 .logo {
   background-image: icon_urls.svg-url-logo();
   background-size: contain;
   background-position-y: 10px;
   background-repeat: no-repeat;
-  height: 60px;
+  height: 3.5rem;
   margin-left: 21px;
-  width: 318px;
+  width: 290px;
   position: relative;
+
+  &:not([tabindex="0"]) {
+    cursor: default;
+  }
 
   &:focus-visible {
     outline: none;
     &::after {
       content: "";
       position: absolute;
-      top: 0.5em;
+      top: 0;
       bottom: 0.5em;
       right: 0;
       left: 0;
