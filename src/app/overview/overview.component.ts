@@ -31,10 +31,8 @@ import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   externalLinks,
-  facetNames,
   isoCountryCodes,
   isoCountryCodesReversed,
-  nonFacetFilters,
   portalNames,
   portalNamesFriendly
 } from '../_data';
@@ -56,6 +54,7 @@ import {
   BreakdownResults,
   CountPercentageValue,
   DimensionName,
+  facetNames,
   FilterInfo,
   FilterOptionSet,
   FilterState,
@@ -66,6 +65,7 @@ import {
   NameLabelValid,
   NamesValuePercent,
   NonFacetFilterNames,
+  nonFacetFilters,
   RequestFilter
 } from '../_models';
 import { APIService } from '../_services';

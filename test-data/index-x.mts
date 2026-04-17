@@ -1,25 +1,29 @@
-import * as url from 'url';
-import * as fileSystem from 'fs';
-import { IncomingMessage, ServerResponse } from 'http';
-import { TestDataServer } from '../tools/test-data-server/test-data-server';
+import * as url from "url";
+import * as fileSystem from "fs";
+import { IncomingMessage, ServerResponse } from "http";
+import { TestDataServer } from "../tools/test-data-server/test-data-server.mjs";
+
+// imports from src/ holding data (including generics) need to be modules
+import { IHashArray } from "./src-copy/ihash.mjs";
+import { DimensionName } from "./src-copy/api.mjs";
+import { facetNames } from "./src-copy/api.mjs";
+import { countryTargetData, targetData } from "./static-country-data.mjs";
+
+// imports from src/ work if they are types only
 import {
+  GeneralResults,
   BreakdownRequest,
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
-  DimensionName,
-  FilterOption,
-  GeneralResults,
-  IHashArray,
   RequestFilter
-} from '../src/app/_models';
-import { facetNames } from '../src/app/_data';
-import { CHO, IHashBoolean } from './_models/test-models';
-import { countryTargetData, targetData } from './static-country-data';
-import { DataGenerator } from './data-generator';
+} from "../src/app/_models/stats-server";
+
+import { CHO, IHashBoolean } from "./_models/test-models";
+import { DataGenerator } from "./data-generator.mjs";
 
 new (class extends TestDataServer {
-  serverName = 'statistics-data-server';
+  serverName = "statistics-data-server";
   generalShowTop = 8;
 
   constructor() {
@@ -96,33 +100,33 @@ new (class extends TestDataServer {
     request: IncomingMessage,
     response: ServerResponse
   ): void => {
-    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader("Access-Control-Allow-Origin", "*");
 
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       this.handleOptions(response);
       return;
     }
 
     response.statusCode = 200;
 
-    if ((request.url as string) === '/matomo.js') {
-      fileSystem.createReadStream('test-data/fake-matomo.js').pipe(response);
+    if ((request.url as string) === "/matomo.js") {
+      fileSystem.createReadStream("test-data/fake-matomo.js").pipe(response);
       return;
     }
 
-    response.setHeader('Content-Type', 'application/json;charset=UTF-8');
+    response.setHeader("Content-Type", "application/json;charset=UTF-8");
     this.clearExclusions();
 
-    if (request.method === 'POST') {
-      let body = '';
-      request.on('data', (chunk) => {
+    if (request.method === "POST") {
+      let body = "";
+      request.on("data", (chunk) => {
         body += chunk;
       });
-      request.on('end', () => {
+      request.on("end", () => {
         this.sendResponse(response, JSON.parse(body) as BreakdownRequest);
       });
     } else if (
-      (request.url as string) === '/statistics/europeana/target/country/all'
+      (request.url as string) === "/statistics/europeana/target/country/all"
     ) {
       const collected = [];
       // take only the latest from each country
@@ -139,13 +143,13 @@ new (class extends TestDataServer {
       response.end(JSON.stringify(result));
     } else if (
       (request.url as string).includes(
-        '/statistics/europeana/target/country/historical'
+        "/statistics/europeana/target/country/historical"
       )
     ) {
       // load specific country history
       const route = request.url as string;
       const params = url.parse(route, true).query;
-      const country = params['country'];
+      const country = params["country"];
       response.end(
         JSON.stringify(
           countryTargetData.filter((item: { country: string }) => {
@@ -153,15 +157,15 @@ new (class extends TestDataServer {
           })
         )
       );
-    } else if ((request.url as string) === '/statistics/europeana/targets') {
+    } else if ((request.url as string) === "/statistics/europeana/targets") {
       response.end(JSON.stringify(targetData));
     } else {
       const route = request.url as string;
       const params = url.parse(route, true).query;
-      const cat = params['rightsCategory'];
+      const cat = params["rightsCategory"];
 
       if (cat) {
-        const result = encodeURIComponent(`${cat}`.replace(/ /g, '-'));
+        const result = encodeURIComponent(`${cat}`.replace(/ /g, "-"));
         response.end(
           JSON.stringify([
             `http://${result}/1.0`,
@@ -170,13 +174,13 @@ new (class extends TestDataServer {
           ])
         );
       } else {
-        const ctZero = params['content-tier-zero'] === 'true';
+        const ctZero = params["content-tier-zero"] === "true";
 
         let resultCHOs = this.allCHOs;
 
         if (!ctZero) {
           resultCHOs = resultCHOs.filter((cho: CHO) => {
-            return cho[DimensionName.contentTier] !== '0';
+            return cho[DimensionName.contentTier] !== "0";
           });
         }
 
@@ -201,12 +205,12 @@ new (class extends TestDataServer {
       let res = true;
       Object.keys(breakdownRequest.filters)
         .filter((fName: string) => {
-          return !['updatedDate'].includes(fName);
+          return !["updatedDate"].includes(fName);
         })
         .forEach((fName: string) => {
           const filter = breakdownRequest.filters[fName] as RequestFilter;
           if (filter.values) {
-            if (fName === 'datasetId') {
+            if (fName === "datasetId") {
               res = true;
               if (!filter.values.includes(cho.datasetId)) {
                 res = false;
@@ -239,7 +243,7 @@ new (class extends TestDataServer {
       JSON.stringify({
         filteringOptions: filterOptions,
         results: {
-          value: 'ALL RECORDS',
+          value: "ALL RECORDS",
           count: filteredCHOs.length,
           percentage: 100,
           breakdowns: this.asBreakdown(

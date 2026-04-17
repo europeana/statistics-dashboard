@@ -14,3 +14,13 @@ export enum NonFacetFilterNames {
   dateTo = 'dataTo',
   datasetId = 'datasetId'
 }
+
+export const facetNames: Array<DimensionName> = [
+  DimensionName.contentTier,
+  DimensionName.metadataTier,
+  DimensionName.country,
+  DimensionName.dataProvider,
+  DimensionName.provider,
+  DimensionName.rightsCategory,
+  DimensionName.type
+];
