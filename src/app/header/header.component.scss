@@ -34,19 +34,14 @@ a,
   z-index: 12;
 }
 
-.page-title {
-  line-height: 1.2;
-  margin: 4px 0;
-}
-
 .logo {
   background-image: icon_urls.svg-url-logo();
   background-size: contain;
   background-position-y: 10px;
   background-repeat: no-repeat;
-  height: 3.5rem;
+  height: 60px;
   margin-left: 21px;
-  width: 290px;
+  width: 318px;
   position: relative;
 
   &:not([tabindex="0"]) {
@@ -58,7 +53,7 @@ a,
     &::after {
       content: "";
       position: absolute;
-      top: 0;
+      top: 0.5em;
       bottom: 0.5em;
       right: 0;
       left: 0;
