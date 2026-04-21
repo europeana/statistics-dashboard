@@ -36,6 +36,10 @@ a,
   width: 318px;
   position: relative;
 
+  &:not([tabindex="0"]) {
+    cursor: default;
+  }
+
   &:focus-visible {
     outline: none;
     &::after {
