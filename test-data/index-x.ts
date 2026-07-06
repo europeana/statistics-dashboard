@@ -1,7 +1,8 @@
 import * as url from 'url';
 import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
-import { TestDataServer } from '../tools/test-data-server/test-data-server';
+import { TestDataServer } from '../tools/test-data-server/test-data-server.mjs';
+
 import {
   BreakdownRequest,
   BreakdownResult,
@@ -14,7 +15,7 @@ import {
   RequestFilter
 } from '../src/app/_models';
 import { facetNames } from '../src/app/_data';
-import { CHO, IHashBoolean } from './_models/test-models';
+import { CHO, IHashBoolean } from './_models/test-models.mjs';
 import { countryTargetData, targetData } from './static-country-data';
 import { DataGenerator } from './data-generator';
 

@@ -4,7 +4,7 @@ import {
   CountryDescriptor,
   DataProviderDescriptor,
   ProviderDescriptor
-} from './_models/test-models';
+} from './_models/test-models.mjs';
 
 import {
   STATIC_COUNTRIES,
