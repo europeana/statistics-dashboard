@@ -1,4 +1,4 @@
-import { isoCountryCodes } from './static-country-data';
+import { isoCountryCodes } from './static-country-data.mjs';
 
 export const STATIC_RIGHTS_CATEGORY_VALUES = [
   'CC0',

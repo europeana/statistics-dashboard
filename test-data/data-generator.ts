@@ -1,17 +1,16 @@
-import { DimensionName } from '../src/app/_models';
 import {
   CHO,
   CountryDescriptor,
   DataProviderDescriptor,
   ProviderDescriptor
 } from './_models/test-models.mjs';
-
+import { DimensionName } from '../src/app/_data/static-data.js';
 import {
   STATIC_COUNTRIES,
   STATIC_DATA_PROVIDERS,
   STATIC_PROVIDERS,
   STATIC_RIGHTS_CATEGORY_VALUES
-} from './static-data';
+} from './static-data.mjs';
 
 export class DataGenerator {
   types = ['TEXT', 'IMAGE', 'SOUND', 'VIDEO', '3D'];

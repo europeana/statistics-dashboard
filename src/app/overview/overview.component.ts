@@ -55,7 +55,6 @@ import {
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
-  DimensionName,
   FilterInfo,
   FilterOptionSet,
   FilterState,
@@ -65,9 +64,9 @@ import {
   NameLabel,
   NameLabelValid,
   NamesValuePercent,
-  NonFacetFilterNames,
   RequestFilter
 } from '../_models';
+import { DimensionName, NonFacetFilterNames } from '../_data';
 import { APIService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';

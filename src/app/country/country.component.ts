@@ -32,6 +32,7 @@ import {
 import { combineLatest, map } from 'rxjs';
 import {
   colours,
+  DimensionName,
   eliData,
   externalLinks,
   isoCountryCodes,
@@ -42,7 +43,6 @@ import {
   BreakdownResults,
   CountPercentageValue,
   CountryHistoryRequest,
-  DimensionName,
   IHash,
   IHashArray,
   NamesValuePercent,

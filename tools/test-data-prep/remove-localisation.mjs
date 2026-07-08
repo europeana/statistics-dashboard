@@ -1,10 +1,5 @@
 /** Script to remove localisation flags and metadata from code statements in order
 /*  to allow the ci data server to parse the mjs
-/*
-/*  Lines like this:
-/*    description: $localize`:{Metadata Tooltip}:Tier Documentation`
-/*  are rewritten like so:
-/*    description: `Tier Documentation`
 */
 import * as path from 'path';
 import * as fs from 'fs';
@@ -20,7 +15,7 @@ if (dir.length === 0) {
       if (fs.statSync(path.join(dir, file)).isDirectory()) {
         fileList = listDir(path.join(dir, file), fileList);
       } else {
-        if (/\.mjs$/.test(file)) {
+        if (/\.m?js$/.test(file)) {
           fileList.push(path.join(dir, file));
         }
       }
@@ -33,16 +28,17 @@ if (dir.length === 0) {
   console.log(`Will remove localisation from ${files.length} files in ${dir}`);
 
   files.forEach((file) => {
-    fs.readFile(file, 'utf8', function (err,data) {
-      if (err) {
-        return console.log(err);
-      }
-      var result = data.replace(/\$localize\s?`:(.)*:/g, '`');
+    try {
+      const data = fs.readFileSync(file, 'utf8');
 
-      fs.writeFile(file, result, 'utf8', function (err) {
-        if (err) return console.log(err);
-      });
-    });
+      let result = data.replace(/\$localize\s*`\s*:[^:]*:/g, '`');
+      // Rewrite internal relative imports/exports pointing to .js to use .mjs instead
+      // This matches patterns like: from './api.js' or import('./api.js')
+      result = result.replace(/(from|import)\s+(['"])(\.\.?\/.*?)\.js\2/g, '$1 $2$3.mjs$2');
+
+      fs.writeFileSync(file, result, 'utf8');
+    } catch (err) {
+      console.error(`Error processing file ${file}:`, err);
+    }
   });
-  console.log('(done)');
 }

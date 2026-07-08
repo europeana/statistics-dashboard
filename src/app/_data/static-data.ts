@@ -1,4 +1,26 @@
-import { DimensionName, IHash, NonFacetFilterNames } from '../_models';
+export enum DimensionName {
+  contentTier = 'contentTier',
+  country = 'country',
+  dataProvider = 'dataProvider',
+  metadataTier = 'metadataTier',
+  provider = 'provider',
+  rightsCategory = 'rightsCategory',
+  type = 'type'
+}
+
+export enum NonFacetFilterNames {
+  contentTierZero = 'contentTierZero',
+  dateFrom = 'dateFrom',
+  dateTo = 'dataTo',
+  datasetId = 'datasetId'
+}
+
+// TODO: remaining duplicate
+
+//export
+interface IHash<T> {
+  [details: string]: T;
+}
 
 export const facetNames: Array<DimensionName> = [
   DimensionName.contentTier,

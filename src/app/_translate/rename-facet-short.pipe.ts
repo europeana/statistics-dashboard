@@ -5,7 +5,7 @@
 /* (short versions for use in the summary grid)
 */
 import { Pipe, PipeTransform } from '@angular/core';
-import { DimensionName } from '../_models';
+import { DimensionName } from '../_data';
 
 const facetNames: { [key: string]: string } = {};
 

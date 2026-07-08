@@ -20,9 +20,13 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ClickAwareDirective, OpenerFocusDirective } from '../_directives';
-import { externalLinks, isoCountryCodes, targetDescriptions } from '../_data';
 import {
   DimensionName,
+  externalLinks,
+  isoCountryCodes,
+  targetDescriptions
+} from '../_data';
+import {
   GeneralResultsFormatted,
   IdValue,
   IHash,

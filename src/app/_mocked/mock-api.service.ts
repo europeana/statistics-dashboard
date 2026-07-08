@@ -1,9 +1,9 @@
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { DimensionName } from '../_data';
 import {
   BreakdownRequest,
   BreakdownResults,
-  DimensionName,
   GeneralResults,
   IHash,
   IHashArray,
