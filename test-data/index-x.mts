@@ -2,7 +2,9 @@ import * as url from 'url';
 import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server.mjs';
-import { IHashArray } from '../src/app/_models/models.js';
+
+import { IHashArray } from '../src/app/_models/ihash.js';
+
 import {
   BreakdownRequest,
   BreakdownResult,

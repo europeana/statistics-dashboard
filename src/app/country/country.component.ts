@@ -20,6 +20,7 @@ import {
   Input,
   model,
   ModelSignal,
+  OnDestroy,
   signal,
   ViewChild
 } from '@angular/core';
@@ -99,7 +100,7 @@ import { TruncateComponent } from '../truncate';
 })
 export class CountryComponent
   extends SubscriptionManager
-  implements AfterViewInit
+  implements AfterViewInit, OnDestroy
 {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
@@ -158,7 +159,10 @@ export class CountryComponent
     if (specificCountryData && specificCountryData.length) {
       const res = specificCountryData.reduce(
         (prev: TargetData, current: TargetData) => {
-          return prev?.date && prev?.date > current.date ? prev : current;
+          if (prev?.date > current.date) {
+            return prev;
+          }
+          return current;
         },
         {} as TargetData
       );
@@ -291,7 +295,7 @@ export class CountryComponent
    **/
   initialiseIntersectionObserver(): void {
     new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
-      threshold: [...Array(10).keys()].map((val) => (val ? val / 10 : val))
+      threshold: [...new Array(10).keys()].map((val) => (val ? val / 10 : val))
     }).observe(this.scrollPoint.nativeElement);
   }
 
@@ -379,7 +383,7 @@ export class CountryComponent
   }
 
   /** loadHistory
-   * picks up onLoadHistory request from legendGrid
+   * picks up historyLoadded request from legendGrid
    *
    * @param {CountryHistoryRequest} request - the data request
    **/
@@ -419,7 +423,8 @@ export class CountryComponent
         const percent =
           value === 0
             ? 0
-            : (value / parseInt(this.latestCountryData()['total'])) * 100;
+            : (value / Number.parseInt(this.latestCountryData()['total'])) *
+              100;
 
         const typeItems =
           valName === TargetFieldName.TOTAL

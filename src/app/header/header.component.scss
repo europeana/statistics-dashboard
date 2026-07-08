@@ -9,14 +9,6 @@ a,
   }
 }
 
-.country-menu-opener {
-  &:has(:focus-visible) {
-    .country-closer {
-      opacity: 1;
-    }
-  }
-}
-
 .header {
   display: flex;
   flex-direction: row;
@@ -185,6 +177,12 @@ a,
   margin-left: 1.6em;
   position: relative;
   z-index: 1;
+
+  &:has(:focus-visible) {
+    .country-closer {
+      opacity: 1;
+    }
+  }
 
   &:hover,
   &.open {

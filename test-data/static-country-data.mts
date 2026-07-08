@@ -1,7 +1,7 @@
 import {
   IHash,
   IHashArray
-} from '../src/app/_models/models';
+} from '../src/app/_models/ihash.js';
 
 import {
   TargetCountryData,

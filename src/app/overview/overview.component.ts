@@ -34,7 +34,6 @@ import {
   facetNames,
   isoCountryCodes,
   isoCountryCodesReversed,
-  nonFacetFilters,
   portalNames,
   portalNamesFriendly
 } from '../_data';
@@ -66,7 +65,7 @@ import {
   NamesValuePercent,
   RequestFilter
 } from '../_models';
-import { DimensionName, NonFacetFilterNames } from '../_data';
+import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
 import { APIService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
@@ -308,9 +307,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             this.countryPageShortcutsAvailable =
               !!queryParams[DimensionName.country] &&
               !!queryParams[DimensionName.metadataTier] &&
-              queryParams[DimensionName.metadataTier].indexOf('0') === -1 &&
+              !queryParams[DimensionName.metadataTier].includes('0') &&
               !!queryParams[DimensionName.contentTier] &&
-              queryParams[DimensionName.contentTier].indexOf('1') === -1;
+              !queryParams[DimensionName.contentTier].includes('1');
           }
 
           // checkbox representation of (split) datasetId

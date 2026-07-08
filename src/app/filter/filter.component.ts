@@ -9,7 +9,7 @@ import {
   ViewChildren
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { isoCountryCodesReversed, DimensionName } from '../_data';
+import { DimensionName, isoCountryCodesReversed } from '../_data';
 import { OpenerFocusDirective } from '../_directives';
 import { getFormValueList } from '../_helpers';
 import {
@@ -87,12 +87,10 @@ export class FilterComponent {
         }
         this.inputToFocus = undefined;
       });
-    } else {
-      if (this.state && this.state.visible) {
-        const ft = this.filterTerm;
-        if (ft) {
-          ft.nativeElement.focus();
-        }
+    } else if (this.state?.visible) {
+      const ft = this.filterTerm;
+      if (ft) {
+        ft.nativeElement.focus();
       }
     }
   }

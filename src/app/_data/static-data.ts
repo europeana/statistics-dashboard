@@ -1,3 +1,33 @@
+export const memberStateCountryCodes = [
+  'AT',
+  'BE',
+  'BG',
+  'HR',
+  'CY',
+  'CZ',
+  'DK',
+  'EE',
+  'FI',
+  'FR',
+  'DE',
+  'GR',
+  'HU',
+  'IE',
+  'IT',
+  'LV',
+  'LT',
+  'LU',
+  'MT',
+  'NL',
+  'PL',
+  'PT',
+  'RO',
+  'SK',
+  'SI',
+  'ES',
+  'SE'
+];
+
 export enum DimensionName {
   contentTier = 'contentTier',
   country = 'country',
@@ -142,36 +172,6 @@ export const targetDescriptions = {
   high_quality: $localize`:@@targetDescriptionsHQ:Digital objects found in ${tooltipLink} which conform to content tiers 2, 3 or 4 and metadata tiers A, B or C according to the Europeana Publishing Framework.`,
   total: $localize`:@@targetDescriptionsTOTAL:All digital objects found in ${tooltipLink} conforming to content tier 1 and higher.`
 };
-
-export const memberStateCountryCodes = [
-  'AT',
-  'BE',
-  'BG',
-  'HR',
-  'CY',
-  'CZ',
-  'DK',
-  'EE',
-  'FI',
-  'FR',
-  'DE',
-  'GR',
-  'HU',
-  'IE',
-  'IT',
-  'LV',
-  'LT',
-  'LU',
-  'MT',
-  'NL',
-  'PL',
-  'PT',
-  'RO',
-  'SK',
-  'SI',
-  'ES',
-  'SE'
-];
 
 export const eliData = {
   eliDocNum: '32021H1970',

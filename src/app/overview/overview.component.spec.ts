@@ -19,11 +19,11 @@ import {
 import { MatDialogModule } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
-import { nonFacetFilters, portalNames } from '../_data';
+import { portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
 import { RenameApiFacetPipe } from '../_translate';
 
-import { DimensionName, NonFacetFilterNames } from '../_data';
+import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
 import {
   createMockPipe,
   MockAPIService,
@@ -126,7 +126,7 @@ describe('OverviewComponent', () => {
         add: { imports: [MockBarComponent, MockGridComponent] }
       })
       .compileComponents();
-    api = TestBed.get(APIService);
+    api = TestBed.inject(APIService);
   };
 
   const b4Each = (): void => {
