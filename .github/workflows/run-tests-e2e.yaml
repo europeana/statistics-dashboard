@@ -1,47 +1,58 @@
 name: '- helper (e2e testing)'
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Branch or tag to test'
+        required: false
+        type: string
+        default: 'develop'
+
 jobs:
   cypress:
-    if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name }}
+          ref: ${{ inputs.tag_name }}
+
       - uses: actions/setup-node@v5
         with:
           node-version: '22.12'
-      - run: npm install
+          cache: 'npm'
+
+      - run: npm ci
+
       - name: Run Cypress Tests
-        run: |
-          (npm run start:ci-data) & (sleep 10 && npm run cypress:ci)
-      - name: close test-data server
-        if: success() || failure()
-        run: |
-          fuser -k 3001/tcp
+        uses: cypress-io/github-action@v6
+        with:
+          # Automatically boots up server, waits safely for it to respond, runs tests, and gracefully terminates it
+          start: npm run start:ci-data
+          wait-on: 'http://localhost:3001'
+          wait-on-timeout: 60
+          command: npm run cypress:ci
+
   a11y:
-    if: ${{ github.event.inputs.run_build == 'true' }}
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name }}
+          ref: ${{ inputs.tag_name }}
 
       - uses: actions/setup-node@v5
         with:
           node-version: '22.12'
+          cache: 'npm'
 
-      - run: npm install
+      - run: npm ci
 
-      - name: Run Cypress AccessibilityTests
-        run: |
-          ((npm run start:ci-data & echo 'started test-data server')
-          && sleep 10) & (npm run cypress:ci-accessibility)
-
-      - name: close test-data server
-        if: success() || failure()
-        run: |
-          fuser -k 3001/tcp
+      - name: Run Cypress Accessibility Tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm run start:ci-data
+          wait-on: 'http://localhost:3001'
+          wait-on-timeout: 60
+          command: npm run cypress:ci-accessibility

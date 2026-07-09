@@ -1,5 +1,13 @@
 name: '- helper (sonar)'
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Branch or tag to analyze'
+        required: false
+        type: string
+        default: 'develop'
+
 jobs:
   run-sonar:
     runs-on: ubuntu-latest
@@ -7,22 +15,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name || github.event.pull_request.head.ref }}
+          ref: ${{ inputs.tag_name || github.event.pull_request.head.ref }}
+
       - name: Get Project LCOV
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v4
         with:
           name: appLcov
-          path: ./lcov.info
+          path: ./lcov-artifact
+
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
         with:
-          args:
+          args: >
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.organization=europeana
             -Dsonar.projectKey=europeana_statistics-dashboard
             -Dsonar.test.inclusions=**/*.spec.ts
             -Dsonar.sources=src/app
             -Dsonar.exclusions=src/**/_mocked/**
-            -Dsonar.javascript.lcov.reportPaths=./lcov.info/lcov.info
+            -Dsonar.javascript.lcov.reportPaths=./lcov-artifact/lcov.info

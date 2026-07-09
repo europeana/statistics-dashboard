@@ -1,5 +1,13 @@
 name: '- helper (lint)'
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Branch or tag to lint'
+        required: false
+        type: string
+        default: 'develop'
+
 jobs:
   run-lint:
     runs-on: ubuntu-latest
@@ -7,10 +15,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name || github.event.pull_request.head.ref }}
+          ref: ${{ inputs.tag_name || github.event.pull_request.head.ref }}
+
       - uses: actions/setup-node@v5
         with:
           node-version: '22.12'
-      - run: npm install
+          cache: 'npm' # Speeds up execution by caching node_modules
+
+      - run: npm ci # Safer and faster than 'npm install' in pipelines
+
       - run: |
           npm run lint:ci

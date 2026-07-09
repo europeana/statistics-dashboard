@@ -68,7 +68,7 @@ jobs:
       - run: npm install
       - run: npm run dist-localised
       - run: mv ./dist/statistics-dashboard/browser/* ./dist/statistics-dashboard
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: ./dist
@@ -83,7 +83,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag_name }}
       - name: Get Built Artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v4
         with:
           name: dist
           path: ./dist
@@ -132,10 +132,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   push-to-kubernetes:
-    if: |
-      always()
-      && !contains(needs.*.result, 'failure')
-      && !cancelled()
     needs: [push-docker-image, make-env-file]
+    if: |
+      always() &&
+      !cancelled() &&
+      (needs.make-env-file.result == 'success') &&
+      (needs.push-docker-image.result == 'success' || needs.push-docker-image.result == 'skipped')
     uses: ./.github/workflows/deploy-image.yaml
     secrets: inherit
