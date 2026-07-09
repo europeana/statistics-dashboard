@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.tag_name || github.event.pull_request.head.ref }}
+          ref: ${{ inputs.inputs.tag_name || github.event.pull_request.head.ref }}
 
       - name: Get Project LCOV
         uses: actions/download-artifact@v4
@@ -28,7 +28,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.METIS_FRONTEND_SONAR_TOKEN }}
         with:
-          args: >
+          # Using the literal block scalar ensures args pass as distinct newline-separated options
+          args: |
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.organization=europeana
             -Dsonar.projectKey=europeana_statistics-dashboard

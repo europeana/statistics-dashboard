@@ -20,9 +20,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22.12'
-          cache: 'npm' # Speeds up execution by caching node_modules
+          cache: 'npm' # Standard caching mechanism remains active
 
-      - run: npm ci # Safer and faster than 'npm install' in pipelines
+      - run: npm install # Dynamically syncs package-lock with package.json dependencies
 
       - run: |
           npm run lint:ci

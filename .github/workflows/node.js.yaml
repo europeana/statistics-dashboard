@@ -40,17 +40,23 @@ jobs:
     if: ${{ github.event.inputs.run_build == 'true' }}
     name: 'e2e'
     uses: ./.github/workflows/run-tests-e2e.yaml
+    with:
+      tag_name: ${{ github.event.inputs.tag_name }}
 
   run-unit:
     if: ${{ github.event.inputs.run_build == 'true' }}
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
+    with:
+      tag_name: ${{ github.event.inputs.tag_name }}
     secrets: inherit
 
   run-sonar:
     if: ${{ github.event.inputs.run_build == 'true' }}
     needs: [run-unit]
     uses: ./.github/workflows/run-sonar.yaml
+    with:
+      tag_name: ${{ github.event.inputs.tag_name }}
     secrets: inherit
 
   build-dist:
@@ -65,6 +71,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '22.12'
+          cache: 'npm'
       - run: npm install
       - run: npm run dist-localised
       - run: mv ./dist/statistics-dashboard/browser/* ./dist/statistics-dashboard

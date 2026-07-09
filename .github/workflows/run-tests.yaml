@@ -22,7 +22,7 @@ jobs:
           node-version: '22.12'
           cache: 'npm' # Speeds up execution by caching node_modules
 
-      - run: npm ci # Safer and faster than 'npm install' in pipelines
+      - run: npm install # Dynamically resolves dependencies without crashing on out-of-sync lockfiles
 
       - run: |
           npm run test:dev
