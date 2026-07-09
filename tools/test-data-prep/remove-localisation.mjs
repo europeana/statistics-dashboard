@@ -1,48 +1,78 @@
-/** Script to remove localisation flags and metadata from code statements in order
-/*  to allow the ci data server to parse the mjs
-/*
-/*  Lines like this:
-/*    description: $localize`:{Metadata Tooltip}:Tier Documentation`
-/*  are rewritten like so:
-/*    description: `Tier Documentation`
-*/
+/**
+ * Script to remove localisation flags and metadata from code statements
+ * and fix module resolution paths to allow the ci data server to parse the mjs
+ */
 import * as path from 'path';
 import * as fs from 'fs';
 
-const dir = process.argv.slice(2);
+const args = process.argv.slice(2);
+const dirArg = args[0];
 
-if (dir.length === 0) {
-  console.log('please supply an argument for the directory');
+if (!dirArg) {
+  console.log('Please supply an argument for the directory (e.g., ./out-tsc)');
+  process.exit(1);
 } else {
   const listDir = (dir, fileList = []) => {
+    if (!fs.existsSync(dir)) return fileList;
+
     const files = fs.readdirSync(dir);
     files.forEach((file) => {
-      if (fs.statSync(path.join(dir, file)).isDirectory()) {
-        fileList = listDir(path.join(dir, file), fileList);
+      const fullPath = path.join(dir, file);
+      if (fs.statSync(fullPath).isDirectory()) {
+        fileList = listDir(fullPath, fileList);
       } else {
-        if (/\.mjs$/.test(file)) {
-          fileList.push(path.join(dir, file));
+        // Target both standard compiled .js and natively generated .mjs files
+        if (/\.m?js$/.test(file)) {
+          fileList.push(fullPath);
         }
       }
     });
     return fileList;
   };
 
-  const files = listDir(`./${dir}`);
+  const targetPath = path.resolve(dirArg);
+  const files = listDir(targetPath);
 
-  console.log(`Will remove localisation from ${files.length} files in ${dir}`);
+  console.log(`Will remove localisation and align extensions for ${files.length} files in ${dirArg}`);
 
   files.forEach((file) => {
-    fs.readFile(file, 'utf8', function (err,data) {
-      if (err) {
-        return console.log(err);
-      }
-      var result = data.replace(/\$localize\s?`:(.)*:/g, '`');
+    try {
+      let data = fs.readFileSync(file, 'utf8');
+      let hasChanges = false;
 
-      fs.writeFile(file, result, 'utf8', function (err) {
-        if (err) return console.log(err);
-      });
-    });
+      // Remove Angular's $localize tags entirely
+      if (/\$localize\s*`/.test(data)) {
+        data = data.replace(/\$localize\s*`\s*:[^:]*:/g, '`');
+        hasChanges = true;
+      }
+
+      // Rewrite internal relative import/export paths pointing to .js to use .mjs instead
+      // This maps patterns like: from './api.js' or import('./api.js')
+      if (/(from|import)\s+(['"])\.\.?\/.*?\.js\2/.test(data)) {
+        data = data.replace(/(from|import)\s+(['"])(\.\.?\/.*?)\.js\2/g, '$1 $2$3.mjs$2');
+        hasChanges = true;
+      }
+
+      // Save adjustments back to disk if updates occurred
+      if (hasChanges) {
+        fs.writeFileSync(file, data, 'utf8');
+      }
+
+      // Rename physical .js files on disk to .mjs for absolute ESM runtime compliance
+      if (file.endsWith('.js')) {
+        const newPath = file.slice(0, -3) + '.mjs';
+
+        // If an .mjs file already exists here, clear it before renaming to avoid conflicts
+        if (fs.existsSync(newPath)) {
+          fs.unlinkSync(newPath);
+        }
+
+        fs.renameSync(file, newPath);
+      }
+    } catch (err) {
+      console.error(`Error processing file ${file}:`, err);
+    }
   });
-  console.log('(done)');
+
+  console.log('Post-processing build transformations complete.');
 }

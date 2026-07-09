@@ -1,5 +1,3 @@
-export * from './api';
-export * from './api-additional';
 export * from './chart';
 export * from './grid';
 export * from './ihash';

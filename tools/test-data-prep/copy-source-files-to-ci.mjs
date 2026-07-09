@@ -1,28 +1,50 @@
-/** Script to copy files */
-
-import * as fs from 'fs';
-
-const filePaths = [
-  'src/app/_models/api.ts',
-  'src/app/_models/ihash.ts',
-  'src/app/_models/targets.ts',
-  'src/app/_data/countries-member-state-codes.ts'
-];
+import fs from 'fs';
+import path from 'path';
 
 const destPath = 'test-data/src-copy';
 
-if (!fs.existsSync(destPath)){
-  fs.mkdirSync(destPath);
+function copyFolderRecursiveSync(from, to) {
+  if (!fs.existsSync(from)) return;
+  if (!fs.existsSync(to)) {
+    fs.mkdirSync(to, { recursive: true });
+  }
+
+  const elements = fs.readdirSync(from);
+  for (const element of elements) {
+    const sourceElement = path.join(from, element);
+    const destElement = path.join(to, element);
+    const stat = fs.statSync(sourceElement);
+
+    if (stat.isDirectory()) {
+      copyFolderRecursiveSync(sourceElement, destElement);
+    } else if (stat.isFile()) {
+      fs.copyFileSync(sourceElement, destElement);
+    }
+  }
 }
 
-filePaths.forEach((path)=> {
-  const fileName = path.split('/').pop().replace('.ts', '.mts');
+try {
+  if (fs.existsSync(destPath)) {
+    fs.rmSync(destPath, { recursive: true, force: true });
+  }
 
-  fs.copyFile(path, `${destPath}/${fileName}`, (err) => {
-    if (err) {
-      throw err;
-    }
-    console.log(`copied "${path}" to "test-data/${fileName}"`);
-  });
+  // 1. Mirror your models and datasets flatly into the sandbox directory
+  copyFolderRecursiveSync('src/app/_models', path.join(destPath, '_models'));
+  copyFolderRecursiveSync('src/app/_data', path.join(destPath, '_data'));
 
-});
+  // 2. Generate the environments directory frame
+  const mockEnvDir = path.join(destPath, 'environments');
+  fs.mkdirSync(mockEnvDir, { recursive: true });
+
+  // 3. Drop clean mock environment files that require NO deep relative app path lookups
+  const mockEnvContent = `export const environment = { production: false };\nexport const cookieConsentConfig = {};\nexport const maintenanceConfig = {};\nexport const externalLinks = {};`;
+
+  fs.writeFileSync(path.join(mockEnvDir, 'environment.ts'), mockEnvContent);
+  fs.writeFileSync(path.join(mockEnvDir, 'eu-cm-settings.ts'), mockEnvContent);
+  fs.writeFileSync(path.join(mockEnvDir, 'maintenance-settings.ts'), mockEnvContent);
+
+  console.log(`Successfully generated a clean, isolated mock testing layer inside "${destPath}"`);
+} catch (err) {
+  console.error('Operation failed:', err);
+  process.exit(1);
+}

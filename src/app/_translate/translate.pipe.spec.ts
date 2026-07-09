@@ -1,4 +1,4 @@
-import { DimensionName } from '../_models';
+import { DimensionName } from '../_data';
 import { HighlightMatchPipe } from '.';
 import { RenameApiFacetPipe } from '.';
 import { RenameApiFacetShortPipe } from '.';

@@ -9,11 +9,10 @@ import {
   ViewChildren
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { isoCountryCodesReversed } from '../_data';
+import { DimensionName, isoCountryCodesReversed } from '../_data';
 import { OpenerFocusDirective } from '../_directives';
 import { getFormValueList } from '../_helpers';
 import {
-  DimensionName,
   FilterInfo,
   FilterOptionSet,
   FilterState,

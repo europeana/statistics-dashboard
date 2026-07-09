@@ -23,6 +23,7 @@ import { portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
 import { RenameApiFacetPipe } from '../_translate';
 
+import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
 import {
   createMockPipe,
   MockAPIService,
@@ -34,11 +35,8 @@ import {
 import {
   BreakdownResult,
   BreakdownResults,
-  DimensionName,
   FilterInfo,
   NameLabel,
-  NonFacetFilterNames,
-  nonFacetFilters,
   RequestFilter,
   RequestFilterRange
 } from '../_models';

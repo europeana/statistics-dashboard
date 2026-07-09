@@ -1,11 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { colours } from '../_data';
+import { colours, facetNames } from '../_data';
 import { filterList } from '../_helpers';
 import {
   ColourSeriesData,
   CompareData,
   CompareDataDescriptor,
-  facetNames,
   HeaderNameType,
   IHash,
   SortBy,

@@ -1,4 +1,74 @@
-import { DimensionName, IHash } from '../_models';
+export const memberStateCountryCodes = [
+  'AT',
+  'BE',
+  'BG',
+  'HR',
+  'CY',
+  'CZ',
+  'DK',
+  'EE',
+  'FI',
+  'FR',
+  'DE',
+  'GR',
+  'HU',
+  'IE',
+  'IT',
+  'LV',
+  'LT',
+  'LU',
+  'MT',
+  'NL',
+  'PL',
+  'PT',
+  'RO',
+  'SK',
+  'SI',
+  'ES',
+  'SE'
+];
+
+export enum DimensionName {
+  contentTier = 'contentTier',
+  country = 'country',
+  dataProvider = 'dataProvider',
+  metadataTier = 'metadataTier',
+  provider = 'provider',
+  rightsCategory = 'rightsCategory',
+  type = 'type'
+}
+
+export enum NonFacetFilterNames {
+  contentTierZero = 'contentTierZero',
+  dateFrom = 'dateFrom',
+  dateTo = 'dataTo',
+  datasetId = 'datasetId'
+}
+
+// TODO: remaining duplicate
+
+//export
+interface IHash<T> {
+  [details: string]: T;
+}
+
+export const facetNames: Array<DimensionName> = [
+  DimensionName.contentTier,
+  DimensionName.metadataTier,
+  DimensionName.country,
+  DimensionName.dataProvider,
+  DimensionName.provider,
+  DimensionName.rightsCategory,
+  DimensionName.type
+];
+
+const additionalFilters: IHash<string> = {};
+additionalFilters[NonFacetFilterNames.contentTierZero] = 'content-tier-zero';
+additionalFilters[NonFacetFilterNames.dateFrom] = 'date-from';
+additionalFilters[NonFacetFilterNames.dateTo] = 'date-to';
+additionalFilters[NonFacetFilterNames.datasetId] = 'dataset-id';
+
+export const nonFacetFilters = additionalFilters;
 
 const facetNamesPortal: IHash<string> = {};
 

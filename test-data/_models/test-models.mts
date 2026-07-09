@@ -1,6 +1,7 @@
-import { DimensionName } from '../../src/app/_models';
+import { DimensionName } from '../src-copy/_data/static-data.js';
 
-export interface CHO {
+// 🔄 Change "export interface CHO" to "export type CHO ="
+export type CHO = {
   datasetId: string;
   date?: number;
   [DimensionName.contentTier]: string;
@@ -11,8 +12,9 @@ export interface CHO {
   [DimensionName.type]: string;
   [DimensionName.rightsCategory]: string;
   exclusions: Array<string>;
-}
+};
 
+// Keep your remaining interfaces exactly as they are:
 export interface CountryDescriptor {
   name: string;
   dataProviders: Array<number>;
