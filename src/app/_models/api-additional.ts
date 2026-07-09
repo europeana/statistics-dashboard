@@ -1,4 +1,5 @@
-import { IHash, NonFacetFilterNames } from './';
+import { IHash } from './';
+import { NonFacetFilterNames } from '../_data/static-data';
 
 const additionalFilters: IHash<string> = {};
 additionalFilters[NonFacetFilterNames.contentTierZero] = 'content-tier-zero';

@@ -3,7 +3,7 @@ import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { TestDataServer } from '../tools/test-data-server/test-data-server.mjs';
 
-import { IHashArray } from '../src/app/_models/ihash.js';
+import { IHashArray } from './src-copy/_models/ihash.js'
 
 import {
   BreakdownRequest,
@@ -13,11 +13,13 @@ import {
   FilterOption,
   GeneralResults,
   RequestFilter
-} from '../src/app/_models/stats-server';
-import { DimensionName, facetNames } from '../src/app/_data/static-data.js';
+} from './src-copy/_models/stats-server.js';
+import { DimensionName, facetNames } from './src-copy/_data/static-data.js';
+
 import { CHO, IHashBoolean } from './_models/test-models.mjs';
+
 import { countryTargetData, targetData } from './static-country-data.mjs';
-import { DataGenerator } from './data-generator.js';
+import { DataGenerator } from './data-generator.mjs';
 
 new (class extends TestDataServer {
   serverName = 'statistics-data-server';

@@ -1,16 +1,16 @@
 import {
   IHash,
   IHashArray
-} from '../src/app/_models/ihash.js';
+} from './src-copy/_models/ihash.js';
 
 import {
   TargetCountryData,
   TargetFieldName,
   TargetMetaData,
   TargetMetaDataRaw
-} from '../src/app/_models/targets.js';
+} from './src-copy/_models/targets.js';
 
-import { memberStateCountryCodes } from '../src/app/_data/static-data.js';
+import { memberStateCountryCodes } from './src-copy/_data/static-data.js';
 
 export const isoCountryCodes = {
   Austria: 'AT',

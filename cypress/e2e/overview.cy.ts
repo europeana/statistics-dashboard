@@ -1,4 +1,4 @@
-import { DimensionName, facetNames } from '../../src/app/_models';
+import { DimensionName, facetNames } from '../../src/app/_data';
 
 context('Statistics Dashboard', () => {
   describe('overview', () => {
