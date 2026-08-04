@@ -176,15 +176,17 @@
       </span>
     </ng-template>
 
-    <ng-container *ngFor="let country of targetCountries">
+    <ng-container *ngFor="let country of targetCountries()">
       <ng-content
         *ngTemplateOutlet="
           countryBlock;
           context: {
             country: country,
-            countryPinValue: pinnedCountries[country],
-            isTopPin: pinnedCountries[country] === 0,
-            isPinned: pinnedCountries[country] > -1
+            countryPinValue: pinnedCountries
+              ? pinnedCountries[country]
+              : undefined,
+            isTopPin: pinnedCountries && pinnedCountries[country] === 0,
+            isPinned: pinnedCountries && pinnedCountries[country] > -1
           }
         "
       ></ng-content>
