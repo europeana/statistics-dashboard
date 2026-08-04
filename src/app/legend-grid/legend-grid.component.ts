@@ -10,13 +10,18 @@ import {
 import {
   AfterViewInit,
   Component,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
+  effect,
   ElementRef,
   EventEmitter,
   inject,
+  Injector,
   Input,
   OnDestroy,
   Output,
+  signal,
+  untracked,
   ViewChild
 } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -54,122 +59,58 @@ import { LegendGridService } from '.';
   ]
 })
 export class LegendGridComponent implements AfterViewInit, OnDestroy {
-  targetCountries: Array<string>;
-  targetCountriesOO: Array<string>;
-  timeoutAnimation = 800;
+  private readonly injector = inject(Injector);
 
-  // class ref needed to access static variables in the template
+  // --- Signals & Reactive Backing State ---
+  readonly column3D = signal<boolean>(true);
+  readonly columnHQ = signal<boolean>(true);
+  readonly columnALL = signal<boolean>(true);
+
+  readonly countryCodeSignal = signal<string>('');
+  readonly targetMetaDataSignal = signal<IHash<IHashArray<TargetMetaData>>>({});
+
+  // Backing state tracking signal
+  private readonly _pinnedCountries = signal<IHash<number>>({});
+
+  // Standard plain object property kept intact for template layout bindings
+  public pinnedCountries: IHash<number> = {};
+
+  // Computed layout helpers
+  readonly columnsEnabledCount = computed(() => {
+    return [this.column3D(), this.columnHQ(), this.columnALL()].filter(Boolean)
+      .length;
+  });
+
+  // 1. Base order from raw keys
+  private readonly targetCountriesOO = computed(() => {
+    return Object.keys(this.targetMetaDataSignal());
+  });
+
+  // 2. Change this from a standard 'get' property to a clean read-only Signal field
+  readonly targetCountries = computed(() => {
+    const pins = this._pinnedCountries();
+    const originalOrder = this.targetCountriesOO();
+
+    return Object.keys(pins).concat(
+      originalOrder.filter((country) => !(country in pins))
+    );
+  });
+
+  // --- Core Configuration and Cache ---
+  timeoutAnimation = 800;
   public classReference = LegendGridComponent;
   private readonly renameCountry = new RenameCountryPipe();
-
   static readonly itemHeight = 84.5;
 
-  _columnEnabled3D = true;
-  _columnEnabledHQ = true;
-  _columnEnabledALL = true;
-  columnsEnabledCount = 3;
-
-  @Input() set columnEnabled3D(value: boolean) {
-    if (value) {
-      this.showSeriesSet(0);
-      this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
-    } else {
-      this.hideRangesByColumn(TargetFieldName.THREE_D);
-      this.hideSeriesSet(0);
-    }
-    this._columnEnabled3D = value;
-    this.calculateColumnsEnabledCount();
-  }
-
-  get columnEnabled3D(): boolean {
-    return this._columnEnabled3D;
-  }
-
-  @Input() set columnEnabledHQ(value: boolean) {
-    if (value) {
-      this.showSeriesSet(1);
-      this.showHiddenRangesByColumn(TargetFieldName.HQ);
-    } else {
-      this.hideRangesByColumn(TargetFieldName.HQ);
-      this.hideSeriesSet(1);
-    }
-    this._columnEnabledHQ = value;
-    this.calculateColumnsEnabledCount();
-  }
-
-  get columnEnabledHQ(): boolean {
-    return this._columnEnabledHQ;
-  }
-
-  @Input() set columnEnabledALL(value: boolean) {
-    if (value) {
-      this.showSeriesSet(2);
-      this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
-    } else {
-      this.hideRangesByColumn(TargetFieldName.TOTAL);
-      this.hideSeriesSet(2);
-    }
-    this._columnEnabledALL = value;
-    this.calculateColumnsEnabledCount();
-  }
-
-  get columnEnabledALL(): boolean {
-    return this._columnEnabledALL;
-  }
-
-  _countryCode: string;
-  _targetMetaData: IHash<IHashArray<TargetMetaData>>;
-
-  @Input() set countryCode(countryCode: string) {
-    if (this.lineChart) {
-      this.lineChart.chart.colors.reset();
-    }
-
-    let timeout = 0;
-
-    // remove old chart lines
-    if (this.countryCode) {
-      const pinned = Object.keys(this.pinnedCountries);
-      if (pinned.length) {
-        timeout = this.timeoutAnimation;
-      }
-      pinned.forEach((countryCode: string) => {
-        this.toggleCountry(countryCode);
-      });
-    }
-
-    // set new country
-    this._countryCode = countryCode;
-    setTimeout(() => {
-      this.toggleCountry(this.countryCode);
-      this.lineChart.enableAxes();
-    }, timeout);
-  }
-
-  get countryCode(): string {
-    return this._countryCode;
-  }
-
-  @Input() set targetMetaData(data: IHash<IHashArray<TargetMetaData>>) {
-    this._targetMetaData = data;
-    this.targetCountries = Object.keys(data);
-    this.targetCountriesOO = Object.keys(data);
-  }
-  get targetMetaData(): IHash<IHashArray<TargetMetaData>> {
-    return this._targetMetaData;
-  }
-
   @Input() countryData: IHash<Array<TargetData>> = {};
-  @Input() lineChart: LineComponent;
+  @Input() lineChart!: LineComponent;
 
   @Output() unpinColumn: EventEmitter<TargetFieldName> = new EventEmitter();
   @Output() historyLoadded: EventEmitter<CountryHistoryRequest> =
     new EventEmitter();
 
-  @ViewChild('legendGrid') legendGrid: ElementRef;
+  @ViewChild('legendGrid') legendGrid!: ElementRef;
 
-  // country names mapped to pin offset
-  pinnedCountries: IHash<number> = {};
   hiddenColumnRanges: IHash<IHash<Array<number>>> = {};
   hiddenColumnPinData: Array<Array<string>> = [[], [], []];
   hiddenSeriesSetData: Array<IHash<am4charts.LineSeries>> = [{}, {}, {}];
@@ -181,67 +122,129 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
 
   private readonly legendGridService = inject(LegendGridService);
 
-  // register this component's readiness via the companion service
-  ngAfterViewInit(): void {
-    this.legendGridService.setLegendGridReady(true);
+  // --- Input Bridges (Keeping Compatibility with Parent Component bindings) ---
+  @Input() set columnEnabled3D(value: boolean) {
+    this.column3D.set(value);
+    if (value) {
+      this.showSeriesSet(0);
+      this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
+    } else {
+      this.hideRangesByColumn(TargetFieldName.THREE_D);
+      this.hideSeriesSet(0);
+    }
+  }
+  get columnEnabled3D(): boolean {
+    return this.column3D();
   }
 
-  // register this component's unavailability via the companion service
+  @Input() set columnEnabledHQ(value: boolean) {
+    this.columnHQ.set(value);
+    if (value) {
+      this.showSeriesSet(1);
+      this.showHiddenRangesByColumn(TargetFieldName.HQ);
+    } else {
+      this.hideRangesByColumn(TargetFieldName.HQ);
+      this.hideSeriesSet(1);
+    }
+  }
+  get columnEnabledHQ(): boolean {
+    return this.columnHQ();
+  }
+
+  @Input() set columnEnabledALL(value: boolean) {
+    this.columnALL.set(value);
+    if (value) {
+      this.showSeriesSet(2);
+      this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
+    } else {
+      this.hideRangesByColumn(TargetFieldName.TOTAL);
+      this.hideSeriesSet(2);
+    }
+  }
+  get columnEnabledALL(): boolean {
+    return this.columnALL();
+  }
+  @Input() set countryCode(value: string) {
+    this.countryCodeSignal.set(value || '');
+  }
+  get countryCode(): string {
+    return this.countryCodeSignal();
+  }
+
+  @Input() set targetMetaData(data: IHash<IHashArray<TargetMetaData>>) {
+    this.targetMetaDataSignal.set(data || {});
+  }
+  get targetMetaData(): IHash<IHashArray<TargetMetaData>> {
+    return this.targetMetaDataSignal();
+  }
+
+  ngAfterViewInit(): void {
+    this.legendGridService.setLegendGridReady(true);
+
+    // Monitor changes to countryCodeSignal safely outside layout mutation states
+    effect(
+      () => {
+        const code = this.countryCodeSignal();
+
+        // Use untracked here so we don't accidentally catch amCharts mutations
+        untracked(() => {
+          if (this.lineChart?.chart?.colors) {
+            this.lineChart.chart.colors.reset();
+          }
+
+          let timeout = 0;
+          const pinnedKeys = Object.keys(this.pinnedCountries);
+          if (pinnedKeys.length) {
+            timeout = this.timeoutAnimation;
+          }
+
+          pinnedKeys.forEach((pinnedCode: string) =>
+            this.toggleCountry(pinnedCode)
+          );
+
+          setTimeout(() => {
+            if (code) {
+              this.toggleCountry(code);
+            }
+            if (this.lineChart) {
+              this.lineChart.enableAxes();
+            }
+          }, timeout);
+        });
+      },
+      { injector: this.injector }
+    );
+  }
+
   ngOnDestroy(): void {
     this.legendGridService.setLegendGridReady(false);
-    this.targetCountries.forEach((country: string) => {
-      this.lineChart.removeRange(country);
+    untracked(this.targetCountriesOO).forEach((country: string) => {
+      if (this.lineChart) {
+        this.lineChart.removeRange(country);
+      }
     });
   }
 
-  calculateColumnsEnabledCount(): void {
-    this.columnsEnabledCount = [
-      this.columnEnabled3D,
-      this.columnEnabledHQ,
-      this.columnEnabledALL
-    ].filter((val: boolean) => !!val).length;
-  }
-
-  /** getCountrySeries
-   * @param { string } country
-   * @returns country mapped to the series suffix
-   **/
   getCountrySeries(country: string): Array<am4charts.LineSeries> {
+    if (!this.lineChart?.allSeriesData) return [];
     return TargetSeriesSuffixes.map((seriesSuffix: string) => {
       return this.lineChart.allSeriesData[`${country}${seriesSuffix}`];
     }).filter((x) => x);
   }
 
-  /** sortPins
-   * sorts string array based on order of strings in separate array
-   * @param { Array<string> } strings
-   * @param { Array<string> } desiredOrder
-   **/
   sortPins(strings: Array<string>, desiredOrder: Array<string>): void {
-    desiredOrder = structuredClone(desiredOrder).reverse();
+    const reversedOrder = structuredClone(desiredOrder).reverse();
     strings.sort((a: string, b: string) => {
-      const indexA = desiredOrder.indexOf(a);
-      const indexB = desiredOrder.indexOf(b);
-      if (indexA < indexB) {
-        return 1;
-      }
-      if (indexA > indexB) {
-        return -1;
-      }
-      return 0;
+      const indexA = reversedOrder.indexOf(a);
+      const indexB = reversedOrder.indexOf(b);
+      return indexA < indexB ? 1 : indexA > indexB ? -1 : 0;
     });
   }
 
-  /** showSeriesSet
-   *
-   * - calls show() on the series referenced in hiddenCountrySeries
-   * - optionally pins the country associated with the series
-   **/
   showSeriesSet(colIndex: number): void {
     const seriesSet = this.hiddenSeriesSetData[colIndex];
     const pinOrder = this.hiddenColumnPinData[colIndex];
 
-    // re-enable pins
     Object.keys(seriesSet).forEach((country: string) => {
       seriesSet[country].show();
       if (!(country in this.pinnedCountries)) {
@@ -253,35 +256,26 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     this.hiddenColumnPinData[colIndex] = [];
   }
 
-  /** hideSeriesSet
-   *
-   * - stores the country/object in hiddenCountrySeries
-   * - optionally unpins the series' associated country
-   *
-   * @param { TargetFieldName } setType - the type to hide
-   **/
   hideSeriesSet(colIndex: number): void {
     const countries = Object.keys(this.pinnedCountries);
 
     countries.forEach((country: string) => {
-      const countrySeriesKeys = TargetSeriesSuffixes.map((suffix: string) => {
-        return `${country}${suffix}`;
-      });
-
-      const countrySeriesObjects = countrySeriesKeys.map((key: string) => {
-        return this.lineChart.allSeriesData[key];
-      });
-
+      const countrySeriesKeys = TargetSeriesSuffixes.map(
+        (suffix: string) => `${country}${suffix}`
+      );
+      const countrySeriesObjects = countrySeriesKeys.map(
+        (key: string) => this.lineChart.allSeriesData[key]
+      );
       const targetSeries = countrySeriesObjects[colIndex];
 
       if (targetSeries && !targetSeries.isHidden) {
         targetSeries.hide();
         this.hiddenSeriesSetData[colIndex][country] = targetSeries;
-        if (
-          countrySeriesObjects.filter((item) => {
-            return item && !item.isHidden;
-          }).length === 1
-        ) {
+
+        const visibleCount = countrySeriesObjects.filter(
+          (item) => item && !item.isHidden
+        ).length;
+        if (visibleCount === 1) {
           this.hiddenColumnPinData[colIndex] = structuredClone(countries);
           this.togglePin(country, false);
         }
@@ -298,30 +292,31 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
       });
     });
   }
-
   showHiddenRangesByColumn(column?: TargetFieldName): void {
     const hidden = this.hiddenColumnRanges;
 
     Object.keys(hidden)
-      .filter((key: string) => {
-        return column ? TargetFieldName[key] === column : true;
-      })
+      .filter((key: string) =>
+        column
+          ? TargetFieldName[key as keyof typeof TargetFieldName] === column
+          : true
+      )
       .forEach((targetFieldName: string) => {
         Object.keys(hidden[targetFieldName]).forEach((country: string) => {
-          // get the range's colour
-          const colour = this.lineChart.allSeriesData[
+          const seriesKey =
             country +
-              TargetSeriesSuffixes[
-                this.seriesValueNames.indexOf(targetFieldName)
-              ]
-          ].fill as am4core.Color;
+            TargetSeriesSuffixes[
+              this.seriesValueNames.indexOf(targetFieldName)
+            ];
+          const fillColour = this.lineChart.allSeriesData[seriesKey]
+            .fill as am4core.Color;
 
           hidden[targetFieldName][country].forEach((index: number) => {
             this.lineChart.showRange(
               country,
-              TargetFieldName[targetFieldName],
+              TargetFieldName[targetFieldName as keyof typeof TargetFieldName],
               index,
-              colour
+              fillColour
             );
           });
         });
@@ -329,14 +324,12 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
       });
   }
 
-  /** resetChartColors
-   * aligns the chart's internal color index with the visible series count
-   **/
   resetChartColors(seriesIndex: number, countryPinIndex: number): void {
-    countryPinIndex =
-      countryPinIndex || Object.keys(this.pinnedCountries).length;
-    const skips = countryPinIndex * 3 + (seriesIndex || 0);
-    if (skips) {
+    const currentPinCount = Object.keys(this.pinnedCountries).length;
+    const resolvedPinIndex = countryPinIndex || currentPinCount;
+    const skips = resolvedPinIndex * 3 + (seriesIndex || 0);
+
+    if (skips && this.lineChart?.chart?.colors) {
       this.lineChart.chart.colors.reset();
       for (let i = 0; i < skips; i++) {
         this.lineChart.chart.colors.next();
@@ -344,15 +337,16 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** loadCountryChartData
-   * loads entries to countryData and updates corresponding chart series
-   * @param { string } country - the country to load
-   **/
-  loadCountryChartData(country: string, seriesTypes = []): void {
+  loadCountryChartData(
+    country: string,
+    seriesTypes: TargetFieldName[] = []
+  ): void {
     this.historyLoadded.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
-        this.countryData[country] = this.countryData[country].concat(data);
+        this.countryData[country] = (this.countryData[country] || []).concat(
+          data
+        );
         this.lineChart.sortSeriesData(this.countryData[country]);
         this.addSeriesSetAndPin(
           country,
@@ -363,10 +357,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  /** toggleCountry
-   * shows existing (hidden) data or loads and creates series
-   * @param { string } country - the target series
-   **/
   toggleCountry(country: string): void {
     const countrySeries = this.getCountrySeries(country);
 
@@ -378,72 +368,53 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
         TargetFieldName.TOTAL
       ];
 
-      // Catch case where the legend grid was unloaded (by a non-target country)
-      // but we still have the data in memeory
       if (countryData && countryData.length > 1) {
-        this.addSeriesSetAndPin(
-          country,
-          this.countryData[country],
-          seriesTypes
-        );
+        this.addSeriesSetAndPin(country, countryData, seriesTypes);
       } else {
         this.loadCountryChartData(country, seriesTypes);
       }
     } else {
-      const hasVisible = countrySeries.some((series: am4charts.LineSeries) => {
-        return !series.isHidden;
-      });
-
+      const hasVisible = countrySeries.some((series) => !series.isHidden);
       if (hasVisible) {
-        countrySeries.forEach((series: am4charts.LineSeries) => {
-          series.hide();
-        });
-        // remove associated ranges
+        countrySeries.forEach((series) => series.hide());
         this.lineChart.removeRange(country);
         this.togglePin(country);
+        this._pinnedCountries.set({ ...this.pinnedCountries });
       } else {
-        countrySeries.forEach((series: am4charts.LineSeries) => {
-          series.show();
-        });
+        countrySeries.forEach((series) => series.show());
         this.togglePin(country);
+        this._pinnedCountries.set({ ...this.pinnedCountries });
       }
     }
   }
 
-  /***
-   * addSeriesSetAndPin
-   *
-   * @param { string } country
-   * @param { Array<TargetData> } data
-   * @param { Array<TargetFieldName> } seriesToAdd
-   ***/
   addSeriesSetAndPin(
     country: string,
     data: Array<TargetData>,
     seriesToAdd: Array<TargetFieldName> = []
   ): void {
-    // we keep local data descending, but send ascending data to the chart
-    const dataAscending = [...data];
-    dataAscending.reverse();
+    const dataAscending = [...data].reverse();
+    const activeColumns = [this.column3D(), this.columnHQ(), this.columnALL()];
 
-    // add relevant series
-    [this.columnEnabled3D, this.columnEnabledHQ, this.columnEnabledALL].forEach(
-      (colEnabled: boolean, i: number) => {
-        if (colEnabled) {
-          const typeFromIndex = TargetFieldName[this.seriesValueNames[i]];
-          if (seriesToAdd.includes(typeFromIndex)) {
-            this.resetChartColors(i, this.pinnedCountries[country]);
-            this.lineChart.addSeries(
-              this.renameCountry.transform(country) + this.seriesSuffixesFmt[i],
-              country + TargetSeriesSuffixes[i],
-              typeFromIndex,
-              dataAscending
-            );
-          }
+    activeColumns.forEach((colEnabled: boolean, i: number) => {
+      if (colEnabled) {
+        const typeFromIndex =
+          TargetFieldName[
+            this.seriesValueNames[i] as keyof typeof TargetFieldName
+          ];
+        if (seriesToAdd.includes(typeFromIndex)) {
+          const currentPinIndex = this.pinnedCountries[country];
+          this.resetChartColors(i, currentPinIndex);
+          this.lineChart.addSeries(
+            this.renameCountry.transform(country) + this.seriesSuffixesFmt[i],
+            country + TargetSeriesSuffixes[i],
+            typeFromIndex,
+            dataAscending
+          );
         }
       }
-    );
-    // add pin
+    });
+
     if (!(country in this.pinnedCountries)) {
       this.togglePin(country);
     }
@@ -462,12 +433,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** togglePin
-   * pins or unpins an item, maintaining pinnedCountries
-   * and the order of targetCountries
-   * @param { string } country - the country to (un)pin
-   * @param { boolean } purgePinData - flag pin data deletion
-   **/
   togglePin(
     country: string,
     purgePinData = true,
@@ -491,7 +456,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
       this.pinnedCountries[country] = 1;
     }
 
-    // re-assign pin keys
     if (reorder) {
       const sortTarget = structuredClone(Object.keys(this.pinnedCountries));
       this.sortPins(sortTarget, reorder);
@@ -504,45 +468,29 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
       );
     }
 
-    // re-assign pin values
     Object.keys(this.pinnedCountries).forEach((key: string, i: number) => {
-      this.pinnedCountries[key] = i; // * LegendGridComponent.itemHeight;
+      this.pinnedCountries[key] = i;
     });
 
-    // re-order targetCountries, putting the pinned items first
-    this.targetCountries = Object.keys(this.pinnedCountries).concat(
-      this.targetCountriesOO.filter((country: string) => {
-        return !(country in this.pinnedCountries);
-      })
-    );
+    this._pinnedCountries.set({ ...this.pinnedCountries });
   }
 
   gridScroll(): void {
     const el = this.legendGrid.nativeElement;
-    const sh = el.scrollHeight;
-    const h = el.getBoundingClientRect().height;
-    const st = el.scrollTop;
-    const canScrollDown = sh > st + h + 1;
+    const canScrollDown =
+      el.scrollHeight > el.scrollTop + el.getBoundingClientRect().height + 1;
     el.classList.toggle('scrollable-downwards', canScrollDown);
   }
 
-  /** toggleSeries
-   * loads a series if it hasn't been loaded and toggles its display
-   * @param { string }
-   * @param { string }
-   * @param { LineSeries }
-   **/
   toggleSeries(
     country: string,
     type: TargetFieldName,
     series?: am4charts.LineSeries
   ): void {
     if (!series) {
-      if (this.countryData[country].length < 2) {
-        // load data and create
+      if ((this.countryData[country] || []).length < 2) {
         this.loadCountryChartData(country, [type]);
       } else {
-        // create from existing data
         const data = this.countryData[country].map((cd) => {
           cd['country'] = country;
           return cd as TargetCountryData;
@@ -556,7 +504,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
       }
     } else {
       series.hide();
-      // remove associated ranges
       this.lineChart.removeRange(country, type);
 
       let visCount = 0;
@@ -567,18 +514,12 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
         }
       });
 
-      // we can unpin (it will be 0 on animation completion)
       if (visCount === 1) {
         this.togglePin(country);
       }
     }
   }
 
-  /** fireUnpinColumn
-   *
-   *  invokes emit unpinColumn
-   * @param { TargetFieldName } column
-   ***/
   fireUnpinColumn(column: TargetFieldName): void {
     this.unpinColumn.emit(column);
   }
