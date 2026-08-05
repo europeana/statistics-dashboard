@@ -16,14 +16,10 @@ describe('LegendGridService', () => {
   });
 
   it('should notify', () => {
-    let result = false;
-    service.legendGridReady.subscribe((value: boolean) => {
-      result = value;
-    });
-    expect(result).toBeFalsy();
+    expect(service.legendGridReady()).toBeFalsy();
     service.setLegendGridReady(true);
-    expect(result).toBeTruthy();
+    expect(service.legendGridReady()).toBeTruthy();
     service.setLegendGridReady(false);
-    expect(result).toBeFalsy();
+    expect(service.legendGridReady()).toBeFalsy();
   });
 });

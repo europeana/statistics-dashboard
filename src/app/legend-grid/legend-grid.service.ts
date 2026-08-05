@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class LegendGridService {
-  legendGridIsReady = new Subject<boolean>();
-  legendGridReady: Observable<boolean> = this.legendGridIsReady.asObservable();
+  private readonly _legendGridReady = signal<boolean>(false);
+  readonly legendGridReady = this._legendGridReady.asReadonly();
 
   setLegendGridReady(value: boolean): void {
-    this.legendGridIsReady.next(value);
+    this._legendGridReady.set(value);
   }
 }

@@ -351,7 +351,7 @@ export class LineComponent implements AfterViewInit {
     cursor.xAxis = this.dateAxis;
 
     chart.events.on('datavalidated', () => {
-      this.lineService.setLineChartReady();
+      this.lineService.setLineChartReady(true);
     });
   }
 
