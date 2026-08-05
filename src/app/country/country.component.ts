@@ -23,7 +23,6 @@ import {
   signal,
   ViewChild
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
   Router,
@@ -118,17 +117,8 @@ export class CountryComponent
   abbreviateNumberPipe = new AbbreviateNumberPipe();
 
   cardData: IHash<Array<NamesValuePercent>>;
-  _includeCTZero?: boolean;
 
-  @Input() set includeCTZero(includeCTZero: boolean) {
-    this._includeCTZero = includeCTZero;
-    if (this.country().length > 0) {
-      this.refreshCardData();
-    }
-  }
-  get includeCTZero(): boolean | undefined {
-    return this._includeCTZero;
-  }
+  readonly includeCTZero = model<boolean>(false);
 
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
   @ViewChild('barChart') barChart: BarComponent;
@@ -228,7 +218,7 @@ export class CountryComponent
               this.targetMetaData = combined.targetMetaData;
               this.countryData.set(combined.countryData);
             } else {
-              const qp = this.includeCTZero
+              const qp = this.includeCTZero()
                 ? { queryParams: { 'content-tier-zero': 'true' } }
                 : undefined;
               if (Object.values(isoCountryCodes).includes(countryParam)) {
@@ -248,7 +238,7 @@ export class CountryComponent
     effect(() => {
       const country = this.country();
       if (country.length) {
-        if (typeof this.includeCTZero === 'boolean') {
+        if (typeof this.includeCTZero() === 'boolean') {
           this.refreshCardData();
         }
         this.restoreHiddenColumns();
@@ -321,7 +311,7 @@ export class CountryComponent
   ): void {
     const contentTierVals = ['1', '2', '3', '4'];
 
-    if (this.includeCTZero) {
+    if (this.includeCTZero()) {
       contentTierVals.unshift('0');
     }
     const req = {

@@ -120,8 +120,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           this.loadLandingData(this.lastSetContentTierZeroValue);
         }
         if (this.countryComponentRef) {
-          this.countryComponentRef.includeCTZero =
-            this.lastSetContentTierZeroValue;
+          this.countryComponentRef.includeCTZero.set(
+            this.lastSetContentTierZeroValue
+          );
         }
       })
     );
@@ -289,7 +290,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       } else if (component instanceof CountryComponent) {
         this.countryComponentRef = component;
-        component.includeCTZero = this.lastSetContentTierZeroValue;
+        component.includeCTZero.set(this.lastSetContentTierZeroValue);
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
         if (!this.header.countryTotalMap) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);

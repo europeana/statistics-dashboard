@@ -672,7 +672,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.type }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-type"
@@ -708,7 +708,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.rightsCategory }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-rights"
@@ -741,7 +741,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.dataProvider }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-data-provider"
@@ -777,7 +777,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.provider }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-provider"
