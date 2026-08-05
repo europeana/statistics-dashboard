@@ -11,7 +11,6 @@ import {
 import {
   AfterViewInit,
   ApplicationRef,
-  ChangeDetectorRef,
   Component,
   computed,
   effect,
@@ -24,6 +23,7 @@ import {
   signal,
   ViewChild
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
   Router,
@@ -134,10 +134,10 @@ export class CountryComponent
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('scrollPoint') scrollPoint: ElementRef;
 
-  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
+
   public countryCodes = isoCountryCodes;
 
   showTargetsData = false;
@@ -171,37 +171,23 @@ export class CountryComponent
   });
 
   appendiceExpanded = false;
-  lineChartIsInitialised = false;
-  legendGridIsInitialised = false;
+
+  readonly legendGridIsInitialised = inject(LegendGridService).legendGridReady;
+  readonly lineChartIsInitialised = inject(LineService).lineChartReady;
 
   @Input() headerRef: HeaderComponent;
 
   /** constructor
-   * binds the lineChartReady service to variable
    * gets the app-ref and obtains the header ref
    * binds the data variables to the url
    * initialises the intersection observer
    **/
   constructor(
     private readonly applicationRef: ApplicationRef,
-    private readonly lineService: LineService,
     private readonly legendGridService: LegendGridService
   ) {
     super();
 
-    // listen for the line chart to be initialised
-    lineService.lineChartReady.subscribe(() => {
-      this.lineChartIsInitialised = true;
-    });
-    // listen for the legend-grid to be initialised
-    legendGridService.legendGridReady.subscribe((value: boolean) => {
-      // first call makes the legendgrid available
-      this.changeDetector.detectChanges();
-      this.legendGridIsInitialised = value;
-
-      // the second call prevents ExpressionChanged the legend gris available to the view
-      this.changeDetector.detectChanges();
-    });
     this.restoreHiddenColumns();
 
     const rootRef = this.applicationRef.components[0].instance;

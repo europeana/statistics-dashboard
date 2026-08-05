@@ -1,15 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class LineService {
-  lineChartIsReady = new Subject<true>();
-  lineChartReady: Observable<true> = this.lineChartIsReady
-    .asObservable()
-    .pipe(take(1));
+  private readonly _lineChartReady = signal<boolean>(false);
+  readonly lineChartReady = this._lineChartReady.asReadonly();
 
-  setLineChartReady(): void {
-    this.lineChartIsReady.next(true);
+  setLineChartReady(value: boolean): void {
+    this._lineChartReady.set(value);
   }
 }

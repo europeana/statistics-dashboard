@@ -581,7 +581,7 @@
           </app-line-chart>
 
           <app-legend-grid
-            *ngIf="lineChartIsInitialised"
+            *ngIf="lineChartIsInitialised()"
             #legendGrid
             [countryData]="countryData()"
             [countryCode]="country()"
@@ -611,7 +611,7 @@
         </a>
 
         <div
-          *ngIf="legendGridIsInitialised"
+          *ngIf="legendGridIsInitialised()"
           class="appendice-grid-wrapper"
           [ngClass]="{ 'is-open': appendiceExpanded }"
           tabindex="-1"

@@ -196,15 +196,15 @@ describe('CountryComponent', () => {
     });
 
     it('should react to the line chart becoming ready', () => {
-      expect(component.lineChartIsInitialised).toBeFalsy();
-      lineService.setLineChartReady();
-      expect(component.lineChartIsInitialised).toBeTruthy();
+      expect(component.lineChartIsInitialised()).toBeFalsy();
+      lineService.setLineChartReady(true);
+      expect(component.lineChartIsInitialised()).toBeTruthy();
     });
 
     it('should listen for legend-grid initialisation', () => {
-      expect(component.legendGridIsInitialised).toBeFalsy();
+      expect(component.legendGridIsInitialised()).toBeFalsy();
       legendGridService.setLegendGridReady(true);
-      expect(component.legendGridIsInitialised).toBeTruthy();
+      expect(component.legendGridIsInitialised()).toBeTruthy();
     });
 
     it('should load the history', () => {

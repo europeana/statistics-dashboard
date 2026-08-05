@@ -121,6 +121,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   public TargetFieldName = TargetFieldName;
 
   private readonly legendGridService = inject(LegendGridService);
+  readonly legendGridIsInitialised = this.legendGridService.legendGridReady;
 
   // --- Input Bridges (Keeping Compatibility with Parent Component bindings) ---
   @Input() set columnEnabled3D(value: boolean) {

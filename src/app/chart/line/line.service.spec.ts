@@ -16,12 +16,8 @@ describe('LineService', () => {
   });
 
   it('should notify', () => {
-    let result = false;
-    service.lineChartReady.subscribe(() => {
-      result = true;
-    });
-    expect(result).toBeFalsy();
-    service.setLineChartReady();
-    expect(result).toBeTruthy();
+    expect(service.lineChartReady()).toBeFalsy();
+    service.setLineChartReady(true);
+    expect(service.lineChartReady()).toBeTruthy();
   });
 });
