@@ -1,5 +1,11 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync
+} from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { HeaderComponent } from '.';
 
@@ -53,12 +59,14 @@ describe('HeaderComponent', () => {
     expect(spyStopPropagation).toHaveBeenCalledTimes(2);
   });
 
-  it('should close the menu when activeCountry is set', () => {
+  it('should close the menu when activeCountry is set', fakeAsync(() => {
     component.menuIsOpen = true;
     expect(component.menuIsOpen).toBeTruthy();
-    component.activeCountry = 'France';
+    component.activeCountry.set('France');
+    fixture.detectChanges();
+    tick();
     expect(component.menuIsOpen).toBeFalsy();
-  });
+  }));
 
   it('should sort by the decoded country', () => {
     const unsorted = ['CZ', 'HR'];
@@ -71,17 +79,21 @@ describe('HeaderComponent', () => {
     expect(
       Object.keys(component.countryFirstOfLetter).includes('XX')
     ).toBeFalsy();
-    component.countryTotalMap = {
-      FR: 1,
-      FI: 1,
-      DE: 2,
-      XX: 3
-    };
+    const mockData = { FR: 1, FI: 1, DE: 2, XX: 3 };
+    const sortedMock = Object.keys(mockData)
+      .sort(HeaderComponent.sortByDecodedCountryName)
+      .reduce((ob, k) => {
+        ob[k] = '' + mockData[k];
+        return ob;
+      }, {});
+
+    component.countryTotalMap.set(sortedMock);
+
     expect(
-      Object.values(component.countryFirstOfLetter).filter((x) => !!x).length
+      Object.values(component.countryFirstOfLetter()).filter((x) => !!x).length
     ).toEqual(3);
     expect(
-      Object.keys(component.countryFirstOfLetter).includes('XX')
+      Object.keys(component.countryFirstOfLetter()).includes('XX')
     ).toBeTruthy();
   });
 });

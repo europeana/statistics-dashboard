@@ -188,7 +188,17 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           }
 
           // assign country data
-          this.header.countryTotalMap = countryTotalMap;
+          //this.header.countryTotalMap = countryTotalMap;
+
+          const sortedProcessedMap = Object.keys(countryTotalMap || {})
+            .sort(HeaderComponent.sortByDecodedCountryName)
+            .reduce((ob, sortedKey) => {
+              ob[sortedKey] = '' + countryTotalMap[sortedKey];
+              return ob;
+            }, {});
+
+          // 3. Pass that cleanly into your signal:
+          this.header.countryTotalMap.set(sortedProcessedMap);
         })
     );
   }
@@ -275,6 +285,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       | CookiePolicyComponent
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
+    const hasCountryMapData =
+      Object.keys(this.header?.countryTotalMap() || {}).length > 0;
+
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
       this.landingComponentRef = component;
@@ -292,13 +305,15 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         this.countryComponentRef = component;
         component.includeCTZero.set(this.lastSetContentTierZeroValue);
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
-        if (!this.header.countryTotalMap) {
+        if (!hasCountryMapData) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);
         }
       } else {
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       }
-      if (!this.header.countryTotalMap) {
+
+      // trigger data fetch if signal is unpopulated
+      if (!hasCountryMapData) {
         this.loadLandingData(this.lastSetContentTierZeroValue);
       }
     }

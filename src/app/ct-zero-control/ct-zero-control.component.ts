@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -15,16 +15,15 @@ import { NgClass, NgIf } from '@angular/common';
   imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf]
 })
 export class CTZeroControlComponent {
-  @Input() form: FormGroup<{ contentTierZero: FormControl<boolean> }>;
-
-  @Input() disabled = false;
-  @Output() onChange = new EventEmitter<void>();
+  form = input<FormGroup<{ contentTierZero: FormControl<boolean> }>>();
+  disabled = input<boolean>(false);
+  onChange = output<void>();
 
   public externalLinks = externalLinks;
 
   /**
    * valueChanged
-   * emits event (invokes updatePageUrl())
+   * trigger parent updates
    **/
   valueChanged(): void {
     this.onChange.emit();

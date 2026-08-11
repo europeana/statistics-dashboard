@@ -76,29 +76,25 @@ describe('CountryComponent', () => {
   }));
 
   const finaliseInit = (): void => {
-    const header = {
-      activeCountry: 'France',
-      pageTitleDynamic: true,
-      countryTotalMap: {
-        France: {
-          total: 1,
-          code: 'FR'
-        }
-      },
-      pageTitleInViewport: false
-    };
+    const headerFixture = TestBed.createComponent(HeaderComponent);
+    const headerInstance = headerFixture.componentInstance;
+
+    headerInstance.activeCountry.set('France');
+    headerInstance.pageTitleDynamic.set(true);
+    headerInstance.pageTitleInViewport.set(false);
+
+    headerInstance.countryTotalMap.set({
+      France: '1'
+    });
 
     appRef.components.push({
-      header: header
+      header: headerInstance
     } as unknown as ComponentRef<unknown>);
 
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
 
-    fixture.componentRef.setInput(
-      'headerRef',
-      header as unknown as HeaderComponent
-    );
+    fixture.componentRef.setInput('headerRef', headerInstance);
   };
 
   const b4Each = (fullInit = true): void => {
@@ -260,7 +256,6 @@ describe('CountryComponent', () => {
 
       component.barChart = barChart;
 
-      // Spy on refreshCardData and force it to invoke the chart methods directly
       jest.spyOn(component, 'refreshCardData').mockImplementation(() => {
         if (component.barChart) {
           component.barChart.removeAllSeries();
@@ -268,11 +263,9 @@ describe('CountryComponent', () => {
         }
       });
 
-      // Trigger the signal updates
       component.country.set('France');
       component.includeCTZero.set(false);
 
-      // Process signals and trigger the method
       TestBed.flushEffects();
       component.refreshCardData();
       fixture.detectChanges();
@@ -299,14 +292,11 @@ describe('CountryComponent', () => {
     });
 
     it('should toggle the column', () => {
-      // 1. Initial state checks
       expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeTruthy();
 
-      // 2. Toggle column off and check state
       component.toggleColumn(TargetFieldName.TOTAL);
       expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeFalsy();
 
-      // 3. Toggle column back on and verify
       component.toggleColumn(TargetFieldName.TOTAL);
       expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeTruthy();
     });
@@ -340,14 +330,14 @@ describe('CountryComponent', () => {
     it('should handle the intersectionObserverCallback', () => {
       // Tests page title visibility based on intersection ratio
       const headerRef = component.headerRef;
-      expect(component.headerRef().pageTitleInViewport).toBeFalsy();
+      expect(component.headerRef().pageTitleInViewport()).toBeFalsy();
       component.intersectionObserverCallback([
         {
           isIntersecting: true,
           intersectionRatio: 0.9
         }
       ]);
-      expect(headerRef().pageTitleInViewport).toBeTruthy();
+      expect(headerRef().pageTitleInViewport()).toBeTruthy();
     });
   });
 });

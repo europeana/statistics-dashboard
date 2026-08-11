@@ -263,14 +263,14 @@ export class CountryComponent
     entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>
   ): void {
     const header = this.headerRef();
-    if (!header) return; // Prevent crashes if header isn't ready yet
+    if (!header) return;
 
     entries.forEach((entry) => {
       if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
-        header.pageTitleInViewport = true;
+        header.pageTitleInViewport.set(true);
       }
       if (!entry.isIntersecting) {
-        header.pageTitleInViewport = false;
+        header.pageTitleInViewport.set(false);
       }
     });
   }
@@ -365,8 +365,8 @@ export class CountryComponent
   setHeaderData(country?: string): void {
     const header = this.headerRef();
     if (header) {
-      header.pageTitleDynamic = country && this.showTargetsData;
-      header.activeCountry = country;
+      header.pageTitleDynamic.set(!!(country && this.showTargetsData));
+      header.activeCountry.set(country);
     }
   }
 
