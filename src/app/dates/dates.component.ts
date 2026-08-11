@@ -1,7 +1,7 @@
 import {
   Component,
-  ElementRef,
   effect,
+  ElementRef,
   input,
   output,
   viewChild
@@ -12,8 +12,8 @@ import {
   UntypedFormGroup
 } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap, startWith } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { startWith, switchMap } from 'rxjs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { getDateAsISOString, today, yearZero } from '../_helpers';
@@ -39,9 +39,11 @@ export class DatesComponent {
 
   readonly dateFrom = viewChild<ElementRef<HTMLInputElement>>('dateFrom');
   readonly dateTo = viewChild<ElementRef<HTMLInputElement>>('dateTo');
-  readonly rangePicker = viewChild<any>('rangePicker');
+  readonly rangePicker =
+    viewChild<import('@angular/material/datepicker').MatDateRangePicker<any>>(
+      'rangePicker'
+    );
 
-  // 2. Correctly convert the input signal to an observable stream using toObservable
   private readonly formValues = toSignal(
     toObservable(this.form).pipe(
       switchMap((formInstance: UntypedFormGroup) =>
@@ -99,7 +101,7 @@ export class DatesComponent {
 
       // Guard against opening standalone/unassociated pickers in mock tests
       if (picker && typeof picker.open === 'function') {
-        const hasInput = !!(picker.datepickerInput || picker._datepickerInput);
+        const hasInput = !!picker.datepickerInput;
         if (hasInput) {
           picker.open();
         }

@@ -1,9 +1,9 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   ComponentFixture,
-  TestBed,
   fakeAsync,
-  flush
+  flush,
+  TestBed
 } from '@angular/core/testing';
 import {
   ReactiveFormsModule,

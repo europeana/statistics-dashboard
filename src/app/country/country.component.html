@@ -8,15 +8,15 @@
     <span class="flag-orb" [ngClass]="country()"></span>
     <ng-container
       *ngIf="
-        headerRef &&
-        headerRef['countryTotalMap'] &&
-        headerRef['countryTotalMap'][country()] !== undefined
+        headerRef() &&
+        headerRef()['countryTotalMap'] &&
+        headerRef()['countryTotalMap'][country()] !== undefined
       "
     >
       <span *ngIf="country(); let country">{{ country | renameCountry }}</span>
       <span *ngIf="country(); let country" i18n="@@countryPageTitle">Data</span>
       <span *ngIf="country(); let country" class="page-subtitle">
-        {{ headerRef["countryTotalMap"][country] }}% of the Europeana dataset
+        {{ headerRef()["countryTotalMap"][country] }}% of the Europeana dataset
       </span>
     </ng-container>
   </h1>

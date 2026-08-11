@@ -185,7 +185,9 @@ export class CountryComponent
 
     const rootRef = this.applicationRef.components[0].instance;
     if (rootRef && !this.headerRef()) {
-      (this as any).headerRef = signal(rootRef['header']).asReadonly();
+      (this as Record<string, unknown>)['headerRef'] = signal(
+        rootRef['header']
+      ).asReadonly();
     }
 
     combineLatest([

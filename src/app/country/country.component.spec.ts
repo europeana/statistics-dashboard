@@ -1,8 +1,7 @@
 import {
   ApplicationRef,
   ComponentRef,
-  CUSTOM_ELEMENTS_SCHEMA,
-  signal
+  CUSTOM_ELEMENTS_SCHEMA
 } from '@angular/core';
 import {
   ComponentFixture,
@@ -329,12 +328,10 @@ describe('CountryComponent', () => {
         .spyOn(component, 'refreshCardData')
         .mockImplementation(() => {});
 
-      // 1. Set country to trigger initial state validation
       component.country.set('FR');
       fixture.detectChanges();
       expect(spyRefreshCardData).toHaveBeenCalledTimes(1);
 
-      // 2. Change the includeCTZero model signal and verify refresh triggers again
       component.includeCTZero.set(true);
       fixture.detectChanges();
       expect(spyRefreshCardData).toHaveBeenCalledTimes(2);
