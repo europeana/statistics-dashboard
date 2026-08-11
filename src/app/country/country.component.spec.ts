@@ -96,7 +96,10 @@ describe('CountryComponent', () => {
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
 
-    component.headerRef = header as unknown as HeaderComponent;
+    fixture.componentRef.setInput(
+      'headerRef',
+      header as unknown as HeaderComponent
+    );
   };
 
   const b4Each = (fullInit = true): void => {
@@ -322,7 +325,9 @@ describe('CountryComponent', () => {
     });
 
     it('should refresh the data when the includeCTZero is set', () => {
-      const spyRefreshCardData = jest.spyOn(component, 'refreshCardData').mockImplementation(() => {});
+      const spyRefreshCardData = jest
+        .spyOn(component, 'refreshCardData')
+        .mockImplementation(() => {});
 
       // 1. Set country to trigger initial state validation
       component.country.set('FR');
@@ -338,15 +343,14 @@ describe('CountryComponent', () => {
     it('should handle the intersectionObserverCallback', () => {
       // Tests page title visibility based on intersection ratio
       const headerRef = component.headerRef;
-      expect(headerRef.pageTitleInViewport).toBeFalsy();
-      // ... mock scroll events
+      expect(component.headerRef().pageTitleInViewport).toBeFalsy();
       component.intersectionObserverCallback([
         {
           isIntersecting: true,
           intersectionRatio: 0.9
         }
       ]);
-      expect(headerRef.pageTitleInViewport).toBeTruthy();
+      expect(headerRef().pageTitleInViewport).toBeTruthy();
     });
   });
 });

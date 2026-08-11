@@ -13,16 +13,18 @@ import {
   ApplicationRef,
   Component,
   computed,
+  DestroyRef,
   effect,
   ElementRef,
   inject,
-  Input,
+  input,
   model,
   ModelSignal,
   OnDestroy,
   signal,
   ViewChild
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
   Router,
@@ -127,6 +129,7 @@ export class CountryComponent
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
+  private readonly destroyRef = inject(DestroyRef);
 
   public countryCodes = isoCountryCodes;
 
@@ -165,7 +168,7 @@ export class CountryComponent
   readonly legendGridIsInitialised = inject(LegendGridService).legendGridReady;
   readonly lineChartIsInitialised = inject(LineService).lineChartReady;
 
-  @Input() headerRef: HeaderComponent;
+  readonly headerRef = input<HeaderComponent>();
 
   /** constructor
    * gets the app-ref and obtains the header ref
@@ -181,59 +184,58 @@ export class CountryComponent
     this.restoreHiddenColumns();
 
     const rootRef = this.applicationRef.components[0].instance;
-    if (rootRef) {
-      this.headerRef = rootRef['header'];
+    if (rootRef && !this.headerRef()) {
+      (this as any).headerRef = signal(rootRef['header']).asReadonly();
     }
 
-    this.subs.push(
-      combineLatest([
-        this.api.getTargetMetaData(),
-        this.api.getCountryData(),
-        this.route.params
-      ])
-        .pipe(
-          map((results) => {
-            return {
-              targetMetaData: results[0],
-              countryData: results[1],
-              params: results[2]
-            };
-          })
-        )
-        .subscribe({
-          next: (combined) => {
-            const countryParam = combined.params['country'];
-            let country = isoCountryCodes[countryParam];
-
-            if (
-              !country &&
-              Object.keys(combined.countryData).includes(countryParam) &&
-              !Object.values(isoCountryCodes).includes(countryParam)
-            ) {
-              country = countryParam;
-            }
-
-            if (country) {
-              this.country.set(country);
-              this.targetMetaData = combined.targetMetaData;
-              this.countryData.set(combined.countryData);
-            } else {
-              const qp = this.includeCTZero()
-                ? { queryParams: { 'content-tier-zero': 'true' } }
-                : undefined;
-              if (Object.values(isoCountryCodes).includes(countryParam)) {
-                const redirecCountry = isoCountryCodesReversed[countryParam];
-                this.router.navigate(['country', redirecCountry], qp);
-              } else {
-                this.router.navigate(['/'], qp);
-              }
-            }
-          },
-          error: (e: Error) => {
-            console.log(e);
-          }
+    combineLatest([
+      this.api.getTargetMetaData(),
+      this.api.getCountryData(),
+      this.route.params
+    ])
+      .pipe(
+        takeUntilDestroyed(),
+        map((results) => {
+          return {
+            targetMetaData: results[0],
+            countryData: results[1],
+            params: results[2]
+          };
         })
-    );
+      )
+      .subscribe({
+        next: (combined) => {
+          const countryParam = combined.params['country'];
+          let country = isoCountryCodes[countryParam];
+
+          if (
+            !country &&
+            Object.keys(combined.countryData).includes(countryParam) &&
+            !Object.values(isoCountryCodes).includes(countryParam)
+          ) {
+            country = countryParam;
+          }
+
+          if (country) {
+            this.country.set(country);
+            this.targetMetaData = combined.targetMetaData;
+            this.countryData.set(combined.countryData);
+          } else {
+            const qp = this.includeCTZero()
+              ? { queryParams: { 'content-tier-zero': 'true' } }
+              : undefined;
+            if (Object.values(isoCountryCodes).includes(countryParam)) {
+              const redirecCountry = isoCountryCodesReversed[countryParam];
+              this.router.navigate(['country', redirecCountry], qp);
+            } else {
+              this.router.navigate(['/'], qp);
+            }
+          }
+        },
+        error: (e: Error) => {
+          console.log(e);
+        }
+      });
 
     effect(() => {
       const country = this.country();
@@ -255,12 +257,15 @@ export class CountryComponent
   intersectionObserverCallback(
     entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>
   ): void {
+    const header = this.headerRef();
+    if (!header) return; // Prevent crashes if header isn't ready yet
+
     entries.forEach((entry) => {
       if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
-        this.headerRef.pageTitleInViewport = true;
+        header.pageTitleInViewport = true;
       }
       if (!entry.isIntersecting) {
-        this.headerRef.pageTitleInViewport = false;
+        header.pageTitleInViewport = false;
       }
     });
   }
@@ -322,40 +327,42 @@ export class CountryComponent
     };
     req.filters[dimensionName] = { breakdown: 0 };
 
-    this.subs.push(
-      this.api
-        .getBreakdowns(req)
-        .pipe(
-          map((br: BreakdownResults) => {
-            return br.results.breakdowns.results;
-          })
-        )
-        .subscribe((res) => {
-          const cardData = res.map((cpv: CountPercentageValue) => {
-            return {
-              name: cpv.value,
-              value: cpv.count,
-              percent: cpv.percentage
-            };
-          });
-
-          if (!this.cardData) {
-            this.cardData = {};
-          }
-          this.cardData[dimensionName] = cardData;
-          if (fnCallback) {
-            fnCallback();
-          }
+    this.api
+      .getBreakdowns(req)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((br: BreakdownResults) => {
+          return br.results.breakdowns.results;
         })
-    );
+      )
+      .subscribe((res) => {
+        const cardData = res.map((cpv: CountPercentageValue) => {
+          return {
+            name: cpv.value,
+            value: cpv.count,
+            percent: cpv.percentage
+          };
+        });
+
+        if (!this.cardData) {
+          this.cardData = {};
+        }
+        this.cardData[dimensionName] = cardData;
+        if (fnCallback) {
+          fnCallback();
+        }
+      });
   }
 
   /** setHeaderData
    * @param {string?} activeCountry - optional country
    **/
   setHeaderData(country?: string): void {
-    this.headerRef.pageTitleDynamic = country && this.showTargetsData;
-    this.headerRef.activeCountry = country;
+    const header = this.headerRef();
+    if (header) {
+      header.pageTitleDynamic = country && this.showTargetsData;
+      header.activeCountry = country;
+    }
   }
 
   /** loadHistory
@@ -364,13 +371,12 @@ export class CountryComponent
    * @param {CountryHistoryRequest} request - the data request
    **/
   loadHistory(request: CountryHistoryRequest): void {
-    this.subs.push(
-      this.api
-        .loadCountryData(request.country)
-        .subscribe((data: Array<TargetCountryData>) => {
-          request.fnCallback(data);
-        })
-    );
+    this.api
+      .loadCountryData(request.country)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: Array<TargetCountryData>) => {
+        request.fnCallback(data);
+      });
   }
 
   tooltipsAndTotals = computed(() => {
