@@ -155,7 +155,7 @@ describe('CountryComponent', () => {
       ).toBeFalsy();
 
       component.countryData.set(mockCountryData);
-      component.targetMetaData = mockTargetMetaData;
+      component.targetMetaData.set(mockTargetMetaData);
       component.country.set('FR');
 
       expect(
@@ -188,7 +188,7 @@ describe('CountryComponent', () => {
       console.log(JSON.stringify(copyTarget, null, 4));
 
       component.countryData.set(copy);
-      component.targetMetaData = copyTarget;
+      component.targetMetaData.set(copyTarget);
       component.country.set('XX');
 
       expect(
@@ -285,7 +285,7 @@ describe('CountryComponent', () => {
     it('should set the latest country data', () => {
       expect(component.latestCountryData()).toBeFalsy();
       component.countryData.set(mockCountryData);
-      component.targetMetaData = mockTargetMetaData;
+      component.targetMetaData.set(mockTargetMetaData);
       component.country.set('FR');
       expect(component.latestCountryData()).toBeTruthy();
     });

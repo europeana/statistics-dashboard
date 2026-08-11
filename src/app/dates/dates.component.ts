@@ -14,7 +14,10 @@ import {
 import { NgIf } from '@angular/common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { startWith, switchMap } from 'rxjs';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import {
+  MatDatepickerModule,
+  MatDateRangePicker
+} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { getDateAsISOString, today, yearZero } from '../_helpers';
 
@@ -39,10 +42,8 @@ export class DatesComponent {
 
   readonly dateFrom = viewChild<ElementRef<HTMLInputElement>>('dateFrom');
   readonly dateTo = viewChild<ElementRef<HTMLInputElement>>('dateTo');
-  readonly rangePicker =
-    viewChild<import('@angular/material/datepicker').MatDateRangePicker<any>>(
-      'rangePicker'
-    );
+
+  readonly rangePicker = viewChild<MatDateRangePicker<unknown>>('rangePicker');
 
   private readonly formValues = toSignal(
     toObservable(this.form).pipe(

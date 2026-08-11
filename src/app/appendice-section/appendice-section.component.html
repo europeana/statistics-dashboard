@@ -1,35 +1,35 @@
 <div
   class="appendice-grid"
   [ngClass]="{
-    single: columnsEnabledCount === 1,
-    double: columnsEnabledCount === 2
+    single: columnsEnabledCount() === 1,
+    double: columnsEnabledCount() === 2
   }"
   tabindex="-1"
 >
   <span class="cell-header"><!-- Country--></span>
   <span class="cell-header cell-bold cell-left"><!--Date--></span>
 
-  <span *ngIf="columnEnabled3D" class="cell-header window">
+  <span *ngIf="columnEnabled3D()" class="cell-header window">
     <span class="window-frame"></span>
   </span>
 
-  <span *ngIf="columnEnabled3D" class="cell-header cell-bold">3D</span>
-  <span *ngIf="columnEnabled3D" class="cell-header diminished">(2025)</span>
-  <span *ngIf="columnEnabled3D" class="cell-header diminished">(2030)</span>
+  <span *ngIf="columnEnabled3D()" class="cell-header cell-bold">3D</span>
+  <span *ngIf="columnEnabled3D()" class="cell-header diminished">(2025)</span>
+  <span *ngIf="columnEnabled3D()" class="cell-header diminished">(2030)</span>
 
-  <span *ngIf="columnEnabledHQ" class="cell-header window">
+  <span *ngIf="columnEnabledHQ()" class="cell-header window">
     <span class="window-frame"></span>
   </span>
-  <span *ngIf="columnEnabledHQ" class="cell-header cell-bold">HQ</span>
-  <span *ngIf="columnEnabledHQ" class="cell-header diminished">2025</span>
-  <span *ngIf="columnEnabledHQ" class="cell-header diminished">2030</span>
+  <span *ngIf="columnEnabledHQ()" class="cell-header cell-bold">HQ</span>
+  <span *ngIf="columnEnabledHQ()" class="cell-header diminished">2025</span>
+  <span *ngIf="columnEnabledHQ()" class="cell-header diminished">2030</span>
 
-  <span *ngIf="columnEnabledALL" class="cell-header window">
+  <span *ngIf="columnEnabledALL()" class="cell-header window">
     <span class="window-frame"></span>
   </span>
-  <span *ngIf="columnEnabledALL" class="cell-header cell-bold">All</span>
-  <span *ngIf="columnEnabledALL" class="cell-header diminished">2025</span>
-  <span *ngIf="columnEnabledALL" class="cell-header diminished cell-pad-right"
+  <span *ngIf="columnEnabledALL()" class="cell-header cell-bold">All</span>
+  <span *ngIf="columnEnabledALL()" class="cell-header diminished">2025</span>
+  <span *ngIf="columnEnabledALL()" class="cell-header diminished cell-pad-right"
     >2030</span
   >
 
@@ -83,9 +83,7 @@
       let-colourTOTAL="colourTOTAL"
     >
       @if(wrap){
-      <!-- wrap -->
       <span class="appendice-grid-sticky-row">
-        <!-- recurse -->
         <ng-content
           *ngTemplateOutlet="
             countryRow;
@@ -115,7 +113,7 @@
         {{ row["date"] | date : "dd/MM/yyyy" }}
       </span>
 
-      <ng-container *ngIf="columnEnabled3D">
+      <ng-container *ngIf="columnEnabled3D()">
         <ng-content
           *ngTemplateOutlet="
             headerGroup;
@@ -130,7 +128,7 @@
         ></ng-content>
       </ng-container>
 
-      <ng-container *ngIf="columnEnabledHQ">
+      <ng-container *ngIf="columnEnabledHQ()">
         <ng-content
           *ngTemplateOutlet="
             headerGroup;
@@ -145,7 +143,7 @@
         ></ng-content>
       </ng-container>
 
-      <ng-container *ngIf="columnEnabledALL">
+      <ng-container *ngIf="columnEnabledALL()">
         <ng-content
           *ngTemplateOutlet="
             headerGroup;
@@ -162,28 +160,28 @@
       }
     </ng-template>
 
-    <ng-container *ngFor="let country of pinnedCountries | keyvalue">
+    <ng-container *ngFor="let country of pinnedCountries() | keyvalue">
       <ng-container
         *ngFor="
-          let row of countryData[country.key];
+          let row of countryData()[country.key];
           let countryRowIndex = index
         "
       >
         <ng-container
-          *ngIf="targetMetaData[country.key]; let countryTargetData"
+          *ngIf="targetMetaData()[country.key]; let countryTargetData"
         >
           <ng-content
             *ngTemplateOutlet="
               countryRow;
               context: {
                 colour3D:
-                  colourMap[country.key + TargetSeriesSuffixes[0]]?.fill ||
+                  colourMap()[country.key + TargetSeriesSuffixes[0]]?.fill ||
                   'transparent',
                 colourHQ:
-                  colourMap[country.key + TargetSeriesSuffixes[1]]?.fill ||
+                  colourMap()[country.key + TargetSeriesSuffixes[1]]?.fill ||
                   'transparent',
                 colourTOTAL:
-                  colourMap[country.key + TargetSeriesSuffixes[2]]?.fill ||
+                  colourMap()[country.key + TargetSeriesSuffixes[2]]?.fill ||
                   'transparent',
                 isHeader: countryRowIndex === 0,
                 country: country.key,

@@ -1,7 +1,7 @@
 <main
   class="fit-to-page"
   [ngClass]="{
-    'loading-modal': !targetMetaData
+    'loading-modal': !targetMetaData()
   }"
 >
   <h1 class="page-title">
@@ -320,7 +320,7 @@
         <div
           class="entry-card-content"
           *ngIf="
-            targetMetaData[country()][TargetFieldName.THREE_D];
+            targetMetaData()[country()][TargetFieldName.THREE_D];
             let targets3D
           "
         >
@@ -412,7 +412,7 @@
         </span>
         <div
           class="entry-card-content"
-          *ngIf="targetMetaData[country()][TargetFieldName.HQ]; let targetsHQ"
+          *ngIf="targetMetaData()[country()][TargetFieldName.HQ]; let targetsHQ"
         >
           <ng-content
             *ngTemplateOutlet="
@@ -499,7 +499,7 @@
         <div
           class="entry-card-content entry-card-totals"
           *ngIf="
-            targetMetaData[country()][TargetFieldName.TOTAL];
+            targetMetaData()[country()][TargetFieldName.TOTAL];
             let targetsTOTAL
           "
         >
@@ -577,7 +577,7 @@
 
       <div class="entry-card-content">
         <div class="entry-card-multi">
-          <app-line-chart #lineChart [targetMetaData]="targetMetaData">
+          <app-line-chart #lineChart [targetMetaData]="targetMetaData()">
           </app-line-chart>
 
           <app-legend-grid
@@ -585,7 +585,7 @@
             #legendGrid
             [countryData]="countryData()"
             [countryCode]="country()"
-            [targetMetaData]="targetMetaData"
+            [targetMetaData]="targetMetaData()"
             [lineChart]="lineChart"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
             [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
@@ -620,7 +620,7 @@
             #appendice
             tabindex="-1"
             [pinnedCountries]="legendGrid.pinnedCountries"
-            [targetMetaData]="targetMetaData"
+            [targetMetaData]="targetMetaData()"
             [countryData]="countryData()"
             [colourMap]="lineChart.allSeriesData"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"

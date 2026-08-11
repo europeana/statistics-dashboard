@@ -145,7 +145,10 @@ export class CountryComponent
     this.initialiseIntersectionObserver();
   }
 
-  targetMetaData: IHash<IHashArray<TargetMetaData>>;
+  targetMetaData = model<IHash<IHashArray<TargetMetaData>> | undefined>(
+    undefined
+  );
+
   countryData: ModelSignal<IHash<Array<TargetData>>> = model({});
   latestCountryData = computed(() => {
     const specificCountryData = this.countryData()[this.country()];
@@ -220,7 +223,7 @@ export class CountryComponent
 
           if (country) {
             this.country.set(country);
-            this.targetMetaData = combined.targetMetaData;
+            this.targetMetaData.set(combined.targetMetaData);
             this.countryData.set(combined.countryData);
           } else {
             const qp = this.includeCTZero()
@@ -246,7 +249,7 @@ export class CountryComponent
           this.refreshCardData();
         }
         this.restoreHiddenColumns();
-        this.showTargetsData = !!this.targetMetaData[country];
+        this.showTargetsData = !!this.targetMetaData()[country];
         this.setHeaderData(country);
       }
     });
@@ -428,7 +431,7 @@ export class CountryComponent
         // percentages
         res.latestCountryPercentages[valName] = percent;
 
-        const targets = this.targetMetaData[this.country()][valName];
+        const targets = this.targetMetaData()[this.country()][valName];
 
         res.latestCountryPercentageOfTargets[valName] = [
           value / targets[0].value,
