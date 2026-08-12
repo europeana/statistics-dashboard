@@ -65,24 +65,25 @@ describe('LegendGridComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LegendGridComponent);
     component = fixture.componentInstance;
-    component.lineChart = new MockLineComponent() as unknown as LineComponent;
 
-    // 1. Force the template reactive signal loop to return an empty array by default
+    fixture.componentRef.setInput(
+      'lineChart',
+      new MockLineComponent() as unknown as LineComponent
+    );
+
     Object.defineProperty(component, 'targetCountries', {
       writable: true,
       value: signal([])
     });
 
-    // Provide native initial state baselines for your Input Signals
     fixture.componentRef.setInput('columnEnabled3D', true);
     fixture.componentRef.setInput('columnEnabledHQ', true);
     fixture.componentRef.setInput('columnEnabledALL', true);
     fixture.componentRef.setInput('countryCode', '');
     fixture.componentRef.setInput('targetMetaData', {});
+    fixture.componentRef.setInput('countryData', {});
 
-    // 2. Set clean structural baselines for your data storage states
     component.pinnedCountries = {};
-    component.countryData = {};
 
     fixture.detectChanges();
   });
@@ -123,8 +124,11 @@ describe('LegendGridComponent', () => {
     component.pinnedCountries['FR'] = 12;
 
     const setData = (indexes: Array<number>): void => {
+      // 1. Extract the underlying mock instance from the signal handle first
+      const chartInstance = component.lineChart();
+
       TargetSeriesSuffixes.forEach((suffix: string, suffixIndex: number) => {
-        component.lineChart.allSeriesData['FR' + suffix] = !indexes.includes(
+        chartInstance.allSeriesData['FR' + suffix] = !indexes.includes(
           suffixIndex
         )
           ? undefined
@@ -177,17 +181,18 @@ describe('LegendGridComponent', () => {
   it('should get the country series', () => {
     // Provide the required context arrays via native setInput handles before running change detection
     fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
-    component.countryData = mockCountryData;
+    component.countryData.set(mockCountryData);
 
     fixture.detectChanges();
 
     expect(component.getCountrySeries('FR')).toBeTruthy();
     expect(component.getCountrySeries('FR').length).toBeGreaterThan(0);
   });
+
   it('should toggle the pin', () => {
     fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     component.pinnedCountries = { AU: 0, DE: 1, FR: 2 };
-    component.countryData = mockCountryData;
+    component.countryData.set(mockCountryData);
 
     component.togglePin('AU');
 
@@ -226,7 +231,7 @@ describe('LegendGridComponent', () => {
     fixture.detectChanges();
 
     const spyToggle = jest.spyOn(
-      component.legendGrid.nativeElement.classList,
+      component.legendGrid().nativeElement.classList,
       'toggle'
     );
     component.gridScroll();
@@ -250,7 +255,10 @@ describe('LegendGridComponent', () => {
     component.pinnedCountries = { FR: 0 };
     component.hiddenColumnRanges = { THREE_D: { FR: [0] }, HQ: { FR: [0] } };
 
-    component.lineChart.allSeriesData['FR' + '3D'] = {
+    // 1. Extract the mock object instance from the signal function handle first
+    const chartInstance = component.lineChart();
+
+    chartInstance.allSeriesData['FR' + '3D'] = {
       fill: {
         hex: '#ffffff',
         toString: () => '#ffffff'
@@ -266,10 +274,11 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the range', () => {
-    const colour = component.lineChart.chart.colors.list[0];
+    const chartInstance = component.lineChart();
+    const colour = chartInstance.chart.colors.list[0];
 
-    const spyShowRange = jest.spyOn(component.lineChart, 'showRange');
-    const spyRemoveRange = jest.spyOn(component.lineChart, 'removeRange');
+    const spyShowRange = jest.spyOn(chartInstance, 'showRange');
+    const spyRemoveRange = jest.spyOn(chartInstance, 'removeRange');
 
     component.toggleRange('FR', TargetFieldName.THREE_D, 0);
 
@@ -285,7 +294,7 @@ describe('LegendGridComponent', () => {
     fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const data = mockTargetMetaData['FR'][TargetFieldName.THREE_D];
-    const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
+    const spyAddSeries = jest.spyOn(component.lineChart(), 'addSeries');
 
     component.addSeriesSetAndPin('FR', data);
     expect(spyAddSeries).toHaveBeenCalledTimes(0);
@@ -306,7 +315,7 @@ describe('LegendGridComponent', () => {
       .spyOn(component.historyLoadded, 'emit')
       .mockImplementation(
         (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
-          component.countryData = { DE: [] };
+          fixture.componentRef.setInput('countryData', { DE: [] });
           req.fnCallback([]);
         }
       );
@@ -334,7 +343,7 @@ describe('LegendGridComponent', () => {
 
     // case where existing country data is reused after component reinitialisation
 
-    component.countryData = mockCountryData;
+    component.countryData.set(mockCountryData);
 
     component.toggleCountry('DE');
 
@@ -343,7 +352,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the series', () => {
-    component.countryData = mockCountryData;
+    component.countryData.set(mockCountryData);
     fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const seriesItemHidden = {
@@ -360,7 +369,7 @@ describe('LegendGridComponent', () => {
     } as unknown as am4charts.LineSeries;
 
     const spyTogglePin = jest.spyOn(component, 'togglePin');
-    const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
+    const spyAddSeries = jest.spyOn(component.lineChart(), 'addSeries');
     const spyLoadCountryChartData = jest.spyOn(
       component,
       'loadCountryChartData'
@@ -395,7 +404,7 @@ describe('LegendGridComponent', () => {
 
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
     fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
-    component.countryData = mockCountryData;
+    component.countryData.set(mockCountryData);
 
     const spyToggleCountry = jest
       .spyOn(component, 'toggleCountry')

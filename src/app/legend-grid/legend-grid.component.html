@@ -35,10 +35,10 @@
           </span>
           <span
             class="target-total right"
-            *ngIf="countryData[country]"
+            *ngIf="countryData()[country]"
             [ngClass]="{ 'pad-right': targetType === TargetFieldName.HQ }"
           >
-            {{ countryData[country][0][targetType] | number }}
+            {{ countryData()[country][0][targetType] | number }}
           </span>
         </a>
       </li>
@@ -142,7 +142,7 @@
               legendItemSeries;
               context: {
                 series:
-                  lineChart?.allSeriesData[
+                  lineChart()?.allSeriesData[
                     country + TargetSeriesSuffixes[$index]
                   ],
                 targetType:
