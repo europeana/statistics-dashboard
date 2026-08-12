@@ -66,10 +66,11 @@ describe('LegendGridComponent', () => {
     fixture = TestBed.createComponent(LegendGridComponent);
     component = fixture.componentInstance;
 
-    fixture.componentRef.setInput(
-      'lineChart',
-      new MockLineComponent() as unknown as LineComponent
-    );
+    const mockChartInstance = TestBed.runInInjectionContext(() => {
+      return new MockLineComponent();
+    }) as unknown as LineComponent;
+
+    fixture.componentRef.setInput('lineChart', mockChartInstance);
 
     Object.defineProperty(component, 'targetCountries', {
       writable: true,
@@ -81,10 +82,9 @@ describe('LegendGridComponent', () => {
     fixture.componentRef.setInput('columnEnabledALL', true);
     fixture.componentRef.setInput('countryCode', '');
     fixture.componentRef.setInput('targetMetaData', {});
-    fixture.componentRef.setInput('countryData', {});
 
     component.pinnedCountries = {};
-
+    fixture.componentRef.setInput('countryData', {});
     fixture.detectChanges();
   });
 
