@@ -42,9 +42,19 @@ describe('AppComponent', () => {
   const queryParams = new BehaviorSubject({} as Params);
 
   // Helper helper function to mimic an Angular ModelSignal wrapper interface
-  const createMockModelSignal = (initialValue: any) => {
-    const sig = signal(initialValue) as any;
-    sig.set = jest.fn((val) => sig.update(() => val));
+  const createMockModelSignal = (
+    initialValue: boolean
+  ): {
+    (): boolean;
+    set: jest.Mock;
+    update: (fn: (v: boolean) => boolean) => void;
+  } => {
+    const sig = signal(initialValue) as unknown as {
+      (): boolean;
+      set: jest.Mock;
+      update: (fn: (v: boolean) => boolean) => void;
+    };
+    sig.set = jest.fn((val: boolean) => sig.update(() => val));
     return sig;
   };
 

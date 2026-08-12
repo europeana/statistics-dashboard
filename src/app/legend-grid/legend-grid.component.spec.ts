@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -22,9 +22,9 @@ const date = new Date().toISOString();
 
 const mockCountryData = {
   FR: [],
-  DE: [date, date, date].map((date) => {
+  DE: [date, date, date].map((d) => {
     return {
-      date: date,
+      date: d,
       three_d: '100',
       high_quality: '200',
       total: '300'
@@ -70,11 +70,17 @@ describe('LegendGridComponent', () => {
     // 1. Force the template reactive signal loop to return an empty array by default
     Object.defineProperty(component, 'targetCountries', {
       writable: true,
-      value: () => []
+      value: signal([])
     });
 
+    // Provide native initial state baselines for your Input Signals
+    fixture.componentRef.setInput('columnEnabled3D', true);
+    fixture.componentRef.setInput('columnEnabledHQ', true);
+    fixture.componentRef.setInput('columnEnabledALL', true);
+    fixture.componentRef.setInput('countryCode', '');
+    fixture.componentRef.setInput('targetMetaData', {});
+
     // 2. Set clean structural baselines for your data storage states
-    component.targetMetaData = {};
     component.pinnedCountries = {};
     component.countryData = {};
 
@@ -143,28 +149,34 @@ describe('LegendGridComponent', () => {
     // 1. Invoke the computed signal as a function ()
     expect(component.columnsEnabledCount()).toEqual(3);
 
-    component.columnEnabled3D = false;
+    fixture.componentRef.setInput('columnEnabled3D', false);
+    fixture.detectChanges();
     expect(component.columnsEnabledCount()).toEqual(2);
 
-    component.columnEnabledHQ = false;
+    fixture.componentRef.setInput('columnEnabledHQ', false);
+    fixture.detectChanges();
     expect(component.columnsEnabledCount()).toEqual(1);
 
-    component.columnEnabledALL = false;
+    fixture.componentRef.setInput('columnEnabledALL', false);
+    fixture.detectChanges();
     expect(component.columnsEnabledCount()).toEqual(0);
 
-    component.columnEnabled3D = true;
+    fixture.componentRef.setInput('columnEnabled3D', true);
+    fixture.detectChanges();
     expect(component.columnsEnabledCount()).toEqual(1);
 
-    component.columnEnabledHQ = true;
+    fixture.componentRef.setInput('columnEnabledHQ', true);
+    fixture.detectChanges();
     expect(component.columnsEnabledCount()).toEqual(2);
 
-    component.columnEnabledALL = true;
+    fixture.componentRef.setInput('columnEnabledALL', true);
+    fixture.detectChanges();
     expect(component.columnsEnabledCount()).toEqual(3);
   });
 
   it('should get the country series', () => {
-    // Provide the required context arrays before running change detection
-    component.targetMetaData = mockTargetMetaData;
+    // Provide the required context arrays via native setInput handles before running change detection
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     component.countryData = mockCountryData;
 
     fixture.detectChanges();
@@ -172,9 +184,8 @@ describe('LegendGridComponent', () => {
     expect(component.getCountrySeries('FR')).toBeTruthy();
     expect(component.getCountrySeries('FR').length).toBeGreaterThan(0);
   });
-
   it('should toggle the pin', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     component.pinnedCountries = { AU: 0, DE: 1, FR: 2 };
     component.countryData = mockCountryData;
 
@@ -211,7 +222,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should handle scrolling', () => {
-    component.targetMetaData = {};
+    fixture.componentRef.setInput('targetMetaData', {});
     fixture.detectChanges();
 
     const spyToggle = jest.spyOn(
@@ -223,8 +234,8 @@ describe('LegendGridComponent', () => {
   });
 
   it('should hide ranges by column', () => {
-    component.targetMetaData = mockTargetMetaData;
-    component.countryCode = 'FR';
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    fixture.componentRef.setInput('countryCode', 'FR');
     component.pinnedCountries = { FR: 0 };
     expect(Object.keys(component.hiddenColumnRanges).length).toBeFalsy();
     component.hideRangesByColumn(TargetFieldName.THREE_D);
@@ -234,14 +245,16 @@ describe('LegendGridComponent', () => {
   });
 
   it('should show ranges by column', () => {
-    component.targetMetaData = mockTargetMetaData;
-    component.countryCode = 'FR';
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    fixture.componentRef.setInput('countryCode', 'FR');
     component.pinnedCountries = { FR: 0 };
     component.hiddenColumnRanges = { THREE_D: { FR: [0] }, HQ: { FR: [0] } };
 
     component.lineChart.allSeriesData['FR' + '3D'] = {
-      // CHANGE THIS from 'xxx' to a valid string-wrapped hex color value
-      fill: { hex: '#ffffff', toString: () => '#ffffff' } as any,
+      fill: {
+        hex: '#ffffff',
+        toString: () => '#ffffff'
+      } as unknown as import('@amcharts/amcharts4/core').Color,
       hide: jest.fn()
     } as unknown as am4charts.LineSeries;
 
@@ -269,7 +282,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should addSeriesSetAndPin', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const data = mockTargetMetaData['FR'][TargetFieldName.THREE_D];
     const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
@@ -281,7 +294,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the country', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const spyTogglePin = jest
       .spyOn(component, 'togglePin')
@@ -331,7 +344,7 @@ describe('LegendGridComponent', () => {
 
   it('should toggle the series', () => {
     component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const seriesItemHidden = {
       isHidden: true,
@@ -381,16 +394,17 @@ describe('LegendGridComponent', () => {
   });
 
   it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     component.countryData = mockCountryData;
 
     const spyToggleCountry = jest
       .spyOn(component, 'toggleCountry')
-      .mockReturnValue(null);
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .mockImplementation(() => {});
 
     component.pinnedCountries = { FR: 0, DE: 1 };
 
-    component.countryCode = 'FR';
+    fixture.componentRef.setInput('countryCode', 'FR');
     fixture.detectChanges();
     tick(0);
 
@@ -401,7 +415,7 @@ describe('LegendGridComponent', () => {
     // Clear out the spy counts for the sequential steps
     spyToggleCountry.mockClear();
 
-    component.countryCode = 'DE';
+    fixture.componentRef.setInput('countryCode', 'DE');
     fixture.detectChanges();
     tick(0);
     tick(component.timeoutAnimation);
@@ -409,18 +423,18 @@ describe('LegendGridComponent', () => {
     expect(spyToggleCountry).toHaveBeenCalled();
     spyToggleCountry.mockClear();
 
-    component.countryCode = 'FR';
+    fixture.componentRef.setInput('countryCode', 'FR');
     fixture.detectChanges();
     tick(0);
     tick(component.timeoutAnimation);
 
     expect(spyToggleCountry).toHaveBeenCalled();
 
-    component.countryCode = '';
+    fixture.componentRef.setInput('countryCode', '');
     fixture.detectChanges();
     tick(component.timeoutAnimation);
 
-    expect(component.countryCode).toBeFalsy();
+    expect(component.countryCode()).toBeFalsy();
   }));
 
   it('should sort the pins', () => {
@@ -441,7 +455,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should load the country chart data', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     fixture.detectChanges();
 
     const spyEmit = jest.spyOn(component.historyLoadded, 'emit');

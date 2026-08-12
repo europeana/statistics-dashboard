@@ -21,9 +21,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 describe('DatesComponent', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockForm: any;
   let component: DatesComponent;
   let fixture: ComponentFixture<DatesComponent>;
-  let mockForm: any;
 
   beforeEach(async () => {
     TestBed.configureTestingModule({

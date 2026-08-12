@@ -316,6 +316,7 @@ describe('CountryComponent', () => {
     it('should refresh the data when the includeCTZero is set', () => {
       const spyRefreshCardData = jest
         .spyOn(component, 'refreshCardData')
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         .mockImplementation(() => {});
 
       component.country.set('FR');

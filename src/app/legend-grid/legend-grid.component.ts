@@ -17,6 +17,7 @@ import {
   EventEmitter,
   inject,
   Injector,
+  input,
   Input,
   OnDestroy,
   Output,
@@ -61,42 +62,36 @@ import { LegendGridService } from '.';
 export class LegendGridComponent implements AfterViewInit, OnDestroy {
   private readonly injector = inject(Injector);
 
-  // --- Signals & Reactive Backing State ---
-  readonly column3D = signal<boolean>(true);
-  readonly columnHQ = signal<boolean>(true);
-  readonly columnALL = signal<boolean>(true);
+  readonly columnEnabled3D = input<boolean>(true);
+  readonly columnEnabledHQ = input<boolean>(true);
+  readonly columnEnabledALL = input<boolean>(true);
+  readonly countryCode = input<string>('');
+  readonly targetMetaData = input<IHash<IHashArray<TargetMetaData>>>({});
 
-  readonly countryCodeSignal = signal<string>('');
-  readonly targetMetaDataSignal = signal<IHash<IHashArray<TargetMetaData>>>({});
-
-  // Backing state tracking signal
+  // transformed Backing State Fields
   private readonly _pinnedCountries = signal<IHash<number>>({});
-
-  // Standard plain object property kept intact for template layout bindings
   public pinnedCountries: IHash<number> = {};
 
-  // Computed layout helpers
   readonly columnsEnabledCount = computed(() => {
-    return [this.column3D(), this.columnHQ(), this.columnALL()].filter(Boolean)
-      .length;
+    return [
+      this.columnEnabled3D(),
+      this.columnEnabledHQ(),
+      this.columnEnabledALL()
+    ].filter(Boolean).length;
   });
 
-  // 1. Base order from raw keys
   private readonly targetCountriesOO = computed(() => {
-    return Object.keys(this.targetMetaDataSignal());
+    return Object.keys(this.targetMetaData());
   });
 
-  // 2. Change this from a standard 'get' property to a clean read-only Signal field
   readonly targetCountries = computed(() => {
     const pins = this._pinnedCountries();
     const originalOrder = this.targetCountriesOO();
-
     return Object.keys(pins).concat(
       originalOrder.filter((country) => !(country in pins))
     );
   });
 
-  // --- Core Configuration and Cache ---
   timeoutAnimation = 800;
   public classReference = LegendGridComponent;
   private readonly renameCountry = new RenameCountryPipe();
@@ -118,76 +113,60 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   public TargetSeriesSuffixes = TargetSeriesSuffixes;
   public seriesSuffixesFmt = [' (3D)', ' (hq)', ' (total)'];
   public seriesValueNames = Object.keys(TargetFieldName);
+
   public TargetFieldName = TargetFieldName;
 
   private readonly legendGridService = inject(LegendGridService);
   readonly legendGridIsInitialised = this.legendGridService.legendGridReady;
 
-  // --- Input Bridges (Keeping Compatibility with Parent Component bindings) ---
-  @Input() set columnEnabled3D(value: boolean) {
-    this.column3D.set(value);
-    if (value) {
-      this.showSeriesSet(0);
-      this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
-    } else {
-      this.hideRangesByColumn(TargetFieldName.THREE_D);
-      this.hideSeriesSet(0);
-    }
-  }
-  get columnEnabled3D(): boolean {
-    return this.column3D();
-  }
+  constructor() {
+    effect(() => {
+      const isEnabled = this.columnEnabled3D();
+      untracked(() => {
+        if (isEnabled) {
+          this.showSeriesSet(0);
+          this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
+        } else {
+          this.hideRangesByColumn(TargetFieldName.THREE_D);
+          this.hideSeriesSet(0);
+        }
+      });
+    });
 
-  @Input() set columnEnabledHQ(value: boolean) {
-    this.columnHQ.set(value);
-    if (value) {
-      this.showSeriesSet(1);
-      this.showHiddenRangesByColumn(TargetFieldName.HQ);
-    } else {
-      this.hideRangesByColumn(TargetFieldName.HQ);
-      this.hideSeriesSet(1);
-    }
-  }
-  get columnEnabledHQ(): boolean {
-    return this.columnHQ();
-  }
+    effect(() => {
+      const isEnabled = this.columnEnabledHQ();
+      untracked(() => {
+        if (isEnabled) {
+          this.showSeriesSet(1);
+          this.showHiddenRangesByColumn(TargetFieldName.HQ);
+        } else {
+          this.hideRangesByColumn(TargetFieldName.HQ);
+          this.hideSeriesSet(1);
+        }
+      });
+    });
 
-  @Input() set columnEnabledALL(value: boolean) {
-    this.columnALL.set(value);
-    if (value) {
-      this.showSeriesSet(2);
-      this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
-    } else {
-      this.hideRangesByColumn(TargetFieldName.TOTAL);
-      this.hideSeriesSet(2);
-    }
-  }
-  get columnEnabledALL(): boolean {
-    return this.columnALL();
-  }
-  @Input() set countryCode(value: string) {
-    this.countryCodeSignal.set(value || '');
-  }
-  get countryCode(): string {
-    return this.countryCodeSignal();
-  }
-
-  @Input() set targetMetaData(data: IHash<IHashArray<TargetMetaData>>) {
-    this.targetMetaDataSignal.set(data || {});
-  }
-  get targetMetaData(): IHash<IHashArray<TargetMetaData>> {
-    return this.targetMetaDataSignal();
+    effect(() => {
+      const isEnabled = this.columnEnabledALL();
+      untracked(() => {
+        if (isEnabled) {
+          this.showSeriesSet(2);
+          this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
+        } else {
+          this.hideRangesByColumn(TargetFieldName.TOTAL);
+          this.hideSeriesSet(2);
+        }
+      });
+    });
   }
 
   ngAfterViewInit(): void {
     this.legendGridService.setLegendGridReady(true);
 
-    // Monitor changes to countryCodeSignal safely outside layout mutation states
     effect(
       () => {
-        const code = this.countryCodeSignal();
+        const code = this.countryCode();
 
-        // Use untracked here so we don't accidentally catch amCharts mutations
         untracked(() => {
           if (this.lineChart?.chart?.colors) {
             this.lineChart.chart.colors.reset();
@@ -293,6 +272,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
       });
     });
   }
+
   showHiddenRangesByColumn(column?: TargetFieldName): void {
     const hidden = this.hiddenColumnRanges;
 
@@ -395,7 +375,11 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     seriesToAdd: Array<TargetFieldName> = []
   ): void {
     const dataAscending = [...data].reverse();
-    const activeColumns = [this.column3D(), this.columnHQ(), this.columnALL()];
+    const activeColumns = [
+      this.columnEnabled3D(),
+      this.columnEnabledHQ(),
+      this.columnEnabledALL()
+    ];
 
     activeColumns.forEach((colEnabled: boolean, i: number) => {
       if (colEnabled) {
