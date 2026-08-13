@@ -1,8 +1,11 @@
 import {
   Component,
+  effect,
   ElementRef,
   EventEmitter,
   Input,
+  input,
+  model,
   Output,
   QueryList,
   ViewChild,
@@ -44,58 +47,22 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
   ]
 })
 export class FilterComponent {
-  @Input() emptyDataset: boolean;
-  @Input() form: FormGroup;
-  @Input() group: DimensionName;
-  @Input() totalAvailable: number;
+  emptyDataset = input<boolean>(false);
 
-  _optionSet?: FilterOptionSet;
+  form = input.required<FormGroup>();
+  group = input.required<DimensionName>();
+  totalAvailable = input.required<number>();
+  optionSet = input<FilterOptionSet | undefined>(undefined);
+
   empty = true;
   emptyData = true;
   term = '';
   pagesVisible = 1;
   inputToFocus?: InputDescription;
+  state = model.required<FilterState>();
 
-  get optionSet(): FilterOptionSet {
-    return this._optionSet;
-  }
-  @Input() set optionSet(optionSet: FilterOptionSet) {
-    if (optionSet && optionSet.options.length > 0) {
-      // if there's data (with no filter) then capture that fact.
-      if (!this.term || this.term.length === 0) {
-        this.emptyData = false;
-      }
-      this.empty = false;
-    } else {
-      this.empty = true;
-    }
-    this._optionSet = optionSet;
-
-    // reapply any focus
-    if (this.inputToFocus) {
-      setTimeout(() => {
-        const focusItem = this.checkboxes.find((cb: CheckboxComponent) => {
-          return (
-            cb.group === this.inputToFocus.group &&
-            cb.controlName === this.inputToFocus.controlName
-          );
-        });
-        if (focusItem) {
-          focusItem.baseInput.nativeElement.focus();
-        } else {
-          this.filterTerm.nativeElement.focus();
-        }
-        this.inputToFocus = undefined;
-      });
-    } else if (this.state?.visible) {
-      const ft = this.filterTerm;
-      if (ft) {
-        ft.nativeElement.focus();
-      }
-    }
-  }
-  @Input() state: FilterState;
   @Input() tierPrefix: string;
+
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
   @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
@@ -104,6 +71,47 @@ export class FilterComponent {
   @ViewChild('opener') opener: ElementRef;
 
   @ViewChildren(CheckboxComponent) checkboxes: QueryList<CheckboxComponent>;
+
+  constructor() {
+    effect(() => {
+      const currentOptionSet = this.optionSet();
+      if (
+        currentOptionSet &&
+        currentOptionSet.options &&
+        currentOptionSet.options.length > 0
+      ) {
+        if (!this.term || this.term.length === 0) {
+          this.emptyData = false;
+        }
+        this.empty = false;
+      } else {
+        this.empty = true;
+      }
+
+      // Reapply any focus states
+      if (this.inputToFocus) {
+        setTimeout(() => {
+          const focusItem = this.checkboxes.find((cb: CheckboxComponent) => {
+            return (
+              cb.group === this.inputToFocus?.group &&
+              cb.controlName === this.inputToFocus?.controlName
+            );
+          });
+          if (focusItem) {
+            focusItem.baseInput.nativeElement.focus();
+          } else {
+            this.filterTerm.nativeElement.focus();
+          }
+          this.inputToFocus = undefined;
+        });
+      } else if (this.state()?.visible) {
+        const ft = this.filterTerm;
+        if (ft) {
+          ft.nativeElement.focus();
+        }
+      }
+    });
+  }
 
   changed(): void {
     this.valueChanged.emit(true);
@@ -119,7 +127,7 @@ export class FilterComponent {
   }
 
   filterOptions(evt: { key: string; target: { value: string } }): void {
-    if (!this.optionSet) {
+    if (!this.optionSet()) {
       return;
     }
     if (evt.key === 'Escape') {
@@ -129,7 +137,7 @@ export class FilterComponent {
     this.term = evt.target.value;
     this.filterTermChanged.emit({
       term: this.term,
-      dimension: this.group
+      dimension: this.group()
     });
   }
 
@@ -137,11 +145,11 @@ export class FilterComponent {
   /* disabling is conditional for dates
   */
   isDisabled(): boolean {
-    if ((this.group as string) === 'dates') {
-      if (this.form.value.dateFrom && this.form.value.dateTo) {
+    if ((this.group() as string) === 'dates') {
+      if (this.form().value.dateFrom && this.form().value.dateTo) {
         return false;
       } else {
-        return this.emptyDataset;
+        return this.emptyDataset();
       }
     } else {
       // consider there to be data (and allow the user to open) if the term is blocking
@@ -149,7 +157,7 @@ export class FilterComponent {
         this.empty &&
         !this.emptyData &&
         this.term.length > 0 &&
-        !this.state.visible
+        !this.state().visible
       ) {
         return false;
       }
@@ -162,7 +170,7 @@ export class FilterComponent {
   /* @param {DimensionName} filterName - the form value key
   */
   getSetCheckboxValues(filterName: DimensionName): string {
-    let result = getFormValueList(this.form, filterName);
+    let result = getFormValueList(this.form(), filterName);
 
     if (filterName === 'country') {
       result = result.map((s: string) => {
@@ -174,7 +182,7 @@ export class FilterComponent {
         let prefix = '';
         if (
           [DimensionName.contentTier, DimensionName.metadataTier].includes(
-            this.group
+            this.group()
           )
         ) {
           prefix = this.tierPrefix;
@@ -185,12 +193,19 @@ export class FilterComponent {
   }
 
   hide(): void {
-    this.state.visible = false;
+    this.state.update((current) => ({
+      ...current,
+      visible: false
+    }));
   }
 
   toggle(): void {
-    this.state.visible = !this.state.visible;
-    this.visibilityChanged.emit(this.group);
+    this.state.update((current) => ({
+      ...current,
+      visible: !current.visible
+    }));
+
+    this.visibilityChanged.emit(this.group());
   }
 
   /** selectOptionEnabled
@@ -200,7 +215,7 @@ export class FilterComponent {
    */
   selectOptionEnabled(group: string, val: string): boolean {
     return val === '0' && group === DimensionName.contentTier
-      ? this.form.value.contentTierZero
+      ? this.form().value.contentTierZero
       : true;
   }
 
@@ -213,7 +228,7 @@ export class FilterComponent {
     this.pagesVisible++;
     this.filterTermChanged.emit({
       term: this.term,
-      dimension: this.group,
+      dimension: this.group(),
       upToPage: this.pagesVisible
     });
   }

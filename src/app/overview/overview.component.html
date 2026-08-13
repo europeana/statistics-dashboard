@@ -113,7 +113,7 @@
                     "
                     [tierPrefix]="tierPrefix"
                     [totalAvailable]="filterKeysLength(filter)"
-                    [state]="filterStates[filter]"
+                    [(state)]="filterStates[filter]"
                     (visibilityChanged)="closeFilters($event)"
                     (valueChanged)="updatePageUrl()"
                     (filterTermChanged)="filterDisplayData($event)"
@@ -123,7 +123,7 @@
                   [emptyDataset]="emptyDataset"
                   [form]="form"
                   [group]="'dates'"
-                  [state]="filterStates['dates']"
+                  [(state)]="filterStates['dates']"
                   (visibilityChanged)="closeFilters($event)"
                   (valueChanged)="updatePageUrl()"
                 ></app-filter>

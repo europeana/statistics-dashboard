@@ -757,13 +757,16 @@ describe('OverviewComponent', () => {
     }));
 
     it('should clear the dates', fakeAsync(() => {
-      expect(component.filterStates.dates.visible).toBeFalsy();
+      expect(component.filterStates.dates().visible).toBeFalsy(); //
+
       component.form.get('dateFrom').setValue(new Date().toISOString());
       expect(component.form.value.dateFrom).toBeTruthy();
       component.datesClear();
       expect(component.form.value.dateFrom).toBeFalsy();
       tick(1);
-      expect(component.filterStates.dates.visible).toBeTruthy();
+
+      expect(component.filterStates.dates().visible).toBeTruthy(); //
+
       component.form.get('dateTo').setValue(new Date().toISOString());
       expect(component.form.value.dateTo).toBeTruthy();
       component.datesClear();
@@ -783,11 +786,18 @@ describe('OverviewComponent', () => {
     it('should enable the filters', fakeAsync(() => {
       component.loadData();
       tick(tickTime);
-      component.filterStates[DimensionName.country].disabled = true;
+
+      component.filterStates[DimensionName.country].update((current) => ({
+        ...current,
+        disabled: true
+      }));
+
       component.enableFilters();
+
       expect(
-        component.filterStates[DimensionName.country].disabled
-      ).toBeFalsy();
+        component.filterStates[DimensionName.country]().disabled
+      ).toBeFalsy(); //
+
       tick(tickTimeChartDebounce);
     }));
 
@@ -819,14 +829,17 @@ describe('OverviewComponent', () => {
       tick(tickTime);
       const setAllTrue = (): void => {
         Object.keys(component.filterStates).forEach((s: string) => {
-          component.filterStates[s].visible = true;
+          component.filterStates[s].update((current) => ({
+            ...current,
+            visible: true
+          }));
         });
       };
 
       const checkAllValue = (tf: boolean): void => {
         let allVal = true;
         Object.keys(component.filterStates).forEach((s: string) => {
-          if (component.filterStates[s].visible != tf) {
+          if (component.filterStates[s]().visible != tf) {
             allVal = false;
           }
         });
@@ -842,7 +855,8 @@ describe('OverviewComponent', () => {
       const exception = DimensionName.type;
       checkAllValue(true);
       component.closeFilters(exception);
-      expect(component.filterStates[exception].visible).toBeTruthy();
+
+      expect(component.filterStates[exception]().visible).toBeTruthy();
       tick(tickTimeChartDebounce);
     }));
 

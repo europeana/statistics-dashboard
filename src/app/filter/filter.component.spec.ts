@@ -45,14 +45,22 @@ describe('FilterComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);
     component = fixture.componentInstance;
-    component.form = new UntypedFormBuilder().group({
-      facetParameter: [],
-      contentTierZero: [''],
-      contentTier: [''],
-      datasetId: [''],
-      dateFrom: [''],
-      dateTo: ['']
-    });
+
+    fixture.componentRef.setInput('group', '' as DimensionName);
+    fixture.componentRef.setInput('state', { visible: false, disabled: false });
+    fixture.componentRef.setInput('totalAvailable', 0);
+
+    fixture.componentRef.setInput(
+      'form',
+      new UntypedFormBuilder().group({
+        facetParameter: [],
+        contentTierZero: [''],
+        contentTier: [''],
+        datasetId: [''],
+        dateFrom: [''],
+        dateTo: ['']
+      })
+    );
 
     component.opener = {
       nativeElement: {
@@ -63,48 +71,57 @@ describe('FilterComponent', () => {
 
   it('should enable when options are added', () => {
     expect(component.isDisabled()).toBeTruthy();
-    component.optionSet = emptyOptions;
+
+    fixture.componentRef.setInput('optionSet', emptyOptions);
+    fixture.detectChanges();
     expect(component.isDisabled()).toBeTruthy();
-    component.optionSet = dataOptions;
+
+    fixture.componentRef.setInput('optionSet', dataOptions);
+    fixture.detectChanges();
     expect(component.isDisabled()).toBeFalsy();
   });
 
   it('should track when the filter is empty and the data is empty', () => {
     expect(component.empty).toBeTruthy();
     expect(component.emptyData).toBeTruthy();
-    component.optionSet = emptyOptions;
+
+    fixture.componentRef.setInput('optionSet', emptyOptions);
+    fixture.detectChanges();
     expect(component.empty).toBeTruthy();
     expect(component.emptyData).toBeTruthy();
 
     component.term = '';
-    component.optionSet = dataOptions;
+    fixture.componentRef.setInput('optionSet', dataOptions);
+    fixture.detectChanges();
     expect(component.empty).toBeFalsy();
     expect(component.emptyData).toBeFalsy();
 
     component.term = 'xxx';
-    component.optionSet = dataOptions;
+    // Re-feed the signal reference to force the effect to evaluate again
+    fixture.componentRef.setInput('optionSet', { ...dataOptions });
+    fixture.detectChanges();
     expect(component.empty).toBeFalsy();
     expect(component.emptyData).toBeFalsy();
   });
 
   it('should not disable the date if a range has been specified', () => {
-    component.emptyDataset = true;
-    component.group = 'dates' as DimensionName;
+    fixture.componentRef.setInput('emptyDataset', true);
+    fixture.componentRef.setInput('group', 'dates' as DimensionName);
     expect(component.isDisabled()).toBeTruthy();
 
-    component.form.get('dateFrom').setValue(new Date().toISOString());
-    component.form.get('dateTo').setValue(new Date().toISOString());
+    component.form().get('dateFrom').setValue(new Date().toISOString());
+    component.form().get('dateTo').setValue(new Date().toISOString());
     expect(component.isDisabled()).toBeFalsy();
 
-    component.form.get('dateFrom').setValue(null);
+    component.form().get('dateFrom').setValue(null);
     expect(component.isDisabled()).toBeTruthy();
   });
 
   it('should not disable the on the basis of a filter', () => {
-    component.state = {
+    fixture.componentRef.setInput('state', {
       visible: true,
       disabled: false
-    };
+    });
 
     component.empty = false;
     component.emptyData = false;
@@ -120,7 +137,10 @@ describe('FilterComponent', () => {
     component.term = 'xxx';
     expect(component.isDisabled()).toBeTruthy();
 
-    component.state.visible = false;
+    fixture.componentRef.setInput('state', {
+      visible: false,
+      disabled: false
+    });
     expect(component.isDisabled()).toBeFalsy();
   });
 
@@ -128,11 +148,11 @@ describe('FilterComponent', () => {
     expect(
       component.selectOptionEnabled(DimensionName.contentTier, '0')
     ).toBeFalsy();
-    component.form.get('contentTierZero').setValue(true);
+    component.form().get('contentTierZero').setValue(true);
     expect(
       component.selectOptionEnabled(DimensionName.contentTier, '0')
     ).toBeTruthy();
-    component.form.get('contentTierZero').setValue(true);
+    component.form().get('contentTierZero').setValue(true);
     expect(
       component.selectOptionEnabled(DimensionName.contentTier, '1')
     ).toBeTruthy();
@@ -145,20 +165,33 @@ describe('FilterComponent', () => {
         value: 'option_1'
       }
     };
-    component.state = { disabled: false, visible: false };
-    expect(component.optionSet).toBeFalsy();
-    component.filterOptions(evt);
-    expect(component.optionSet).toBeFalsy();
 
-    component.optionSet = {
-      options: [{ name: 'option_1', label: 'option_1' }]
-    };
+    fixture.componentRef.setInput('state', {
+      visible: false,
+      disabled: false
+    });
+
+    expect(component.optionSet()).toBeFalsy();
     component.filterOptions(evt);
-    expect(component.optionSet.options.length).toEqual(1);
+    expect(component.optionSet()).toBeFalsy();
+
+    fixture.componentRef.setInput('optionSet', {
+      options: [{ name: 'option_1', label: 'option_1' }]
+    });
+    fixture.detectChanges();
+
+    component.filterOptions(evt);
+    expect(component.optionSet().options.length).toEqual(1);
 
     const spyHide = jest.spyOn(component, 'hide');
     component.filterOptions(evt);
     expect(spyHide).not.toHaveBeenCalled();
+
+    component.opener = {
+      nativeElement: {
+        focus: jest.fn()
+      }
+    } as unknown as ElementRef;
 
     evt.key = 'Escape';
     component.filterOptions(evt);
@@ -167,14 +200,15 @@ describe('FilterComponent', () => {
 
   it('should reapply the focus', fakeAsync(() => {
     const spyFocus = jest.fn();
+    const spyFilterTermFocus = jest.fn();
 
-    component.state = { disabled: false, visible: true };
-    component.filterTerm = {
+    const mockFilterTerm = {
       nativeElement: {
-        focus: jest.fn()
+        focus: spyFilterTermFocus
       }
-    };
-    component.checkboxes = {
+    } as unknown as ElementRef;
+
+    const mockCheckboxes = {
       find: (_: CheckboxComponent) => {
         return {
           baseInput: {
@@ -185,23 +219,49 @@ describe('FilterComponent', () => {
         } as unknown as CheckboxComponent;
       }
     } as unknown as QueryList<CheckboxComponent>;
-    component.optionSet = {
+
+    component.filterTerm = mockFilterTerm;
+    component.checkboxes = mockCheckboxes;
+
+    fixture.componentRef.setInput('state', {
+      visible: true,
+      disabled: true
+    });
+
+    fixture.componentRef.setInput('optionSet', {
       options: [{ name: 'option_1', label: 'option_1' }]
-    };
+    });
+
+    fixture.detectChanges();
+
+    component.filterTerm = mockFilterTerm;
+    component.checkboxes = mockCheckboxes;
+
     expect(spyFocus).not.toHaveBeenCalled();
+
     tick();
+
     expect(spyFocus).not.toHaveBeenCalled();
-    expect(spyFocus).not.toHaveBeenCalled();
-    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalled();
+    expect(spyFilterTermFocus).toHaveBeenCalled();
+
+    // Reset mock tracking counts for the next verification step
+    spyFilterTermFocus.mockClear();
 
     component.inputToFocus = { group: '', controlName: '' };
-    component.optionSet = {
+    fixture.componentRef.setInput('optionSet', {
       options: [{ name: 'option_2', label: 'option_2' }]
-    };
+    });
+
+    fixture.detectChanges();
+
+    // Re-apply once more before ticking the final macro-task queue loop
+    component.filterTerm = mockFilterTerm;
+    component.checkboxes = mockCheckboxes;
+
     tick();
     expect(spyFocus).toHaveBeenCalled();
     expect(component.inputToFocus).toBeFalsy();
-    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalledTimes(1);
+    expect(spyFilterTermFocus).not.toHaveBeenCalled();
   }));
 
   it('should get the values', () => {
@@ -211,11 +271,11 @@ describe('FilterComponent', () => {
     ): Array<UntypedFormControl> => {
       const fGroup = new UntypedFormBuilder().group({});
       expect(component.getSetCheckboxValues(grp).length).toBe(0);
-      component.form.addControl(grp, fGroup);
+      component.form().addControl(grp, fGroup);
       const res = [];
       ops.forEach((s: string) => {
         fGroup.addControl(s, new UntypedFormControl(false));
-        const ctrl = component.form.get(`${grp}.${s}`) as UntypedFormControl;
+        const ctrl = component.form().get(`${grp}.${s}`) as UntypedFormControl;
         ctrl.setValue(true);
         res.push(ctrl);
       });
@@ -234,18 +294,19 @@ describe('FilterComponent', () => {
       'aaa, bbb'
     );
 
-    component.group = DimensionName.metadataTier;
+    fixture.componentRef.setInput('group', DimensionName.metadataTier);
     expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
       'Tier aaa, Tier bbb'
     );
 
-    component.group = DimensionName.provider;
+    fixture.componentRef.setInput('group', DimensionName.provider);
     createFormControls(DimensionName.provider, ['Europeana']);
     expect(component.getSetCheckboxValues(DimensionName.provider)).toEqual(
       'Europeana'
     );
 
-    component.group = DimensionName.rightsCategory;
+    fixture.componentRef.setInput('group', DimensionName.rightsCategory);
+
     createFormControls(DimensionName.rightsCategory, [
       'xxx',
       toInputSafeName('CC BY-ND')
@@ -262,24 +323,29 @@ describe('FilterComponent', () => {
   });
 
   it('should hide', () => {
-    component.state = { disabled: false, visible: true };
-    expect(component.state.visible).toBeTruthy();
+    fixture.componentRef.setInput('state', { visible: true, disabled: false });
+    fixture.detectChanges();
+
     component.hide();
-    expect(component.state.visible).toBeFalsy();
+    fixture.detectChanges();
+
+    // Read the signal output as a function invocation
+    expect(component.state().visible).toBeFalsy();
   });
 
   it('should toggle', fakeAsync(() => {
-    component.state = { disabled: false, visible: true };
-    expect(component.state.visible).toBeTruthy();
+    fixture.componentRef.setInput('state', { disabled: false, visible: true });
+    fixture.detectChanges();
+    expect(component.state().visible).toBeTruthy();
     component.toggle();
     tick(1);
-    expect(component.state.visible).toBeFalsy();
+    expect(component.state().visible).toBeFalsy();
     component.toggle();
     tick(1);
-    expect(component.state.visible).toBeTruthy();
+    expect(component.state().visible).toBeTruthy();
     component.toggle();
     tick(1);
-    expect(component.state.visible).toBeFalsy();
+    expect(component.state().visible).toBeFalsy();
   }));
 
   it('should bind to the key selection', () => {

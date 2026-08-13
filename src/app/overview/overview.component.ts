@@ -5,8 +5,10 @@ import {
   ElementRef,
   inject,
   OnInit,
+  signal,
   TemplateRef,
-  ViewChild
+  ViewChild,
+  WritableSignal
 } from '@angular/core';
 import {
   DatePipe,
@@ -152,7 +154,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   readonly MAX_FILTER_OPTIONS = 50;
   readonly facetConf = facetNames;
 
-  filterStates: { [key: string]: FilterState } = {};
+  filterStates: { [key: string]: WritableSignal<FilterState> } = {};
+
   userFilterSearchTerms = facetNames.reduce((newMap, item: string) => {
     newMap[item] = {
       dimension: item,
@@ -602,12 +605,16 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   initialiseFilterStates(): void {
     this.facetConf.forEach((name: string) => {
-      this.filterStates[name] = {
+      this.filterStates[name] = signal<FilterState>({
         visible: false,
         disabled: this.form.value.facetParameter === name
-      };
+      });
     });
-    this.filterStates.dates = { visible: false, disabled: false };
+
+    this.filterStates.dates = signal<FilterState>({
+      visible: false,
+      disabled: false
+    });
   }
 
   iHashNumberFromNVPs(
@@ -1079,14 +1086,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* Opens the date fields after a millisecond pause
   */
   datesOpen(): void {
-    const filterStates = this.filterStates;
-    const fn = (): void => {
-      filterStates.dates = {
+    setTimeout(() => {
+      this.filterStates.dates.set({
         visible: true,
         disabled: false
-      };
-    };
-    setTimeout(fn, 1);
+      });
+    }, 1);
   }
 
   /** focusExportOpener
@@ -1109,7 +1114,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   enableFilters(): void {
     this.facetConf.forEach((name: string) => {
       this.form.controls[name].enable();
-      this.filterStates[name].disabled = false;
+      this.filterStates[name].update((current) => ({
+        ...current,
+        disabled: false
+      }));
     });
   }
 
@@ -1120,7 +1128,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   updateFilterAvailability(): void {
     this.enableFilters();
-    this.filterStates[this.form.value['facetParameter']].disabled = true;
+
+    const activeFacet = this.form.value['facetParameter'];
+    if (activeFacet && this.filterStates[activeFacet]) {
+      this.filterStates[activeFacet].update((current) => ({
+        ...current,
+        disabled: true
+      }));
+    }
   }
 
   /** updatePageUrl
@@ -1259,7 +1274,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         return state !== exempt;
       })
       .forEach((state: string) => {
-        this.filterStates[state].visible = false;
+        this.filterStates[state].update((current) => ({
+          ...current,
+          visible: false
+        }));
       });
   }
 

@@ -303,7 +303,11 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       } else if (component instanceof CountryComponent) {
         this.countryComponentRef = component;
-        component.includeCTZero.set(this.lastSetContentTierZeroValue);
+
+        setTimeout(() => {
+          component.includeCTZero.set(this.lastSetContentTierZeroValue);
+        }, 0);
+
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
         if (!hasCountryMapData) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);
