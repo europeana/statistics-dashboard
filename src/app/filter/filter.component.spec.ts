@@ -287,7 +287,7 @@ describe('FilterComponent', () => {
       'Belgium, Germany, Italy'
     );
 
-    component.tierPrefix = 'Tier ';
+    fixture.componentRef.setInput('tierPrefix', 'Tier ');
 
     createFormControls(DimensionName.metadataTier, ['aaa', 'bbb']);
     expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(

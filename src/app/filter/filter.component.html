@@ -56,10 +56,10 @@
       </li>
     </ul>
     <ul class="checkboxes-list" tabindex="-1">
-      <li>
-        @for (option of currentOptionSet.options; track option.name) {
+      <li tabindex="-1">
         <ul tabindex="-1">
-          <li tabindex="-1">
+          @for (option of currentOptionSet.options; track option.name) {
+          <li tabindex="-1" class="checkbox-item-row" style="display: block">
             <app-checkbox
               [form]="form()"
               [controlName]="option.name"
@@ -68,8 +68,8 @@
               (valueChanged)="changed()"
             ></app-checkbox>
           </li>
+          }
         </ul>
-        }
       </li>
       <li
         class="load-more-item"

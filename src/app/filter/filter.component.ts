@@ -3,7 +3,6 @@ import {
   effect,
   ElementRef,
   EventEmitter,
-  Input,
   input,
   model,
   Output,
@@ -26,7 +25,7 @@ import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { DatesComponent } from '../dates/dates.component';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-filter',
@@ -39,7 +38,6 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
     ReactiveFormsModule,
     NgClass,
     DatesComponent,
-    NgFor,
     CheckboxComponent,
     HighlightMatchPipe,
     RenameApiFacetPipe,
@@ -51,6 +49,7 @@ export class FilterComponent {
 
   form = input.required<FormGroup>();
   group = input.required<DimensionName>();
+  tierPrefix = input<string>('');
   totalAvailable = input.required<number>();
   optionSet = input<FilterOptionSet | undefined>(undefined);
 
@@ -60,8 +59,6 @@ export class FilterComponent {
   pagesVisible = 1;
   inputToFocus?: InputDescription;
   state = model.required<FilterState>();
-
-  @Input() tierPrefix: string;
 
   @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
   @Output() valueChanged: EventEmitter<true> = new EventEmitter();
@@ -185,7 +182,7 @@ export class FilterComponent {
             this.group()
           )
         ) {
-          prefix = this.tierPrefix;
+          prefix = this.tierPrefix();
         }
         return prefix + s;
       })

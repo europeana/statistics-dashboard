@@ -22,7 +22,7 @@ import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
 import { AppDateAdapter } from './_helpers';
-import { APIService, ClickService } from './_services';
+import { APIService, ClickService, FilterStateService } from './_services';
 import {
   BreakdownResult,
   CountPercentageValue,
@@ -51,6 +51,7 @@ import { HeaderComponent } from './header/header.component';
 })
 export class AppComponent extends SubscriptionManager implements OnInit {
   private readonly maintenanceService = inject(MaintenanceScheduleService);
+  public filterStateService = inject(FilterStateService);
 
   formCTZero: FormGroup<{ contentTierZero: FormControl<boolean> }>;
   landingData: GeneralResultsFormatted;
@@ -106,7 +107,10 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     this.subs.push(
       this.formCTZero.valueChanges.subscribe(() => {
         this.lastSetContentTierZeroValue =
-          this.formCTZero.value.contentTierZero;
+          !!this.formCTZero.value.contentTierZero;
+        this.filterStateService.includeCTZero.set(
+          this.lastSetContentTierZeroValue
+        );
 
         if (!this.skipLocationUpdate) {
           this.updateLocation();
@@ -116,7 +120,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
         // load landing data if on country page or landing page
         const path = this.location.path();
-        if (path.split('?')[0] === '' || path.split('/country')[0] === '') {
+        if (path === '' || path.startsWith('/country')) {
           this.loadLandingData(this.lastSetContentTierZeroValue);
         }
         if (this.countryComponentRef) {
@@ -182,13 +186,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           });
 
           if (this.landingComponentRef) {
-            this.landingComponentRef.includeCTZero = includeCTZero;
             this.landingComponentRef.landingData = this.landingData;
             this.landingComponentRef.isLoading = false;
           }
-
-          // assign country data
-          //this.header.countryTotalMap = countryTotalMap;
 
           const sortedProcessedMap = Object.keys(countryTotalMap || {})
             .sort(HeaderComponent.sortByDecodedCountryName)
@@ -197,8 +197,15 @@ export class AppComponent extends SubscriptionManager implements OnInit {
               return ob;
             }, {});
 
-          // 3. Pass that cleanly into your signal:
-          this.header.countryTotalMap.set(sortedProcessedMap);
+          if (this.header) {
+            if (typeof this.header.countryTotalMap === 'function') {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (this.header.countryTotalMap as any).set(sortedProcessedMap);
+            } else {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (this.header as any).countryTotalMap = sortedProcessedMap;
+            }
+          }
         })
     );
   }
@@ -214,11 +221,12 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    **/
   setContentTierZeroValue(value: boolean): void {
     const ctrlCTZero = this.getCtrlCTZero();
-
     this.lastSetContentTierZeroValue = value;
+    this.filterStateService.includeCTZero.set(value);
+
     if (value !== ctrlCTZero.value) {
       this.skipLocationUpdate = true;
-      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
+      ctrlCTZero.setValue(value);
     }
   }
 
@@ -232,8 +240,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * @param { PopStateEvent } state - the event
    **/
   handleLocationPopState(state: PopStateEvent): void {
+    const targetUrlString = state?.url || window.location.href;
     this.setContentTierZeroValue(
-      `${state.url}`.includes('content-tier-zero=true')
+      `${targetUrlString}`.includes('content-tier-zero=true')
     );
   }
 
@@ -245,9 +254,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   ngOnInit(): void {
     this.subs.push(
       this.route.queryParams.subscribe((params: Params) => {
-        // set default for form initalisation / track changes coming from either page
-        this.lastSetContentTierZeroValue =
-          params[this.paramNameCTZero] === 'true';
+        const hasParam = params[this.paramNameCTZero] === 'true';
+        this.filterStateService.includeCTZero.set(hasParam);
+        this.lastSetContentTierZeroValue = hasParam;
       })
     );
     this.location.subscribe(this.handleLocationPopState.bind(this));
@@ -255,6 +264,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   }
 
   setCTZeroInputToLastSetValue(ctrlCTZero: FormControl): void {
+    if (!ctrlCTZero) return;
     this.skipLocationUpdate = true;
     ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
   }
@@ -285,14 +295,19 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       | CookiePolicyComponent
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
-    const hasCountryMapData =
-      Object.keys(this.header?.countryTotalMap() || {}).length > 0;
+
+    const hasCountryMapData = Object.keys(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        typeof (this.header as any)?.countryTotalMap === 'function'
+      ).length > 0;
 
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
       this.landingComponentRef = component;
-      this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
-      this.setCTZeroInputToLastSetValue(ctrlCTZero);
+
+      if (ctrlCTZero) {
+        this.setCTZeroInputToLastSetValue(ctrlCTZero);
+      }
       if (this.landingData) {
         this.landingComponentRef.landingData = this.landingData;
       }
@@ -303,22 +318,16 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       } else if (component instanceof CountryComponent) {
         this.countryComponentRef = component;
-
-        setTimeout(() => {
-          component.includeCTZero.set(this.lastSetContentTierZeroValue);
-        }, 0);
-
         this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
-        if (!hasCountryMapData) {
+        if (!hasCountryMapData && ctrlCTZero) {
           this.setCTZeroInputToLastSetValue(ctrlCTZero);
         }
       } else {
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
       }
 
-      // trigger data fetch if signal is unpopulated
       if (!hasCountryMapData) {
-        this.loadLandingData(this.lastSetContentTierZeroValue);
+        this.loadLandingData(this.filterStateService.includeCTZero());
       }
     }
   }
@@ -355,12 +364,10 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * toggle this.paramNameCTZero in window location
    **/
   updateLocation(): void {
-    const path = this.location.path().split('?')[0];
-
-    if (this.formCTZero.value.contentTierZero) {
-      this.location.go(`${path}?${this.paramNameCTZero}=true`);
-    } else {
-      this.location.go(path);
-    }
+    const path = this.location.path().split('?');
+    const queryParams = this.filterStateService.includeCTZero()
+      ? `?${this.paramNameCTZero}=true`
+      : '';
+    this.location.go(`${path[0]}${queryParams}`);
   }
 }

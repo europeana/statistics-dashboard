@@ -68,7 +68,7 @@ import {
   RequestFilter
 } from '../_models';
 import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
 import { SpeechBubbleComponent } from '../speech-bubble';
@@ -129,6 +129,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private filterStateService = inject(FilterStateService);
 
   // Make variables available to template
   public fromCSL = fromCSL;
@@ -153,6 +154,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   readonly MAX_FILTER_OPTIONS = 50;
   readonly facetConf = facetNames;
+  readonly includeCTZero = this.filterStateService.includeCTZero;
 
   filterStates: { [key: string]: WritableSignal<FilterState> } = {};
 

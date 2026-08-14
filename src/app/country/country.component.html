@@ -6,15 +6,14 @@
 >
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="country()"></span>
-
-    @if (headerRef()?.countryTotalMap() &&
-    headerRef().countryTotalMap()[country()] !== undefined) {
+    @if (headerRef()?.countryTotalMap(); as activeMap) { @if
+    (activeMap[country()] !== undefined) {
     <span>{{ country() | renameCountry }}</span>
     <span i18n="@@countryPageTitle">Data</span>
     <span class="page-subtitle">
-      {{ headerRef().countryTotalMap()[country()] }}% of the Europeana dataset
+      {{ activeMap[country()] }}% of the Europeana dataset
     </span>
-    }
+    } }
   </h1>
 
   <ng-template

@@ -37,7 +37,7 @@ import {
   TargetMetaData,
   VisibleHeatMap
 } from '../_models';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
 import {
   RenameApiFacetPipe,
   RenameApiFacetShortPipe,
@@ -85,8 +85,11 @@ export class LandingComponent extends SubscriptionManager {
   public TargetFieldName = TargetFieldName;
   public targetDescriptions = targetDescriptions;
 
+  private readonly api = inject(APIService);
+  private readonly filterStateService = inject(FilterStateService);
+
   // Used to parameterise links to the data page
-  @Input() includeCTZero = false;
+  readonly includeCTZero = this.filterStateService.includeCTZero;
 
   @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
   @ViewChild(MapComponent) mapChart: MapComponent;
@@ -135,8 +138,6 @@ export class LandingComponent extends SubscriptionManager {
   get landingData(): GeneralResultsFormatted {
     return this._landingData;
   }
-
-  private readonly api = inject(APIService);
 
   constructor() {
     super();

@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { signal, ViewContainerRef } from '@angular/core';
+import { signal, ViewContainerRef, WritableSignal } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -19,7 +19,7 @@ import {
 } from '@europeana/metis-ui-maintenance-utils';
 
 import { MockAPIService } from './_mocked';
-import { APIService, ClickService } from './_services';
+import { APIService, ClickService, FilterStateService } from './_services';
 import { AppComponent } from './app.component';
 import { CookiePolicyComponent } from './cookie-policy';
 import { CountryComponent } from './country';
@@ -37,11 +37,12 @@ describe('AppComponent', () => {
   let clicks: ClickService;
   let location: Location;
   let maintenanceSchedules: MaintenanceScheduleService;
+  let mockFilterStateService: { includeCTZero: WritableSignal<boolean> };
 
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({} as Params);
 
-  // Helper helper function to mimic an Angular ModelSignal wrapper interface
+  // Helper function to mimic an Angular ModelSignal wrapper interface
   const createMockModelSignal = (
     initialValue: boolean
   ): {
@@ -59,6 +60,11 @@ describe('AppComponent', () => {
   };
 
   beforeEach(waitForAsync(() => {
+    // Initialize a mock signal source of truth for the shared state service
+    mockFilterStateService = {
+      includeCTZero: signal<boolean>(false)
+    };
+
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([
@@ -74,6 +80,10 @@ describe('AppComponent', () => {
         {
           provide: APIService,
           useClass: MockAPIService
+        },
+        {
+          provide: FilterStateService,
+          useValue: mockFilterStateService
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
@@ -125,31 +135,30 @@ describe('AppComponent', () => {
   }));
 
   it('should listen for history navigation', fakeAsync(() => {
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
     app.buildForm();
 
     app.countryComponentRef = {
       includeCTZero: createMockModelSignal(false)
     } as unknown as CountryComponent;
 
-    // trigger location change does nothing
     app.updateLocation();
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
 
     app.landingComponentRef = {
       isLoading: true
     } as unknown as LandingComponent;
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
 
     app.updateLocation();
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
 
     // trigger location change with different value
     const ctrl = app.getCtrlCTZero();
     ctrl.setValue(true);
 
     tick(1);
-    expect(app.lastSetContentTierZeroValue).toBeTruthy();
+    expect(mockFilterStateService.includeCTZero()).toBeTruthy();
     expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
       true
     );
@@ -157,16 +166,15 @@ describe('AppComponent', () => {
     ctrl.setValue(false);
 
     tick(1);
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
     expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
       false
     );
 
-    // trigger location change with different value
     location.go('/');
 
     tick(1);
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
   }));
 
   it('should handle the location pop-state', () => {
@@ -180,10 +188,10 @@ describe('AppComponent', () => {
       isLoading: false
     } as unknown as LandingComponent;
 
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
     app.handleLocationPopState(ps);
     fixture.detectChanges();
-    expect(app.lastSetContentTierZeroValue).toBeTruthy();
+    expect(mockFilterStateService.includeCTZero()).toBeTruthy();
   });
 
   it('should load the landing data', fakeAsync(() => {
@@ -227,15 +235,19 @@ describe('AppComponent', () => {
       fixture.detectChanges();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
+      // Near line 253 inside your mock setup loader sequence:
       const cmp = new LandingComponent();
       app.landingData = {};
       app.onOutletLoaded(cmp);
       expect(app.showPageTitle).toBeTruthy();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(4);
-      expect(app.lastSetContentTierZeroValue).toBeTruthy();
+
+      // Update this check to evaluate your mock service state reference
+      expect(mockFilterStateService.includeCTZero()).toBeTruthy();
       expect(cmp.landingData).toBeTruthy();
 
-      app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
+      // Mutate the service signal directly rather than assigning to a read-only getter
+      mockFilterStateService.includeCTZero.set(!app.getCtrlCTZero().value);
       app.onOutletLoaded(new LandingComponent());
       expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
@@ -265,23 +277,21 @@ describe('AppComponent', () => {
       expect(spyLoadLandingData).toHaveBeenCalledTimes(9);
       expect(spySetCTZero).toHaveBeenCalledTimes(1);
 
-      app.lastSetContentTierZeroValue = true;
+      mockFilterStateService.includeCTZero.set(true);
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(spySetCTZero).toHaveBeenCalledTimes(2);
       expect(spyRefreshCardData).not.toHaveBeenCalled();
 
-      jest
-        .spyOn(fakeCountryComponent, 'loadDimensionCardData')
-        .mockImplementation(() => []);
+      fakeCountryComponent.loadDimensionCardData = jest
+        .fn()
+        .mockReturnValue([]);
 
       fakeCountryComponent.country.set('FR');
       fakeCountryComponent.includeCTZero = createMockModelSignal(false);
 
-      // Inject standard mock behavior directly over instance to let callTimes assertions pass flawlessly
       fakeCountryComponent.refreshCardData = spyRefreshCardData;
 
-      // Manually trigger effect logic sequence simulated by Angular's dynamic model bindings
       if (
         fakeCountryComponent.country().length &&
         typeof fakeCountryComponent.includeCTZero() === 'boolean'

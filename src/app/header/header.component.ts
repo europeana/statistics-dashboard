@@ -10,7 +10,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
 import { Router, RouterLink } from '@angular/router';
 
@@ -18,6 +18,7 @@ import { OpenerFocusDirective } from '../_directives';
 import { isoCountryCodes, isoCountryCodesReversed } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
 import { IHash } from '../_models';
+import { FilterStateService } from '../_services';
 import { RenameCountryPipe } from '../_translate';
 
 interface CountryPair {
@@ -32,10 +33,8 @@ interface CountryPair {
   imports: [
     ClickAwareDirective,
     CTZeroControlComponent,
-    KeyValuePipe,
     NgClass,
     NgIf,
-    NgFor,
     OpenerFocusDirective,
     RenameCountryPipe,
     RouterLink
@@ -47,8 +46,11 @@ export class HeaderComponent {
   public static readonly PAGE_TITLE_MINIFIED = 1;
   public static readonly PAGE_TITLE_SHOWING = 2;
 
+  private filterStateService = inject(FilterStateService);
+
+  readonly includeCTZero = this.filterStateService.includeCTZero;
+
   form = input<FormGroup>();
-  includeCTZero = input<boolean>(false);
   showPageTitle = model<number>(HeaderComponent.PAGE_TITLE_HIDDEN);
   pageTitleInViewport = model<boolean>(false);
   pageTitleDynamic = model<boolean>(false);

@@ -489,7 +489,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-ct"
             i18n="landing section link edm@@landingSectionLinkEDM"
             >View by content tier</a
@@ -528,7 +528,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.metadataTier }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-metadata"
             i18n="landing section link metadata@@landingSectionLinkMetadata"
             >View by metadata tier</a
@@ -567,7 +567,7 @@
         <a
           class="data-link"
           routerLink="/data/{{ DimensionName.country }}"
-          [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+          [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
           data-e2e="link-entry-country"
           i18n="landing section link countries@@landingSectionLinkCountries"
           >View by countries</a
@@ -597,7 +597,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-type"
             i18n="landing section link type@@landingSectionLinkType"
             >View by type</a
@@ -629,7 +629,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.rightsCategory }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-rights"
             i18n="landing section link rights@@landingSectionLinkRights"
             >View by rights category</a
@@ -660,7 +660,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.dataProvider }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-data-provider"
             i18n="
               landing section link data provider@@landingSectionLinkDataProvider"
@@ -693,7 +693,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.provider }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-provider"
             i18n="landing section link provider@@landingSectionLinkProvider"
             >View by provider</a

@@ -53,7 +53,7 @@ import {
   TargetFieldName,
   TargetMetaData
 } from '../_models';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
 import {
   AbbreviateNumberPipe,
   RenameApiFacetPipe,
@@ -120,8 +120,6 @@ export class CountryComponent
 
   cardData: IHash<Array<NamesValuePercent>>;
 
-  readonly includeCTZero = model<boolean>(false);
-
   @ViewChild('legendGrid') legendGrid: LegendGridComponent;
   @ViewChild('barChart') barChart: BarComponent;
   @ViewChild('scrollPoint') scrollPoint: ElementRef;
@@ -130,6 +128,7 @@ export class CountryComponent
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(APIService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly filterStateService = inject(FilterStateService);
 
   public countryCodes = isoCountryCodes;
 
@@ -172,6 +171,7 @@ export class CountryComponent
   readonly lineChartIsInitialised = inject(LineService).lineChartReady;
 
   readonly headerRef = input<HeaderComponent>();
+  readonly includeCTZero = this.filterStateService.includeCTZero;
 
   /** constructor
    * gets the app-ref and obtains the header ref
@@ -188,8 +188,18 @@ export class CountryComponent
 
     const rootRef = this.applicationRef.components[0].instance;
     if (rootRef && !this.headerRef()) {
+      // 1. Extract the header property from the root container instance safely
+      const rawHeaderProperty = rootRef['header'];
+
+      // 2. Fix: Check if the extracted property is an un-executed signal function tracker wrapper,
+      // and invoke it with () to unwrap the true HeaderComponent instance before passing it to your signal!
+      const trueHeaderComponentInstance =
+        typeof rawHeaderProperty === 'function'
+          ? rawHeaderProperty()
+          : rawHeaderProperty;
+
       (this as Record<string, unknown>)['headerRef'] = signal(
-        rootRef['header']
+        trueHeaderComponentInstance
       ).asReadonly();
     }
 
@@ -290,8 +300,7 @@ export class CountryComponent
    * - invoked before router navigates to overview page on (target) link click
    **/
   resetAppCTZeroParam(): void {
-    const rootRef = this.applicationRef.components[0].instance;
-    rootRef.setContentTierZeroValue(false);
+    this.filterStateService.includeCTZero.set(false);
   }
 
   /** refreshCardData

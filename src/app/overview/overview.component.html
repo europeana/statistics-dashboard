@@ -78,9 +78,7 @@
                 i18n="Home Link@@labelLinkHome"
                 routerLink="/"
                 [queryParams]="
-                  form.value.contentTierZero
-                    ? { 'content-tier-zero': true }
-                    : {}
+                  includeCTZero() ? { 'content-tier-zero': true } : {}
                 "
                 >Home</a
               >
@@ -312,7 +310,7 @@
                       <a
                         [routerLink]="['/country', countryCode | renameCountry]"
                         [queryParams]="{
-                          'content-tier-zero': form.value.contentTierZero
+                          'content-tier-zero': includeCTZero()
                             ? true
                             : undefined
                         }"
