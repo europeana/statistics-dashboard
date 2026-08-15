@@ -19,6 +19,8 @@ import {
 } from '@europeana/metis-ui-maintenance-utils';
 
 import { MockAPIService } from './_mocked';
+import { GeneralResultsFormatted } from './_models';
+
 import { APIService, ClickService, FilterStateService } from './_services';
 import { AppComponent } from './app.component';
 import { CookiePolicyComponent } from './cookie-policy';
@@ -37,7 +39,12 @@ describe('AppComponent', () => {
   let clicks: ClickService;
   let location: Location;
   let maintenanceSchedules: MaintenanceScheduleService;
-  let mockFilterStateService: { includeCTZero: WritableSignal<boolean> };
+  let mockFilterStateService: {
+    includeCTZero: WritableSignal<boolean>;
+    hasCountryMapData: WritableSignal<boolean>;
+    landingData: WritableSignal<GeneralResultsFormatted>;
+    landingDataIsLoading: WritableSignal<boolean>;
+  };
 
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({} as Params);
@@ -62,7 +69,10 @@ describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     // Initialize a mock signal source of truth for the shared state service
     mockFilterStateService = {
-      includeCTZero: signal<boolean>(false)
+      includeCTZero: signal<boolean>(false),
+      hasCountryMapData: signal<boolean>(false),
+      landingData: signal({} as GeneralResultsFormatted),
+      landingDataIsLoading: signal<boolean>(false)
     };
 
     TestBed.configureTestingModule({
@@ -139,15 +149,15 @@ describe('AppComponent', () => {
     app.buildForm();
 
     app.countryComponentRef = {
-      includeCTZero: createMockModelSignal(false)
+      includeCTZero: createMockModelSignal(false),
+      hasCountryMapData: createMockModelSignal(false),
+      landingData: signal({} as GeneralResultsFormatted),
+      landingDataIsLoading: signal<boolean>(false)
     } as unknown as CountryComponent;
 
     app.updateLocation();
     expect(mockFilterStateService.includeCTZero()).toBeFalsy();
 
-    app.landingComponentRef = {
-      isLoading: true
-    } as unknown as LandingComponent;
     expect(mockFilterStateService.includeCTZero()).toBeFalsy();
 
     app.updateLocation();
@@ -184,10 +194,6 @@ describe('AppComponent', () => {
 
     app.buildForm();
 
-    app.landingComponentRef = {
-      isLoading: false
-    } as unknown as LandingComponent;
-
     expect(mockFilterStateService.includeCTZero()).toBeFalsy();
     app.handleLocationPopState(ps);
     fixture.detectChanges();
@@ -195,16 +201,13 @@ describe('AppComponent', () => {
   });
 
   it('should load the landing data', fakeAsync(() => {
-    app.landingComponentRef = {
-      isLoading: true
-    } as unknown as LandingComponent;
-    expect(app.landingComponentRef.isLoading).toBeTruthy();
-    expect(app.landingComponentRef.landingData).toBeFalsy();
     app.buildForm();
+    expect(mockFilterStateService.landingDataIsLoading()).toBeFalsy();
     app.loadLandingData(false);
+    expect(mockFilterStateService.landingDataIsLoading()).toBeTruthy();
     tick(1);
-    expect(app.landingComponentRef.isLoading).toBeFalsy();
-    expect(app.landingComponentRef.landingData).toBeTruthy();
+    fixture.detectChanges();
+    expect(mockFilterStateService.landingDataIsLoading()).toBeFalsy();
   }));
 
   it('should handle the outlet load', waitForAsync(async () => {
@@ -235,8 +238,9 @@ describe('AppComponent', () => {
       fixture.detectChanges();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
-      // Near line 253 inside your mock setup loader sequence:
       const cmp = new LandingComponent();
+      cmp.landingData.set({} as GeneralResultsFormatted);
+
       app.landingData = {};
       app.onOutletLoaded(cmp);
       expect(app.showPageTitle).toBeTruthy();
@@ -244,7 +248,7 @@ describe('AppComponent', () => {
 
       // Update this check to evaluate your mock service state reference
       expect(mockFilterStateService.includeCTZero()).toBeTruthy();
-      expect(cmp.landingData).toBeTruthy();
+      expect(cmp.landingData()).toBeTruthy();
 
       // Mutate the service signal directly rather than assigning to a read-only getter
       mockFilterStateService.includeCTZero.set(!app.getCtrlCTZero().value);
@@ -307,10 +311,6 @@ describe('AppComponent', () => {
   }));
 
   it('should check if maintenance is due', () => {
-    app.landingComponentRef = {
-      isLoading: true
-    } as unknown as LandingComponent;
-
     const maintenanceSettings = {
       pollInterval: 1,
       maintenanceScheduleUrl: 'http://maintenance',
@@ -329,7 +329,6 @@ describe('AppComponent', () => {
 
     app.checkIfMaintenanceDue(maintenanceSettings);
     expect(spyLoadMaintenanceItem).toHaveBeenCalled();
-
-    expect(app.landingComponentRef.isLoading).toBeFalsy();
+    expect(mockFilterStateService.landingDataIsLoading()).toBeFalsy();
   });
 });

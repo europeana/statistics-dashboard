@@ -1,9 +1,12 @@
 import { Injectable, signal } from '@angular/core';
+import { GeneralResultsFormatted } from '../_models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FilterStateService {
-  // A clean, shared global signal that any component can read/write reactively
   includeCTZero = signal<boolean>(false);
+  hasCountryMapData = signal<boolean>(false);
+  landingData = signal<GeneralResultsFormatted>({});
+  landingDataIsLoading = signal<boolean>(false);
 }

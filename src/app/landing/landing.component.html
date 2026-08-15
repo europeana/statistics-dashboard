@@ -1,8 +1,8 @@
 <main
   class="fit-to-page landing-page"
   [ngClass]="{
-    'loading-modal': isLoading && !hasLandingData(),
-    loading: isLoading && hasLandingData()
+    'loading-modal': landingDataIsLoading() && !hasLandingData(),
+    loading: landingDataIsLoading() && hasLandingData()
   }"
 >
   <app-resize (sizeChanged)="refreshCharts()"></app-resize>
@@ -14,7 +14,7 @@
   <ng-template #chartSummary let-dimension="facetName">
     <span
       class="container-h totals"
-      *ngIf="landingData[dimension] && landingData[dimension][0]; let data"
+      *ngIf="landingData()[dimension] && landingData()[dimension][0]; let data"
     >
       <span class="container-v">
         <span
@@ -156,7 +156,10 @@
     let-dimension="facetName"
     let-isCountryCard="isCountryCard"
   >
-    <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
+    <div
+      class="container-v data-rows"
+      *ngIf="landingData()[dimension]; let data"
+    >
       <div class="container-h data-rows-title">
         <!-- Begin Map Toolbar Contents-->
 
@@ -458,7 +461,7 @@
     <div class="entry-card-pair">
       <div
         class="entry-card"
-        *ngIf="landingData[DimensionName.contentTier]; let data"
+        *ngIf="landingData()[DimensionName.contentTier]; let data"
       >
         <span
           class="entry-card-header"
@@ -498,7 +501,7 @@
       </div>
       <div
         class="entry-card"
-        *ngIf="landingData[DimensionName.metadataTier]; let data"
+        *ngIf="landingData()[DimensionName.metadataTier]; let data"
       >
         <span
           class="entry-card-header"
@@ -539,7 +542,7 @@
 
     <div
       class="entry-card double-card"
-      *ngIf="landingData[DimensionName.country]; let data"
+      *ngIf="landingData()[DimensionName.country]; let data"
     >
       <span
         class="entry-card-header"
@@ -547,11 +550,11 @@
         >Explore by providing countries</span
       >
       <div class="entry-card-content">
-        <div class="entry-card-pair map-section" *ngIf="!!mapData">
+        <div class="entry-card-pair map-section" *ngIf="!!mapData()">
           <div class="map-container" tabindex="-1">
             <app-map-chart
               tabindex="-1"
-              [mapData]="mapData"
+              [mapData]="mapData()"
               (mapCountrySet)="onMapCountrySet($event)"
               #mapChart
             ></app-map-chart>
@@ -576,7 +579,10 @@
     </div>
 
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
+      <div
+        class="entry-card"
+        *ngIf="landingData()[DimensionName.type]; let data"
+      >
         <span
           class="entry-card-header"
           i18n="landing section title type@@landingSectionTitleType"
@@ -604,7 +610,10 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="landingData[DimensionName.rightsCategory]">
+      <div
+        class="entry-card"
+        *ngIf="landingData()[DimensionName.rightsCategory]"
+      >
         <span
           class="entry-card-header"
           i18n="landing section title rights@@landingSectionTitleRights"
@@ -639,7 +648,7 @@
     </div>
 
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
+      <div class="entry-card" *ngIf="landingData()[DimensionName.dataProvider]">
         <span
           class="entry-card-header"
           i18n="
@@ -668,7 +677,7 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="landingData[DimensionName.provider]">
+      <div class="entry-card" *ngIf="landingData()[DimensionName.provider]">
         <span
           class="entry-card-header"
           i18n="landing section title provider@@landingSectionTitleProvider"

@@ -11,9 +11,10 @@ import {
 } from '@angular/common';
 import {
   Component,
+  computed,
+  effect,
   ElementRef,
   inject,
-  Input,
   QueryList,
   ViewChild,
   ViewChildren
@@ -97,14 +98,11 @@ export class LandingComponent extends SubscriptionManager {
 
   singleCountryMode = false;
   barColour = '#0771ce';
-  isLoading: boolean;
-  _landingData: GeneralResultsFormatted = {};
   targetMetaData: IHash<IHashArray<TargetMetaData>>;
   targetData: IHash<IHashArray<TargetMetaData>>;
   targetExpanded: TargetFieldName | undefined;
   countryData: IHash<Array<TargetData>>;
   allProgressSeries: IHashArray<Array<IdValue>> = {};
-  mapData: Array<IdValue>;
   mapMenuIsOpen = false;
   heatmapActivated = false;
   _visibleHeatMap?: VisibleHeatMap;
@@ -122,25 +120,25 @@ export class LandingComponent extends SubscriptionManager {
     this._visibleHeatMap = visibleHeatMap;
   }
 
-  @Input() set landingData(results: GeneralResultsFormatted) {
-    this._landingData = results;
-    this.mapData = results[DimensionName.country]
-      ? results[DimensionName.country].map((nv: NameValue) => {
-          return {
-            id: nv.name,
-            value: nv.value
-          };
-        })
-      : [];
-    this.refreshCharts();
-  }
+  readonly landingData = this.filterStateService.landingData;
+  readonly landingDataIsLoading = this.filterStateService.landingDataIsLoading;
 
-  get landingData(): GeneralResultsFormatted {
-    return this._landingData;
-  }
+  readonly mapData = computed<Array<IdValue>>(() => {
+    const results = this.landingData();
+    return results[DimensionName.country]
+      ? results[DimensionName.country].map((nv: NameValue) => ({
+          id: nv.name,
+          value: nv.value
+        }))
+      : [];
+  });
 
   constructor() {
     super();
+    effect(() => {
+      this.landingData();
+      this.refreshCharts();
+    });
   }
 
   /**
@@ -270,10 +268,9 @@ export class LandingComponent extends SubscriptionManager {
    * reset visibleHeatMap variable
    **/
   clearHeatmap(): void {
-    this.mapChart.mapData = this.mapData;
+    this.mapChart.mapData = this.mapData();
     this.mapChart.colourScheme = this.mapChart.colourSchemeDefault;
     this.mapChart.setMapPercentMode(false);
-
     this.visibleHeatMap = undefined;
     this.closeMapMenu();
   }
@@ -364,7 +361,7 @@ export class LandingComponent extends SubscriptionManager {
   }
 
   hasLandingData(): boolean {
-    return Object.keys(this.landingData).length > 0;
+    return Object.keys(this.landingData()).length > 0;
   }
 
   refreshCharts(): void {

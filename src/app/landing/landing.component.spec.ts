@@ -78,22 +78,21 @@ describe('LandingComponent', () => {
 
   it('should have data', () => {
     expect(component.hasLandingData()).toBeFalsy();
-    expect(component.mapData).toBeFalsy();
+    expect(component.mapData().length).toBeFalsy();
 
-    component.landingData = { contentTier: [] };
+    component.landingData.set({ contentTier: [] });
 
     expect(component.hasLandingData()).toBeTruthy();
-    expect(component.mapData).not.toBeFalsy();
-    expect(component.mapData.length).toBeFalsy();
+    expect(component.mapData().length).toBeFalsy();
 
-    component.landingData = mockLandingData;
+    component.landingData.set(mockLandingData);
     expect(component.hasLandingData()).toBeTruthy();
-    expect(component.mapData.length).toBeTruthy();
+    expect(component.mapData().length).toBeTruthy();
   });
 
   it('should refresh the charts when the data changes', () => {
     const spyRefreshCharts = jest.spyOn(component, 'refreshCharts');
-    component.landingData = { contentTier: [], country: [] };
+    component.landingData.set({ contentTier: [], country: [] });
     fixture.detectChanges();
     expect(spyRefreshCharts).toHaveBeenCalled();
   });
@@ -302,7 +301,7 @@ describe('LandingComponent', () => {
   });
 
   it('should show the heat map', () => {
-    component.landingData = mockLandingData;
+    component.landingData.set(mockLandingData);
 
     component.countryData = mockCountryData;
     component.targetMetaData = mockTargetMetaData;

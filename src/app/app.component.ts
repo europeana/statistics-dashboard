@@ -55,7 +55,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   formCTZero: FormGroup<{ contentTierZero: FormControl<boolean> }>;
   landingData: GeneralResultsFormatted;
-  landingComponentRef: LandingComponent;
   countryComponentRef: CountryComponent;
   paramNameCTZero = 'content-tier-zero';
   showPageTitle: number;
@@ -89,9 +88,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         .loadMaintenanceItem()
         .subscribe((item: MaintenanceItem | undefined) => {
           this.maintenanceInfo = item;
-          if (item?.maintenanceMessage && this.landingComponentRef) {
-            this.landingComponentRef.isLoading = false;
-          }
+          this.filterStateService.landingDataIsLoading.set(false);
         })
     );
   }
@@ -157,9 +154,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * @param { boolean: includeCTZero } - request content-tier-zero
    ***/
   loadLandingData(includeCTZero: boolean): void {
-    if (this.landingComponentRef) {
-      this.landingComponentRef.isLoading = true;
-    }
+    console.log('loadLandingData(' + includeCTZero + ')');
+
+    this.filterStateService.landingDataIsLoading.set(true);
 
     const countryTotalMap: { [key: string]: number } = {};
 
@@ -185,10 +182,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
             }
           });
 
-          if (this.landingComponentRef) {
-            this.landingComponentRef.landingData = this.landingData;
-            this.landingComponentRef.isLoading = false;
-          }
+          this.filterStateService.landingData.set(this.landingData);
+          this.filterStateService.landingDataIsLoading.set(false);
 
           const sortedProcessedMap = Object.keys(countryTotalMap || {})
             .sort(HeaderComponent.sortByDecodedCountryName)
@@ -196,6 +191,8 @@ export class AppComponent extends SubscriptionManager implements OnInit {
               ob[sortedKey] = '' + countryTotalMap[sortedKey];
               return ob;
             }, {});
+
+          // THIS HAS TO GO TO THE SERVICE - cascading computes from there
 
           if (this.header) {
             if (typeof this.header.countryTotalMap === 'function') {
@@ -296,23 +293,21 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
 
-    const hasCountryMapData = Object.keys(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        typeof (this.header as any)?.countryTotalMap === 'function'
+    const hasCountryMapData =
+      this.header &&
+      Object.keys(
+        typeof this.header.countryTotalMap === 'function'
+          ? (this.header.countryTotalMap as any)()
+          : (this.header as any).countryTotalMap || {}
       ).length > 0;
 
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
-      this.landingComponentRef = component;
 
       if (ctrlCTZero) {
         this.setCTZeroInputToLastSetValue(ctrlCTZero);
       }
-      if (this.landingData) {
-        this.landingComponentRef.landingData = this.landingData;
-      }
     } else {
-      this.landingComponentRef = undefined;
       if (component instanceof OverviewComponent) {
         component.locale = this.locale;
         this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
