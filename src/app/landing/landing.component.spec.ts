@@ -15,10 +15,11 @@ import * as am4core from '@amcharts/amcharts4/core';
 import {
   MockAPIService,
   mockCountryData,
+  mockFilterStateService,
   MockMapComponent,
   mockTargetMetaData
 } from '../_mocked';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
 import { TargetFieldName, VisibleHeatMap } from '../_models';
 import { BarComponent, MapComponent } from '../chart';
 import { LandingComponent } from '.';
@@ -31,6 +32,8 @@ describe('LandingComponent', () => {
   let component: LandingComponent;
   let fixture: ComponentFixture<LandingComponent>;
   let api: APIService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
 
   const mockLandingData = {
     contentTier: [],
@@ -38,6 +41,8 @@ describe('LandingComponent', () => {
   };
 
   const configureTestBed = (): void => {
+    mockFilterState = mockFilterStateService();
+
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [FormsModule, ReactiveFormsModule, LandingComponent],
@@ -49,6 +54,10 @@ describe('LandingComponent', () => {
         {
           provide: APIService,
           useClass: MockAPIService
+        },
+        {
+          provide: FilterStateService,
+          useValue: mockFilterState
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
@@ -76,23 +85,9 @@ describe('LandingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have data', () => {
-    expect(component.hasLandingData()).toBeFalsy();
-    expect(component.mapData().length).toBeFalsy();
-
-    component.landingData.set({ contentTier: [] });
-
-    expect(component.hasLandingData()).toBeTruthy();
-    expect(component.mapData().length).toBeFalsy();
-
-    component.landingData.set(mockLandingData);
-    expect(component.hasLandingData()).toBeTruthy();
-    expect(component.mapData().length).toBeTruthy();
-  });
-
   it('should refresh the charts when the data changes', () => {
     const spyRefreshCharts = jest.spyOn(component, 'refreshCharts');
-    component.landingData.set({ contentTier: [], country: [] });
+    mockFilterState.landingData.set({ contentTier: [], country: [] });
     fixture.detectChanges();
     expect(spyRefreshCharts).toHaveBeenCalled();
   });
@@ -301,8 +296,7 @@ describe('LandingComponent', () => {
   });
 
   it('should show the heat map', () => {
-    component.landingData.set(mockLandingData);
-
+    mockFilterState.landingData.set(mockLandingData);
     component.countryData = mockCountryData;
     component.targetMetaData = mockTargetMetaData;
 

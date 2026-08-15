@@ -6,7 +6,6 @@ import {
   inject,
   input,
   model,
-  signal,
   ViewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -15,6 +14,7 @@ import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.compo
 import { Router, RouterLink } from '@angular/router';
 
 import { OpenerFocusDirective } from '../_directives';
+import { sortByDecodedCountryName } from '../_helpers';
 import { isoCountryCodes, isoCountryCodesReversed } from '../_data';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
 import { IHash } from '../_models';
@@ -56,7 +56,7 @@ export class HeaderComponent {
   pageTitleDynamic = model<boolean>(false);
   activeCountry = model<string | undefined>();
 
-  readonly countryTotalMap = signal<IHash<string>>({});
+  readonly countryTotalMap = this.filterStateService.countryTotalMap;
 
   readonly countryList = computed<CountryPair[]>(() => {
     const rawMap = this.countryTotalMap() || {};
@@ -72,7 +72,7 @@ export class HeaderComponent {
     let lastLetter = '';
 
     Object.keys(rawMap)
-      .sort(HeaderComponent.sortByDecodedCountryName)
+      .sort(sortByDecodedCountryName)
       .forEach((key) => {
         const decoded = isoCountryCodesReversed[key] ?? key;
         const firstLetter = decoded[0];
@@ -96,12 +96,6 @@ export class HeaderComponent {
       this.activeCountry();
       this.menuIsOpen = false;
     });
-  }
-
-  static sortByDecodedCountryName(a: string, b: string): number {
-    const aDecoded = isoCountryCodesReversed[a] ?? a;
-    const bDecoded = isoCountryCodesReversed[b] ?? b;
-    return Intl.Collator('en').compare(aDecoded, bDecoded);
   }
 
   keyNavHome(event: KeyboardEvent): void {

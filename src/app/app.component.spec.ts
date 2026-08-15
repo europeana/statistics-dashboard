@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { signal, ViewContainerRef, WritableSignal } from '@angular/core';
+import { signal, ViewContainerRef } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -18,7 +18,8 @@ import {
   MaintenanceScheduleService
 } from '@europeana/metis-ui-maintenance-utils';
 
-import { MockAPIService } from './_mocked';
+import { MockAPIService, mockFilterStateService } from './_mocked';
+
 import { GeneralResultsFormatted } from './_models';
 
 import { APIService, ClickService, FilterStateService } from './_services';
@@ -39,12 +40,9 @@ describe('AppComponent', () => {
   let clicks: ClickService;
   let location: Location;
   let maintenanceSchedules: MaintenanceScheduleService;
-  let mockFilterStateService: {
-    includeCTZero: WritableSignal<boolean>;
-    hasCountryMapData: WritableSignal<boolean>;
-    landingData: WritableSignal<GeneralResultsFormatted>;
-    landingDataIsLoading: WritableSignal<boolean>;
-  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
 
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({} as Params);
@@ -67,13 +65,7 @@ describe('AppComponent', () => {
   };
 
   beforeEach(waitForAsync(() => {
-    // Initialize a mock signal source of truth for the shared state service
-    mockFilterStateService = {
-      includeCTZero: signal<boolean>(false),
-      hasCountryMapData: signal<boolean>(false),
-      landingData: signal({} as GeneralResultsFormatted),
-      landingDataIsLoading: signal<boolean>(false)
-    };
+    mockFilterState = mockFilterStateService();
 
     TestBed.configureTestingModule({
       imports: [
@@ -93,7 +85,7 @@ describe('AppComponent', () => {
         },
         {
           provide: FilterStateService,
-          useValue: mockFilterStateService
+          useValue: mockFilterState
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
@@ -145,7 +137,7 @@ describe('AppComponent', () => {
   }));
 
   it('should listen for history navigation', fakeAsync(() => {
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
     app.buildForm();
 
     app.countryComponentRef = {
@@ -156,19 +148,19 @@ describe('AppComponent', () => {
     } as unknown as CountryComponent;
 
     app.updateLocation();
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
 
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
 
     app.updateLocation();
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
 
     // trigger location change with different value
     const ctrl = app.getCtrlCTZero();
     ctrl.setValue(true);
 
     tick(1);
-    expect(mockFilterStateService.includeCTZero()).toBeTruthy();
+    expect(mockFilterState.includeCTZero()).toBeTruthy();
     expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
       true
     );
@@ -176,7 +168,7 @@ describe('AppComponent', () => {
     ctrl.setValue(false);
 
     tick(1);
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
     expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
       false
     );
@@ -184,7 +176,7 @@ describe('AppComponent', () => {
     location.go('/');
 
     tick(1);
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
   }));
 
   it('should handle the location pop-state', () => {
@@ -194,20 +186,20 @@ describe('AppComponent', () => {
 
     app.buildForm();
 
-    expect(mockFilterStateService.includeCTZero()).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
     app.handleLocationPopState(ps);
     fixture.detectChanges();
-    expect(mockFilterStateService.includeCTZero()).toBeTruthy();
+    expect(mockFilterState.includeCTZero()).toBeTruthy();
   });
 
   it('should load the landing data', fakeAsync(() => {
     app.buildForm();
-    expect(mockFilterStateService.landingDataIsLoading()).toBeFalsy();
+    expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
     app.loadLandingData(false);
-    expect(mockFilterStateService.landingDataIsLoading()).toBeTruthy();
+    expect(mockFilterState.landingDataIsLoading()).toBeTruthy();
     tick(1);
     fixture.detectChanges();
-    expect(mockFilterStateService.landingDataIsLoading()).toBeFalsy();
+    expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
   }));
 
   it('should handle the outlet load', waitForAsync(async () => {
@@ -239,19 +231,19 @@ describe('AppComponent', () => {
       expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
       const cmp = new LandingComponent();
-      cmp.landingData.set({} as GeneralResultsFormatted);
+      mockFilterState.landingData.set({} as GeneralResultsFormatted);
 
-      app.landingData = {};
+      //app.landingData = {};
       app.onOutletLoaded(cmp);
       expect(app.showPageTitle).toBeTruthy();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(4);
 
       // Update this check to evaluate your mock service state reference
-      expect(mockFilterStateService.includeCTZero()).toBeTruthy();
+      expect(mockFilterState.includeCTZero()).toBeTruthy();
       expect(cmp.landingData()).toBeTruthy();
 
       // Mutate the service signal directly rather than assigning to a read-only getter
-      mockFilterStateService.includeCTZero.set(!app.getCtrlCTZero().value);
+      mockFilterState.includeCTZero.set(!app.getCtrlCTZero().value);
       app.onOutletLoaded(new LandingComponent());
       expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
@@ -281,7 +273,7 @@ describe('AppComponent', () => {
       expect(spyLoadLandingData).toHaveBeenCalledTimes(9);
       expect(spySetCTZero).toHaveBeenCalledTimes(1);
 
-      mockFilterStateService.includeCTZero.set(true);
+      mockFilterState.includeCTZero.set(true);
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(spySetCTZero).toHaveBeenCalledTimes(2);
@@ -329,6 +321,6 @@ describe('AppComponent', () => {
 
     app.checkIfMaintenanceDue(maintenanceSettings);
     expect(spyLoadMaintenanceItem).toHaveBeenCalled();
-    expect(mockFilterStateService.landingDataIsLoading()).toBeFalsy();
+    expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
   });
 });

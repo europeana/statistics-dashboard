@@ -13,10 +13,11 @@ import {
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { isoCountryCodesReversed } from '../_data';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
 import {
   MockAPIService,
   mockCountryData,
+  mockFilterStateService,
   MockLineComponent,
   mockTargetMetaData
 } from '../_mocked';
@@ -35,6 +36,9 @@ describe('CountryComponent', () => {
   let legendGridService: LegendGridService;
   let api: APIService;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
+
   class IntersectionObserver {
     observe(): void {
       console.log('IntersectionObserver.observe()');
@@ -46,6 +50,7 @@ describe('CountryComponent', () => {
 
   const configureTestBed = (): void => {
     routeChangeSource = new BehaviorSubject({ country: 'France' } as Params);
+    mockFilterState = mockFilterStateService();
     TestBed.configureTestingModule({
       imports: [CountryComponent],
       providers: [
@@ -53,7 +58,11 @@ describe('CountryComponent', () => {
           provide: ActivatedRoute,
           useValue: { params: routeChangeSource }
         },
-        { provide: APIService, useClass: MockAPIService }
+        { provide: APIService, useClass: MockAPIService },
+        {
+          provide: FilterStateService,
+          useValue: mockFilterState
+        }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -82,10 +91,6 @@ describe('CountryComponent', () => {
     headerInstance.activeCountry.set('France');
     headerInstance.pageTitleDynamic.set(true);
     headerInstance.pageTitleInViewport.set(false);
-
-    headerInstance.countryTotalMap.set({
-      France: '1'
-    });
 
     appRef.components.push({
       header: headerInstance

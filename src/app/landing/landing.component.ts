@@ -28,7 +28,6 @@ import {
   targetDescriptions
 } from '../_data';
 import {
-  GeneralResultsFormatted,
   IdValue,
   IHash,
   IHashArray,

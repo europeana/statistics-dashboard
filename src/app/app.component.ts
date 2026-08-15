@@ -23,12 +23,7 @@ import { maintenanceSettings } from '../environments/maintenance-settings';
 import { SubscriptionManager } from './subscription-manager';
 import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService, FilterStateService } from './_services';
-import {
-  BreakdownResult,
-  CountPercentageValue,
-  GeneralResults,
-  GeneralResultsFormatted
-} from './_models';
+import { GeneralResults, GeneralResultsFormatted } from './_models';
 import { CookiePolicyComponent } from './cookie-policy';
 import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
@@ -154,55 +149,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * @param { boolean: includeCTZero } - request content-tier-zero
    ***/
   loadLandingData(includeCTZero: boolean): void {
-    console.log('loadLandingData(' + includeCTZero + ')');
-
     this.filterStateService.landingDataIsLoading.set(true);
-
-    const countryTotalMap: { [key: string]: number } = {};
-
     this.subs.push(
       this.api
         .getGeneralResults(includeCTZero)
         .subscribe((general: GeneralResults) => {
-          this.landingData = {};
-          general.allBreakdowns.forEach((br: BreakdownResult) => {
-            this.landingData[br.breakdownBy] = br.results.map(
-              (cpv: CountPercentageValue) => {
-                return {
-                  name: cpv.value,
-                  value: cpv.count,
-                  percent: cpv.percentage
-                };
-              }
-            );
-            if (br.breakdownBy === 'country') {
-              br.results.forEach((result: CountPercentageValue) => {
-                countryTotalMap[result.value] = result.percentage;
-              });
-            }
-          });
-
-          this.filterStateService.landingData.set(this.landingData);
+          this.filterStateService.rawGeneralData.set(general);
           this.filterStateService.landingDataIsLoading.set(false);
-
-          const sortedProcessedMap = Object.keys(countryTotalMap || {})
-            .sort(HeaderComponent.sortByDecodedCountryName)
-            .reduce((ob, sortedKey) => {
-              ob[sortedKey] = '' + countryTotalMap[sortedKey];
-              return ob;
-            }, {});
-
-          // THIS HAS TO GO TO THE SERVICE - cascading computes from there
-
-          if (this.header) {
-            if (typeof this.header.countryTotalMap === 'function') {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (this.header.countryTotalMap as any).set(sortedProcessedMap);
-            } else {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (this.header as any).countryTotalMap = sortedProcessedMap;
-            }
-          }
         })
     );
   }
@@ -292,14 +245,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       | CookiePolicyComponent
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
-
-    const hasCountryMapData =
-      this.header &&
-      Object.keys(
-        typeof this.header.countryTotalMap === 'function'
-          ? (this.header.countryTotalMap as any)()
-          : (this.header as any).countryTotalMap || {}
-      ).length > 0;
+    const hasCountryMapData = this.filterStateService.hasCountryMapData();
 
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;

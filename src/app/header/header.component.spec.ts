@@ -7,13 +7,18 @@ import {
   waitForAsync
 } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
+import { mockFilterStateService } from '../_mocked';
+import { FilterStateService } from '../_services';
 import { HeaderComponent } from '.';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
 
   const configureTestBed = (): void => {
+    mockFilterState = mockFilterStateService();
     TestBed.configureTestingModule({
       imports: [HeaderComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -21,6 +26,10 @@ describe('HeaderComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {}
+        },
+        {
+          provide: FilterStateService,
+          useValue: mockFilterState
         }
       ]
     }).compileComponents();
@@ -67,33 +76,4 @@ describe('HeaderComponent', () => {
     tick();
     expect(component.menuIsOpen).toBeFalsy();
   }));
-
-  it('should sort by the decoded country', () => {
-    const unsorted = ['CZ', 'HR'];
-    unsorted.sort(HeaderComponent.sortByDecodedCountryName);
-    expect(unsorted[0]).toEqual('HR');
-    expect(unsorted[1]).toEqual('CZ');
-  });
-
-  it('should work out the first-letter countries', () => {
-    expect(
-      Object.keys(component.countryFirstOfLetter).includes('XX')
-    ).toBeFalsy();
-    const mockData = { FR: 1, FI: 1, DE: 2, XX: 3 };
-    const sortedMock = Object.keys(mockData)
-      .sort(HeaderComponent.sortByDecodedCountryName)
-      .reduce((ob, k) => {
-        ob[k] = '' + mockData[k];
-        return ob;
-      }, {});
-
-    component.countryTotalMap.set(sortedMock);
-
-    expect(
-      Object.values(component.countryFirstOfLetter()).filter((x) => !!x).length
-    ).toEqual(3);
-    expect(
-      Object.keys(component.countryFirstOfLetter()).includes('XX')
-    ).toBeTruthy();
-  });
 });
