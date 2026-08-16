@@ -88,9 +88,9 @@ describe('CountryComponent', () => {
     const headerFixture = TestBed.createComponent(HeaderComponent);
     const headerInstance = headerFixture.componentInstance;
 
-    headerInstance.activeCountry.set('France');
-    headerInstance.pageTitleDynamic.set(true);
-    headerInstance.pageTitleInViewport.set(false);
+    mockFilterState.activeCountry.set('France');
+    mockFilterState.pageTitleDynamic.set(true);
+    mockFilterState.pageTitleInViewport.set(false);
 
     appRef.components.push({
       header: headerInstance
@@ -334,16 +334,14 @@ describe('CountryComponent', () => {
     });
 
     it('should handle the intersectionObserverCallback', () => {
-      // Tests page title visibility based on intersection ratio
-      const headerRef = component.headerRef;
-      expect(component.headerRef().pageTitleInViewport()).toBeFalsy();
+      expect(mockFilterState.pageTitleInViewport()).toBeFalsy();
       component.intersectionObserverCallback([
         {
           isIntersecting: true,
           intersectionRatio: 0.9
         }
       ]);
-      expect(headerRef().pageTitleInViewport()).toBeTruthy();
+      expect(mockFilterState.pageTitleInViewport()).toBeTruthy();
     });
   });
 });

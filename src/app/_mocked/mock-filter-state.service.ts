@@ -13,6 +13,9 @@ export const mockFilterStateService = (): any => {
     } as unknown as GeneralResults),
     countryTotalMap: signal<Record<string, string>>({
       France: '1'
-    })
+    }),
+    pageTitleDynamic: signal<boolean>(false),
+    pageTitleInViewport: signal<boolean>(false),
+    activeCountry: signal<string | undefined>(undefined)
   };
 };

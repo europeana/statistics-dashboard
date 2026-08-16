@@ -11,10 +11,8 @@ import {
   providedIn: 'root'
 })
 export class FilterStateService {
-  includeCTZero = signal<boolean>(false);
-
+  readonly includeCTZero = signal<boolean>(false);
   readonly rawGeneralData = signal<GeneralResults | null>(null);
-
   readonly landingData = computed<GeneralResultsFormatted>(() => {
     const general = this.rawGeneralData();
     if (!general) return {};
@@ -33,7 +31,6 @@ export class FilterStateService {
 
     return processedData;
   });
-
   readonly countryTotalMap = computed<Record<string, string>>(() => {
     const general = this.rawGeneralData();
     if (!general) return {};
@@ -59,10 +56,11 @@ export class FilterStateService {
         return ob;
       }, {} as Record<string, string>);
   });
-
   readonly hasCountryMapData = computed<boolean>(() => {
     return Object.keys(this.countryTotalMap()).length > 0;
   });
-
-  landingDataIsLoading = signal<boolean>(false);
+  readonly landingDataIsLoading = signal<boolean>(false);
+  readonly pageTitleDynamic = signal<boolean>(false);
+  readonly pageTitleInViewport = signal<boolean>(false);
+  readonly activeCountry = signal<string | undefined>(undefined);
 }

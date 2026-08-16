@@ -48,14 +48,13 @@ export class HeaderComponent {
 
   private filterStateService = inject(FilterStateService);
 
-  readonly includeCTZero = this.filterStateService.includeCTZero;
-
   form = input<FormGroup>();
   showPageTitle = model<number>(HeaderComponent.PAGE_TITLE_HIDDEN);
-  pageTitleInViewport = model<boolean>(false);
-  pageTitleDynamic = model<boolean>(false);
-  activeCountry = model<string | undefined>();
 
+  readonly includeCTZero = this.filterStateService.includeCTZero;
+  readonly pageTitleInViewport = this.filterStateService.pageTitleInViewport;
+  readonly pageTitleDynamic = this.filterStateService.pageTitleDynamic;
+  readonly activeCountry = this.filterStateService.activeCountry;
   readonly countryTotalMap = this.filterStateService.countryTotalMap;
 
   readonly countryList = computed<CountryPair[]>(() => {

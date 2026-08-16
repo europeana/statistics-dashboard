@@ -169,7 +169,7 @@ export class CountryComponent
 
   readonly legendGridIsInitialised = inject(LegendGridService).legendGridReady;
   readonly lineChartIsInitialised = inject(LineService).lineChartReady;
-
+  readonly countryTotalMap = this.filterStateService.countryTotalMap;
   readonly headerRef = input<HeaderComponent>();
   readonly includeCTZero = this.filterStateService.includeCTZero;
 
@@ -185,23 +185,6 @@ export class CountryComponent
     super();
 
     this.restoreHiddenColumns();
-
-    const rootRef = this.applicationRef.components[0].instance;
-    if (rootRef && !this.headerRef()) {
-      // 1. Extract the header property from the root container instance safely
-      const rawHeaderProperty = rootRef['header'];
-
-      // 2. Fix: Check if the extracted property is an un-executed signal function tracker wrapper,
-      // and invoke it with () to unwrap the true HeaderComponent instance before passing it to your signal!
-      const trueHeaderComponentInstance =
-        typeof rawHeaderProperty === 'function'
-          ? rawHeaderProperty()
-          : rawHeaderProperty;
-
-      (this as Record<string, unknown>)['headerRef'] = signal(
-        trueHeaderComponentInstance
-      ).asReadonly();
-    }
 
     combineLatest([
       this.api.getTargetMetaData(),
@@ -272,15 +255,12 @@ export class CountryComponent
   intersectionObserverCallback(
     entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>
   ): void {
-    const header = this.headerRef();
-    if (!header) return;
-
     entries.forEach((entry) => {
       if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
-        header.pageTitleInViewport.set(true);
+        this.filterStateService.pageTitleInViewport.set(true);
       }
       if (!entry.isIntersecting) {
-        header.pageTitleInViewport.set(false);
+        this.filterStateService.pageTitleInViewport.set(false);
       }
     });
   }
@@ -372,11 +352,10 @@ export class CountryComponent
    * @param {string?} activeCountry - optional country
    **/
   setHeaderData(country?: string): void {
-    const header = this.headerRef();
-    if (header) {
-      header.pageTitleDynamic.set(!!(country && this.showTargetsData));
-      header.activeCountry.set(country);
-    }
+    this.filterStateService.pageTitleDynamic.set(
+      !!(country && this.showTargetsData)
+    );
+    this.filterStateService.activeCountry.set(country);
   }
 
   /** loadHistory

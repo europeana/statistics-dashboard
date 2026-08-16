@@ -71,7 +71,7 @@ describe('HeaderComponent', () => {
   it('should close the menu when activeCountry is set', fakeAsync(() => {
     component.menuIsOpen = true;
     expect(component.menuIsOpen).toBeTruthy();
-    component.activeCountry.set('France');
+    mockFilterState.activeCountry.set('France');
     fixture.detectChanges();
     tick();
     expect(component.menuIsOpen).toBeFalsy();

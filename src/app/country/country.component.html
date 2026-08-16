@@ -6,8 +6,8 @@
 >
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="country()"></span>
-    @if (headerRef()?.countryTotalMap(); as activeMap) { @if
-    (activeMap[country()] !== undefined) {
+    @if (countryTotalMap(); as activeMap) { @if (activeMap[country()] !==
+    undefined) {
     <span>{{ country() | renameCountry }}</span>
     <span i18n="@@countryPageTitle">Data</span>
     <span class="page-subtitle">
