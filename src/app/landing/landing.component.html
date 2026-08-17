@@ -554,7 +554,7 @@
           <div class="map-container" tabindex="-1">
             <app-map-chart
               tabindex="-1"
-              [mapData]="mapData()"
+              [mapData]="activeMapData()"
               (mapCountrySet)="onMapCountrySet($event)"
               #mapChart
             ></app-map-chart>
@@ -567,6 +567,7 @@
             "
           ></ng-content>
         </div>
+
         <a
           class="data-link"
           routerLink="/data/{{ DimensionName.country }}"

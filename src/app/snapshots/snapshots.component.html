@@ -1,44 +1,39 @@
-<div class="snapshots" *ngIf="isVisible">
-  <ng-template #comparisonItem let-key="key" let-item="item">
-    <ng-container *ngIf="item.current || item.saved">
-      <a
-        (click)="toggle(key, item.current)"
-        (keydown.enter)="toggle(key, item.current)"
-        tabindex="-1"
-        class="compare-data-link"
-        [ngClass]="{ applied: item.applied, current: item.current }"
-        ><span
-          class="legend-square"
-          [ngStyle]="{
-            'background-color': item.applied
-              ? colours[item._colourIndex]
-              : '#fff'
-          }"
-        ></span>
-        <span class="editable" contenteditable spellcheck="false">{{
-          item.label
-        }}</span>
-      </a>
-
-      <a
-        aria-label="save (pin) item"
-        (click)="toggleSaved(key, item.current)"
-        (keydown.enter)="toggleSaved(key, item.current)"
-        class="save"
-        [ngClass]="{ saved: item.saved }"
-        tabindex="0"
-      ></a>
-    </ng-container>
-  </ng-template>
-
-  <ul class="comparison-list">
-    <li class="compare-data" *ngFor="let key of getSortKeys()">
-      <ng-content
-        *ngTemplateOutlet="
-          comparisonItem;
-          context: { key: key, item: compareData[key] }
+@if (isVisible()) {
+<ul class="comparison-list">
+  @for (key of getSortKeys(); track key) { @if (compareData[key]; as item) { @if
+  (item.saved || item.current || item.applied || key === '') {
+  <li class="compare-data">
+    <a
+      class="compare-data-link"
+      [class.applied]="item.applied || item.current"
+      [class.current]="item.current"
+      [attr.tabindex]="item.current ? -1 : 0"
+      (keydown.enter)="toggle(key, item.current)"
+      (click)="toggle(key, item.current)"
+    >
+      <span
+        class="legend-square"
+        [style.background-color]="
+          item.applied || item.current
+            ? colours[item._colourIndex]
+            : 'transparent'
         "
-      ></ng-content>
-    </li>
-  </ul>
-</div>
+      ></span>
+
+      <span class="editable" contenteditable="false" spellcheck="false">
+        {{ item.label }}
+      </span>
+    </a>
+
+    <a
+      class="save"
+      [class.saved]="item.saved"
+      aria-label="save (pin) item"
+      [attr.tabindex]="0"
+      (keydown.enter)="toggleSaved(key, item.current)"
+      (click)="toggleSaved(key, item.current)"
+    ></a>
+  </li>
+  } } }
+</ul>
+}

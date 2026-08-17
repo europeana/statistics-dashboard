@@ -1,40 +1,33 @@
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild
-} from '@angular/core';
+import { Component, ElementRef, input, output, viewChild } from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
-import { NgClass } from '@angular/common';
-
 import { OpenerFocusDirective } from '../_directives';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  imports: [NgClass, OpenerFocusDirective]
+  imports: [OpenerFocusDirective]
 })
 export class ExportComponent {
   get currentUrl(): string {
     return window.location.href;
   }
 
-  @Input() getGridData: () => FmtTableData;
-  @Input() getChartData: () => Promise<string>;
-  @Input() getChartTitle: () => string;
+  getGridData = input.required<() => FmtTableData>();
+  getChartData = input.required<() => Promise<string>>();
+  getChartTitle = input.required<() => string>();
 
-  @Output() closeExport = new EventEmitter<boolean>();
-  @ViewChild('contentRef') contentRef: ElementRef;
-  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
-  @ViewChild('closer') closer: ElementRef;
+  closeExport = output<boolean>();
+
+  contentRef = viewChild.required<ElementRef<HTMLInputElement>>('contentRef');
+  downloadAnchor =
+    viewChild.required<ElementRef<HTMLAnchorElement>>('downloadAnchor');
+  closer = viewChild.required<ElementRef<HTMLAnchorElement>>('closer');
 
   openedFromToolbar = false;
-
   public ExportType = ExportType;
+
   active = false;
   busy = false;
   copied = false;
@@ -44,7 +37,8 @@ export class ExportComponent {
   set tabIndex(value: number) {
     this._tabIndex = value;
     if (value === 0) {
-      this.closer.nativeElement.focus();
+      // Resolve the signal query reference and focus
+      this.closer().nativeElement.focus();
     }
   }
 
@@ -58,7 +52,7 @@ export class ExportComponent {
   ) {}
 
   copy(): void {
-    navigator.clipboard.writeText(this.contentRef.nativeElement.value);
+    navigator.clipboard.writeText(this.contentRef().nativeElement.value);
     this.copied = true;
     const fn = (): void => {
       this.copied = false;
@@ -67,21 +61,22 @@ export class ExportComponent {
   }
 
   export(type: ExportType): void {
-    const gridData = this.getGridData();
+    const gridData = this.getGridData()();
+
     if (type === ExportType.CSV) {
       const data = this.csv.csvFromTableRows(
         gridData.columns,
         gridData.tableRows
       );
-      this.csv.download(data, this.downloadAnchor);
+      this.csv.download(data, this.downloadAnchor());
     } else if (type === ExportType.PDF) {
       this.busy = true;
-      this.getChartData().then((imgUrl: string) => {
-        this.pdf.download(this.getChartTitle(), gridData, imgUrl);
+      this.getChartData()().then((imgUrl: string) => {
+        this.pdf.download(this.getChartTitle()(), gridData, imgUrl);
         this.busy = false;
       });
     } else if (type === ExportType.PNG) {
-      this.getChartData().then((imgUrl: string) => {
+      this.getChartData()().then((imgUrl: string) => {
         const anchor = document.createElement('a');
         anchor.href = imgUrl;
         anchor.target = '_blank';

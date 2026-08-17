@@ -25,8 +25,6 @@ import { FormsModule } from '@angular/forms';
 import {
   DecimalPipe,
   NgClass,
-  NgFor,
-  NgIf,
   NgStyle,
   NgTemplateOutlet
 } from '@angular/common';
@@ -36,11 +34,9 @@ import {
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
   imports: [
-    NgIf,
     NgClass,
     NgStyle,
     FormsModule,
-    NgFor,
     GridPaginatorComponent,
     NgTemplateOutlet,
     TruncateComponent,

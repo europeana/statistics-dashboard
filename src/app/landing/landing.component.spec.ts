@@ -293,6 +293,8 @@ describe('LandingComponent', () => {
     } as unknown as MapComponent;
 
     component.clearHeatmap();
+    // Verify the tracking signal reset itself back to baseline
+    expect(component.activeMapData()).toEqual(component.mapData());
   });
 
   it('should show the heat map', () => {
@@ -302,7 +304,6 @@ describe('LandingComponent', () => {
 
     const colour = '#ffffff' as unknown as am4core.Color;
     component.mapChart = {
-      mapData: [],
       setMapPercentMode: jest.fn(),
       colourSchemeTargets: {
         total: [
@@ -316,18 +317,16 @@ describe('LandingComponent', () => {
     } as unknown as MapComponent;
 
     expect(component.mapChart.colourScheme).toBeFalsy();
-    expect(component.mapChart.colourScheme).toBeFalsy();
 
     component.showHeatmap(TargetFieldName.TOTAL, 0);
-
     expect(component.mapChart.colourScheme).toBeTruthy();
     expect(component.mapChart.colourScheme.base).toEqual(colour);
-
+    expect(component.activeMapData()).toEqual(
+      component.allProgressSeries[TargetFieldName.TOTAL][0]
+    );
     component.targetExpanded = undefined;
     component.singleCountryMode = true;
-
     component.showHeatmap(TargetFieldName.TOTAL, 0);
-
     expect(component.targetExpanded).toEqual(TargetFieldName.TOTAL);
   });
 });

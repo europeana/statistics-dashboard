@@ -34,7 +34,7 @@ describe('MapComponent', () => {
     jest.spyOn(component, 'obtainChart').mockImplementation(() => {
       return MockMapChart;
     });
-    component.mapData = [];
+    fixture.componentRef.setInput('mapData', []);
     fixture.detectChanges();
   });
 
@@ -70,7 +70,8 @@ describe('MapComponent', () => {
 
   it('should update the data', () => {
     component.mapCountries = [];
-    component.mapData = [{ id: 'IT', value: 1881 }];
+    fixture.componentRef.setInput('mapData', [{ id: 'IT', value: 1881 }]);
+    fixture.detectChanges();
     expect(component.mapCountries.length).toBeGreaterThan(0);
   });
 
@@ -78,7 +79,8 @@ describe('MapComponent', () => {
     const spyHide = jest.spyOn(component, 'hideGlobe');
     const spyShow = jest.spyOn(component, 'showGlobe');
 
-    component.mapData = [{ id: 'IT', value: 1881 }];
+    fixture.componentRef.setInput('mapData', [{ id: 'IT', value: 1881 }]);
+    fixture.detectChanges();
 
     const spyEmit = jest.spyOn(component.mapCountrySet, 'emit');
 
@@ -146,7 +148,9 @@ describe('MapComponent', () => {
     let res = component.mapTooltipAdapter('default', clicked);
     expect(res).toEqual('{name}');
 
-    component.mapData = [{ id: 'IT', value: 1881 }];
+    fixture.componentRef.setInput('mapData', [{ id: 'IT', value: 1881 }]);
+    fixture.detectChanges();
+
     res = component.mapTooltipAdapter('default', clicked);
     expect(res).toEqual('{name}: 1,881');
 
@@ -216,7 +220,8 @@ describe('MapComponent', () => {
 
   it('should track which countries are shown', () => {
     const spyHideGlobe = jest.spyOn(component, 'hideGlobe');
-    component.mapData = [{ id: 'IT', value: 1881 }];
+    fixture.componentRef.setInput('mapData', [{ id: 'IT', value: 1881 }]);
+    fixture.detectChanges();
     const spyOnce = jest.spyOn(component.polygonSeries.events, 'once');
 
     component.selectedCountry = 'DE';
@@ -249,7 +254,8 @@ describe('MapComponent', () => {
     fixture.detectChanges();
 
     const spyHide = jest.spyOn(component, 'hideGlobe');
-    component.mapData = [{ id: 'IT', value: 1881 }];
+    fixture.componentRef.setInput('mapData', [{ id: 'IT', value: 1881 }]);
+    fixture.detectChanges();
     component.setCountryInclusion(['IT', 'DE']);
 
     expect(component.selectedCountry).toEqual(undefined);

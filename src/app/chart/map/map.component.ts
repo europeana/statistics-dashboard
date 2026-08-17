@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  Input,
-  Output
-} from '@angular/core';
+import { AfterViewInit, Component, effect, input, output } from '@angular/core';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -48,9 +42,10 @@ type ColourSchemeMap = {
   standalone: true
 })
 export class MapComponent extends SubscriptionManager implements AfterViewInit {
-  @Output() mapCountrySet = new EventEmitter<boolean>();
+  mapData = input<Array<IdValue>>([]);
+  mapCountrySet = output<boolean>();
 
-  _mapData: Array<IdValue>;
+  _mapData: Array<IdValue> = [];
   chart: am4maps.MapChart;
   chartHidden: am4maps.MapChart;
   chartGlobe: am4maps.MapChart;
@@ -67,7 +62,7 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
   animationTime = 750;
   boundingCountries = ['IS', 'TR', 'ES', 'NO'];
   countryUnknown = 'EU';
-  mapCountries = [];
+  mapCountries: Array<string> = [];
 
   selectedCountryNext?: string;
   selectedCountryPrev?: string;
@@ -87,13 +82,15 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     return this._isAnimating;
   }
 
-  get selectedCountry(): string {
+  get selectedCountry(): string | undefined {
     return this._selectedCountry;
   }
 
   set selectedCountry(selectedCountry: string | undefined) {
     this._selectedCountry = selectedCountry;
-    this.polygonSeries.tooltip.disabled = !!selectedCountry;
+    if (this.polygonSeries) {
+      this.polygonSeries.tooltip.disabled = !!selectedCountry;
+    }
 
     const selectedIndex = this.mapCountries.indexOf(selectedCountry);
     const length = this.mapCountries.length;
@@ -110,29 +107,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
       this.hideGlobe();
     }
     this.mapCountrySet.emit(!!selectedCountry);
-  }
-
-  @Input() set mapData(mapData: Array<IdValue>) {
-    // set country set based on original data
-    if (this.mapCountries.length === 0) {
-      this.mapCountries = Object.keys(
-        mapData
-          .map((item: IdValue) => {
-            return item.id;
-          })
-          .concat(this.boundingCountries)
-          .reduce((ob: IHash<boolean>, name) => {
-            ob[name] = true;
-            return ob;
-          }, {})
-      );
-    }
-    this._mapData = mapData;
-    this.updatePolygonData();
-  }
-
-  get mapData(): Array<IdValue> {
-    return this._mapData;
   }
 
   colourSchemeTargets: ColourSchemeMap;
@@ -211,6 +185,25 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
         this.isAnimating = false;
       })
     );
+
+    effect(() => {
+      const incomingData = this.mapData();
+      if (!incomingData) return;
+
+      if (this.mapCountries.length === 0) {
+        this.mapCountries = Object.keys(
+          incomingData
+            .map((item: IdValue) => item.id)
+            .concat(this.boundingCountries)
+            .reduce((ob: IHash<boolean>, name) => {
+              ob[name] = true;
+              return ob;
+            }, {})
+        );
+      }
+      this._mapData = incomingData;
+      this.updatePolygonData();
+    });
   }
 
   /* setter colourScheme
@@ -225,11 +218,15 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
 
     this.updateHeatRules(colourScheme.base);
 
-    this.legend.maxColor = colourScheme.base.brighten(1);
-    this.legend.minColor = colourScheme.base.brighten(-0.3);
+    if (this.legend) {
+      this.legend.maxColor = colourScheme.base.brighten(1);
+      this.legend.minColor = colourScheme.base.brighten(-0.3);
+    }
 
-    this.hs.properties.fill = colourScheme.highlight;
-    this.hs.properties.stroke = colourScheme.outline;
+    if (this.hs) {
+      this.hs.properties.fill = colourScheme.highlight;
+      this.hs.properties.stroke = colourScheme.outline;
+    }
   }
 
   get colourScheme(): MapColourScheme {
@@ -240,7 +237,7 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
    *
    **/
   updatePolygonData(): void {
-    if (!this.polygonSeries || !this.mapData) {
+    if (!this.polygonSeries || !this._mapData) {
       return;
     }
     const data = this.filterResultsData();
@@ -263,19 +260,12 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
    * filters mapped data
    **/
   filterResultsData(countries = this.mapCountries): Array<IdValue> {
-    return (
-      this.mapData
-        .filter((nv: IdValue) => {
-          return countries.includes(nv.id);
-        })
-        // this map looks redundant, but it clears out MapPolygon data
-        .map((nv: IdValue) => {
-          return {
-            id: nv.id,
-            value: nv.value
-          };
-        })
-    );
+    return this._mapData
+      .filter((nv: IdValue) => countries.includes(nv.id))
+      .map((nv: IdValue) => ({
+        id: nv.id,
+        value: nv.value
+      }));
   }
 
   /** setCountryInclusion
@@ -330,7 +320,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
 
     this.isAnimating = true;
 
-    // curtail the hidden map to include only the
     this.polygonSeriesHidden.data = [];
     this.polygonSeriesHidden.include = [newCountry];
     this.selectedCountry = newCountry;
@@ -345,7 +334,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     const poly = this.polygonSeries.getPolygonById(oldCountry);
 
     const morphAnimationEnded = (): void => {
-      // reset the hidden / update the actual
       this.polygonSeriesHidden.data = [];
       this.polygonSeriesHidden.include = this.mapCountries;
       setTimeout(() => {
@@ -382,12 +370,10 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     const singleMode = this.polygonSeries.include.length === 1;
 
     if (singleMode) {
-      // revert back to full map (will invoke zoomTo with instant effect)
       this.setCountryInclusion(this.mapCountries);
     } else {
       this.isAnimating = true;
 
-      // set selection and zoom
       this.legend.hide();
       this.selectedCountry = country;
 
@@ -423,11 +409,9 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
    * customises map item tooltip
    **/
   mapTooltipAdapter(html: string, ev: am4maps.MapPolygon): string {
-    const mapData = this.mapData;
+    const mapData = this._mapData;
     const ctxtId = ev.dataItem.dataContext['id'];
-    const dataItem = mapData.find((item) => {
-      return item['id'] === ctxtId;
-    });
+    const dataItem = mapData.find((item) => item['id'] === ctxtId);
     if (dataItem) {
       const suffix = this.mapPercentMode ? '%' : '';
       return (
@@ -458,17 +442,18 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
   }
 
   hideGlobe(): void {
-    this.chart.show();
-    this.chartGlobe.hide();
+    if (this.chart) this.chart.show();
+    if (this.chartGlobe) this.chartGlobe.hide();
   }
 
   showGlobe(): void {
-    this.chart.hide();
-    this.chartGlobe.show();
+    if (this.chart) this.chart.hide();
+    if (this.chartGlobe) this.chartGlobe.show();
     this.animateLatitude();
   }
 
   animateLatitude(): void {
+    if (!this.chartGlobe) return;
     this.chartGlobe.deltaLatitude = -45;
     this.chartGlobe.animate(
       { property: 'deltaLatitude', to: 0 },
@@ -482,6 +467,7 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
    **/
   synchroniseLegend(): void {
     const heatLegend = this.legend;
+    if (!heatLegend) return;
     const hlMin = heatLegend.series.dataItem.values.value.low;
     const hlMinRange = heatLegend.valueAxis.axisRanges.getIndex(0);
     hlMinRange.value = hlMin;
@@ -538,7 +524,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     chartHidden.geodata = am4geodata_worldHigh;
 
     // Set projection
-
     const mp = new am4maps.projections.Miller();
     chart.projection = mp;
     const mpHidden = new am4maps.projections.Miller();
@@ -566,7 +551,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     this.addLegend();
 
     // Set up custom heat map legend labels using axis ranges
-
     const minRange = this.legend.valueAxis.axisRanges.create();
     minRange.label.horizontalCenter = 'left';
 
@@ -574,7 +558,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     maxRange.label.horizontalCenter = 'right';
 
     // Bind labels to percent setting
-
     const fnPct = (val: string): string => {
       return this.mapPercentMode ? `${val}%` : val;
     };
@@ -583,7 +566,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     maxRange.label.adapter.add('text', fnPct);
 
     // Blank out internal heat legend value axis labels
-
     this.legend.valueAxis.renderer.labels.template.adapter.add(
       'text',
       function (_: string) {
@@ -594,7 +576,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     this.setZoomLevels();
 
     // Bind series to country click
-
     polygonSeries.mapPolygons.template.events.on('hit', (ev) => {
       const clickedId = ev.target.dataItem.dataContext['id'];
       this.countryClickSubject.next(clickedId);
@@ -685,12 +666,14 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
   getBoundingCoords(countryIds: Array<string>): Array<number> {
     let [north, south, east, west] = [-90, 90, -180, 180];
     countryIds.forEach((countryId: string) => {
-      const country = this.polygonSeries.getPolygonById(countryId);
-      if (country && !Number.isNaN(country.north)) {
-        north = Math.max(north, country.north);
-        south = Math.min(south, country.south);
-        west = Math.min(west, country.west);
-        east = Math.max(east, country.east);
+      if (this.polygonSeries) {
+        const country = this.polygonSeries.getPolygonById(countryId);
+        if (country && !Number.isNaN(country.north)) {
+          north = Math.max(north, country.north);
+          south = Math.min(south, country.south);
+          west = Math.min(west, country.west);
+          east = Math.max(east, country.east);
+        }
       }
     });
     return [north, south, east, west];
@@ -743,11 +726,9 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
     res.events.on('animationstopped', () => {
       this.isAnimating = false;
     });
-
     res.events.on('animationended', () => {
       this.isAnimating = false;
     });
-
     return res;
   }
 }

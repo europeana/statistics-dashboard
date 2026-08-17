@@ -135,7 +135,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   /** getCtrlCTZero
    * - convenience function
-   * @returns the contentTierZero input as a FormControl
+   * @returns the contentTierZero value as a FormControl
    **/
   getCtrlCTZero(): FormControl {
     return this.formCTZero.get('contentTierZero') as FormControl;

@@ -29,22 +29,20 @@ describe('ExportComponent', () => {
     fixture = TestBed.createComponent(ExportComponent);
     component = fixture.componentInstance;
 
-    component.getGridData = (): FmtTableData => {
-      return {
-        columns: [],
-        tableRows: []
-      };
-    };
+    fixture.componentRef.setInput('getGridData', (): FmtTableData => {
+      return { columns: [], tableRows: [] };
+    });
 
-    component.getChartTitle = (): string => {
+    fixture.componentRef.setInput('getChartTitle', (): string => {
       return 'title';
-    };
+    });
 
-    component.getChartData = (): Promise<string> => {
+    fixture.componentRef.setInput('getChartData', (): Promise<string> => {
       return new Promise((resolve) => {
         resolve(null);
       });
-    };
+    });
+
     fixture.detectChanges();
   });
 
@@ -54,13 +52,17 @@ describe('ExportComponent', () => {
 
   it('should copy', fakeAsync(() => {
     jest.spyOn(navigator.clipboard, 'writeText');
-    (component.contentRef.nativeElement as HTMLInputElement).value = 'some-url';
+    (component.contentRef().nativeElement as HTMLInputElement).value =
+      'some-url';
+
     component.copy();
     fixture.detectChanges();
+
     expect(
-      component.contentRef.nativeElement.classList.contains('copied')
+      component.contentRef().nativeElement.classList.contains('copied')
     ).toBeTruthy();
     expect(component.copied).toBeTruthy();
+
     tick(component.msMsgDisplay);
     expect(component.copied).toBeFalsy();
   }));
@@ -69,31 +71,43 @@ describe('ExportComponent', () => {
     const spyDownload = jest.spyOn(exportCSV, 'download');
     const elDownload = document.createElement('a');
     document.body.append(elDownload);
-    component.downloadAnchor = { nativeElement: elDownload } as ElementRef;
+
+    // Explicitly stub the read-only signal viewChild value for the execution context
+    const mockAnchor = {
+      nativeElement: elDownload
+    } as ElementRef<HTMLAnchorElement>;
+    Object.defineProperty(component, 'downloadAnchor', {
+      value: () => mockAnchor
+    });
+
     component.export(ExportType.CSV);
     expect(spyDownload).toHaveBeenCalled();
   });
 
   it('should export PDF', () => {
-    const spyGetChartData = jest
-      .spyOn(component, 'getChartData')
-      .mockImplementation(() => {
-        return new Promise((resolve) => {
-          resolve(MockExportPDFService.imgDataURL);
-        }) as Promise<string>;
+    const mockChartDataFn = (): Promise<string> => {
+      return new Promise((resolve) => {
+        resolve(MockExportPDFService.imgDataURL);
       });
+    };
+    fixture.componentRef.setInput('getChartData', mockChartDataFn);
+    fixture.detectChanges();
+
+    const spyGetChartData = jest.spyOn(component, 'getChartData');
     component.export(ExportType.PDF);
     expect(spyGetChartData).toHaveBeenCalled();
   });
 
   it('should export PNG', () => {
-    const spyGetChartData = jest
-      .spyOn(component, 'getChartData')
-      .mockImplementation(() => {
-        return new Promise((resolve) => {
-          resolve(MockExportPDFService.imgDataURL);
-        }) as Promise<string>;
+    const mockChartDataFn = (): Promise<string> => {
+      return new Promise((resolve) => {
+        resolve(MockExportPDFService.imgDataURL);
       });
+    };
+    fixture.componentRef.setInput('getChartData', mockChartDataFn);
+    fixture.detectChanges();
+
+    const spyGetChartData = jest.spyOn(component, 'getChartData');
     component.export(ExportType.PNG);
     expect(spyGetChartData).toHaveBeenCalled();
   });

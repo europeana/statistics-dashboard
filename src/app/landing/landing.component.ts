@@ -16,6 +16,7 @@ import {
   ElementRef,
   inject,
   QueryList,
+  signal,
   ViewChild,
   ViewChildren
 } from '@angular/core';
@@ -121,7 +122,6 @@ export class LandingComponent extends SubscriptionManager {
 
   readonly landingData = this.filterStateService.landingData;
   readonly landingDataIsLoading = this.filterStateService.landingDataIsLoading;
-
   readonly mapData = computed<Array<IdValue>>(() => {
     const results = this.landingData();
     return results[DimensionName.country]
@@ -132,11 +132,14 @@ export class LandingComponent extends SubscriptionManager {
       : [];
   });
 
+  activeMapData = signal<Array<IdValue>>([]);
+
   constructor() {
     super();
     effect(() => {
       this.landingData();
       this.refreshCharts();
+      this.activeMapData.set(this.mapData());
     });
   }
 
@@ -267,7 +270,7 @@ export class LandingComponent extends SubscriptionManager {
    * reset visibleHeatMap variable
    **/
   clearHeatmap(): void {
-    this.mapChart.mapData = this.mapData();
+    this.activeMapData.set(this.mapData());
     this.mapChart.colourScheme = this.mapChart.colourSchemeDefault;
     this.mapChart.setMapPercentMode(false);
     this.visibleHeatMap = undefined;
@@ -294,8 +297,9 @@ export class LandingComponent extends SubscriptionManager {
       this.sortDerivedSeries();
     }
 
-    this.mapChart.mapData =
-      this.allProgressSeries[seriesTargetType][targetIndex];
+    this.activeMapData.set(
+      this.allProgressSeries[seriesTargetType][targetIndex]
+    );
 
     this.mapChart.setMapPercentMode(true);
 
