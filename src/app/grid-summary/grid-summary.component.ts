@@ -1,38 +1,34 @@
-import { Component, Input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { BreakdownResult, CountPercentageValue } from '../_models';
 import { DimensionName } from '../_data';
-
 import { RenameApiFacetShortPipe, RenameCountryPipe } from '../_translate';
-import { DecimalPipe, NgIf } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-grid-summary',
   templateUrl: './grid-summary.component.html',
   styleUrls: ['./grid-summary.component.scss'],
-  imports: [NgIf, DecimalPipe, RenameApiFacetShortPipe, RenameCountryPipe]
+  imports: [DecimalPipe, RenameApiFacetShortPipe, RenameCountryPipe]
 })
 export class GridSummaryComponent {
   public DimensionName = DimensionName;
 
-  _summaryData: BreakdownResult;
-  @Input() grandTotal: number;
-
-  get summaryData(): BreakdownResult {
-    return this._summaryData;
-  }
-  @Input() set summaryData(data: BreakdownResult) {
-    this._summaryData = structuredClone(data);
-    if (data) {
-      this._summaryData.results.sort(
-        (a: CountPercentageValue, b: CountPercentageValue) => {
-          if (a.count > b.count) {
-            return -1;
-          } else if (b.count > a.count) {
-            return 1;
-          }
-          return 0;
-        }
-      );
+  grandTotal = input<number>(0);
+  summaryDataInput = input<BreakdownResult | undefined>(undefined, {
+    alias: 'summaryData'
+  });
+  summaryData = computed(() => {
+    const data = this.summaryDataInput();
+    if (!data) {
+      return undefined;
     }
-  }
+
+    const cloned = structuredClone(data);
+    cloned.results.sort((a: CountPercentageValue, b: CountPercentageValue) => {
+      if (a.count > b.count) return -1;
+      if (b.count > a.count) return 1;
+      return 0;
+    });
+    return cloned;
+  });
 }

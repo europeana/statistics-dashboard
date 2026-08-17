@@ -1,31 +1,34 @@
-<ul *ngIf="pages && pages.length > 0" class="paginator" tabindex="-1">
+@if (pages && pages.length > 0) {
+<ul class="paginator" tabindex="-1">
   <li>
     <a
       aria-label="go to previous page"
       class="previous"
+      [class.disabled]="!canPrev()"
       data-e2e="grid-page-prev"
       [attr.tabindex]="canPrev() ? 0 : -1"
-      (keydown.enter)="callSetPage($event, activePageIndex - 1)"
-      (click)="callSetPage($event, activePageIndex - 1)"
-      [ngClass]="{ disabled: !canPrev() }"
+      (keydown.enter)="callSetPage($event, activePageIndex() - 1)"
+      (click)="callSetPage($event, activePageIndex() - 1)"
     ></a>
   </li>
 
-  <li class="range" *ngIf="ranges[this.activePageIndex]">
-    {{ ranges[this.activePageIndex][0] }} -
-    {{ ranges[this.activePageIndex][1] }}
+  @if (ranges[activePageIndex()]) {
+  <li class="range">
+    {{ ranges[activePageIndex()][0] }} - {{ ranges[activePageIndex()][1] }}
     <span i18n="Pagination of @@gridPaginatorOf">of</span> {{ totalRows }}
   </li>
+  }
 
   <li>
     <a
       aria-label="go to next page"
       class="next"
+      [class.disabled]="!canNext()"
       data-e2e="grid-page-next"
       [attr.tabindex]="canNext() ? 0 : -1"
-      (keydown.enter)="callSetPage($event, activePageIndex + 1)"
-      (click)="callSetPage($event, activePageIndex + 1)"
-      [ngClass]="{ disabled: !canNext() }"
+      (keydown.enter)="callSetPage($event, activePageIndex() + 1)"
+      (click)="callSetPage($event, activePageIndex() + 1)"
     ></a>
   </li>
 </ul>
+}

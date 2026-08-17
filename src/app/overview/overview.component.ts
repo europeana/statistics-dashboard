@@ -1249,7 +1249,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.emptyDataset = true;
     this.grid.setRows([]);
     if (this.gridSummary) {
-      this.gridSummary.summaryData = { breakdownBy: '', results: [] };
+      if (this.dataServerData?.results) {
+        this.dataServerData.results.breakdowns = {
+          breakdownBy: '',
+          results: []
+        };
+      }
     }
   }
 

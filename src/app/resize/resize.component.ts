@@ -1,24 +1,28 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, effect, EventEmitter, input, Output } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { SubscriptionManager } from '../subscription-manager';
 
 @Component({
   selector: 'app-resize',
   template: '',
   standalone: true
 })
-export class ResizeComponent extends SubscriptionManager implements OnInit {
-  @Input() time = 200;
+export class ResizeComponent {
+  time = input<number>(200);
+
   @Output() sizeChanged = new EventEmitter<boolean>();
 
-  public ngOnInit(): void {
-    this.subs.push(
-      fromEvent(window, 'resize')
-        .pipe(debounceTime(this.time))
+  constructor() {
+    effect((onCleanup) => {
+      const resizeSubscription = fromEvent(window, 'resize')
+        .pipe(debounceTime(this.time()))
         .subscribe(() => {
           this.sizeChanged.emit(true);
-        })
-    );
+        });
+
+      onCleanup(() => {
+        resizeSubscription.unsubscribe();
+      });
+    });
   }
 }

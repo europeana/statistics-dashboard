@@ -1,10 +1,13 @@
 import {
   Component,
+  DestroyRef,
   EventEmitter,
-  Input,
+  inject,
+  input,
   Output,
-  ViewChild
+  viewChild
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { colours, DimensionName } from '../_data';
 import {
   FmtTableData,
@@ -16,7 +19,6 @@ import {
 } from '../_models';
 import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
-import { SubscriptionManager } from '../subscription-manager';
 import { RenameApiFacetPipe } from '../_translate/rename-facet.pipe';
 import { TruncateComponent } from '../truncate/truncate.component';
 import { FormsModule } from '@angular/forms';
@@ -46,13 +48,18 @@ import {
     RenameApiFacetPipe
   ]
 })
-export class GridComponent extends SubscriptionManager {
-  @Input() facet: DimensionName;
-  @Input() tierPrefix: string;
-  @Input() isVisible: boolean;
+export class GridComponent {
+  private readonly api = inject(APIService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  facet = input.required<DimensionName>();
+  tierPrefix = input<string>('');
+  isVisible = input<boolean>(false);
+
   @Output() refreshData = new EventEmitter<void>();
   @Output() chartPositionChanged = new EventEmitter<number>();
-  @ViewChild('paginator') paginator: GridPaginatorComponent;
+
+  paginator = viewChild<GridPaginatorComponent>('paginator');
 
   filterTerm = '';
   maxPageSizes = [10, 20, 50].map((option: number) => {
@@ -77,10 +84,6 @@ export class GridComponent extends SubscriptionManager {
     $localize`:@@gridColHeaderView:View in Europeana`
   ];
 
-  constructor(private readonly api: APIService) {
-    super();
-  }
-
   /** loadLinkInformation
   /* loads url parameters and appends them to row.portalUrlInfo.href (optionally opens that link)
   /*
@@ -90,34 +93,30 @@ export class GridComponent extends SubscriptionManager {
   loadLinkInformation(
     row: TableRow,
     rightsGroups: Array<string>,
-    followLink
+    followLink: boolean
   ): void {
-    this.subs.push(
-      this.api
-        .getRightsCategoryUrls(rightsGroups)
-        .subscribe((urls: Array<string>) => {
-          const rightsParams = urls
-            .map((url: string) => {
-              // eslint-disable-next-line no-useless-escape
-              return `&qf=RIGHTS:\"${url}\"`;
-            })
-            .join('');
+    this.api
+      .getRightsCategoryUrls(rightsGroups)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((urls: Array<string>) => {
+        const rightsParams = urls
+          .map((url: string) => `&qf=RIGHTS:"${url}"`)
+          .join('');
 
-          row.portalUrlInfo.href = row.portalUrlInfo.href + rightsParams;
-          row.portalUrlInfo.hrefRewritten = true;
+        row.portalUrlInfo.href = row.portalUrlInfo.href + rightsParams;
+        row.portalUrlInfo.hrefRewritten = true;
 
-          if (followLink) {
-            // timeout and 2-stage location setting needed to avoid popup-blocker
-            setTimeout(() => {
-              const newWin = window.open('', '_blank');
+        if (followLink) {
+          setTimeout(() => {
+            const newWin = window.open('', '_blank');
+            if (newWin) {
               newWin.location.href = row.portalUrlInfo.href;
-            }, 0);
-          }
-        })
-    );
+            }
+          }, 0);
+        }
+      });
   }
 
-  /** loadFullLink
   /* click / right click / hover handler
   /* determines if the url needs augmented, updates if it so
   /*
@@ -128,7 +127,8 @@ export class GridComponent extends SubscriptionManager {
     if (row.portalUrlInfo.hrefRewritten) {
       return true;
     }
-    if (this.facet === DimensionName.rightsCategory) {
+    // Read the facet input signal via function call execution syntax
+    if (this.facet() === DimensionName.rightsCategory) {
       if (row.isTotal) {
         return true;
       } else {
@@ -166,11 +166,6 @@ export class GridComponent extends SubscriptionManager {
     });
   }
 
-  /** bumpSortState
-  /* Moves sortInfo.dir one iteration through (looped) sequence -1, 0, 1
-  /* Clears other sort states
-  /* @param { string } header
-  **/
   bumpSortState(header: SortBy): void {
     const isChanged = this.sortInfo.by !== header;
     let val = 1;
@@ -191,39 +186,35 @@ export class GridComponent extends SubscriptionManager {
 
   getData(): FmtTableData {
     return {
-      columns: ['colour', 'series', 'name', 'count', 'percent'].map((x) => {
-        return x as HeaderNameType;
-      }),
+      columns: ['colour', 'series', 'name', 'count', 'percent'].map(
+        (x) => x as HeaderNameType
+      ),
       tableRows: this.gridRows
     };
   }
 
   getPrefix(): string {
-    if (['contentTier', 'metadataTier'].includes(this.facet)) {
-      return this.tierPrefix;
+    // Read the input signal value cleanly here
+    if (['contentTier', 'metadataTier'].includes(this.facet())) {
+      return this.tierPrefix();
     }
     return '';
   }
 
-  /** goToPage
-  /* @param { KeyboardEvent } event
-  **/
   goToPage(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-      const input = event.target as HTMLInputElement;
-      const val = input.value.replace(/\D/g, '');
+      const inputEl = event.target as HTMLInputElement;
+      const val = inputEl.value.replace(/\D/g, '');
       if (val.length > 0) {
         const pageNum = Math.min(this.pagerInfo.pageCount, parseInt(val));
-        this.paginator.setPage(Math.max(0, pageNum - 1));
+
+        // 5. Read the viewChild signal safely and trigger its page index
+        this.paginator()?.setPage(Math.max(0, pageNum - 1));
       }
-      input.value = '';
+      inputEl.value = '';
     }
   }
 
-  /** setRows
-  /* called from parent when data changes
-  /* @param { Array<TableRow> } rows
-  **/
   setRows(rows: Array<TableRow>): void {
     const normalRows = [];
     const summaryRows = [];
@@ -241,10 +232,6 @@ export class GridComponent extends SubscriptionManager {
     this.gridRows = normalRows;
   }
 
-  /** setPagerInfo
-  /* handle page info from pager when page changes
-  /* @param { PagerInfo } pagerInfo
-  **/
   setPagerInfo(pagerInfo: PagerInfo): void {
     const fn = (): void => {
       const doEmit = !!this.pagerInfo;
@@ -257,18 +244,11 @@ export class GridComponent extends SubscriptionManager {
     setTimeout(fn, 0);
   }
 
-  /** sort
-  /* Template utility: bumps sort state and emits refresh event
-  /* @param { SortBy } sortBy - the field to sort on
-  **/
   sort(sortBy: SortBy): void {
     this.bumpSortState(sortBy);
     this.refreshData.emit();
   }
 
-  /** updateRows
-  /* @param { KeyboardEvent } e
-  **/
   updateRows(e: KeyboardEvent): void {
     if (e.key.length === 1 || ['Backspace', 'Delete'].includes(e.key)) {
       this.refreshData.emit();

@@ -23,42 +23,32 @@ describe('GridComponent', () => {
       name: 'A',
       count: 1,
       percent: 2,
-      portalUrlInfo: {
-        href: ''
-      }
+      portalUrlInfo: { href: '' }
     },
     {
       name: 'B',
       count: 2,
       percent: 2,
-      portalUrlInfo: {
-        href: ''
-      }
+      portalUrlInfo: { href: '' }
     },
     {
       name: 'B',
       count: 3,
       percent: 1,
       isTotal: true,
-      portalUrlInfo: {
-        href: ''
-      }
+      portalUrlInfo: { href: '' }
     },
     {
       name: 'C',
       count: 0,
       percent: 1,
-      portalUrlInfo: {
-        href: ''
-      }
+      portalUrlInfo: { href: '' }
     },
     {
       name: 'D',
       count: 2,
       percent: 1,
-      portalUrlInfo: {
-        href: ''
-      }
+      portalUrlInfo: { href: '' }
     }
   ] as Array<TableRow>;
 
@@ -80,6 +70,7 @@ describe('GridComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(GridComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('facet', DimensionName.country);
     fixture.detectChanges();
   });
 
@@ -129,18 +120,17 @@ describe('GridComponent', () => {
       count: 1,
       percent: 1,
       portalUrlInfo: {
-        href: 'http://www.europeana.eu?query=*'
+        href: 'http://europeana.eu*'
       }
     } as TableRow;
     component.loadFullLink(mockTableRow);
     tick();
 
     // test urls for rightsCategory facet
-
     expect(spyGetRightsCategoryUrls).not.toHaveBeenCalled();
     expect(spyOpen).not.toHaveBeenCalled();
 
-    component.facet = DimensionName.rightsCategory;
+    fixture.componentRef.setInput('facet', DimensionName.rightsCategory);
     component.loadFullLink(mockTableRow);
     tick();
 
@@ -177,8 +167,7 @@ describe('GridComponent', () => {
     expect(spyOpen).toHaveBeenCalledTimes(2);
 
     // test urls for rightsCategory filters
-
-    component.facet = DimensionName.contentTier;
+    fixture.componentRef.setInput('facet', DimensionName.contentTier);
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     mockTableRow.portalUrlInfo.rightsFilters = ['CC0'];
 
@@ -189,8 +178,7 @@ describe('GridComponent', () => {
     expect(spyOpen).toHaveBeenCalledTimes(2);
 
     // test normal links work correctly (normal behaviour - doesn't invoke open)
-
-    component.facet = DimensionName.country;
+    fixture.componentRef.setInput('facet', DimensionName.country);
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     delete mockTableRow.portalUrlInfo.rightsFilters;
     component.loadFullLink(mockTableRow, true);
@@ -199,7 +187,6 @@ describe('GridComponent', () => {
     expect(spyOpen).toHaveBeenCalledTimes(2);
 
     // another test of the rightsCategory filter
-
     mockTableRow.portalUrlInfo.rightsFilters = ['In Copyright'];
     mockTableRow.portalUrlInfo.hrefRewritten = false;
 
@@ -216,27 +203,41 @@ describe('GridComponent', () => {
 
   it('should get the prefix', () => {
     const tierPrefix = 'Tier Prefix ';
-    component.tierPrefix = tierPrefix;
+    fixture.componentRef.setInput('tierPrefix', tierPrefix);
+    fixture.componentRef.setInput('facet', DimensionName.country);
     expect(component.getPrefix()).toEqual('');
-    component.facet = DimensionName.contentTier;
+
+    fixture.componentRef.setInput('facet', DimensionName.contentTier);
     expect(component.getPrefix()).toEqual(tierPrefix);
   });
 
   it('should go to the page', fakeAsync(() => {
     component.setRows(testRows.slice(0));
     fixture.detectChanges();
-    expect(component.paginator).toBeFalsy();
-    component.isVisible = true;
+    expect(component.paginator()).toBeFalsy();
+
+    fixture.componentRef.setInput('isVisible', true);
     fixture.detectChanges();
-    expect(component.paginator).toBeTruthy();
+
+    // Explicitly stub the read-only signal viewChild value for the test runtime execution context
+    const mockPaginator = {
+      setPage: jest.fn()
+    } as unknown as GridPaginatorComponent;
+    Object.defineProperty(component, 'paginator', {
+      value: () => mockPaginator
+    });
+
+    expect(component.paginator()).toBeTruthy();
     tick(1);
-    const spySetPage = jest.spyOn(component.paginator, 'setPage');
+
+    const spySetPage = jest.spyOn(component.paginator(), 'setPage');
     component.goToPage({ key: '99' } as unknown as KeyboardEvent);
     component.goToPage({
       key: 'Enter',
       target: { value: 'a' }
     } as unknown as KeyboardEvent);
     expect(spySetPage).not.toHaveBeenCalled();
+
     component.goToPage({ key: '99' } as unknown as KeyboardEvent);
     component.goToPage({
       key: 'Enter',
