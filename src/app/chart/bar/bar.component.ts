@@ -1,14 +1,15 @@
 import {
   AfterViewInit,
   Component,
-  Inject,
-  Input,
+  effect,
+  inject,
+  input,
+  model,
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser, NgClass, NgIf } from '@angular/common';
 
-// amCharts imports
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 
@@ -34,41 +35,40 @@ import { FormsModule } from '@angular/forms';
 })
 export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
+
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly zone = inject(NgZone);
+
   readonly maxNumberBars = 50;
   preferredNumberBars = 8;
   maxBarSizeRelativeRatio = 20;
 
-  _results?: Array<NameValue>;
+  results = model<Array<NameValue> | undefined>();
+
   categoryAxis: am4charts.CategoryAxis;
 
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
-
-  settings = structuredClone(BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
 
-  @Input() chartId = 'barChart';
-  @Input() showPercent: boolean;
-  @Input() set results(results: Array<NameValue>) {
-    // empty setter forces it to be ready before AfterViewInit
-    this._results = results;
-  }
-  get results(): Array<NameValue> {
-    return this._results;
-  }
-  @Input() set extraSettings(extraSettings: ChartSettings) {
-    this.settings = { ...this.settings, ...extraSettings };
-  }
-  get extraSettings(): ChartSettings {
-    return this.settings;
-  }
+  chartId = input<string>('barChart');
+  showPercent = input<boolean>();
+  extraSettings = input<Partial<ChartSettings>>();
 
-  constructor(
-    @Inject(PLATFORM_ID) private readonly platformId,
-    private readonly zone: NgZone
-  ) {
-    this.browserOnly(() => {
+  settings: ChartSettings = structuredClone(BarChartDefaults);
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
       am4core.options.autoDispose = true;
+    }
+    effect(() => {
+      const overrides = this.extraSettings();
+      if (overrides) {
+        this.settings = {
+          ...this.settings,
+          ...overrides
+        };
+      }
     });
   }
 
@@ -93,17 +93,14 @@ export class BarComponent implements AfterViewInit {
   }
 
   addSeriesFromResult(): void {
-    if (this.results) {
+    const results = this.results();
+    if (results && results.length > 0) {
       this.addSeries([
         {
-          data: this.results.reduce(function (
-            map: IHash<number>,
-            nv: NameValue
-          ) {
+          data: results.reduce(function (map: IHash<number>, nv: NameValue) {
             map[nv.name] = nv.value;
             return map;
-          },
-          {}),
+          }, {}),
           colour: colours[0],
           seriesName: 'seriesKey'
         } as ColourSeriesData
@@ -249,7 +246,7 @@ export class BarComponent implements AfterViewInit {
    */
   createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
     const series = this.chart.series.push(new am4charts.ColumnSeries());
-    const labelSuffix = this.showPercent ? '%' : '';
+    const labelSuffix = this.showPercent() ? '%' : '';
 
     series.columns.template.events.once('inited', function (event) {
       event.target.fill = am4core.color(colour);
@@ -355,7 +352,7 @@ export class BarComponent implements AfterViewInit {
     this.valueAxis.renderer.labels.template.adapter.add(
       'text',
       (label: string) => {
-        return `${label}${this.showPercent ? '%' : ''}`;
+        return `${label}${this.showPercent() ? '%' : ''}`;
       }
     );
   }
@@ -368,7 +365,7 @@ export class BarComponent implements AfterViewInit {
   drawChart(zoomIndex?: number): void {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
-      this.chart = am4core.create(this.chartId, am4charts.XYChart);
+      this.chart = am4core.create(this.chartId(), am4charts.XYChart);
       const chart = this.chart;
 
       if (typeof zoomIndex !== 'undefined') {
@@ -384,7 +381,7 @@ export class BarComponent implements AfterViewInit {
       this.valueAxis = new am4charts.ValueAxis();
 
       this.valueAxis.numberFormatter = new am4core.NumberFormatter();
-      this.valueAxis.numberFormatter.numberFormat = this.showPercent
+      this.valueAxis.numberFormatter.numberFormat = this.showPercent()
         ? '#.'
         : '#.0a';
 

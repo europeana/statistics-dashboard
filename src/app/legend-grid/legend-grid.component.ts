@@ -39,7 +39,6 @@ import {
 } from '../_models';
 import { RenameCountryPipe, RenameTargetTypePipe } from '../_translate';
 import { LineComponent } from '../chart';
-import { LegendGridService } from '.';
 
 @Component({
   selector: 'app-legend-grid',
@@ -114,9 +113,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
 
   public TargetFieldName = TargetFieldName;
 
-  private readonly legendGridService = inject(LegendGridService);
-  readonly legendGridIsInitialised = this.legendGridService.legendGridReady;
-
   constructor() {
     effect(() => {
       const isEnabled = this.columnEnabled3D();
@@ -159,8 +155,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.legendGridService.setLegendGridReady(true);
-
     effect(
       () => {
         const code = this.countryCode();
@@ -195,7 +189,6 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.legendGridService.setLegendGridReady(false);
     untracked(this.targetCountriesOO).forEach((country: string) => {
       if (this.lineChart()) {
         this.lineChart().removeRange(country);

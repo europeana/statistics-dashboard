@@ -10,7 +10,6 @@ import {
 } from '@angular/common';
 import {
   AfterViewInit,
-  ApplicationRef,
   Component,
   computed,
   DestroyRef,
@@ -22,7 +21,7 @@ import {
   ModelSignal,
   OnDestroy,
   signal,
-  ViewChild
+  viewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -67,7 +66,7 @@ import {
 import { AppendiceSectionComponent } from '../appendice-section';
 import { BarComponent, LineComponent, LineService } from '../chart';
 import { HeaderComponent } from '../header';
-import { LegendGridComponent, LegendGridService } from '../legend-grid';
+import { LegendGridComponent } from '../legend-grid';
 import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
@@ -120,9 +119,9 @@ export class CountryComponent
 
   cardData: IHash<Array<NamesValuePercent>>;
 
-  @ViewChild('legendGrid') legendGrid: LegendGridComponent;
-  @ViewChild('barChart') barChart: BarComponent;
-  @ViewChild('scrollPoint') scrollPoint: ElementRef;
+  legendGrid = viewChild<LegendGridComponent>('legendGrid');
+  barChart = viewChild<BarComponent>('barChart');
+  scrollPoint = viewChild<ElementRef>('scrollPoint');
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -167,25 +166,18 @@ export class CountryComponent
 
   appendiceExpanded = false;
 
-  readonly legendGridIsInitialised = inject(LegendGridService).legendGridReady;
   readonly lineChartIsInitialised = inject(LineService).lineChartReady;
   readonly countryTotalMap = this.filterStateService.countryTotalMap;
   readonly headerRef = input<HeaderComponent>();
   readonly includeCTZero = this.filterStateService.includeCTZero;
 
   /** constructor
-   * gets the app-ref and obtains the header ref
    * binds the data variables to the url
    * initialises the intersection observer
    **/
-  constructor(
-    private readonly applicationRef: ApplicationRef,
-    private readonly legendGridService: LegendGridService
-  ) {
+  constructor() {
     super();
-
     this.restoreHiddenColumns();
-
     combineLatest([
       this.api.getTargetMetaData(),
       this.api.getCountryData(),
@@ -272,7 +264,7 @@ export class CountryComponent
   initialiseIntersectionObserver(): void {
     new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
       threshold: [...new Array(10).keys()].map((val) => (val ? val / 10 : val))
-    }).observe(this.scrollPoint.nativeElement);
+    }).observe(this.scrollPoint().nativeElement);
   }
 
   /** resetAppCTZeroParam
@@ -291,10 +283,11 @@ export class CountryComponent
     this.loadDimensionCardData(DimensionName.provider);
     this.loadDimensionCardData(DimensionName.rightsCategory);
     this.loadDimensionCardData(DimensionName.type, () => {
-      if (this.barChart) {
-        this.barChart.removeAllSeries();
-        this.barChart.results = this.cardData[DimensionName.type];
-        this.barChart.ngAfterViewInit();
+      const chart = this.barChart();
+      if (chart) {
+        chart.removeAllSeries();
+        chart.results.set(this.cardData[DimensionName.type]);
+        chart.ngAfterViewInit();
       }
     });
   }

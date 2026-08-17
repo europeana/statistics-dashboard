@@ -1,8 +1,4 @@
-import {
-  ApplicationRef,
-  ComponentRef,
-  CUSTOM_ELEMENTS_SCHEMA
-} from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -12,7 +8,7 @@ import {
 } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
-import { isoCountryCodesReversed } from '../_data';
+import { DimensionName, isoCountryCodesReversed } from '../_data';
 import { APIService, FilterStateService } from '../_services';
 import {
   MockAPIService,
@@ -23,8 +19,6 @@ import {
 } from '../_mocked';
 import { TargetFieldName } from '../_models';
 import { BarComponent, LineComponent, LineService } from '../chart';
-import { LegendGridService } from '../legend-grid';
-import { HeaderComponent } from '../header';
 import { CountryComponent } from '.';
 
 describe('CountryComponent', () => {
@@ -33,7 +27,6 @@ describe('CountryComponent', () => {
   let router: Router;
   let routeChangeSource: BehaviorSubject<Params>;
   let lineService: LineService;
-  let legendGridService: LegendGridService;
   let api: APIService;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,32 +67,18 @@ describe('CountryComponent', () => {
     api = TestBed.inject(APIService);
     router = TestBed.inject(Router);
     lineService = TestBed.inject(LineService);
-    legendGridService = TestBed.inject(LegendGridService);
   };
-
-  let appRef: ApplicationRef;
 
   beforeEach(waitForAsync(() => {
     configureTestBed();
-    appRef = TestBed.inject(ApplicationRef);
   }));
 
   const finaliseInit = (): void => {
-    const headerFixture = TestBed.createComponent(HeaderComponent);
-    const headerInstance = headerFixture.componentInstance;
-
     mockFilterState.activeCountry.set('France');
     mockFilterState.pageTitleDynamic.set(true);
     mockFilterState.pageTitleInViewport.set(false);
-
-    appRef.components.push({
-      header: headerInstance
-    } as unknown as ComponentRef<unknown>);
-
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
-
-    fixture.componentRef.setInput('headerRef', headerInstance);
   };
 
   const b4Each = (fullInit = true): void => {
@@ -203,12 +182,6 @@ describe('CountryComponent', () => {
       expect(component.lineChartIsInitialised()).toBeTruthy();
     });
 
-    it('should listen for legend-grid initialisation', () => {
-      expect(component.legendGridIsInitialised()).toBeFalsy();
-      legendGridService.setLegendGridReady(true);
-      expect(component.legendGridIsInitialised()).toBeTruthy();
-    });
-
     it('should load the history', () => {
       const country = 'DE';
       const fnCallback = jest.fn();
@@ -253,18 +226,31 @@ describe('CountryComponent', () => {
     it('should set the country', fakeAsync(() => {
       const mockRemoveAllSeries = jest.fn();
       const mockNgAfterViewInit = jest.fn();
+      const mockSetResults = jest.fn();
 
-      const barChart = {
+      const mockBarChart = {
         removeAllSeries: mockRemoveAllSeries,
-        ngAfterViewInit: mockNgAfterViewInit
+        ngAfterViewInit: mockNgAfterViewInit,
+        results: Object.assign(jest.fn().mockReturnValue([]), {
+          set: mockSetResults
+        }),
+        chartId: jest.fn().mockReturnValue('barChart')
       } as unknown as BarComponent;
 
-      component.barChart = barChart;
+      jest.spyOn(component, 'barChart').mockReturnValue(mockBarChart);
+
+      component.cardData = {
+        [DimensionName.type]: []
+      };
+
+      fixture.detectChanges();
 
       jest.spyOn(component, 'refreshCardData').mockImplementation(() => {
-        if (component.barChart) {
-          component.barChart.removeAllSeries();
-          component.barChart.ngAfterViewInit();
+        const chart = component.barChart();
+        if (chart) {
+          chart.removeAllSeries();
+          chart.results.set(component.cardData[DimensionName.type]);
+          chart.ngAfterViewInit();
         }
       });
 
@@ -272,11 +258,13 @@ describe('CountryComponent', () => {
       component.includeCTZero.set(false);
 
       TestBed.flushEffects();
+
       component.refreshCardData();
       fixture.detectChanges();
       tick(1);
 
       expect(mockRemoveAllSeries).toHaveBeenCalled();
+      expect(mockSetResults).toHaveBeenCalled();
       expect(mockNgAfterViewInit).toHaveBeenCalled();
     }));
 
