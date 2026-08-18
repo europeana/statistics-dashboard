@@ -1,11 +1,19 @@
-import { Component, input } from '@angular/core';
+import { Component, forwardRef, input } from '@angular/core';
 import { DimensionName } from '../_data';
 import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
+import { GridComponent } from '../grid';
 
 @Component({
   standalone: true,
   selector: 'app-grid',
-  template: ''
+  template: '',
+  providers: [
+    {
+      provide: GridComponent,
+      // useExisting points the real GridComponent query token to this mock instance
+      useExisting: forwardRef(() => MockGridComponent)
+    }
+  ]
 })
 export class MockGridComponent {
   facet = input<DimensionName>();

@@ -152,7 +152,7 @@
 
       <div class="statistics-dashboard-right">
         <app-export
-          #export
+          #cmpExport
           (closeExport)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
@@ -203,8 +203,8 @@
           <a
             aria-label="toggle export section"
             #exportOpenerToolbar
-            (click)="export.toggleActive(true)"
-            (keydown.enter)="export.toggleActive(true)"
+            (click)="cmpExport.toggleActive(true)"
+            (keydown.enter)="cmpExport.toggleActive(true)"
             class="export-icon export-opener"
             tabindex="0"
           >
@@ -434,8 +434,8 @@
               #exportOpener
               class="export-opener-link"
               tabindex="0"
-              (click)="export.toggleActive(false)"
-              (keydown.enter)="export.toggleActive(false)"
+              (click)="cmpExport.toggleActive(false)"
+              (keydown.enter)="cmpExport.toggleActive(false)"
               i18n="Share Report Opener@@exportReportOpenerLink"
               >Export data</a
             >

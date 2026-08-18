@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -253,7 +253,15 @@ describe('OverviewComponent', () => {
     });
 
     it('should refresh the chart', fakeAsync(() => {
-      const spyDrawChart = jest.spyOn(component.barChart, 'drawChart');
+      fixture.detectChanges();
+
+      const barChartInstance = component.barChart();
+      if (!barChartInstance) {
+        throw new Error(
+          'BarChart signal is undefined. Check template and fixture.detectChanges().'
+        );
+      }
+      const spyDrawChart = jest.spyOn(barChartInstance, 'drawChart');
 
       component.refreshChart();
       component.refreshChart(true);
@@ -288,11 +296,23 @@ describe('OverviewComponent', () => {
     });
 
     it('should track changes in the chart position', () => {
+      fixture.detectChanges();
+
+      const barChartInstance = component.barChart();
+      if (!barChartInstance) {
+        throw new Error(
+          'BarChart signal is undefined. Verify fixture.detectChanges() was called.'
+        );
+      }
+
       expect(component.chartPosition).toEqual(0);
-      const spyZoomTop = jest.spyOn(component.barChart, 'zoomTop');
-      component.chartPositionChanged(component.barChart.maxNumberBars);
+
+      const spyZoomTop = jest.spyOn(barChartInstance, 'zoomTop');
+
+      component.chartPositionChanged(barChartInstance.maxNumberBars);
       expect(spyZoomTop).not.toHaveBeenCalled();
-      component.chartPositionChanged(component.barChart.maxNumberBars);
+
+      component.chartPositionChanged(barChartInstance.maxNumberBars);
       expect(spyZoomTop).toHaveBeenCalled();
     });
 
@@ -729,31 +749,31 @@ describe('OverviewComponent', () => {
     });
 
     it('should focus the export opener', fakeAsync(() => {
-      component.exportOpener = {
-        nativeElement: {
-          focus: jest.fn()
-        }
-      };
-      component.exportOpenerToolbar = {
-        nativeElement: {
-          focus: jest.fn()
-        }
-      };
+      const mockOpenerFocus = jest.fn();
+      const mockToolbarFocus = jest.fn();
+
+      const mockExportOpener = {
+        nativeElement: { focus: mockOpenerFocus }
+      } as ElementRef;
+      const mockExportOpenerToolbar = {
+        nativeElement: { focus: mockToolbarFocus }
+      } as ElementRef;
+
+      jest.spyOn(component, 'exportOpener').mockReturnValue(mockExportOpener);
+      jest
+        .spyOn(component, 'exportOpenerToolbar')
+        .mockReturnValue(mockExportOpenerToolbar);
 
       component.focusExportOpener(false);
       tick(1);
 
-      expect(component.exportOpener.nativeElement.focus).toHaveBeenCalled();
-      expect(
-        component.exportOpenerToolbar.nativeElement.focus
-      ).not.toHaveBeenCalled();
+      expect(mockOpenerFocus).toHaveBeenCalled();
+      expect(mockToolbarFocus).not.toHaveBeenCalled();
 
       component.focusExportOpener(true);
       tick(1);
 
-      expect(
-        component.exportOpenerToolbar.nativeElement.focus
-      ).toHaveBeenCalled();
+      expect(mockToolbarFocus).toHaveBeenCalled();
     }));
 
     it('should clear the dates', fakeAsync(() => {
@@ -877,12 +897,23 @@ describe('OverviewComponent', () => {
     });
 
     it('should add the series', fakeAsync(() => {
+      fixture.detectChanges();
+
+      const snapshotsInstance = component.snapshots();
+      if (!snapshotsInstance) {
+        throw new Error(
+          'Snapshots signal is undefined. Check template and fixture.detectChanges().'
+        );
+      }
+
       const spyApply = jest
-        .spyOn(component.snapshots, 'apply')
+        .spyOn(snapshotsInstance, 'apply')
         .mockReturnValue(null);
+
       const spyShowAppliedSeriesInGridAndChart = jest
         .spyOn(component, 'showAppliedSeriesInGridAndChart')
         .mockImplementation(() => false);
+
       component.addSeries(['series-key']);
       expect(spyShowAppliedSeriesInGridAndChart).toHaveBeenCalled();
       expect(spyApply).toHaveBeenCalled();
@@ -890,12 +921,23 @@ describe('OverviewComponent', () => {
     }));
 
     it('should remove the series', fakeAsync(() => {
+      fixture.detectChanges();
+
+      const snapshotsInstance = component.snapshots();
+      if (!snapshotsInstance) {
+        throw new Error(
+          'Snapshots signal is undefined. Check template and fixture.detectChanges().'
+        );
+      }
+
       const spyUnapply = jest
-        .spyOn(component.snapshots, 'unapply')
+        .spyOn(snapshotsInstance, 'unapply')
         .mockReturnValue(null);
+
       const spyShowAppliedSeriesInGridAndChart = jest
         .spyOn(component, 'showAppliedSeriesInGridAndChart')
         .mockReturnValue(null);
+
       component.removeSeries('');
       expect(spyShowAppliedSeriesInGridAndChart).toHaveBeenCalled();
       expect(spyUnapply).toHaveBeenCalled();

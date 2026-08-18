@@ -1,10 +1,9 @@
 import {
   Component,
   DestroyRef,
-  EventEmitter,
   inject,
   input,
-  Output,
+  output,
   viewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -52,8 +51,8 @@ export class GridComponent {
   tierPrefix = input<string>('');
   isVisible = input<boolean>(false);
 
-  @Output() refreshData = new EventEmitter<void>();
-  @Output() chartPositionChanged = new EventEmitter<number>();
+  refreshData = output<void>();
+  chartPositionChanged = output<number>();
 
   paginator = viewChild<GridPaginatorComponent>('paginator');
 

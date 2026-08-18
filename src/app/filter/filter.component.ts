@@ -2,10 +2,9 @@ import {
   Component,
   effect,
   ElementRef,
-  EventEmitter,
   input,
   model,
-  Output,
+  output,
   QueryList,
   ViewChild,
   ViewChildren
@@ -60,9 +59,9 @@ export class FilterComponent {
   inputToFocus?: InputDescription;
   state = model.required<FilterState>();
 
-  @Output() filterTermChanged: EventEmitter<FilterInfo> = new EventEmitter();
-  @Output() valueChanged: EventEmitter<true> = new EventEmitter();
-  @Output() visibilityChanged: EventEmitter<string> = new EventEmitter();
+  filterTermChanged = output<FilterInfo>();
+  valueChanged = output<true>();
+  visibilityChanged = output<string>();
 
   @ViewChild('filterTerm') filterTerm: ElementRef;
   @ViewChild('opener') opener: ElementRef;

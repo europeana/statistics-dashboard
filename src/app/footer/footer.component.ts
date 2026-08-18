@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { externalLinks } from '../_data/static-data';
 import { environment } from '../../environments/environment';
 import { RouterLink } from '@angular/router';
@@ -13,7 +13,7 @@ export class FooterComponent {
   public externalLinks = externalLinks;
   public feedbackUrl = environment.feedbackUrl;
 
-  @Output() showCookieConsent = new EventEmitter<void>();
+  showCookieConsent = output<void>();
 
   clickPrivacySettings(): void {
     this.showCookieConsent.emit();

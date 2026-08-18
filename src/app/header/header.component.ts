@@ -6,7 +6,7 @@ import {
   inject,
   input,
   model,
-  ViewChild
+  viewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NgClass, NgIf } from '@angular/common';
@@ -85,7 +85,7 @@ export class HeaderComponent {
   });
 
   menuIsOpen = false;
-  @ViewChild('menuOpener') menuOpener: ElementRef;
+  menuOpener = viewChild(ElementRef);
 
   public isoCountryCodes = isoCountryCodes;
   public router = inject(Router);
@@ -105,7 +105,7 @@ export class HeaderComponent {
   keyNavToCountry(event: KeyboardEvent, country: string): void {
     event.stopPropagation();
     this.menuIsOpen = false;
-    this.menuOpener.nativeElement.focus();
+    this.menuOpener()?.nativeElement.focus();
 
     this.router.navigate(
       [`country`, country],
@@ -121,7 +121,7 @@ export class HeaderComponent {
       event.stopPropagation();
     }
     if (isKeyboardEvent) {
-      this.menuOpener.nativeElement.focus();
+      this.menuOpener()?.nativeElement.focus();
     }
   }
 }

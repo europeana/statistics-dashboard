@@ -7,7 +7,7 @@ import {
   OnInit,
   signal,
   TemplateRef,
-  ViewChild,
+  viewChild,
   WritableSignal
 } from '@angular/core';
 import {
@@ -113,15 +113,15 @@ import { ResizeComponent } from '../resize';
   ]
 })
 export class OverviewComponent extends SubscriptionManager implements OnInit {
-  @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridSummary') gridSummary: GridSummaryComponent;
-  @ViewChild('export') export: ExportComponent;
-  @ViewChild('barChart') barChart: BarComponent;
-  @ViewChild('snapshots') snapshots: SnapshotsComponent;
-  @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
-  @ViewChild('exportOpenerToolbar') exportOpenerToolbar: ElementRef;
-  @ViewChild('exportOpener') exportOpener: ElementRef;
-  @ViewChild('dateFocusControl') dateFocusControl: ElementRef;
+  grid = viewChild(GridComponent);
+  cmpExport = viewChild(ExportComponent);
+  barChart = viewChild(BarComponent);
+  snapshots = viewChild(SnapshotsComponent);
+  gridSummary = viewChild(GridSummaryComponent);
+  dialogRef = viewChild.required<TemplateRef<HTMLElement>>('dialogRef');
+  exportOpenerToolbar = viewChild(ElementRef);
+  exportOpener = viewChild(ElementRef);
+  dateFocusControl = viewChild(ElementRef);
 
   private readonly api = inject(APIService);
   private readonly fb = inject(UntypedFormBuilder);
@@ -356,24 +356,24 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   }
 
   getGridData(): FmtTableData {
-    return this.grid.getData();
+    return this.grid().getData();
   }
 
   getChartData(): Promise<string> {
-    return this.barChart.getSvgData();
+    return this.barChart().getSvgData();
   }
 
   /** chartPositionChanged
   /* @param {number} position - absolute position
   */
   chartPositionChanged(absPos: number): void {
-    const newPosition = Math.floor(absPos / this.barChart.maxNumberBars);
-    const scrollDiff = absPos % this.barChart.maxNumberBars;
+    const newPosition = Math.floor(absPos / this.barChart().maxNumberBars);
+    const scrollDiff = absPos % this.barChart().maxNumberBars;
     if (newPosition !== this.chartPosition) {
       this.chartPosition = newPosition;
       this.refreshChart(true, scrollDiff);
     } else {
-      this.barChart.zoomTop(scrollDiff);
+      this.barChart().zoomTop(scrollDiff);
     }
   }
 
@@ -737,7 +737,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
       return rightsInfo[key];
     });
-    this.snapshots.snap(this.form.value.facetParameter, name, {
+    this.snapshots().snap(this.form.value.facetParameter, name, {
       name: name,
       label: this.generateSeriesLabel(),
       data: this.iHashNumberFromNVPs(seriesValues),
@@ -761,21 +761,21 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { string : seriesKey } - the key of the series to remove
    */
   removeSeries(seriesKey: string): void {
-    this.snapshots.unapply(seriesKey);
+    this.snapshots().unapply(seriesKey);
     this.showAppliedSeriesInGridAndChart();
   }
 
   showAppliedSeriesInGridAndChart(): void {
-    const seriesKeys = this.snapshots.filteredCDKeys(
+    const seriesKeys = this.snapshots().filteredCDKeys(
       this.form.value.facetParameter,
       'applied'
     );
 
-    this.snapshots.preSortAndFilter(
+    this.snapshots().preSortAndFilter(
       this.form.value.facetParameter,
       seriesKeys,
-      this.grid.sortInfo,
-      this.grid.filterTerm
+      this.grid().sortInfo,
+      this.grid().filterTerm
     );
 
     this.showAppliedSeriesInGrid();
@@ -783,7 +783,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   }
 
   showDateDisclaimer(): void {
-    this.dialog.open(this.dialogRef);
+    this.dialog.open(this.dialogRef());
   }
 
   /** addSeries
@@ -792,7 +792,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { Array<string> : seriesKeys } - the keys of the series to add
    */
   addSeries(seriesKeys: Array<string>): void {
-    this.snapshots.apply(this.form.value.facetParameter, seriesKeys);
+    this.snapshots()?.apply(this.form.value.facetParameter, seriesKeys);
     this.showAppliedSeriesInGridAndChart();
   }
 
@@ -803,15 +803,15 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
     const fn = (): void => {
-      const maxbars = this.barChart.maxNumberBars;
-      const seriesData = this.snapshots.getSeriesDataForChart(
+      const maxbars = this.barChart().maxNumberBars;
+      const seriesData = this.snapshots().getSeriesDataForChart(
         this.form.value.facetParameter,
         seriesKeys,
         this.form.value['chartFormat']['percent'],
         this.chartPosition * maxbars,
         maxbars
       );
-      this.barChart.addSeries(seriesData);
+      this.barChart().addSeries(seriesData);
     };
     setTimeout(fn, 0);
   }
@@ -823,12 +823,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { boolean : redrawChart } - flag redraw
    */
   refreshChart(redrawChart = false, scrollToTop = 0): void {
-    this.barChart.removeAllSeries();
+    this.barChart().removeAllSeries();
     this.addSeriesToChart(
-      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+      this.snapshots().filteredCDKeys(this.form.value.facetParameter, 'applied')
     );
     if (redrawChart) {
-      this.barChart.drawChart(scrollToTop);
+      this.barChart().drawChart(scrollToTop);
     }
   }
 
@@ -1081,7 +1081,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.updatePageUrl();
     this.datesOpen();
     this.changeDetector.detectChanges();
-    this.dateFocusControl.nativeElement.focus();
+    this.dateFocusControl()?.nativeElement.focus();
   }
 
   /** datesOpen
@@ -1102,9 +1102,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   focusExportOpener(fromToolbar: boolean): void {
     setTimeout(() => {
       if (fromToolbar) {
-        this.exportOpenerToolbar.nativeElement.focus();
+        this.exportOpenerToolbar().nativeElement.focus();
       } else {
-        this.exportOpener.nativeElement.focus();
+        this.exportOpener().nativeElement.focus();
       }
     }, 1);
   }
@@ -1245,10 +1245,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* clears the chart and grid data
   */
   clearData(): void {
-    this.barChart.removeAllSeries();
+    this.barChart().removeAllSeries();
     this.emptyDataset = true;
-    this.grid.setRows([]);
-    if (this.gridSummary) {
+    this.grid().setRows([]);
+    if (this.gridSummary()) {
       if (this.dataServerData?.results) {
         this.dataServerData.results.breakdowns = {
           breakdownBy: '',
@@ -1312,17 +1312,17 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* sets table set table rows (combined series)
   */
   showAppliedSeriesInGrid(): void {
-    const seriesKeys = this.snapshots.filteredCDKeys(
+    const seriesKeys = this.snapshots().filteredCDKeys(
       this.form.value.facetParameter,
       'applied'
     );
 
-    const rows = this.snapshots.getSeriesDataForGrid(
+    const rows = this.snapshots().getSeriesDataForGrid(
       this.form.value.facetParameter,
       seriesKeys
     );
 
-    this.grid.isShowingSeriesInfo = seriesKeys.length > 1;
-    this.grid.setRows(rows);
+    this.grid().isShowingSeriesInfo = seriesKeys.length > 1;
+    this.grid().setRows(rows);
   }
 }

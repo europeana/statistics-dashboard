@@ -1,11 +1,18 @@
-import { Component, input } from '@angular/core';
+import { Component, forwardRef, input } from '@angular/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { ChartSettings, ColourSeriesData } from '../_models';
+import { BarComponent } from '../chart';
 
 @Component({
   standalone: true,
   selector: 'app-bar-chart',
-  template: ''
+  template: '',
+  providers: [
+    {
+      provide: BarComponent,
+      useExisting: forwardRef(() => MockBarComponent)
+    }
+  ]
 })
 export class MockBarComponent {
   readonly maxNumberBars = 50;

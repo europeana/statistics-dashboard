@@ -1,4 +1,4 @@
-import { Component, effect, EventEmitter, input, Output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -10,7 +10,7 @@ import { debounceTime } from 'rxjs/operators';
 export class ResizeComponent {
   time = input<number>(200);
 
-  @Output() sizeChanged = new EventEmitter<boolean>();
+  sizeChanged = output<boolean>();
 
   constructor() {
     effect((onCleanup) => {
