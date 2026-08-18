@@ -1,5 +1,5 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, QueryList } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   ComponentFixture,
@@ -96,29 +96,31 @@ describe('LandingComponent', () => {
     let mockChartRefreshed = false;
     let mockChartRemoved = false;
 
-    const mockCharts = {
-      length: 3,
-      toArray: () =>
-        [1, 2, 3].map(() => {
-          return {
-            removeAllSeries: () => {
-              mockChartRemoved = true;
-            },
-            ngAfterViewInit: () => {
-              mockChartRefreshed = true;
-            }
-          } as unknown as BarComponent;
-        })
-    } as unknown as QueryList<BarComponent>;
+    const mockChartsArray = [1, 2, 3].map(() => {
+      return {
+        removeAllSeries: () => {
+          mockChartRemoved = true;
+        },
+        ngAfterViewInit: () => {
+          mockChartRefreshed = true;
+        }
+      } as unknown as BarComponent;
+    });
 
-    component.barCharts = undefined;
+    component.barCharts = jest.fn().mockReturnValue([]) as unknown as Signal<
+      readonly BarComponent[]
+    >;
     component.refreshCharts();
     tick(1);
 
     expect(mockChartRefreshed).toBeFalsy();
     expect(mockChartRemoved).toBeFalsy();
 
-    component.barCharts = mockCharts;
+    component.barCharts = jest
+      .fn()
+      .mockReturnValue(mockChartsArray) as unknown as Signal<
+      readonly BarComponent[]
+    >;
     component.refreshCharts();
     tick(1);
 
@@ -190,7 +192,6 @@ describe('LandingComponent', () => {
     expect(
       component.getDerivedSeriesValue(TargetFieldName.THREE_D, 0, 'IT')
     ).toEqual(derivedValue);
-
     expect(
       component.getDerivedSeriesValue(TargetFieldName.THREE_D, 0, 'XXX')
     ).toEqual(0);
@@ -205,27 +206,43 @@ describe('LandingComponent', () => {
   });
 
   it('should close the map section', () => {
-    component.mapChart = {
+    const mockMapComponent = {
       countryClick: jest.fn()
     } as unknown as MapComponent;
+
+    component.mapChart = jest
+      .fn()
+      .mockReturnValue(mockMapComponent) as unknown as Signal<
+      MapComponent | undefined
+    >;
     component.closeMapSelection();
-    expect(component.mapChart.countryClick).toHaveBeenCalled();
+
+    expect(component.mapChart().countryClick).toHaveBeenCalled();
   });
 
   it('should close the map menu, refocussing the opener', () => {
-    component.layerOpener = {
+    const mockElementRef = {
       nativeElement: {
         focus: jest.fn()
       }
-    } as unknown as ElementRef;
+    } as unknown as ElementRef<HTMLElement>;
+
+    component.layerOpener = jest
+      .fn()
+      .mockReturnValue(mockElementRef) as unknown as Signal<
+      ElementRef<HTMLElement> | undefined
+    >;
 
     component.mapMenuIsOpen = true;
     component.closeMapMenu();
+
     expect(component.mapMenuIsOpen).toBeFalsy();
-    expect(component.layerOpener.nativeElement.focus).toHaveBeenCalled();
+    expect(component.layerOpener()?.nativeElement.focus).toHaveBeenCalled();
 
     component.closeMapMenu();
-    expect(component.layerOpener.nativeElement.focus).toHaveBeenCalledTimes(1);
+    expect(component.layerOpener()?.nativeElement.focus).toHaveBeenCalledTimes(
+      1
+    );
   });
 
   it('should tap the target data load', () => {
@@ -252,7 +269,6 @@ describe('LandingComponent', () => {
     component.tapCountryDataLoad(fnCallback);
     expect(spyGetCountryData).toHaveBeenCalledTimes(1);
     expect(fnCallback).toHaveBeenCalled();
-
     expect(component.countryData).toBeTruthy();
 
     component.tapCountryDataLoad();
@@ -283,7 +299,7 @@ describe('LandingComponent', () => {
   });
 
   it('should clear the heatmap', () => {
-    component.mapChart = {
+    const mockMapComponent = {
       colourSchemeDefault: {
         base: { hex: '#fffff' } as am4core.Color,
         highlight: { hex: '#fffff' } as am4core.Color,
@@ -292,8 +308,13 @@ describe('LandingComponent', () => {
       setMapPercentMode: jest.fn()
     } as unknown as MapComponent;
 
+    component.mapChart = jest
+      .fn()
+      .mockReturnValue(mockMapComponent) as unknown as Signal<
+      MapComponent | undefined
+    >;
     component.clearHeatmap();
-    // Verify the tracking signal reset itself back to baseline
+
     expect(component.activeMapData()).toEqual(component.mapData());
   });
 
@@ -303,8 +324,10 @@ describe('LandingComponent', () => {
     component.targetMetaData = mockTargetMetaData;
 
     const colour = '#ffffff' as unknown as am4core.Color;
-    component.mapChart = {
+
+    const mockMapComponent = {
       setMapPercentMode: jest.fn(),
+      colourScheme: undefined,
       colourSchemeTargets: {
         total: [
           {
@@ -316,14 +339,22 @@ describe('LandingComponent', () => {
       }
     } as unknown as MapComponent;
 
-    expect(component.mapChart.colourScheme).toBeFalsy();
+    component.mapChart = jest
+      .fn()
+      .mockReturnValue(mockMapComponent) as unknown as Signal<
+      MapComponent | undefined
+    >;
+
+    expect(component.mapChart().colourScheme).toBeFalsy();
 
     component.showHeatmap(TargetFieldName.TOTAL, 0);
-    expect(component.mapChart.colourScheme).toBeTruthy();
-    expect(component.mapChart.colourScheme.base).toEqual(colour);
+
+    expect(component.mapChart().colourScheme).toBeTruthy();
+    expect(component.mapChart().colourScheme.base).toEqual(colour);
     expect(component.activeMapData()).toEqual(
       component.allProgressSeries[TargetFieldName.TOTAL][0]
     );
+
     component.targetExpanded = undefined;
     component.singleCountryMode = true;
     component.showHeatmap(TargetFieldName.TOTAL, 0);

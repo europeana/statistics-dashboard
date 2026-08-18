@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, QueryList } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -62,11 +62,17 @@ describe('FilterComponent', () => {
       })
     );
 
-    component.opener = {
+    const mockElementRef = {
       nativeElement: {
         focus: jest.fn()
       }
-    } as unknown as ElementRef;
+    } as unknown as ElementRef<HTMLElement>;
+
+    component.opener = jest
+      .fn()
+      .mockReturnValue(mockElementRef) as unknown as Signal<
+      ElementRef<HTMLElement> | undefined
+    >;
   });
 
   it('should create', () => {
@@ -190,11 +196,17 @@ describe('FilterComponent', () => {
     component.filterOptions(evt);
     expect(spyHide).not.toHaveBeenCalled();
 
-    component.opener = {
+    const mockElementRef = {
       nativeElement: {
         focus: jest.fn()
       }
-    } as unknown as ElementRef;
+    } as unknown as ElementRef<HTMLElement>;
+
+    component.opener = jest
+      .fn()
+      .mockReturnValue(mockElementRef) as unknown as Signal<
+      ElementRef<HTMLElement> | undefined
+    >;
 
     evt.key = 'Escape';
     component.filterOptions(evt);
@@ -209,7 +221,7 @@ describe('FilterComponent', () => {
       nativeElement: {
         focus: spyFilterTermFocus
       }
-    } as unknown as ElementRef;
+    } as unknown as ElementRef<HTMLInputElement>;
 
     const mockCheckboxes = {
       find: (_: CheckboxComponent) => {
@@ -223,10 +235,18 @@ describe('FilterComponent', () => {
           })
         } as unknown as CheckboxComponent;
       }
-    } as unknown as QueryList<CheckboxComponent>;
+    } as unknown as readonly CheckboxComponent[];
 
-    component.filterTerm = mockFilterTerm;
-    component.checkboxes = mockCheckboxes;
+    component.checkboxes = jest
+      .fn()
+      .mockReturnValue(mockCheckboxes) as unknown as Signal<
+      readonly CheckboxComponent[]
+    >;
+    component.filterTerm = jest
+      .fn()
+      .mockReturnValue(mockFilterTerm) as unknown as Signal<
+      ElementRef<HTMLInputElement> | undefined
+    >;
 
     fixture.componentRef.setInput('state', {
       visible: true,
@@ -239,8 +259,17 @@ describe('FilterComponent', () => {
 
     fixture.detectChanges();
 
-    component.filterTerm = mockFilterTerm;
-    component.checkboxes = mockCheckboxes;
+    // Re-assign using the functional signal mock format to ensure the effect logic stays wired up
+    component.filterTerm = jest
+      .fn()
+      .mockReturnValue(mockFilterTerm) as unknown as Signal<
+      ElementRef<HTMLInputElement> | undefined
+    >;
+    component.checkboxes = jest
+      .fn()
+      .mockReturnValue(mockCheckboxes) as unknown as Signal<
+      readonly CheckboxComponent[]
+    >;
 
     expect(spyFocus).not.toHaveBeenCalled();
 
@@ -258,8 +287,17 @@ describe('FilterComponent', () => {
 
     fixture.detectChanges();
 
-    component.filterTerm = mockFilterTerm;
-    component.checkboxes = mockCheckboxes;
+    // Final clean signal wrapper assignments before ticking the async queue
+    component.filterTerm = jest
+      .fn()
+      .mockReturnValue(mockFilterTerm) as unknown as Signal<
+      ElementRef<HTMLInputElement> | undefined
+    >;
+    component.checkboxes = jest
+      .fn()
+      .mockReturnValue(mockCheckboxes) as unknown as Signal<
+      readonly CheckboxComponent[]
+    >;
 
     tick();
     expect(spyFocus).toHaveBeenCalled();

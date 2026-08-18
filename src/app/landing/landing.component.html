@@ -77,8 +77,8 @@
           }"
           [ngStyle]="{
             color:
-              visibleHeatMap && mapChart && !menuDisabled
-                ? mapChart.colourScheme.base.hex
+              visibleHeatMap && mapChart() && !menuDisabled
+                ? mapChart().colourScheme.base.hex
                 : 'unset'
           }"
           tabindex="0"
@@ -107,7 +107,7 @@
                 [ngStyle]="{
                   borderColor:
                     visibleHeatMap && visibleHeatMap[targetType] === i
-                      ? mapChart.colourScheme.base.hex
+                      ? mapChart().colourScheme.base.hex
                       : 'transparent'
                 }"
               >
@@ -150,7 +150,6 @@
       } }
     </span>
   </ng-template>
-
   <ng-template
     #dataRows
     let-dimension="facetName"
@@ -162,16 +161,14 @@
     >
       <div class="container-h data-rows-title">
         <!-- Begin Map Toolbar Contents-->
-
         @if (isCountryCard){
-
         <!-- show selected country with close bar -->
-        @if (mapChart && mapChart.selectedCountry) {
+        @if (mapChart() && mapChart().selectedCountry) {
         <span class="container-h">
           <span>
             {{ dimension | renameApiFacet | uppercase }}
           </span>
-          <span> : {{ mapChart.selectedCountry | renameCountry }} </span>
+          <span> : {{ mapChart().selectedCountry | renameCountry }} </span>
           <a
             class="x country-closer"
             data-e2e="close-map-selection"
@@ -191,71 +188,65 @@
             context: {
               menuDisabled:
                 !countryData ||
-                !mapChart.selectedCountry ||
-                (countryData && countryData[mapChart.selectedCountry])
+                !mapChart() ||
+                !mapChart().selectedCountry ||
+                (countryData && countryData[mapChart().selectedCountry])
                   ? null
                   : 'disabled'
             }
           "
         ></ng-content>
-
         <!-- End Map Toolbar Contents-->
         }@else{
-
         <!--not a country -->
-
         <span>{{ dimension | renameApiFacet | uppercase }} </span>
         <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
         }
       </div>
 
       <!-- end of menu bar -->
-
       @if (isCountryCard){
-
       <!-- Selected Country Navigation -->
-      @if(mapChart && mapChart.selectedCountry){
+      @if(mapChart() && mapChart().selectedCountry){
       <div
         *ngFor="
           let navCountry of [
-            mapChart.selectedCountryPrev,
-            mapChart.selectedCountry,
-            mapChart.selectedCountryNext
+            mapChart().selectedCountryPrev,
+            mapChart().selectedCountry,
+            mapChart().selectedCountryNext
           ]
         "
         class="container-h record-list"
       >
         <a
           class="map-navigation-link"
-          (click)="mapChart.countryMorph(navCountry)"
-          (keydown.enter)="mapChart.countryMorph(navCountry)"
+          (click)="mapChart().countryMorph(navCountry)"
+          (keydown.enter)="mapChart().countryMorph(navCountry)"
           [attr.disabled]="
-            navCountry === mapChart.selectedCountry ? 'disabled' : null
+            navCountry === mapChart().selectedCountry ? 'disabled' : null
           "
-          [attr.tabIndex]="navCountry === mapChart.selectedCountry ? -1 : 0"
+          [attr.tabIndex]="navCountry === mapChart().selectedCountry ? -1 : 0"
         >
           {{ navCountry | renameCountry }}
         </a>
 
         <span
-          *ngIf="navCountry === mapChart.selectedCountry"
+          *ngIf="navCountry === mapChart().selectedCountry"
           class="map-navigation-close-country-link-wrapper"
         >
           <a class="x" title="close country" (click)="closeMapSelection()"></a>
         </span>
 
         <!-- country selection -->
-
-        @if(navCountry === mapChart.selectedCountry){ @if(countryData &&
-        countryData[mapChart.selectedCountry]){
-
+        @if(navCountry === mapChart().selectedCountry){ @if(countryData &&
+        countryData[mapChart().selectedCountry]){
         <span
           class="numeric"
           [ngClass]="{
             'target-active': targetExpanded === undefined
           }"
         >
-          {{ data[mapChart.selectedIndex].value | number }}
+          {{ data[mapChart().selectedIndex].value | number }}
         </span>
 
         <span class="boxed">
@@ -272,17 +263,15 @@
             <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
           </a>
         </span>
-
-        } @else if(data[mapChart.selectedIndex]){
+        } @else if(data[mapChart().selectedIndex]){
         <span class="numeric">
-          {{ data[mapChart.selectedIndex].value | number }}
+          {{ data[mapChart().selectedIndex].value | number }}
         </span>
         } }
       </div>
 
       <!-- selected country display -->
-
-      @if(countryData && countryData[mapChart.selectedCountry]){
+      @if(countryData && countryData[mapChart().selectedCountry]){
       <ng-template #tmpTargetSummary let-targetType="targetType">
         <div class="container-h target-summary">
           <span
@@ -292,7 +281,8 @@
             }"
           >
             {{
-              countryData[mapChart.selectedCountry][0][targetType] || 0 | number
+              countryData[mapChart().selectedCountry][0][targetType] || 0
+                | number
             }}
           </span>
 
@@ -333,7 +323,7 @@
         </div>
 
         <div
-          *ngFor="let theYear of [2025, 2030]; let i = index"
+          *ngFor="let theYear of ['2025', '2030']; let i = index"
           class="container-h target-summary target-expanded"
           [ngClass]="{
             'is-open': targetExpanded === targetType
@@ -348,20 +338,24 @@
               [ngStyle]="
                 visibleHeatMap &&
                 visibleHeatMap[targetType] === i && {
-                  borderColor: mapChart.colourScheme.base.hex
+                  borderColor: mapChart().colourScheme.base.hex
                 }
               "
             >
               {{
-                getDerivedSeriesValue(targetType, i, mapChart.selectedCountry)
+                getDerivedSeriesValue(
+                  targetType,
+                  i,
+                  mapChart().selectedCountry
+                )
               }}%
             </span>
           </span>
 
           <span class="numeric">
-            @if(targetMetaData && targetMetaData[mapChart.selectedCountry]){
+            @if(targetMetaData && targetMetaData[mapChart().selectedCountry]){
             {{
-              targetMetaData[mapChart.selectedCountry][targetType][i].value
+              targetMetaData[mapChart().selectedCountry][targetType][i].value
                 | number
             }}
             }
@@ -391,27 +385,29 @@
         ></ng-content>
       </ng-container>
       }
-
       <!-- end selected country display -->
 
       <div class="container-h record-list">
         <a
           class="link-open-country"
-          [routerLink]="['/country', mapChart.selectedCountry | renameCountry]"
+          [routerLink]="[
+            '/country',
+            mapChart().selectedCountry | renameCountry
+          ]"
         >
-          <span class="flag-orb" [ngClass]="mapChart.selectedCountry"></span>
-          <span>View {{ mapChart.selectedCountry | renameCountry }} Data</span>
+          <span class="flag-orb" [ngClass]="mapChart().selectedCountry"></span>
+          <span
+            >View {{ mapChart().selectedCountry | renameCountry }} Data</span
+          >
         </a>
       </div>
-
       }
 
       <!-- country data rows -->
-
       <div
         class="country-list"
         [ngClass]="{
-          hidden: mapChart && mapChart.selectedCountry
+          hidden: mapChart() && mapChart().selectedCountry
         }"
         tabindex="-1"
       >
@@ -421,8 +417,8 @@
         >
           <a
             class="link-select-country"
-            (click)="mapChart.countryClick(row.id ?? row.name)"
-            (keydown.enter)="mapChart.countryClick(row.id ?? row.name)"
+            (click)="mapChart().countryClick(row.id ?? row.name)"
+            (keydown.enter)="mapChart().countryClick(row.id ?? row.name)"
             tabindex="0"
           >
             <span
@@ -445,9 +441,7 @@
         </div>
       </div>
       } @else {
-
       <!-- generic data rows -->
-
       <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
@@ -578,7 +572,6 @@
         >
       </div>
     </div>
-
     <div class="entry-card-pair">
       <div
         class="entry-card"
@@ -647,7 +640,6 @@
         </div>
       </div>
     </div>
-
     <div class="entry-card-pair">
       <div class="entry-card" *ngIf="landingData()[DimensionName.dataProvider]">
         <span

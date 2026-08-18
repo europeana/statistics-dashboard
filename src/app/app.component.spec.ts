@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { signal, ViewContainerRef } from '@angular/core';
+import { signal, Signal, ViewContainerRef } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -97,7 +97,7 @@ describe('AppComponent', () => {
     fixture = TestBed.createComponent(AppComponent);
     app = fixture.componentInstance;
 
-    app.consentContainer = {
+    const mockContainer = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       clear: (): void => {},
       createComponent: () => {
@@ -106,6 +106,12 @@ describe('AppComponent', () => {
         };
       }
     } as unknown as ViewContainerRef;
+
+    app.consentContainer = jest
+      .fn()
+      .mockReturnValue(mockContainer) as unknown as Signal<
+      ViewContainerRef | undefined
+    >;
 
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
@@ -233,16 +239,13 @@ describe('AppComponent', () => {
       const cmp = new LandingComponent();
       mockFilterState.landingData.set({} as GeneralResultsFormatted);
 
-      //app.landingData = {};
       app.onOutletLoaded(cmp);
       expect(app.showPageTitle).toBeTruthy();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(4);
 
-      // Update this check to evaluate your mock service state reference
       expect(mockFilterState.includeCTZero()).toBeTruthy();
       expect(cmp.landingData()).toBeTruthy();
 
-      // Mutate the service signal directly rather than assigning to a read-only getter
       mockFilterState.includeCTZero.set(!app.getCtrlCTZero().value);
       app.onOutletLoaded(new LandingComponent());
       expect(app.loadLandingData).toHaveBeenCalledTimes(5);

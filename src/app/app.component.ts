@@ -6,7 +6,7 @@ import {
   Inject,
   LOCALE_ID,
   OnInit,
-  ViewChild,
+  viewChild,
   ViewContainerRef
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -57,9 +57,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   skipLocationUpdate = false;
   maintenanceInfo?: MaintenanceItem = undefined;
 
-  @ViewChild('header') header: HeaderComponent;
-  @ViewChild('consentContainer', { read: ViewContainerRef })
-  consentContainer: ViewContainerRef;
+  consentContainer = viewChild('consentContainer', { read: ViewContainerRef });
 
   constructor(
     private readonly api: APIService,
@@ -282,11 +280,16 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       await import('@europeana/metis-ui-consent-management')
     ).CookieConsentComponent;
 
-    this.consentContainer.clear();
+    const container = this.consentContainer();
 
-    const cookieConsent = this.consentContainer.createComponent(
-      CookieConsentComponent
-    );
+    if (!container) {
+      console.warn('Consent container view child is not available yet.');
+      return;
+    }
+
+    container.clear();
+
+    const cookieConsent = container.createComponent(CookieConsentComponent);
 
     cookieConsent.setInput('translations', cookieConsentConfig.translations);
     cookieConsent.setInput('services', cookieConsentConfig.services);

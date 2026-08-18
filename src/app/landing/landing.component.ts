@@ -15,10 +15,9 @@ import {
   effect,
   ElementRef,
   inject,
-  QueryList,
   signal,
-  ViewChild,
-  ViewChildren
+  viewChild,
+  viewChildren
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ClickAwareDirective, OpenerFocusDirective } from '../_directives';
@@ -92,9 +91,9 @@ export class LandingComponent extends SubscriptionManager {
   // Used to parameterise links to the data page
   readonly includeCTZero = this.filterStateService.includeCTZero;
 
-  @ViewChildren(BarComponent) barCharts: QueryList<BarComponent>;
-  @ViewChild(MapComponent) mapChart: MapComponent;
-  @ViewChild('layerOpener', { static: false }) layerOpener: ElementRef;
+  barCharts = viewChildren(BarComponent);
+  mapChart = viewChild(MapComponent);
+  layerOpener = viewChild<ElementRef<HTMLElement>>('layerOpener');
 
   singleCountryMode = false;
   barColour = '#0771ce';
@@ -186,7 +185,7 @@ export class LandingComponent extends SubscriptionManager {
   }
 
   closeMapSelection(): void {
-    this.mapChart.countryClick(this.mapChart.selectedCountry);
+    this.mapChart()?.countryClick(this.mapChart()?.selectedCountry);
   }
 
   /**
@@ -271,8 +270,11 @@ export class LandingComponent extends SubscriptionManager {
    **/
   clearHeatmap(): void {
     this.activeMapData.set(this.mapData());
-    this.mapChart.colourScheme = this.mapChart.colourSchemeDefault;
-    this.mapChart.setMapPercentMode(false);
+    const chart = this.mapChart();
+    if (chart) {
+      chart.colourScheme = chart.colourSchemeDefault;
+      chart.setMapPercentMode(false);
+    }
     this.visibleHeatMap = undefined;
     this.closeMapMenu();
   }
@@ -282,7 +284,7 @@ export class LandingComponent extends SubscriptionManager {
     const wasAlreadyClosed = !this.mapMenuIsOpen;
     this.mapMenuIsOpen = false;
     if (!this.mapMenuIsOpen && !wasAlreadyClosed) {
-      this.layerOpener.nativeElement.focus();
+      this.layerOpener().nativeElement.focus();
     }
   }
 
@@ -301,18 +303,12 @@ export class LandingComponent extends SubscriptionManager {
       this.allProgressSeries[seriesTargetType][targetIndex]
     );
 
-    this.mapChart.setMapPercentMode(true);
-
-    const vhm = [seriesTargetType].reduce(
-      (ob: VisibleHeatMap, tType: TargetFieldName) => {
-        ob[tType] = targetIndex;
-        return ob;
-      },
-      {} as VisibleHeatMap
-    );
-    this.visibleHeatMap = vhm;
-    this.mapChart.colourScheme =
-      this.mapChart.colourSchemeTargets[seriesTargetType][targetIndex];
+    const chart = this.mapChart();
+    if (chart) {
+      chart.setMapPercentMode(true);
+      chart.colourScheme =
+        chart.colourSchemeTargets[seriesTargetType][targetIndex];
+    }
 
     if (this.singleCountryMode) {
       this.targetExpanded = seriesTargetType;
@@ -368,10 +364,12 @@ export class LandingComponent extends SubscriptionManager {
   }
 
   refreshCharts(): void {
-    if (this.barCharts) {
+    const charts = this.barCharts();
+
+    if (charts && charts.length > 0) {
       // Top tier items count
       setTimeout(() => {
-        this.barCharts.toArray().forEach((bc) => {
+        charts.forEach((bc) => {
           bc.removeAllSeries();
           bc.ngAfterViewInit();
         });

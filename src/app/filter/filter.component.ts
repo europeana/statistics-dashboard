@@ -5,9 +5,8 @@ import {
   input,
   model,
   output,
-  QueryList,
-  ViewChild,
-  ViewChildren
+  viewChild,
+  viewChildren
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DimensionName, isoCountryCodesReversed } from '../_data';
@@ -63,10 +62,9 @@ export class FilterComponent {
   valueChanged = output<true>();
   visibilityChanged = output<string>();
 
-  @ViewChild('filterTerm') filterTerm: ElementRef;
-  @ViewChild('opener') opener: ElementRef;
-
-  @ViewChildren(CheckboxComponent) checkboxes: QueryList<CheckboxComponent>;
+  filterTerm = viewChild<ElementRef<HTMLInputElement>>('filterTerm');
+  opener = viewChild<ElementRef<HTMLElement>>('opener');
+  checkboxes = viewChildren(CheckboxComponent);
 
   constructor() {
     effect(() => {
@@ -87,7 +85,7 @@ export class FilterComponent {
       // Reapply any focus states
       if (this.inputToFocus) {
         setTimeout(() => {
-          const focusItem = this.checkboxes.find((cb: CheckboxComponent) => {
+          const focusItem = this.checkboxes().find((cb: CheckboxComponent) => {
             return (
               cb.group() === this.inputToFocus?.group &&
               cb.controlName() === this.inputToFocus?.controlName
@@ -96,12 +94,12 @@ export class FilterComponent {
           if (focusItem) {
             focusItem.baseInput()?.nativeElement.focus();
           } else {
-            this.filterTerm.nativeElement.focus();
+            this.filterTerm()?.nativeElement.focus();
           }
           this.inputToFocus = undefined;
         });
       } else if (this.state()?.visible) {
-        const ft = this.filterTerm;
+        const ft = this.filterTerm();
         if (ft) {
           ft.nativeElement.focus();
         }
@@ -128,7 +126,7 @@ export class FilterComponent {
     }
     if (evt.key === 'Escape') {
       this.hide();
-      this.opener.nativeElement.focus();
+      this.opener()?.nativeElement?.focus();
     }
     this.term = evt.target.value;
     this.filterTermChanged.emit({
