@@ -8,7 +8,7 @@ describe('CheckboxComponent', () => {
   let fixture: ComponentFixture<CheckboxComponent>;
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, CheckboxComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
@@ -33,7 +33,7 @@ describe('CheckboxComponent', () => {
     component.writeValue();
     component.registerOnTouched();
     component.registerOnChange(() => {
-      console.log('unimplemented');
+      // test implementation
     });
   });
 
@@ -45,7 +45,16 @@ describe('CheckboxComponent', () => {
 
   it('should handle the space key', () => {
     const spyEmit = jest.spyOn(component.keySelectionMade, 'emit');
+
+    fixture.componentRef.setInput('group', 'contentTier');
+    fixture.componentRef.setInput('controlName', 'tier2');
+    fixture.detectChanges();
+
     component.onSpaceKey();
-    expect(spyEmit).toHaveBeenCalled();
+
+    expect(spyEmit).toHaveBeenCalledWith({
+      group: 'contentTier',
+      controlName: 'tier2'
+    });
   });
 });

@@ -1,11 +1,10 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
   forwardRef,
-  Input,
-  Output,
-  ViewChild
+  input,
+  output,
+  viewChild
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -14,8 +13,6 @@ import {
   ReactiveFormsModule,
   UntypedFormGroup
 } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
-
 import { InputDescription } from '../_models';
 
 @Component({
@@ -28,19 +25,19 @@ import { InputDescription } from '../_models';
       multi: true
     }
   ],
-  imports: [NgIf, FormsModule, ReactiveFormsModule, NgClass]
+  imports: [FormsModule, ReactiveFormsModule],
+  standalone: true
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  @Input() form: UntypedFormGroup;
-  @Input() labelText: string;
-  @Input() group: string;
-  @Input() controlName: string;
+  form = input<UntypedFormGroup | undefined>(undefined);
+  labelText = input<string>('');
+  group = input<string>('');
+  controlName = input<string>('');
 
-  @ViewChild('baseInput') baseInput: ElementRef;
+  baseInput = viewChild<ElementRef<HTMLInputElement>>('baseInput');
 
-  @Output() valueChanged: EventEmitter<boolean> = new EventEmitter();
-  @Output() keySelectionMade: EventEmitter<InputDescription> =
-    new EventEmitter();
+  valueChanged = output<void>();
+  keySelectionMade = output<InputDescription>();
 
   writeValue(): void {
     // unimplemented
@@ -60,8 +57,8 @@ export class CheckboxComponent implements ControlValueAccessor {
 
   onSpaceKey(): void {
     this.keySelectionMade.emit({
-      group: this.group,
-      controlName: this.controlName
+      group: this.group(),
+      controlName: this.controlName()
     });
   }
 }

@@ -90,12 +90,12 @@ export class FilterComponent {
         setTimeout(() => {
           const focusItem = this.checkboxes.find((cb: CheckboxComponent) => {
             return (
-              cb.group === this.inputToFocus?.group &&
-              cb.controlName === this.inputToFocus?.controlName
+              cb.group() === this.inputToFocus?.group &&
+              cb.controlName() === this.inputToFocus?.controlName
             );
           });
           if (focusItem) {
-            focusItem.baseInput.nativeElement.focus();
+            focusItem.baseInput()?.nativeElement.focus();
           } else {
             this.filterTerm.nativeElement.focus();
           }

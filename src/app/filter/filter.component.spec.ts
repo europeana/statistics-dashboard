@@ -69,6 +69,10 @@ describe('FilterComponent', () => {
     } as unknown as ElementRef;
   });
 
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
   it('should enable when options are added', () => {
     expect(component.isDisabled()).toBeTruthy();
 
@@ -97,7 +101,6 @@ describe('FilterComponent', () => {
     expect(component.emptyData).toBeFalsy();
 
     component.term = 'xxx';
-    // Re-feed the signal reference to force the effect to evaluate again
     fixture.componentRef.setInput('optionSet', { ...dataOptions });
     fixture.detectChanges();
     expect(component.empty).toBeFalsy();
@@ -211,11 +214,13 @@ describe('FilterComponent', () => {
     const mockCheckboxes = {
       find: (_: CheckboxComponent) => {
         return {
-          baseInput: {
+          group: () => '',
+          controlName: () => '',
+          baseInput: () => ({
             nativeElement: {
               focus: spyFocus
             }
-          }
+          })
         } as unknown as CheckboxComponent;
       }
     } as unknown as QueryList<CheckboxComponent>;
@@ -244,7 +249,6 @@ describe('FilterComponent', () => {
     expect(spyFocus).not.toHaveBeenCalled();
     expect(spyFilterTermFocus).toHaveBeenCalled();
 
-    // Reset mock tracking counts for the next verification step
     spyFilterTermFocus.mockClear();
 
     component.inputToFocus = { group: '', controlName: '' };
@@ -254,7 +258,6 @@ describe('FilterComponent', () => {
 
     fixture.detectChanges();
 
-    // Re-apply once more before ticking the final macro-task queue loop
     component.filterTerm = mockFilterTerm;
     component.checkboxes = mockCheckboxes;
 
@@ -329,7 +332,6 @@ describe('FilterComponent', () => {
     component.hide();
     fixture.detectChanges();
 
-    // Read the signal output as a function invocation
     expect(component.state().visible).toBeFalsy();
   });
 

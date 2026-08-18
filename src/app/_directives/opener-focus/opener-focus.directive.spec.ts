@@ -34,6 +34,7 @@ describe('OpenerFocusDirective', () => {
     TestBed.configureTestingModule({
       imports: [OpenerFocusDirective, TestOpenerFocusDirectiveComponent]
     }).compileComponents();
+
     fixture = TestBed.createComponent(TestOpenerFocusDirectiveComponent);
     testComponent = fixture.componentInstance;
     cmp = fixture.debugElement.query(By.directive(OpenerFocusDirective));
@@ -42,27 +43,29 @@ describe('OpenerFocusDirective', () => {
     fixture.detectChanges();
   });
 
-  it('it should create', () => {
+  it('should create', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('it should handle the escape key', fakeAsync(() => {
+  it('should handle the escape key', fakeAsync(() => {
     const spyFocus1 = jest.spyOn(link1.nativeElement, 'focus');
     const spyFocus2 = jest.spyOn(link2.nativeElement, 'focus');
 
     const spyHide = jest.spyOn(testComponent, 'fnHide');
     fixture.detectChanges();
+
     const event = new KeyboardEvent('keydown', {
       key: 'Escape'
     });
     cmp.nativeElement.dispatchEvent(event);
     tick(1);
+
     expect(spyHide).toHaveBeenCalled();
     expect(spyFocus1).toHaveBeenCalled();
     expect(spyFocus2).not.toHaveBeenCalled();
   }));
 
-  it('it should handle the tab key', fakeAsync(() => {
+  it('should handle the tab key', fakeAsync(() => {
     const spyFocus = jest.spyOn(link1.nativeElement, 'focus');
 
     const getTabEvent = (): KeyboardEvent => {
