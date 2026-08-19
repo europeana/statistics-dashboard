@@ -13,14 +13,14 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { externalLinks } from '../_data';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-ct-zero-control',
   templateUrl: './ct-zero-control.component.html',
   styleUrls: ['./ct-zero-control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf]
+  imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class CTZeroControlComponent {
   form = input.required<FormGroup<{ contentTierZero: FormControl<boolean> }>>();

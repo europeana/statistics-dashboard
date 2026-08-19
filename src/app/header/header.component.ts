@@ -11,7 +11,7 @@ import {
   viewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { CTZeroControlComponent } from '../ct-zero-control/ct-zero-control.component';
 import { Router, RouterLink } from '@angular/router';
 
@@ -37,7 +37,6 @@ interface CountryPair {
     ClickAwareDirective,
     CTZeroControlComponent,
     NgClass,
-    NgIf,
     OpenerFocusDirective,
     RenameCountryPipe,
     RouterLink

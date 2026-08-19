@@ -1322,7 +1322,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       seriesKeys
     );
 
-    //this.grid().isShowingSeriesInfo = seriesKeys.length > 1;
     this.grid().isShowingSeriesInfo.set(seriesKeys.length > 1);
     this.grid().setRows(rows);
   }

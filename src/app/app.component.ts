@@ -108,9 +108,12 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           this.skipLocationUpdate = false;
         }
 
-        // load landing data if on country page or landing page
-        const path = this.location.path();
-        if (path === '' || path.startsWith('/country')) {
+        const rawPath = this.location.path().split('?')[0];
+        if (
+          rawPath === '' ||
+          rawPath === '/' ||
+          rawPath.startsWith('/country')
+        ) {
           this.loadLandingData(this.lastSetContentTierZeroValue);
         }
         if (this.countryComponentRef) {

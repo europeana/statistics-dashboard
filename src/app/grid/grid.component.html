@@ -143,18 +143,19 @@
     <span class="bold black text-right">
       {{ row.count | number }}
     </span>
-    <span class="black text-right total percent-value">
-      {{ row.percent }}%
-    </span>
 
-    <ng-container
-      *ngTemplateOutlet="linkOut; context: { row: row }"
-    ></ng-container>
+    <span class="black text-right"> {{ row.percent }}% </span>
+
+    <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
+      <ng-container
+        *ngTemplateOutlet="linkOut; context: { row: row }"
+      ></ng-container>
+    </span>
     }
 
-    <!-- Rows -->
+    <!-- Main Paged Rows: Make sure they are direct child <span> wrappers -->
     @if (pagerInfo(); as currentPager) { @for (row of currentPager.pageRows;
-    track row.name; let i = $index) {
+    track (row.name + '_' + row.series + '_' + $index); let i = $index) {
     <span [ngClass]="{ highlight: row.highlight }">
       {{ row.displayIndex }}
     </span>
@@ -187,24 +188,20 @@
 
     <span
       class="text-right"
-      [ngClass]="{
-        highlight: row.highlight,
-        bold: row.isTotal
-      }"
+      [ngClass]="{ highlight: row.highlight, bold: row.isTotal }"
     >
       {{ row.count | number }}
     </span>
 
-    <span
-      class="text-right total percent-value"
-      [ngClass]="{ highlight: row.highlight }"
-    >
+    <span class="text-right" [ngClass]="{ highlight: row.highlight }">
       {{ row.percent }}%
     </span>
 
-    <ng-container
-      *ngTemplateOutlet="linkOut; context: { row: row }"
-    ></ng-container>
+    <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
+      <ng-container
+        *ngTemplateOutlet="linkOut; context: { row: row }"
+      ></ng-container>
+    </span>
     } }
   </ng-container>
 </div>

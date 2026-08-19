@@ -1,4 +1,4 @@
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -36,7 +36,6 @@ import { ClickAwareDirective } from '../_directives/click-aware/click-aware.dire
   styleUrls: ['./filter.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush, // Highly recommended for zoneless
   imports: [
-    NgIf,
     ClickAwareDirective,
     FormsModule,
     ReactiveFormsModule,
