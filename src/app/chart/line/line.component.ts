@@ -4,6 +4,7 @@ import {
   Inject,
   input,
   NgZone,
+  output,
   PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -22,8 +23,6 @@ import {
   TargetMetaData
 } from '../../_models';
 
-import { LineService } from './line.service';
-
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line.component.html',
@@ -41,12 +40,12 @@ export class LineComponent implements AfterViewInit {
     rightWide: 30
   };
   valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>;
+  chartReady = output<boolean>();
   targetMetaData = input.required<IHash<IHashArray<TargetMetaData>>>({});
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId,
-    private readonly zone: NgZone,
-    private readonly lineService: LineService
+    private readonly zone: NgZone
   ) {
     this.browserOnly(() => {
       am4core.options.autoDispose = true;
@@ -350,7 +349,7 @@ export class LineComponent implements AfterViewInit {
     cursor.xAxis = this.dateAxis;
 
     chart.events.on('datavalidated', () => {
-      this.lineService.setLineChartReady(true);
+      this.chartReady.emit(true);
     });
   }
 

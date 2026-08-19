@@ -27,9 +27,9 @@
     Total items in {{ "plural_" + data.breakdownBy | renameApiFacetShort }}
   </span>
   <span class="total">{{ data.results[0].percentage }}%</span>
-  <span class="total" data-e2e="total-records">{{
-    grandTotal() | number
-  }}</span>
+  <span class="total" data-e2e="total-records">
+    {{ grandTotal() | number }}
+  </span>
 
   <span class="total-title" i18n="@@summaryTopRecordsCount">
     Top {{ data.breakdownBy | renameApiFacetShort }} items count

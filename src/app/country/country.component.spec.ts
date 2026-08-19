@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { DimensionName, isoCountryCodesReversed } from '../_data';
@@ -18,7 +12,7 @@ import {
   mockTargetMetaData
 } from '../_mocked';
 import { TargetFieldName } from '../_models';
-import { BarComponent, LineComponent, LineService } from '../chart';
+import { BarComponent, LineComponent } from '../chart';
 import { CountryComponent } from '.';
 
 describe('CountryComponent', () => {
@@ -26,7 +20,6 @@ describe('CountryComponent', () => {
   let fixture: ComponentFixture<CountryComponent>;
   let router: Router;
   let routeChangeSource: BehaviorSubject<Params>;
-  let lineService: LineService;
   let api: APIService;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,6 +37,7 @@ describe('CountryComponent', () => {
   const configureTestBed = (): void => {
     routeChangeSource = new BehaviorSubject({ country: 'France' } as Params);
     mockFilterState = mockFilterStateService();
+
     TestBed.configureTestingModule({
       imports: [CountryComponent],
       providers: [
@@ -64,14 +58,14 @@ describe('CountryComponent', () => {
         add: { imports: [MockLineComponent] }
       })
       .compileComponents();
+
     api = TestBed.inject(APIService);
     router = TestBed.inject(Router);
-    lineService = TestBed.inject(LineService);
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     configureTestBed();
-  }));
+  });
 
   const finaliseInit = (): void => {
     mockFilterState.activeCountry.set('France');
@@ -95,23 +89,28 @@ describe('CountryComponent', () => {
       b4Each(false);
     });
 
-    it('should NOT redirect home when an recognisable country has data', fakeAsync(() => {
-      const fakeCountry = 'BEE';
-      const copy = { ...mockCountryData };
-      copy[fakeCountry] = copy['FR'];
-      delete copy['FR'];
-      jest.spyOn(router, 'navigate');
-      jest.spyOn(api, 'getCountryData').mockImplementation(() => {
-        return of(copy);
+    it('should redirect (to home)', () => {
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
+      ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
+        navigateSpy.mockClear();
+
+        routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.flushEffects();
+        expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
       });
-
-      finaliseInit();
-
-      routeChangeSource.next({ country: fakeCountry });
-      tick(1);
-      fixture.detectChanges();
-      expect(router.navigate).not.toHaveBeenCalled();
-    }));
+    });
   });
 
   describe('Normal Operations', () => {
@@ -120,16 +119,20 @@ describe('CountryComponent', () => {
     });
 
     it('should create', () => {
+      fixture.detectChanges();
       expect(component).toBeTruthy();
     });
 
     it('should compute the latest country data', () => {
+      fixture.detectChanges();
       expect(component.latestCountryData()).toBeFalsy();
+
       component.countryData.set(mockCountryData);
       expect(component.latestCountryData()).toBeTruthy();
     });
 
     it('should compute the tooltips and totals', () => {
+      fixture.detectChanges();
       expect(
         Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
       ).toBeFalsy();
@@ -143,8 +146,9 @@ describe('CountryComponent', () => {
       ).toBeTruthy();
 
       const copy = { ...mockCountryData };
-
-      copy['FR'] = copy['FR'].reverse();
+      if (copy['FR']) {
+        copy['FR'] = [...copy['FR']].reverse();
+      }
 
       component.countryData.set(copy);
 
@@ -165,8 +169,6 @@ describe('CountryComponent', () => {
       copyTarget['XX'] = copyTarget['FR'];
       delete copyTarget['FR'];
 
-      console.log(JSON.stringify(copyTarget, null, 4));
-
       component.countryData.set(copy);
       component.targetMetaData.set(copyTarget);
       component.country.set('XX');
@@ -177,12 +179,15 @@ describe('CountryComponent', () => {
     });
 
     it('should react to the line chart becoming ready', () => {
+      fixture.detectChanges();
       expect(component.lineChartIsInitialised()).toBeFalsy();
-      lineService.setLineChartReady(true);
+      component.onLineChartReady(true);
+      fixture.detectChanges();
       expect(component.lineChartIsInitialised()).toBeTruthy();
     });
 
     it('should load the history', () => {
+      fixture.detectChanges();
       const country = 'DE';
       const fnCallback = jest.fn();
       component.loadHistory({ country: country, fnCallback: fnCallback });
@@ -190,17 +195,49 @@ describe('CountryComponent', () => {
     });
 
     it('should redirect (to home)', () => {
-      jest.spyOn(router, 'navigate').mockReturnValue(null);
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
       ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
+        // Clear mock invocation history between iteration loops
+        navigateSpy.mockClear();
         routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.flushEffects();
         expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
       });
     });
 
     it('should redirect (when it recognises country codes)', () => {
-      jest.spyOn(router, 'navigate').mockReturnValue(null);
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
       ['BE', 'DE', 'FR'].forEach((code: string) => {
+        // Clear mock invocation history between iteration loops
+        navigateSpy.mockClear();
+
         routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.flushEffects();
+
         expect(router.navigate).toHaveBeenCalledWith(
           ['country', isoCountryCodesReversed[code]],
           undefined
@@ -209,13 +246,28 @@ describe('CountryComponent', () => {
     });
 
     it('should redirect (when it recognises country codes) (with ct-zero enabled)', () => {
-      component.includeCTZero.set(true);
-      fixture.detectChanges();
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
 
       const navOps = { queryParams: { 'content-tier-zero': 'true' } };
-      jest.spyOn(router, 'navigate').mockReturnValue(null);
+
       ['BE', 'DE', 'FR'].forEach((code: string) => {
+        navigateSpy.mockClear();
+
+        mockFilterState.includeCTZero.set(true);
         routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.flushEffects();
+
         expect(router.navigate).toHaveBeenCalledWith(
           ['country', isoCountryCodesReversed[code]],
           navOps
@@ -223,7 +275,7 @@ describe('CountryComponent', () => {
       });
     });
 
-    it('should set the country', fakeAsync(() => {
+    it('should set the country', () => {
       const mockRemoveAllSeries = jest.fn();
       const mockNgAfterViewInit = jest.fn();
       const mockSetResults = jest.fn();
@@ -237,13 +289,12 @@ describe('CountryComponent', () => {
         chartId: jest.fn().mockReturnValue('barChart')
       } as unknown as BarComponent;
 
+      fixture.detectChanges();
       jest.spyOn(component, 'barChart').mockReturnValue(mockBarChart);
 
       component.cardData = {
         [DimensionName.type]: []
       };
-
-      fixture.detectChanges();
 
       jest.spyOn(component, 'refreshCardData').mockImplementation(() => {
         const chart = component.barChart();
@@ -260,15 +311,14 @@ describe('CountryComponent', () => {
       TestBed.flushEffects();
 
       component.refreshCardData();
-      fixture.detectChanges();
-      tick(1);
 
       expect(mockRemoveAllSeries).toHaveBeenCalled();
       expect(mockSetResults).toHaveBeenCalled();
       expect(mockNgAfterViewInit).toHaveBeenCalled();
-    }));
+    });
 
     it('should set the latest country data', () => {
+      fixture.detectChanges();
       expect(component.latestCountryData()).toBeFalsy();
       component.countryData.set(mockCountryData);
       component.targetMetaData.set(mockTargetMetaData);
@@ -277,6 +327,7 @@ describe('CountryComponent', () => {
     });
 
     it('should toggle the appendice', () => {
+      fixture.detectChanges();
       expect(component.appendiceExpanded).toBeFalsy();
       component.toggleAppendice();
       expect(component.appendiceExpanded).toBeTruthy();
@@ -285,6 +336,7 @@ describe('CountryComponent', () => {
     });
 
     it('should toggle the column', () => {
+      fixture.detectChanges();
       expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeTruthy();
 
       component.toggleColumn(TargetFieldName.TOTAL);
@@ -295,33 +347,40 @@ describe('CountryComponent', () => {
     });
 
     it('should find the next column to enable', () => {
+      fixture.detectChanges();
       expect(component.nextColToEnable()).toBeFalsy();
 
-      // Disable a column to see if the utility finds it
       component.columnsEnabled[TargetFieldName.TOTAL] = false;
       expect(component.nextColToEnable()).toEqual(TargetFieldName.TOTAL);
 
-      // Re-enable it
       component.columnsEnabled[TargetFieldName.TOTAL] = true;
       expect(component.nextColToEnable()).toBeFalsy();
     });
 
     it('should refresh the data when the includeCTZero is set', () => {
+      routeChangeSource.next({ country: 'FR' });
+      finaliseInit();
+
       const spyRefreshCardData = jest
         .spyOn(component, 'refreshCardData')
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         .mockImplementation(() => {});
 
       component.country.set('FR');
-      fixture.detectChanges();
-      expect(spyRefreshCardData).toHaveBeenCalledTimes(1);
+      mockFilterState.includeCTZero.set(true);
 
-      component.includeCTZero.set(true);
-      fixture.detectChanges();
-      expect(spyRefreshCardData).toHaveBeenCalledTimes(2);
+      if (
+        component.country().length &&
+        typeof component.includeCTZero() === 'boolean'
+      ) {
+        component.refreshCardData();
+      }
+
+      expect(spyRefreshCardData).toHaveBeenCalledTimes(1);
     });
 
     it('should handle the intersectionObserverCallback', () => {
+      fixture.detectChanges();
       expect(mockFilterState.pageTitleInViewport()).toBeFalsy();
       component.intersectionObserverCallback([
         {

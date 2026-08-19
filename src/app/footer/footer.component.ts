@@ -10,8 +10,8 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink]
 })
 export class FooterComponent {
-  public externalLinks = externalLinks;
-  public feedbackUrl = environment.feedbackUrl;
+  public readonly externalLinks = externalLinks;
+  public readonly feedbackUrl = environment.feedbackUrl;
 
   showCookieConsent = output<void>();
 

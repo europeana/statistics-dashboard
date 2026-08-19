@@ -1,11 +1,6 @@
 import { Component, DebugElement } from '@angular/core';
 import { NgIf } from '@angular/common';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OpenerFocusDirective } from '.';
 
@@ -30,8 +25,8 @@ describe('OpenerFocusDirective', () => {
   let link1: DebugElement;
   let link2: DebugElement;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [OpenerFocusDirective, TestOpenerFocusDirectiveComponent]
     }).compileComponents();
 
@@ -47,30 +42,33 @@ describe('OpenerFocusDirective', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('should handle the escape key', fakeAsync(() => {
+  it('should handle the escape key', () => {
     const spyFocus1 = jest.spyOn(link1.nativeElement, 'focus');
     const spyFocus2 = jest.spyOn(link2.nativeElement, 'focus');
 
-    const spyHide = jest.spyOn(testComponent, 'fnHide');
+    const spyHide = jest.fn();
+    testComponent.fnHide = spyHide;
+
     fixture.detectChanges();
 
     const event = new KeyboardEvent('keydown', {
-      key: 'Escape'
+      key: 'escape',
+      bubbles: true
     });
+
     cmp.nativeElement.dispatchEvent(event);
-    tick(1);
 
     expect(spyHide).toHaveBeenCalled();
     expect(spyFocus1).toHaveBeenCalled();
     expect(spyFocus2).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('should handle the tab key', fakeAsync(() => {
+  it('should handle the tab key', () => {
     const spyFocus = jest.spyOn(link1.nativeElement, 'focus');
 
     const getTabEvent = (): KeyboardEvent => {
       return new KeyboardEvent('keydown', {
-        key: 'tab',
+        key: 'Tab',
         bubbles: true
       });
     };
@@ -78,9 +76,13 @@ describe('OpenerFocusDirective', () => {
     const event = getTabEvent();
     const spyPreventDefault = jest.spyOn(event, 'preventDefault');
 
+    Object.defineProperty(event, 'target', {
+      value: link2.nativeElement,
+      enumerable: true
+    });
     link2.nativeElement.dispatchEvent(event);
 
     expect(spyFocus).toHaveBeenCalled();
     expect(spyPreventDefault).toHaveBeenCalled();
-  }));
+  });
 });

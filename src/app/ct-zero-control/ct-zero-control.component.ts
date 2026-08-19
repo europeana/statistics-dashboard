@@ -1,4 +1,11 @@
-import { Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  output,
+  signal
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,19 +19,33 @@ import { NgClass, NgIf } from '@angular/common';
   selector: 'app-ct-zero-control',
   templateUrl: './ct-zero-control.component.html',
   styleUrls: ['./ct-zero-control.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf]
 })
 export class CTZeroControlComponent {
-  form = input<FormGroup<{ contentTierZero: FormControl<boolean> }>>();
+  form = input.required<FormGroup<{ contentTierZero: FormControl<boolean> }>>();
   disabled = input<boolean>(false);
   onChange = output<void>();
 
-  public externalLinks = externalLinks;
+  public readonly externalLinks = externalLinks;
 
-  /**
-   * valueChanged
-   * trigger parent updates
-   **/
+  contentTierZeroChecked = signal<boolean>(false);
+
+  constructor() {
+    effect((onCleanup) => {
+      const activeForm = this.form();
+      const control = activeForm.controls.contentTierZero;
+
+      this.contentTierZeroChecked.set(!!control.value);
+
+      const subscription = control.valueChanges.subscribe((value) => {
+        this.contentTierZeroChecked.set(!!value);
+      });
+
+      onCleanup(() => subscription.unsubscribe());
+    });
+  }
+
   valueChanged(): void {
     this.onChange.emit();
   }

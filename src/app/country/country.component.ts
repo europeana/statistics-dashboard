@@ -18,12 +18,11 @@ import {
   inject,
   input,
   model,
-  ModelSignal,
   OnDestroy,
   signal,
   viewChild
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   ActivatedRoute,
   Router,
@@ -64,10 +63,9 @@ import {
 } from '../_translate';
 
 import { AppendiceSectionComponent } from '../appendice-section';
-import { BarComponent, LineComponent, LineService } from '../chart';
+import { BarComponent, LineComponent } from '../chart';
 import { HeaderComponent } from '../header';
 import { LegendGridComponent } from '../legend-grid';
-import { SubscriptionManager } from '../subscription-manager';
 import { SpeechBubbleComponent } from '../speech-bubble';
 import { TruncateComponent } from '../truncate';
 
@@ -98,15 +96,10 @@ import { TruncateComponent } from '../truncate';
     StripMarkupPipe
   ]
 })
-export class CountryComponent
-  extends SubscriptionManager
-  implements AfterViewInit, OnDestroy
-{
+export class CountryComponent implements AfterViewInit, OnDestroy {
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
-
   public isoCountryCodes = isoCountryCodes;
-
   public TargetFieldName = TargetFieldName;
   public colours = colours;
   public eliDocNum = eliData.eliDocNum;
@@ -114,14 +107,14 @@ export class CountryComponent
   public eliTitle = eliData.eliTitle;
   public targetDescriptions = targetDescriptions;
 
-  renameTargetTypePipe = new RenameTargetTypeLongPipe();
-  abbreviateNumberPipe = new AbbreviateNumberPipe();
+  private readonly renameTargetTypePipe = new RenameTargetTypeLongPipe();
+  private readonly abbreviateNumberPipe = new AbbreviateNumberPipe();
 
-  cardData: IHash<Array<NamesValuePercent>>;
+  cardData: IHash<Array<NamesValuePercent>> = {};
 
-  legendGrid = viewChild<LegendGridComponent>('legendGrid');
-  barChart = viewChild<BarComponent>('barChart');
-  scrollPoint = viewChild<ElementRef>('scrollPoint');
+  readonly legendGrid = viewChild<LegendGridComponent>('legendGrid');
+  readonly barChart = viewChild<BarComponent>('barChart');
+  readonly scrollPoint = viewChild<ElementRef>('scrollPoint');
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -132,118 +125,106 @@ export class CountryComponent
   public countryCodes = isoCountryCodes;
 
   showTargetsData = false;
-
   columnsEnabledCount = 3;
   columnsEnabled: IHash<boolean> = {};
   columnToEnable?: TargetFieldName;
+  appendiceExpanded = false;
 
-  country = signal('');
+  readonly country = signal('');
+  readonly lineChartIsInitialised = signal<boolean>(false);
+
+  readonly countryTotalMap = this.filterStateService.countryTotalMap;
+  readonly headerRef = input<HeaderComponent>();
+  readonly includeCTZero = this.filterStateService.includeCTZero;
+
+  targetMetaData = model<IHash<IHashArray<TargetMetaData>> | undefined>(
+    undefined
+  );
+  countryData = model<IHash<Array<TargetData>>>({});
+
+  latestCountryData = computed(() => {
+    const specificCountryData = this.countryData()[this.country()];
+    if (specificCountryData && specificCountryData.length) {
+      return specificCountryData.reduce(
+        (prev: TargetData, current: TargetData) =>
+          prev?.date > current.date ? prev : current,
+        {} as TargetData
+      );
+    }
+    return undefined;
+  });
+
+  private routeDataSignal = toSignal(
+    combineLatest([
+      this.api.getTargetMetaData(),
+      this.api.getCountryData(),
+      this.route.params
+    ]).pipe(
+      map(([targetMetaData, countryData, params]) => ({
+        targetMetaData,
+        countryData,
+        params
+      }))
+    )
+  );
+
+  constructor() {
+    this.restoreHiddenColumns();
+
+    effect(() => {
+      const data = this.routeDataSignal();
+      if (!data) return;
+
+      const countryParam = data.params['country'];
+      let calculatedCountry = isoCountryCodes[countryParam];
+
+      if (
+        !calculatedCountry &&
+        Object.keys(data.countryData).includes(countryParam) &&
+        !Object.values(isoCountryCodes).includes(countryParam)
+      ) {
+        calculatedCountry = countryParam;
+      }
+
+      if (calculatedCountry) {
+        this.country.set(calculatedCountry);
+        this.targetMetaData.set(data.targetMetaData);
+        this.countryData.set(data.countryData);
+      } else {
+        const qp = this.includeCTZero()
+          ? { queryParams: { 'content-tier-zero': 'true' } }
+          : undefined;
+        if (Object.values(isoCountryCodes).includes(countryParam)) {
+          const redirectCountry = isoCountryCodesReversed[countryParam];
+          this.router.navigate(['country', redirectCountry], qp);
+        } else {
+          this.router.navigate(['/'], qp);
+        }
+      }
+    });
+
+    effect(() => {
+      const activeCountry = this.country();
+      const meta = this.targetMetaData();
+      if (activeCountry.length) {
+        if (typeof this.includeCTZero() === 'boolean') {
+          this.refreshCardData();
+        }
+        this.restoreHiddenColumns();
+        this.showTargetsData = !!(meta && meta[activeCountry]);
+        this.setHeaderData(activeCountry);
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.initialiseIntersectionObserver();
   }
 
-  targetMetaData = model<IHash<IHashArray<TargetMetaData>> | undefined>(
-    undefined
-  );
-
-  countryData: ModelSignal<IHash<Array<TargetData>>> = model({});
-  latestCountryData = computed(() => {
-    const specificCountryData = this.countryData()[this.country()];
-    if (specificCountryData && specificCountryData.length) {
-      const res = specificCountryData.reduce(
-        (prev: TargetData, current: TargetData) => {
-          if (prev?.date > current.date) {
-            return prev;
-          }
-          return current;
-        },
-        {} as TargetData
-      );
-      return res;
-    }
-  });
-
-  appendiceExpanded = false;
-
-  readonly lineChartIsInitialised = inject(LineService).lineChartReady;
-  readonly countryTotalMap = this.filterStateService.countryTotalMap;
-  readonly headerRef = input<HeaderComponent>();
-  readonly includeCTZero = this.filterStateService.includeCTZero;
-
-  /** constructor
-   * binds the data variables to the url
-   * initialises the intersection observer
-   **/
-  constructor() {
-    super();
-    this.restoreHiddenColumns();
-    combineLatest([
-      this.api.getTargetMetaData(),
-      this.api.getCountryData(),
-      this.route.params
-    ])
-      .pipe(
-        takeUntilDestroyed(),
-        map((results) => {
-          return {
-            targetMetaData: results[0],
-            countryData: results[1],
-            params: results[2]
-          };
-        })
-      )
-      .subscribe({
-        next: (combined) => {
-          const countryParam = combined.params['country'];
-          let country = isoCountryCodes[countryParam];
-
-          if (
-            !country &&
-            Object.keys(combined.countryData).includes(countryParam) &&
-            !Object.values(isoCountryCodes).includes(countryParam)
-          ) {
-            country = countryParam;
-          }
-
-          if (country) {
-            this.country.set(country);
-            this.targetMetaData.set(combined.targetMetaData);
-            this.countryData.set(combined.countryData);
-          } else {
-            const qp = this.includeCTZero()
-              ? { queryParams: { 'content-tier-zero': 'true' } }
-              : undefined;
-            if (Object.values(isoCountryCodes).includes(countryParam)) {
-              const redirecCountry = isoCountryCodesReversed[countryParam];
-              this.router.navigate(['country', redirecCountry], qp);
-            } else {
-              this.router.navigate(['/'], qp);
-            }
-          }
-        },
-        error: (e: Error) => {
-          console.log(e);
-        }
-      });
-
-    effect(() => {
-      const country = this.country();
-      if (country.length) {
-        if (typeof this.includeCTZero() === 'boolean') {
-          this.refreshCardData();
-        }
-        this.restoreHiddenColumns();
-        this.showTargetsData = !!this.targetMetaData()[country];
-        this.setHeaderData(country);
-      }
-    });
+  onLineChartReady(isReady: boolean): void {
+    this.lineChartIsInitialised.set(isReady);
   }
 
-  /** intersectionObserverCallback
-   *  - callback logic for showing and hiding the page title
-   *  - setting is made more difficult than unsetting to prevent flickering
-   **/
   intersectionObserverCallback(
     entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>
   ): void {
@@ -257,27 +238,21 @@ export class CountryComponent
     });
   }
 
-  /** initialiseIntersectionObserver
-   * binds the headerRef's pageTitleInViewport to an intersection observer
-   * generates a threshold config option of [0, 0.1, ..., 0.9]
-   **/
   initialiseIntersectionObserver(): void {
-    new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
-      threshold: [...new Array(10).keys()].map((val) => (val ? val / 10 : val))
-    }).observe(this.scrollPoint().nativeElement);
+    const scrollEl = this.scrollPoint();
+    if (scrollEl?.nativeElement) {
+      new IntersectionObserver(this.intersectionObserverCallback.bind(this), {
+        threshold: [...new Array(10).keys()].map((val) =>
+          val ? val / 10 : val
+        )
+      }).observe(scrollEl.nativeElement);
+    }
   }
 
-  /** resetAppCTZeroParam
-   * - UI utility: clears "lastSetContentTierZeroValue" on app component
-   * - invoked before router navigates to overview page on (target) link click
-   **/
   resetAppCTZeroParam(): void {
     this.filterStateService.includeCTZero.set(false);
   }
 
-  /** refreshCardData
-   * (re)loads all dimension card data and reinitialises barChart
-   **/
   refreshCardData(): void {
     this.loadDimensionCardData(DimensionName.dataProvider);
     this.loadDimensionCardData(DimensionName.provider);
@@ -286,23 +261,17 @@ export class CountryComponent
       const chart = this.barChart();
       if (chart) {
         chart.removeAllSeries();
-        chart.results.set(this.cardData[DimensionName.type]);
+        chart.results.set(this.cardData[DimensionName.type] || []);
         chart.ngAfterViewInit();
       }
     });
   }
 
-  /** loadDimensionCardData
-   * loads dimension card data
-   * @param { DimensionName } dimensionName
-   * @param { ()=> void } fnCallback
-   **/
   loadDimensionCardData(
     dimensionName: DimensionName,
     fnCallback?: () => void
   ): void {
     const contentTierVals = ['1', '2', '3', '4'];
-
     if (this.includeCTZero()) {
       contentTierVals.unshift('0');
     }
@@ -310,40 +279,31 @@ export class CountryComponent
       filters: {
         contentTier: { values: contentTierVals },
         country: { values: [this.country()] }
-      }
+      } as Record<string, unknown>
     };
+
     req.filters[dimensionName] = { breakdown: 0 };
 
     this.api
       .getBreakdowns(req)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        map((br: BreakdownResults) => {
-          return br.results.breakdowns.results;
-        })
+        map((br: BreakdownResults) => br.results.breakdowns.results)
       )
       .subscribe((res) => {
-        const cardData = res.map((cpv: CountPercentageValue) => {
-          return {
-            name: cpv.value,
-            value: cpv.count,
-            percent: cpv.percentage
-          };
-        });
+        const parsedData = res.map((cpv: CountPercentageValue) => ({
+          name: cpv.value,
+          value: cpv.count,
+          percent: cpv.percentage
+        }));
 
-        if (!this.cardData) {
-          this.cardData = {};
-        }
-        this.cardData[dimensionName] = cardData;
+        this.cardData[dimensionName] = parsedData;
         if (fnCallback) {
           fnCallback();
         }
       });
   }
 
-  /** setHeaderData
-   * @param {string?} activeCountry - optional country
-   **/
   setHeaderData(country?: string): void {
     this.filterStateService.pageTitleDynamic.set(
       !!(country && this.showTargetsData)
@@ -351,11 +311,6 @@ export class CountryComponent
     this.filterStateService.activeCountry.set(country);
   }
 
-  /** loadHistory
-   * picks up historyLoadded request from legendGrid
-   *
-   * @param {CountryHistoryRequest} request - the data request
-   **/
   loadHistory(request: CountryHistoryRequest): void {
     this.api
       .loadCountryData(request.country)
@@ -366,9 +321,8 @@ export class CountryComponent
   }
 
   tooltipsAndTotals = computed(() => {
-    const fmtNum = (num: number, fmt = '1.0-1'): string => {
-      return formatNumber(num, 'en-US', fmt);
-    };
+    const fmtNum = (num: number, fmt = '1.0-1'): string =>
+      formatNumber(num, 'en-US', fmt);
 
     const res = {
       tooltipsTotal: {},
@@ -378,11 +332,20 @@ export class CountryComponent
       latestCountryPercentageOfTargets: {}
     };
 
-    if (this.latestCountryData()) {
+    const currentCountry = this.country();
+    const currentLatestData = this.latestCountryData();
+    const metaMap = this.targetMetaData();
+
+    if (
+      currentLatestData &&
+      currentCountry &&
+      metaMap &&
+      metaMap[currentCountry]
+    ) {
       Object.values(TargetFieldName).forEach((valName: string) => {
         const countryName =
-          isoCountryCodesReversed[this.country()] ?? this.country();
-        const value: number = this.latestCountryData()[valName] ?? 0;
+          isoCountryCodesReversed[currentCountry] ?? currentCountry;
+        const value: number = currentLatestData[valName] ?? 0;
 
         const fmtName = this.renameTargetTypePipe.transform(valName);
         const fmtValue = fmtNum(value, '1.0-2');
@@ -391,47 +354,37 @@ export class CountryComponent
         const percent =
           value === 0
             ? 0
-            : (value / Number.parseInt(this.latestCountryData()['total'])) *
-              100;
-
+            : (value / Number.parseInt(currentLatestData['total'])) * 100;
         const typeItems =
           valName === TargetFieldName.TOTAL
             ? ` (${abbrevValue})`
             : ` ${fmtName}`;
 
-        // set tooltip / help texts
-
         res.tooltipsTotal[
           valName
         ] = $localize`:@@countryHelpTotal:${countryName} has ${fmtValue}${typeItems} ${itemPluralString}`;
-
         res.tooltipsPercent[valName] = $localize`:@@countryHelpPercent:${fmtNum(
           percent
         )}% of the data from ${countryName} is ${fmtName}`;
-
-        // percentages
         res.latestCountryPercentages[valName] = percent;
 
-        const targets = this.targetMetaData()[this.country()][valName];
+        const targets = metaMap[currentCountry][valName];
+        if (targets && targets.length >= 2) {
+          res.latestCountryPercentageOfTargets[valName] = [
+            value / targets[0].value,
+            value / targets[1].value
+          ].map((val: number) => val * 100);
 
-        res.latestCountryPercentageOfTargets[valName] = [
-          value / targets[0].value,
-          value / targets[1].value
-        ].map((val: number) => {
-          return val * 100;
-        });
-
-        // tooltipsTargets
-
-        res.tooltipsTargets[valName] = targets.map(
-          (x: TargetMetaData, i: number) => {
-            const tgtVal = fmtNum(x.value);
-            const tgtPct = fmtNum(
-              res.latestCountryPercentageOfTargets[valName][i]
-            );
-            return $localize`:@@countryHelpTarget:The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
-          }
-        );
+          res.tooltipsTargets[valName] = targets.map(
+            (x: TargetMetaData, i: number) => {
+              const tgtVal = fmtNum(x.value);
+              const tgtPct = fmtNum(
+                res.latestCountryPercentageOfTargets[valName][i]
+              );
+              return $localize`:@@countryHelpTarget:The ${x.targetYear} target (${tgtVal}) is ${tgtPct}% complete`;
+            }
+          );
+        }
       });
     }
     return res;
@@ -441,35 +394,24 @@ export class CountryComponent
     this.appendiceExpanded = !this.appendiceExpanded;
   }
 
-  /** nextColToEnable
-   *
-   * @return TargetFieldName
-   **/
-  nextColToEnable(): TargetFieldName {
-    return Object.values(TargetFieldName).find((tfn: TargetFieldName) => {
-      return !this.columnsEnabled[tfn];
-    });
+  nextColToEnable(): TargetFieldName | undefined {
+    return Object.values(TargetFieldName).find(
+      (tfn: TargetFieldName) => !this.columnsEnabled[tfn]
+    );
   }
 
-  /** toggleColumn
-   *
-   * @param { TargetFieldName } column
-   **/
   toggleColumn(column?: TargetFieldName): void {
-    column = column || this.nextColToEnable();
-    this.columnsEnabled[column] = !this.columnsEnabled[column];
-
-    this.columnsEnabledCount = Object.values(TargetFieldName).filter(
-      (tfn: TargetFieldName) => {
-        return this.columnsEnabled[tfn];
-      }
-    ).length;
-
-    this.columnToEnable = this.nextColToEnable();
+    const targetCol = column || this.nextColToEnable();
+    if (targetCol) {
+      this.columnsEnabled[targetCol] = !this.columnsEnabled[targetCol];
+      this.columnsEnabledCount = Object.values(TargetFieldName).filter(
+        (tfn: TargetFieldName) => this.columnsEnabled[tfn]
+      ).length;
+      this.columnToEnable = this.nextColToEnable();
+    }
   }
 
   restoreHiddenColumns(): void {
-    // re-initialise the hidden columns
     this.columnsEnabledCount = 3;
     Object.values(TargetFieldName).forEach((key: string) => {
       this.columnsEnabled[key] = true;

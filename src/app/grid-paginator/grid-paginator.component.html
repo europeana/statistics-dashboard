@@ -1,4 +1,4 @@
-@if (pages && pages.length > 0) {
+@if (paginationData().pages.length > 0) {
 <ul class="paginator" tabindex="-1">
   <li>
     <a
@@ -12,10 +12,12 @@
     ></a>
   </li>
 
-  @if (ranges[activePageIndex()]) {
+  @if (paginationData().ranges[activePageIndex()]) {
   <li class="range">
-    {{ ranges[activePageIndex()][0] }} - {{ ranges[activePageIndex()][1] }}
-    <span i18n="Pagination of @@gridPaginatorOf">of</span> {{ totalRows }}
+    {{ paginationData().ranges[activePageIndex()][0] }} -
+    {{ paginationData().ranges[activePageIndex()][1] }}
+    <span i18n="Pagination of @@gridPaginatorOf">of</span>
+    {{ paginationData().totalRows }}
   </li>
   }
 

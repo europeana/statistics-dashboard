@@ -572,7 +572,11 @@
 
       <div class="entry-card-content">
         <div class="entry-card-multi">
-          <app-line-chart #lineChart [targetMetaData]="targetMetaData()">
+          <app-line-chart
+            #lineChart
+            [targetMetaData]="targetMetaData()"
+            (chartReady)="onLineChartReady($event)"
+          >
           </app-line-chart>
 
           <app-legend-grid

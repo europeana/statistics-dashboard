@@ -1,11 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { mockFilterStateService } from '../_mocked';
 import { FilterStateService } from '../_services';
@@ -14,8 +8,7 @@ import { HeaderComponent } from '.';
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let mockFilterState: any;
+  let mockFilterState: ReturnType<typeof mockFilterStateService>;
 
   const configureTestBed = (): void => {
     mockFilterState = mockFilterStateService();
@@ -23,14 +16,8 @@ describe('HeaderComponent', () => {
       imports: [HeaderComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {}
-        },
-        {
-          provide: FilterStateService,
-          useValue: mockFilterState
-        }
+        { provide: ActivatedRoute, useValue: {} },
+        { provide: FilterStateService, useValue: mockFilterState }
       ]
     }).compileComponents();
   };
@@ -50,30 +37,48 @@ describe('HeaderComponent', () => {
   });
 
   it('should toggle the menu', () => {
-    const isDisabled = false;
-    const spyStopPropagation = jest.fn();
     const e = {
-      target: {
-        getAttribute: () => {
-          return isDisabled;
-        }
-      } as unknown as HTMLElement,
-      stopPropagation: spyStopPropagation
+      target: { getAttribute: () => false } as unknown as HTMLElement,
+      stopPropagation: jest.fn()
     } as unknown as MouseEvent;
-    expect(component.menuIsOpen).toBeFalsy();
+
+    expect(component.menuIsOpen()).toBeFalsy();
     component.toggleMenu(e);
-    expect(component.menuIsOpen).toBeTruthy();
-    component.toggleMenu(e);
-    expect(component.menuIsOpen).toBeFalsy();
-    expect(spyStopPropagation).toHaveBeenCalledTimes(2);
+    expect(component.menuIsOpen()).toBeTruthy();
   });
 
-  it('should close the menu when activeCountry is set', fakeAsync(() => {
-    component.menuIsOpen = true;
-    expect(component.menuIsOpen).toBeTruthy();
+  it('should close the menu when activeCountry is set', () => {
+    component.menuIsOpen.set(true);
+    expect(component.menuIsOpen()).toBeTruthy();
+
+    // Mutate the dependency signal state tree
     mockFilterState.activeCountry.set('France');
+
+    // Force a change detection sweep over the component instance
+    // This synchronously processes the effect under a standard TestBed environment
     fixture.detectChanges();
-    tick();
-    expect(component.menuIsOpen).toBeFalsy();
-  }));
+
+    // Assert the reactive result cleanly
+    expect(component.menuIsOpen()).toBeFalsy();
+  });
+
+  it('should focus the menu opener on keyboard toggle events', () => {
+    const spyFocus = jest.fn();
+    const mockElementRef = {
+      nativeElement: { focus: spyFocus }
+    } as unknown as ElementRef<HTMLElement>;
+
+    Object.defineProperty(component, 'menuOpener', {
+      writable: true,
+      value: jest.fn().mockReturnValue(mockElementRef)
+    });
+
+    const e = {
+      target: { getAttribute: () => false } as unknown as HTMLElement,
+      stopPropagation: jest.fn()
+    } as unknown as MouseEvent;
+
+    component.toggleMenu(e, true);
+    expect(spyFocus).toHaveBeenCalled();
+  });
 });

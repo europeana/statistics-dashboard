@@ -22,7 +22,7 @@ export class ClickAwareDirective {
    */
   constructor() {
     this.clickService.documentClickedTarget
-      .pipe(takeUntilDestroyed()) // 2. Automatically manages subscription cleanup natively on destroy
+      .pipe(takeUntilDestroyed())
       .subscribe((target: HTMLElement) => {
         this.documentClickListener(this.elementRef.nativeElement, target);
       });

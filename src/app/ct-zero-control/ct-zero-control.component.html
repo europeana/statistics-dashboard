@@ -1,9 +1,10 @@
+@if (form()) {
 <span class="ct-zero container-h">
-  <span [formGroup]="form()" class="checkbox-labelled" *ngIf="form()">
+  <span [formGroup]="form()" class="checkbox-labelled">
     <span
       class="checkmarked-checkbox"
       [ngClass]="{
-        checked: form().value.contentTierZero,
+        checked: contentTierZeroChecked(),
         disabled: disabled()
       }"
     >
@@ -22,18 +23,19 @@
       }"
       for="ctZero"
     >
-      <ng-template
-        #enableCTZero
-        i18n="control label enable content tier zero@@ctrlLabelEnableCTZero"
-      >
-        Enable content tier 0
-      </ng-template>
+      @if (contentTierZeroChecked()) {
       <ng-container
-        *ngIf="form().value.contentTierZero; else enableCTZero"
         i18n="control label disable content tier zero@@ctrlLabelDisableCTZero"
       >
         Disable content tier 0
       </ng-container>
+      } @else {
+      <ng-container
+        i18n="control label enable content tier zero@@ctrlLabelEnableCTZero"
+      >
+        Enable content tier 0
+      </ng-container>
+      }
     </label>
   </span>
   <a
@@ -43,8 +45,9 @@
     i18n-title="Documentation@@documentationLinkCTZero"
     title="Documentation"
     [ngClass]="{
-      checked: form()?.value?.contentTierZero,
+      checked: contentTierZeroChecked(),
       disabled: disabled()
     }"
   ></a>
 </span>
+}

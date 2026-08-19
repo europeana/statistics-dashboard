@@ -1,32 +1,29 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import * as am4core from '@amcharts/amcharts4/core';
 
 import {
   MockAPIService,
+  MockBarComponent,
   mockCountryData,
   mockFilterStateService,
   MockMapComponent,
   mockTargetMetaData
 } from '../_mocked';
 import { APIService, FilterStateService } from '../_services';
+
 import { TargetFieldName, VisibleHeatMap } from '../_models';
 import { BarComponent, MapComponent } from '../chart';
 import { LandingComponent } from '.';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi
-} from '@angular/common/http';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -40,42 +37,28 @@ describe('LandingComponent', () => {
     country: [{ name: 'IT', percent: 3, value: 400 }]
   };
 
-  const configureTestBed = (): void => {
+  beforeEach(() => {
     mockFilterState = mockFilterStateService();
 
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [FormsModule, ReactiveFormsModule, LandingComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {}
-        },
-        {
-          provide: APIService,
-          useClass: MockAPIService
-        },
-        {
-          provide: FilterStateService,
-          useValue: mockFilterState
-        },
+        { provide: ActivatedRoute, useValue: {} },
+        { provide: APIService, useClass: MockAPIService },
+        { provide: FilterStateService, useValue: mockFilterState },
         provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        provideNoopAnimations()
       ]
     })
       .overrideComponent(LandingComponent, {
-        remove: { imports: [MapComponent] },
-        add: { imports: [MockMapComponent] }
+        remove: { imports: [MapComponent, BarComponent] },
+        add: { imports: [MockMapComponent, MockBarComponent] }
       })
       .compileComponents();
+
     api = TestBed.inject(APIService);
-  };
-
-  beforeEach(waitForAsync(() => {
-    configureTestBed();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(LandingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -85,14 +68,20 @@ describe('LandingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should refresh the charts when the data changes', () => {
+  it('should refresh the charts when the data changes', async () => {
     const spyRefreshCharts = jest.spyOn(component, 'refreshCharts');
     mockFilterState.landingData.set({ contentTier: [], country: [] });
+
     fixture.detectChanges();
+    TestBed.flushEffects();
+
+    // Explicitly drain the microtask queue to allow queueMicrotask to execute
+    await Promise.resolve();
+
     expect(spyRefreshCharts).toHaveBeenCalled();
   });
 
-  it('should refresh the charts', fakeAsync(() => {
+  it('should refresh the charts', () => {
     let mockChartRefreshed = false;
     let mockChartRemoved = false;
 
@@ -111,7 +100,6 @@ describe('LandingComponent', () => {
       readonly BarComponent[]
     >;
     component.refreshCharts();
-    tick(1);
 
     expect(mockChartRefreshed).toBeFalsy();
     expect(mockChartRemoved).toBeFalsy();
@@ -122,16 +110,17 @@ describe('LandingComponent', () => {
       readonly BarComponent[]
     >;
     component.refreshCharts();
-    tick(1);
 
     expect(mockChartRefreshed).toBeTruthy();
     expect(mockChartRemoved).toBeTruthy();
-  }));
+  });
 
   it('should build the derived series', () => {
     expect(Object.keys(component.allProgressSeries).length).toBeFalsy();
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
+
     component.buildDerivedSeries();
     expect(Object.keys(component.allProgressSeries).length).toBeTruthy();
 
@@ -145,8 +134,8 @@ describe('LandingComponent', () => {
   });
 
   it('should override the derived series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
     component.buildDerivedSeries();
 
     const defaultResult = [{ name: 'IT', value: 1 }];
@@ -158,8 +147,8 @@ describe('LandingComponent', () => {
   });
 
   it('should sort the derived series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
     component.buildDerivedSeries();
 
     const testSeries = component.allProgressSeries[TargetFieldName.THREE_D][0];
@@ -177,8 +166,8 @@ describe('LandingComponent', () => {
   });
 
   it('should look up values in the derived series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
     component.buildDerivedSeries();
 
     const derivedValue = 12300;
@@ -217,14 +206,12 @@ describe('LandingComponent', () => {
     >;
     component.closeMapSelection();
 
-    expect(component.mapChart().countryClick).toHaveBeenCalled();
+    expect(component.mapChart()?.countryClick).toHaveBeenCalled();
   });
 
   it('should close the map menu, refocussing the opener', () => {
     const mockElementRef = {
-      nativeElement: {
-        focus: jest.fn()
-      }
+      nativeElement: { focus: jest.fn() }
     } as unknown as ElementRef<HTMLElement>;
 
     component.layerOpener = jest
@@ -263,13 +250,12 @@ describe('LandingComponent', () => {
 
   it('should tap the country data load', () => {
     const fnCallback = jest.fn();
-
     const spyGetCountryData = jest.spyOn(api, 'getCountryData');
 
     component.tapCountryDataLoad(fnCallback);
     expect(spyGetCountryData).toHaveBeenCalledTimes(1);
     expect(fnCallback).toHaveBeenCalled();
-    expect(component.countryData).toBeTruthy();
+    expect(component.countryData()).toBeTruthy();
 
     component.tapCountryDataLoad();
     expect(spyGetCountryData).toHaveBeenCalledTimes(1);
@@ -320,8 +306,8 @@ describe('LandingComponent', () => {
 
   it('should show the heat map', () => {
     mockFilterState.landingData.set(mockLandingData);
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
 
     const colour = '#ffffff' as unknown as am4core.Color;
 
@@ -345,12 +331,12 @@ describe('LandingComponent', () => {
       MapComponent | undefined
     >;
 
-    expect(component.mapChart().colourScheme).toBeFalsy();
+    expect(component.mapChart()?.colourScheme).toBeFalsy();
 
     component.showHeatmap(TargetFieldName.TOTAL, 0);
 
-    expect(component.mapChart().colourScheme).toBeTruthy();
-    expect(component.mapChart().colourScheme.base).toEqual(colour);
+    expect(component.mapChart()?.colourScheme).toBeTruthy();
+    expect(component.mapChart()?.colourScheme?.base).toEqual(colour);
     expect(component.activeMapData()).toEqual(
       component.allProgressSeries[TargetFieldName.TOTAL][0]
     );

@@ -1,4 +1,12 @@
-import { Component, ElementRef, input, output, viewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  output,
+  viewChild
+} from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
 import { OpenerFocusDirective } from '../_directives';
@@ -10,6 +18,8 @@ import { OpenerFocusDirective } from '../_directives';
   imports: [OpenerFocusDirective]
 })
 export class ExportComponent {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   get currentUrl(): string {
     return window.location.href;
   }
@@ -31,15 +41,15 @@ export class ExportComponent {
   active = false;
   busy = false;
   copied = false;
-  msMsgDisplay = 2000;
   _tabIndex = -1;
+  msMsgDisplay = 2000;
 
   set tabIndex(value: number) {
     this._tabIndex = value;
     if (value === 0) {
-      // Resolve the signal query reference and focus
       this.closer().nativeElement.focus();
     }
+    this.cdr.markForCheck();
   }
 
   get tabIndex(): number {
@@ -54,10 +64,12 @@ export class ExportComponent {
   copy(): void {
     navigator.clipboard.writeText(this.contentRef().nativeElement.value);
     this.copied = true;
-    const fn = (): void => {
+    this.cdr.markForCheck();
+
+    setTimeout(() => {
       this.copied = false;
-    };
-    setTimeout(fn, this.msMsgDisplay);
+      this.cdr.markForCheck();
+    }, this.msMsgDisplay);
   }
 
   export(type: ExportType): void {
@@ -71,9 +83,11 @@ export class ExportComponent {
       this.csv.download(data, this.downloadAnchor());
     } else if (type === ExportType.PDF) {
       this.busy = true;
+      this.cdr.markForCheck();
       this.getChartData()().then((imgUrl: string) => {
         this.pdf.download(this.getChartTitle()(), gridData, imgUrl);
         this.busy = false;
+        this.cdr.markForCheck();
       });
     } else if (type === ExportType.PNG) {
       this.getChartData()().then((imgUrl: string) => {
@@ -88,20 +102,10 @@ export class ExportComponent {
     }
   }
 
-  /**
-   * fnHide
-   *
-   * connect OpenerFocusDirective to the correct opener
-   **/
   fnHide(): void {
     this.toggleActive(this.openedFromToolbar);
   }
 
-  /**
-   * toggleActive
-   *
-   * @param { boolean } fromToolbar - flags if component was opened from the toolbar
-   **/
   toggleActive(fromToolbar?: boolean): void {
     if (fromToolbar !== undefined) {
       this.openedFromToolbar = fromToolbar;
@@ -113,5 +117,6 @@ export class ExportComponent {
     if (!this.active) {
       this.closeExport.emit(this.openedFromToolbar);
     }
+    this.cdr.markForCheck();
   }
 }

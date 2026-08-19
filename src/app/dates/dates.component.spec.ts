@@ -1,14 +1,10 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  flush,
-  TestBed
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   ReactiveFormsModule,
   UntypedFormBuilder,
   UntypedFormControl,
+  UntypedFormGroup,
   ValidationErrors
 } from '@angular/forms';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
@@ -21,12 +17,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
 describe('DatesComponent', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let mockForm: any;
+  let mockForm: UntypedFormGroup;
   let component: DatesComponent;
   let fixture: ComponentFixture<DatesComponent>;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, DatesComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -50,13 +45,10 @@ describe('DatesComponent', () => {
         MatFormFieldModule
       ]
     }).compileComponents();
-  });
 
-  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(DatesComponent);
     component = fixture.componentInstance;
 
-    // Create the untyped form instance
     mockForm = new UntypedFormBuilder().group({
       dateFrom: [
         '',
@@ -74,10 +66,10 @@ describe('DatesComponent', () => {
 
     fixture.componentRef.setInput('form', mockForm);
     fixture.detectChanges();
-    flush();
-  }));
+    TestBed.flushEffects();
+  });
 
-  it('should handle the to-date change', fakeAsync(() => {
+  it('should handle the to-date change', () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
@@ -92,7 +84,7 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateTo: localYesterdayString });
     fixture.detectChanges();
-    flush();
+    TestBed.flushEffects();
 
     expect(component.dateFrom().nativeElement.getAttribute('max')).toEqual(
       localYesterdayString
@@ -100,21 +92,21 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateTo: null });
     fixture.detectChanges();
-    flush();
+    TestBed.flushEffects();
 
     expect(component.dateFrom().nativeElement.getAttribute('max')).toEqual(
       component.today
     );
-  }));
+  });
 
-  it('should set the min-max attributes', fakeAsync(() => {
+  it('should set the min-max attributes', () => {
     expect(component.dateTo().nativeElement.getAttribute('min')).toEqual(
       component.yearZero
     );
 
     mockForm.patchValue({ dateFrom: component.today });
     fixture.detectChanges();
-    flush();
+    TestBed.flushEffects();
 
     expect(component.dateTo().nativeElement.getAttribute('min')).toBeTruthy();
     expect(component.dateTo().nativeElement.getAttribute('min')).not.toEqual(
@@ -123,53 +115,51 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateFrom: null });
     fixture.detectChanges();
-    flush();
+    TestBed.flushEffects();
 
     expect(component.dateTo().nativeElement.getAttribute('min')).toEqual(
       component.yearZero
     );
-  }));
+  });
 
-  it('should clear validation errors for the corresponding field', fakeAsync(() => {
+  it('should clear validation errors for the corresponding field', () => {
     const tomorrow = new Date(component.today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     const spyUpdateDateTo = jest.spyOn(
-      mockForm.controls.dateTo,
+      mockForm.controls['dateTo'],
       'updateValueAndValidity'
     );
 
-    // Set dateTo to something invalid
-    mockForm.controls.dateTo.setValue(tomorrow.toISOString());
-    expect(mockForm.controls.dateTo.errors).toBeTruthy();
+    mockForm.controls['dateTo'].setValue(tomorrow.toISOString());
+    expect(mockForm.controls['dateTo'].errors).toBeTruthy();
 
     fixture.detectChanges();
-    flush();
+    TestBed.flushEffects();
 
     expect(spyUpdateDateTo).toHaveBeenCalled();
 
     mockForm.reset();
 
     const spyUpdateDateFrom = jest.spyOn(
-      mockForm.controls.dateFrom,
+      mockForm.controls['dateFrom'],
       'updateValueAndValidity'
     );
 
-    // Set dateFrom to something invalid
-    mockForm.controls.dateFrom.setValue(tomorrow.toISOString());
-    expect(mockForm.controls.dateFrom.errors).toBeTruthy();
+    mockForm.controls['dateFrom'].setValue(tomorrow.toISOString());
+    expect(mockForm.controls['dateFrom'].errors).toBeTruthy();
 
     fixture.detectChanges();
-    flush();
+    TestBed.flushEffects();
 
     expect(spyUpdateDateFrom).toHaveBeenCalled();
-  }));
+  });
 
   it('should validate dates', () => {
     mockForm.patchValue({ dateFrom: null, dateTo: null });
 
-    const dateFrom = mockForm.controls.dateFrom as UntypedFormControl;
-    const dateTo = mockForm.controls.dateTo as UntypedFormControl;
+    const dateFrom = mockForm.controls['dateFrom'] as UntypedFormControl;
+    const dateTo = mockForm.controls['dateTo'] as UntypedFormControl;
 
     let resFrom = validateDateGeneric(dateFrom, 'dateFrom');
     expect(resFrom).toBeFalsy();

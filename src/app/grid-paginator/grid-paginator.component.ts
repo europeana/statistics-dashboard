@@ -1,10 +1,9 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   input,
-  output,
-  signal
+  linkedSignal
 } from '@angular/core';
 import { PagerInfo, TableRow } from '../_models';
 
@@ -12,15 +11,17 @@ import { PagerInfo, TableRow } from '../_models';
   selector: 'app-grid-paginator',
   templateUrl: './grid-paginator.component.html',
   styleUrls: ['./grid-paginator.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: []
 })
 export class GridPaginatorComponent {
   rows = input<Array<TableRow>>([]);
   maxPageSize = input<number>(10);
 
-  change = output<PagerInfo>();
-
-  activePageIndex = signal<number>(0);
+  activePageIndex = linkedSignal({
+    source: () => ({ rows: this.rows(), size: this.maxPageSize() }),
+    computation: () => 0
+  });
 
   paginationData = computed(() => {
     const currentRows = this.rows();
@@ -32,20 +33,15 @@ export class GridPaginatorComponent {
 
     const calculatedRanges = Array.from(
       { length: Math.ceil(currentRows.length / currentSize) },
-      (_, i: number) => {
-        const lowerIndex = i * currentSize;
-        const upperIndex = lowerIndex + currentSize;
-        return [lowerIndex, upperIndex];
-      }
+      (_, i: number) => [i * currentSize, i * currentSize + currentSize]
     );
 
-    const pages = calculatedRanges.map((range: Array<number>) =>
-      currentRows.slice(range[0], range[1])
+    const pages = calculatedRanges.map(([lower, upper]) =>
+      currentRows.slice(lower, upper)
     );
-
-    const ranges = calculatedRanges.map((range: Array<number>) => [
-      range[0] + 1,
-      Math.min(range[1], currentRows.length)
+    const ranges = calculatedRanges.map(([lower, upper]) => [
+      lower + 1,
+      Math.min(upper, currentRows.length)
     ]);
 
     return {
@@ -56,29 +52,20 @@ export class GridPaginatorComponent {
     };
   });
 
-  get pages(): Array<Array<TableRow>> {
-    return this.paginationData().pages;
-  }
-  get ranges(): Array<Array<number>> {
-    return this.paginationData().ranges;
-  }
-  get totalRows(): number {
-    return this.paginationData().totalRows;
-  }
-  get totalPageCount(): number {
-    return this.paginationData().totalPageCount;
-  }
+  pagerInfo = computed<PagerInfo>(() => {
+    const data = this.paginationData();
+    const index = this.activePageIndex();
+    return {
+      currentPage: index,
+      pageCount: data.totalPageCount,
+      pageRows: data.pages[index] || []
+    };
+  });
 
-  canNext = computed(() => this.activePageIndex() + 1 < this.totalPageCount);
+  canNext = computed(
+    () => this.activePageIndex() + 1 < this.paginationData().totalPageCount
+  );
   canPrev = computed(() => this.activePageIndex() > 0);
-
-  constructor() {
-    effect(() => {
-      this.rows();
-      this.maxPageSize();
-      this.setPage(0);
-    });
-  }
 
   callSetPage(e: Event, index: number): false {
     e.preventDefault();
@@ -87,15 +74,8 @@ export class GridPaginatorComponent {
   }
 
   setPage(index: number): void {
-    this.activePageIndex.set(index);
-    const data = this.paginationData();
-
-    if (data.pages.length > 0) {
-      this.change.emit({
-        currentPage: index,
-        pageCount: data.totalPageCount,
-        pageRows: data.pages[index]
-      });
+    if (index >= 0 && index < this.paginationData().totalPageCount) {
+      this.activePageIndex.set(index);
     }
   }
 }

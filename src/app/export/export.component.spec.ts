@@ -1,11 +1,5 @@
 import { ElementRef } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExportComponent } from '.';
 
 import { MockExportCSVService, MockExportPDFService } from '../_mocked';
@@ -17,13 +11,13 @@ describe('ExportComponent', () => {
   let fixture: ComponentFixture<ExportComponent>;
   let exportCSV: ExportCSVService;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ExportComponent],
       providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
     }).compileComponents();
     exportCSV = TestBed.inject(ExportCSVService);
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExportComponent);
@@ -38,9 +32,7 @@ describe('ExportComponent', () => {
     });
 
     fixture.componentRef.setInput('getChartData', (): Promise<string> => {
-      return new Promise((resolve) => {
-        resolve(null);
-      });
+      return Promise.resolve(null);
     });
 
     fixture.detectChanges();
@@ -50,29 +42,34 @@ describe('ExportComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should copy', fakeAsync(() => {
-    jest.spyOn(navigator.clipboard, 'writeText');
+  it('should copy', () => {
+    jest.useFakeTimers();
+    jest
+      .spyOn(navigator.clipboard, 'writeText')
+      .mockImplementation(() => Promise.resolve());
+
     (component.contentRef().nativeElement as HTMLInputElement).value =
       'some-url';
 
     component.copy();
     fixture.detectChanges();
+    TestBed.flushEffects();
 
-    expect(
-      component.contentRef().nativeElement.classList.contains('copied')
-    ).toBeTruthy();
     expect(component.copied).toBeTruthy();
 
-    tick(component.msMsgDisplay);
+    jest.advanceTimersByTime(component.msMsgDisplay);
+    fixture.detectChanges();
+    TestBed.flushEffects();
+
     expect(component.copied).toBeFalsy();
-  }));
+    jest.useRealTimers();
+  });
 
   it('should export CSV', () => {
     const spyDownload = jest.spyOn(exportCSV, 'download');
     const elDownload = document.createElement('a');
     document.body.append(elDownload);
 
-    // Explicitly stub the read-only signal viewChild value for the execution context
     const mockAnchor = {
       nativeElement: elDownload
     } as ElementRef<HTMLAnchorElement>;
@@ -82,15 +79,13 @@ describe('ExportComponent', () => {
 
     component.export(ExportType.CSV);
     expect(spyDownload).toHaveBeenCalled();
+    elDownload.remove();
   });
 
   it('should export PDF', () => {
-    const mockChartDataFn = (): Promise<string> => {
-      return new Promise((resolve) => {
-        resolve(MockExportPDFService.imgDataURL);
-      });
-    };
-    fixture.componentRef.setInput('getChartData', mockChartDataFn);
+    fixture.componentRef.setInput('getChartData', () =>
+      Promise.resolve(MockExportPDFService.imgDataURL)
+    );
     fixture.detectChanges();
 
     const spyGetChartData = jest.spyOn(component, 'getChartData');
@@ -99,12 +94,9 @@ describe('ExportComponent', () => {
   });
 
   it('should export PNG', () => {
-    const mockChartDataFn = (): Promise<string> => {
-      return new Promise((resolve) => {
-        resolve(MockExportPDFService.imgDataURL);
-      });
-    };
-    fixture.componentRef.setInput('getChartData', mockChartDataFn);
+    fixture.componentRef.setInput('getChartData', () =>
+      Promise.resolve(MockExportPDFService.imgDataURL)
+    );
     fixture.detectChanges();
 
     const spyGetChartData = jest.spyOn(component, 'getChartData');

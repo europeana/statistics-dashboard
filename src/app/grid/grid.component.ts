@@ -1,9 +1,13 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
+  effect,
   inject,
   input,
   output,
+  signal,
   viewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,7 +15,6 @@ import { colours, DimensionName } from '../_data';
 import {
   FmtTableData,
   HeaderNameType,
-  PagerInfo,
   SortBy,
   SortInfo,
   TableRow
@@ -32,6 +35,7 @@ import {
   selector: 'app-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgClass,
     NgStyle,
@@ -56,28 +60,39 @@ export class GridComponent {
 
   paginator = viewChild<GridPaginatorComponent>('paginator');
 
-  filterTerm = '';
+  filterTerm = signal<string>('');
   maxPageSizes = [10, 20, 50].map((option: number) => {
     return { title: `${option}`, value: option };
   });
-  maxPageSize = this.maxPageSizes[0].value;
-  pagerInfo: PagerInfo;
-  summaryRows: Array<TableRow> = [];
-  gridRows: Array<TableRow>;
-  isShowingSeriesInfo = false;
-  sortInfo: SortInfo = {
+  maxPageSize = signal<number>(this.maxPageSizes[0].value);
+  pagerInfo = computed(() => this.paginator()?.pagerInfo());
+
+  summaryRows = signal<Array<TableRow>>([]);
+  gridRows = signal<Array<TableRow>>([]);
+  isShowingSeriesInfo = signal<boolean>(false);
+  sortInfo = signal<SortInfo>({
     by: SortBy.count,
     dir: -1
-  };
+  });
 
-  public colours = colours;
-  public SortBy = SortBy;
-  public colHeaders = [
+  public readonly colours = colours;
+  public readonly SortBy = SortBy;
+  public readonly colHeaders = [
     $localize`:@@gridColHeaderPrefix:Items by`,
     $localize`:@@gridColHeaderCount:Count`,
     $localize`:@@gridColHeaderPercent:Percent`,
     $localize`:@@gridColHeaderView:View in Europeana`
   ];
+
+  constructor() {
+    effect(() => {
+      const currentPager = this.pagerInfo();
+      if (currentPager && currentPager.currentPage > 0) {
+        const position = currentPager.currentPage * this.maxPageSize();
+        this.chartPositionChanged.emit(position);
+      }
+    });
+  }
 
   /** loadLinkInformation
   /* loads url parameters and appends them to row.portalUrlInfo.href (optionally opens that link)
@@ -101,13 +116,15 @@ export class GridComponent {
         row.portalUrlInfo.href = row.portalUrlInfo.href + rightsParams;
         row.portalUrlInfo.hrefRewritten = true;
 
+        // Force rows signal to refresh the view since a nested property mutated inside an async callback
+        this.gridRows.update((current) => [...current]);
+        this.summaryRows.update((current) => [...current]);
+
         if (followLink) {
-          setTimeout(() => {
-            const newWin = window.open('', '_blank');
-            if (newWin) {
-              newWin.location.href = row.portalUrlInfo.href;
-            }
-          }, 0);
+          const newWin = window.open('', '_blank');
+          if (newWin) {
+            newWin.location.href = row.portalUrlInfo.href;
+          }
         }
       });
   }
@@ -122,7 +139,6 @@ export class GridComponent {
     if (row.portalUrlInfo.hrefRewritten) {
       return true;
     }
-    // Read the facet input signal via function call execution syntax
     if (this.facet() === DimensionName.rightsCategory) {
       if (row.isTotal) {
         return true;
@@ -162,21 +178,22 @@ export class GridComponent {
   }
 
   bumpSortState(header: SortBy): void {
-    const isChanged = this.sortInfo.by !== header;
+    const currentSort = this.sortInfo();
+    const isChanged = currentSort.by !== header;
     let val = 1;
 
     if (!isChanged) {
-      val = this.sortInfo.dir;
+      val = currentSort.dir;
       val += 1;
       if (val > 1) {
         val = -1;
       }
     }
 
-    this.sortInfo = {
+    this.sortInfo.set({
       by: header,
       dir: val
-    };
+    });
   }
 
   getData(): FmtTableData {
@@ -184,12 +201,11 @@ export class GridComponent {
       columns: ['colour', 'series', 'name', 'count', 'percent'].map(
         (x) => x as HeaderNameType
       ),
-      tableRows: this.gridRows
+      tableRows: this.gridRows()
     };
   }
 
   getPrefix(): string {
-    // Read the input signal value cleanly here
     if (['contentTier', 'metadataTier'].includes(this.facet())) {
       return this.tierPrefix();
     }
@@ -200,10 +216,10 @@ export class GridComponent {
     if (event.key === 'Enter') {
       const inputEl = event.target as HTMLInputElement;
       const val = inputEl.value.replace(/\D/g, '');
-      if (val.length > 0) {
-        const pageNum = Math.min(this.pagerInfo.pageCount, parseInt(val));
+      const currentPager = this.pagerInfo();
 
-        // 5. Read the viewChild signal safely and trigger its page index
+      if (val.length > 0 && currentPager) {
+        const pageNum = Math.min(currentPager.pageCount, parseInt(val));
         this.paginator()?.setPage(Math.max(0, pageNum - 1));
       }
       inputEl.value = '';
@@ -211,8 +227,8 @@ export class GridComponent {
   }
 
   setRows(rows: Array<TableRow>): void {
-    const normalRows = [];
-    const summaryRows = [];
+    const normalRows: Array<TableRow> = [];
+    const summaryRows: Array<TableRow> = [];
 
     rows.forEach((tr: TableRow) => {
       if (tr.isTotal) {
@@ -221,22 +237,11 @@ export class GridComponent {
         normalRows.push(tr);
       }
     });
-    this.summaryRows = summaryRows;
 
     this.applyHighlights(normalRows);
-    this.gridRows = normalRows;
-  }
 
-  setPagerInfo(pagerInfo: PagerInfo): void {
-    const fn = (): void => {
-      const doEmit = !!this.pagerInfo;
-      this.pagerInfo = pagerInfo;
-      if (doEmit) {
-        const position = pagerInfo.currentPage * this.maxPageSize;
-        this.chartPositionChanged.emit(position);
-      }
-    };
-    setTimeout(fn, 0);
+    this.summaryRows.set(summaryRows);
+    this.gridRows.set(normalRows);
   }
 
   sort(sortBy: SortBy): void {

@@ -1,10 +1,10 @@
+@if (form() && group() && !state().disabled) {
 <ul
   class="filter"
-  *ngIf="form() && group() && !state().disabled"
   [formGroup]="form()"
   appClickAware
   appOpenerFocus
-  [fnHide]="hide.bind(this)"
+  [fnHide]="hide"
   [includeClicksOnClasses]="
     group() + '' === 'dates'
       ? ['mat-calendar-body', 'mat-datepicker-content']
@@ -27,11 +27,11 @@
       <span class="container-h">
         <span class="icon filter-icon-{{ group() }}"> </span>
         <span class="opener-name-container">
-          <ng-container *ngIf="getSetCheckboxValues(group()) as setVals">
-            <span class="selection">
-              {{ setVals }}
-            </span>
-          </ng-container>
+          @if (getSetCheckboxValues(group()); as setVals) {
+          <span class="selection">
+            {{ setVals }}
+          </span>
+          }
           <a #opener class="opener-name" tabindex="0">
             {{ group() | renameApiFacet }}
           </a>
@@ -63,7 +63,7 @@
             <app-checkbox
               [form]="form()"
               [controlName]="option.name"
-              [labelText]="option.label | highlightMatch : [filterTerm.value]"
+              [labelText]="option.label | highlightMatch : [term()]"
               [group]="group()"
               (valueChanged)="changed()"
             ></app-checkbox>
@@ -85,3 +85,4 @@
   </li>
   } } }
 </ul>
+}

@@ -1,7 +1,9 @@
 import {
+  ChangeDetectorRef,
   Component,
   effect,
   ElementRef,
+  inject,
   input,
   output,
   viewChild
@@ -34,6 +36,8 @@ import { getDateAsISOString, today, yearZero } from '../_helpers';
   ]
 })
 export class DatesComponent {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   public today = today;
   public yearZero = yearZero;
 
@@ -63,7 +67,6 @@ export class DatesComponent {
       const inputTo = this.dateTo();
       const picker = this.rangePicker();
 
-      // Shield execution blocks from empty initial ticks
       if (!values || !currentForm || !inputFrom || !inputTo) {
         return;
       }
@@ -100,11 +103,15 @@ export class DatesComponent {
         }
       }
 
-      // Guard against opening standalone/unassociated pickers in mock tests
+      // Explicitly tell the zoneless framework that form validity controls updated layout states
+      this.cdr.markForCheck();
+
       if (picker && typeof picker.open === 'function') {
         const hasInput = !!picker.datepickerInput;
-        if (hasInput) {
-          picker.open();
+        if (hasInput && !picker.opened) {
+          queueMicrotask(() => {
+            picker.open();
+          });
         }
       }
     });

@@ -9,7 +9,7 @@
       #baseInput
       class="checkbox"
       type="checkbox"
-      (change)="onChange()"
+      (change)="onInputChange($event)"
       (keyup.Space)="onSpaceKey()"
       [formControl]="form()!.get([group(), controlName()])"
     />

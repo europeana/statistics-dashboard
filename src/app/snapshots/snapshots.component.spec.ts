@@ -344,7 +344,6 @@ describe('SnapshotsComponent', () => {
     component.compareDataAllFacets[DimensionName.contentTier][staleKey] =
       staleDescriptor;
 
-    // 2. Establish a pinned snapshot entry that must be protected
     const pinnedKey = 'countryGermany';
     const pinnedDescriptor: CompareDataDescriptor = {
       ...structuredClone(dscCountry),

@@ -1,12 +1,11 @@
 import { Component, forwardRef, input } from '@angular/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import { ChartSettings, ColourSeriesData } from '../_models';
 import { BarComponent } from '../chart';
+import { IdValue } from '../_models';
 
 @Component({
-  standalone: true,
   selector: 'app-bar-chart',
   template: '',
+  standalone: true,
   providers: [
     {
       provide: BarComponent,
@@ -15,54 +14,29 @@ import { BarComponent } from '../chart';
   ]
 })
 export class MockBarComponent {
-  readonly maxNumberBars = 50;
+  colours = input<string[]>();
+  extraSettings = input<Record<string, boolean | number | string>>();
+  results = input<IdValue[]>();
 
-  showPercent = input<boolean>(false);
-  extraSettings = input<ChartSettings | undefined>(undefined);
+  public chartId = 'mockBarChart';
+  public maxNumberBars = 10;
 
-  browserOnly(_: () => void): void {
-    // mock browserOnly
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  removeAllSeries(): void {}
 
-  ngAfterViewInit(): void {
-    // mock ngAfterViewInit
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ngAfterViewInit(): void {}
 
-  addSeriesFromResult(): void {
-    // mock addSeriesFromResult
-  }
-
-  toggleCtrls(): void {
-    // mock toggleCtrls
-  }
-
-  removeSeries(_: string): void {
-    // mock removeSeries
-  }
-
-  removeAllSeries(): void {
-    // mock removeAllSeries
-  }
-
-  addSeries(_: Array<ColourSeriesData>): void {
-    // mock addSeries
-  }
-
-  createSeries(_: Array<string>, __ = 'value'): am4charts.ColumnSeries {
-    return {} as unknown as am4charts.ColumnSeries;
-  }
-
-  zoomTop(): void {
-    // mock zoomTop
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  addSeries(_seriesData: IdValue[]): void {}
 
   getSvgData(): Promise<string> {
-    return new Promise((resolve) => {
-      resolve('svg');
-    });
+    return Promise.resolve('mock-svg-string');
   }
 
-  drawChart(): void {
-    // mock drawChart
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  drawChart(): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  zoomTop(): void {}
 }

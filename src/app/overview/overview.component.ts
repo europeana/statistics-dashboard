@@ -774,8 +774,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.snapshots().preSortAndFilter(
       this.form.value.facetParameter,
       seriesKeys,
-      this.grid().sortInfo,
-      this.grid().filterTerm
+      this.grid().sortInfo(),
+      this.grid().filterTerm()
     );
 
     this.showAppliedSeriesInGrid();
@@ -1100,12 +1100,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* Focuses the exportOpenerLastUsed after a millisecond pause
   */
   focusExportOpener(fromToolbar: boolean): void {
+    const targetEl = fromToolbar
+      ? this.exportOpenerToolbar()?.nativeElement
+      : this.exportOpener()?.nativeElement;
+
     setTimeout(() => {
-      if (fromToolbar) {
-        this.exportOpenerToolbar().nativeElement.focus();
-      } else {
-        this.exportOpener().nativeElement.focus();
-      }
+      targetEl?.focus();
     }, 1);
   }
 
@@ -1322,7 +1322,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
       seriesKeys
     );
 
-    this.grid().isShowingSeriesInfo = seriesKeys.length > 1;
+    //this.grid().isShowingSeriesInfo = seriesKeys.length > 1;
+    this.grid().isShowingSeriesInfo.set(seriesKeys.length > 1);
     this.grid().setRows(rows);
   }
 }

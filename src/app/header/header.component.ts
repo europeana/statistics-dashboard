@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -6,6 +7,7 @@ import {
   inject,
   input,
   model,
+  signal,
   viewChild
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -30,6 +32,7 @@ interface CountryPair {
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ClickAwareDirective,
     CTZeroControlComponent,
@@ -41,12 +44,13 @@ interface CountryPair {
   ]
 })
 export class HeaderComponent {
-  public classReference = HeaderComponent;
+  public readonly classReference = HeaderComponent;
   public static readonly PAGE_TITLE_HIDDEN = 0;
   public static readonly PAGE_TITLE_MINIFIED = 1;
   public static readonly PAGE_TITLE_SHOWING = 2;
 
   private filterStateService = inject(FilterStateService);
+  public router = inject(Router);
 
   form = input<FormGroup>();
   showPageTitle = model<number>(HeaderComponent.PAGE_TITLE_HIDDEN);
@@ -56,6 +60,9 @@ export class HeaderComponent {
   readonly pageTitleDynamic = this.filterStateService.pageTitleDynamic;
   readonly activeCountry = this.filterStateService.activeCountry;
   readonly countryTotalMap = this.filterStateService.countryTotalMap;
+
+  menuIsOpen = signal<boolean>(false);
+  menuOpener = viewChild('menuOpener', { read: ElementRef });
 
   readonly countryList = computed<CountryPair[]>(() => {
     const rawMap = this.countryTotalMap() || {};
@@ -84,16 +91,12 @@ export class HeaderComponent {
     return firstLetterMap;
   });
 
-  menuIsOpen = false;
-  menuOpener = viewChild(ElementRef);
-
-  public isoCountryCodes = isoCountryCodes;
-  public router = inject(Router);
+  public readonly isoCountryCodes = isoCountryCodes;
 
   constructor() {
     effect(() => {
       this.activeCountry();
-      this.menuIsOpen = false;
+      this.menuIsOpen.set(false);
     });
   }
 
@@ -104,7 +107,7 @@ export class HeaderComponent {
 
   keyNavToCountry(event: KeyboardEvent, country: string): void {
     event.stopPropagation();
-    this.menuIsOpen = false;
+    this.menuIsOpen.set(false);
     this.menuOpener()?.nativeElement.focus();
 
     this.router.navigate(
@@ -115,13 +118,13 @@ export class HeaderComponent {
     );
   }
 
-  toggleMenu(event: MouseEvent, isKeyboardEvent = false): void {
+  toggleMenu = (event: Event, isKeyboardEvent = false): void => {
     if (!(event.target as HTMLElement).getAttribute('disabled')) {
-      this.menuIsOpen = !this.menuIsOpen;
+      this.menuIsOpen.update((open) => !open);
       event.stopPropagation();
     }
     if (isKeyboardEvent) {
       this.menuOpener()?.nativeElement.focus();
     }
-  }
+  };
 }

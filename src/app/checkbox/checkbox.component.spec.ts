@@ -31,7 +31,9 @@ describe('CheckboxComponent', () => {
     expect(component.registerOnTouched).toBeTruthy();
     expect(component.writeValue).toBeTruthy();
     component.writeValue();
-    component.registerOnTouched();
+    component.registerOnTouched(() => {
+      // test implementation
+    });
     component.registerOnChange(() => {
       // test implementation
     });
@@ -39,7 +41,11 @@ describe('CheckboxComponent', () => {
 
   it('should handle the field change', () => {
     const spyEmit = jest.spyOn(component.valueChanged, 'emit');
-    component.onChange();
+    const mockEvent = {
+      target: { checked: true }
+    } as unknown as Event;
+
+    component.onInputChange(mockEvent);
     expect(spyEmit).toHaveBeenCalled();
   });
 

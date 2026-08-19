@@ -29,29 +29,41 @@ import { InputDescription } from '../_models';
   standalone: true
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  form = input<UntypedFormGroup | undefined>(undefined);
-  labelText = input<string>('');
-  group = input<string>('');
-  controlName = input<string>('');
+  readonly form = input<UntypedFormGroup | undefined>(undefined);
+  readonly labelText = input<string>('');
+  readonly group = input<string>('');
+  readonly controlName = input<string>('');
 
-  baseInput = viewChild<ElementRef<HTMLInputElement>>('baseInput');
+  readonly baseInput = viewChild<ElementRef<HTMLInputElement>>('baseInput');
 
-  valueChanged = output<void>();
-  keySelectionMade = output<InputDescription>();
+  readonly valueChanged = output<void>();
+  readonly keySelectionMade = output<InputDescription>();
+
+  private onModelChange: (value: unknown) => void = () => {
+    // unimplemented
+  };
+  private onModelTouched: () => void = () => {
+    // unimplemented
+  };
 
   writeValue(): void {
     // unimplemented
   }
 
-  registerOnChange(fn: () => void): void {
-    this.onChange = fn;
+  registerOnChange(fn: (value: unknown) => void): void {
+    this.onModelChange = fn;
   }
 
-  registerOnTouched(): void {
-    // unimplemented
+  registerOnTouched(fn: () => void): void {
+    this.onModelTouched = fn;
   }
 
-  onChange(): void {
+  onInputChange(event: Event): void {
+    const inputEl = event.target as HTMLInputElement;
+
+    this.onModelChange(inputEl.checked);
+    this.onModelTouched();
+
     this.valueChanged.emit();
   }
 

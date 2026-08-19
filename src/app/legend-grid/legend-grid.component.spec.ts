@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 
@@ -124,7 +118,6 @@ describe('LegendGridComponent', () => {
     component.pinnedCountries['FR'] = 12;
 
     const setData = (indexes: Array<number>): void => {
-      // 1. Extract the underlying mock instance from the signal handle first
       const chartInstance = component.lineChart();
 
       TargetSeriesSuffixes.forEach((suffix: string, suffixIndex: number) => {
@@ -150,7 +143,6 @@ describe('LegendGridComponent', () => {
   });
 
   it('should get the enabled columns', () => {
-    // 1. Invoke the computed signal as a function ()
     expect(component.columnsEnabledCount()).toEqual(3);
 
     fixture.componentRef.setInput('columnEnabled3D', false);
@@ -255,7 +247,6 @@ describe('LegendGridComponent', () => {
     component.pinnedCountries = { FR: 0 };
     component.hiddenColumnRanges = { THREE_D: { FR: [0] }, HQ: { FR: [0] } };
 
-    // 1. Extract the mock object instance from the signal function handle first
     const chartInstance = component.lineChart();
 
     chartInstance.allSeriesData['FR' + '3D'] = {
@@ -311,11 +302,13 @@ describe('LegendGridComponent', () => {
     const spyAddSeriesSetAndPin = jest
       .spyOn(component, 'addSeriesSetAndPin')
       .mockImplementation();
+
     const spyEmit = jest
       .spyOn(component.historyLoadded, 'emit')
       .mockImplementation(
         (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
-          fixture.componentRef.setInput('countryData', { DE: [] });
+          const activeData = component.countryData();
+          activeData['DE'] = [];
           req.fnCallback([]);
         }
       );
@@ -341,9 +334,9 @@ describe('LegendGridComponent', () => {
     expect(spyAddSeriesSetAndPin).toHaveBeenCalled();
     expect(spyEmit).toHaveBeenCalled();
 
-    // case where existing country data is reused after component reinitialisation
-
-    component.countryData.set(mockCountryData);
+    // Re-verify case where existing component state memory is reused cleanly
+    const updatedData = component.countryData();
+    Object.assign(updatedData, mockCountryData);
 
     component.toggleCountry('DE');
 
@@ -402,49 +395,52 @@ describe('LegendGridComponent', () => {
     expect(spyTogglePin).toHaveBeenCalled();
   });
 
-  it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
+  it('should call toggleCountry when the countryCode is set', () => {
+    jest.useFakeTimers();
     fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     component.countryData.set(mockCountryData);
 
     const spyToggleCountry = jest
       .spyOn(component, 'toggleCountry')
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      .mockImplementation(() => {});
+      .mockImplementation(() => {
+        /* No-op spy wrapper to safely intercept reactive triggers */
+      });
 
     component.pinnedCountries = { FR: 0, DE: 1 };
 
     fixture.componentRef.setInput('countryCode', 'FR');
     fixture.detectChanges();
-    tick(0);
+    TestBed.flushEffects();
 
-    // The reactive effect flushes the queue up to the current value state
+    jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
-    tick(component.timeoutAnimation);
 
-    // Clear out the spy counts for the sequential steps
     spyToggleCountry.mockClear();
 
     fixture.componentRef.setInput('countryCode', 'DE');
     fixture.detectChanges();
-    tick(0);
-    tick(component.timeoutAnimation);
+    TestBed.flushEffects();
 
+    jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
     spyToggleCountry.mockClear();
 
     fixture.componentRef.setInput('countryCode', 'FR');
     fixture.detectChanges();
-    tick(0);
-    tick(component.timeoutAnimation);
+    TestBed.flushEffects();
 
+    jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
 
     fixture.componentRef.setInput('countryCode', '');
     fixture.detectChanges();
-    tick(component.timeoutAnimation);
+    TestBed.flushEffects();
 
+    jest.advanceTimersByTime(component.timeoutAnimation);
     expect(component.countryCode()).toBeFalsy();
-  }));
+
+    jest.useRealTimers();
+  });
 
   it('should sort the pins', () => {
     const desiredOrder = ['NL', 'IT'];

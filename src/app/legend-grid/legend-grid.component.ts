@@ -9,6 +9,7 @@ import {
 } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   computed,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -60,13 +61,14 @@ import { LineComponent } from '../chart';
 export class LegendGridComponent implements AfterViewInit, OnDestroy {
   private readonly injector = inject(Injector);
 
+  private readonly cdr = inject(ChangeDetectorRef);
+
   readonly columnEnabled3D = input<boolean>(true);
   readonly columnEnabledHQ = input<boolean>(true);
   readonly columnEnabledALL = input<boolean>(true);
   readonly countryCode = input<string>('');
   readonly targetMetaData = input<IHash<IHashArray<TargetMetaData>>>({});
 
-  // transformed Backing State Fields
   private readonly _pinnedCountries = signal<IHash<number>>({});
   public pinnedCountries: IHash<number> = {};
 
@@ -115,42 +117,36 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      const isEnabled = this.columnEnabled3D();
-      untracked(() => {
-        if (isEnabled) {
-          this.showSeriesSet(0);
-          this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
-        } else {
-          this.hideRangesByColumn(TargetFieldName.THREE_D);
-          this.hideSeriesSet(0);
-        }
-      });
+      if (this.columnEnabled3D()) {
+        this.showSeriesSet(0);
+        this.showHiddenRangesByColumn(TargetFieldName.THREE_D);
+      } else {
+        this.hideRangesByColumn(TargetFieldName.THREE_D);
+        this.hideSeriesSet(0);
+      }
+      this.cdr.markForCheck();
     });
 
     effect(() => {
-      const isEnabled = this.columnEnabledHQ();
-      untracked(() => {
-        if (isEnabled) {
-          this.showSeriesSet(1);
-          this.showHiddenRangesByColumn(TargetFieldName.HQ);
-        } else {
-          this.hideRangesByColumn(TargetFieldName.HQ);
-          this.hideSeriesSet(1);
-        }
-      });
+      if (this.columnEnabledHQ()) {
+        this.showSeriesSet(1);
+        this.showHiddenRangesByColumn(TargetFieldName.HQ);
+      } else {
+        this.hideRangesByColumn(TargetFieldName.HQ);
+        this.hideSeriesSet(1);
+      }
+      this.cdr.markForCheck();
     });
 
     effect(() => {
-      const isEnabled = this.columnEnabledALL();
-      untracked(() => {
-        if (isEnabled) {
-          this.showSeriesSet(2);
-          this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
-        } else {
-          this.hideRangesByColumn(TargetFieldName.TOTAL);
-          this.hideSeriesSet(2);
-        }
-      });
+      if (this.columnEnabledALL()) {
+        this.showSeriesSet(2);
+        this.showHiddenRangesByColumn(TargetFieldName.TOTAL);
+      } else {
+        this.hideRangesByColumn(TargetFieldName.TOTAL);
+        this.hideSeriesSet(2);
+      }
+      this.cdr.markForCheck();
     });
   }
 
@@ -158,8 +154,13 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     effect(
       () => {
         const code = this.countryCode();
+        const meta = this.targetMetaData();
 
         untracked(() => {
+          if (!meta || Object.keys(meta).length === 0) {
+            return;
+          }
+
           if (this.lineChart()?.chart?.colors) {
             this.lineChart().chart.colors.reset();
           }
@@ -181,6 +182,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
             if (this.lineChart()) {
               this.lineChart().enableAxes();
             }
+            this.cdr.markForCheck();
           }, timeout);
         });
       },
@@ -316,19 +318,14 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
     this.historyLoadded.emit({
       country: country,
       fnCallback: (data: Array<TargetCountryData>) => {
-        // create a shallow clone to avoid direct mutation errors
-        const currentData = { ...this.countryData() };
+        const currentData = this.countryData();
 
         currentData[country] = (currentData[country] || []).concat(data);
 
-        this.countryData.set(currentData);
+        this.lineChart().sortSeriesData(currentData[country]);
+        this.addSeriesSetAndPin(country, currentData[country], seriesTypes);
 
-        this.lineChart().sortSeriesData(this.countryData()[country]);
-        this.addSeriesSetAndPin(
-          country,
-          this.countryData()[country],
-          seriesTypes
-        );
+        this.cdr.markForCheck();
       }
     });
   }

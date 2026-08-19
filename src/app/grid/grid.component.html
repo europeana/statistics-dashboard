@@ -1,4 +1,4 @@
-@if (isVisible() && gridRows) {
+@if (isVisible() && gridRows().length > 0) {
 <ng-template #linkOut let-row="row" let-total="row.isTotal">
   <span class="cell-link-out" [ngClass]="{ highlight: row.highlight }">
     <a
@@ -27,9 +27,9 @@
     class="cell-header"
     data-e2e="grid-sort-count"
     [ngClass]="{
-      active: sortInfo.by === sortBy,
-      ascending: sortInfo.dir === 1,
-      descending: sortInfo.dir === -1,
+      active: sortInfo().by === sortBy,
+      ascending: sortInfo().dir === 1,
+      descending: sortInfo().dir === -1,
       'text-right': sortBy === SortBy.count,
       'cell-first-wide': sortBy === SortBy.name
     }"
@@ -37,25 +37,31 @@
   >
 </ng-template>
 
-<div class="data-grid" [ngClass]="{ 'with-series': isShowingSeriesInfo }">
+<div class="data-grid" [ngClass]="{ 'with-series': isShowingSeriesInfo() }">
   <span class="search-control container-h cell-first-wide">
     <span class="search-icon"></span>
     <input
       class="search"
       i18n-placeholder="Search grid rows input@@gridSearchPlaceholder"
-      placeholder="Search ({{ gridRows.length }} entries)"
-      [(ngModel)]="filterTerm"
+      placeholder="Search ({{ gridRows().length }} entries)"
+      [ngModel]="filterTerm()"
+      (ngModelChange)="filterTerm.set($event)"
       (keyup)="updateRows($event)"
     />
   </span>
 
   <span class="navigation-controls container-h">
-    @if (pagerInfo && pagerInfo.pageCount > 0) {
+    @if (pagerInfo(); as currentPager) { @if (currentPager.pageCount > 0) {
     <span class="conditional-controls container-h">
       <label for="maxPageSize" i18n="Rows per page@@gridRowsPerPage"
         >Rows per page</label
       >
-      <select id="maxPageSize" class="max-page-size" [(ngModel)]="maxPageSize">
+      <select
+        id="maxPageSize"
+        class="max-page-size"
+        [ngModel]="maxPageSize()"
+        (ngModelChange)="maxPageSize.set($event)"
+      >
         @for (mps of maxPageSizes; track mps.value) {
         <option [ngValue]="mps.value">
           {{ mps.title }}
@@ -68,20 +74,20 @@
         pattern="[0-9]+"
         class="go-to"
         (keyup)="goToPage($event)"
-        placeholder="{{ pagerInfo.currentPage + 1 }}"
+        placeholder="{{ currentPager.currentPage + 1 }}"
       />
     </span>
-    }
+    } }
 
     <app-grid-paginator
       #paginator
-      [maxPageSize]="maxPageSize"
-      [rows]="gridRows"
+      [maxPageSize]="maxPageSize()"
+      [rows]="gridRows()"
       (change)="setPagerInfo($event)"
     ></app-grid-paginator>
   </span>
 
-  <ng-content
+  <ng-container
     *ngTemplateOutlet="
       cellHeader;
       context: {
@@ -89,9 +95,9 @@
         sortBy: SortBy.name
       }
     "
-  ></ng-content>
+  ></ng-container>
 
-  <ng-content
+  <ng-container
     *ngTemplateOutlet="
       cellHeader;
       context: {
@@ -100,14 +106,14 @@
         e2e: 'grid-sort-count'
       }
     "
-  ></ng-content>
+  ></ng-container>
 
-  <ng-content
+  <ng-container
     *ngTemplateOutlet="
       cellHeader;
       context: { label: colHeaders[2], sortBy: SortBy.count }
     "
-  ></ng-content>
+  ></ng-container>
 
   <span class="cell-header">{{ colHeaders[3] }}</span>
 
@@ -115,19 +121,19 @@
     <!-- Summary rows -->
     <ng-template #labelTotal><span class="bold">Total</span></ng-template>
 
-    @for (row of summaryRows; track row.name) {
+    @for (row of summaryRows(); track row.name) {
     <span class="cell-prefix">
-      @if (isShowingSeriesInfo) {
+      @if (isShowingSeriesInfo()) {
       <span class="container-h">
-        <ng-content
+        <ng-container
           *ngTemplateOutlet="seriesColour; context: { row: row }"
-        ></ng-content>
+        ></ng-container>
       </span>
       }
     </span>
 
     <span class="cell-name cell-wide">
-      @if (isShowingSeriesInfo) {
+      @if (isShowingSeriesInfo()) {
       {{ row.series }}
       } @else {
       <ng-container *ngTemplateOutlet="labelTotal"></ng-container>
@@ -137,14 +143,18 @@
     <span class="bold black text-right">
       {{ row.count | number }}
     </span>
-    <span class="black text-right"> {{ row.percent }}% </span>
+    <span class="black text-right total percent-value">
+      {{ row.percent }}%
+    </span>
 
-    <ng-content *ngTemplateOutlet="linkOut; context: { row: row }"></ng-content>
+    <ng-container
+      *ngTemplateOutlet="linkOut; context: { row: row }"
+    ></ng-container>
     }
 
     <!-- Rows -->
-    @if (pagerInfo) { @for (row of pagerInfo.pageRows; track row.name; let i =
-    $index) {
+    @if (pagerInfo(); as currentPager) { @for (row of currentPager.pageRows;
+    track row.name; let i = $index) {
     <span [ngClass]="{ highlight: row.highlight }">
       {{ row.displayIndex }}
     </span>
@@ -153,25 +163,25 @@
       class="cell-name"
       [ngClass]="{
         highlight: row.highlight,
-        'highlighting-terms': filterTerm.length > 0
+        'highlighting-terms': filterTerm().length > 0
       }"
       data-e2e="grid-row-name"
       [title]="row.name"
     >
       <app-truncate
         [text]="getPrefix() + row.name"
-        [highlightText]="filterTerm"
+        [highlightText]="filterTerm()"
       ></app-truncate>
     </span>
 
-    @if (isShowingSeriesInfo) {
+    @if (isShowingSeriesInfo()) {
     <span
       class="cell-series container-h"
       [ngClass]="{ highlight: row.highlight }"
     >
-      <ng-content
+      <ng-container
         *ngTemplateOutlet="seriesColour; context: { row: row }"
-      ></ng-content>
+      ></ng-container>
     </span>
     }
 
@@ -185,11 +195,16 @@
       {{ row.count | number }}
     </span>
 
-    <span class="text-right" [ngClass]="{ highlight: row.highlight }">
+    <span
+      class="text-right total percent-value"
+      [ngClass]="{ highlight: row.highlight }"
+    >
       {{ row.percent }}%
     </span>
 
-    <ng-content *ngTemplateOutlet="linkOut; context: { row: row }"></ng-content>
+    <ng-container
+      *ngTemplateOutlet="linkOut; context: { row: row }"
+    ></ng-container>
     } }
   </ng-container>
 </div>

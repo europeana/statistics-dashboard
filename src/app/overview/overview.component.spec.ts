@@ -30,7 +30,8 @@ import {
   MockAPIServiceErrors,
   MockBarComponent,
   MockBreakdowns,
-  MockGridComponent
+  MockGridComponent,
+  MockSnapshotsComponent
 } from '../_mocked';
 import {
   BreakdownResult,
@@ -101,8 +102,7 @@ describe('OverviewComponent', () => {
         ]),
         IsScrollableDirective,
         MatDialogModule,
-        OverviewComponent,
-        SnapshotsComponent
+        OverviewComponent
       ],
       providers: [
         {
@@ -122,8 +122,10 @@ describe('OverviewComponent', () => {
       ]
     })
       .overrideComponent(OverviewComponent, {
-        remove: { imports: [BarComponent, GridComponent] },
-        add: { imports: [MockBarComponent, MockGridComponent] }
+        remove: { imports: [BarComponent, GridComponent, SnapshotsComponent] },
+        add: {
+          imports: [MockBarComponent, MockGridComponent, MockSnapshotsComponent]
+        }
       })
       .compileComponents();
     api = TestBed.inject(APIService);
@@ -133,7 +135,50 @@ describe('OverviewComponent', () => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
-    jest.spyOn(router, 'navigate').mockReturnValue(null);
+    jest
+      .spyOn(router, 'navigate')
+      .mockReturnValue(null as unknown as Promise<boolean>);
+
+    const mockBarInstance = {
+      removeAllSeries: jest.fn(),
+      ngAfterViewInit: jest.fn(),
+      drawChart: jest.fn(),
+      zoomTop: jest.fn(),
+      maxNumberBars: 10,
+      addSeries: jest.fn(),
+      getSvgData: jest.fn().mockResolvedValue('mock-svg-string')
+    };
+
+    const mockGridInstance = {
+      setRows: jest.fn(),
+      getData: jest.fn().mockReturnValue({ columns: [], tableRows: [] }),
+      sortInfo: jest.fn().mockReturnValue({ by: 'count', dir: -1 }),
+      filterTerm: jest.fn().mockReturnValue(''),
+      isShowingSeriesInfo: {
+        set: jest.fn()
+      }
+    };
+
+    const mockSnapshotsInstance = {
+      filteredCDKeys: jest.fn().mockReturnValue([]),
+      apply: jest.fn(),
+      unapply: jest.fn(),
+      snap: jest.fn(),
+      preSortAndFilter: jest.fn(),
+      getSeriesDataForGrid: jest.fn(),
+      getSeriesDataForChart: jest.fn().mockReturnValue([])
+    };
+
+    jest
+      .spyOn(component, 'barChart')
+      .mockReturnValue(mockBarInstance as unknown as BarComponent);
+    jest
+      .spyOn(component, 'grid')
+      .mockReturnValue(mockGridInstance as unknown as GridComponent);
+    jest
+      .spyOn(component, 'snapshots')
+      .mockReturnValue(mockSnapshotsInstance as unknown as SnapshotsComponent);
+
     component.form.get('facetParameter').setValue(DimensionName.contentTier);
     fixture.detectChanges();
   };
@@ -171,37 +216,46 @@ describe('OverviewComponent', () => {
   });
 
   describe('Normal Operations', () => {
-    beforeEach(waitForAsync(() => {
+    beforeEach(() => {
       configureTestBed();
-    }));
+    });
 
     beforeEach(b4Each);
 
-    afterEach(fakeAsync(() => {
+    afterEach(() => {
+      jest.useFakeTimers();
       component.cleanup();
-      tick(tickTimeChartDebounce);
-    }));
+      // Synchronously flush out the 400ms chart debounce timers instantly
+      jest.advanceTimersByTime(tickTimeChartDebounce);
 
-    it('should load', fakeAsync(() => {
+      jest.clearAllTimers();
+      jest.useRealTimers();
+    });
+
+    it('should load', () => {
+      jest.useFakeTimers();
       const spyGetBreakdowns = jest.spyOn(api, 'getBreakdowns');
 
       params.next({ facet: DimensionName.country });
-      tick(1);
       fixture.detectChanges();
+      TestBed.flushEffects();
       expect(spyGetBreakdowns).toHaveBeenCalledTimes(1);
+
       params.next({ facet: DimensionName.type });
-      tick(1);
       fixture.detectChanges();
+      TestBed.flushEffects();
       expect(spyGetBreakdowns).toHaveBeenCalledTimes(2);
 
       const nextParams = {};
       nextParams[DimensionName.type] = ['SOUND', 'VIDEO'];
       queryParams.next(nextParams);
-      tick(1);
       fixture.detectChanges();
+      TestBed.flushEffects();
       expect(spyGetBreakdowns).toHaveBeenCalledTimes(3);
-      tick(tickTimeChartDebounce);
-    }));
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
 
     it('should calculate the portal urls', () => {
       queryParams.next({});
@@ -252,7 +306,8 @@ describe('OverviewComponent', () => {
       expect(spyExtractSeriesServerData).toHaveBeenCalledTimes(1);
     });
 
-    it('should refresh the chart', fakeAsync(() => {
+    it('should refresh the chart', () => {
+      jest.useFakeTimers();
       fixture.detectChanges();
 
       const barChartInstance = component.barChart();
@@ -271,15 +326,9 @@ describe('OverviewComponent', () => {
 
       expect(spyDrawChart).toHaveBeenCalledTimes(2);
 
-      tick(tickTimeChartDebounce);
-      expect(spyDrawChart).toHaveBeenCalledTimes(2);
-      tick(tickTimeChartDebounce);
-      tick(tickTimeChartDebounce);
-      tick(tickTimeChartDebounce);
-      tick(tickTimeChartDebounce);
+      jest.advanceTimersByTime(tickTimeChartDebounce);
       expect(spyDrawChart).toHaveBeenCalledTimes(2);
 
-      // test invocation
       const spyRefreshChart = jest.spyOn(component, 'refreshChart');
 
       component.showAppliedSeriesInGridAndChart();
@@ -287,9 +336,12 @@ describe('OverviewComponent', () => {
         DimensionName.contentTier
       );
       fixture.detectChanges();
-      tick(tickTimeChartDebounce);
+      TestBed.flushEffects();
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
       expect(spyRefreshChart).toHaveBeenCalledWith(true, 0);
-    }));
+      jest.useRealTimers();
+    });
 
     it('should get the chart data', () => {
       expect(component.getChartData()).toBeTruthy();
@@ -748,7 +800,8 @@ describe('OverviewComponent', () => {
       expect(selected.length).toEqual(0);
     });
 
-    it('should focus the export opener', fakeAsync(() => {
+    it('should focus the export opener', () => {
+      jest.useFakeTimers();
       const mockOpenerFocus = jest.fn();
       const mockToolbarFocus = jest.fn();
 
@@ -765,16 +818,17 @@ describe('OverviewComponent', () => {
         .mockReturnValue(mockExportOpenerToolbar);
 
       component.focusExportOpener(false);
-      tick(1);
+      jest.advanceTimersByTime(1);
 
       expect(mockOpenerFocus).toHaveBeenCalled();
       expect(mockToolbarFocus).not.toHaveBeenCalled();
 
       component.focusExportOpener(true);
-      tick(1);
+      jest.advanceTimersByTime(1);
 
       expect(mockToolbarFocus).toHaveBeenCalled();
-    }));
+      jest.useRealTimers();
+    });
 
     it('should clear the dates', fakeAsync(() => {
       expect(component.filterStates.dates().visible).toBeFalsy(); //

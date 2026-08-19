@@ -1,5 +1,13 @@
-import { Component, effect, input, output } from '@angular/core';
-import { fromEvent } from 'rxjs';
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+  output
+} from '@angular/core';
+import { fromEvent, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
@@ -7,22 +15,25 @@ import { debounceTime } from 'rxjs/operators';
   template: '',
   standalone: true
 })
-export class ResizeComponent {
+export class ResizeComponent implements OnInit, OnDestroy {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   time = input<number>(200);
 
   sizeChanged = output<boolean>();
 
-  constructor() {
-    effect((onCleanup) => {
-      const resizeSubscription = fromEvent(window, 'resize')
-        .pipe(debounceTime(this.time()))
-        .subscribe(() => {
-          this.sizeChanged.emit(true);
-        });
+  private resizeSubscription?: Subscription;
 
-      onCleanup(() => {
-        resizeSubscription.unsubscribe();
+  ngOnInit(): void {
+    this.resizeSubscription = fromEvent(window, 'resize')
+      .pipe(debounceTime(this.time()))
+      .subscribe(() => {
+        this.sizeChanged.emit(true);
+        this.cdr.markForCheck();
       });
-    });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeSubscription?.unsubscribe();
   }
 }

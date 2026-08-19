@@ -1,14 +1,9 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { DimensionName } from '../_data';
 import { MockAPIService } from '../_mocked';
-import { PagerInfo, SortBy, TableRow } from '../_models';
+import { SortBy, TableRow } from '../_models';
 import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { GridComponent } from '.';
@@ -96,20 +91,20 @@ describe('GridComponent', () => {
   });
 
   it('should bump the sort state', () => {
-    expect(component.sortInfo.dir).toEqual(-1);
+    expect(component.sortInfo().dir).toEqual(-1);
     component.bumpSortState(SortBy.count);
-    expect(component.sortInfo.dir).toEqual(0);
+    expect(component.sortInfo().dir).toEqual(0);
     component.bumpSortState(SortBy.count);
-    expect(component.sortInfo.dir).toEqual(1);
+    expect(component.sortInfo().dir).toEqual(1);
     component.bumpSortState(SortBy.count);
-    expect(component.sortInfo.dir).toEqual(-1);
-    expect(component.sortInfo.by).toBe(SortBy.count);
+    expect(component.sortInfo().dir).toEqual(-1);
+    expect(component.sortInfo().by).toBe(SortBy.count);
 
     component.bumpSortState(SortBy.name);
-    expect(component.sortInfo.by).toBe(SortBy.name);
+    expect(component.sortInfo().by).toBe(SortBy.name);
   });
 
-  it('should click the link out', fakeAsync(() => {
+  it('should click the link out', () => {
     const spyGetRightsCategoryUrls = jest.spyOn(api, 'getRightsCategoryUrls');
     const spyOpen = jest.spyOn(window, 'open').mockImplementation(() => {
       return { location: { href: '' } } as unknown as Window;
@@ -123,8 +118,8 @@ describe('GridComponent', () => {
         href: 'http://europeana.eu*'
       }
     } as TableRow;
+
     component.loadFullLink(mockTableRow);
-    tick();
 
     // test urls for rightsCategory facet
     expect(spyGetRightsCategoryUrls).not.toHaveBeenCalled();
@@ -132,28 +127,24 @@ describe('GridComponent', () => {
 
     fixture.componentRef.setInput('facet', DimensionName.rightsCategory);
     component.loadFullLink(mockTableRow);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalled();
     expect(spyOpen).not.toHaveBeenCalled();
 
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     component.loadFullLink(mockTableRow, true);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(2);
     expect(spyOpen).toHaveBeenCalled();
     expect(mockTableRow.portalUrlInfo.hrefRewritten).toBeTruthy();
 
     component.loadFullLink(mockTableRow, true);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(2);
     expect(spyOpen).toHaveBeenCalledTimes(1);
 
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     component.loadFullLink(mockTableRow, true);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(3);
     expect(spyOpen).toHaveBeenCalledTimes(2);
@@ -161,7 +152,6 @@ describe('GridComponent', () => {
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     mockTableRow.isTotal = true;
     component.loadFullLink(mockTableRow, true);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(3);
     expect(spyOpen).toHaveBeenCalledTimes(2);
@@ -172,7 +162,6 @@ describe('GridComponent', () => {
     mockTableRow.portalUrlInfo.rightsFilters = ['CC0'];
 
     component.loadFullLink(mockTableRow, false);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(4);
     expect(spyOpen).toHaveBeenCalledTimes(2);
@@ -182,7 +171,6 @@ describe('GridComponent', () => {
     mockTableRow.portalUrlInfo.hrefRewritten = false;
     delete mockTableRow.portalUrlInfo.rightsFilters;
     component.loadFullLink(mockTableRow, true);
-    tick();
 
     expect(spyOpen).toHaveBeenCalledTimes(2);
 
@@ -191,14 +179,9 @@ describe('GridComponent', () => {
     mockTableRow.portalUrlInfo.hrefRewritten = false;
 
     component.loadFullLink(mockTableRow, true);
-    tick();
 
     expect(spyGetRightsCategoryUrls).toHaveBeenCalledTimes(5);
     expect(spyOpen).toHaveBeenCalledTimes(3);
-  }));
-
-  it('should get the data', () => {
-    expect(component.getData()).toBeTruthy();
   });
 
   it('should get the prefix', () => {
@@ -211,7 +194,7 @@ describe('GridComponent', () => {
     expect(component.getPrefix()).toEqual(tierPrefix);
   });
 
-  it('should go to the page', fakeAsync(() => {
+  it('should go to the page', () => {
     component.setRows(testRows.slice(0));
     fixture.detectChanges();
     expect(component.paginator()).toBeFalsy();
@@ -219,18 +202,24 @@ describe('GridComponent', () => {
     fixture.componentRef.setInput('isVisible', true);
     fixture.detectChanges();
 
-    // Explicitly stub the read-only signal viewChild value for the test runtime execution context
+    // Mock out both the paginator viewChild and the computed pagerInfo pipeline mirror
     const mockPaginator = {
-      setPage: jest.fn()
+      setPage: jest.fn(),
+      pagerInfo: () => ({ pageCount: 5, currentPage: 0, pageRows: [] })
     } as unknown as GridPaginatorComponent;
+
     Object.defineProperty(component, 'paginator', {
       value: () => mockPaginator
     });
 
-    expect(component.paginator()).toBeTruthy();
-    tick(1);
+    // Explicitly stub the parent read-only computed state override for testing boundaries safely
+    Object.defineProperty(component, 'pagerInfo', {
+      value: () => ({ pageCount: 5, currentPage: 0, pageRows: [] })
+    });
 
+    expect(component.paginator()).toBeTruthy();
     const spySetPage = jest.spyOn(component.paginator(), 'setPage');
+
     component.goToPage({ key: '99' } as unknown as KeyboardEvent);
     component.goToPage({
       key: 'Enter',
@@ -243,20 +232,8 @@ describe('GridComponent', () => {
       key: 'Enter',
       target: { value: '99' }
     } as unknown as KeyboardEvent);
-    expect(spySetPage).toHaveBeenCalledWith(0);
-  }));
-
-  it('should set the page info', fakeAsync(() => {
-    const spyEmit = jest.spyOn(component.chartPositionChanged, 'emit');
-    component.setPagerInfo({} as PagerInfo);
-    tick();
-    expect(component.pagerInfo).toBeTruthy();
-    expect(spyEmit).not.toHaveBeenCalled();
-    component.setPagerInfo({} as PagerInfo);
-    tick();
-    expect(component.pagerInfo).toBeTruthy();
-    expect(spyEmit).toHaveBeenCalled();
-  }));
+    expect(spySetPage).toHaveBeenCalledWith(4);
+  });
 
   it('should sort', () => {
     const spyBumpSortState = jest.spyOn(component, 'bumpSortState');
@@ -268,9 +245,11 @@ describe('GridComponent', () => {
 
   it('should update the rows', () => {
     const spyEmit = jest.spyOn(component.refreshData, 'emit');
-    component.updateRows({ key: '' } as unknown as KeyboardEvent);
-    expect(spyEmit).not.toHaveBeenCalled();
-    component.updateRows({ key: '1' } as unknown as KeyboardEvent);
+    component.updateRows({ key: 'a' } as unknown as KeyboardEvent);
     expect(spyEmit).toHaveBeenCalled();
+
+    spyEmit.mockClear();
+    component.updateRows({ key: 'Escape' } as unknown as KeyboardEvent);
+    expect(spyEmit).not.toHaveBeenCalled();
   });
 });

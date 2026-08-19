@@ -9,12 +9,15 @@ import {
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
+
 import {
+  ChangeDetectorRef,
   Component,
   computed,
   effect,
   ElementRef,
   inject,
+  OnDestroy,
   signal,
   viewChild,
   viewChildren
@@ -44,12 +47,11 @@ import {
   RenameCountryPipe,
   RenameTargetTypePipe
 } from '../_translate';
-
 import { BarComponent, MapComponent } from '../chart';
 import { ResizeComponent } from '../resize';
 import { SpeechBubbleComponent } from '../speech-bubble';
-import { SubscriptionManager } from '../subscription-manager';
 import { TruncateComponent } from '../truncate';
+import { Subscription } from 'rxjs';
 
 @Component({
   templateUrl: './landing.component.html',
@@ -78,17 +80,17 @@ import { TruncateComponent } from '../truncate';
     SpeechBubbleComponent
   ]
 })
-export class LandingComponent extends SubscriptionManager {
+export class LandingComponent implements OnDestroy {
+  private readonly api = inject(APIService);
+  private readonly filterStateService = inject(FilterStateService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public isoCountryCodes = isoCountryCodes;
   public TargetFieldName = TargetFieldName;
   public targetDescriptions = targetDescriptions;
 
-  private readonly api = inject(APIService);
-  private readonly filterStateService = inject(FilterStateService);
-
-  // Used to parameterise links to the data page
   readonly includeCTZero = this.filterStateService.includeCTZero;
 
   barCharts = viewChildren(BarComponent);
@@ -97,30 +99,33 @@ export class LandingComponent extends SubscriptionManager {
 
   singleCountryMode = false;
   barColour = '#0771ce';
-  targetMetaData: IHash<IHashArray<TargetMetaData>>;
-  targetData: IHash<IHashArray<TargetMetaData>>;
+
+  targetMetaData = signal<IHash<IHashArray<TargetMetaData>> | undefined>(
+    undefined
+  );
+  countryData = signal<IHash<Array<TargetData>> | undefined>(undefined);
+
   targetExpanded: TargetFieldName | undefined;
-  countryData: IHash<Array<TargetData>>;
   allProgressSeries: IHashArray<Array<IdValue>> = {};
   mapMenuIsOpen = false;
   heatmapActivated = false;
-  _visibleHeatMap?: VisibleHeatMap;
+
+  private _visibleHeatMap?: VisibleHeatMap;
+  private readonly activeSubscriptions: Subscription[] = [];
 
   get visibleHeatMap(): VisibleHeatMap | undefined {
     return this._visibleHeatMap;
   }
 
-  set visibleHeatMap(visibleHeatMap: VisibleHeatMap) {
-    if (!this.visibleHeatMap && visibleHeatMap) {
-      this.heatmapActivated = true;
-    } else {
-      this.heatmapActivated = false;
-    }
+  set visibleHeatMap(visibleHeatMap: VisibleHeatMap | undefined) {
+    this.heatmapActivated = !this.visibleHeatMap && !!visibleHeatMap;
     this._visibleHeatMap = visibleHeatMap;
+    this.cdr.markForCheck();
   }
 
   readonly landingData = this.filterStateService.landingData;
   readonly landingDataIsLoading = this.filterStateService.landingDataIsLoading;
+
   readonly mapData = computed<Array<IdValue>>(() => {
     const results = this.landingData();
     return results[DimensionName.country]
@@ -134,19 +139,19 @@ export class LandingComponent extends SubscriptionManager {
   activeMapData = signal<Array<IdValue>>([]);
 
   constructor() {
-    super();
     effect(() => {
       this.landingData();
-      this.refreshCharts();
       this.activeMapData.set(this.mapData());
+      queueMicrotask(() => {
+        this.refreshCharts();
+      });
     });
   }
 
-  /**
-   * getCountryRows
-   * @param { Array<NameValue> } defaultResult - the default return value
-   * template utility for overriding data result with a derived heatmap result
-   **/
+  ngOnDestroy(): void {
+    this.activeSubscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
   getCountryRows(
     defaultResult: Array<NameValue>
   ): Array<IdValue> | Array<NameValue> {
@@ -157,41 +162,24 @@ export class LandingComponent extends SubscriptionManager {
     return defaultResult;
   }
 
-  /**
-   * getDerivedSeriesValue
-   *
-   * template utility for looking up data value
-   *
-   * @param { TargetFieldName } targetType - used to index the data series
-   * @param { number } targetIndex - used to index the data series
-   * @param { string } id - the id to match on
-   *
-   * @returns the indexed value
-   **/
   getDerivedSeriesValue(
     targetType: TargetFieldName,
     targetIndex: number,
     id: string
   ): number {
-    const idVal = this.allProgressSeries[targetType][targetIndex].find(
-      (idVal: IdValue) => {
-        return idVal.id === id;
-      }
-    );
-    if (idVal) {
-      return idVal.value;
-    }
-    return 0;
+    const series = this.allProgressSeries[targetType]?.[targetIndex];
+    if (!series) return 0;
+    const idVal = series.find((item: IdValue) => item.id === id);
+    return idVal ? idVal.value : 0;
   }
 
   closeMapSelection(): void {
-    this.mapChart()?.countryClick(this.mapChart()?.selectedCountry);
+    const chart = this.mapChart();
+    if (chart) {
+      chart.countryClick(chart.selectedCountry);
+    }
   }
 
-  /**
-   * onMapCountrySet
-   * reacts to mapChart events by loading data
-   **/
   onMapCountrySet(singleCountryMode: boolean): void {
     this.singleCountryMode = singleCountryMode;
     this.tapCountryDataLoad();
@@ -199,40 +187,39 @@ export class LandingComponent extends SubscriptionManager {
       const vhm = this.visibleHeatMap;
       this.targetExpanded = Object.keys(vhm)[0] as TargetFieldName;
     }
+    this.cdr.markForCheck();
   }
 
-  /**
-   * mapMenuOpenerClicked
-   *
-   * toggles mapMenuIsOpen
-   * triggers data load if needed
-   **/
   mapMenuOpenerClicked(): void {
     this.mapMenuIsOpen = !this.mapMenuIsOpen;
     if (this.mapMenuIsOpen) {
       this.tapCountryDataLoad();
       this.tapTargetDataLoad();
     }
+    this.cdr.markForCheck();
   }
 
-  /**
-   * buildDerivedSeries
-   *
-   **/
   buildDerivedSeries(): void {
+    const cData = this.countryData();
+    const meta = this.targetMetaData();
+    if (!cData || !meta) return;
+
     Object.values(TargetFieldName).forEach((targetType: TargetFieldName) => {
       this.allProgressSeries[targetType] = [[], []];
 
-      Object.keys(this.countryData).forEach((country: string) => {
+      Object.keys(cData).forEach((country: string) => {
         [0, 1].forEach((targetIndex: number) => {
-          const value = this.countryData[country][0][targetType];
-          const target =
-            this.targetMetaData[country][targetType][targetIndex].value;
-          const progress = value
-            ? Number.parseFloat(
-                ((Number.parseInt(value) / target) * 100).toFixed(2)
-              )
-            : 0;
+          const value = cData[country][0]?.[targetType];
+          const countryMeta = meta[country]?.[targetType]?.[targetIndex];
+          const target = countryMeta ? countryMeta.value : 0;
+
+          const progress =
+            value && target
+              ? Number.parseFloat(
+                  ((Number.parseInt(value) / target) * 100).toFixed(2)
+                )
+              : 0;
+
           this.allProgressSeries[targetType][targetIndex].push({
             id: country,
             value: progress
@@ -242,32 +229,16 @@ export class LandingComponent extends SubscriptionManager {
     });
   }
 
-  /**
-   * sortDerivedSeries
-   *
-   **/
   sortDerivedSeries(): void {
     Object.values(TargetFieldName).forEach((targetType: TargetFieldName) => {
       [0, 1].forEach((targetIndex: number) => {
         this.allProgressSeries[targetType][targetIndex].sort(
-          (itemA: IdValue, itemB: IdValue) => {
-            if (itemA.value > itemB.value) {
-              return -1;
-            } else if (itemA.value < itemB.value) {
-              return 1;
-            }
-            return 0;
-          }
+          (itemA: IdValue, itemB: IdValue) => itemB.value - itemA.value
         );
       });
     });
   }
 
-  /** clearHeatmap
-   * restore the default data in the map component
-   * set colours and unset percentage mode in the map component
-   * reset visibleHeatMap variable
-   **/
   clearHeatmap(): void {
     this.activeMapData.set(this.mapData());
     const chart = this.mapChart();
@@ -279,35 +250,30 @@ export class LandingComponent extends SubscriptionManager {
     this.closeMapMenu();
   }
 
-  // this is bound to clickOutside, so should not set focus
   closeMapMenu(): void {
     const wasAlreadyClosed = !this.mapMenuIsOpen;
     this.mapMenuIsOpen = false;
     if (!this.mapMenuIsOpen && !wasAlreadyClosed) {
-      this.layerOpener().nativeElement.focus();
+      this.layerOpener()?.nativeElement.focus();
     }
+    this.cdr.markForCheck();
   }
 
-  /** showHeatmap
-   * overwrite the data in the map component with derived target-progress series
-   * set colours and percentage mode in the map component
-   * set visibleHeatMap variable
-   **/
   showHeatmap(seriesTargetType: TargetFieldName, targetIndex: number): void {
     if (Object.keys(this.allProgressSeries).length === 0) {
       this.buildDerivedSeries();
       this.sortDerivedSeries();
     }
 
-    this.activeMapData.set(
-      this.allProgressSeries[seriesTargetType][targetIndex]
-    );
+    const seriesData =
+      this.allProgressSeries[seriesTargetType]?.[targetIndex] || [];
+    this.activeMapData.set(seriesData);
 
     const chart = this.mapChart();
     if (chart) {
       chart.setMapPercentMode(true);
       chart.colourScheme =
-        chart.colourSchemeTargets[seriesTargetType][targetIndex];
+        chart.colourSchemeTargets[seriesTargetType]?.[targetIndex];
     }
 
     if (this.singleCountryMode) {
@@ -322,15 +288,14 @@ export class LandingComponent extends SubscriptionManager {
   }
 
   tapCountryDataLoad(fnCallback?: () => void): void {
-    if (!this.countryData) {
-      this.subs.push(
+    if (!this.countryData()) {
+      this.activeSubscriptions.push(
         this.api
           .getCountryData()
           .subscribe((countryData: IHash<Array<TargetData>>) => {
-            this.countryData = countryData;
-            if (fnCallback) {
-              fnCallback();
-            }
+            this.countryData.set(countryData);
+            if (fnCallback) fnCallback();
+            this.cdr.markForCheck();
           })
       );
     } else if (fnCallback) {
@@ -342,15 +307,14 @@ export class LandingComponent extends SubscriptionManager {
     targetType?: TargetFieldName,
     fnCallback?: () => void
   ): TargetFieldName | undefined {
-    if (!this.targetMetaData) {
-      this.subs.push(
+    if (!this.targetMetaData()) {
+      this.activeSubscriptions.push(
         this.api
           .getTargetMetaData()
           .subscribe((targetMetaData: IHash<IHashArray<TargetMetaData>>) => {
-            this.targetMetaData = targetMetaData;
-            if (fnCallback) {
-              fnCallback();
-            }
+            this.targetMetaData.set(targetMetaData);
+            if (fnCallback) fnCallback();
+            this.cdr.markForCheck();
           })
       );
     } else if (fnCallback) {
@@ -365,15 +329,12 @@ export class LandingComponent extends SubscriptionManager {
 
   refreshCharts(): void {
     const charts = this.barCharts();
-
     if (charts && charts.length > 0) {
-      // Top tier items count
-      setTimeout(() => {
-        charts.forEach((bc) => {
-          bc.removeAllSeries();
-          bc.ngAfterViewInit();
-        });
-      }, 1);
+      charts.forEach((bc) => {
+        bc.removeAllSeries();
+        bc.ngAfterViewInit();
+      });
+      this.cdr.markForCheck();
     }
   }
 }

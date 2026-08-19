@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
@@ -34,8 +28,13 @@ describe('MapComponent', () => {
     jest.spyOn(component, 'obtainChart').mockImplementation(() => {
       return MockMapChart;
     });
+    jest.useFakeTimers();
     fixture.componentRef.setInput('mapData', []);
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('should create', () => {
@@ -159,20 +158,21 @@ describe('MapComponent', () => {
     expect(res).toEqual('{name}: 1,881%');
   });
 
-  it('should debounce clicks on the country', fakeAsync(() => {
+  it('should debounce clicks on the country', () => {
     const spyCountryClick = jest.spyOn(component, 'countryClick');
-    component.countryClickSubject.next('IT');
-    tick(component.animationTime);
-    expect(spyCountryClick).toHaveBeenCalled();
-    tick(component.animationTime);
-  }));
 
-  it('should debounce dragging', fakeAsync(() => {
+    component.countryClickSubject.next('IT');
+    jest.advanceTimersByTime(component.animationTime);
+    expect(spyCountryClick).toHaveBeenCalled();
+    jest.advanceTimersByTime(component.animationTime);
+  });
+
+  it('should debounce dragging', () => {
     component.isDragging = true;
     component.dragEndSubject.next(true);
-    tick(350);
+    jest.advanceTimersByTime(350);
     expect(component.isDragging).toBeFalsy();
-  }));
+  });
 
   it('should handle clicks on the country', () => {
     const spySetCountryInclusion = jest

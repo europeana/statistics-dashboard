@@ -1,12 +1,11 @@
 import { Location } from '@angular/common';
-import { signal, Signal, ViewContainerRef } from '@angular/core';
 import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+  ChangeDetectorRef,
+  signal,
+  Signal,
+  ViewContainerRef
+} from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -47,7 +46,6 @@ describe('AppComponent', () => {
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({} as Params);
 
-  // Helper function to mimic an Angular ModelSignal wrapper interface
   const createMockModelSignal = (
     initialValue: boolean
   ): {
@@ -82,6 +80,14 @@ describe('AppComponent', () => {
         {
           provide: APIService,
           useClass: MockAPIService
+        },
+        {
+          provide: ChangeDetectorRef,
+          useValue: {
+            markForCheck: (): void => {
+              /* No-op mock view validation */
+            }
+          }
         },
         {
           provide: FilterStateService,
@@ -125,14 +131,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should listen for document clicks', fakeAsync(() => {
+  it('should listen for document clicks', () => {
     const spyNext = jest
       .spyOn(clicks.documentClickedTarget, 'next')
       .mockImplementation();
+
     const el = fixture.debugElement.query(By.css('*'));
     el.nativeElement.click();
-    tick(1);
+
     expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
+
     app.documentClick({
       target: {
         nativeElement: { contains: () => false }
@@ -140,9 +148,9 @@ describe('AppComponent', () => {
     });
 
     expect(spyNext).toHaveBeenCalledTimes(2);
-  }));
+  });
 
-  it('should listen for history navigation', fakeAsync(() => {
+  it('should listen for history navigation', async () => {
     expect(mockFilterState.includeCTZero()).toBeFalsy();
     app.buildForm();
 
@@ -156,8 +164,6 @@ describe('AppComponent', () => {
     app.updateLocation();
     expect(mockFilterState.includeCTZero()).toBeFalsy();
 
-    expect(mockFilterState.includeCTZero()).toBeFalsy();
-
     app.updateLocation();
     expect(mockFilterState.includeCTZero()).toBeFalsy();
 
@@ -165,7 +171,8 @@ describe('AppComponent', () => {
     const ctrl = app.getCtrlCTZero();
     ctrl.setValue(true);
 
-    tick(1);
+    await Promise.resolve();
+
     expect(mockFilterState.includeCTZero()).toBeTruthy();
     expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
       true
@@ -173,7 +180,8 @@ describe('AppComponent', () => {
 
     ctrl.setValue(false);
 
-    tick(1);
+    await Promise.resolve();
+
     expect(mockFilterState.includeCTZero()).toBeFalsy();
     expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
       false
@@ -181,9 +189,10 @@ describe('AppComponent', () => {
 
     location.go('/');
 
-    tick(1);
+    await Promise.resolve();
+
     expect(mockFilterState.includeCTZero()).toBeFalsy();
-  }));
+  });
 
   it('should handle the location pop-state', () => {
     const ps = {
@@ -198,15 +207,23 @@ describe('AppComponent', () => {
     expect(mockFilterState.includeCTZero()).toBeTruthy();
   });
 
-  it('should load the landing data', fakeAsync(() => {
+  it('should load the landing data', async () => {
+    jest.useFakeTimers();
+
     app.buildForm();
     expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
+
     app.loadLandingData(false);
     expect(mockFilterState.landingDataIsLoading()).toBeTruthy();
-    tick(1);
+
+    jest.advanceTimersByTime(1);
+
+    await fixture.whenStable();
     fixture.detectChanges();
+
     expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
-  }));
+    jest.useRealTimers();
+  });
 
   it('should handle the outlet load', waitForAsync(async () => {
     expect(app.showPageTitle).toBeFalsy();
@@ -219,7 +236,10 @@ describe('AppComponent', () => {
     });
 
     await TestBed.runInInjectionContext(() => {
-      app.onOutletLoaded(new LandingComponent());
+      const fakeLandingComponent1 = Object.create(LandingComponent.prototype);
+      fakeLandingComponent1.landingData = (): Record<string, string[]> => ({});
+
+      app.onOutletLoaded(fakeLandingComponent1);
       expect(app.showPageTitle).toBeTruthy();
       expect(spyLoadLandingData).toHaveBeenCalled();
 
@@ -236,7 +256,8 @@ describe('AppComponent', () => {
       fixture.detectChanges();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
-      const cmp = new LandingComponent();
+      const cmp = Object.create(LandingComponent.prototype);
+      cmp.landingData = (): Record<string, string[]> => ({});
       mockFilterState.landingData.set({} as GeneralResultsFormatted);
 
       app.onOutletLoaded(cmp);
@@ -247,16 +268,22 @@ describe('AppComponent', () => {
       expect(cmp.landingData()).toBeTruthy();
 
       mockFilterState.includeCTZero.set(!app.getCtrlCTZero().value);
-      app.onOutletLoaded(new LandingComponent());
+
+      const fakeLandingComponent3 = Object.create(LandingComponent.prototype);
+      app.onOutletLoaded(fakeLandingComponent3);
       expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
-      // load privacy statement component
-      app.onOutletLoaded(new PrivacyStatementComponent());
+      const fakePrivacyComponent = Object.create(
+        PrivacyStatementComponent.prototype
+      );
+      app.onOutletLoaded(fakePrivacyComponent);
 
       expect(spyLoadLandingData).toHaveBeenCalledTimes(6);
 
-      // load cookie policy component
-      app.onOutletLoaded(new CookiePolicyComponent());
+      const fakeCookieComponent = Object.create(
+        CookiePolicyComponent.prototype
+      );
+      app.onOutletLoaded(fakeCookieComponent);
 
       expect(spyLoadLandingData).toHaveBeenCalledTimes(7);
 

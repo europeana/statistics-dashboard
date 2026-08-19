@@ -1,10 +1,16 @@
+import { NgClass, NgIf } from '@angular/common';
 import {
+  afterNextRender,
+  ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   ElementRef,
+  Injector,
   input,
   model,
   output,
+  signal,
   viewChild,
   viewChildren
 } from '@angular/core';
@@ -23,12 +29,12 @@ import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
 import { CheckboxComponent } from '../checkbox/checkbox.component';
 import { DatesComponent } from '../dates/dates.component';
 import { ClickAwareDirective } from '../_directives/click-aware/click-aware.directive';
-import { NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-filter',
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush, // Highly recommended for zoneless
   imports: [
     NgIf,
     ClickAwareDirective,
@@ -51,12 +57,28 @@ export class FilterComponent {
   totalAvailable = input.required<number>();
   optionSet = input<FilterOptionSet | undefined>(undefined);
 
-  empty = true;
-  emptyData = true;
-  term = '';
-  pagesVisible = 1;
-  inputToFocus?: InputDescription;
+  term = signal<string>('');
+  pagesVisible = signal<number>(1);
+  inputToFocus = signal<InputDescription | undefined>(undefined);
   state = model.required<FilterState>();
+
+  empty = computed(() => {
+    const currentOptionSet = this.optionSet();
+    return !(
+      currentOptionSet &&
+      currentOptionSet.options &&
+      currentOptionSet.options.length > 0
+    );
+  });
+
+  emptyData = computed(() => {
+    if (!this.empty()) {
+      if (!this.term() || this.term().length === 0) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   filterTermChanged = output<FilterInfo>();
   valueChanged = output<true>();
@@ -66,43 +88,38 @@ export class FilterComponent {
   opener = viewChild<ElementRef<HTMLElement>>('opener');
   checkboxes = viewChildren(CheckboxComponent);
 
-  constructor() {
+  constructor(private injector: Injector) {
     effect(() => {
-      const currentOptionSet = this.optionSet();
-      if (
-        currentOptionSet &&
-        currentOptionSet.options &&
-        currentOptionSet.options.length > 0
-      ) {
-        if (!this.term || this.term.length === 0) {
-          this.emptyData = false;
-        }
-        this.empty = false;
-      } else {
-        this.empty = true;
-      }
+      const isVisible = this.state()?.visible;
+      const targetInput = this.inputToFocus();
 
-      // Reapply any focus states
-      if (this.inputToFocus) {
-        setTimeout(() => {
-          const focusItem = this.checkboxes().find((cb: CheckboxComponent) => {
-            return (
-              cb.group() === this.inputToFocus?.group &&
-              cb.controlName() === this.inputToFocus?.controlName
-            );
-          });
-          if (focusItem) {
-            focusItem.baseInput()?.nativeElement.focus();
-          } else {
-            this.filterTerm()?.nativeElement.focus();
-          }
-          this.inputToFocus = undefined;
-        });
-      } else if (this.state()?.visible) {
-        const ft = this.filterTerm();
-        if (ft) {
-          ft.nativeElement.focus();
-        }
+      if (targetInput || isVisible) {
+        // handle asynchronous DOM steps safely without setTimeout
+        afterNextRender(
+          () => {
+            if (targetInput) {
+              const focusItem = this.checkboxes().find(
+                (cb: CheckboxComponent) => {
+                  return (
+                    cb.group() === targetInput.group &&
+                    cb.controlName() === targetInput.controlName
+                  );
+                }
+              );
+
+              if (focusItem) {
+                focusItem.baseInput()?.nativeElement.focus();
+              } else {
+                this.filterTerm()?.nativeElement.focus();
+              }
+              // safe signal update inside the correct lifecycle loop
+              this.inputToFocus.set(undefined);
+            } else if (isVisible) {
+              this.filterTerm()?.nativeElement.focus();
+            }
+          },
+          { injector: this.injector }
+        );
       }
     });
   }
@@ -117,7 +134,7 @@ export class FilterComponent {
    * @param { InputDescription } keyData
    **/
   onKeySelectionMade(keyData: InputDescription): void {
-    this.inputToFocus = keyData;
+    this.inputToFocus.set(keyData);
   }
 
   filterOptions(evt: { key: string; target: { value: string } }): void {
@@ -128,9 +145,9 @@ export class FilterComponent {
       this.hide();
       this.opener()?.nativeElement?.focus();
     }
-    this.term = evt.target.value;
+    this.term.set(evt.target.value);
     this.filterTermChanged.emit({
-      term: this.term,
+      term: this.term(),
       dimension: this.group()
     });
   }
@@ -148,14 +165,14 @@ export class FilterComponent {
     } else {
       // consider there to be data (and allow the user to open) if the term is blocking
       if (
-        this.empty &&
-        !this.emptyData &&
-        this.term.length > 0 &&
+        this.empty() &&
+        !this.emptyData() &&
+        this.term().length > 0 &&
         !this.state().visible
       ) {
         return false;
       }
-      return this.empty;
+      return this.empty();
     }
   }
 
@@ -186,12 +203,12 @@ export class FilterComponent {
       .join(', ');
   }
 
-  hide(): void {
+  hide = (): void => {
     this.state.update((current) => ({
       ...current,
       visible: false
     }));
-  }
+  };
 
   toggle(): void {
     this.state.update((current) => ({
@@ -219,11 +236,11 @@ export class FilterComponent {
    * @returns number
    */
   loadMore(): void {
-    this.pagesVisible++;
+    this.pagesVisible.update((p) => p + 1);
     this.filterTermChanged.emit({
-      term: this.term,
+      term: this.term(),
       dimension: this.group(),
-      upToPage: this.pagesVisible
+      upToPage: this.pagesVisible()
     });
   }
 }
