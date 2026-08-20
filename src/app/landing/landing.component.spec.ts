@@ -90,7 +90,7 @@ describe('LandingComponent', () => {
         removeAllSeries: () => {
           mockChartRemoved = true;
         },
-        ngAfterViewInit: () => {
+        addSeriesFromResult: () => {
           mockChartRefreshed = true;
         }
       } as unknown as BarComponent;

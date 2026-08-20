@@ -262,7 +262,7 @@ export class CountryComponent implements AfterViewInit, OnDestroy {
       if (chart) {
         chart.removeAllSeries();
         chart.results.set(this.cardData[DimensionName.type] || []);
-        chart.ngAfterViewInit();
+        chart.addSeriesFromResult();
       }
     });
   }

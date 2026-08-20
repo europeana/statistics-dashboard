@@ -481,7 +481,7 @@
             [colours]="[barColour]"
             chartId="contentTypeChart"
             [extraSettings]="{ prefixValueAxis: 'Tier' }"
-            [results]="data"
+            [(results)]="data"
           ></app-bar-chart>
           <a
             class="data-link"
@@ -520,7 +520,7 @@
             [colours]="[barColour]"
             chartId="metadataTierChart"
             [extraSettings]="{ prefixValueAxis: 'Tier' }"
-            [results]="data"
+            [(results)]="data"
           ></app-bar-chart>
           <a
             class="data-link"
@@ -592,7 +592,7 @@
           <app-bar-chart
             [colours]="[barColour]"
             chartId="typeChart"
-            [results]="data"
+            [(results)]="data"
           ></app-bar-chart>
           <a
             class="data-link"

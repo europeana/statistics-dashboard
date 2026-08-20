@@ -802,8 +802,11 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
-    const fn = (): void => {
-      const maxbars = this.barChart().maxNumberBars;
+    queueMicrotask(() => {
+      const chart = this.barChart();
+      if (!chart) return;
+
+      const maxbars = chart.maxNumberBars;
       const seriesData = this.snapshots().getSeriesDataForChart(
         this.form.value.facetParameter,
         seriesKeys,
@@ -811,9 +814,8 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         this.chartPosition * maxbars,
         maxbars
       );
-      this.barChart().addSeries(seriesData);
-    };
-    setTimeout(fn, 0);
+      chart.addSeries(seriesData);
+    });
   }
 
   /** refreshChart

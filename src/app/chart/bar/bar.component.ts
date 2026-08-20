@@ -9,10 +9,10 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser, NgClass, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
@@ -21,16 +21,14 @@ import {
   IHash,
   NameValue
 } from '../../_models';
-
 import { colours } from '../../_data';
-
 import { BarChartDefaults } from '../chart-defaults';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bar-chart',
   templateUrl: './bar.component.html',
   styleUrls: ['./bar.component.scss'],
+  standalone: true,
   imports: [NgIf, FormsModule, NgClass]
 })
 export class BarComponent implements AfterViewInit {
@@ -46,7 +44,6 @@ export class BarComponent implements AfterViewInit {
   results = model<Array<NameValue> | undefined>();
 
   categoryAxis: am4charts.CategoryAxis;
-
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
   valueAxis: am4charts.ValueAxis;
@@ -95,13 +92,18 @@ export class BarComponent implements AfterViewInit {
   addSeriesFromResult(): void {
     const results = this.results();
     if (results && results.length > 0) {
+      // Safely read the single color string out of the colours array reference
+      const seriesColour = Array.isArray(colours)
+        ? colours[0]
+        : colours || '#0771ce';
+
       this.addSeries([
         {
           data: results.reduce(function (map: IHash<number>, nv: NameValue) {
             map[nv.name] = nv.value;
             return map;
           }, {}),
-          colour: colours[0],
+          colour: seriesColour,
           seriesName: 'seriesKey'
         } as ColourSeriesData
       ]);
@@ -156,20 +158,30 @@ export class BarComponent implements AfterViewInit {
 
   removeSeries(id: string): void {
     const series = this.allSeries[id];
-
     if (series) {
       const seriesIndex = this.chart.series.indexOf(series);
       if (seriesIndex > -1) {
         this.chart.series.removeIndex(seriesIndex).dispose();
       }
       delete this.allSeries[id];
-    } else {
-      console.log(`Bar: can't find series to remove (${id})`);
     }
-    this.chart.invalidateData();
+    this.chart?.invalidateData();
   }
 
   removeAllSeries(): void {
+    // wipe out amCharts internal data structure completely
+    if (this.chart) {
+      this.chart.data = [];
+    }
+
+    // clear any existing axis breaks to prevent scale warping
+    if (this.valueAxis) {
+      this.valueAxis.axisBreaks.clear();
+      this.valueAxis.min = undefined;
+      this.valueAxis.max = undefined;
+    }
+
+    // clear and dispose of the existing series
     Object.keys(this.allSeries).forEach((id: string) => {
       this.removeSeries(id);
     });
@@ -188,7 +200,7 @@ export class BarComponent implements AfterViewInit {
     const seriesVals = [];
 
     csds.forEach((csd: ColourSeriesData) => {
-      if (!this.chart.data.length) {
+      if (!this.chart.data || !this.chart.data.length) {
         this.chart.data = Object.keys(csd.data)
           .slice(0, this.maxNumberBars)
           .map((s: string) => {
@@ -227,15 +239,17 @@ export class BarComponent implements AfterViewInit {
       });
     }
 
-    if (!this.isZoomable()) {
+    if (!this.isZoomable() && seriesVals.length > 0) {
       const seriesMin = Math.min(...seriesVals);
       const seriesMax = Math.max(...seriesVals);
-      const scale = seriesMax / seriesMin;
-      if (scale > this.maxBarSizeRelativeRatio) {
-        this.addAxisBreak(seriesMin, seriesMax);
+      if (seriesMin > 0) {
+        const scale = seriesMax / seriesMin;
+        if (scale > this.maxBarSizeRelativeRatio) {
+          this.addAxisBreak(seriesMin, seriesMax);
+        }
       }
     }
-    this.chart.invalidateData();
+    this.chart?.invalidateData();
   }
 
   /** createSeries
@@ -268,7 +282,11 @@ export class BarComponent implements AfterViewInit {
   }
 
   isZoomable(): boolean {
-    return this.chart.data && this.chart.data.length > this.preferredNumberBars;
+    return (
+      this.chart &&
+      this.chart.data &&
+      this.chart.data.length > this.preferredNumberBars
+    );
   }
 
   zoomTop(start = 0): void {
@@ -286,6 +304,7 @@ export class BarComponent implements AfterViewInit {
   }
 
   getSvgData(): Promise<string> {
+    if (!this.chart) return Promise.resolve('');
     this.chart.exporting.useWebFonts = false;
     return this.chart.exporting.getImage('png', {
       minHeight: 1000,
@@ -345,14 +364,14 @@ export class BarComponent implements AfterViewInit {
         if (this.settings.prefixValueAxis) {
           prefix = `${this.settings.prefixValueAxis} `;
         }
-        return `${prefix}${label}`;
+        return `${prefix}${label || ''}`;
       }
     );
 
     this.valueAxis.renderer.labels.template.adapter.add(
       'text',
       (label: string) => {
-        return `${label}${this.showPercent() ? '%' : ''}`;
+        return `${label || ''}${this.showPercent() ? '%' : ''}`;
       }
     );
   }
@@ -399,7 +418,6 @@ export class BarComponent implements AfterViewInit {
         if (this.settings.hasScroll) {
           chart.scrollbarX = new am4core.Scrollbar();
         }
-
         // Label / rotation
         this.categoryAxis.renderer.labels.template.horizontalCenter = 'right';
         this.categoryAxis.renderer.labels.template.verticalCenter = 'middle';

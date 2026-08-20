@@ -332,7 +332,7 @@ export class LandingComponent implements OnDestroy {
     if (charts && charts.length > 0) {
       charts.forEach((bc) => {
         bc.removeAllSeries();
-        bc.ngAfterViewInit();
+        bc.addSeriesFromResult();
       });
       this.cdr.markForCheck();
     }
