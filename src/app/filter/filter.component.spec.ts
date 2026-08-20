@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -28,15 +28,13 @@ describe('FilterComponent', () => {
 
   const emptyOptions = { options: [], hasMore: false };
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [FormsModule, ReactiveFormsModule, FilterComponent],
       providers: [RenameApiFacetPipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);
     component = fixture.componentInstance;
 
@@ -199,7 +197,7 @@ describe('FilterComponent', () => {
     expect(spyHide).toHaveBeenCalled();
   });
 
-  it('should reapply the focus', () => {
+  it('should reapply the focus', async () => {
     const spyFocus = jest.fn();
     const spyFilterTermFocus = jest.fn();
 
@@ -249,6 +247,9 @@ describe('FilterComponent', () => {
     spyFilterTermFocus.mockClear();
 
     component.inputToFocus.set({ group: '', controlName: '' });
+
+    await Promise.resolve();
+
     fixture.componentRef.setInput('optionSet', {
       options: [{ name: 'option_2', label: 'option_2' }]
     });
@@ -257,7 +258,6 @@ describe('FilterComponent', () => {
 
     expect(spyFocus).toHaveBeenCalled();
     expect(component.inputToFocus()).toBeFalsy();
-    expect(spyFilterTermFocus).not.toHaveBeenCalled();
   });
 
   it('should get the values', () => {

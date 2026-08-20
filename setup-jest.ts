@@ -1,7 +1,7 @@
 import '@angular/localize/init';
-import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
+import { setupZonelessTestEnv } from 'jest-preset-angular/setup-env/zoneless';
 
-setupZoneTestEnv();
+setupZonelessTestEnv();
 
 // Stub Canvas API for amCharts / JSDOM environment
 HTMLCanvasElement.prototype.getContext = jest.fn(() => ({

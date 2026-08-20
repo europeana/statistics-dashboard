@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { BarComponent } from './bar.component';
 
@@ -17,14 +17,11 @@ describe('BarComponent', () => {
     }
   ];
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [BarComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(BarComponent);
     component = fixture.componentInstance;
 

@@ -5,7 +5,7 @@ import {
   Signal,
   ViewContainerRef
 } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -62,10 +62,10 @@ describe('AppComponent', () => {
     return sig;
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     mockFilterState = mockFilterStateService();
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([
           { path: './data', component: AppComponent },
@@ -97,9 +97,7 @@ describe('AppComponent', () => {
         provideHttpClientTesting()
       ]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
     app = fixture.componentInstance;
 
@@ -225,7 +223,7 @@ describe('AppComponent', () => {
     jest.useRealTimers();
   });
 
-  it('should handle the outlet load', waitForAsync(async () => {
+  it('should handle the outlet load', async () => {
     expect(app.showPageTitle).toBeFalsy();
 
     const spyLoadLandingData = jest
@@ -235,7 +233,7 @@ describe('AppComponent', () => {
       return '';
     });
 
-    await TestBed.runInInjectionContext(() => {
+    await TestBed.runInInjectionContext(async () => {
       const fakeLandingComponent1 = Object.create(LandingComponent.prototype);
       fakeLandingComponent1.landingData = (): Record<string, string[]> => ({});
 
@@ -253,7 +251,7 @@ describe('AppComponent', () => {
 
       // load landing component
       app.getCtrlCTZero().setValue(true);
-      fixture.detectChanges();
+
       expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
       const cmp = Object.create(LandingComponent.prototype);
@@ -268,6 +266,7 @@ describe('AppComponent', () => {
       expect(cmp.landingData()).toBeTruthy();
 
       mockFilterState.includeCTZero.set(!app.getCtrlCTZero().value);
+      await Promise.resolve();
 
       const fakeLandingComponent3 = Object.create(LandingComponent.prototype);
       app.onOutletLoaded(fakeLandingComponent3);
@@ -304,6 +303,8 @@ describe('AppComponent', () => {
       expect(spySetCTZero).toHaveBeenCalledTimes(1);
 
       mockFilterState.includeCTZero.set(true);
+      await Promise.resolve();
+
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(spySetCTZero).toHaveBeenCalledTimes(2);
@@ -315,6 +316,7 @@ describe('AppComponent', () => {
 
       fakeCountryComponent.country.set('FR');
       fakeCountryComponent.includeCTZero = createMockModelSignal(false);
+      await Promise.resolve();
 
       fakeCountryComponent.refreshCardData = spyRefreshCardData;
 
@@ -330,7 +332,7 @@ describe('AppComponent', () => {
       expect(spySetCTZero).toHaveBeenCalledTimes(3);
       expect(spyRefreshCardData).toHaveBeenCalledTimes(1);
     });
-  }));
+  });
 
   it('should check if maintenance is due', () => {
     const maintenanceSettings = {

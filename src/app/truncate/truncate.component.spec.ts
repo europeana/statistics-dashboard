@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ElementRef } from '@angular/core';
 import { ResizeComponent } from '../resize';
 import { TruncateComponent } from './';
@@ -15,11 +15,8 @@ describe('TruncateComponent', () => {
     }).compileComponents();
   };
 
-  beforeEach(waitForAsync(() => {
-    configureTestBed();
-  }));
-
-  beforeEach(() => {
+  beforeEach(async () => {
+    await configureTestBed();
     fixture = TestBed.createComponent(TruncateComponent);
     component = fixture.componentInstance;
 

@@ -69,15 +69,24 @@ describe('LandingComponent', () => {
   });
 
   it('should refresh the charts when the data changes', async () => {
+    const mockBarChartsArray = [1, 2].map(() => ({
+      removeAllSeries: jest.fn(),
+      addSeriesFromResult: jest.fn()
+    }));
+
+    jest
+      .spyOn(component, 'barCharts')
+      .mockReturnValue(
+        mockBarChartsArray as unknown as readonly BarComponent[]
+      );
+
     const spyRefreshCharts = jest.spyOn(component, 'refreshCharts');
     mockFilterState.landingData.set({ contentTier: [], country: [] });
 
     fixture.detectChanges();
     TestBed.flushEffects();
 
-    // Explicitly drain the microtask queue to allow queueMicrotask to execute
     await Promise.resolve();
-
     expect(spyRefreshCharts).toHaveBeenCalled();
   });
 

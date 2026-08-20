@@ -1,29 +1,38 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-
-import { environment } from './environments/environment';
-import { AppComponent } from './app/app.component';
-import { matomoSettings } from './environments/matomo-settings';
-import { MatomoModule, MatomoConsentMode } from 'ngx-matomo-client';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { AppRoutingModule } from './app/app-routing.module';
-import { maintenanceSettings } from './environments/maintenance-settings';
 import {
-  maintenanceInterceptor,
-  MaintenanceUtilsModule
-} from '@europeana/metis-ui-maintenance-utils';
+  enableProdMode,
+  importProvidersFrom,
+  provideExperimentalZonelessChangeDetection
+} from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import {
   provideHttpClient,
   withInterceptors,
   withInterceptorsFromDi
 } from '@angular/common/http';
+
+import { environment } from './environments/environment';
+import { AppComponent } from './app/app.component';
+import { matomoSettings } from './environments/matomo-settings';
+import { maintenanceSettings } from './environments/maintenance-settings';
+import { routes } from './app/app.routes';
+
+import {
+  provideMatomo,
+  withRouter,
+  withRouterInterceptors,
+  MatomoConsentMode,
+  MatomoRouteDataInterceptor
+} from 'ngx-matomo-client';
+
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppDateAdapter } from './app/_helpers';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
+import { maintenanceInterceptor } from '@europeana/metis-ui-maintenance-utils';
 
 if (environment.production) {
   enableProdMode();
@@ -31,16 +40,10 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
-      AppRoutingModule,
-      BrowserModule,
-      FormsModule,
-      MaintenanceUtilsModule,
-      MatDatepickerModule,
-      MatDialogModule,
-      MatFormFieldModule,
-      ReactiveFormsModule,
-      MatomoModule.forRoot({
+    provideExperimentalZonelessChangeDetection(),
+    provideRouter(routes, withComponentInputBinding()),
+    provideMatomo(
+      {
         requireConsent: MatomoConsentMode.COOKIE,
         scriptUrl: matomoSettings.matomoScriptUrl,
         trackers: [
@@ -50,7 +53,16 @@ bootstrapApplication(AppComponent, {
           }
         ],
         enableLinkTracking: true
-      })
+      },
+      withRouter(),
+      withRouterInterceptors([MatomoRouteDataInterceptor])
+    ),
+    importProvidersFrom(
+      FormsModule,
+      MatDatepickerModule,
+      MatDialogModule,
+      MatFormFieldModule,
+      ReactiveFormsModule
     ),
     { provide: DateAdapter, useClass: AppDateAdapter },
     {
@@ -69,9 +81,10 @@ bootstrapApplication(AppComponent, {
       }
     },
     provideHttpClient(
-      withInterceptors([maintenanceInterceptor(maintenanceSettings)])
+      withInterceptors([maintenanceInterceptor(maintenanceSettings)]),
+      withInterceptorsFromDi()
     ),
-    provideAnimations(),
-    provideHttpClient(withInterceptorsFromDi())
+    provideHttpClient(withInterceptorsFromDi()),
+    provideAnimations()
   ]
 }).catch((err) => console.error(err));

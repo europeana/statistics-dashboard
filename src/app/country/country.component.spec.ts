@@ -277,12 +277,12 @@ describe('CountryComponent', () => {
 
     it('should set the country', () => {
       const mockRemoveAllSeries = jest.fn();
-      const mockNgAfterViewInit = jest.fn();
+      const mockAddSeriesFromResult = jest.fn();
       const mockSetResults = jest.fn();
 
       const mockBarChart = {
         removeAllSeries: mockRemoveAllSeries,
-        ngAfterViewInit: mockNgAfterViewInit,
+        addSeriesFromResult: mockAddSeriesFromResult,
         results: Object.assign(jest.fn().mockReturnValue([]), {
           set: mockSetResults
         }),
@@ -301,7 +301,7 @@ describe('CountryComponent', () => {
         if (chart) {
           chart.removeAllSeries();
           chart.results.set(component.cardData[DimensionName.type]);
-          chart.ngAfterViewInit();
+          chart.addSeriesFromResult();
         }
       });
 
@@ -314,7 +314,7 @@ describe('CountryComponent', () => {
 
       expect(mockRemoveAllSeries).toHaveBeenCalled();
       expect(mockSetResults).toHaveBeenCalled();
-      expect(mockNgAfterViewInit).toHaveBeenCalled();
+      expect(mockAddSeriesFromResult).toHaveBeenCalled();
     });
 
     it('should set the latest country data', () => {

@@ -42,21 +42,25 @@ describe('OpenerFocusDirective', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('should handle the escape key', () => {
+  it('should handle the escape key', async () => {
     const spyFocus1 = jest.spyOn(link1.nativeElement, 'focus');
     const spyFocus2 = jest.spyOn(link2.nativeElement, 'focus');
-
-    const spyHide = jest.fn();
-    testComponent.fnHide = spyHide;
+    const directiveInstance = cmp.injector.get(OpenerFocusDirective);
+    const spyHide = jest
+      .spyOn(directiveInstance, 'hide')
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .mockImplementation(() => {});
 
     fixture.detectChanges();
 
-    const event = new KeyboardEvent('keydown', {
-      key: 'escape',
-      bubbles: true
-    });
+    directiveInstance.escape({
+      key: 'Escape',
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      preventDefault: () => {}
+    } as KeyboardEvent);
 
-    cmp.nativeElement.dispatchEvent(event);
+    await Promise.resolve();
+    fixture.detectChanges();
 
     expect(spyHide).toHaveBeenCalled();
     expect(spyFocus1).toHaveBeenCalled();

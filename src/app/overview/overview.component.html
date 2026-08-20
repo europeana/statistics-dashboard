@@ -388,7 +388,7 @@
                 #gridSummary
                 *ngIf="dataServerData"
                 [grandTotal]="resultTotal"
-                [summaryData]="dataServerData.results.breakdowns"
+                [summaryData]="dataServerData.results?.breakdowns"
               ></app-grid-summary>
             </ng-container>
           </div>

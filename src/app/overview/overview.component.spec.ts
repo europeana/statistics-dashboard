@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -188,11 +188,8 @@ describe('OverviewComponent', () => {
   };
 
   describe('Route Parameter', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed(false);
-    }));
-
-    beforeEach(() => {
+    beforeEach(async () => {
+      await configureTestBed(false);
       b4Each();
       params.next({ facet: DimensionName.country });
     });
@@ -566,6 +563,8 @@ describe('OverviewComponent', () => {
 
       component.form.controls.datasetId.setValue('1');
       fixture.detectChanges();
+
+      await Promise.resolve();
       component.loadData();
 
       jest.advanceTimersByTime(tickTime);
@@ -573,6 +572,8 @@ describe('OverviewComponent', () => {
 
       component.form.controls.datasetId.setValue('EMPTY');
       fixture.detectChanges();
+
+      await Promise.resolve();
       component.loadData();
 
       jest.advanceTimersByTime(tickTime);
@@ -1068,11 +1069,8 @@ describe('OverviewComponent', () => {
   });
 
   describe('Request / Url Generation', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed();
-    }));
-
-    beforeEach(() => {
+    beforeEach(async () => {
+      await configureTestBed();
       b4Each();
       component.form.value.facetParameter = DimensionName.contentTier;
       fixture.detectChanges();

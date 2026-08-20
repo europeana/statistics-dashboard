@@ -10,6 +10,7 @@ import {
 } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   computed,
   DestroyRef,
@@ -97,6 +98,8 @@ import { TruncateComponent } from '../truncate';
   ]
 })
 export class CountryComponent implements AfterViewInit, OnDestroy {
+  private readonly changeDetector = inject(ChangeDetectorRef);
+
   public externalLinks = externalLinks;
   public DimensionName = DimensionName;
   public isoCountryCodes = isoCountryCodes;
@@ -253,10 +256,22 @@ export class CountryComponent implements AfterViewInit, OnDestroy {
     this.filterStateService.includeCTZero.set(false);
   }
 
+  /** refreshCardData
+  /* Core layout fetcher block supporting standard and non-standard custom regions like 'Europe' (EU)
+  */
   refreshCardData(): void {
-    this.loadDimensionCardData(DimensionName.dataProvider);
-    this.loadDimensionCardData(DimensionName.provider);
-    this.loadDimensionCardData(DimensionName.rightsCategory);
+    this.loadDimensionCardData(DimensionName.dataProvider, () => {
+      this.changeDetector.markForCheck();
+    });
+
+    this.loadDimensionCardData(DimensionName.provider, () => {
+      this.changeDetector.markForCheck();
+    });
+
+    this.loadDimensionCardData(DimensionName.rightsCategory, () => {
+      this.changeDetector.markForCheck();
+    });
+
     this.loadDimensionCardData(DimensionName.type, () => {
       const chart = this.barChart();
       if (chart) {
@@ -264,6 +279,7 @@ export class CountryComponent implements AfterViewInit, OnDestroy {
         chart.results.set(this.cardData[DimensionName.type] || []);
         chart.addSeriesFromResult();
       }
+      this.changeDetector.markForCheck();
     });
   }
 

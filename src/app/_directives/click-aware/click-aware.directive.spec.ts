@@ -95,7 +95,7 @@ describe('ClickAwareDirective', () => {
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 
-  it('should detect clicks on ancestor elements with specific classes', () => {
+  it('should detect clicks on ancestor elements with specific classes', async () => {
     const clickInfo = component.clickInfo()!;
 
     expect(clickInfo.isClickedInside).toBeFalsy();
@@ -110,17 +110,25 @@ describe('ClickAwareDirective', () => {
     );
     expect(clickInfo.isClickedInside).toBeFalsy();
 
-    component.classesToInclude = ['cmp'];
+    jest.spyOn(clickInfo, 'includeClicksOnClasses').mockReturnValue(['cmp']);
+
+    const parentContainer = fixture.debugElement.query(
+      By.css('.cmp')
+    ).nativeElement;
+    parentContainer.classList.add('cmp');
+
     fixture.detectChanges();
+    await Promise.resolve();
 
     clickInfo.documentClickListener(
       liveElement.nativeElement,
       deadElementInner.nativeElement
     );
+
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 
-  it('should detect clicks in the element via the service', () => {
+  it('should detect clicks in the element via the service', async () => {
     const clickInfo = component.clickInfo()!;
     const cmpClickService =
       fixture.debugElement.injector.get<ClickService>(ClickService);
@@ -128,9 +136,11 @@ describe('ClickAwareDirective', () => {
     expect(clickInfo.isClickedInside).toBeFalsy();
 
     cmpClickService.documentClickedTarget.next(deadElement.nativeElement);
+    await Promise.resolve();
     expect(clickInfo.isClickedInside).toBeFalsy();
 
     cmpClickService.documentClickedTarget.next(innerElement.nativeElement);
+    await Promise.resolve();
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 });

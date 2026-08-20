@@ -34,24 +34,38 @@ context('Statistics Dashboard', () => {
       const waProviders = ['EFG - The European Film Gateway'];
 
       cy.get(selFilter).type('ar', force);
+      cy.wait(500);
 
       assertRowLength(arCountries, 1);
       assertRowLength(orCountries, 0);
 
-      cy.get(selFilter).clear(force).type('or', force);
+      cy.get(selFilter).clear(force);
+      cy.wait(100);
+      cy.get(selFilter).type('or', force);
+      cy.wait(500);
+
       assertRowLength(arCountries, 0);
       assertRowLength(orCountries, 1);
+
       cy.get(selFacetSelect).select('Provider', force);
+      cy.wait(500);
       assertRowLength(waProviders, 0);
 
-      cy.get(selFilter).clear(force).type('wa', force);
+      cy.get(selFilter).clear(force);
+      cy.wait(100);
+      cy.get(selFilter).type('wa', force);
+      cy.wait(500);
       assertRowLength(waProviders, 1);
 
-      cy.get(selFilter).clear(force).type('ar', force);
+      cy.get(selFilter).clear(force);
+      cy.wait(100);
+      cy.get(selFilter).type('ar', force);
+      cy.wait(500);
       assertRowLength(arProviders, 1);
       assertRowLength(waProviders, 0);
 
       cy.get(selFacetSelect).select('Country', force);
+      cy.wait(500);
 
       assertRowLength(arCountries, 1);
       assertRowLength(orCountries, 0);
