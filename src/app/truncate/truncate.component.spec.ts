@@ -1,10 +1,4 @@
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ElementRef } from '@angular/core';
 import { ResizeComponent } from '../resize';
 import { TruncateComponent } from './';
@@ -55,14 +49,20 @@ describe('TruncateComponent', () => {
     expect(spySplitText).toHaveBeenCalled();
   });
 
-  it('should split the text on resize', fakeAsync(() => {
+  it('should split the text on resize', async () => {
     fixture.componentRef.setInput('text', 'xxxx');
     fixture.detectChanges();
     const spySplitText = jest.spyOn(component, 'splitText');
+
+    jest.useFakeTimers();
+
     window.dispatchEvent(new Event('resize'));
-    tick(component.debounceMS);
+
+    jest.advanceTimersByTime(component.debounceMS);
+
     expect(spySplitText).toHaveBeenCalled();
-  }));
+    jest.useRealTimers();
+  });
 
   it('should split the text recursively', () => {
     jest.spyOn(component, 'isEllipsisActive').mockReturnValue(false);

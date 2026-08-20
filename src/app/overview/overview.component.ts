@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
@@ -87,6 +88,7 @@ import { ResizeComponent } from '../resize';
   templateUrl: './overview.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./overview.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -268,6 +270,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         .pipe(debounceTime(400))
         .subscribe((redraw: boolean) => {
           this.refreshChart(redraw, 0);
+          this.changeDetector.markForCheck();
         })
     );
 
@@ -601,6 +604,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
           if (fnCallback) {
             fnCallback();
           }
+          this.changeDetector.markForCheck();
         })
     );
   }
@@ -1087,28 +1091,30 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   }
 
   /** datesOpen
-  /* Opens the date fields after a millisecond pause
+  /* Opens the date fields after a microtask rendering frame pause
   */
   datesOpen(): void {
-    setTimeout(() => {
+    queueMicrotask(() => {
       this.filterStates.dates.set({
         visible: true,
         disabled: false
       });
-    }, 1);
+      this.changeDetector.markForCheck();
+    });
   }
 
   /** focusExportOpener
-  /* Focuses the exportOpenerLastUsed after a millisecond pause
+  /* Focuses the exportOpenerLastUsed after a microtask rendering frame pause
   */
   focusExportOpener(fromToolbar: boolean): void {
     const targetEl = fromToolbar
       ? this.exportOpenerToolbar()?.nativeElement
       : this.exportOpener()?.nativeElement;
 
-    setTimeout(() => {
+    queueMicrotask(() => {
       targetEl?.focus();
-    }, 1);
+      this.changeDetector.markForCheck();
+    });
   }
 
   /** enableFilters

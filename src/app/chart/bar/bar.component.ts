@@ -291,15 +291,14 @@ export class BarComponent implements AfterViewInit {
 
   zoomTop(start = 0): void {
     if (this.isZoomable()) {
-      const fn = (): void => {
+      queueMicrotask(() => {
         this.categoryAxis.zoomToIndexes(
           start,
           start + this.preferredNumberBars,
           false,
           true
         );
-      };
-      setTimeout(fn, 100);
+      });
     }
   }
 

@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -15,16 +16,18 @@ import { ResizeComponent } from '../resize/resize.component';
   selector: 'app-truncate',
   templateUrl: './truncate.component.html',
   styleUrls: ['./truncate.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush, // Secure OnPush bounds
+  standalone: true,
   imports: [ResizeComponent, NgClass, HighlightMatchPipe]
 })
 export class TruncateComponent implements AfterViewInit {
   private readonly changeDetector = inject(ChangeDetectorRef);
 
-  elRefTextLeft = viewChild<ElementRef>('elRefTextLeft');
-  elRefTextRight = viewChild<ElementRef>('elRefTextRight');
+  readonly elRefTextLeft = viewChild<ElementRef>('elRefTextLeft');
+  readonly elRefTextRight = viewChild<ElementRef>('elRefTextRight');
 
   private _text = '';
-  text = input<string, string>('', {
+  readonly text = input<string, string>('', {
     transform: (value: string) => {
       this._text = value || '';
       this.omitCount = 0;
@@ -33,7 +36,7 @@ export class TruncateComponent implements AfterViewInit {
     }
   });
 
-  highlightText = input<string>('');
+  readonly highlightText = input<string>('');
 
   applySpace = false;
   maxRecursions = 100;
@@ -59,8 +62,7 @@ export class TruncateComponent implements AfterViewInit {
   }
 
   /** splitText
-   * Splits the text variable according to current omitCount settings
-   * param { number: recursions } - track recursion depth
+   * Splits the text variable according to current omitCount settings safely inside a microtask frame
    **/
   splitText(recursions = 0): void {
     const rawText = this._text;
@@ -76,13 +78,29 @@ export class TruncateComponent implements AfterViewInit {
     this.applySpace =
       this.textLeft.endsWith(' ') || this.textRight.startsWith(' ');
 
-    this.changeDetector.detectChanges();
+    // 1. Notify the template engine that the state changes require a paint update
+    this.changeDetector.markForCheck();
+
+    // 2. Synchronously write the text updates to the DOM so getBoundingClientRect can read them accurately
+    const leftEl = this.elRefTextLeft()?.nativeElement;
+    const rightEl = this.elRefTextRight()?.nativeElement;
+    if (leftEl && leftEl.firstElementChild) {
+      leftEl.firstElementChild.innerHTML = this.textLeft;
+    }
+    if (rightEl) {
+      rightEl.innerHTML = this.textRight;
+      if (this.applySpace) {
+        rightEl.classList.add('with-leading-space');
+      } else {
+        rightEl.classList.remove('with-leading-space');
+      }
+    }
+
+    // 3. Keep the recursive loop sequence intact and working synchronously
     this.callSplitText(recursions);
   }
 
   /** Companion function for splitText to call it recursively
-   *
-   * @param { number: recursions } - track recursion depth
    **/
   callSplitText(recursions = 0): void {
     const leftEl = this.elRefTextLeft()?.nativeElement;

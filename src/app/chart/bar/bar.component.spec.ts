@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { BarComponent } from './bar.component';
 
@@ -168,7 +162,7 @@ describe('BarComponent', () => {
     expect(component.roundUpNumber(28021318)).toEqual(28021320);
   });
 
-  it('should zoom to the top entries', fakeAsync(() => {
+  it('should zoom to the top entries', async () => {
     fixture.componentRef.setInput('results', testResults);
     fixture.detectChanges();
     component.addSeriesFromResult();
@@ -178,7 +172,8 @@ describe('BarComponent', () => {
       'zoomToIndexes'
     );
     component.zoomTop();
-    tick(100);
+    await Promise.resolve();
+
     expect(component.categoryAxis.zoomToIndexes).not.toHaveBeenCalled();
 
     fixture.componentRef.setInput('results', testResults);
@@ -186,9 +181,10 @@ describe('BarComponent', () => {
 
     component.preferredNumberBars = 1;
     component.zoomTop();
-    tick(100);
+    await Promise.resolve();
+
     expect(spyZoomToIndexes).toHaveBeenCalled();
-  }));
+  });
 
   it('should get the extra setting', () => {
     expect(component.extraSettings).toBeTruthy();

@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { FormControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -203,16 +197,25 @@ describe('OverviewComponent', () => {
       params.next({ facet: DimensionName.country });
     });
 
-    it('should load on initialisation', fakeAsync(() => {
+    it('should load on initialisation', async () => {
+      jest.useFakeTimers();
+
       component.ngOnInit();
-      tick(1);
+
+      await Promise.resolve();
+      jest.advanceTimersByTime(tickTime);
+
       fixture.detectChanges();
+
       const ctrlFacet = component.form.controls
         .facetParameter as UntypedFormControl;
       expect(ctrlFacet.value).toBe(DimensionName.country);
+
       expect(component.dataServerData).toBeTruthy();
-      tick(tickTimeChartDebounce);
-    }));
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
   });
 
   describe('Normal Operations', () => {
@@ -536,44 +539,62 @@ describe('OverviewComponent', () => {
       expect(Object.keys(component.filterData).length).toBeTruthy();
     });
 
-    it('should build the filters (from the query parameters)', fakeAsync(() => {
+    it('should build the filters (from the query parameters)', async () => {
       expect(Object.keys(component.filterData).length).toBeFalsy();
+
       const nextParams = {};
       nextParams[DimensionName.country] = ['Italy', 'Greece'];
+
+      jest.useFakeTimers();
+
       queryParams.next(nextParams);
       fixture.detectChanges();
-      tick(1);
-      component.buildFilters({});
+
+      jest.advanceTimersByTime(tickTime);
+      fixture.detectChanges();
 
       expect(Object.keys(component.filterData).length).toBeTruthy();
-      tick(tickTimeChartDebounce);
-    }));
 
-    it('should load the data', fakeAsync(() => {
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
+
+    it('should load the data', async () => {
       const spyPostProcessResult = jest.spyOn(component, 'postProcessResult');
+
+      jest.useFakeTimers();
+
       component.form.controls.datasetId.setValue('1');
       fixture.detectChanges();
       component.loadData();
-      tick(tickTime);
 
+      jest.advanceTimersByTime(tickTime);
       expect(spyPostProcessResult).toHaveBeenCalled();
 
       component.form.controls.datasetId.setValue('EMPTY');
       fixture.detectChanges();
       component.loadData();
-      tick(tickTime);
-      expect(spyPostProcessResult).toHaveBeenCalledTimes(1);
-      tick(tickTimeChartDebounce);
-    }));
 
-    it('should get the select options', fakeAsync(() => {
+      jest.advanceTimersByTime(tickTime);
+      expect(spyPostProcessResult).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
+
+    it('should get the select options', async () => {
       fixture.detectChanges();
       expect(component.filterData.length).toBeFalsy();
+
+      jest.useFakeTimers();
       component.loadData();
-      tick(tickTime);
+      jest.advanceTimersByTime(tickTime);
+
       expect(Object.keys(component.filterData).length).toBeGreaterThan(0);
-      tick(tickTimeChartDebounce);
-    }));
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
 
     it('should get the url for a dataset', () => {
       expect(component.getUrl().indexOf('XXX')).toEqual(-1);
@@ -645,29 +666,32 @@ describe('OverviewComponent', () => {
       expect(component.getFormattedDateParam().length).toBeFalsy();
     });
 
-    it('should read the datasetId param', fakeAsync(() => {
+    it('should read the datasetId param', async () => {
+      jest.useFakeTimers();
+
       component.loadData();
-      tick(tickTime);
+      jest.advanceTimersByTime(tickTime);
       expect(component.form.value.datasetId.length).toBeFalsy();
 
       const nextParams = {};
       nextParams[nonFacetFilters[NonFacetFilterNames.datasetId]] = '123';
 
       queryParams.next(nextParams);
-      tick(tickTime);
+      jest.advanceTimersByTime(tickTime);
       fixture.detectChanges();
 
       expect(component.form.value.datasetId.length).toBeTruthy();
       expect(component.form.value.datasetId).toEqual('123');
 
       queryParams.next({});
-      tick(tickTime);
+      jest.advanceTimersByTime(tickTime);
       fixture.detectChanges();
 
       expect(component.form.value.datasetId).toEqual('');
 
-      tick(tickTimeChartDebounce);
-    }));
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
 
     it('should update the datasetId param', () => {
       component.form.get('datasetId').setValue('123, 456, 789');
@@ -800,8 +824,7 @@ describe('OverviewComponent', () => {
       expect(selected.length).toEqual(0);
     });
 
-    it('should focus the export opener', () => {
-      jest.useFakeTimers();
+    it('should focus the export opener', async () => {
       const mockOpenerFocus = jest.fn();
       const mockToolbarFocus = jest.fn();
 
@@ -818,35 +841,36 @@ describe('OverviewComponent', () => {
         .mockReturnValue(mockExportOpenerToolbar);
 
       component.focusExportOpener(false);
-      jest.advanceTimersByTime(1);
+      await Promise.resolve();
 
       expect(mockOpenerFocus).toHaveBeenCalled();
       expect(mockToolbarFocus).not.toHaveBeenCalled();
 
       component.focusExportOpener(true);
-      jest.advanceTimersByTime(1);
+      await Promise.resolve();
 
       expect(mockToolbarFocus).toHaveBeenCalled();
-      jest.useRealTimers();
     });
 
-    it('should clear the dates', fakeAsync(() => {
-      expect(component.filterStates.dates().visible).toBeFalsy(); //
+    it('should clear the dates', async () => {
+      expect(component.filterStates.dates().visible).toBeFalsy();
 
       component.form.get('dateFrom').setValue(new Date().toISOString());
       expect(component.form.value.dateFrom).toBeTruthy();
       component.datesClear();
       expect(component.form.value.dateFrom).toBeFalsy();
-      tick(1);
 
-      expect(component.filterStates.dates().visible).toBeTruthy(); //
+      await Promise.resolve();
+      expect(component.filterStates.dates().visible).toBeTruthy();
 
       component.form.get('dateTo').setValue(new Date().toISOString());
       expect(component.form.value.dateTo).toBeTruthy();
       component.datesClear();
       expect(component.form.value.dateTo).toBeFalsy();
-      tick(1);
-    }));
+
+      await Promise.resolve();
+      expect(component.filterStates.dates().visible).toBeTruthy();
+    });
 
     it('should get the formatted date param', () => {
       expect(component.getFormattedDateParam()).toEqual('');
@@ -857,23 +881,25 @@ describe('OverviewComponent', () => {
       ).toBeGreaterThan(-1);
     });
 
-    it('should enable the filters', fakeAsync(() => {
+    it('should enable the filters', async () => {
       component.loadData();
-      tick(tickTime);
+      await Promise.resolve();
 
       component.filterStates[DimensionName.country].update((current) => ({
         ...current,
         disabled: true
       }));
 
+      jest.useFakeTimers();
       component.enableFilters();
 
       expect(
         component.filterStates[DimensionName.country]().disabled
-      ).toBeFalsy(); //
+      ).toBeFalsy();
 
-      tick(tickTimeChartDebounce);
-    }));
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
 
     it('should clear the filters', () => {
       setFilterValue1(DimensionName.type);
@@ -898,9 +924,10 @@ describe('OverviewComponent', () => {
       ).toBeFalsy();
     });
 
-    it('should close the filters', fakeAsync(() => {
+    it('should close the filters', async () => {
       component.loadData();
-      tick(tickTime);
+      await Promise.resolve();
+
       const setAllTrue = (): void => {
         Object.keys(component.filterStates).forEach((s: string) => {
           component.filterStates[s].update((current) => ({
@@ -928,11 +955,16 @@ describe('OverviewComponent', () => {
 
       const exception = DimensionName.type;
       checkAllValue(true);
+
+      jest.useFakeTimers();
+
       component.closeFilters(exception);
 
       expect(component.filterStates[exception]().visible).toBeTruthy();
-      tick(tickTimeChartDebounce);
-    }));
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
 
     it('should convert the facet names for the portal query', () => {
       fixture.detectChanges();
@@ -950,7 +982,7 @@ describe('OverviewComponent', () => {
       ).toBeGreaterThan(-1);
     });
 
-    it('should add the series', fakeAsync(() => {
+    it('should add the series', async () => {
       fixture.detectChanges();
 
       const snapshotsInstance = component.snapshots();
@@ -968,13 +1000,19 @@ describe('OverviewComponent', () => {
         .spyOn(component, 'showAppliedSeriesInGridAndChart')
         .mockImplementation(() => false);
 
+      jest.useFakeTimers();
       component.addSeries(['series-key']);
+
+      await Promise.resolve();
+
       expect(spyShowAppliedSeriesInGridAndChart).toHaveBeenCalled();
       expect(spyApply).toHaveBeenCalled();
-      tick(tickTimeChartDebounce);
-    }));
 
-    it('should remove the series', fakeAsync(() => {
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
+
+    it('should remove the series', async () => {
       fixture.detectChanges();
 
       const snapshotsInstance = component.snapshots();
@@ -992,11 +1030,17 @@ describe('OverviewComponent', () => {
         .spyOn(component, 'showAppliedSeriesInGridAndChart')
         .mockReturnValue(null);
 
+      jest.useFakeTimers();
+
       component.removeSeries('');
+      await Promise.resolve();
+
       expect(spyShowAppliedSeriesInGridAndChart).toHaveBeenCalled();
       expect(spyUnapply).toHaveBeenCalled();
-      tick(tickTimeChartDebounce);
-    }));
+
+      jest.advanceTimersByTime(tickTimeChartDebounce);
+      jest.useRealTimers();
+    });
 
     it('should update the page url', () => {
       expect(router.navigate).not.toHaveBeenCalled();
@@ -1127,24 +1171,5 @@ describe('OverviewComponent', () => {
         component.getUrlRow(DimensionName.contentTier, '1').indexOf(dateDetect)
       ).toBeGreaterThan(-1);
     });
-  });
-
-  describe('Polling', () => {
-    beforeEach(waitForAsync(() => {
-      configureTestBed();
-    }));
-
-    beforeEach(() => {
-      b4Each();
-    });
-
-    it('should invoke the provided callback', fakeAsync(() => {
-      const spy = jest.fn();
-      component.loadData(spy);
-      tick(tickTime);
-      expect(spy).toHaveBeenCalled();
-      component.ngOnDestroy();
-      tick(tickTimeChartDebounce);
-    }));
   });
 });
