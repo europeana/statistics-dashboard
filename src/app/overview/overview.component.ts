@@ -3,6 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
   ElementRef,
   inject,
   OnInit,
@@ -11,6 +12,7 @@ import {
   viewChild,
   WritableSignal
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   DatePipe,
   formatDate,
@@ -49,7 +51,6 @@ import {
   yearZero
 } from '../_helpers';
 import { BarChartCool } from '../chart/chart-defaults';
-import { SubscriptionManager } from '../subscription-manager';
 import {
   BreakdownRequest,
   BreakdownResult,
@@ -110,7 +111,7 @@ import { ResizeComponent } from '../resize';
     RenameCountryPipe
   ]
 })
-export class OverviewComponent extends SubscriptionManager implements OnInit {
+export class OverviewComponent implements OnInit {
   grid = viewChild(GridComponent);
   cmpExport = viewChild(ExportComponent);
   barChart = viewChild(BarComponent);
@@ -121,6 +122,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   exportOpener = viewChild(ElementRef);
   dateFocusControl = viewChild(ElementRef);
 
+  private destroyRef = inject(DestroyRef);
   private readonly api = inject(APIService);
   private readonly fb = inject(UntypedFormBuilder);
   private readonly route = inject(ActivatedRoute);
@@ -203,7 +205,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
    * untyped formbuilder used so that unpredictable datasetId fields can be added
    **/
   constructor() {
-    super();
     this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));
       this.form.addControl(`filter_list_${s}`, new FormControl(''));
@@ -261,97 +262,94 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* Event hook: subscribe to changes in the route / query params
   */
   ngOnInit(): void {
-    this.subs.push(
-      this.chartRefresher
-        .pipe(debounceTime(400))
-        .subscribe((redraw: boolean) => {
-          this.refreshChart(redraw, 0);
-          this.changeDetector.markForCheck();
-        })
-    );
+    this.chartRefresher
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe((redraw: boolean) => {
+        this.refreshChart(redraw, 0);
+        this.changeDetector.markForCheck();
+      });
 
-    this.subs.push(
-      combineLatest([this.route.params, this.route.queryParams])
-        .pipe(
-          map((results) => {
-            const qp = results[1];
-            const qpValArrays = {};
-            Object.keys(qp).forEach((paramName: string) => {
-              this.queryParamsRaw[paramName] = [];
-              qpValArrays[paramName] = (
-                Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
-              ).map((qpValue: string) => {
-                qpValue =
-                  paramName === DimensionName.country
-                    ? isoCountryCodes[qpValue]
-                    : qpValue;
-                this.queryParamsRaw[paramName].push(qpValue);
-                return toInputSafeName(qpValue);
-              });
+    combineLatest([this.route.params, this.route.queryParams])
+      .pipe(
+        map((results) => {
+          const qp = results[1];
+          const qpValArrays = {};
+          Object.keys(qp).forEach((paramName: string) => {
+            this.queryParamsRaw[paramName] = [];
+            qpValArrays[paramName] = (
+              Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+            ).map((qpValue: string) => {
+              qpValue =
+                paramName === DimensionName.country
+                  ? isoCountryCodes[qpValue]
+                  : qpValue;
+              this.queryParamsRaw[paramName].push(qpValue);
+              return toInputSafeName(qpValue);
             });
-            return {
-              params: results[0],
-              queryParams: qpValArrays
-            };
-          })
-        )
-        .subscribe((combined) => {
-          this.disabledParams = {};
-
-          const params = combined.params;
-          const queryParams = combined.queryParams;
-
-          this.countryPageShortcutsAvailable =
-            Object.keys(queryParams).length === 2 &&
-            !!queryParams[DimensionName.country] &&
-            `${queryParams[DimensionName.type]}` === '3D' &&
-            queryParams[DimensionName.type].length === 1;
-
-          if (!this.countryPageShortcutsAvailable) {
-            this.countryPageShortcutsAvailable =
-              !!queryParams[DimensionName.country] &&
-              !!queryParams[DimensionName.metadataTier] &&
-              !queryParams[DimensionName.metadataTier].includes('0') &&
-              !!queryParams[DimensionName.contentTier] &&
-              !queryParams[DimensionName.contentTier].includes('1');
-          }
-
-          // checkbox representation of (split) datasetId
-          this.form.addControl('datasetIds', this.fb.group({}));
-
-          const datasetId =
-            queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
-          if (datasetId) {
-            const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
-            `${datasetId}`.split(',').forEach((part: string) => {
-              datasetIds.addControl(part.trim(), new FormControl(''));
-            });
-          }
-
-          if (queryParams[params.facet]) {
-            this.disabledParams[params.facet] = queryParams[params.facet];
-            delete queryParams[params.facet];
-          }
-
-          const facetChanged =
-            params.facet &&
-            params.facet !== this.form.controls.facetParameter.value;
-
-          if (facetChanged) {
-            this.form.controls.facetParameter.setValue(params.facet);
-            if (this.dataServerData) {
-              this.switchFacet();
-            }
-          }
-          this.queryParams = queryParams;
-          this.setCtZeroInputToQueryParam();
-          this.setDateInputsToQueryParams();
-          this.setDatasetIdInputToQueryParam();
-          this.loadData((): void => {
-            this.updateFilterAvailability();
           });
-        })
-    );
+          return {
+            params: results[0],
+            queryParams: qpValArrays
+          };
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((combined) => {
+        this.disabledParams = {};
+
+        const params = combined.params;
+        const queryParams = combined.queryParams;
+
+        this.countryPageShortcutsAvailable =
+          Object.keys(queryParams).length === 2 &&
+          !!queryParams[DimensionName.country] &&
+          `${queryParams[DimensionName.type]}` === '3D' &&
+          queryParams[DimensionName.type].length === 1;
+
+        if (!this.countryPageShortcutsAvailable) {
+          this.countryPageShortcutsAvailable =
+            !!queryParams[DimensionName.country] &&
+            !!queryParams[DimensionName.metadataTier] &&
+            !queryParams[DimensionName.metadataTier].includes('0') &&
+            !!queryParams[DimensionName.contentTier] &&
+            !queryParams[DimensionName.contentTier].includes('1');
+        }
+
+        // checkbox representation of (split) datasetId
+        this.form.addControl('datasetIds', this.fb.group({}));
+
+        const datasetId =
+          queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
+        if (datasetId) {
+          const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
+          `${datasetId}`.split(',').forEach((part: string) => {
+            datasetIds.addControl(part.trim(), new FormControl(''));
+          });
+        }
+
+        if (queryParams[params.facet]) {
+          this.disabledParams[params.facet] = queryParams[params.facet];
+          delete queryParams[params.facet];
+        }
+
+        const facetChanged =
+          params.facet &&
+          params.facet !== this.form.controls.facetParameter.value;
+
+        if (facetChanged) {
+          this.form.controls.facetParameter.setValue(params.facet);
+          if (this.dataServerData) {
+            this.switchFacet();
+          }
+        }
+        this.queryParams = queryParams;
+        this.setCtZeroInputToQueryParam();
+        this.setDateInputsToQueryParams();
+        this.setDatasetIdInputToQueryParam();
+        this.loadData((): void => {
+          this.updateFilterAvailability();
+        });
+      });
   }
 
   getGridData(): FmtTableData {
@@ -586,23 +584,22 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* - loads the facet data
   */
   loadData(fnCallback?: (refresh?: boolean) => void): void {
-    this.subs.push(
-      this.api
-        .getBreakdowns(this.getDataServerDataRequest())
-        .subscribe((breakdownResults: BreakdownResults) => {
-          this.isLoading = false;
-          if (this.processServerResult(breakdownResults)) {
-            this.postProcessResult();
-          } else {
-            // build filter data using param data to allow removal of any blocking filters
-            this.buildFilters(this.queryParamsRaw);
-          }
-          if (fnCallback) {
-            fnCallback();
-          }
-          this.changeDetector.markForCheck();
-        })
-    );
+    this.api
+      .getBreakdowns(this.getDataServerDataRequest())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((breakdownResults: BreakdownResults) => {
+        this.isLoading = false;
+        if (this.processServerResult(breakdownResults)) {
+          this.postProcessResult();
+        } else {
+          // build filter data using param data to allow removal of any blocking filters
+          this.buildFilters(this.queryParamsRaw);
+        }
+        if (fnCallback) {
+          fnCallback();
+        }
+        this.changeDetector.markForCheck();
+      });
   }
 
   initialiseFilterStates(): void {

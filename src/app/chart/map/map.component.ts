@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, effect, input, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -7,7 +8,6 @@ import am4geodata_worldHigh from '@amcharts/amcharts4-geodata/worldHigh';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { SubscriptionManager } from '../../subscription-manager';
 import { IdValue, IHash, TargetFieldName } from '../../_models';
 import {
   colourHeatmapBlue,
@@ -41,7 +41,7 @@ type ColourSchemeMap = {
   styleUrls: ['./map.component.scss'],
   standalone: true
 })
-export class MapComponent extends SubscriptionManager implements AfterViewInit {
+export class MapComponent implements AfterViewInit {
   mapData = input<Array<IdValue>>([]);
   mapCountrySet = output<boolean>();
 
@@ -116,8 +116,6 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
   isDragging = false;
 
   constructor() {
-    super();
-
     const cst = Object.values(TargetFieldName).reduce(
       (ob: ColourSchemeMap, tType: TargetFieldName) => {
         ob[tType] = [];
@@ -174,17 +172,15 @@ export class MapComponent extends SubscriptionManager implements AfterViewInit {
       outline: am4core.color(colourHighlightYellow)
     };
 
-    this.subs.push(
-      this.countryClickSubject
-        .pipe(debounceTime(250))
-        .subscribe((clickedId: string) => {
-          this.countryClick(clickedId);
-        }),
+    this.countryClickSubject
+      .pipe(debounceTime(250), takeUntilDestroyed())
+      .subscribe((clickedId: string) => {
+        this.countryClick(clickedId);
+      }),
       this.dragEndSubject.pipe(debounceTime(350)).subscribe(() => {
         this.isDragging = false;
         this.isAnimating = false;
-      })
-    );
+      });
 
     effect(() => {
       const incomingData = this.mapData();

@@ -1,6 +1,7 @@
 import { Location, PopStateEvent } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   HostListener,
   inject,
   Inject,
@@ -9,6 +10,7 @@ import {
   viewChild,
   ViewContainerRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router, RouterOutlet } from '@angular/router';
 import {
@@ -20,7 +22,6 @@ import {
 
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
-import { SubscriptionManager } from './subscription-manager';
 import { AppDateAdapter } from './_helpers';
 import { APIService, ClickService, FilterStateService } from './_services';
 import { GeneralResults, GeneralResultsFormatted } from './_models';
@@ -43,7 +44,8 @@ import { HeaderComponent } from './header/header.component';
     FooterComponent
   ]
 })
-export class AppComponent extends SubscriptionManager implements OnInit {
+export class AppComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly maintenanceService = inject(MaintenanceScheduleService);
   public filterStateService = inject(FilterStateService);
 
@@ -66,7 +68,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     @Inject(LOCALE_ID) private readonly locale: string,
     @Inject(LOCALE_ID) private readonly dateAdapter: AppDateAdapter
   ) {
-    super();
     document.title = 'Statistics Dashboard';
     this.checkIfMaintenanceDue(maintenanceSettings);
     this.showCookieConsent();
@@ -74,14 +75,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   checkIfMaintenanceDue(settings: MaintenanceSettings): void {
     this.maintenanceService.setApiSettings(settings);
-    this.subs.push(
-      this.maintenanceService
-        .loadMaintenanceItem()
-        .subscribe((item: MaintenanceItem | undefined) => {
-          this.maintenanceInfo = item;
-          this.filterStateService.landingDataIsLoading.set(false);
-        })
-    );
+    this.maintenanceService
+      .loadMaintenanceItem()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((item: MaintenanceItem | undefined) => {
+        this.maintenanceInfo = item;
+        this.filterStateService.landingDataIsLoading.set(false);
+      });
   }
 
   /** buildForm
@@ -92,8 +92,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       contentTierZero: this.lastSetContentTierZeroValue
     });
 
-    this.subs.push(
-      this.formCTZero.valueChanges.subscribe(() => {
+    this.formCTZero.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.lastSetContentTierZeroValue =
           !!this.formCTZero.value.contentTierZero;
         this.filterStateService.includeCTZero.set(
@@ -115,8 +116,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
         ) {
           this.loadLandingData(this.lastSetContentTierZeroValue);
         }
-      })
-    );
+      });
   }
 
   /** documentClick
@@ -142,14 +142,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    ***/
   loadLandingData(includeCTZero: boolean): void {
     this.filterStateService.landingDataIsLoading.set(true);
-    this.subs.push(
-      this.api
-        .getGeneralResults(includeCTZero)
-        .subscribe((general: GeneralResults) => {
-          this.filterStateService.rawGeneralData.set(general);
-          this.filterStateService.landingDataIsLoading.set(false);
-        })
-    );
+    this.api
+      .getGeneralResults(includeCTZero)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((general: GeneralResults) => {
+        this.filterStateService.rawGeneralData.set(general);
+        this.filterStateService.landingDataIsLoading.set(false);
+      });
   }
 
   /** setContentTierZeroValue
@@ -194,13 +193,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * - bind location back / forward events to form
    **/
   ngOnInit(): void {
-    this.subs.push(
-      this.route.queryParams.subscribe((params: Params) => {
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params: Params) => {
         const hasParam = params[this.paramNameCTZero] === 'true';
         this.filterStateService.includeCTZero.set(hasParam);
         this.lastSetContentTierZeroValue = hasParam;
-      })
-    );
+      });
     this.location.subscribe(this.handleLocationPopState.bind(this));
     this.buildForm();
   }

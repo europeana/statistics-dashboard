@@ -223,11 +223,6 @@ describe('OverviewComponent', () => {
     beforeEach(b4Each);
 
     afterEach(() => {
-      jest.useFakeTimers();
-      component.cleanup();
-      // Synchronously flush out the 400ms chart debounce timers instantly
-      jest.advanceTimersByTime(tickTimeChartDebounce);
-
       jest.clearAllTimers();
       jest.useRealTimers();
     });
