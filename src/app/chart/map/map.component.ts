@@ -176,11 +176,12 @@ export class MapComponent implements AfterViewInit {
       .pipe(debounceTime(250), takeUntilDestroyed())
       .subscribe((clickedId: string) => {
         this.countryClick(clickedId);
-      }),
-      this.dragEndSubject.pipe(debounceTime(350)).subscribe(() => {
-        this.isDragging = false;
-        this.isAnimating = false;
       });
+
+    this.dragEndSubject.pipe(debounceTime(350)).subscribe(() => {
+      this.isDragging = false;
+      this.isAnimating = false;
+    });
 
     effect(() => {
       const incomingData = this.mapData();
