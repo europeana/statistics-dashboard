@@ -1,4 +1,4 @@
-import { Location, NgIf, PopStateEvent } from '@angular/common';
+import { Location, PopStateEvent } from '@angular/common';
 import {
   Component,
   HostListener,
@@ -37,7 +37,6 @@ import { HeaderComponent } from './header/header.component';
   styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html',
   imports: [
-    NgIf,
     MaintenanceUtilsModule,
     HeaderComponent,
     RouterOutlet,

@@ -8,7 +8,7 @@ import {
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
-import { isPlatformBrowser, NgClass, NgIf } from '@angular/common';
+import { isPlatformBrowser, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import * as am4core from '@amcharts/amcharts4/core';
@@ -29,7 +29,7 @@ import { BarChartDefaults } from '../chart-defaults';
   templateUrl: './bar.component.html',
   styleUrls: ['./bar.component.scss'],
   standalone: true,
-  imports: [NgIf, FormsModule, NgClass]
+  imports: [FormsModule, NgClass]
 })
 export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;

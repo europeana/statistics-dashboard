@@ -13,7 +13,6 @@ import {
   ReactiveFormsModule,
   UntypedFormGroup
 } from '@angular/forms';
-import { NgIf } from '@angular/common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { startWith, switchMap } from 'rxjs';
 import {
@@ -31,8 +30,7 @@ import { getDateAsISOString, today, yearZero } from '../_helpers';
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatDatepickerModule,
-    NgIf
+    MatDatepickerModule
   ]
 })
 export class DatesComponent {

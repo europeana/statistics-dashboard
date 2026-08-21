@@ -1,9 +1,11 @@
-<div class="fixed-modal" *ngIf="maintenanceInfo?.maintenanceMessage">
+@if(maintenanceInfo?.maintenanceMessage){
+<div class="fixed-modal">
   <div class="fixed-modal-content">
     <lib-maintenance-info [maintenanceInfo]="maintenanceInfo">
     </lib-maintenance-info>
   </div>
 </div>
+}
 
 <app-header [(showPageTitle)]="showPageTitle" [form]="formCTZero"></app-header>
 

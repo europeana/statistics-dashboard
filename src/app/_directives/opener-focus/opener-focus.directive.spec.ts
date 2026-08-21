@@ -1,11 +1,10 @@
 import { Component, DebugElement } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OpenerFocusDirective } from '.';
 
 @Component({
-  imports: [OpenerFocusDirective, NgIf],
+  imports: [OpenerFocusDirective],
   template: `
     <div appOpenerFocus [fnHide]="fnHide">
       <a class="link1" tabindex="0"></a>
