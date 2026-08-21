@@ -407,7 +407,7 @@ describe('LegendGridComponent', () => {
 
     fixture.componentRef.setInput('countryCode', 'FR');
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
@@ -416,7 +416,7 @@ describe('LegendGridComponent', () => {
 
     fixture.componentRef.setInput('countryCode', 'DE');
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
@@ -424,14 +424,14 @@ describe('LegendGridComponent', () => {
 
     fixture.componentRef.setInput('countryCode', 'FR');
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
 
     fixture.componentRef.setInput('countryCode', '');
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     jest.advanceTimersByTime(component.timeoutAnimation);
     expect(component.countryCode()).toBeFalsy();

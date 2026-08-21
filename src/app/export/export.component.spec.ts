@@ -53,13 +53,13 @@ describe('ExportComponent', () => {
 
     component.copy();
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(component.copied).toBeTruthy();
 
     jest.advanceTimersByTime(component.msMsgDisplay);
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(component.copied).toBeFalsy();
     jest.useRealTimers();

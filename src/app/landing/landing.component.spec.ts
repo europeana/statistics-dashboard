@@ -84,7 +84,7 @@ describe('LandingComponent', () => {
     mockFilterState.landingData.set({ contentTier: [], country: [] });
 
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     await Promise.resolve();
     expect(spyRefreshCharts).toHaveBeenCalled();

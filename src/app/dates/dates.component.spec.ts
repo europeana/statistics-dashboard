@@ -66,7 +66,7 @@ describe('DatesComponent', () => {
 
     fixture.componentRef.setInput('form', mockForm);
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
   });
 
   it('should handle the to-date change', () => {
@@ -84,7 +84,7 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateTo: localYesterdayString });
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(component.dateFrom().nativeElement.getAttribute('max')).toEqual(
       localYesterdayString
@@ -92,7 +92,7 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateTo: null });
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(component.dateFrom().nativeElement.getAttribute('max')).toEqual(
       component.today
@@ -106,7 +106,7 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateFrom: component.today });
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(component.dateTo().nativeElement.getAttribute('min')).toBeTruthy();
     expect(component.dateTo().nativeElement.getAttribute('min')).not.toEqual(
@@ -115,7 +115,7 @@ describe('DatesComponent', () => {
 
     mockForm.patchValue({ dateFrom: null });
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(component.dateTo().nativeElement.getAttribute('min')).toEqual(
       component.yearZero
@@ -135,7 +135,7 @@ describe('DatesComponent', () => {
     expect(mockForm.controls['dateTo'].errors).toBeTruthy();
 
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(spyUpdateDateTo).toHaveBeenCalled();
 
@@ -150,7 +150,7 @@ describe('DatesComponent', () => {
     expect(mockForm.controls['dateFrom'].errors).toBeTruthy();
 
     fixture.detectChanges();
-    TestBed.flushEffects();
+    TestBed.tick();
 
     expect(spyUpdateDateFrom).toHaveBeenCalled();
   });

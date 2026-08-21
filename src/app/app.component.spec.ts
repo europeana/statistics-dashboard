@@ -18,9 +18,7 @@ import {
 } from '@europeana/metis-ui-maintenance-utils';
 
 import { MockAPIService, mockFilterStateService } from './_mocked';
-
 import { GeneralResultsFormatted } from './_models';
-
 import { APIService, ClickService, FilterStateService } from './_services';
 import { AppComponent } from './app.component';
 import { CookiePolicyComponent } from './cookie-policy';
@@ -152,13 +150,6 @@ describe('AppComponent', () => {
     expect(mockFilterState.includeCTZero()).toBeFalsy();
     app.buildForm();
 
-    app.countryComponentRef = {
-      includeCTZero: createMockModelSignal(false),
-      hasCountryMapData: createMockModelSignal(false),
-      landingData: signal({} as GeneralResultsFormatted),
-      landingDataIsLoading: signal<boolean>(false)
-    } as unknown as CountryComponent;
-
     app.updateLocation();
     expect(mockFilterState.includeCTZero()).toBeFalsy();
 
@@ -172,18 +163,12 @@ describe('AppComponent', () => {
     await Promise.resolve();
 
     expect(mockFilterState.includeCTZero()).toBeTruthy();
-    expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
-      true
-    );
 
     ctrl.setValue(false);
 
     await Promise.resolve();
 
     expect(mockFilterState.includeCTZero()).toBeFalsy();
-    expect(app.countryComponentRef.includeCTZero.set).toHaveBeenCalledWith(
-      false
-    );
 
     location.go('/');
 
@@ -346,11 +331,8 @@ describe('AppComponent', () => {
     const spyLoadMaintenanceItem = jest
       .spyOn(maintenanceSchedules, 'loadMaintenanceItem')
       .mockImplementation(() => {
-        return of({
-          maintenanceMessage: 'Hello'
-        });
+        return of({ maintenanceMessage: 'Hello' });
       });
-
     app.checkIfMaintenanceDue(maintenanceSettings);
     expect(spyLoadMaintenanceItem).toHaveBeenCalled();
     expect(mockFilterState.landingDataIsLoading()).toBeFalsy();

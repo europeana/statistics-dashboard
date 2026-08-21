@@ -50,7 +50,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   formCTZero: FormGroup<{ contentTierZero: FormControl<boolean> }>;
   landingData: GeneralResultsFormatted;
-  countryComponentRef: CountryComponent;
   paramNameCTZero = 'content-tier-zero';
   showPageTitle: number;
   lastSetContentTierZeroValue = false;
@@ -108,18 +107,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           this.skipLocationUpdate = false;
         }
 
-        const rawPath = this.location.path().split('?')[0];
+        const basePath = this.location.path().split('?')[0];
+
         if (
-          rawPath === '' ||
-          rawPath === '/' ||
-          rawPath.startsWith('/country')
+          basePath === '' ||
+          basePath === '/' ||
+          basePath.startsWith('/country')
         ) {
           this.loadLandingData(this.lastSetContentTierZeroValue);
-        }
-        if (this.countryComponentRef) {
-          this.countryComponentRef.includeCTZero.set(
-            this.lastSetContentTierZeroValue
-          );
         }
       })
     );
@@ -143,10 +138,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   }
 
   /*** loadLandingData
-   * - resets local landingData object
-   * - loads the general breakdown data / reconstructs local object
-   * - sets landingComponentRef landingData to local object
-   * - derives countryTotalMap data and assigns to header component
+   * - binds rawGeneralData in filterStateService to api
    * @param { boolean: includeCTZero } - request content-tier-zero
    ***/
   loadLandingData(includeCTZero: boolean): void {
@@ -222,20 +214,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   /**
    * onOutletLoaded
-   * invoked when router component loads a component
-   *    - sets showPageTitle
-   * if it's an OverviewComponent
-   *    - sets the component locale
-   *    - (and if countryTotalMap is unset)
-   *      - loads the landing data
-   * if it's a CountryComponent or a LandingComponent:
-   *    - updates the compenent ref and ctZero control value
-   *    - assigns landing data
-   *
-   * @param { LandingComponent | OverviewComponent |
-   *   CountryComponent| PrivacyStatementComponent |
-   *   CookiePolicyComponent: component } - the loaded component
-   *
+   * Handles component rendering states
    **/
   onOutletLoaded(
     component:
@@ -247,30 +226,46 @@ export class AppComponent extends SubscriptionManager implements OnInit {
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
     const hasCountryMapData = this.filterStateService.hasCountryMapData();
+    const isLanding = component instanceof LandingComponent;
 
+    this.updateHeaderTitleState(component);
+    this.handleComponentSetup(component);
+    this.syncGlobalModeInputs(component, ctrlCTZero, hasCountryMapData);
+
+    if (!isLanding && !hasCountryMapData) {
+      this.loadLandingData(this.filterStateService.includeCTZero());
+    }
+  }
+
+  private updateHeaderTitleState(component: unknown): void {
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
-
-      if (ctrlCTZero) {
-        this.setCTZeroInputToLastSetValue(ctrlCTZero);
-      }
+    } else if (component instanceof CountryComponent) {
+      this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
     } else {
-      if (component instanceof OverviewComponent) {
-        component.locale = this.locale;
-        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
-      } else if (component instanceof CountryComponent) {
-        this.countryComponentRef = component;
-        this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
-        if (!hasCountryMapData && ctrlCTZero) {
-          this.setCTZeroInputToLastSetValue(ctrlCTZero);
-        }
-      } else {
-        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
-      }
+      this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
+    }
+  }
 
-      if (!hasCountryMapData) {
-        this.loadLandingData(this.filterStateService.includeCTZero());
-      }
+  private handleComponentSetup(component: unknown): void {
+    if (component instanceof OverviewComponent) {
+      component.locale = this.locale;
+    }
+  }
+
+  private syncGlobalModeInputs(
+    component: unknown,
+    ctrlCTZero: FormControl,
+    hasCountryMapData: boolean
+  ): void {
+    if (!ctrlCTZero) return;
+
+    const isLanding = component instanceof LandingComponent;
+    const isCountryMissingMap =
+      component instanceof CountryComponent && !hasCountryMapData;
+
+    if (isLanding || isCountryMissingMap) {
+      this.setCTZeroInputToLastSetValue(ctrlCTZero);
     }
   }
 
@@ -284,14 +279,12 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     ).CookieConsentComponent;
 
     const container = this.consentContainer();
-
     if (!container) {
       console.warn('Consent container view child is not available yet.');
       return;
     }
 
     container.clear();
-
     const cookieConsent = container.createComponent(CookieConsentComponent);
 
     cookieConsent.setInput('translations', cookieConsentConfig.translations);

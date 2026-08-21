@@ -107,7 +107,7 @@ describe('CountryComponent', () => {
         finaliseInit();
         fixture.detectChanges();
 
-        TestBed.flushEffects();
+        TestBed.tick();
         expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
       });
     });
@@ -212,7 +212,7 @@ describe('CountryComponent', () => {
         finaliseInit();
         fixture.detectChanges();
 
-        TestBed.flushEffects();
+        TestBed.tick();
         expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
       });
     });
@@ -236,7 +236,7 @@ describe('CountryComponent', () => {
         finaliseInit();
         fixture.detectChanges();
 
-        TestBed.flushEffects();
+        TestBed.tick();
 
         expect(router.navigate).toHaveBeenCalledWith(
           ['country', isoCountryCodesReversed[code]],
@@ -266,7 +266,7 @@ describe('CountryComponent', () => {
         finaliseInit();
         fixture.detectChanges();
 
-        TestBed.flushEffects();
+        TestBed.tick();
 
         expect(router.navigate).toHaveBeenCalledWith(
           ['country', isoCountryCodesReversed[code]],
@@ -308,7 +308,7 @@ describe('CountryComponent', () => {
       component.country.set('France');
       component.includeCTZero.set(false);
 
-      TestBed.flushEffects();
+      TestBed.tick();
 
       component.refreshCardData();
 

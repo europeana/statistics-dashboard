@@ -238,19 +238,19 @@ describe('OverviewComponent', () => {
 
       params.next({ facet: DimensionName.country });
       fixture.detectChanges();
-      TestBed.flushEffects();
+      TestBed.tick();
       expect(spyGetBreakdowns).toHaveBeenCalledTimes(1);
 
       params.next({ facet: DimensionName.type });
       fixture.detectChanges();
-      TestBed.flushEffects();
+      TestBed.tick();
       expect(spyGetBreakdowns).toHaveBeenCalledTimes(2);
 
       const nextParams = {};
       nextParams[DimensionName.type] = ['SOUND', 'VIDEO'];
       queryParams.next(nextParams);
       fixture.detectChanges();
-      TestBed.flushEffects();
+      TestBed.tick();
       expect(spyGetBreakdowns).toHaveBeenCalledTimes(3);
 
       jest.advanceTimersByTime(tickTimeChartDebounce);
@@ -336,7 +336,7 @@ describe('OverviewComponent', () => {
         DimensionName.contentTier
       );
       fixture.detectChanges();
-      TestBed.flushEffects();
+      TestBed.tick();
 
       jest.advanceTimersByTime(tickTimeChartDebounce);
       expect(spyRefreshChart).toHaveBeenCalledWith(true, 0);
