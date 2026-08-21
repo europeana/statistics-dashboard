@@ -15,8 +15,6 @@ import {
   DatePipe,
   formatDate,
   NgClass,
-  NgFor,
-  NgIf,
   NgTemplateOutlet
 } from '@angular/common';
 import {
@@ -97,8 +95,6 @@ import { ResizeComponent } from '../resize';
     MatDialogModule,
     RouterLink,
     CTZeroControlComponent,
-    NgIf,
-    NgFor,
     NgTemplateOutlet,
     FilterComponent,
     IsScrollableDirective,

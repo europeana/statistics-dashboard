@@ -3,8 +3,6 @@ import {
   formatNumber,
   LowerCasePipe,
   NgClass,
-  NgFor,
-  NgIf,
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
@@ -78,8 +76,6 @@ import { TruncateComponent } from '../truncate';
     AppendiceSectionComponent,
     RouterOutlet,
     NgClass,
-    NgIf,
-    NgFor,
     SpeechBubbleComponent,
     TruncateComponent,
     NgTemplateOutlet,

@@ -29,3 +29,19 @@ HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
   rect: jest.fn(),
   clip: jest.fn(),
 })) as any;
+
+
+// Intercept console errors to silence the fake JSDOM CSS parsing bugs
+const originalConsoleError = console.error;
+
+console.error = (...args: any[]) => {
+  const errorMessage = args[0]?.toString() || '';
+
+  // If the error message mentions the CSS stylesheet parser, swallow it quietly
+  if (errorMessage.includes('Could not parse CSS stylesheet')) {
+    return;
+  }
+
+  // Otherwise, pass normal framework/runtime errors through to the screen
+  originalConsoleError(...args);
+};

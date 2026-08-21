@@ -3,8 +3,6 @@ import {
   KeyValuePipe,
   LowerCasePipe,
   NgClass,
-  NgFor,
-  NgIf,
   NgStyle,
   NgTemplateOutlet,
   UpperCasePipe
@@ -61,8 +59,6 @@ import { Subscription } from 'rxjs';
     OpenerFocusDirective,
     NgClass,
     ResizeComponent,
-    NgIf,
-    NgFor,
     TruncateComponent,
     NgStyle,
     NgTemplateOutlet,

@@ -2,8 +2,6 @@ import {
   DecimalPipe,
   LowerCasePipe,
   NgClass,
-  NgFor,
-  NgIf,
   NgStyle,
   NgTemplateOutlet
 } from '@angular/common';
@@ -50,8 +48,6 @@ import { LineComponent } from '../chart';
     DecimalPipe,
     LowerCasePipe,
     NgClass,
-    NgIf,
-    NgFor,
     NgTemplateOutlet,
     NgStyle,
     RenameCountryPipe,

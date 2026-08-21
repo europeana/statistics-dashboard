@@ -33,29 +33,28 @@
           <span>
             {{ targetType | renameTargetType }}
           </span>
+          @if(countryData()[country]){
           <span
             class="target-total right"
-            *ngIf="countryData()[country]"
             [ngClass]="{ 'pad-right': targetType === TargetFieldName.HQ }"
           >
             {{ countryData()[country][0][targetType] | number }}
           </span>
+          }
         </a>
       </li>
+      @if(series && targetMetaData()[country]){
       <li
         class="roll-down-wrapper"
-        *ngIf="series && targetMetaData()[country]"
         [ngClass]="{ 'is-open': !(series.isHidden || series.isHiding) }"
       >
         <ul class="roll-down">
+          @for (data of targetMetaData()[country][targetType]; track data; let i
+          = $index) {
           <li
             class="target-toggle"
             [ngStyle]="{ color: series.fill }"
             [ngClass]="{ active: data.range }"
-            *ngFor="
-              let data of targetMetaData()[country][targetType];
-              let i = index
-            "
           >
             <a
               class="legend-item-target-toggle"
@@ -86,8 +85,10 @@
               }}</span>
             </a>
           </li>
+          }
         </ul>
       </li>
+      }
     </ul>
   </ng-template>
 
@@ -131,11 +132,8 @@
           isPinned ? countryPinValue * classReference.itemHeight || 10 : ''
         "
       >
-        <!-- Replaced legacy *ngFor loop with signals-native @for block -->
         @for (enabled of [columnEnabled3D(), columnEnabledHQ(),
-        columnEnabledALL()]; track $index) {
-        <!-- Replaced *ngIf with @if to evaluate the boolean state synchronously -->
-        @if (enabled) {
+        columnEnabledALL()]; track $index) { @if (enabled) {
         <span [ngClass]="{ 'top-pin': isTopPin }">
           <ng-content
             *ngTemplateOutlet="
@@ -158,11 +156,10 @@
 
           @if (isTopPin) {
           <span class="perma-pin">
-            <!-- Evaluated the computed signal columnsEnabledCount with execution brackets -->
+            @if(columnsEnabledCount() > 1){
             <a
               aria-label="unpin column"
               class="x"
-              *ngIf="columnsEnabledCount() > 1"
               (click)="
                 fireUnpinColumn(
                   $index === 0
@@ -173,6 +170,7 @@
                 )
               "
             ></a>
+            }
           </span>
           }
         </span>
