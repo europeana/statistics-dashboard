@@ -95,7 +95,7 @@ export class MapComponent implements AfterViewInit {
     const selectedIndex = this.mapCountries.indexOf(selectedCountry);
     const length = this.mapCountries.length;
     const indexNext = (selectedIndex + 1) % length;
-    const indexPrev = (selectedIndex ? selectedIndex : length) - 1;
+    const indexPrev = (selectedIndex || length) - 1;
 
     this.selectedIndex = selectedCountry ? selectedIndex : undefined;
     this.selectedCountryNext = this.mapCountries[indexNext];

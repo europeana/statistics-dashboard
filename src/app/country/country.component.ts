@@ -153,7 +153,7 @@ export class CountryComponent implements AfterViewInit, OnDestroy {
     return undefined;
   });
 
-  private routeDataSignal = toSignal(
+  private readonly routeDataSignal = toSignal(
     combineLatest([
       this.api.getTargetMetaData(),
       this.api.getCountryData(),
@@ -210,7 +210,7 @@ export class CountryComponent implements AfterViewInit, OnDestroy {
           this.refreshCardData();
         }
         this.restoreHiddenColumns();
-        this.showTargetsData = !!(meta && meta[activeCountry]);
+        this.showTargetsData = !!meta?.[activeCountry];
         this.setHeaderData(activeCountry);
       }
     });
@@ -348,12 +348,7 @@ export class CountryComponent implements AfterViewInit, OnDestroy {
     const currentLatestData = this.latestCountryData();
     const metaMap = this.targetMetaData();
 
-    if (
-      currentLatestData &&
-      currentCountry &&
-      metaMap &&
-      metaMap[currentCountry]
-    ) {
+    if (currentLatestData && currentCountry && metaMap?.[currentCountry]) {
       Object.values(TargetFieldName).forEach((valName: string) => {
         const countryName =
           isoCountryCodesReversed[currentCountry] ?? currentCountry;

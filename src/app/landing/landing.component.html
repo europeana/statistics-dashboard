@@ -180,17 +180,10 @@
         <ng-content
           *ngTemplateOutlet="
             tmpMapLayerMenu;
-            context: {
-              menuDisabled:
-                !countryData ||
-                !mapChart() ||
-                !mapChart().selectedCountry ||
-                (countryData && countryData[mapChart().selectedCountry])
-                  ? null
-                  : 'disabled'
-            }
+            context: { menuDisabled: menuDisabledStatus() }
           "
         ></ng-content>
+
         <!-- End Map Toolbar Contents-->
         }@else{
         <!--not a country -->
@@ -225,8 +218,8 @@
         }
 
         <!-- country selection -->
-        @if(navCountry === mapChart().selectedCountry){ @if(countryData &&
-        countryData[mapChart().selectedCountry]){
+        @if(navCountry === mapChart().selectedCountry){ @if(
+        countryData()?.[mapChart().selectedCountry]){
         <span
           class="numeric"
           [ngClass]="{
@@ -258,7 +251,7 @@
       </div>
       }
       <!-- selected country display -->
-      @if(countryData && countryData[mapChart().selectedCountry]){
+      @if(countryData()?.[mapChart().selectedCountry]){
       <ng-template #tmpTargetSummary let-targetType="targetType">
         <div class="container-h target-summary">
           <span
@@ -268,7 +261,7 @@
             }"
           >
             {{
-              countryData[mapChart().selectedCountry][0][targetType] || 0
+              countryData()?.[mapChart().selectedCountry][0][targetType] || 0
                 | number
             }}
           </span>
@@ -305,7 +298,11 @@
             ></ng-content>
           </span>
           <span class="boxed">
-            <a class="info-icon"></a>
+            <a
+              class="info-icon"
+              aria-label="Target metadata info tooltip"
+              href="javascript:void(0)"
+            ></a>
           </span>
         </div>
 

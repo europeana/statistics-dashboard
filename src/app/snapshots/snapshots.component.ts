@@ -25,13 +25,10 @@ export class SnapshotsComponent {
   isVisible = input<boolean>(false);
   hideItem = output<string>();
   showItems = output<Array<string>>();
-
   pinIndex = signal<number>(0);
 
-  // Single primitive change trigger to notify the template when mutations occur
-  private stateChangeTrigger = signal<number>(0);
+  private readonly stateChangeTrigger = signal<number>(0);
 
-  // Core Data Cache
   compareDataAllFacets: { [key: string]: CompareData } = facetNames.reduce(
     (map, s: string) => {
       map[s] = {};

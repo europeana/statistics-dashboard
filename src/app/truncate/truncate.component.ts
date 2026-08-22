@@ -53,12 +53,10 @@ export class TruncateComponent implements AfterViewInit {
 
   isEllipsisActive(): boolean {
     const leftEl = this.elRefTextLeft()?.nativeElement;
-    if (!leftEl || !leftEl.firstElementChild) return false;
+    const childWidth = leftEl?.firstElementChild?.getBoundingClientRect().width;
+    const parentWidth = leftEl?.getBoundingClientRect().width;
 
-    return (
-      leftEl.firstElementChild.getBoundingClientRect().width >
-      leftEl.getBoundingClientRect().width
-    );
+    return !!(childWidth && parentWidth && childWidth > parentWidth);
   }
 
   /** splitText
@@ -78,25 +76,20 @@ export class TruncateComponent implements AfterViewInit {
     this.applySpace =
       this.textLeft.endsWith(' ') || this.textRight.startsWith(' ');
 
-    // 1. Notify the template engine that the state changes require a paint update
     this.changeDetector.markForCheck();
 
-    // 2. Synchronously write the text updates to the DOM so getBoundingClientRect can read them accurately
     const leftEl = this.elRefTextLeft()?.nativeElement;
     const rightEl = this.elRefTextRight()?.nativeElement;
-    if (leftEl && leftEl.firstElementChild) {
+
+    if (leftEl?.firstElementChild) {
       leftEl.firstElementChild.innerHTML = this.textLeft;
     }
+
     if (rightEl) {
       rightEl.innerHTML = this.textRight;
-      if (this.applySpace) {
-        rightEl.classList.add('with-leading-space');
-      } else {
-        rightEl.classList.remove('with-leading-space');
-      }
+      rightEl.classList.toggle('with-leading-space', !!this.applySpace);
     }
 
-    // 3. Keep the recursive loop sequence intact and working synchronously
     this.callSplitText(recursions);
   }
 

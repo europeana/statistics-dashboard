@@ -204,9 +204,7 @@ export class LegendGridComponent implements AfterViewInit, OnDestroy {
   sortPins(strings: Array<string>, desiredOrder: Array<string>): void {
     const reversedOrder = structuredClone(desiredOrder).reverse();
     strings.sort((a: string, b: string) => {
-      const indexA = reversedOrder.indexOf(a);
-      const indexB = reversedOrder.indexOf(b);
-      return indexA < indexB ? 1 : indexA > indexB ? -1 : 0;
+      return reversedOrder.indexOf(b) - reversedOrder.indexOf(a);
     });
   }
 

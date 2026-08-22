@@ -219,7 +219,7 @@ export class GridComponent {
       const currentPager = this.pagerInfo();
 
       if (val.length > 0 && currentPager) {
-        const pageNum = Math.min(currentPager.pageCount, parseInt(val));
+        const pageNum = Math.min(currentPager.pageCount, Number.parseInt(val));
         this.paginator()?.setPage(Math.max(0, pageNum - 1));
       }
       inputEl.value = '';

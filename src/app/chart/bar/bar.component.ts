@@ -200,7 +200,7 @@ export class BarComponent implements AfterViewInit {
     const seriesVals = [];
 
     csds.forEach((csd: ColourSeriesData) => {
-      if (!this.chart.data || !this.chart.data.length) {
+      if (!this.chart.data?.length) {
         this.chart.data = Object.keys(csd.data)
           .slice(0, this.maxNumberBars)
           .map((s: string) => {
@@ -282,11 +282,7 @@ export class BarComponent implements AfterViewInit {
   }
 
   isZoomable(): boolean {
-    return (
-      this.chart &&
-      this.chart.data &&
-      this.chart.data.length > this.preferredNumberBars
-    );
+    return this.chart?.data?.length > this.preferredNumberBars;
   }
 
   zoomTop(start = 0): void {

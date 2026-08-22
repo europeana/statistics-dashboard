@@ -48,7 +48,7 @@ export class HeaderComponent {
   public static readonly PAGE_TITLE_MINIFIED = 1;
   public static readonly PAGE_TITLE_SHOWING = 2;
 
-  private filterStateService = inject(FilterStateService);
+  private readonly filterStateService = inject(FilterStateService);
   public router = inject(Router);
 
   form = input<FormGroup>();

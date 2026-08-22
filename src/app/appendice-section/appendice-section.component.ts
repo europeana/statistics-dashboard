@@ -39,6 +39,6 @@ export class AppendiceSectionComponent {
       this.columnEnabled3D(),
       this.columnEnabledHQ(),
       this.columnEnabledALL()
-    ].filter((val: boolean) => val).length;
+    ].filter(Boolean).length;
   });
 }

@@ -33,10 +33,13 @@ import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
+  DimensionName,
   externalLinks,
   facetNames,
   isoCountryCodes,
   isoCountryCodesReversed,
+  NonFacetFilterNames,
+  nonFacetFilters,
   portalNames,
   portalNamesFriendly
 } from '../_data';
@@ -67,7 +70,6 @@ import {
   NamesValuePercent,
   RequestFilter
 } from '../_models';
-import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
 import { APIService, FilterStateService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
@@ -122,14 +124,14 @@ export class OverviewComponent implements OnInit {
   exportOpener = viewChild(ElementRef);
   dateFocusControl = viewChild(ElementRef);
 
-  private destroyRef = inject(DestroyRef);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(APIService);
   private readonly fb = inject(UntypedFormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly changeDetector = inject(ChangeDetectorRef);
-  private filterStateService = inject(FilterStateService);
+  private readonly filterStateService = inject(FilterStateService);
 
   // Make variables available to template
   public fromCSL = fromCSL;

@@ -25,7 +25,7 @@ import { NgClass } from '@angular/common';
 export class CTZeroControlComponent {
   form = input.required<FormGroup<{ contentTierZero: FormControl<boolean> }>>();
   disabled = input<boolean>(false);
-  onChange = output<void>();
+  readonly changed = output<void>();
 
   public readonly externalLinks = externalLinks;
 
@@ -47,6 +47,6 @@ export class CTZeroControlComponent {
   }
 
   valueChanged(): void {
-    this.onChange.emit();
+    this.changed.emit();
   }
 }

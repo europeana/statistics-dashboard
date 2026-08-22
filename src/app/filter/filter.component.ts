@@ -63,20 +63,11 @@ export class FilterComponent {
 
   empty = computed(() => {
     const currentOptionSet = this.optionSet();
-    return !(
-      currentOptionSet &&
-      currentOptionSet.options &&
-      currentOptionSet.options.length > 0
-    );
+    return !(currentOptionSet?.options?.length > 0);
   });
 
   emptyData = computed(() => {
-    if (!this.empty()) {
-      if (!this.term() || this.term().length === 0) {
-        return false;
-      }
-    }
-    return true;
+    return this.empty() || !(this.term()?.length > 0);
   });
 
   filterTermChanged = output<FilterInfo>();
@@ -87,7 +78,7 @@ export class FilterComponent {
   opener = viewChild<ElementRef<HTMLElement>>('opener');
   checkboxes = viewChildren(CheckboxComponent);
 
-  constructor(private injector: Injector) {
+  constructor(private readonly injector: Injector) {
     effect(() => {
       const isVisible = this.state()?.visible;
       const targetInput = this.inputToFocus();

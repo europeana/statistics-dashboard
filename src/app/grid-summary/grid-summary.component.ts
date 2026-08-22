@@ -4,7 +4,7 @@ import {
   computed,
   input
 } from '@angular/core';
-import { BreakdownResult, CountPercentageValue } from '../_models';
+import { BreakdownResult } from '../_models';
 import { DimensionName } from '../_data';
 import { RenameApiFacetShortPipe, RenameCountryPipe } from '../_translate';
 import { DecimalPipe } from '@angular/common';
@@ -26,14 +26,10 @@ export class GridSummaryComponent {
 
   summaryData = computed(() => {
     const data = this.summaryDataInput();
-    if (!data) {
-      return undefined;
-    }
-
-    const cloned = structuredClone(data);
-    cloned.results.sort((a: CountPercentageValue, b: CountPercentageValue) => {
-      return b.count - a.count;
-    });
-    return cloned;
+    if (!data) return undefined;
+    return {
+      ...data,
+      results: [...data.results].sort((a, b) => b.count - a.count)
+    };
   });
 }

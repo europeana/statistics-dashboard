@@ -104,6 +104,18 @@ export class LandingComponent implements OnDestroy {
   targetExpanded: TargetFieldName | undefined;
   allProgressSeries: IHashArray<Array<IdValue>> = {};
   mapMenuIsOpen = false;
+  menuDisabledStatus = computed(() => {
+    const data = this.countryData();
+    const chart = this.mapChart();
+    const selected = chart?.selectedCountry;
+
+    if (!data || !chart || !selected) {
+      return 'disabled';
+    }
+    const hasCountryRecord = !!data[selected];
+    return hasCountryRecord ? null : 'disabled';
+  });
+
   heatmapActivated = false;
 
   private _visibleHeatMap?: VisibleHeatMap;
