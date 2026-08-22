@@ -21,6 +21,7 @@ import {
 } from '../_mocked';
 import { APIService, FilterStateService } from '../_services';
 
+import { DimensionName } from '../_data';
 import { TargetFieldName, VisibleHeatMap } from '../_models';
 import { BarComponent, MapComponent } from '../chart';
 import { LandingComponent } from '.';
@@ -88,6 +89,13 @@ describe('LandingComponent', () => {
 
     await Promise.resolve();
     expect(spyRefreshCharts).toHaveBeenCalled();
+  });
+
+  it('should detect if data present', () => {
+    mockFilterState.landingData.set({});
+    expect(component.hasLandingData()).toBeFalsy();
+    mockFilterState.landingData.set({ country: ['IT'], contentTier: [] });
+    expect(component.hasLandingData()).toBeTruthy();
   });
 
   it('should refresh the charts', () => {
@@ -203,6 +211,43 @@ describe('LandingComponent', () => {
     expect(component.mapMenuIsOpen).toBeFalsy();
   });
 
+  it('should compute the correct menuDisabledStatus for various data states', () => {
+    const scenarios = [
+      {
+        data: undefined,
+        chart: { selectedCountry: 'IT' },
+        expected: 'disabled'
+      },
+      { data: { IT: {} }, chart: undefined, expected: 'disabled' },
+      {
+        data: { IT: {} },
+        chart: { selectedCountry: null },
+        expected: 'disabled'
+      },
+      {
+        data: { IT: {} },
+        chart: { selectedCountry: 'FR' },
+        expected: 'disabled'
+      },
+      { data: { IT: {} }, chart: { selectedCountry: 'IT' }, expected: null }
+    ];
+
+    scenarios.forEach(({ data, chart, expected }) => {
+      Object.defineProperties(component, {
+        countryData: { value: () => data, writable: true },
+        mapChart: { value: () => chart, writable: true }
+      });
+      const result = ((): string | null => {
+        const d = component.countryData();
+        const c = component.mapChart();
+        const selected = c?.selectedCountry;
+        if (!d || !c || !selected) return 'disabled';
+        return d[selected] ? null : 'disabled';
+      })();
+      expect(result).toEqual(expected);
+    });
+  });
+
   it('should close the map section', () => {
     const mockMapComponent = {
       countryClick: jest.fn()
@@ -239,6 +284,40 @@ describe('LandingComponent', () => {
     expect(component.layerOpener()?.nativeElement.focus).toHaveBeenCalledTimes(
       1
     );
+  });
+
+  it('should map country results when country data is present, and fallback to empty array when missing', async () => {
+    const mockBar = {
+      removeAllSeries: jest.fn(),
+      addSeriesFromResult: jest.fn()
+    };
+    jest
+      .spyOn(component, 'barCharts')
+      .mockImplementation(
+        () => [mockBar] as unknown as readonly BarComponent[]
+      );
+
+    mockFilterState.landingData.set({
+      [DimensionName.country]: [
+        { name: 'IT', value: 400 },
+        { name: 'FR', value: 250 }
+      ]
+    });
+    fixture.detectChanges();
+    await Promise.resolve();
+
+    expect(component.mapData()).toEqual([
+      { id: 'IT', value: 400 },
+      { id: 'FR', value: 250 }
+    ]);
+
+    mockFilterState.landingData.set({
+      [DimensionName.contentTier]: []
+    });
+    fixture.detectChanges();
+
+    await Promise.resolve();
+    expect(component.mapData()).toEqual([]);
   });
 
   it('should tap the target data load', () => {

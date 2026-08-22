@@ -152,6 +152,46 @@ describe('FilterComponent', () => {
     ).toBeTruthy();
   });
 
+  it('should compute correct empty and emptyData flags for all option sets and terms', () => {
+    const scenarios = [
+      {
+        optionSet: undefined,
+        term: '',
+        expectedEmpty: true,
+        expectedEmptyData: true
+      },
+      {
+        optionSet: { options: [] },
+        term: 'abc',
+        expectedEmpty: true,
+        expectedEmptyData: true
+      },
+      {
+        optionSet: { options: [{ id: 1 }] },
+        term: '',
+        expectedEmpty: false,
+        expectedEmptyData: true
+      },
+      {
+        optionSet: { options: [{ id: 1 }] },
+        term: 'abc',
+        expectedEmpty: false,
+        expectedEmptyData: false
+      }
+    ];
+
+    scenarios.forEach(
+      ({ optionSet, term, expectedEmpty, expectedEmptyData }) => {
+        fixture.componentRef.setInput('optionSet', optionSet);
+        component.term.set(term);
+        fixture.detectChanges();
+
+        expect(component.empty()).toBe(expectedEmpty);
+        expect(component.emptyData()).toBe(expectedEmptyData);
+      }
+    );
+  });
+
   it('should set the filter options', () => {
     const evt = {
       key: '1',
