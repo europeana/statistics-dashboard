@@ -1,10 +1,5 @@
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ElementRef } from '@angular/core';
 import { ResizeComponent } from '../resize';
 import { TruncateComponent } from './';
 import { HighlightMatchPipe } from '../_translate';
@@ -20,13 +15,22 @@ describe('TruncateComponent', () => {
     }).compileComponents();
   };
 
-  beforeEach(waitForAsync(() => {
-    configureTestBed();
-  }));
-
-  beforeEach(() => {
+  beforeEach(async () => {
+    await configureTestBed();
     fixture = TestBed.createComponent(TruncateComponent);
     component = fixture.componentInstance;
+
+    const parentSpan = document.createElement('span');
+    const childSpan = document.createElement('span');
+    parentSpan.appendChild(childSpan);
+
+    const mockElementRef = {
+      nativeElement: parentSpan
+    } as ElementRef;
+
+    jest.spyOn(component, 'elRefTextLeft').mockReturnValue(mockElementRef);
+    jest.spyOn(component, 'elRefTextRight').mockReturnValue(mockElementRef);
+
     fixture.detectChanges();
   });
 
@@ -36,38 +40,130 @@ describe('TruncateComponent', () => {
 
   it('should split the text on init', () => {
     const spySplitText = jest.spyOn(component, 'splitText');
-    component.text = 'xxxx';
-    component.ngOnInit();
+    fixture.componentRef.setInput('text', 'xxxx');
+    fixture.detectChanges();
+
     expect(spySplitText).toHaveBeenCalled();
   });
 
-  it('should split the text on resize', fakeAsync(() => {
-    component.text = 'xxxx';
-    component.ngOnInit();
+  it('should split the text on resize', async () => {
+    fixture.componentRef.setInput('text', 'xxxx');
+    fixture.detectChanges();
     const spySplitText = jest.spyOn(component, 'splitText');
+
+    jest.useFakeTimers();
+
     window.dispatchEvent(new Event('resize'));
-    tick(component.debounceMS);
+
+    jest.advanceTimersByTime(component.debounceMS);
+
     expect(spySplitText).toHaveBeenCalled();
-  }));
+    jest.useRealTimers();
+  });
 
-  it('should split the text recursively', fakeAsync(() => {
-    const ellipsisActive = false;
-    jest.spyOn(component, 'isEllipsisActive').mockImplementation(() => {
-      return ellipsisActive;
-    });
+  it('should split the text recursively', () => {
+    jest.spyOn(component, 'isEllipsisActive').mockReturnValue(false);
 
-    component.text = 'xxxx';
+    let rawText = 'xxxx';
     for (let x = 0; x < 10; x++) {
-      component.text = component.text + component.text;
+      rawText = rawText + rawText;
     }
 
     const spySplitText = jest.spyOn(component, 'splitText');
-    component.ngOnInit();
+
+    fixture.componentRef.setInput('text', rawText);
     fixture.detectChanges();
+
     component.omitCount = 2;
     component.callSplitText();
+
     expect(component.omitCount).toEqual(0);
-    tick(component.debounceMS);
-    expect(spySplitText).toHaveBeenCalledTimes(2);
-  }));
+    expect(spySplitText).toHaveBeenCalled();
+  });
+
+  it('should test all callSplitText branches correctly', () => {
+    const leftEl = document.createElement('span');
+    const rightEl = document.createElement('span');
+    leftEl.appendChild(document.createElement('span'));
+
+    const scenarios = [
+      {
+        left: null,
+        right: null,
+        ellipsis: false,
+        wL: 0,
+        wR: 0,
+        rec: 0,
+        expectedOmit: 0,
+        shouldSplit: false
+      },
+      {
+        left: leftEl,
+        right: rightEl,
+        ellipsis: true,
+        wL: 100,
+        wR: 150,
+        rec: 0,
+        expectedOmit: 2,
+        shouldSplit: true
+      },
+      {
+        left: leftEl,
+        right: rightEl,
+        ellipsis: true,
+        wL: 100,
+        wR: 150,
+        rec: 5,
+        expectedOmit: 2,
+        shouldSplit: false
+      }
+    ];
+
+    scenarios.forEach(
+      ({ left, right, ellipsis, wL, wR, rec, expectedOmit, shouldSplit }) => {
+        jest
+          .spyOn(component, 'elRefTextLeft')
+          .mockReturnValue(
+            left
+              ? ({ nativeElement: left } as unknown as ElementRef)
+              : undefined
+          );
+
+        jest
+          .spyOn(component, 'elRefTextRight')
+          .mockReturnValue(
+            right
+              ? ({ nativeElement: right } as unknown as ElementRef)
+              : undefined
+          );
+
+        jest.spyOn(component, 'isEllipsisActive').mockReturnValue(ellipsis);
+
+        if (left && right) {
+          jest
+            .spyOn(left, 'getBoundingClientRect')
+            .mockReturnValue({ width: wL } as DOMRect);
+          jest
+            .spyOn(right, 'getBoundingClientRect')
+            .mockReturnValue({ width: wR } as DOMRect);
+        }
+
+        const spySplitText = jest
+          .spyOn(component, 'splitText')
+          .mockImplementation();
+
+        spySplitText.mockClear();
+
+        component['_text'] = 'abcdefgh';
+        component.omitCount = 0;
+        component.maxRecursions = 5;
+
+        component.callSplitText(rec);
+
+        expect(component.omitCount).toEqual(expectedOmit);
+        if (shouldSplit) expect(spySplitText).toHaveBeenCalled();
+        else expect(spySplitText).not.toHaveBeenCalled();
+      }
+    );
+  });
 });

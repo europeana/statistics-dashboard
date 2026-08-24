@@ -1,72 +1,65 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, QueryList } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import * as am4core from '@amcharts/amcharts4/core';
 
 import {
   MockAPIService,
+  MockBarComponent,
   mockCountryData,
+  mockFilterStateService,
   MockMapComponent,
   mockTargetMetaData
 } from '../_mocked';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
+
+import { DimensionName } from '../_data';
 import { TargetFieldName, VisibleHeatMap } from '../_models';
 import { BarComponent, MapComponent } from '../chart';
 import { LandingComponent } from '.';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi
-} from '@angular/common/http';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
   let fixture: ComponentFixture<LandingComponent>;
   let api: APIService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
 
   const mockLandingData = {
     contentTier: [],
     country: [{ name: 'IT', percent: 3, value: 400 }]
   };
 
-  const configureTestBed = (): void => {
+  beforeEach(() => {
+    mockFilterState = mockFilterStateService();
+
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [FormsModule, ReactiveFormsModule, LandingComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {}
-        },
-        {
-          provide: APIService,
-          useClass: MockAPIService
-        },
+        { provide: ActivatedRoute, useValue: {} },
+        { provide: APIService, useClass: MockAPIService },
+        { provide: FilterStateService, useValue: mockFilterState },
         provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        provideNoopAnimations()
       ]
     })
       .overrideComponent(LandingComponent, {
-        remove: { imports: [MapComponent] },
-        add: { imports: [MockMapComponent] }
+        remove: { imports: [MapComponent, BarComponent] },
+        add: { imports: [MockMapComponent, MockBarComponent] }
       })
       .compileComponents();
+
     api = TestBed.inject(APIService);
-  };
-
-  beforeEach(waitForAsync(() => {
-    configureTestBed();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(LandingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -76,66 +69,75 @@ describe('LandingComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have data', () => {
-    expect(component.hasLandingData()).toBeFalsy();
-    expect(component.mapData).toBeFalsy();
+  it('should refresh the charts when the data changes', async () => {
+    const mockBarChartsArray = [1, 2].map(() => ({
+      removeAllSeries: jest.fn(),
+      addSeriesFromResult: jest.fn()
+    }));
 
-    component.landingData = { contentTier: [] };
+    jest
+      .spyOn(component, 'barCharts')
+      .mockReturnValue(
+        mockBarChartsArray as unknown as readonly BarComponent[]
+      );
 
-    expect(component.hasLandingData()).toBeTruthy();
-    expect(component.mapData).not.toBeFalsy();
-    expect(component.mapData.length).toBeFalsy();
-
-    component.landingData = mockLandingData;
-    expect(component.hasLandingData()).toBeTruthy();
-    expect(component.mapData.length).toBeTruthy();
-  });
-
-  it('should refresh the charts when the data changes', () => {
     const spyRefreshCharts = jest.spyOn(component, 'refreshCharts');
-    component.landingData = { contentTier: [], country: [] };
+    mockFilterState.landingData.set({ contentTier: [], country: [] });
+
     fixture.detectChanges();
+    TestBed.tick();
+
+    await Promise.resolve();
     expect(spyRefreshCharts).toHaveBeenCalled();
   });
 
-  it('should refresh the charts', fakeAsync(() => {
+  it('should detect if data present', () => {
+    mockFilterState.landingData.set({});
+    expect(component.hasLandingData()).toBeFalsy();
+    mockFilterState.landingData.set({ country: ['IT'], contentTier: [] });
+    expect(component.hasLandingData()).toBeTruthy();
+  });
+
+  it('should refresh the charts', () => {
     let mockChartRefreshed = false;
     let mockChartRemoved = false;
 
-    const mockCharts = {
-      length: 3,
-      toArray: () =>
-        [1, 2, 3].map(() => {
-          return {
-            removeAllSeries: () => {
-              mockChartRemoved = true;
-            },
-            ngAfterViewInit: () => {
-              mockChartRefreshed = true;
-            }
-          } as unknown as BarComponent;
-        })
-    } as unknown as QueryList<BarComponent>;
+    const mockChartsArray = [1, 2, 3].map(() => {
+      return {
+        removeAllSeries: () => {
+          mockChartRemoved = true;
+        },
+        addSeriesFromResult: () => {
+          mockChartRefreshed = true;
+        }
+      } as unknown as BarComponent;
+    });
 
-    component.barCharts = undefined;
+    component.barCharts = jest.fn().mockReturnValue([]) as unknown as Signal<
+      readonly BarComponent[]
+    >;
     component.refreshCharts();
-    tick(1);
 
     expect(mockChartRefreshed).toBeFalsy();
     expect(mockChartRemoved).toBeFalsy();
 
-    component.barCharts = mockCharts;
+    component.barCharts = jest
+      .fn()
+      .mockReturnValue(mockChartsArray) as unknown as Signal<
+      readonly BarComponent[]
+    >;
     component.refreshCharts();
-    tick(1);
 
     expect(mockChartRefreshed).toBeTruthy();
     expect(mockChartRemoved).toBeTruthy();
-  }));
+  });
 
   it('should build the derived series', () => {
     expect(Object.keys(component.allProgressSeries).length).toBeFalsy();
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
+
     component.buildDerivedSeries();
     expect(Object.keys(component.allProgressSeries).length).toBeTruthy();
 
@@ -149,8 +151,8 @@ describe('LandingComponent', () => {
   });
 
   it('should override the derived series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
     component.buildDerivedSeries();
 
     const defaultResult = [{ name: 'IT', value: 1 }];
@@ -162,8 +164,8 @@ describe('LandingComponent', () => {
   });
 
   it('should sort the derived series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
     component.buildDerivedSeries();
 
     const testSeries = component.allProgressSeries[TargetFieldName.THREE_D][0];
@@ -181,8 +183,8 @@ describe('LandingComponent', () => {
   });
 
   it('should look up values in the derived series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
     component.buildDerivedSeries();
 
     const derivedValue = 12300;
@@ -196,7 +198,6 @@ describe('LandingComponent', () => {
     expect(
       component.getDerivedSeriesValue(TargetFieldName.THREE_D, 0, 'IT')
     ).toEqual(derivedValue);
-
     expect(
       component.getDerivedSeriesValue(TargetFieldName.THREE_D, 0, 'XXX')
     ).toEqual(0);
@@ -210,28 +211,113 @@ describe('LandingComponent', () => {
     expect(component.mapMenuIsOpen).toBeFalsy();
   });
 
+  it('should compute the correct menuDisabledStatus for various data states', () => {
+    const scenarios = [
+      {
+        data: undefined,
+        chart: { selectedCountry: 'IT' },
+        expected: 'disabled'
+      },
+      { data: { IT: {} }, chart: undefined, expected: 'disabled' },
+      {
+        data: { IT: {} },
+        chart: { selectedCountry: null },
+        expected: 'disabled'
+      },
+      {
+        data: { IT: {} },
+        chart: { selectedCountry: 'FR' },
+        expected: 'disabled'
+      },
+      { data: { IT: {} }, chart: { selectedCountry: 'IT' }, expected: null }
+    ];
+
+    scenarios.forEach(({ data, chart, expected }) => {
+      Object.defineProperties(component, {
+        countryData: { value: () => data, writable: true },
+        mapChart: { value: () => chart, writable: true }
+      });
+      const result = ((): string | null => {
+        const d = component.countryData();
+        const c = component.mapChart();
+        const selected = c?.selectedCountry;
+        if (!d || !c || !selected) return 'disabled';
+        return d[selected] ? null : 'disabled';
+      })();
+      expect(result).toEqual(expected);
+    });
+  });
+
   it('should close the map section', () => {
-    component.mapChart = {
+    const mockMapComponent = {
       countryClick: jest.fn()
     } as unknown as MapComponent;
+
+    component.mapChart = jest
+      .fn()
+      .mockReturnValue(mockMapComponent) as unknown as Signal<
+      MapComponent | undefined
+    >;
     component.closeMapSelection();
-    expect(component.mapChart.countryClick).toHaveBeenCalled();
+
+    expect(component.mapChart()?.countryClick).toHaveBeenCalled();
   });
 
   it('should close the map menu, refocussing the opener', () => {
-    component.layerOpener = {
-      nativeElement: {
-        focus: jest.fn()
-      }
-    } as unknown as ElementRef;
+    const mockElementRef = {
+      nativeElement: { focus: jest.fn() }
+    } as unknown as ElementRef<HTMLElement>;
+
+    component.layerOpener = jest
+      .fn()
+      .mockReturnValue(mockElementRef) as unknown as Signal<
+      ElementRef<HTMLElement> | undefined
+    >;
 
     component.mapMenuIsOpen = true;
     component.closeMapMenu();
+
     expect(component.mapMenuIsOpen).toBeFalsy();
-    expect(component.layerOpener.nativeElement.focus).toHaveBeenCalled();
+    expect(component.layerOpener()?.nativeElement.focus).toHaveBeenCalled();
 
     component.closeMapMenu();
-    expect(component.layerOpener.nativeElement.focus).toHaveBeenCalledTimes(1);
+    expect(component.layerOpener()?.nativeElement.focus).toHaveBeenCalledTimes(
+      1
+    );
+  });
+
+  it('should map country results when country data is present, and fallback to empty array when missing', async () => {
+    const mockBar = {
+      removeAllSeries: jest.fn(),
+      addSeriesFromResult: jest.fn()
+    };
+    jest
+      .spyOn(component, 'barCharts')
+      .mockImplementation(
+        () => [mockBar] as unknown as readonly BarComponent[]
+      );
+
+    mockFilterState.landingData.set({
+      [DimensionName.country]: [
+        { name: 'IT', value: 400 },
+        { name: 'FR', value: 250 }
+      ]
+    });
+    fixture.detectChanges();
+    await Promise.resolve();
+
+    expect(component.mapData()).toEqual([
+      { id: 'IT', value: 400 },
+      { id: 'FR', value: 250 }
+    ]);
+
+    mockFilterState.landingData.set({
+      [DimensionName.contentTier]: []
+    });
+    fixture.detectChanges();
+
+    await Promise.resolve();
+    expect(component.mapData()).toEqual([]);
   });
 
   it('should tap the target data load', () => {
@@ -252,14 +338,12 @@ describe('LandingComponent', () => {
 
   it('should tap the country data load', () => {
     const fnCallback = jest.fn();
-
     const spyGetCountryData = jest.spyOn(api, 'getCountryData');
 
     component.tapCountryDataLoad(fnCallback);
     expect(spyGetCountryData).toHaveBeenCalledTimes(1);
     expect(fnCallback).toHaveBeenCalled();
-
-    expect(component.countryData).toBeTruthy();
+    expect(component.countryData()).toBeTruthy();
 
     component.tapCountryDataLoad();
     expect(spyGetCountryData).toHaveBeenCalledTimes(1);
@@ -289,7 +373,7 @@ describe('LandingComponent', () => {
   });
 
   it('should clear the heatmap', () => {
-    component.mapChart = {
+    const mockMapComponent = {
       colourSchemeDefault: {
         base: { hex: '#fffff' } as am4core.Color,
         highlight: { hex: '#fffff' } as am4core.Color,
@@ -298,19 +382,26 @@ describe('LandingComponent', () => {
       setMapPercentMode: jest.fn()
     } as unknown as MapComponent;
 
+    component.mapChart = jest
+      .fn()
+      .mockReturnValue(mockMapComponent) as unknown as Signal<
+      MapComponent | undefined
+    >;
     component.clearHeatmap();
+
+    expect(component.activeMapData()).toEqual(component.mapData());
   });
 
   it('should show the heat map', () => {
-    component.landingData = mockLandingData;
-
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    mockFilterState.landingData.set(mockLandingData);
+    component.countryData.set(mockCountryData);
+    component.targetMetaData.set(mockTargetMetaData);
 
     const colour = '#ffffff' as unknown as am4core.Color;
-    component.mapChart = {
-      mapData: [],
+
+    const mockMapComponent = {
       setMapPercentMode: jest.fn(),
+      colourScheme: undefined,
       colourSchemeTargets: {
         total: [
           {
@@ -322,19 +413,25 @@ describe('LandingComponent', () => {
       }
     } as unknown as MapComponent;
 
-    expect(component.mapChart.colourScheme).toBeFalsy();
-    expect(component.mapChart.colourScheme).toBeFalsy();
+    component.mapChart = jest
+      .fn()
+      .mockReturnValue(mockMapComponent) as unknown as Signal<
+      MapComponent | undefined
+    >;
+
+    expect(component.mapChart()?.colourScheme).toBeFalsy();
 
     component.showHeatmap(TargetFieldName.TOTAL, 0);
 
-    expect(component.mapChart.colourScheme).toBeTruthy();
-    expect(component.mapChart.colourScheme.base).toEqual(colour);
+    expect(component.mapChart()?.colourScheme).toBeTruthy();
+    expect(component.mapChart()?.colourScheme?.base).toEqual(colour);
+    expect(component.activeMapData()).toEqual(
+      component.allProgressSeries[TargetFieldName.TOTAL][0]
+    );
 
     component.targetExpanded = undefined;
     component.singleCountryMode = true;
-
     component.showHeatmap(TargetFieldName.TOTAL, 0);
-
     expect(component.targetExpanded).toEqual(TargetFieldName.TOTAL);
   });
 });

@@ -1,17 +1,18 @@
 import {
   AfterViewInit,
   Component,
-  Inject,
-  Input,
+  effect,
+  inject,
+  input,
+  model,
   NgZone,
   PLATFORM_ID
 } from '@angular/core';
-import { isPlatformBrowser, NgClass, NgIf } from '@angular/common';
+import { isPlatformBrowser, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-// amCharts imports
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
@@ -20,55 +21,51 @@ import {
   IHash,
   NameValue
 } from '../../_models';
-
 import { colours } from '../../_data';
-
 import { BarChartDefaults } from '../chart-defaults';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-bar-chart',
   templateUrl: './bar.component.html',
   styleUrls: ['./bar.component.scss'],
-  imports: [NgIf, FormsModule, NgClass]
+  standalone: true,
+  imports: [FormsModule, NgClass]
 })
 export class BarComponent implements AfterViewInit {
   private chart: am4charts.XYChart;
+
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly zone = inject(NgZone);
+
   readonly maxNumberBars = 50;
   preferredNumberBars = 8;
   maxBarSizeRelativeRatio = 20;
 
-  _results?: Array<NameValue>;
-  categoryAxis: am4charts.CategoryAxis;
+  results = model<Array<NameValue> | undefined>();
 
+  categoryAxis: am4charts.CategoryAxis;
   allSeries: { [key: string]: am4charts.ColumnSeries } = {};
   series: am4charts.ColumnSeries;
-
-  settings = structuredClone(BarChartDefaults);
   valueAxis: am4charts.ValueAxis;
 
-  @Input() chartId = 'barChart';
-  @Input() showPercent: boolean;
-  @Input() set results(results: Array<NameValue>) {
-    // empty setter forces it to be ready before AfterViewInit
-    this._results = results;
-  }
-  get results(): Array<NameValue> {
-    return this._results;
-  }
-  @Input() set extraSettings(extraSettings: ChartSettings) {
-    this.settings = { ...this.settings, ...extraSettings };
-  }
-  get extraSettings(): ChartSettings {
-    return this.settings;
-  }
+  chartId = input<string>('barChart');
+  showPercent = input<boolean>();
+  extraSettings = input<Partial<ChartSettings>>();
 
-  constructor(
-    @Inject(PLATFORM_ID) private readonly platformId,
-    private readonly zone: NgZone
-  ) {
-    this.browserOnly(() => {
+  settings: ChartSettings = structuredClone(BarChartDefaults);
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
       am4core.options.autoDispose = true;
+    }
+    effect(() => {
+      const overrides = this.extraSettings();
+      if (overrides) {
+        this.settings = {
+          ...this.settings,
+          ...overrides
+        };
+      }
     });
   }
 
@@ -93,18 +90,20 @@ export class BarComponent implements AfterViewInit {
   }
 
   addSeriesFromResult(): void {
-    if (this.results) {
+    const results = this.results();
+    if (results && results.length > 0) {
+      // Safely read the single color string out of the colours array reference
+      const seriesColour = Array.isArray(colours)
+        ? colours[0]
+        : colours || '#0771ce';
+
       this.addSeries([
         {
-          data: this.results.reduce(function (
-            map: IHash<number>,
-            nv: NameValue
-          ) {
+          data: results.reduce(function (map: IHash<number>, nv: NameValue) {
             map[nv.name] = nv.value;
             return map;
-          },
-          {}),
-          colour: colours[0],
+          }, {}),
+          colour: seriesColour,
           seriesName: 'seriesKey'
         } as ColourSeriesData
       ]);
@@ -159,20 +158,30 @@ export class BarComponent implements AfterViewInit {
 
   removeSeries(id: string): void {
     const series = this.allSeries[id];
-
     if (series) {
       const seriesIndex = this.chart.series.indexOf(series);
       if (seriesIndex > -1) {
         this.chart.series.removeIndex(seriesIndex).dispose();
       }
       delete this.allSeries[id];
-    } else {
-      console.log(`Bar: can't find series to remove (${id})`);
     }
-    this.chart.invalidateData();
+    this.chart?.invalidateData();
   }
 
   removeAllSeries(): void {
+    // wipe out amCharts internal data structure completely
+    if (this.chart) {
+      this.chart.data = [];
+    }
+
+    // clear any existing axis breaks to prevent scale warping
+    if (this.valueAxis) {
+      this.valueAxis.axisBreaks.clear();
+      this.valueAxis.min = undefined;
+      this.valueAxis.max = undefined;
+    }
+
+    // clear and dispose of the existing series
     Object.keys(this.allSeries).forEach((id: string) => {
       this.removeSeries(id);
     });
@@ -191,7 +200,7 @@ export class BarComponent implements AfterViewInit {
     const seriesVals = [];
 
     csds.forEach((csd: ColourSeriesData) => {
-      if (!this.chart.data.length) {
+      if (!this.chart.data?.length) {
         this.chart.data = Object.keys(csd.data)
           .slice(0, this.maxNumberBars)
           .map((s: string) => {
@@ -230,15 +239,17 @@ export class BarComponent implements AfterViewInit {
       });
     }
 
-    if (!this.isZoomable()) {
+    if (!this.isZoomable() && seriesVals.length > 0) {
       const seriesMin = Math.min(...seriesVals);
       const seriesMax = Math.max(...seriesVals);
-      const scale = seriesMax / seriesMin;
-      if (scale > this.maxBarSizeRelativeRatio) {
-        this.addAxisBreak(seriesMin, seriesMax);
+      if (seriesMin > 0) {
+        const scale = seriesMax / seriesMin;
+        if (scale > this.maxBarSizeRelativeRatio) {
+          this.addAxisBreak(seriesMin, seriesMax);
+        }
       }
     }
-    this.chart.invalidateData();
+    this.chart?.invalidateData();
   }
 
   /** createSeries
@@ -249,7 +260,7 @@ export class BarComponent implements AfterViewInit {
    */
   createSeries(colour: string, valueField = 'value'): am4charts.ColumnSeries {
     const series = this.chart.series.push(new am4charts.ColumnSeries());
-    const labelSuffix = this.showPercent ? '%' : '';
+    const labelSuffix = this.showPercent() ? '%' : '';
 
     series.columns.template.events.once('inited', function (event) {
       event.target.fill = am4core.color(colour);
@@ -271,24 +282,24 @@ export class BarComponent implements AfterViewInit {
   }
 
   isZoomable(): boolean {
-    return this.chart.data && this.chart.data.length > this.preferredNumberBars;
+    return this.chart?.data?.length > this.preferredNumberBars;
   }
 
   zoomTop(start = 0): void {
     if (this.isZoomable()) {
-      const fn = (): void => {
+      queueMicrotask(() => {
         this.categoryAxis.zoomToIndexes(
           start,
           start + this.preferredNumberBars,
           false,
           true
         );
-      };
-      setTimeout(fn, 100);
+      });
     }
   }
 
   getSvgData(): Promise<string> {
+    if (!this.chart) return Promise.resolve('');
     this.chart.exporting.useWebFonts = false;
     return this.chart.exporting.getImage('png', {
       minHeight: 1000,
@@ -348,14 +359,14 @@ export class BarComponent implements AfterViewInit {
         if (this.settings.prefixValueAxis) {
           prefix = `${this.settings.prefixValueAxis} `;
         }
-        return `${prefix}${label}`;
+        return `${prefix}${label || ''}`;
       }
     );
 
     this.valueAxis.renderer.labels.template.adapter.add(
       'text',
       (label: string) => {
-        return `${label}${this.showPercent ? '%' : ''}`;
+        return `${label || ''}${this.showPercent() ? '%' : ''}`;
       }
     );
   }
@@ -368,7 +379,7 @@ export class BarComponent implements AfterViewInit {
   drawChart(zoomIndex?: number): void {
     this.browserOnly(() => {
       am4core.useTheme(am4themes_animated);
-      this.chart = am4core.create(this.chartId, am4charts.XYChart);
+      this.chart = am4core.create(this.chartId(), am4charts.XYChart);
       const chart = this.chart;
 
       if (typeof zoomIndex !== 'undefined') {
@@ -384,7 +395,7 @@ export class BarComponent implements AfterViewInit {
       this.valueAxis = new am4charts.ValueAxis();
 
       this.valueAxis.numberFormatter = new am4core.NumberFormatter();
-      this.valueAxis.numberFormatter.numberFormat = this.showPercent
+      this.valueAxis.numberFormatter.numberFormat = this.showPercent()
         ? '#.'
         : '#.0a';
 
@@ -402,7 +413,6 @@ export class BarComponent implements AfterViewInit {
         if (this.settings.hasScroll) {
           chart.scrollbarX = new am4core.Scrollbar();
         }
-
         // Label / rotation
         this.categoryAxis.renderer.labels.template.horizontalCenter = 'right';
         this.categoryAxis.renderer.labels.template.verticalCenter = 'middle';

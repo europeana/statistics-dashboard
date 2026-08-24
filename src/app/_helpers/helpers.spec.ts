@@ -3,7 +3,8 @@ import {
   filterList,
   fromCSL,
   fromInputSafeName,
-  replaceDiacritics
+  replaceDiacritics,
+  sortByDecodedCountryName
 } from '.';
 
 describe('Helpers', () => {
@@ -80,5 +81,12 @@ describe('Helpers', () => {
     expect(filterList('ia$', list).length).toEqual(3);
     expect(filterList('a$', list).length).toEqual(4);
     expect(filterList('$l', list).length).toEqual(1);
+  });
+
+  it('should sort by the decoded country', () => {
+    const unsorted = ['CZ', 'HR'];
+    unsorted.sort(sortByDecodedCountryName);
+    expect(unsorted[0]).toEqual('HR');
+    expect(unsorted[1]).toEqual('CZ');
   });
 });

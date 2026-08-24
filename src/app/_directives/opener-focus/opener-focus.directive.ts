@@ -1,16 +1,18 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, input } from '@angular/core';
 
 @Directive({
-  selector: '[appOpenerFocus]'
+  selector: '[appOpenerFocus]',
+  standalone: true
 })
 export class OpenerFocusDirective {
-  @Input() fnHide: (event?: KeyboardEvent) => void;
+  fnHide = input<(event?: KeyboardEvent) => void>();
 
   constructor(private readonly elRef: ElementRef) {}
 
   hide(event: KeyboardEvent): void {
-    if (this.fnHide) {
-      this.fnHide(event);
+    const hideFn = this.fnHide();
+    if (hideFn) {
+      hideFn(event);
     }
   }
 
@@ -20,8 +22,8 @@ export class OpenerFocusDirective {
       'button, [href], input, [tabindex="0"]'
     );
 
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
+    const first = focusables[0] as HTMLElement;
+    const last = focusables[focusables.length - 1] as HTMLElement;
 
     if (last === event.target) {
       if (first === last) {
@@ -47,7 +49,7 @@ export class OpenerFocusDirective {
     );
 
     if (focusables.length) {
-      focusables[0].focus();
+      (focusables[0] as HTMLElement).focus();
     }
   }
 }

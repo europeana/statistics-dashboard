@@ -1,11 +1,10 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
   forwardRef,
-  Input,
-  Output,
-  ViewChild
+  input,
+  output,
+  viewChild
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -14,8 +13,6 @@ import {
   ReactiveFormsModule,
   UntypedFormGroup
 } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
-
 import { InputDescription } from '../_models';
 
 @Component({
@@ -28,40 +25,52 @@ import { InputDescription } from '../_models';
       multi: true
     }
   ],
-  imports: [NgIf, FormsModule, ReactiveFormsModule, NgClass]
+  imports: [FormsModule, ReactiveFormsModule],
+  standalone: true
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  @Input() form: UntypedFormGroup;
-  @Input() labelText: string;
-  @Input() group: string;
-  @Input() controlName: string;
+  readonly form = input<UntypedFormGroup | undefined>(undefined);
+  readonly labelText = input<string>('');
+  readonly group = input<string>('');
+  readonly controlName = input<string>('');
 
-  @ViewChild('baseInput') baseInput: ElementRef;
+  readonly baseInput = viewChild<ElementRef<HTMLInputElement>>('baseInput');
 
-  @Output() valueChanged: EventEmitter<boolean> = new EventEmitter();
-  @Output() keySelectionMade: EventEmitter<InputDescription> =
-    new EventEmitter();
+  readonly valueChanged = output<void>();
+  readonly keySelectionMade = output<InputDescription>();
+
+  private onModelChange: (value: unknown) => void = () => {
+    // unimplemented
+  };
+  private onModelTouched: () => void = () => {
+    // unimplemented
+  };
 
   writeValue(): void {
     // unimplemented
   }
 
-  registerOnChange(fn: () => void): void {
-    this.onChange = fn;
+  registerOnChange(fn: (value: unknown) => void): void {
+    this.onModelChange = fn;
   }
 
-  registerOnTouched(): void {
-    // unimplemented
+  registerOnTouched(fn: () => void): void {
+    this.onModelTouched = fn;
   }
 
-  onChange(): void {
+  onInputChange(event: Event): void {
+    const inputEl = event.target as HTMLInputElement;
+
+    this.onModelChange(inputEl.checked);
+    this.onModelTouched();
+
     this.valueChanged.emit();
   }
 
   onSpaceKey(): void {
     this.keySelectionMade.emit({
-      group: this.group,
-      controlName: this.controlName
+      group: this.group(),
+      controlName: this.controlName()
     });
   }
 }

@@ -1,14 +1,16 @@
-import { Location, NgIf, PopStateEvent } from '@angular/common';
+import { Location, PopStateEvent } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   HostListener,
   inject,
   Inject,
   LOCALE_ID,
   OnInit,
-  ViewChild,
+  viewChild,
   ViewContainerRef
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router, RouterOutlet } from '@angular/router';
 import {
@@ -20,15 +22,9 @@ import {
 
 import { cookieConsentConfig } from '../environments/eu-cm-settings';
 import { maintenanceSettings } from '../environments/maintenance-settings';
-import { SubscriptionManager } from './subscription-manager';
 import { AppDateAdapter } from './_helpers';
-import { APIService, ClickService } from './_services';
-import {
-  BreakdownResult,
-  CountPercentageValue,
-  GeneralResults,
-  GeneralResultsFormatted
-} from './_models';
+import { APIService, ClickService, FilterStateService } from './_services';
+import { GeneralResults, GeneralResultsFormatted } from './_models';
 import { CookiePolicyComponent } from './cookie-policy';
 import { CountryComponent } from './country';
 import { LandingComponent } from './landing';
@@ -42,29 +38,26 @@ import { HeaderComponent } from './header/header.component';
   styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html',
   imports: [
-    NgIf,
     MaintenanceUtilsModule,
     HeaderComponent,
     RouterOutlet,
     FooterComponent
   ]
 })
-export class AppComponent extends SubscriptionManager implements OnInit {
+export class AppComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly maintenanceService = inject(MaintenanceScheduleService);
+  public filterStateService = inject(FilterStateService);
 
   formCTZero: FormGroup<{ contentTierZero: FormControl<boolean> }>;
   landingData: GeneralResultsFormatted;
-  landingComponentRef: LandingComponent;
-  countryComponentRef: CountryComponent;
   paramNameCTZero = 'content-tier-zero';
   showPageTitle: number;
   lastSetContentTierZeroValue = false;
   skipLocationUpdate = false;
   maintenanceInfo?: MaintenanceItem = undefined;
 
-  @ViewChild('header') header: HeaderComponent;
-  @ViewChild('consentContainer', { read: ViewContainerRef })
-  consentContainer: ViewContainerRef;
+  consentContainer = viewChild('consentContainer', { read: ViewContainerRef });
 
   constructor(
     private readonly api: APIService,
@@ -75,7 +68,6 @@ export class AppComponent extends SubscriptionManager implements OnInit {
     @Inject(LOCALE_ID) private readonly locale: string,
     @Inject(LOCALE_ID) private readonly dateAdapter: AppDateAdapter
   ) {
-    super();
     document.title = 'Statistics Dashboard';
     this.checkIfMaintenanceDue(maintenanceSettings);
     this.showCookieConsent();
@@ -83,16 +75,13 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   checkIfMaintenanceDue(settings: MaintenanceSettings): void {
     this.maintenanceService.setApiSettings(settings);
-    this.subs.push(
-      this.maintenanceService
-        .loadMaintenanceItem()
-        .subscribe((item: MaintenanceItem | undefined) => {
-          this.maintenanceInfo = item;
-          if (item?.maintenanceMessage && this.landingComponentRef) {
-            this.landingComponentRef.isLoading = false;
-          }
-        })
-    );
+    this.maintenanceService
+      .loadMaintenanceItem()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((item: MaintenanceItem | undefined) => {
+        this.maintenanceInfo = item;
+        this.filterStateService.landingDataIsLoading.set(false);
+      });
   }
 
   /** buildForm
@@ -103,10 +92,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       contentTierZero: this.lastSetContentTierZeroValue
     });
 
-    this.subs.push(
-      this.formCTZero.valueChanges.subscribe(() => {
+    this.formCTZero.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.lastSetContentTierZeroValue =
-          this.formCTZero.value.contentTierZero;
+          !!this.formCTZero.value.contentTierZero;
+        this.filterStateService.includeCTZero.set(
+          this.lastSetContentTierZeroValue
+        );
 
         if (!this.skipLocationUpdate) {
           this.updateLocation();
@@ -114,17 +107,16 @@ export class AppComponent extends SubscriptionManager implements OnInit {
           this.skipLocationUpdate = false;
         }
 
-        // load landing data if on country page or landing page
-        const path = this.location.path();
-        if (path.split('?')[0] === '' || path.split('/country')[0] === '') {
+        const basePath = this.location.path().split('?')[0];
+
+        if (
+          basePath === '' ||
+          basePath === '/' ||
+          basePath.startsWith('/country')
+        ) {
           this.loadLandingData(this.lastSetContentTierZeroValue);
         }
-        if (this.countryComponentRef) {
-          this.countryComponentRef.includeCTZero =
-            this.lastSetContentTierZeroValue;
-        }
-      })
-    );
+      });
   }
 
   /** documentClick
@@ -138,58 +130,25 @@ export class AppComponent extends SubscriptionManager implements OnInit {
 
   /** getCtrlCTZero
    * - convenience function
-   * @returns the contentTierZero input as a FormControl
+   * @returns the contentTierZero value as a FormControl
    **/
   getCtrlCTZero(): FormControl {
     return this.formCTZero.get('contentTierZero') as FormControl;
   }
 
   /*** loadLandingData
-   * - resets local landingData object
-   * - loads the general breakdown data / reconstructs local object
-   * - sets landingComponentRef landingData to local object
-   * - derives countryTotalMap data and assigns to header component
+   * - binds rawGeneralData in filterStateService to api
    * @param { boolean: includeCTZero } - request content-tier-zero
    ***/
   loadLandingData(includeCTZero: boolean): void {
-    if (this.landingComponentRef) {
-      this.landingComponentRef.isLoading = true;
-    }
-
-    const countryTotalMap: { [key: string]: number } = {};
-
-    this.subs.push(
-      this.api
-        .getGeneralResults(includeCTZero)
-        .subscribe((general: GeneralResults) => {
-          this.landingData = {};
-          general.allBreakdowns.forEach((br: BreakdownResult) => {
-            this.landingData[br.breakdownBy] = br.results.map(
-              (cpv: CountPercentageValue) => {
-                return {
-                  name: cpv.value,
-                  value: cpv.count,
-                  percent: cpv.percentage
-                };
-              }
-            );
-            if (br.breakdownBy === 'country') {
-              br.results.forEach((result: CountPercentageValue) => {
-                countryTotalMap[result.value] = result.percentage;
-              });
-            }
-          });
-
-          if (this.landingComponentRef) {
-            this.landingComponentRef.includeCTZero = includeCTZero;
-            this.landingComponentRef.landingData = this.landingData;
-            this.landingComponentRef.isLoading = false;
-          }
-
-          // assign country data
-          this.header.countryTotalMap = countryTotalMap;
-        })
-    );
+    this.filterStateService.landingDataIsLoading.set(true);
+    this.api
+      .getGeneralResults(includeCTZero)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((general: GeneralResults) => {
+        this.filterStateService.rawGeneralData.set(general);
+        this.filterStateService.landingDataIsLoading.set(false);
+      });
   }
 
   /** setContentTierZeroValue
@@ -203,11 +162,12 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    **/
   setContentTierZeroValue(value: boolean): void {
     const ctrlCTZero = this.getCtrlCTZero();
-
     this.lastSetContentTierZeroValue = value;
+    this.filterStateService.includeCTZero.set(value);
+
     if (value !== ctrlCTZero.value) {
       this.skipLocationUpdate = true;
-      ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
+      ctrlCTZero.setValue(value);
     }
   }
 
@@ -221,8 +181,9 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * @param { PopStateEvent } state - the event
    **/
   handleLocationPopState(state: PopStateEvent): void {
+    const targetUrlString = state?.url || window.location.href;
     this.setContentTierZeroValue(
-      `${state.url}`.includes('content-tier-zero=true')
+      `${targetUrlString}`.includes('content-tier-zero=true')
     );
   }
 
@@ -232,38 +193,26 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * - bind location back / forward events to form
    **/
   ngOnInit(): void {
-    this.subs.push(
-      this.route.queryParams.subscribe((params: Params) => {
-        // set default for form initalisation / track changes coming from either page
-        this.lastSetContentTierZeroValue =
-          params[this.paramNameCTZero] === 'true';
-      })
-    );
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params: Params) => {
+        const hasParam = params[this.paramNameCTZero] === 'true';
+        this.filterStateService.includeCTZero.set(hasParam);
+        this.lastSetContentTierZeroValue = hasParam;
+      });
     this.location.subscribe(this.handleLocationPopState.bind(this));
     this.buildForm();
   }
 
   setCTZeroInputToLastSetValue(ctrlCTZero: FormControl): void {
+    if (!ctrlCTZero) return;
     this.skipLocationUpdate = true;
     ctrlCTZero.setValue(this.lastSetContentTierZeroValue);
   }
 
   /**
    * onOutletLoaded
-   * invoked when router component loads a component
-   *    - sets showPageTitle
-   * if it's an OverviewComponent
-   *    - sets the component locale
-   *    - (and if countryTotalMap is unset)
-   *      - loads the landing data
-   * if it's a CountryComponent or a LandingComponent:
-   *    - updates the compenent ref and ctZero control value
-   *    - assigns landing data
-   *
-   * @param { LandingComponent | OverviewComponent |
-   *   CountryComponent| PrivacyStatementComponent |
-   *   CookiePolicyComponent: component } - the loaded component
-   *
+   * Handles component rendering states
    **/
   onOutletLoaded(
     component:
@@ -274,32 +223,47 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       | CookiePolicyComponent
   ): void {
     const ctrlCTZero = this.getCtrlCTZero();
+    const hasCountryMapData = this.filterStateService.hasCountryMapData();
+    const isLanding = component instanceof LandingComponent;
+
+    this.updateHeaderTitleState(component);
+    this.handleComponentSetup(component);
+    this.syncGlobalModeInputs(component, ctrlCTZero, hasCountryMapData);
+
+    if (!isLanding && !hasCountryMapData) {
+      this.loadLandingData(this.filterStateService.includeCTZero());
+    }
+  }
+
+  private updateHeaderTitleState(component: unknown): void {
     if (component instanceof LandingComponent) {
       this.showPageTitle = HeaderComponent.PAGE_TITLE_SHOWING;
-      this.landingComponentRef = component;
-      this.landingComponentRef.includeCTZero = this.lastSetContentTierZeroValue;
-      this.setCTZeroInputToLastSetValue(ctrlCTZero);
-      if (this.landingData) {
-        this.landingComponentRef.landingData = this.landingData;
-      }
+    } else if (component instanceof CountryComponent) {
+      this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
     } else {
-      this.landingComponentRef = undefined;
-      if (component instanceof OverviewComponent) {
-        component.locale = this.locale;
-        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
-      } else if (component instanceof CountryComponent) {
-        this.countryComponentRef = component;
-        component.includeCTZero = this.lastSetContentTierZeroValue;
-        this.showPageTitle = HeaderComponent.PAGE_TITLE_MINIFIED;
-        if (!this.header.countryTotalMap) {
-          this.setCTZeroInputToLastSetValue(ctrlCTZero);
-        }
-      } else {
-        this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
-      }
-      if (!this.header.countryTotalMap) {
-        this.loadLandingData(this.lastSetContentTierZeroValue);
-      }
+      this.showPageTitle = HeaderComponent.PAGE_TITLE_HIDDEN;
+    }
+  }
+
+  private handleComponentSetup(component: unknown): void {
+    if (component instanceof OverviewComponent) {
+      component.locale = this.locale;
+    }
+  }
+
+  private syncGlobalModeInputs(
+    component: unknown,
+    ctrlCTZero: FormControl,
+    hasCountryMapData: boolean
+  ): void {
+    if (!ctrlCTZero) return;
+
+    const isLanding = component instanceof LandingComponent;
+    const isCountryMissingMap =
+      component instanceof CountryComponent && !hasCountryMapData;
+
+    if (isLanding || isCountryMissingMap) {
+      this.setCTZeroInputToLastSetValue(ctrlCTZero);
     }
   }
 
@@ -312,11 +276,14 @@ export class AppComponent extends SubscriptionManager implements OnInit {
       await import('@europeana/metis-ui-consent-management')
     ).CookieConsentComponent;
 
-    this.consentContainer.clear();
+    const container = this.consentContainer();
+    if (!container) {
+      console.warn('Consent container view child is not available yet.');
+      return;
+    }
 
-    const cookieConsent = this.consentContainer.createComponent(
-      CookieConsentComponent
-    );
+    container.clear();
+    const cookieConsent = container.createComponent(CookieConsentComponent);
 
     cookieConsent.setInput('translations', cookieConsentConfig.translations);
     cookieConsent.setInput('services', cookieConsentConfig.services);
@@ -335,12 +302,10 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    * toggle this.paramNameCTZero in window location
    **/
   updateLocation(): void {
-    const path = this.location.path().split('?')[0];
-
-    if (this.formCTZero.value.contentTierZero) {
-      this.location.go(`${path}?${this.paramNameCTZero}=true`);
-    } else {
-      this.location.go(path);
-    }
+    const path = this.location.path().split('?');
+    const queryParams = this.filterStateService.includeCTZero()
+      ? `?${this.paramNameCTZero}=true`
+      : '';
+    this.location.go(`${path[0]}${queryParams}`);
   }
 }

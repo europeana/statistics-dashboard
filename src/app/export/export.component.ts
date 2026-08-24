@@ -1,51 +1,55 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild
+  inject,
+  input,
+  output,
+  viewChild
 } from '@angular/core';
 import { ExportType, FmtTableData } from '../_models';
 import { ExportCSVService, ExportPDFService } from '../_services';
-import { NgClass } from '@angular/common';
-
 import { OpenerFocusDirective } from '../_directives';
 
 @Component({
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss'],
-  imports: [NgClass, OpenerFocusDirective]
+  imports: [OpenerFocusDirective]
 })
 export class ExportComponent {
+  private readonly cdr = inject(ChangeDetectorRef);
+
   get currentUrl(): string {
     return window.location.href;
   }
 
-  @Input() getGridData: () => FmtTableData;
-  @Input() getChartData: () => Promise<string>;
-  @Input() getChartTitle: () => string;
+  getGridData = input.required<() => FmtTableData>();
+  getChartData = input.required<() => Promise<string>>();
+  getChartTitle = input.required<() => string>();
 
-  @Output() closeExport = new EventEmitter<boolean>();
-  @ViewChild('contentRef') contentRef: ElementRef;
-  @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
-  @ViewChild('closer') closer: ElementRef;
+  closeExport = output<boolean>();
+
+  contentRef = viewChild.required<ElementRef<HTMLInputElement>>('contentRef');
+  downloadAnchor =
+    viewChild.required<ElementRef<HTMLAnchorElement>>('downloadAnchor');
+  closer = viewChild.required<ElementRef<HTMLAnchorElement>>('closer');
 
   openedFromToolbar = false;
-
   public ExportType = ExportType;
+
   active = false;
   busy = false;
   copied = false;
-  msMsgDisplay = 2000;
   _tabIndex = -1;
+  msMsgDisplay = 2000;
 
   set tabIndex(value: number) {
     this._tabIndex = value;
     if (value === 0) {
-      this.closer.nativeElement.focus();
+      this.closer().nativeElement.focus();
     }
+    this.cdr.markForCheck();
   }
 
   get tabIndex(): number {
@@ -58,30 +62,35 @@ export class ExportComponent {
   ) {}
 
   copy(): void {
-    navigator.clipboard.writeText(this.contentRef.nativeElement.value);
+    navigator.clipboard.writeText(this.contentRef().nativeElement.value);
     this.copied = true;
-    const fn = (): void => {
+    this.cdr.markForCheck();
+
+    setTimeout(() => {
       this.copied = false;
-    };
-    setTimeout(fn, this.msMsgDisplay);
+      this.cdr.markForCheck();
+    }, this.msMsgDisplay);
   }
 
   export(type: ExportType): void {
-    const gridData = this.getGridData();
+    const gridData = this.getGridData()();
+
     if (type === ExportType.CSV) {
       const data = this.csv.csvFromTableRows(
         gridData.columns,
         gridData.tableRows
       );
-      this.csv.download(data, this.downloadAnchor);
+      this.csv.download(data, this.downloadAnchor());
     } else if (type === ExportType.PDF) {
       this.busy = true;
-      this.getChartData().then((imgUrl: string) => {
-        this.pdf.download(this.getChartTitle(), gridData, imgUrl);
+      this.cdr.markForCheck();
+      this.getChartData()().then((imgUrl: string) => {
+        this.pdf.download(this.getChartTitle()(), gridData, imgUrl);
         this.busy = false;
+        this.cdr.markForCheck();
       });
     } else if (type === ExportType.PNG) {
-      this.getChartData().then((imgUrl: string) => {
+      this.getChartData()().then((imgUrl: string) => {
         const anchor = document.createElement('a');
         anchor.href = imgUrl;
         anchor.target = '_blank';
@@ -93,20 +102,10 @@ export class ExportComponent {
     }
   }
 
-  /**
-   * fnHide
-   *
-   * connect OpenerFocusDirective to the correct opener
-   **/
   fnHide(): void {
     this.toggleActive(this.openedFromToolbar);
   }
 
-  /**
-   * toggleActive
-   *
-   * @param { boolean } fromToolbar - flags if component was opened from the toolbar
-   **/
   toggleActive(fromToolbar?: boolean): void {
     if (fromToolbar !== undefined) {
       this.openedFromToolbar = fromToolbar;
@@ -118,5 +117,6 @@ export class ExportComponent {
     if (!this.active) {
       this.closeExport.emit(this.openedFromToolbar);
     }
+    this.cdr.markForCheck();
   }
 }

@@ -18,6 +18,24 @@ context('Statistics Dashboard', () => {
         .should('have.length', enabled ? 0 : 1);
     };
 
+    describe('landing page', () => {
+      it('should refresh record data when the CT Zero control is checked or unchecked', () => {
+        const baselinePct = '33.46%';
+        const modifiedPct = '31.8%';
+        const selCTZero = '.filter-title';
+        cy.visit('/');
+        cy.get('.entry-card').eq(1).find('.container-v').eq(2).as('targetCell');
+
+        cy.get('@targetCell').should('contain', baselinePct);
+
+        cy.get(selCTZero).click();
+        cy.get('@targetCell').should('contain', modifiedPct);
+
+        cy.get(selCTZero).click();
+        cy.get('@targetCell').should('contain', baselinePct);
+      });
+    });
+
     describe('country pages', () => {
       const urlDefault = `/country/Europe`;
       const urlCTZero = `${urlDefault}?${ctZeroParam}`;

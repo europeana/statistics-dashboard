@@ -1,11 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, ElementRef, QueryList } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -34,93 +28,113 @@ describe('FilterComponent', () => {
 
   const emptyOptions = { options: [], hasMore: false };
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [FormsModule, ReactiveFormsModule, FilterComponent],
       providers: [RenameApiFacetPipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(FilterComponent);
     component = fixture.componentInstance;
-    component.form = new UntypedFormBuilder().group({
-      facetParameter: [],
-      contentTierZero: [''],
-      contentTier: [''],
-      datasetId: [''],
-      dateFrom: [''],
-      dateTo: ['']
-    });
 
-    component.opener = {
+    fixture.componentRef.setInput('group', '' as DimensionName);
+    fixture.componentRef.setInput('state', { visible: false, disabled: false });
+    fixture.componentRef.setInput('totalAvailable', 0);
+
+    fixture.componentRef.setInput(
+      'form',
+      new UntypedFormBuilder().group({
+        facetParameter: [],
+        contentTierZero: [''],
+        contentTier: [''],
+        datasetId: [''],
+        dateFrom: [''],
+        dateTo: ['']
+      })
+    );
+
+    const mockElementRef = {
       nativeElement: {
         focus: jest.fn()
       }
-    } as unknown as ElementRef;
+    } as unknown as ElementRef<HTMLElement>;
+
+    Object.defineProperty(component, 'opener', {
+      writable: true,
+      value: jest.fn().mockReturnValue(mockElementRef)
+    });
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
   it('should enable when options are added', () => {
     expect(component.isDisabled()).toBeTruthy();
-    component.optionSet = emptyOptions;
+
+    fixture.componentRef.setInput('optionSet', emptyOptions);
+    fixture.detectChanges();
     expect(component.isDisabled()).toBeTruthy();
-    component.optionSet = dataOptions;
+
+    fixture.componentRef.setInput('optionSet', dataOptions);
+    fixture.detectChanges();
     expect(component.isDisabled()).toBeFalsy();
-  });
-
-  it('should track when the filter is empty and the data is empty', () => {
-    expect(component.empty).toBeTruthy();
-    expect(component.emptyData).toBeTruthy();
-    component.optionSet = emptyOptions;
-    expect(component.empty).toBeTruthy();
-    expect(component.emptyData).toBeTruthy();
-
-    component.term = '';
-    component.optionSet = dataOptions;
-    expect(component.empty).toBeFalsy();
-    expect(component.emptyData).toBeFalsy();
-
-    component.term = 'xxx';
-    component.optionSet = dataOptions;
-    expect(component.empty).toBeFalsy();
-    expect(component.emptyData).toBeFalsy();
   });
 
   it('should not disable the date if a range has been specified', () => {
-    component.emptyDataset = true;
-    component.group = 'dates' as DimensionName;
+    fixture.componentRef.setInput('emptyDataset', true);
+    fixture.componentRef.setInput('group', 'dates' as DimensionName);
     expect(component.isDisabled()).toBeTruthy();
 
-    component.form.get('dateFrom').setValue(new Date().toISOString());
-    component.form.get('dateTo').setValue(new Date().toISOString());
+    component.form().get('dateFrom').setValue(new Date().toISOString());
+    component.form().get('dateTo').setValue(new Date().toISOString());
     expect(component.isDisabled()).toBeFalsy();
 
-    component.form.get('dateFrom').setValue(null);
+    component.form().get('dateFrom').setValue(null);
     expect(component.isDisabled()).toBeTruthy();
   });
 
-  it('should not disable the on the basis of a filter', () => {
-    component.state = {
+  it('should not disable on the basis of a filter', () => {
+    fixture.componentRef.setInput('state', {
       visible: true,
       disabled: false
-    };
+    });
 
-    component.empty = false;
-    component.emptyData = false;
+    // Override structural computed signals cleanly for isolated state scenarios
+    Object.defineProperty(component, 'empty', {
+      writable: true,
+      value: () => false
+    });
+    Object.defineProperty(component, 'emptyData', {
+      writable: true,
+      value: () => false
+    });
     expect(component.isDisabled()).toBeFalsy();
 
-    component.empty = true;
-    component.emptyData = true;
+    Object.defineProperty(component, 'empty', {
+      writable: true,
+      value: () => true
+    });
+    Object.defineProperty(component, 'emptyData', {
+      writable: true,
+      value: () => true
+    });
     expect(component.isDisabled()).toBeTruthy();
 
-    component.emptyData = false;
+    Object.defineProperty(component, 'emptyData', {
+      writable: true,
+      value: () => false
+    });
     expect(component.isDisabled()).toBeTruthy();
 
-    component.term = 'xxx';
+    component.term.set('xxx');
     expect(component.isDisabled()).toBeTruthy();
 
-    component.state.visible = false;
+    fixture.componentRef.setInput('state', {
+      visible: false,
+      disabled: false
+    });
     expect(component.isDisabled()).toBeFalsy();
   });
 
@@ -128,14 +142,54 @@ describe('FilterComponent', () => {
     expect(
       component.selectOptionEnabled(DimensionName.contentTier, '0')
     ).toBeFalsy();
-    component.form.get('contentTierZero').setValue(true);
+    component.form().get('contentTierZero').setValue(true);
     expect(
       component.selectOptionEnabled(DimensionName.contentTier, '0')
     ).toBeTruthy();
-    component.form.get('contentTierZero').setValue(true);
+    component.form().get('contentTierZero').setValue(true);
     expect(
       component.selectOptionEnabled(DimensionName.contentTier, '1')
     ).toBeTruthy();
+  });
+
+  it('should compute correct empty and emptyData flags for all option sets and terms', () => {
+    const scenarios = [
+      {
+        optionSet: undefined,
+        term: '',
+        expectedEmpty: true,
+        expectedEmptyData: true
+      },
+      {
+        optionSet: { options: [] },
+        term: 'abc',
+        expectedEmpty: true,
+        expectedEmptyData: true
+      },
+      {
+        optionSet: { options: [{ id: 1 }] },
+        term: '',
+        expectedEmpty: false,
+        expectedEmptyData: true
+      },
+      {
+        optionSet: { options: [{ id: 1 }] },
+        term: 'abc',
+        expectedEmpty: false,
+        expectedEmptyData: false
+      }
+    ];
+
+    scenarios.forEach(
+      ({ optionSet, term, expectedEmpty, expectedEmptyData }) => {
+        fixture.componentRef.setInput('optionSet', optionSet);
+        component.term.set(term);
+        fixture.detectChanges();
+
+        expect(component.empty()).toBe(expectedEmpty);
+        expect(component.emptyData()).toBe(expectedEmptyData);
+      }
+    );
   });
 
   it('should set the filter options', () => {
@@ -145,64 +199,106 @@ describe('FilterComponent', () => {
         value: 'option_1'
       }
     };
-    component.state = { disabled: false, visible: false };
-    expect(component.optionSet).toBeFalsy();
-    component.filterOptions(evt);
-    expect(component.optionSet).toBeFalsy();
 
-    component.optionSet = {
-      options: [{ name: 'option_1', label: 'option_1' }]
-    };
+    fixture.componentRef.setInput('state', {
+      visible: false,
+      disabled: false
+    });
+
+    expect(component.optionSet()).toBeFalsy();
     component.filterOptions(evt);
-    expect(component.optionSet.options.length).toEqual(1);
+    expect(component.optionSet()).toBeFalsy();
+
+    fixture.componentRef.setInput('optionSet', {
+      options: [{ name: 'option_1', label: 'option_1' }]
+    });
+    fixture.detectChanges();
+
+    component.filterOptions(evt);
+    expect(component.optionSet().options.length).toEqual(1);
 
     const spyHide = jest.spyOn(component, 'hide');
     component.filterOptions(evt);
     expect(spyHide).not.toHaveBeenCalled();
+
+    const mockElementRef = {
+      nativeElement: {
+        focus: jest.fn()
+      }
+    } as unknown as ElementRef<HTMLElement>;
+
+    Object.defineProperty(component, 'opener', {
+      writable: true,
+      value: jest.fn().mockReturnValue(mockElementRef)
+    });
 
     evt.key = 'Escape';
     component.filterOptions(evt);
     expect(spyHide).toHaveBeenCalled();
   });
 
-  it('should reapply the focus', fakeAsync(() => {
+  it('should reapply the focus', async () => {
     const spyFocus = jest.fn();
+    const spyFilterTermFocus = jest.fn();
 
-    component.state = { disabled: false, visible: true };
-    component.filterTerm = {
+    const mockFilterTerm = {
       nativeElement: {
-        focus: jest.fn()
+        focus: spyFilterTermFocus
       }
-    };
-    component.checkboxes = {
+    } as unknown as ElementRef<HTMLInputElement>;
+
+    const mockCheckboxes = {
       find: (_: CheckboxComponent) => {
         return {
-          baseInput: {
+          group: () => '',
+          controlName: () => '',
+          baseInput: () => ({
             nativeElement: {
               focus: spyFocus
             }
-          }
+          })
         } as unknown as CheckboxComponent;
       }
-    } as unknown as QueryList<CheckboxComponent>;
-    component.optionSet = {
-      options: [{ name: 'option_1', label: 'option_1' }]
-    };
-    expect(spyFocus).not.toHaveBeenCalled();
-    tick();
-    expect(spyFocus).not.toHaveBeenCalled();
-    expect(spyFocus).not.toHaveBeenCalled();
-    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalled();
+    } as unknown as readonly CheckboxComponent[];
 
-    component.inputToFocus = { group: '', controlName: '' };
-    component.optionSet = {
+    Object.defineProperty(component, 'checkboxes', {
+      writable: true,
+      value: jest.fn().mockReturnValue(mockCheckboxes)
+    });
+    Object.defineProperty(component, 'filterTerm', {
+      writable: true,
+      value: jest.fn().mockReturnValue(mockFilterTerm)
+    });
+
+    fixture.componentRef.setInput('state', {
+      visible: true,
+      disabled: true
+    });
+
+    fixture.componentRef.setInput('optionSet', {
+      options: [{ name: 'option_1', label: 'option_1' }]
+    });
+
+    fixture.detectChanges();
+
+    expect(spyFocus).not.toHaveBeenCalled();
+    expect(spyFilterTermFocus).toHaveBeenCalled();
+
+    spyFilterTermFocus.mockClear();
+
+    component.inputToFocus.set({ group: '', controlName: '' });
+
+    await Promise.resolve();
+
+    fixture.componentRef.setInput('optionSet', {
       options: [{ name: 'option_2', label: 'option_2' }]
-    };
-    tick();
+    });
+
+    fixture.detectChanges();
+
     expect(spyFocus).toHaveBeenCalled();
-    expect(component.inputToFocus).toBeFalsy();
-    expect(component.filterTerm.nativeElement.focus).toHaveBeenCalledTimes(1);
-  }));
+    expect(component.inputToFocus()).toBeFalsy();
+  });
 
   it('should get the values', () => {
     const createFormControls = (
@@ -211,11 +307,11 @@ describe('FilterComponent', () => {
     ): Array<UntypedFormControl> => {
       const fGroup = new UntypedFormBuilder().group({});
       expect(component.getSetCheckboxValues(grp).length).toBe(0);
-      component.form.addControl(grp, fGroup);
+      component.form().addControl(grp, fGroup);
       const res = [];
       ops.forEach((s: string) => {
         fGroup.addControl(s, new UntypedFormControl(false));
-        const ctrl = component.form.get(`${grp}.${s}`) as UntypedFormControl;
+        const ctrl = component.form().get(`${grp}.${s}`) as UntypedFormControl;
         ctrl.setValue(true);
         res.push(ctrl);
       });
@@ -227,25 +323,26 @@ describe('FilterComponent', () => {
       'Belgium, Germany, Italy'
     );
 
-    component.tierPrefix = 'Tier ';
+    fixture.componentRef.setInput('tierPrefix', 'Tier ');
 
     createFormControls(DimensionName.metadataTier, ['aaa', 'bbb']);
     expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
       'aaa, bbb'
     );
 
-    component.group = DimensionName.metadataTier;
+    fixture.componentRef.setInput('group', DimensionName.metadataTier);
     expect(component.getSetCheckboxValues(DimensionName.metadataTier)).toEqual(
       'Tier aaa, Tier bbb'
     );
 
-    component.group = DimensionName.provider;
+    fixture.componentRef.setInput('group', DimensionName.provider);
     createFormControls(DimensionName.provider, ['Europeana']);
     expect(component.getSetCheckboxValues(DimensionName.provider)).toEqual(
       'Europeana'
     );
 
-    component.group = DimensionName.rightsCategory;
+    fixture.componentRef.setInput('group', DimensionName.rightsCategory);
+
     createFormControls(DimensionName.rightsCategory, [
       'xxx',
       toInputSafeName('CC BY-ND')
@@ -262,40 +359,44 @@ describe('FilterComponent', () => {
   });
 
   it('should hide', () => {
-    component.state = { disabled: false, visible: true };
-    expect(component.state.visible).toBeTruthy();
+    fixture.componentRef.setInput('state', { visible: true, disabled: false });
+    fixture.detectChanges();
+
     component.hide();
-    expect(component.state.visible).toBeFalsy();
+    fixture.detectChanges();
+
+    expect(component.state().visible).toBeFalsy();
   });
 
-  it('should toggle', fakeAsync(() => {
-    component.state = { disabled: false, visible: true };
-    expect(component.state.visible).toBeTruthy();
+  it('should toggle', () => {
+    fixture.componentRef.setInput('state', { disabled: false, visible: true });
+    fixture.detectChanges();
+    expect(component.state().visible).toBeTruthy();
+
     component.toggle();
-    tick(1);
-    expect(component.state.visible).toBeFalsy();
+    expect(component.state().visible).toBeFalsy();
+
     component.toggle();
-    tick(1);
-    expect(component.state.visible).toBeTruthy();
+    expect(component.state().visible).toBeTruthy();
+
     component.toggle();
-    tick(1);
-    expect(component.state.visible).toBeFalsy();
-  }));
+    expect(component.state().visible).toBeFalsy();
+  });
 
   it('should bind to the key selection', () => {
-    expect(component.inputToFocus).toBeFalsy();
+    expect(component.inputToFocus()).toBeFalsy();
     component.onKeySelectionMade({ controlName: '', group: '' });
-    expect(component.inputToFocus).toBeTruthy();
+    expect(component.inputToFocus()).toBeTruthy();
   });
 
   it('should load more', () => {
     const spyEmit = jest.spyOn(component.filterTermChanged, 'emit');
 
-    expect(component.pagesVisible).toEqual(1);
+    expect(component.pagesVisible()).toEqual(1);
 
     component.loadMore();
 
     expect(spyEmit).toHaveBeenCalled();
-    expect(component.pagesVisible).toEqual(2);
+    expect(component.pagesVisible()).toEqual(2);
   });
 });

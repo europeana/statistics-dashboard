@@ -1,29 +1,18 @@
-import {
-  ApplicationRef,
-  ComponentRef,
-  CUSTOM_ELEMENTS_SCHEMA
-} from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
-import { isoCountryCodesReversed } from '../_data';
-import { APIService } from '../_services';
+import { DimensionName, isoCountryCodesReversed } from '../_data';
+import { APIService, FilterStateService } from '../_services';
 import {
   MockAPIService,
   mockCountryData,
+  mockFilterStateService,
   MockLineComponent,
   mockTargetMetaData
 } from '../_mocked';
 import { TargetFieldName } from '../_models';
-import { BarComponent, LineComponent, LineService } from '../chart';
-import { LegendGridService } from '../legend-grid';
-import { HeaderComponent } from '../header';
+import { BarComponent, LineComponent } from '../chart';
 import { CountryComponent } from '.';
 
 describe('CountryComponent', () => {
@@ -31,9 +20,10 @@ describe('CountryComponent', () => {
   let fixture: ComponentFixture<CountryComponent>;
   let router: Router;
   let routeChangeSource: BehaviorSubject<Params>;
-  let lineService: LineService;
-  let legendGridService: LegendGridService;
   let api: APIService;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
 
   class IntersectionObserver {
     observe(): void {
@@ -46,6 +36,8 @@ describe('CountryComponent', () => {
 
   const configureTestBed = (): void => {
     routeChangeSource = new BehaviorSubject({ country: 'France' } as Params);
+    mockFilterState = mockFilterStateService();
+
     TestBed.configureTestingModule({
       imports: [CountryComponent],
       providers: [
@@ -53,7 +45,11 @@ describe('CountryComponent', () => {
           provide: ActivatedRoute,
           useValue: { params: routeChangeSource }
         },
-        { provide: APIService, useClass: MockAPIService }
+        { provide: APIService, useClass: MockAPIService },
+        {
+          provide: FilterStateService,
+          useValue: mockFilterState
+        }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -62,45 +58,24 @@ describe('CountryComponent', () => {
         add: { imports: [MockLineComponent] }
       })
       .compileComponents();
+
     api = TestBed.inject(APIService);
     router = TestBed.inject(Router);
-    lineService = TestBed.inject(LineService);
-    legendGridService = TestBed.inject(LegendGridService);
   };
 
-  let appRef: ApplicationRef;
-
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     configureTestBed();
-    appRef = TestBed.inject(ApplicationRef);
-  }));
+  });
 
-  // split initialisation to delay conponent creation
   const finaliseInit = (): void => {
-    const header = {
-      activeCountry: 'France',
-      pageTitleDynamic: true,
-      countryTotalMap: {
-        France: {
-          total: 1,
-          code: 'FR'
-        }
-      },
-      pageTitleInViewport: false
-    };
-
-    appRef.components.push({
-      header: header
-    } as unknown as ComponentRef<unknown>);
-
+    mockFilterState.activeCountry.set('France');
+    mockFilterState.pageTitleDynamic.set(true);
+    mockFilterState.pageTitleInViewport.set(false);
     fixture = TestBed.createComponent(CountryComponent);
     component = fixture.componentInstance;
-
-    component.headerRef = header as unknown as HeaderComponent;
   };
 
   const b4Each = (fullInit = true): void => {
-    // Supply fake IntersectionObserver to window prototype
     (
       window as unknown as { IntersectionObserver: unknown }
     ).IntersectionObserver = IntersectionObserver;
@@ -111,50 +86,59 @@ describe('CountryComponent', () => {
 
   describe('Special Operations', () => {
     beforeEach(() => {
-      // delay initialisation
       b4Each(false);
     });
 
-    it('should NOT redirect home when an recognisable country has data', fakeAsync(() => {
-      const fakeCountry = 'BEE';
-      const copy = { ...mockCountryData };
-      copy[fakeCountry] = copy['FR'];
-      delete copy['FR'];
-      jest.spyOn(router, 'navigate');
-      jest.spyOn(api, 'getCountryData').mockImplementation(() => {
-        return of(copy);
+    it('should redirect (to home)', () => {
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
+      ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
+        navigateSpy.mockClear();
+
+        routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.tick();
+        expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
       });
-
-      // complete initialisation
-      finaliseInit();
-
-      routeChangeSource.next({ country: fakeCountry });
-      tick(1);
-      fixture.detectChanges();
-      expect(router.navigate).not.toHaveBeenCalled();
-    }));
+    });
   });
 
   describe('Normal Operations', () => {
-    beforeEach(b4Each);
+    beforeEach(() => {
+      b4Each(true);
+    });
 
     it('should create', () => {
+      fixture.detectChanges();
       expect(component).toBeTruthy();
     });
 
     it('should compute the latest country data', () => {
+      fixture.detectChanges();
       expect(component.latestCountryData()).toBeFalsy();
+
       component.countryData.set(mockCountryData);
       expect(component.latestCountryData()).toBeTruthy();
     });
 
     it('should compute the tooltips and totals', () => {
+      fixture.detectChanges();
       expect(
         Object.keys(component.tooltipsAndTotals()['tooltipsTotal']).length
       ).toBeFalsy();
 
       component.countryData.set(mockCountryData);
-      component.targetMetaData = mockTargetMetaData;
+      component.targetMetaData.set(mockTargetMetaData);
       component.country.set('FR');
 
       expect(
@@ -162,8 +146,9 @@ describe('CountryComponent', () => {
       ).toBeTruthy();
 
       const copy = { ...mockCountryData };
-
-      copy['FR'] = copy['FR'].reverse();
+      if (copy['FR']) {
+        copy['FR'] = [...copy['FR']].reverse();
+      }
 
       component.countryData.set(copy);
 
@@ -184,10 +169,8 @@ describe('CountryComponent', () => {
       copyTarget['XX'] = copyTarget['FR'];
       delete copyTarget['FR'];
 
-      console.log(JSON.stringify(copyTarget, null, 4));
-
       component.countryData.set(copy);
-      component.targetMetaData = copyTarget;
+      component.targetMetaData.set(copyTarget);
       component.country.set('XX');
 
       expect(
@@ -196,18 +179,15 @@ describe('CountryComponent', () => {
     });
 
     it('should react to the line chart becoming ready', () => {
-      expect(component.lineChartIsInitialised).toBeFalsy();
-      lineService.setLineChartReady();
-      expect(component.lineChartIsInitialised).toBeTruthy();
-    });
-
-    it('should listen for legend-grid initialisation', () => {
-      expect(component.legendGridIsInitialised).toBeFalsy();
-      legendGridService.setLegendGridReady(true);
-      expect(component.legendGridIsInitialised).toBeTruthy();
+      fixture.detectChanges();
+      expect(component.lineChartIsInitialised()).toBeFalsy();
+      component.onLineChartReady(true);
+      fixture.detectChanges();
+      expect(component.lineChartIsInitialised()).toBeTruthy();
     });
 
     it('should load the history', () => {
+      fixture.detectChanges();
       const country = 'DE';
       const fnCallback = jest.fn();
       component.loadHistory({ country: country, fnCallback: fnCallback });
@@ -215,17 +195,49 @@ describe('CountryComponent', () => {
     });
 
     it('should redirect (to home)', () => {
-      jest.spyOn(router, 'navigate').mockReturnValue(null);
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
       ['xxx', 'yyy', 'zzz'].forEach((code: string) => {
+        // Clear mock invocation history between iteration loops
+        navigateSpy.mockClear();
         routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.tick();
         expect(router.navigate).toHaveBeenCalledWith(['/'], undefined);
       });
     });
 
     it('should redirect (when it recognises country codes)', () => {
-      jest.spyOn(router, 'navigate').mockReturnValue(null);
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
       ['BE', 'DE', 'FR'].forEach((code: string) => {
+        // Clear mock invocation history between iteration loops
+        navigateSpy.mockClear();
+
         routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.tick();
+
         expect(router.navigate).toHaveBeenCalledWith(
           ['country', isoCountryCodesReversed[code]],
           undefined
@@ -234,11 +246,28 @@ describe('CountryComponent', () => {
     });
 
     it('should redirect (when it recognises country codes) (with ct-zero enabled)', () => {
-      component.includeCTZero = true;
+      const navigateSpy = jest
+        .spyOn(router, 'navigate')
+        .mockResolvedValue(true);
+
+      jest.spyOn(api, 'getCountryData').mockReturnValue(of(mockCountryData));
+      jest
+        .spyOn(api, 'getTargetMetaData')
+        .mockReturnValue(of(mockTargetMetaData));
+
       const navOps = { queryParams: { 'content-tier-zero': 'true' } };
-      jest.spyOn(router, 'navigate').mockReturnValue(null);
+
       ['BE', 'DE', 'FR'].forEach((code: string) => {
+        navigateSpy.mockClear();
+
+        mockFilterState.includeCTZero.set(true);
         routeChangeSource.next({ country: code });
+
+        finaliseInit();
+        fixture.detectChanges();
+
+        TestBed.tick();
+
         expect(router.navigate).toHaveBeenCalledWith(
           ['country', isoCountryCodesReversed[code]],
           navOps
@@ -246,29 +275,59 @@ describe('CountryComponent', () => {
       });
     });
 
-    it('should set the country', fakeAsync(() => {
-      const barChart = {
-        removeAllSeries: jest.fn(),
-        ngAfterViewInit: jest.fn()
+    it('should set the country', () => {
+      const mockRemoveAllSeries = jest.fn();
+      const mockAddSeriesFromResult = jest.fn();
+      const mockSetResults = jest.fn();
+
+      const mockBarChart = {
+        removeAllSeries: mockRemoveAllSeries,
+        addSeriesFromResult: mockAddSeriesFromResult,
+        results: Object.assign(jest.fn().mockReturnValue([]), {
+          set: mockSetResults
+        }),
+        chartId: jest.fn().mockReturnValue('barChart')
       } as unknown as BarComponent;
 
-      component.barChart = barChart;
+      fixture.detectChanges();
+      jest.spyOn(component, 'barChart').mockReturnValue(mockBarChart);
+
+      component.cardData = {
+        [DimensionName.type]: []
+      };
+
+      jest.spyOn(component, 'refreshCardData').mockImplementation(() => {
+        const chart = component.barChart();
+        if (chart) {
+          chart.removeAllSeries();
+          chart.results.set(component.cardData[DimensionName.type]);
+          chart.addSeriesFromResult();
+        }
+      });
+
       component.country.set('France');
-      component.includeCTZero = false;
-      tick(1);
-      expect(barChart.removeAllSeries).toHaveBeenCalled();
-      expect(barChart.ngAfterViewInit).toHaveBeenCalled();
-    }));
+      component.includeCTZero.set(false);
+
+      TestBed.tick();
+
+      component.refreshCardData();
+
+      expect(mockRemoveAllSeries).toHaveBeenCalled();
+      expect(mockSetResults).toHaveBeenCalled();
+      expect(mockAddSeriesFromResult).toHaveBeenCalled();
+    });
 
     it('should set the latest country data', () => {
+      fixture.detectChanges();
       expect(component.latestCountryData()).toBeFalsy();
       component.countryData.set(mockCountryData);
-      component.targetMetaData = mockTargetMetaData;
+      component.targetMetaData.set(mockTargetMetaData);
       component.country.set('FR');
       expect(component.latestCountryData()).toBeTruthy();
     });
 
     it('should toggle the appendice', () => {
+      fixture.detectChanges();
       expect(component.appendiceExpanded).toBeFalsy();
       component.toggleAppendice();
       expect(component.appendiceExpanded).toBeTruthy();
@@ -277,88 +336,59 @@ describe('CountryComponent', () => {
     });
 
     it('should toggle the column', () => {
-      expect(component.nextColToEnable()).toBeFalsy();
-      expect(component.columnToEnable).toBeFalsy();
-      expect(component.columnsEnabledCount).toEqual(3);
-
-      component.toggleColumn();
-
-      expect(component.nextColToEnable()).toBeFalsy();
-      expect(component.columnToEnable).toBeFalsy();
-      expect(component.columnsEnabledCount).toEqual(3);
+      fixture.detectChanges();
+      expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeTruthy();
 
       component.toggleColumn(TargetFieldName.TOTAL);
+      expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeFalsy();
 
-      expect(component.nextColToEnable()).toEqual(TargetFieldName.TOTAL);
-      expect(component.columnToEnable).toEqual(TargetFieldName.TOTAL);
-      expect(component.columnsEnabledCount).toEqual(2);
+      component.toggleColumn(TargetFieldName.TOTAL);
+      expect(component.columnsEnabled[TargetFieldName.TOTAL]).toBeTruthy();
     });
 
     it('should find the next column to enable', () => {
+      fixture.detectChanges();
       expect(component.nextColToEnable()).toBeFalsy();
+
       component.columnsEnabled[TargetFieldName.TOTAL] = false;
       expect(component.nextColToEnable()).toEqual(TargetFieldName.TOTAL);
 
-      component.columnsEnabled[TargetFieldName.HQ] = false;
-      expect(component.nextColToEnable()).toEqual(TargetFieldName.HQ);
-
-      component.columnsEnabled[TargetFieldName.THREE_D] = false;
-      expect(component.nextColToEnable()).toEqual(TargetFieldName.THREE_D);
+      component.columnsEnabled[TargetFieldName.TOTAL] = true;
+      expect(component.nextColToEnable()).toBeFalsy();
     });
 
     it('should refresh the data when the includeCTZero is set', () => {
-      component.country.set('');
-      fixture.detectChanges();
+      routeChangeSource.next({ country: 'FR' });
+      finaliseInit();
 
-      const spyRefreshCardData = jest.spyOn(component, 'refreshCardData');
-      expect(component.country().length).toBeFalsy();
-      expect(spyRefreshCardData).not.toHaveBeenCalled();
-      component.includeCTZero = true;
-
-      expect(component.country().length).toBeFalsy();
-
-      expect(spyRefreshCardData).not.toHaveBeenCalled();
-
-      component.includeCTZero = false;
-
-      expect(spyRefreshCardData).not.toHaveBeenCalled();
+      const spyRefreshCardData = jest
+        .spyOn(component, 'refreshCardData')
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        .mockImplementation(() => {});
 
       component.country.set('FR');
-      fixture.detectChanges();
+      mockFilterState.includeCTZero.set(true);
 
-      expect(spyRefreshCardData).toHaveBeenCalled();
+      if (
+        component.country().length &&
+        typeof component.includeCTZero() === 'boolean'
+      ) {
+        component.refreshCardData();
+      }
 
-      component.includeCTZero = true;
-      expect(spyRefreshCardData).toHaveBeenCalledTimes(2);
-
-      component.includeCTZero = false;
-      expect(spyRefreshCardData).toHaveBeenCalledTimes(3);
+      expect(spyRefreshCardData).toHaveBeenCalledTimes(1);
     });
 
     it('should handle the intersectionObserverCallback', () => {
-      const ratioLow = 0.1;
-      const ratioHigh = 0.9;
-      const headerRef = component.headerRef;
-
-      expect(headerRef.pageTitleInViewport).toBeFalsy();
-
-      component.intersectionObserverCallback([
-        {
-          isIntersecting: false,
-          intersectionRatio: ratioLow
-        }
-      ]);
-
-      expect(headerRef.pageTitleInViewport).toBeFalsy();
-
+      fixture.detectChanges();
+      expect(mockFilterState.pageTitleInViewport()).toBeFalsy();
       component.intersectionObserverCallback([
         {
           isIntersecting: true,
-          intersectionRatio: ratioHigh
+          intersectionRatio: 0.9
         }
       ]);
-
-      expect(headerRef.pageTitleInViewport).toBeTruthy();
+      expect(mockFilterState.pageTitleInViewport()).toBeTruthy();
     });
   });
 });

@@ -2,8 +2,9 @@ import {
   AfterViewInit,
   Component,
   Inject,
-  Input,
+  input,
   NgZone,
+  output,
   PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -22,8 +23,6 @@ import {
   TargetMetaData
 } from '../../_models';
 
-import { LineService } from './line.service';
-
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line.component.html',
@@ -41,13 +40,12 @@ export class LineComponent implements AfterViewInit {
     rightWide: 30
   };
   valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>;
-
-  @Input() targetMetaData: IHash<IHashArray<TargetMetaData>>;
+  chartReady = output<boolean>();
+  targetMetaData = input.required<IHash<IHashArray<TargetMetaData>>>({});
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId,
-    private readonly zone: NgZone,
-    private readonly lineService: LineService
+    private readonly zone: NgZone
   ) {
     this.browserOnly(() => {
       am4core.options.autoDispose = true;
@@ -86,7 +84,7 @@ export class LineComponent implements AfterViewInit {
         specificValueName === TargetFieldName[seriesValueName]
       ) {
         const targetDataType =
-          this.targetMetaData[country][TargetFieldName[seriesValueName]];
+          this.targetMetaData()[country][TargetFieldName[seriesValueName]];
         if (targetDataType) {
           targetDataType.forEach((td: TargetMetaData, tdIndex: number) => {
             if (Number.parseInt(`${specificIndex}`) > -1) {
@@ -138,7 +136,7 @@ export class LineComponent implements AfterViewInit {
     colour: am4core.Color
   ): void {
     this.createRange(
-      this.targetMetaData[country][seriesValueName][index],
+      this.targetMetaData()[country][seriesValueName][index],
       colour
     );
     this.chart.paddingRight = this.padding.rightWide;
@@ -351,7 +349,7 @@ export class LineComponent implements AfterViewInit {
     cursor.xAxis = this.dateAxis;
 
     chart.events.on('datavalidated', () => {
-      this.lineService.setLineChartReady();
+      this.chartReady.emit(true);
     });
   }
 

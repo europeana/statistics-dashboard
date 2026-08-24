@@ -2,7 +2,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting
 } from '@angular/common/http/testing';
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { MockHttp } from '@europeana/metis-ui-test-utils';
 import { environment } from '../../environments/environment';
 import { GeneralResults, TargetFieldName } from '../_models';
@@ -16,7 +16,7 @@ describe('API Service', () => {
   let service: APIService;
   let mockHttp: MockHttp;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [
         APIService,
@@ -26,7 +26,7 @@ describe('API Service', () => {
     }).compileComponents();
     service = TestBed.inject(APIService);
     mockHttp = new MockHttp(TestBed.inject(HttpTestingController));
-  }));
+  });
 
   it('should load specific country data', () => {
     const country = 'BE';
