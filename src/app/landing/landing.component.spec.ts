@@ -324,6 +324,9 @@ describe('LandingComponent', () => {
     const spyGetTargetMetaData = jest.spyOn(api, 'getTargetMetaData');
     const fnCallback = jest.fn();
 
+    component.targetMetaData.set(undefined);
+    spyGetTargetMetaData.mockClear();
+
     component.tapTargetDataLoad(TargetFieldName.TOTAL, fnCallback);
     expect(spyGetTargetMetaData).toHaveBeenCalled();
     expect(fnCallback).toHaveBeenCalled();
@@ -339,6 +342,9 @@ describe('LandingComponent', () => {
   it('should tap the country data load', () => {
     const fnCallback = jest.fn();
     const spyGetCountryData = jest.spyOn(api, 'getCountryData');
+
+    component.countryData.set(undefined);
+    spyGetCountryData.mockClear();
 
     component.tapCountryDataLoad(fnCallback);
     expect(spyGetCountryData).toHaveBeenCalledTimes(1);

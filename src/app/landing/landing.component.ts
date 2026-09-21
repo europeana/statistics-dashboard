@@ -7,7 +7,6 @@ import {
   NgTemplateOutlet,
   UpperCasePipe
 } from '@angular/common';
-
 import {
   ChangeDetectorRef,
   Component,
@@ -16,6 +15,7 @@ import {
   ElementRef,
   inject,
   OnDestroy,
+  OnInit,
   signal,
   viewChild,
   viewChildren
@@ -76,7 +76,7 @@ import { Subscription } from 'rxjs';
     SpeechBubbleComponent
   ]
 })
-export class LandingComponent implements OnDestroy {
+export class LandingComponent implements OnInit, OnDestroy {
   private readonly api = inject(APIService);
   private readonly filterStateService = inject(FilterStateService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -104,16 +104,15 @@ export class LandingComponent implements OnDestroy {
   targetExpanded: TargetFieldName | undefined;
   allProgressSeries: IHashArray<Array<IdValue>> = {};
   mapMenuIsOpen = false;
+
   menuDisabledStatus = computed(() => {
     const data = this.countryData();
     const chart = this.mapChart();
-    const selected = chart?.selectedCountry;
 
-    if (!data || !chart || !selected) {
+    if (!data || !chart) {
       return 'disabled';
     }
-    const hasCountryRecord = !!data[selected];
-    return hasCountryRecord ? null : 'disabled';
+    return Object.keys(data).length > 0 ? null : 'disabled';
   });
 
   heatmapActivated = false;
@@ -154,6 +153,11 @@ export class LandingComponent implements OnDestroy {
         this.refreshCharts();
       });
     });
+  }
+
+  ngOnInit(): void {
+    this.tapCountryDataLoad();
+    this.tapTargetDataLoad();
   }
 
   ngOnDestroy(): void {
