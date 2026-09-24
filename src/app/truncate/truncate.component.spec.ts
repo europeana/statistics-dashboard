@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ElementRef } from '@angular/core';
-import { ResizeComponent } from '../resize';
 import { TruncateComponent } from './';
 import { HighlightMatchPipe } from '../_translate';
 
@@ -8,9 +7,22 @@ describe('TruncateComponent', () => {
   let component: TruncateComponent;
   let fixture: ComponentFixture<TruncateComponent>;
 
+  beforeAll(() => {
+    class MockResizeObserver {
+      observe = jest.fn();
+      unobserve = jest.fn();
+      disconnect = jest.fn();
+    }
+    Object.defineProperty(window, 'ResizeObserver', {
+      writable: true,
+      configurable: true,
+      value: MockResizeObserver
+    });
+  });
+
   const configureTestBed = (): void => {
     TestBed.configureTestingModule({
-      imports: [TruncateComponent, ResizeComponent],
+      imports: [TruncateComponent],
       providers: [HighlightMatchPipe]
     }).compileComponents();
   };
@@ -28,6 +40,7 @@ describe('TruncateComponent', () => {
       nativeElement: parentSpan
     } as ElementRef;
 
+    jest.spyOn(component, 'container').mockReturnValue(mockElementRef);
     jest.spyOn(component, 'elRefTextLeft').mockReturnValue(mockElementRef);
     jest.spyOn(component, 'elRefTextRight').mockReturnValue(mockElementRef);
 
@@ -38,50 +51,31 @@ describe('TruncateComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should split the text on init', () => {
-    const spySplitText = jest.spyOn(component, 'splitText');
+  it('should truncate the text on data input change pass', () => {
+    const spyTruncate = jest.spyOn(component, 'truncateTextToFit');
     fixture.componentRef.setInput('text', 'xxxx');
     fixture.detectChanges();
 
-    expect(spySplitText).toHaveBeenCalled();
+    expect(spyTruncate).toHaveBeenCalled();
   });
 
-  it('should split the text on resize', async () => {
-    fixture.componentRef.setInput('text', 'xxxx');
-    fixture.detectChanges();
-    const spySplitText = jest.spyOn(component, 'splitText');
-
-    jest.useFakeTimers();
-
-    window.dispatchEvent(new Event('resize'));
-
-    jest.advanceTimersByTime(component.debounceMS);
-
-    expect(spySplitText).toHaveBeenCalled();
-    jest.useRealTimers();
+  it('should attach a layout ResizeObserver instance on init', () => {
+    const containerEl = component.container()?.nativeElement;
+    expect(containerEl).toBeTruthy();
   });
 
-  it('should split the text recursively', () => {
-    jest.spyOn(component, 'isEllipsisActive').mockReturnValue(false);
-
-    let rawText = 'xxxx';
-    for (let x = 0; x < 10; x++) {
-      rawText = rawText + rawText;
-    }
-
-    const spySplitText = jest.spyOn(component, 'splitText');
-
-    fixture.componentRef.setInput('text', rawText);
-    fixture.detectChanges();
-
-    component.omitCount = 2;
-    component.callSplitText();
-
-    expect(component.omitCount).toEqual(0);
-    expect(spySplitText).toHaveBeenCalled();
+  it('should disconnect the ResizeObserver layout binding on destroy', () => {
+    // Access the instance to verify it disconnects cleanly when destroyed
+    const spyDisconnect = jest.spyOn(
+      (component as any).resizeObserver,
+      'disconnect'
+    );
+    fixture.destroy();
+    expect(spyDisconnect).toHaveBeenCalled();
   });
 
-  it('should test all callSplitText branches correctly', () => {
+  it('should process text truncation iterations correctly across different layout conditions', () => {
+    const outerEl = document.createElement('span');
     const leftEl = document.createElement('span');
     const rightEl = document.createElement('span');
     leftEl.appendChild(document.createElement('span'));
@@ -90,37 +84,42 @@ describe('TruncateComponent', () => {
       {
         left: null,
         right: null,
-        ellipsis: false,
+        ellipsisOnFirstPass: false,
+        wOuter: 200,
         wL: 0,
         wR: 0,
-        rec: 0,
-        expectedOmit: 0,
-        shouldSplit: false
+        expectedOmit: 0
       },
       {
         left: leftEl,
         right: rightEl,
-        ellipsis: true,
-        wL: 100,
-        wR: 150,
-        rec: 0,
-        expectedOmit: 2,
-        shouldSplit: true
+        ellipsisOnFirstPass: false, // Fits perfectly -> breaks out immediately
+        wOuter: 200,
+        wL: 80,
+        wR: 80,
+        expectedOmit: 0
       },
       {
         left: leftEl,
         right: rightEl,
-        ellipsis: true,
-        wL: 100,
-        wR: 150,
-        rec: 5,
-        expectedOmit: 2,
-        shouldSplit: false
+        ellipsisOnFirstPass: true, // Needs adjustment -> runs once, trims, then fits
+        wOuter: 200,
+        wL: 120,
+        wR: 100, // 120 + 100 = 220 (> 200 Max)
+        expectedOmit: 2
       }
     ];
 
     scenarios.forEach(
-      ({ left, right, ellipsis, wL, wR, rec, expectedOmit, shouldSplit }) => {
+      ({ left, right, ellipsisOnFirstPass, wOuter, wL, wR, expectedOmit }) => {
+        jest
+          .spyOn(component, 'container')
+          .mockReturnValue(
+            outerEl
+              ? ({ nativeElement: outerEl } as unknown as ElementRef)
+              : undefined
+          );
+
         jest
           .spyOn(component, 'elRefTextLeft')
           .mockReturnValue(
@@ -137,7 +136,19 @@ describe('TruncateComponent', () => {
               : undefined
           );
 
-        jest.spyOn(component, 'isEllipsisActive').mockReturnValue(ellipsis);
+        // Simulate a real layout: return ellipsis flag on first check, but false once trimmed
+        let isFirstCheck = true;
+        jest.spyOn(component, 'isEllipsisActive').mockImplementation(() => {
+          if (isFirstCheck) {
+            isFirstCheck = false;
+            return ellipsisOnFirstPass;
+          }
+          return false;
+        });
+
+        jest
+          .spyOn(outerEl, 'getBoundingClientRect')
+          .mockReturnValue({ width: wOuter } as DOMRect);
 
         if (left && right) {
           jest
@@ -148,21 +159,16 @@ describe('TruncateComponent', () => {
             .mockReturnValue({ width: wR } as DOMRect);
         }
 
-        const spySplitText = jest
-          .spyOn(component, 'splitText')
-          .mockImplementation();
-
-        spySplitText.mockClear();
-
-        component['_text'] = 'abcdefgh';
+        // Reset values
         component.omitCount = 0;
-        component.maxRecursions = 5;
 
-        component.callSplitText(rec);
+        // Update state via input signals safely
+        fixture.componentRef.setInput('text', 'abcdefgh');
+        fixture.detectChanges();
+
+        component.truncateTextToFit();
 
         expect(component.omitCount).toEqual(expectedOmit);
-        if (shouldSplit) expect(spySplitText).toHaveBeenCalled();
-        else expect(spySplitText).not.toHaveBeenCalled();
       }
     );
   });

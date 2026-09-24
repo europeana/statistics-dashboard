@@ -69,6 +69,19 @@ describe('GridComponent', () => {
     fixture.detectChanges();
   });
 
+  beforeAll(() => {
+    class MockResizeObserver {
+      observe = jest.fn();
+      unobserve = jest.fn();
+      disconnect = jest.fn();
+    }
+    Object.defineProperty(window, 'ResizeObserver', {
+      writable: true,
+      configurable: true,
+      value: MockResizeObserver
+    });
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

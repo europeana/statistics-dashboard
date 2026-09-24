@@ -4,34 +4,35 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  OnDestroy,
   inject,
   input,
   viewChild
 } from '@angular/core';
 import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';
 import { NgClass } from '@angular/common';
-import { ResizeComponent } from '../resize/resize.component';
 
 @Component({
   selector: 'app-truncate',
   templateUrl: './truncate.component.html',
   styleUrls: ['./truncate.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush, // Secure OnPush bounds
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [ResizeComponent, NgClass, HighlightMatchPipe]
+  imports: [NgClass, HighlightMatchPipe]
 })
-export class TruncateComponent implements AfterViewInit {
+export class TruncateComponent implements AfterViewInit, OnDestroy {
   private readonly changeDetector = inject(ChangeDetectorRef);
 
   readonly elRefTextLeft = viewChild<ElementRef>('elRefTextLeft');
   readonly elRefTextRight = viewChild<ElementRef>('elRefTextRight');
+  readonly container = viewChild<ElementRef>('container');
 
   private _text = '';
   readonly text = input<string, string>('', {
     transform: (value: string) => {
       this._text = value || '';
       this.omitCount = 0;
-      this.splitText();
+      this.truncateTextToFit();
       return this._text;
     }
   });
@@ -39,80 +40,78 @@ export class TruncateComponent implements AfterViewInit {
   readonly highlightText = input<string>('');
 
   applySpace = false;
-  maxRecursions = 100;
   omitCount = 0;
   omitStep = 2;
   textLeft = '';
   textRight = '';
 
-  public debounceMS = 500;
+  private resizeObserver?: ResizeObserver;
 
   ngAfterViewInit(): void {
-    this.splitText();
+    const containerEl = this.container()?.nativeElement;
+    if (containerEl) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.truncateTextToFit();
+      });
+      this.resizeObserver.observe(containerEl);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
   }
 
   isEllipsisActive(): boolean {
     const leftEl = this.elRefTextLeft()?.nativeElement;
     const childWidth = leftEl?.firstElementChild?.getBoundingClientRect().width;
     const parentWidth = leftEl?.getBoundingClientRect().width;
-
     return !!(childWidth && parentWidth && childWidth > parentWidth);
   }
 
-  /** splitText
-   * Splits the text variable according to current omitCount settings safely inside a microtask frame
+  /**
+   * Calculates structural slices across a flat iterative pass to prevent loop recursion crashes.
    **/
-  splitText(recursions = 0): void {
+  truncateTextToFit(): void {
     const rawText = this._text;
     if (!rawText) return;
 
-    const textLength = rawText.length;
-    const omit = Math.floor(this.omitCount / 2);
-    const cutOff = Math.floor(textLength / 2);
+    this.omitCount = 0;
+    let iterations = 0;
+    const maxIterations = 50; // Safety ceiling to handle tight boundary layouts completely fast
 
-    this.textLeft = rawText.substring(0, cutOff - omit);
-    this.textRight = rawText.substring(cutOff + omit);
+    while (iterations < maxIterations) {
+      const textLength = rawText.length;
+      const omit = Math.floor(this.omitCount / 2);
+      const cutOff = Math.floor(textLength / 2);
 
-    this.applySpace =
-      this.textLeft.endsWith(' ') || this.textRight.startsWith(' ');
+      this.textLeft = rawText.substring(0, cutOff - omit);
+      this.textRight = rawText.substring(cutOff + omit);
+      this.applySpace =
+        this.textLeft.endsWith(' ') || this.textRight.startsWith(' ');
 
-    this.changeDetector.markForCheck();
+      // Synchronously notify the template bindings to recalculate string widths in the DOM
+      this.changeDetector.detectChanges();
 
-    const leftEl = this.elRefTextLeft()?.nativeElement;
-    const rightEl = this.elRefTextRight()?.nativeElement;
+      const outerContainer = this.container()?.nativeElement;
+      const leftEl = this.elRefTextLeft()?.nativeElement;
+      const rightEl = this.elRefTextRight()?.nativeElement;
 
-    if (leftEl?.firstElementChild) {
-      leftEl.firstElementChild.innerHTML = this.textLeft;
-    }
+      if (!outerContainer || !leftEl || !rightEl) break;
 
-    if (rightEl) {
-      rightEl.innerHTML = this.textRight;
-      rightEl.classList.toggle('with-leading-space', !!this.applySpace);
-    }
+      if (!this.isEllipsisActive()) {
+        break; // Layout fits perfectly fine
+      } else {
+        const combinedWidth =
+          leftEl.getBoundingClientRect().width +
+          rightEl.getBoundingClientRect().width;
+        const maxWidth = outerContainer.getBoundingClientRect().width;
 
-    this.callSplitText(recursions);
-  }
-
-  /** Companion function for splitText to call it recursively
-   **/
-  callSplitText(recursions = 0): void {
-    const leftEl = this.elRefTextLeft()?.nativeElement;
-    const rightEl = this.elRefTextRight()?.nativeElement;
-    if (!leftEl || !rightEl) return;
-
-    if (!this.isEllipsisActive()) {
-      if (this.omitCount !== 0) {
-        this.omitCount = Math.max(this.omitCount - this.omitStep, 0);
-        this.splitText(this.maxRecursions);
-      }
-    } else {
-      const wLeft = leftEl.getBoundingClientRect().width;
-      const wRight = rightEl.getBoundingClientRect().width;
-
-      if (wRight > wLeft) {
-        this.omitCount += this.omitStep;
-        if (recursions < this.maxRecursions) {
-          this.splitText(recursions + 1);
+        // Strip characters if sub-elements combine to overflow the outer layout limit
+        if (combinedWidth > maxWidth && this.omitCount < rawText.length) {
+          this.omitCount += this.omitStep;
+          iterations++;
+        } else {
+          break;
         }
       }
     }

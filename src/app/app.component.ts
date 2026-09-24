@@ -80,7 +80,6 @@ export class AppComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((item: MaintenanceItem | undefined) => {
         this.maintenanceInfo = item;
-        this.filterStateService.landingDataIsLoading.set(false);
       });
   }
 
