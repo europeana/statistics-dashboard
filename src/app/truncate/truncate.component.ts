@@ -4,9 +4,9 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  OnDestroy,
   inject,
   input,
+  OnDestroy,
   viewChild
 } from '@angular/core';
 import { HighlightMatchPipe } from '../_translate/highlight-match.pipe';

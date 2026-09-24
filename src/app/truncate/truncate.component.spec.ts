@@ -65,13 +65,14 @@ describe('TruncateComponent', () => {
   });
 
   it('should disconnect the ResizeObserver layout binding on destroy', () => {
-    // Access the instance to verify it disconnects cleanly when destroyed
-    const spyDisconnect = jest.spyOn(
-      (component as any).resizeObserver,
-      'disconnect'
-    );
-    fixture.destroy();
-    expect(spyDisconnect).toHaveBeenCalled();
+    const observerInstance = component['resizeObserver'];
+    if (observerInstance) {
+      const spyDisconnect = jest.spyOn(observerInstance, 'disconnect');
+      fixture.destroy();
+      expect(spyDisconnect).toHaveBeenCalled();
+    } else {
+      fail('ResizeObserver instance was not initialized on the component.');
+    }
   });
 
   it('should process text truncation iterations correctly across different layout conditions', () => {
