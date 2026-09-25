@@ -1,15 +1,24 @@
-import { Component, Input } from '@angular/core';
+import { Component, forwardRef, input } from '@angular/core';
 import { DimensionName } from '../_data';
 import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
+import { GridComponent } from '../grid';
+
 @Component({
   standalone: true,
   selector: 'app-grid',
-  template: ''
+  template: '',
+  providers: [
+    {
+      provide: GridComponent,
+      // useExisting points the real GridComponent query token to this mock instance
+      useExisting: forwardRef(() => MockGridComponent)
+    }
+  ]
 })
 export class MockGridComponent {
-  @Input() facet: DimensionName;
-  @Input() isVisible: boolean;
-  @Input() tierPrefix: string;
+  facet = input<DimensionName>();
+  isVisible = input<boolean>(false);
+  tierPrefix = input<string>('');
 
   sortInfo: SortInfo = {
     by: SortBy.name,

@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -34,16 +34,17 @@ describe('LineComponent', () => {
     }
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [LineComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LineComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('targetMetaData', {});
     fixture.detectChanges();
   });
 
@@ -73,9 +74,8 @@ describe('LineComponent', () => {
   });
 
   it('should remove the range', () => {
-    component.targetMetaData = structuredClone(mockTargetMetaData);
-
-    const deData = component.targetMetaData['DE'];
+    const clonedMetaData = structuredClone(mockTargetMetaData);
+    const deData = clonedMetaData['DE'];
 
     Object.keys(deData).forEach((key: string) => {
       deData[key].forEach((ob: TargetMetaData) => {
@@ -85,6 +85,9 @@ describe('LineComponent', () => {
         } as unknown as am4charts.ValueAxisDataItem;
       });
     });
+
+    fixture.componentRef.setInput('targetMetaData', clonedMetaData);
+    fixture.detectChanges();
 
     const spyRemoveValue = jest.spyOn(
       component.valueAxis.axisRanges,
@@ -103,16 +106,25 @@ describe('LineComponent', () => {
     component.removeRange('DE', TargetFieldName.HQ, 0);
     expect(spyRemoveValue).toHaveBeenCalledTimes(2);
 
-    component.targetMetaData['DE'][TargetFieldName.HQ] = [
-      { value: 12, targetYear: 2030 }
+    clonedMetaData['DE'][TargetFieldName.HQ] = [
+      { value: 12, targetYear: 2030 } as TargetMetaData
     ];
+    fixture.componentRef.setInput('targetMetaData', { ...clonedMetaData });
+    fixture.detectChanges();
+
     component.removeRange('DE', TargetFieldName.HQ, 6);
     expect(spyRemoveValue).toHaveBeenCalledTimes(2);
   });
 
   it('should show the range', () => {
     const paddingRight = component.chart.paddingRight as number;
-    component.targetMetaData = structuredClone(mockTargetMetaData);
+
+    fixture.componentRef.setInput(
+      'targetMetaData',
+      structuredClone(mockTargetMetaData)
+    );
+    fixture.detectChanges();
+
     component.showRange('DE', TargetFieldName.HQ, 0, am4core.color('#0c529c'));
     expect(component.chart.paddingRight as number).toBeGreaterThan(
       paddingRight

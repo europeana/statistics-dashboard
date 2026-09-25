@@ -1,11 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { BarComponent } from './bar.component';
 
@@ -23,17 +17,15 @@ describe('BarComponent', () => {
     }
   ];
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [BarComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(BarComponent);
     component = fixture.componentInstance;
-    component.results = [];
+
+    fixture.componentRef.setInput('results', []);
     fixture.detectChanges();
   });
 
@@ -59,7 +51,8 @@ describe('BarComponent', () => {
     const seriesAbs = component.createSeries('#000');
     expect(seriesAbs.columns.template.tooltipText).not.toContain('%');
 
-    component.showPercent = true;
+    fixture.componentRef.setInput('showPercent', true);
+    fixture.detectChanges();
 
     const seriesPct = component.createSeries('#000');
     expect(seriesPct.columns.template.tooltipText).toContain('%');
@@ -68,7 +61,10 @@ describe('BarComponent', () => {
   it('should format the numbers', () => {
     component.drawChart();
     expect(component.valueAxis.numberFormatter.numberFormat).toEqual('#.0a');
-    component.showPercent = true;
+
+    fixture.componentRef.setInput('showPercent', true);
+    fixture.detectChanges();
+
     component.drawChart();
     expect(component.valueAxis.numberFormatter.numberFormat).toEqual('#.');
   });
@@ -96,20 +92,30 @@ describe('BarComponent', () => {
   });
 
   it('should add a series from a result', () => {
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
+
     const spyAddSeries = jest.spyOn(component, 'addSeries');
-    component.addSeriesFromResult();
-    expect(spyAddSeries).toHaveBeenCalledTimes(1);
-    component.results = null;
+
     component.addSeriesFromResult();
     expect(spyAddSeries).toHaveBeenCalledTimes(1);
 
-    component.results = testResults;
+    fixture.componentRef.setInput('results', []);
+    fixture.detectChanges();
+
+    component.addSeriesFromResult();
+    expect(spyAddSeries).toHaveBeenCalledTimes(1);
+
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
+
     component.addSeriesFromResult();
     expect(spyAddSeries).toHaveBeenCalledTimes(2);
   });
 
   it('should detect zoomabability', () => {
-    component.results = testResults;
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
     expect(component.isZoomable()).toBeFalsy();
     component.addSeriesFromResult();
     expect(component.isZoomable()).toBeFalsy();
@@ -127,7 +133,9 @@ describe('BarComponent', () => {
   it('should add an axis break if zoomability is high', () => {
     const spyAddAxisBreak = jest.spyOn(component, 'addAxisBreak');
     component.preferredNumberBars = 1;
-    component.results = testResults;
+
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
     component.addSeriesFromResult();
     expect(component.isZoomable()).toBeTruthy();
     expect(component.addAxisBreak).not.toHaveBeenCalled();
@@ -151,8 +159,9 @@ describe('BarComponent', () => {
     expect(component.roundUpNumber(28021318)).toEqual(28021320);
   });
 
-  it('should zoom to the top entries', fakeAsync(() => {
-    component.results = testResults;
+  it('should zoom to the top entries', async () => {
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
     component.addSeriesFromResult();
 
     const spyZoomToIndexes = jest.spyOn(
@@ -160,15 +169,19 @@ describe('BarComponent', () => {
       'zoomToIndexes'
     );
     component.zoomTop();
-    tick(100);
+    await Promise.resolve();
+
     expect(component.categoryAxis.zoomToIndexes).not.toHaveBeenCalled();
 
-    component.results = testResults;
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
+
     component.preferredNumberBars = 1;
     component.zoomTop();
-    tick(100);
+    await Promise.resolve();
+
     expect(spyZoomToIndexes).toHaveBeenCalled();
-  }));
+  });
 
   it('should get the extra setting', () => {
     expect(component.extraSettings).toBeTruthy();
@@ -198,7 +211,9 @@ describe('BarComponent', () => {
     component.removeSeries('x');
     expect(component.allSeries.x).toBeFalsy();
 
-    component.results = testResults;
+    fixture.componentRef.setInput('results', testResults);
+    fixture.detectChanges();
+
     component.addSeriesFromResult();
     expect(component.allSeries.seriesKey).toBeTruthy();
     component.removeSeries('seriesKey');
@@ -207,8 +222,13 @@ describe('BarComponent', () => {
 
   it('should take extra settings', () => {
     expect(component.settings.prefixValueAxis).toBeFalsy();
-    component.extraSettings = { configurable: false, prefixValueAxis: 'Test' };
+    fixture.componentRef.setInput('extraSettings', {
+      configurable: false,
+      prefixValueAxis: 'Test'
+    });
+    fixture.detectChanges();
     expect(component.settings.prefixValueAxis).toBeTruthy();
+    expect(component.settings.prefixValueAxis).toBe('Test');
   });
 
   it('should toggle the controls', () => {

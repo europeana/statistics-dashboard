@@ -221,13 +221,17 @@ context('Statistics Dashboard', () => {
 
     it('should allow date range definitions', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
+
       cy.get(selDateFrom).should('not.exist');
       cy.get(selDateTo).should('not.exist');
+
       cy.get(selFilterOpener).last().click(force);
-      cy.get(selDateFrom).should('have.length', 1);
-      cy.get(selDateTo).should('have.length', 1);
+
+      cy.get(selDateFrom).should('be.visible');
+      cy.get(selDateTo).should('be.visible');
 
       const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
+
       cy.get(selDateFrom).type(today, force);
       cy.get(selDateFrom).type('{enter}', force);
       cy.get(selDateTo).type(today, force);

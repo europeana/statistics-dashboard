@@ -33,29 +33,28 @@
           <span>
             {{ targetType | renameTargetType }}
           </span>
+          @if(countryData()[country]){
           <span
             class="target-total right"
-            *ngIf="countryData[country]"
             [ngClass]="{ 'pad-right': targetType === TargetFieldName.HQ }"
           >
-            {{ countryData[country][0][targetType] | number }}
+            {{ countryData()[country][0][targetType] | number }}
           </span>
+          }
         </a>
       </li>
+      @if(series && targetMetaData()[country]){
       <li
         class="roll-down-wrapper"
-        *ngIf="series && targetMetaData[country]"
         [ngClass]="{ 'is-open': !(series.isHidden || series.isHiding) }"
       >
         <ul class="roll-down">
+          @for (data of targetMetaData()[country][targetType]; track data; let i
+          = $index) {
           <li
             class="target-toggle"
             [ngStyle]="{ color: series.fill }"
             [ngClass]="{ active: data.range }"
-            *ngFor="
-              let data of targetMetaData[country][targetType];
-              let i = index
-            "
           >
             <a
               class="legend-item-target-toggle"
@@ -86,8 +85,10 @@
               }}</span>
             </a>
           </li>
+          }
         </ul>
       </li>
+      }
     </ul>
   </ng-template>
 
@@ -111,11 +112,9 @@
           'stick-left': isPinned,
           'perma-pin-left': isTopPin
         }"
-        [ngStyle]="{
-          'top.px': isPinned
-            ? countryPinValue * classReference.itemHeight || 10
-            : null
-        }"
+        [style.top.px]="
+          isPinned ? countryPinValue * classReference.itemHeight || 10 : ''
+        "
       >
         <a (click)="toggleCountry(country)">
           <span>{{ country | renameCountry }} </span>
@@ -129,66 +128,72 @@
         [ngClass]="{
           'stick-right': isPinned
         }"
-        [ngStyle]="{
-          'top.px': isPinned
-            ? countryPinValue * classReference.itemHeight || 10
-            : null
-        }"
+        [style.top.px]="
+          isPinned ? countryPinValue * classReference.itemHeight || 10 : ''
+        "
       >
-        <ng-container
-          *ngFor="
-            let enabled of [columnEnabled3D, columnEnabledHQ, columnEnabledALL];
-            let i = index
-          "
-          class="series-column"
-        >
-          <span *ngIf="enabled">
-            <span [ngClass]="{ 'top-pin': isTopPin }">
-              <ng-content
-                *ngTemplateOutlet="
-                  legendItemSeries;
-                  context: {
-                    series:
-                      lineChart.allSeriesData[
-                        country + TargetSeriesSuffixes[i]
-                      ],
-                    targetType: TargetFieldName[seriesValueNames[i]],
-                    country: country
-                  }
-                "
-              ></ng-content>
+        @for (enabled of [columnEnabled3D(), columnEnabledHQ(),
+        columnEnabledALL()]; track $index) { @if (enabled) {
+        <span [ngClass]="{ 'top-pin': isTopPin }">
+          <ng-content
+            *ngTemplateOutlet="
+              legendItemSeries;
+              context: {
+                series:
+                  lineChart()?.allSeriesData[
+                    country + TargetSeriesSuffixes[$index]
+                  ],
+                targetType:
+                  $index === 0
+                    ? TargetFieldName.THREE_D
+                    : $index === 1
+                    ? TargetFieldName.HQ
+                    : TargetFieldName.TOTAL,
+                country: country
+              }
+            "
+          ></ng-content>
 
-              <ng-container *ngIf="isTopPin">
-                <span class="perma-pin">
-                  <a
-                    aria-label="unpin column"
-                    class="x"
-                    *ngIf="columnsEnabledCount > 1"
-                    (click)="
-                      fireUnpinColumn(TargetFieldName[seriesValueNames[i]])
-                    "
-                  ></a>
-                </span>
-              </ng-container>
-            </span>
+          @if (isTopPin) {
+          <span class="perma-pin">
+            @if(columnsEnabledCount() > 1){
+            <a
+              aria-label="unpin column"
+              class="x"
+              (click)="
+                fireUnpinColumn(
+                  $index === 0
+                    ? TargetFieldName.THREE_D
+                    : $index === 1
+                    ? TargetFieldName.HQ
+                    : TargetFieldName.TOTAL
+                )
+              "
+            ></a>
+            }
           </span>
-        </ng-container>
+          }
+        </span>
+        } }
       </span>
     </ng-template>
 
-    <ng-container *ngFor="let country of targetCountries">
-      <ng-content
-        *ngTemplateOutlet="
-          countryBlock;
-          context: {
-            country: country,
-            countryPinValue: pinnedCountries[country],
-            isTopPin: pinnedCountries[country] === 0,
-            isPinned: pinnedCountries[country] > -1
-          }
-        "
-      ></ng-content>
-    </ng-container>
+    <!-- Replaced legacy country array tracker loop with signals-native @for block -->
+    @for (country of targetCountries(); track country) {
+    <ng-content
+      *ngTemplateOutlet="
+        countryBlock;
+        context: {
+          country: country,
+          countryPinValue: pinnedCountries
+            ? pinnedCountries[country]
+            : undefined,
+          isTopPin: pinnedCountries && pinnedCountries[country] === 0,
+          isPinned: pinnedCountries && pinnedCountries[country] > -1
+        }
+      "
+    ></ng-content>
+    }
 
     <span class="scrollable-indicator"></span>
   </span>

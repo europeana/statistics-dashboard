@@ -1,23 +1,25 @@
 <ul
   class="export"
-  [ngClass]="{
-    active: active,
-    'loading-modal': busy
-  }"
+  [class.active]="active"
+  [class.loading-modal]="busy"
   tabindex="-1"
   appOpenerFocus
   [fnHide]="fnHide.bind(this)"
 >
   <li class="container-h">
     <span class="export-icon"
-      ><!-- // NOSONAR --><a
+      ><!-- // NOSONAR
+    --><a
         #downloadAnchor
         tabindex="-1"
         aria-hidden="true"
-      ></a></span
-    ><span class="label-top" i18n="Share Report Header@@exportReportHeader"
+        aria-label="Download Data"
+      ></a>
+    </span>
+    <span class="label-top" i18n="Share Report Header@@exportReportHeader"
       >Share Report</span
-    ><!-- // NOSONAR --><a
+    ><!-- // NOSONAR
+    --><a
       #closer
       aria-label="toggle export"
       class="x"
@@ -35,10 +37,11 @@
       #contentRef
       class="copy-source pad-top"
       readonly="readonly"
-      [ngClass]="{ copied: copied }"
-      value="{{ copied ? '' : currentUrl }}"
+      [class.copied]="copied"
+      [value]="copied ? '' : currentUrl"
       i18n-placeholder="Copied message@@exportReportLinkCopiedMessage"
       placeholder="Copied to clipboard!"
+      aria-label="share link URL"
       [attr.tabindex]="tabIndex"
     />
   </li>
@@ -47,7 +50,7 @@
       class="copy-btn"
       (click)="copy()"
       (keydown.enter)="copy()"
-      [ngClass]="{ disabled: copied }"
+      [class.disabled]="copied"
       i18n="Copy Link Button@@exportReportLinkCopyButton"
       [attr.tabindex]="tabIndex"
       >Copy link</a

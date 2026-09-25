@@ -98,6 +98,18 @@ context('Statistics Dashboard', () => {
       cy.get(selAppendiceTable).should('not.have.class', 'double');
     });
 
+    it('should show the title and subtitle', () => {
+      const selTitle = 'h1.page-title';
+      const selSubtitle = `${selTitle} .page-subtitle`;
+      cy.get(selTitle).should('be.visible');
+      cy.get(selTitle).should('contain.text', 'Austria');
+      cy.get(selTitle).should('contain.text', 'Data');
+      cy.get(selSubtitle)
+        .should('be.visible')
+        .and('not.be.empty')
+        .and('contain.text', '% of the Europeana dataset');
+    });
+
     it('should show the power bars', () => {
       cy.get(selPowerBar).should('have.length', 6);
       cy.get(selPowerBarHQ).should('have.length', 2);

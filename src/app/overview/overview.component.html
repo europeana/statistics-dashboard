@@ -22,15 +22,15 @@
       i18n="Period Summary|Summary for applied date filters@@periodSummary"
       >Whole period</a
     >
-    <ng-container *ngIf="getAppliedDateRange(); let dates">
-      <span class="date">
-        {{ dates[0] | date : "MMM d, y" }}
-      </span>
-      <span class="separator"> - </span>
-      <span class="date">
-        {{ dates[1] | date : "MMM d, y" }}
-      </span>
-    </ng-container>
+    @if (getAppliedDateRange(); as dates) {
+    <span class="date">
+      {{ dates[0] | date : "MMM d, y" }}
+    </span>
+    <span class="separator"> - </span>
+    <span class="date">
+      {{ dates[1] | date : "MMM d, y" }}
+    </span>
+    }
     <a
       class="date warn"
       (click)="showDateDisclaimer()"
@@ -78,9 +78,7 @@
                 i18n="Home Link@@labelLinkHome"
                 routerLink="/"
                 [queryParams]="
-                  form.value.contentTierZero
-                    ? { 'content-tier-zero': true }
-                    : {}
+                  includeCTZero() ? { 'content-tier-zero': true } : {}
                 "
                 >Home</a
               >
@@ -89,7 +87,7 @@
               <app-ct-zero-control
                 [form]="form"
                 [disabled]="emptyDataset"
-                (onChange)="updatePageUrl()"
+                (change)="updatePageUrl()"
               ></app-ct-zero-control>
             </li>
           </ul>
@@ -101,33 +99,31 @@
           </h3>
           <ul class="filters">
             <li>
-              <ng-container *ngIf="dataServerData">
-                <ng-container *ngFor="let filter of facetConf">
-                  <app-filter
-                    [form]="form"
-                    [group]="filter"
-                    [optionSet]="
-                      emptyDataset
-                        ? { options: [] }
-                        : displayedFilterData[filter]
-                    "
-                    [tierPrefix]="tierPrefix"
-                    [totalAvailable]="filterKeysLength(filter)"
-                    [state]="filterStates[filter]"
-                    (visibilityChanged)="closeFilters($event)"
-                    (valueChanged)="updatePageUrl()"
-                    (filterTermChanged)="filterDisplayData($event)"
-                  ></app-filter>
-                </ng-container>
-                <app-filter
-                  [emptyDataset]="emptyDataset"
-                  [form]="form"
-                  [group]="'dates'"
-                  [state]="filterStates['dates']"
-                  (visibilityChanged)="closeFilters($event)"
-                  (valueChanged)="updatePageUrl()"
-                ></app-filter>
-              </ng-container>
+              @if(dataServerData){ @for (filter of facetConf; track filter) {
+              <app-filter
+                [form]="form"
+                [group]="filter"
+                [optionSet]="
+                  emptyDataset ? { options: [] } : displayedFilterData[filter]
+                "
+                [tierPrefix]="tierPrefix"
+                [totalAvailable]="filterKeysLength(filter)"
+                [(state)]="filterStates[filter]"
+                (visibilityChanged)="closeFilters($event)"
+                (valueChanged)="updatePageUrl()"
+                (filterTermChanged)="filterDisplayData($event)"
+              ></app-filter>
+              }
+
+              <app-filter
+                [emptyDataset]="emptyDataset"
+                [form]="form"
+                [group]="'dates'"
+                [(state)]="filterStates['dates']"
+                (visibilityChanged)="closeFilters($event)"
+                (valueChanged)="updatePageUrl()"
+              ></app-filter>
+              }
             </li>
           </ul>
         </div>
@@ -154,7 +150,7 @@
 
       <div class="statistics-dashboard-right">
         <app-export
-          #export
+          #cmpExport
           (closeExport)="focusExportOpener($event)"
           [getGridData]="getGridData.bind(this)"
           [getChartData]="getChartData.bind(this)"
@@ -165,48 +161,47 @@
         <!-- Header -->
 
         <div class="container-h header-bar">
-          <ng-container *ngIf="!form.value.facetParameter">
-            <h3 class="header-data">Select a facet dimension</h3>
-          </ng-container>
-          <ng-container *ngIf="form.value.facetParameter">
-            <h1 class="header-data">
-              <span
-                class="facet-param-text"
-                i18n="Facet selection@@facetSelection"
-              >
-                Europeana database by
-              </span>
-              <select
-                class="facet-param"
-                formControlName="facetParameter"
-                (change)="switchFacet()"
-                aria-label="Data dimension selection"
-              >
-                <option *ngFor="let facet of facetConf" [ngValue]="facet">
-                  {{ facet | renameApiFacet }}
-                </option>
-              </select>
+          @if(!form.value.facetParameter){
+          <h3 class="header-data">Select a facet dimension</h3>
+          } @if(form.value.facetParameter){
+          <h1 class="header-data">
+            <span
+              class="facet-param-text"
+              i18n="Facet selection@@facetSelection"
+            >
+              Europeana database by
+            </span>
+            <select
+              class="facet-param"
+              formControlName="facetParameter"
+              (change)="switchFacet()"
+              aria-label="Data dimension selection"
+            >
+              @for (facet of facetConf; track facet) {
+              <option [ngValue]="facet">
+                {{ facet | renameApiFacet }}
+              </option>
+              }
+            </select>
 
-              <ng-container
-                *ngIf="externalLinks.help[form.value.facetParameter]; let help"
-              >
-                <a
-                  class="info-icon"
-                  [href]="help.href"
-                  target="_blank"
-                  [title]="help.description"
-                ></a>
-              </ng-container>
-            </h1>
-          </ng-container>
+            @if(externalLinks.help[form.value.facetParameter]; as help){
+            <a
+              class="info-icon"
+              [href]="help.href"
+              target="_blank"
+              [title]="help.description"
+            ></a>
+            }
+          </h1>
+          }
 
           <ng-content *ngTemplateOutlet="dateRemoval"></ng-content>
 
           <a
             aria-label="toggle export section"
             #exportOpenerToolbar
-            (click)="export.toggleActive(true)"
-            (keydown.enter)="export.toggleActive(true)"
+            (click)="cmpExport.toggleActive(true)"
+            (keydown.enter)="cmpExport.toggleActive(true)"
             class="export-icon export-opener"
             tabindex="0"
           >
@@ -229,54 +224,47 @@
                 ></app-resize>
               </li>
 
-              <ng-container *ngFor="let filter of facetConf">
-                <ng-container *ngIf="filter !== form.value.facetParameter">
-                  <ng-container
-                    *ngFor="let option of getRemoveFilterCheckboxData(filter)"
-                  >
-                    <label
-                      class="rm-filter"
-                      [ngClass]="{ 'dead-facet': !option.valid }"
-                    >
-                      <app-checkbox
-                        [form]="form"
-                        [controlName]="option.name"
-                        [labelText]="option.label"
-                        [group]="filter"
-                        (valueChanged)="updatePageUrl(option.valid)"
-                        title="remove filter: {{ option.label }}"
-                      ></app-checkbox>
-                      <span
-                        class="x"
-                        title="remove filter: {{ option.label }}"
-                      ></span>
-                    </label>
-                  </ng-container>
-                </ng-container>
-              </ng-container>
-              <ng-container *ngIf="queryParams['dataset-id']; let datasets">
-                <ng-container *ngFor="let id of fromCSL(datasets.toString())">
-                  <ng-container *ngIf="form.controls['datasetIds'].get(id)">
-                    <label class="rm-filter">
-                      <app-checkbox
-                        [form]="form"
-                        [controlName]="id"
-                        group="datasetIds"
-                        [labelText]="id"
-                        (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
-                        title="remove filter: {{ id }}"
-                      ></app-checkbox>
-                      <span class="x" title="remove filter: {{ id }}"></span>
-                    </label>
-                  </ng-container>
-                </ng-container>
-              </ng-container>
+              @for (filter of facetConf; track filter) { @if (filter !==
+              form.value.facetParameter) { @for (option of
+              getRemoveFilterCheckboxData(filter); track option.name) {
+              <label
+                class="rm-filter"
+                [ngClass]="{ 'dead-facet': !option.valid }"
+              >
+                <app-checkbox
+                  [form]="form"
+                  [controlName]="option.name"
+                  [labelText]="option.label"
+                  [group]="filter"
+                  (valueChanged)="updatePageUrl(option.valid)"
+                  title="remove filter: {{ option.label }}"
+                ></app-checkbox>
+                <span
+                  class="x"
+                  title="remove filter: {{ option.label }}"
+                ></span>
+              </label>
+              } } } @if (queryParams['dataset-id']; as datasets) { @for (id of
+              fromCSL(datasets.toString()); track id) { @if
+              (form.controls['datasetIds'].get(id)) {
+              <label class="rm-filter">
+                <app-checkbox
+                  [form]="form"
+                  [controlName]="id"
+                  group="datasetIds"
+                  [labelText]="id"
+                  (valueChanged)="updateDatasetIdFieldAndPageUrl(id)"
+                  title="remove filter: {{ id }}"
+                ></app-checkbox>
+                <span class="x" title="remove filter: {{ id }}"></span>
+              </label>
+              } } }
             </ul>
           </div>
+          @if(scrollInfo.canScrollBack() || scrollInfo.canScrollFwd()){
           <div
             class="rm-filter-nav"
             [ngClass]="{ active: scrollInfo.canScrollFwd() }"
-            *ngIf="scrollInfo.canScrollBack() || scrollInfo.canScrollFwd()"
           >
             <a
               class="rm-filter-nav-prev"
@@ -293,48 +281,47 @@
               >&rsaquo;</a
             >
           </div>
+          }
         </div>
 
         <!-- Data Area -->
         <div class="data-area">
           <!-- Country Page Shortcut Links -->
           <ng-template #tmpCountryPageShortcuts>
-            <ng-container *ngIf="countryPageShortcutsAvailable">
-              <div class="country-shortcut-links-container">
-                <span class="flag-orb default" title="View country data"></span>
-                <app-speech-bubble [arrowTopRight]="true">
-                  <ul class="country-shortcuts">
-                    <li
-                      *ngFor="
-                        let countryCode of queryParams[DimensionName.country]
-                      "
+            @if(countryPageShortcutsAvailable){
+            <div class="country-shortcut-links-container">
+              <span class="flag-orb default" title="View country data"></span>
+              <app-speech-bubble [arrowTopRight]="true">
+                <ul class="country-shortcuts">
+                  @for (countryCode of queryParams[DimensionName.country]; track
+                  $index) {
+                  <li>
+                    <a
+                      [routerLink]="['/country', countryCode | renameCountry]"
+                      [queryParams]="{
+                        'content-tier-zero': includeCTZero() ? true : undefined
+                      }"
                     >
-                      <a
-                        [routerLink]="['/country', countryCode | renameCountry]"
-                        [queryParams]="{
-                          'content-tier-zero': form.value.contentTierZero
-                            ? true
-                            : undefined
-                        }"
-                      >
-                        <span>View</span>
-                        <span class="pad-word">{{
-                          countryCode | renameCountry
-                        }}</span>
-                        <span>data</span>
-                        <span class="flag-orb" [ngClass]="countryCode"> </span>
-                      </a>
-                    </li>
-                  </ul>
-                </app-speech-bubble>
-              </div>
-            </ng-container>
+                      <span>View</span>
+                      <span class="pad-word">{{
+                        countryCode | renameCountry
+                      }}</span>
+                      <span>data</span>
+                      <span class="flag-orb" [ngClass]="countryCode"> </span>
+                    </a>
+                  </li>
+                  }
+                </ul>
+              </app-speech-bubble>
+            </div>
+            }
           </ng-template>
 
           <span class="load-bar" [ngClass]="{ showing: isLoading }"></span>
 
           <!-- NO-DATA FALLBACK -->
-          <div *ngIf="emptyDataset && !isLoading" class="no-data">
+          @if(emptyDataset && !isLoading){
+          <div class="no-data">
             <!-- COUNTRY PAGE LINKS -->
             <ng-content
               *ngTemplateOutlet="tmpCountryPageShortcuts"
@@ -342,32 +329,27 @@
 
             <span i18n="Warn no results@@warnNoResults">No results found!</span>
             <ul>
-              <li
-                *ngIf="
-                  queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]]
-                "
-                i18n="No results detail dataset id@@warnNoResultsDatasetId"
-              >
+              @if (queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]])
+              {
+              <li i18n="No results detail dataset id@@warnNoResultsDatasetId">
                 try removing the <span class="param">dataset id</span> parameter
               </li>
-              <li
-                *ngIf="
-                  queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]] &&
-                  queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]
-                "
-                i18n="No results detail date@@warnNoResultsDate"
-              >
+              } @if (queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]]
+              && queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]]) {
+              <li i18n="No results detail date@@warnNoResultsDate">
                 try removing the <span class="param">date</span> parameters
               </li>
+              }
             </ul>
           </div>
+          }
 
           <!-- COUNTRY PAGE LINK -->
-          <ng-container *ngIf="!emptyDataset">
-            <ng-content
-              *ngTemplateOutlet="tmpCountryPageShortcuts"
-            ></ng-content>
-          </ng-container>
+          @if (!emptyDataset) {
+          <ng-container
+            [ngTemplateOutlet]="tmpCountryPageShortcuts"
+          ></ng-container>
+          }
 
           <!-- CHART AND SUMMARY -->
           <div class="chart-and-summary">
@@ -385,27 +367,26 @@
                 "
               ></app-bar-chart>
             </div>
-            <ng-container>
-              <app-grid-summary
-                #gridSummary
-                *ngIf="dataServerData"
-                [grandTotal]="resultTotal"
-                [summaryData]="dataServerData.results.breakdowns"
-              ></app-grid-summary>
-            </ng-container>
+            @if (dataServerData) {
+            <app-grid-summary
+              #gridSummary
+              [grandTotal]="resultTotal"
+              [summaryData]="dataServerData.results?.breakdowns"
+            ></app-grid-summary>
+            }
           </div>
 
           <!-- PERCENT SWITCH -->
-          <ng-container *ngIf="!emptyDataset">
-            <app-checkbox
-              [form]="form"
-              controlName="percent"
-              i18n-labelText="As percentages@@percentSwitchLabel"
-              labelText="As percentages"
-              group="chartFormat"
-              (valueChanged)="refreshChart()"
-            ></app-checkbox>
-          </ng-container>
+          @if(!emptyDataset){
+          <app-checkbox
+            [form]="form"
+            controlName="percent"
+            i18n-labelText="As percentages@@percentSwitchLabel"
+            labelText="As percentages"
+            group="chartFormat"
+            (valueChanged)="refreshChart()"
+          ></app-checkbox>
+          }
 
           <!-- SNAPSHOTS -->
           <ng-container>
@@ -431,17 +412,19 @@
           ></app-grid>
 
           <!-- EXPORT LINK -->
-          <div class="export-opener-link-wrapper" *ngIf="!emptyDataset">
+          @if(!emptyDataset){
+          <div class="export-opener-link-wrapper">
             <a
               #exportOpener
               class="export-opener-link"
               tabindex="0"
-              (click)="export.toggleActive(false)"
-              (keydown.enter)="export.toggleActive(false)"
+              (click)="cmpExport.toggleActive(false)"
+              (keydown.enter)="cmpExport.toggleActive(false)"
               i18n="Share Report Opener@@exportReportOpenerLink"
               >Export data</a
             >
           </div>
+          }
         </div>
       </div>
     </div>

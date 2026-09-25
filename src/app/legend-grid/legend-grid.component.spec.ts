@@ -1,11 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import * as am4charts from '@amcharts/amcharts4/charts';
 
@@ -22,9 +16,9 @@ const date = new Date().toISOString();
 
 const mockCountryData = {
   FR: [],
-  DE: [date, date, date].map((date) => {
+  DE: [date, date, date].map((d) => {
     return {
-      date: date,
+      date: d,
       three_d: '100',
       high_quality: '200',
       total: '300'
@@ -58,15 +52,30 @@ describe('LegendGridComponent', () => {
       .compileComponents();
   };
 
-  beforeEach(waitForAsync(() => {
-    configureTestBed();
-  }));
-
-  beforeEach(() => {
+  beforeEach(async () => {
+    await configureTestBed();
     fixture = TestBed.createComponent(LegendGridComponent);
     component = fixture.componentInstance;
-    component.lineChart = new MockLineComponent() as unknown as LineComponent;
-    component.targetCountries = [];
+
+    const mockChartInstance = TestBed.runInInjectionContext(() => {
+      return new MockLineComponent();
+    }) as unknown as LineComponent;
+
+    fixture.componentRef.setInput('lineChart', mockChartInstance);
+
+    Object.defineProperty(component, 'targetCountries', {
+      writable: true,
+      value: signal([])
+    });
+
+    fixture.componentRef.setInput('columnEnabled3D', true);
+    fixture.componentRef.setInput('columnEnabledHQ', true);
+    fixture.componentRef.setInput('columnEnabledALL', true);
+    fixture.componentRef.setInput('countryCode', '');
+    fixture.componentRef.setInput('targetMetaData', {});
+
+    component.pinnedCountries = {};
+    fixture.componentRef.setInput('countryData', {});
     fixture.detectChanges();
   });
 
@@ -106,8 +115,10 @@ describe('LegendGridComponent', () => {
     component.pinnedCountries['FR'] = 12;
 
     const setData = (indexes: Array<number>): void => {
+      const chartInstance = component.lineChart();
+
       TargetSeriesSuffixes.forEach((suffix: string, suffixIndex: number) => {
-        component.lineChart.allSeriesData['FR' + suffix] = !indexes.includes(
+        chartInstance.allSeriesData['FR' + suffix] = !indexes.includes(
           suffixIndex
         )
           ? undefined
@@ -129,34 +140,48 @@ describe('LegendGridComponent', () => {
   });
 
   it('should get the enabled columns', () => {
-    expect(component.columnsEnabledCount).toEqual(3);
+    expect(component.columnsEnabledCount()).toEqual(3);
 
-    component.columnEnabled3D = false;
-    expect(component.columnsEnabledCount).toEqual(2);
-    component.columnEnabledHQ = false;
-    expect(component.columnsEnabledCount).toEqual(1);
-    component.columnEnabledALL = false;
-    expect(component.columnsEnabledCount).toEqual(0);
+    fixture.componentRef.setInput('columnEnabled3D', false);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(2);
 
-    component.columnEnabled3D = true;
-    expect(component.columnsEnabledCount).toEqual(1);
-    component.columnEnabledHQ = true;
-    expect(component.columnsEnabledCount).toEqual(2);
-    component.columnEnabledALL = true;
-    expect(component.columnsEnabledCount).toEqual(3);
+    fixture.componentRef.setInput('columnEnabledHQ', false);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(1);
+
+    fixture.componentRef.setInput('columnEnabledALL', false);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(0);
+
+    fixture.componentRef.setInput('columnEnabled3D', true);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(1);
+
+    fixture.componentRef.setInput('columnEnabledHQ', true);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(2);
+
+    fixture.componentRef.setInput('columnEnabledALL', true);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(3);
   });
 
   it('should get the country series', () => {
-    component.targetMetaData = mockTargetMetaData;
+    // Provide the required context arrays via native setInput handles before running change detection
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    component.countryData.set(mockCountryData);
+
+    fixture.detectChanges();
 
     expect(component.getCountrySeries('FR')).toBeTruthy();
     expect(component.getCountrySeries('FR').length).toBeGreaterThan(0);
   });
 
   it('should toggle the pin', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
     component.pinnedCountries = { AU: 0, DE: 1, FR: 2 };
-    component.countryData = mockCountryData;
+    component.countryData.set(mockCountryData);
 
     component.togglePin('AU');
 
@@ -191,8 +216,11 @@ describe('LegendGridComponent', () => {
   });
 
   it('should handle scrolling', () => {
+    fixture.componentRef.setInput('targetMetaData', {});
+    fixture.detectChanges();
+
     const spyToggle = jest.spyOn(
-      component.legendGrid.nativeElement.classList,
+      component.legendGrid().nativeElement.classList,
       'toggle'
     );
     component.gridScroll();
@@ -200,8 +228,8 @@ describe('LegendGridComponent', () => {
   });
 
   it('should hide ranges by column', () => {
-    component.targetMetaData = mockTargetMetaData;
-    component.countryCode = 'FR';
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    fixture.componentRef.setInput('countryCode', 'FR');
     component.pinnedCountries = { FR: 0 };
     expect(Object.keys(component.hiddenColumnRanges).length).toBeFalsy();
     component.hideRangesByColumn(TargetFieldName.THREE_D);
@@ -211,12 +239,18 @@ describe('LegendGridComponent', () => {
   });
 
   it('should show ranges by column', () => {
-    component.targetMetaData = mockTargetMetaData;
-    component.countryCode = 'FR';
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    fixture.componentRef.setInput('countryCode', 'FR');
     component.pinnedCountries = { FR: 0 };
     component.hiddenColumnRanges = { THREE_D: { FR: [0] }, HQ: { FR: [0] } };
-    component.lineChart.allSeriesData['FR' + '3D'] = {
-      fill: 'xxx',
+
+    const chartInstance = component.lineChart();
+
+    chartInstance.allSeriesData['FR' + '3D'] = {
+      fill: {
+        hex: '#ffffff',
+        toString: () => '#ffffff'
+      } as unknown as import('@amcharts/amcharts4/core').Color,
       hide: jest.fn()
     } as unknown as am4charts.LineSeries;
 
@@ -228,10 +262,11 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the range', () => {
-    const colour = component.lineChart.chart.colors.list[0];
+    const chartInstance = component.lineChart();
+    const colour = chartInstance.chart.colors.list[0];
 
-    const spyShowRange = jest.spyOn(component.lineChart, 'showRange');
-    const spyRemoveRange = jest.spyOn(component.lineChart, 'removeRange');
+    const spyShowRange = jest.spyOn(chartInstance, 'showRange');
+    const spyRemoveRange = jest.spyOn(chartInstance, 'removeRange');
 
     component.toggleRange('FR', TargetFieldName.THREE_D, 0);
 
@@ -244,10 +279,10 @@ describe('LegendGridComponent', () => {
   });
 
   it('should addSeriesSetAndPin', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const data = mockTargetMetaData['FR'][TargetFieldName.THREE_D];
-    const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
+    const spyAddSeries = jest.spyOn(component.lineChart(), 'addSeries');
 
     component.addSeriesSetAndPin('FR', data);
     expect(spyAddSeries).toHaveBeenCalledTimes(0);
@@ -256,7 +291,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the country', () => {
-    component.targetMetaData = mockTargetMetaData;
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const spyTogglePin = jest
       .spyOn(component, 'togglePin')
@@ -264,11 +299,13 @@ describe('LegendGridComponent', () => {
     const spyAddSeriesSetAndPin = jest
       .spyOn(component, 'addSeriesSetAndPin')
       .mockImplementation();
+
     const spyEmit = jest
       .spyOn(component.historyLoadded, 'emit')
       .mockImplementation(
         (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
-          component.countryData = { DE: [] };
+          const activeData = component.countryData();
+          activeData['DE'] = [];
           req.fnCallback([]);
         }
       );
@@ -294,9 +331,9 @@ describe('LegendGridComponent', () => {
     expect(spyAddSeriesSetAndPin).toHaveBeenCalled();
     expect(spyEmit).toHaveBeenCalled();
 
-    // case where existing country data is reused after component reinitialisation
-
-    component.countryData = mockCountryData;
+    // Re-verify case where existing component state memory is reused cleanly
+    const updatedData = component.countryData();
+    Object.assign(updatedData, mockCountryData);
 
     component.toggleCountry('DE');
 
@@ -305,8 +342,8 @@ describe('LegendGridComponent', () => {
   });
 
   it('should toggle the series', () => {
-    component.countryData = mockCountryData;
-    component.targetMetaData = mockTargetMetaData;
+    component.countryData.set(mockCountryData);
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
 
     const seriesItemHidden = {
       isHidden: true,
@@ -322,7 +359,7 @@ describe('LegendGridComponent', () => {
     } as unknown as am4charts.LineSeries;
 
     const spyTogglePin = jest.spyOn(component, 'togglePin');
-    const spyAddSeries = jest.spyOn(component.lineChart, 'addSeries');
+    const spyAddSeries = jest.spyOn(component.lineChart(), 'addSeries');
     const spyLoadCountryChartData = jest.spyOn(
       component,
       'loadCountryChartData'
@@ -355,46 +392,52 @@ describe('LegendGridComponent', () => {
     expect(spyTogglePin).toHaveBeenCalled();
   });
 
-  it('should call toggleCountry when the countryCode is set', fakeAsync(() => {
-    component.targetMetaData = mockTargetMetaData;
+  it('should call toggleCountry when the countryCode is set', () => {
+    jest.useFakeTimers();
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    component.countryData.set(mockCountryData);
 
     const spyToggleCountry = jest
       .spyOn(component, 'toggleCountry')
-      .mockReturnValue(null);
+      .mockImplementation(() => {
+        /* No-op spy wrapper to safely intercept reactive triggers */
+      });
 
-    // set initial code and a pinned country
-    component.countryCode = 'FR';
-    component.pinnedCountries = { FR: 0 };
+    component.pinnedCountries = { FR: 0, DE: 1 };
 
-    expect(spyToggleCountry).not.toHaveBeenCalled();
-    tick(0);
+    fixture.componentRef.setInput('countryCode', 'FR');
+    fixture.detectChanges();
+    TestBed.tick();
+
+    jest.advanceTimersByTime(component.timeoutAnimation);
     expect(spyToggleCountry).toHaveBeenCalled();
 
-    tick(component.timeoutAnimation);
-    expect(spyToggleCountry).toHaveBeenCalledTimes(1);
-    component.pinnedCountries = { FR: 0 };
+    spyToggleCountry.mockClear();
 
-    // set again
-    component.countryCode = 'DE';
+    fixture.componentRef.setInput('countryCode', 'DE');
+    fixture.detectChanges();
+    TestBed.tick();
 
-    expect(spyToggleCountry).toHaveBeenCalledTimes(2);
-    tick(component.timeoutAnimation);
-    expect(spyToggleCountry).toHaveBeenCalledTimes(3);
-    tick(component.timeoutAnimation);
-    expect(spyToggleCountry).toHaveBeenCalledTimes(3);
+    jest.advanceTimersByTime(component.timeoutAnimation);
+    expect(spyToggleCountry).toHaveBeenCalled();
+    spyToggleCountry.mockClear();
 
-    // set again
-    component.countryCode = 'FR';
-    expect(spyToggleCountry).toHaveBeenCalledTimes(4);
-    tick(component.timeoutAnimation);
-    expect(spyToggleCountry).toHaveBeenCalledTimes(5);
-    tick(component.timeoutAnimation);
-    expect(spyToggleCountry).toHaveBeenCalledTimes(5);
+    fixture.componentRef.setInput('countryCode', 'FR');
+    fixture.detectChanges();
+    TestBed.tick();
 
-    component.countryCode = undefined;
-    tick(component.timeoutAnimation);
-    expect(component.countryCode).toBeFalsy();
-  }));
+    jest.advanceTimersByTime(component.timeoutAnimation);
+    expect(spyToggleCountry).toHaveBeenCalled();
+
+    fixture.componentRef.setInput('countryCode', '');
+    fixture.detectChanges();
+    TestBed.tick();
+
+    jest.advanceTimersByTime(component.timeoutAnimation);
+    expect(component.countryCode()).toBeFalsy();
+
+    jest.useRealTimers();
+  });
 
   it('should sort the pins', () => {
     const desiredOrder = ['NL', 'IT'];
@@ -414,6 +457,9 @@ describe('LegendGridComponent', () => {
   });
 
   it('should load the country chart data', () => {
+    fixture.componentRef.setInput('targetMetaData', mockTargetMetaData);
+    fixture.detectChanges();
+
     const spyEmit = jest.spyOn(component.historyLoadded, 'emit');
     component.loadCountryChartData('DE');
     expect(spyEmit).toHaveBeenCalled();

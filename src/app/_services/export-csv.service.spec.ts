@@ -1,16 +1,16 @@
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HeaderNameType } from '../_models';
 import { ExportCSVService } from './';
 
 describe('ExportCSVService', () => {
   let service: ExportCSVService;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [ExportCSVService]
     }).compileComponents();
     service = TestBed.inject(ExportCSVService);
-  }));
+  });
 
   it('should convert', () => {
     const testHeaders = ['series', 'name', 'count', 'percent'].map(

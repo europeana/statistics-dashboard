@@ -1,7 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DimensionName } from '../_data';
-import { CompareDataDescriptor, SortBy } from '../_models';
+import { CompareData, CompareDataDescriptor, SortBy } from '../_models';
 import { SnapshotsComponent } from '.';
 
 describe('SnapshotsComponent', () => {
@@ -66,7 +66,7 @@ describe('SnapshotsComponent', () => {
   };
 
   const initData = (): void => {
-    const cds = {};
+    const cds = {} as unknown as Record<string, CompareData>;
     cds[DimensionName.contentTier] = {
       '': dscContentTier,
       countryLuxembourg: dscContentTierQueried
@@ -75,12 +75,13 @@ describe('SnapshotsComponent', () => {
     cds[DimensionName.rightsCategory] = {
       '': dscRights
     };
-    component.facetName = DimensionName.contentTier;
+    fixture.componentRef.setInput('facetName', DimensionName.contentTier);
     component.compareDataAllFacets = cds;
+    fixture.detectChanges();
   };
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [SnapshotsComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
@@ -89,7 +90,7 @@ describe('SnapshotsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SnapshotsComponent);
     component = fixture.componentInstance;
-    component.facetName = DimensionName.contentTier;
+    fixture.componentRef.setInput('facetName', DimensionName.contentTier);
     fixture.detectChanges();
   });
 
@@ -100,7 +101,8 @@ describe('SnapshotsComponent', () => {
   it('should set the facetName', () => {
     dscContentTier.applied = true;
     initData();
-    component.facetName = DimensionName.country;
+    fixture.componentRef.setInput('facetName', DimensionName.country);
+    fixture.detectChanges();
     expect(dscContentTier.applied).toBeFalsy();
   });
 
@@ -112,7 +114,8 @@ describe('SnapshotsComponent', () => {
     component.compareDataAllFacets[DimensionName.contentTier] = {
       '': dscContentTier
     };
-    component.facetName = DimensionName.contentTier;
+    fixture.componentRef.setInput('facetName', DimensionName.contentTier);
+    fixture.detectChanges();
     expect(
       component.filteredCDKeys(DimensionName.contentTier, 'applied').length
     ).toBeTruthy();
@@ -179,7 +182,7 @@ describe('SnapshotsComponent', () => {
       ''
     );
 
-    expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
+    expect(dscContentTier.orderPreferred[0]).toEqual('4');
 
     component.preSortAndFilter(
       DimensionName.contentTier,
@@ -191,7 +194,7 @@ describe('SnapshotsComponent', () => {
       ''
     );
 
-    expect(dscContentTier.orderPreferred[0].trim()).toEqual('1');
+    expect(dscContentTier.orderPreferred[0]).toEqual('1');
 
     component.preSortAndFilter(
       DimensionName.contentTier,
@@ -203,7 +206,7 @@ describe('SnapshotsComponent', () => {
       ''
     );
 
-    expect(dscContentTier.orderPreferred[0].trim()).toEqual('3');
+    expect(dscContentTier.orderPreferred[0]).toEqual('3');
 
     component.preSortAndFilter(
       DimensionName.contentTier,
@@ -215,7 +218,7 @@ describe('SnapshotsComponent', () => {
       ''
     );
 
-    expect(dscContentTier.orderPreferred[0].trim()).toEqual('4');
+    expect(dscContentTier.orderPreferred[0]).toEqual('4');
     expect(dscRights.orderPreferred.length).toBeFalsy();
 
     component.preSortAndFilter(
@@ -228,7 +231,7 @@ describe('SnapshotsComponent', () => {
       ''
     );
 
-    expect(dscRights.orderPreferred[0].trim()).toEqual('CC0');
+    expect(dscRights.orderPreferred[0]).toEqual('CC0');
 
     component.preSortAndFilter(
       DimensionName.rightsCategory,
@@ -326,5 +329,54 @@ describe('SnapshotsComponent', () => {
     expect(dscContentTier.applied).toBeFalsy();
     component.apply(DimensionName.contentTier, ['']);
     expect(dscContentTier.applied).toBeTruthy();
+  });
+
+  it('should optimize memory by garbage collecting unpinned historical facets during a snap operation', () => {
+    initData();
+
+    const staleKey = 'countryItaly';
+    const staleDescriptor: CompareDataDescriptor = {
+      ...structuredClone(dscCountry),
+      current: false,
+      saved: false,
+      applied: false
+    };
+    component.compareDataAllFacets[DimensionName.contentTier][staleKey] =
+      staleDescriptor;
+
+    const pinnedKey = 'countryGermany';
+    const pinnedDescriptor: CompareDataDescriptor = {
+      ...structuredClone(dscCountry),
+      current: false,
+      saved: true,
+      applied: true
+    };
+    component.compareDataAllFacets[DimensionName.contentTier][pinnedKey] =
+      pinnedDescriptor;
+
+    expect(
+      component.compareDataAllFacets[DimensionName.contentTier][staleKey]
+    ).toBeTruthy();
+    expect(
+      component.compareDataAllFacets[DimensionName.contentTier][pinnedKey]
+    ).toBeTruthy();
+
+    const newKey = 'countryFrance';
+    component.snap(
+      DimensionName.contentTier,
+      newKey,
+      structuredClone(dscCountry)
+    );
+
+    // check garbage collection executed successfully
+    expect(
+      component.compareDataAllFacets[DimensionName.contentTier][staleKey]
+    ).toBeUndefined();
+    expect(
+      component.compareDataAllFacets[DimensionName.contentTier][pinnedKey]
+    ).toBeTruthy();
+    expect(
+      component.compareDataAllFacets[DimensionName.contentTier][newKey]
+    ).toBeTruthy();
   });
 });

@@ -1,8 +1,8 @@
 <main
   class="fit-to-page landing-page"
   [ngClass]="{
-    'loading-modal': isLoading && !hasLandingData(),
-    loading: isLoading && hasLandingData()
+    'loading-modal': landingDataIsLoading() && !hasLandingData(),
+    loading: landingDataIsLoading() && hasLandingData()
   }"
 >
   <app-resize (sizeChanged)="refreshCharts()"></app-resize>
@@ -12,10 +12,8 @@
   </ng-template>
 
   <ng-template #chartSummary let-dimension="facetName">
-    <span
-      class="container-h totals"
-      *ngIf="landingData[dimension] && landingData[dimension][0]; let data"
-    >
+    @if(landingData()[dimension] && landingData()[dimension][0]; as data){
+    <span class="container-h totals">
       <span class="container-v">
         <span
           class="total-title bold"
@@ -44,6 +42,7 @@
         <span class="total">{{ data.percent }}%</span>
       </span>
     </span>
+    }
   </ng-template>
 
   <ng-template #tmpSpeechBubble let-targetType="targetType">
@@ -77,8 +76,8 @@
           }"
           [ngStyle]="{
             color:
-              visibleHeatMap && mapChart && !menuDisabled
-                ? mapChart.colourScheme.base.hex
+              visibleHeatMap && mapChart() && !menuDisabled
+                ? mapChart().colourScheme.base.hex
                 : 'unset'
           }"
           tabindex="0"
@@ -89,38 +88,33 @@
           [ngClass]="{ hidden: !mapMenuIsOpen }"
         >
           <ul class="derived-series-menu-inner">
-            <ng-container
-              *ngFor="
-                let targetType of [
-                  TargetFieldName.THREE_D,
-                  TargetFieldName.HQ,
-                  TargetFieldName.TOTAL
-                ]
-              "
-            >
-              <li>
-                {{ targetType | renameTargetType }}
-              </li>
-              <li
-                class="menu-item"
-                *ngFor="let targetYear of ['2025', '2030']; let i = index"
-                [ngStyle]="{
-                  borderColor:
-                    visibleHeatMap && visibleHeatMap[targetType] === i
-                      ? mapChart.colourScheme.base.hex
-                      : 'transparent'
-                }"
-              >
-                <a
-                  (click)="showHeatmap(targetType, i)"
-                  (keydown.enter)="showHeatmap(targetType, i)"
-                  tabindex="0"
-                  >{{ targetYear }}
-                </a>
-              </li>
-            </ng-container>
+            @for (targetType of [ TargetFieldName.THREE_D, TargetFieldName.HQ,
+            TargetFieldName.TOTAL ]; track targetType) {
 
-            <li class="map-series-menu-clear-link" *ngIf="visibleHeatMap">
+            <li>
+              {{ targetType | renameTargetType }}
+            </li>
+            @for (targetYear of ['2025', '2030']; track targetYear; let i =
+            $index) {
+            <li
+              class="menu-item"
+              [ngStyle]="{
+                borderColor:
+                  visibleHeatMap && visibleHeatMap[targetType] === i
+                    ? mapChart().colourScheme.base.hex
+                    : 'transparent'
+              }"
+            >
+              <a
+                (click)="showHeatmap(targetType, i)"
+                (keydown.enter)="showHeatmap(targetType, i)"
+                tabindex="0"
+              >
+                {{ targetYear }}
+              </a>
+            </li>
+            } } @if(visibleHeatMap){
+            <li class="map-series-menu-clear-link">
               <a
                 (click)="clearHeatmap()"
                 (keydown.enter)="clearHeatmap()"
@@ -128,6 +122,7 @@
                 >clear</a
               >
             </li>
+            }
           </ul>
         </span>
       </span>
@@ -135,9 +130,11 @@
       <!-- layer label -->
       @if(visibleHeatMap) {
       <span class="container-h">
-        <span *ngFor="let vhr of visibleHeatMap | keyvalue"
-          >{{ vhr.key | renameTargetType }} {{ vhr.value ? 2030 : 2025 }}</span
-        >
+        @for (vhr of visibleHeatMap | keyvalue; track vhr.key) {
+        <span>
+          {{ vhr.key | renameTargetType }} {{ vhr.value ? 2030 : 2025 }}
+        </span>
+        }
         <a
           class="x"
           [attr.disabled]="menuDisabled"
@@ -150,25 +147,23 @@
       } }
     </span>
   </ng-template>
-
   <ng-template
     #dataRows
     let-dimension="facetName"
     let-isCountryCard="isCountryCard"
   >
-    <div class="container-v data-rows" *ngIf="landingData[dimension]; let data">
+    @if(landingData()[dimension]; as data){
+    <div class="container-v data-rows">
       <div class="container-h data-rows-title">
         <!-- Begin Map Toolbar Contents-->
-
         @if (isCountryCard){
-
         <!-- show selected country with close bar -->
-        @if (mapChart && mapChart.selectedCountry) {
+        @if (mapChart() && mapChart().selectedCountry) {
         <span class="container-h">
           <span>
             {{ dimension | renameApiFacet | uppercase }}
           </span>
-          <span> : {{ mapChart.selectedCountry | renameCountry }} </span>
+          <span> : {{ mapChart().selectedCountry | renameCountry }} </span>
           <a
             class="x country-closer"
             data-e2e="close-map-selection"
@@ -185,74 +180,53 @@
         <ng-content
           *ngTemplateOutlet="
             tmpMapLayerMenu;
-            context: {
-              menuDisabled:
-                !countryData ||
-                !mapChart.selectedCountry ||
-                (countryData && countryData[mapChart.selectedCountry])
-                  ? null
-                  : 'disabled'
-            }
+            context: { menuDisabled: menuDisabledStatus() }
           "
         ></ng-content>
 
         <!-- End Map Toolbar Contents-->
         }@else{
-
         <!--not a country -->
-
         <span>{{ dimension | renameApiFacet | uppercase }} </span>
         <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
         }
       </div>
 
       <!-- end of menu bar -->
-
       @if (isCountryCard){
-
       <!-- Selected Country Navigation -->
-      @if(mapChart && mapChart.selectedCountry){
-      <div
-        *ngFor="
-          let navCountry of [
-            mapChart.selectedCountryPrev,
-            mapChart.selectedCountry,
-            mapChart.selectedCountryNext
-          ]
-        "
-        class="container-h record-list"
-      >
+      @if(mapChart() && mapChart().selectedCountry){ @for (navCountry of [
+      mapChart().selectedCountryPrev, mapChart().selectedCountry,
+      mapChart().selectedCountryNext ]; track navCountry) {
+      <div class="container-h record-list">
         <a
           class="map-navigation-link"
-          (click)="mapChart.countryMorph(navCountry)"
-          (keydown.enter)="mapChart.countryMorph(navCountry)"
+          (click)="mapChart().countryMorph(navCountry)"
+          (keydown.enter)="mapChart().countryMorph(navCountry)"
           [attr.disabled]="
-            navCountry === mapChart.selectedCountry ? 'disabled' : null
+            navCountry === mapChart().selectedCountry ? 'disabled' : null
           "
-          [attr.tabIndex]="navCountry === mapChart.selectedCountry ? -1 : 0"
+          [attr.tabIndex]="navCountry === mapChart().selectedCountry ? -1 : 0"
         >
           {{ navCountry | renameCountry }}
         </a>
 
-        <span
-          *ngIf="navCountry === mapChart.selectedCountry"
-          class="map-navigation-close-country-link-wrapper"
-        >
+        @if(navCountry === mapChart().selectedCountry){
+        <span class="map-navigation-close-country-link-wrapper">
           <a class="x" title="close country" (click)="closeMapSelection()"></a>
         </span>
+        }
 
         <!-- country selection -->
-
-        @if(navCountry === mapChart.selectedCountry){ @if(countryData &&
-        countryData[mapChart.selectedCountry]){
-
+        @if(navCountry === mapChart().selectedCountry){ @if(
+        countryData()?.[mapChart().selectedCountry]){
         <span
           class="numeric"
           [ngClass]="{
             'target-active': targetExpanded === undefined
           }"
         >
-          {{ data[mapChart.selectedIndex].value | number }}
+          {{ data[mapChart().selectedIndex].value | number }}
         </span>
 
         <span class="boxed">
@@ -269,17 +243,15 @@
             <ng-content *ngTemplateOutlet="titleItemsProvided"> </ng-content>
           </a>
         </span>
-
-        } @else if(data[mapChart.selectedIndex]){
+        } @else if(data[mapChart().selectedIndex]){
         <span class="numeric">
-          {{ data[mapChart.selectedIndex].value | number }}
+          {{ data[mapChart().selectedIndex].value | number }}
         </span>
         } }
       </div>
-
+      }
       <!-- selected country display -->
-
-      @if(countryData && countryData[mapChart.selectedCountry]){
+      @if(countryData()?.[mapChart().selectedCountry]){
       <ng-template #tmpTargetSummary let-targetType="targetType">
         <div class="container-h target-summary">
           <span
@@ -289,7 +261,8 @@
             }"
           >
             {{
-              countryData[mapChart.selectedCountry][0][targetType] || 0 | number
+              countryData()?.[mapChart().selectedCountry][0][targetType] || 0
+                | number
             }}
           </span>
 
@@ -325,40 +298,47 @@
             ></ng-content>
           </span>
           <span class="boxed">
-            <a class="info-icon"></a>
+            <a
+              class="info-icon"
+              aria-label="Target metadata info tooltip"
+              href="javascript:void(0)"
+            ></a>
           </span>
         </div>
 
+        @for (theYear of ['2025', '2030']; track theYear; let i = $index) {
         <div
-          *ngFor="let theYear of [2025, 2030]; let i = index"
           class="container-h target-summary target-expanded"
           [ngClass]="{
             'is-open': targetExpanded === targetType
           }"
         >
-          <span
-            class="boxed"
-            *ngIf="visibleHeatMap && visibleHeatMap[targetType] === i"
-          >
+          @if(visibleHeatMap && visibleHeatMap[targetType] === i){
+          <span class="boxed">
             <span
               class="boxed-inner target-highlight"
               [ngStyle]="
                 visibleHeatMap &&
                 visibleHeatMap[targetType] === i && {
-                  borderColor: mapChart.colourScheme.base.hex
+                  borderColor: mapChart().colourScheme.base.hex
                 }
               "
             >
               {{
-                getDerivedSeriesValue(targetType, i, mapChart.selectedCountry)
+                getDerivedSeriesValue(
+                  targetType,
+                  i,
+                  mapChart().selectedCountry
+                )
               }}%
             </span>
           </span>
+          }
 
           <span class="numeric">
-            @if(targetMetaData && targetMetaData[mapChart.selectedCountry]){
+            @if(targetMetaData && targetMetaData[mapChart().selectedCountry]){
             {{
-              targetMetaData[mapChart.selectedCountry][targetType][i].value
+              targetMetaData[mapChart().selectedCountry][targetType][i].value
                 | number
             }}
             }
@@ -367,59 +347,52 @@
             ><span class="boxed-inner">target {{ theYear }} </span></span
           >
         </div>
+        }
       </ng-template>
 
-      <ng-container
-        *ngFor="
-          let targetType of [
-            TargetFieldName.THREE_D,
-            TargetFieldName.HQ,
-            TargetFieldName.TOTAL
-          ]
+      @for(targetType of [ TargetFieldName.THREE_D, TargetFieldName.HQ,
+      TargetFieldName.TOTAL ]; track targetType){
+      <ng-content
+        *ngTemplateOutlet="
+          tmpTargetSummary;
+          context: {
+            targetType: targetType
+          }
         "
-      >
-        <ng-content
-          *ngTemplateOutlet="
-            tmpTargetSummary;
-            context: {
-              targetType: targetType
-            }
-          "
-        ></ng-content>
-      </ng-container>
-      }
-
+      ></ng-content>
+      } }
       <!-- end selected country display -->
 
       <div class="container-h record-list">
         <a
           class="link-open-country"
-          [routerLink]="['/country', mapChart.selectedCountry | renameCountry]"
+          [routerLink]="[
+            '/country',
+            mapChart().selectedCountry | renameCountry
+          ]"
         >
-          <span class="flag-orb" [ngClass]="mapChart.selectedCountry"></span>
-          <span>View {{ mapChart.selectedCountry | renameCountry }} Data</span>
+          <span class="flag-orb" [ngClass]="mapChart().selectedCountry"></span>
+          <span
+            >View {{ mapChart().selectedCountry | renameCountry }} Data</span
+          >
         </a>
       </div>
-
       }
 
       <!-- country data rows -->
-
       <div
         class="country-list"
         [ngClass]="{
-          hidden: mapChart && mapChart.selectedCountry
+          hidden: mapChart() && mapChart().selectedCountry
         }"
         tabindex="-1"
       >
-        <div
-          *ngFor="let row of getCountryRows(data)"
-          class="container-h record-list"
-        >
+        @for(row of getCountryRows(data); track row.id || row.name || $index){
+        <div class="container-h record-list">
           <a
             class="link-select-country"
-            (click)="mapChart.countryClick(row.id ?? row.name)"
-            (keydown.enter)="mapChart.countryClick(row.id ?? row.name)"
+            (click)="mapChart().countryClick(row.id ?? row.name)"
+            (keydown.enter)="mapChart().countryClick(row.id ?? row.name)"
             tabindex="0"
           >
             <span
@@ -440,26 +413,26 @@
           <span class="numeric">{{ row.percent | number }}%</span>
           }
         </div>
+        }
       </div>
       } @else {
-
       <!-- generic data rows -->
+      @for(row of data.slice(0, 8); track row.name){
 
-      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+      <div class="container-h record-list">
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
-      }
+      } }
     </div>
+    }
   </ng-template>
 
   <div class="container-v">
     <div class="entry-card-pair">
-      <div
-        class="entry-card"
-        *ngIf="landingData[DimensionName.contentTier]; let data"
-      >
+      @if (landingData()[DimensionName.contentTier]; as data) {
+      <div class="entry-card">
         <span
           class="entry-card-header"
           i18n="landing section title edm@@landingSectionTitleEDM"
@@ -489,17 +462,15 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.contentTier }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-ct"
             i18n="landing section link edm@@landingSectionLinkEDM"
             >View by content tier</a
           >
         </div>
       </div>
-      <div
-        class="entry-card"
-        *ngIf="landingData[DimensionName.metadataTier]; let data"
-      >
+      } @if(landingData()[DimensionName.metadataTier]; as data){
+      <div class="entry-card">
         <span
           class="entry-card-header"
           i18n="landing section title metadata@@landingSectionTitleMetadata"
@@ -528,30 +499,30 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.metadataTier }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-metadata"
             i18n="landing section link metadata@@landingSectionLinkMetadata"
             >View by metadata tier</a
           >
         </div>
       </div>
+      }
     </div>
 
-    <div
-      class="entry-card double-card"
-      *ngIf="landingData[DimensionName.country]; let data"
-    >
+    @if(landingData()[DimensionName.country]; as data){
+    <div class="entry-card double-card">
       <span
         class="entry-card-header"
         i18n="landing section title countries@@landingSectionTitleCountries"
         >Explore by providing countries</span
       >
       <div class="entry-card-content">
-        <div class="entry-card-pair map-section" *ngIf="!!mapData">
+        @if(!!mapData()) {
+        <div class="entry-card-pair map-section">
           <div class="map-container" tabindex="-1">
             <app-map-chart
               tabindex="-1"
-              [mapData]="mapData"
+              [mapData]="activeMapData()"
               (mapCountrySet)="onMapCountrySet($event)"
               #mapChart
             ></app-map-chart>
@@ -564,19 +535,23 @@
             "
           ></ng-content>
         </div>
+        }
+
         <a
           class="data-link"
           routerLink="/data/{{ DimensionName.country }}"
-          [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+          [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
           data-e2e="link-entry-country"
           i18n="landing section link countries@@landingSectionLinkCountries"
           >View by countries</a
         >
       </div>
     </div>
+    }
 
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="landingData[DimensionName.type]; let data">
+      @if(landingData()[DimensionName.type]; as data){
+      <div class="entry-card">
         <span
           class="entry-card-header"
           i18n="landing section title type@@landingSectionTitleType"
@@ -597,14 +572,15 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.type }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-type"
             i18n="landing section link type@@landingSectionLinkType"
             >View by type</a
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="landingData[DimensionName.rightsCategory]">
+      } @if(landingData()[DimensionName.rightsCategory]){
+      <div class="entry-card">
         <span
           class="entry-card-header"
           i18n="landing section title rights@@landingSectionTitleRights"
@@ -629,17 +605,18 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.rightsCategory }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-rights"
             i18n="landing section link rights@@landingSectionLinkRights"
             >View by rights category</a
           >
         </div>
       </div>
+      }
     </div>
-
     <div class="entry-card-pair">
-      <div class="entry-card" *ngIf="landingData[DimensionName.dataProvider]">
+      @if(landingData()[DimensionName.dataProvider]){
+      <div class="entry-card">
         <span
           class="entry-card-header"
           i18n="
@@ -660,7 +637,7 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.dataProvider }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-data-provider"
             i18n="
               landing section link data provider@@landingSectionLinkDataProvider"
@@ -668,7 +645,8 @@
           >
         </div>
       </div>
-      <div class="entry-card" *ngIf="landingData[DimensionName.provider]">
+      } @if(landingData()[DimensionName.provider]){
+      <div class="entry-card">
         <span
           class="entry-card-header"
           i18n="landing section title provider@@landingSectionTitleProvider"
@@ -693,13 +671,14 @@
           <a
             class="data-link"
             routerLink="/data/{{ DimensionName.provider }}"
-            [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
+            [queryParams]="includeCTZero() ? { 'content-tier-zero': true } : {}"
             data-e2e="link-entry-provider"
             i18n="landing section link provider@@landingSectionLinkProvider"
             >View by provider</a
           >
         </div>
       </div>
+      }
     </div>
   </div>
 </main>

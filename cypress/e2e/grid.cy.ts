@@ -33,37 +33,57 @@ context('Statistics Dashboard', () => {
       ];
       const waProviders = ['EFG - The European Film Gateway'];
 
-      cy.get(selFilter).type('ar', force);
+      cy.get(selFilter).type('ar');
+      cy.wait(500);
 
       assertRowLength(arCountries, 1);
       assertRowLength(orCountries, 0);
 
-      cy.get(selFilter).clear(force).type('or', force);
+      cy.get(selFilter).clear();
+      cy.wait(100);
+      cy.get(selFilter).type('or');
+      cy.wait(500);
+
       assertRowLength(arCountries, 0);
       assertRowLength(orCountries, 1);
-      cy.get(selFacetSelect).select('Provider', force);
+
+      cy.get(selFacetSelect).select('Provider');
+      cy.wait(500);
       assertRowLength(waProviders, 0);
 
-      cy.get(selFilter).clear(force).type('wa', force);
+      cy.get(selFilter).clear();
+      cy.wait(100);
+      cy.get(selFilter).type('wa');
+      cy.wait(500);
       assertRowLength(waProviders, 1);
 
-      cy.get(selFilter).clear(force).type('ar', force);
+      cy.get(selFilter).clear();
+      cy.wait(100);
+      cy.get(selFilter).type('ar');
+      cy.wait(500);
       assertRowLength(arProviders, 1);
       assertRowLength(waProviders, 0);
 
-      cy.get(selFacetSelect).select('Country', force);
+      cy.get(selFacetSelect).select('Country');
+      cy.wait(500);
 
       assertRowLength(arCountries, 1);
       assertRowLength(orCountries, 0);
+
+      cy.get(selFilter).clear();
+      cy.wait(100);
+      cy.get(selFilter).type('xxx');
+      cy.get(selRowName).should('have.length', 0);
+      cy.get(selFilter).should('be.visible');
     });
 
     it('should filter (diacritics)', () => {
       cy.visit(`/data/${DimensionName.dataProvider}`);
       cy.get(selRowName).should('have.length', 10);
-      cy.get(selFilter).type('Sõj', force);
+      cy.get(selFilter).type('Sõj');
       cy.get(selRowName).should('have.length', 1);
       cy.get(selFilter).clear();
-      cy.get(selFilter).type('Os', force);
+      cy.get(selFilter).type('Os');
       cy.get(selRowName).should('have.length', 3);
     });
 
@@ -78,26 +98,26 @@ context('Statistics Dashboard', () => {
       assertRowLength(pageTwoCountries, 0);
       assertRowLength(pageThreeCountries, 0);
 
-      cy.get(selInputGoTo).type('2{enter}', force);
+      cy.get(selInputGoTo).type('2{enter}');
 
       assertRowLength(pageOneCountries, 0);
       assertRowLength(pageTwoCountries, 1);
 
       assertRowLength(pageThreeCountries, 0);
 
-      cy.get(selInputGoTo).type('3{enter}', force);
+      cy.get(selInputGoTo).type('3{enter}');
 
       assertRowLength(pageOneCountries, 0);
       assertRowLength(pageTwoCountries, 0);
       assertRowLength(pageThreeCountries, 1);
 
-      cy.get(selInputGoTo).type('999{enter}', force);
+      cy.get(selInputGoTo).type('999{enter}');
 
       assertRowLength(pageOneCountries, 0);
       assertRowLength(pageTwoCountries, 0);
       assertRowLength(pageThreeCountries, 1);
 
-      cy.get(selInputGoTo).type('0{enter}', force);
+      cy.get(selInputGoTo).type('0{enter}');
 
       assertRowLength(pageOneCountries, 1);
       assertRowLength(pageTwoCountries, 0);
@@ -161,12 +181,12 @@ context('Statistics Dashboard', () => {
       assertRowLength(inFirst20, 1);
       assertRowLength(inSecond20, 0);
 
-      cy.get(selInputPageSize).select('20', force);
+      cy.get(selInputPageSize).select('20');
 
       assertRowLength(inFirst20, 1);
       assertRowLength(inSecond20, 1);
 
-      cy.get(selInputPageSize).select('10', force);
+      cy.get(selInputPageSize).select('10');
 
       assertRowLength(inFirst20, 1);
       assertRowLength(inSecond20, 0);

@@ -1,5 +1,9 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
-import { ViewChild } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  DebugElement,
+  viewChild
+} from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ClickService } from '../../_services';
@@ -18,6 +22,7 @@ import { ClickAwareDirective } from '.';
       <div
         class="live-zone"
         appClickAware
+        [includeClicksOnClasses]="classesToInclude"
         #clickInfo="clickInfo"
         (click)="clicked()"
       >
@@ -28,8 +33,9 @@ import { ClickAwareDirective } from '.';
   styles: ['.collapsed{ background-color: red; }']
 })
 class TestClickAwareDirectiveComponent {
-  @ViewChild('clickInfo') clickInfo: ClickAwareDirective;
+  readonly clickInfo = viewChild<ClickAwareDirective>('clickInfo');
   hasBeenClicked = false;
+  classesToInclude: string[] = [];
   clicked(): void {
     this.hasBeenClicked = true;
   }
@@ -47,6 +53,7 @@ describe('ClickAwareDirective', () => {
       imports: [ClickAwareDirective, TestClickAwareDirectiveComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
+
     fixture = TestBed.createComponent(TestClickAwareDirectiveComponent);
     deadElement = fixture.debugElement.query(By.css('.dead-zone'));
     liveElement = fixture.debugElement.query(By.css('.live-zone'));
@@ -56,7 +63,7 @@ describe('ClickAwareDirective', () => {
   });
 
   it('should create', () => {
-    const clickInfo = component.clickInfo;
+    const clickInfo = component.clickInfo();
     expect(clickInfo).toBeTruthy();
   });
 
@@ -71,7 +78,7 @@ describe('ClickAwareDirective', () => {
   });
 
   it('should detect clicks in the element', () => {
-    const clickInfo = component.clickInfo;
+    const clickInfo = component.clickInfo()!;
 
     expect(clickInfo.isClickedInside).toBeFalsy();
 
@@ -88,8 +95,8 @@ describe('ClickAwareDirective', () => {
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 
-  it('should detect clicks on ancestor elements with specific classes', () => {
-    const clickInfo = component.clickInfo;
+  it('should detect clicks on ancestor elements with specific classes', async () => {
+    const clickInfo = component.clickInfo()!;
 
     expect(clickInfo.isClickedInside).toBeFalsy();
 
@@ -103,26 +110,37 @@ describe('ClickAwareDirective', () => {
     );
     expect(clickInfo.isClickedInside).toBeFalsy();
 
-    clickInfo.includeClicksOnClasses = ['cmp'];
+    jest.spyOn(clickInfo, 'includeClicksOnClasses').mockReturnValue(['cmp']);
+
+    const parentContainer = fixture.debugElement.query(
+      By.css('.cmp')
+    ).nativeElement;
+    parentContainer.classList.add('cmp');
+
+    fixture.detectChanges();
+    await Promise.resolve();
 
     clickInfo.documentClickListener(
       liveElement.nativeElement,
       deadElementInner.nativeElement
     );
+
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 
-  it('should detect clicks in the element via the service', () => {
-    const clickInfo = component.clickInfo;
+  it('should detect clicks in the element via the service', async () => {
+    const clickInfo = component.clickInfo()!;
     const cmpClickService =
       fixture.debugElement.injector.get<ClickService>(ClickService);
 
     expect(clickInfo.isClickedInside).toBeFalsy();
 
     cmpClickService.documentClickedTarget.next(deadElement.nativeElement);
+    await Promise.resolve();
     expect(clickInfo.isClickedInside).toBeFalsy();
 
     cmpClickService.documentClickedTarget.next(innerElement.nativeElement);
+    await Promise.resolve();
     expect(clickInfo.isClickedInside).toBeTruthy();
   });
 });

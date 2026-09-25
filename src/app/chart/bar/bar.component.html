@@ -1,9 +1,9 @@
-<a (click)="toggleCtrls()" *ngIf="settings.configurable">
-  <ng-container *ngIf="!settings.ctrlsOpen"> configure &gt;&gt;</ng-container>
-  <ng-container *ngIf="settings.ctrlsOpen"> close &lt;&lt;</ng-container>
+@if (settings.configurable) {
+<a (click)="toggleCtrls()">
+  @if (!settings.ctrlsOpen) { configure &gt;&gt; } @else { close &lt;&lt; }
 </a>
-
-<div *ngIf="settings.ctrlsOpen && settings.ctrlsOpen" class="am4-ctrls">
+} @if(settings.ctrlsOpen && settings.ctrlsOpen){
+<div class="am4-ctrls">
   <div class="sub-group">
     <h4>Legend</h4>
     <label
@@ -38,5 +38,6 @@
     >
   </div>
 </div>
-<div id="{{ chartId }}" class="bar-chart"></div>
+}
+<div id="{{ chartId() }}" class="bar-chart"></div>
 <div id="barLegend" [ngClass]="{ offscreen: !settings.chartLegend }"></div>

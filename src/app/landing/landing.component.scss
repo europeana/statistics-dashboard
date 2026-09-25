@@ -250,4 +250,8 @@ a[disabled] {
   .map-container + .data-rows {
     width: 50%;
   }
+
+  .record-list .numeric:has(+ .numeric) {
+    margin-left: 1em;
+  }
 }
