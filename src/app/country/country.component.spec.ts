@@ -72,7 +72,7 @@ describe('CountryComponent', () => {
 
   beforeEach(waitForAsync(() => {
     configureTestBed();
-    appRef = TestBed.get(ApplicationRef) as ApplicationRef;
+    appRef = TestBed.inject(ApplicationRef);
   }));
 
   // split initialisation to delay conponent creation
@@ -97,9 +97,6 @@ describe('CountryComponent', () => {
     component = fixture.componentInstance;
 
     component.headerRef = header as unknown as HeaderComponent;
-
-    TestBed.flushEffects();
-    fixture.detectChanges();
   };
 
   const b4Each = (fullInit = true): void => {
@@ -311,7 +308,6 @@ describe('CountryComponent', () => {
 
     it('should refresh the data when the includeCTZero is set', () => {
       component.country.set('');
-      TestBed.flushEffects();
       fixture.detectChanges();
 
       const spyRefreshCardData = jest.spyOn(component, 'refreshCardData');
@@ -328,7 +324,6 @@ describe('CountryComponent', () => {
       expect(spyRefreshCardData).not.toHaveBeenCalled();
 
       component.country.set('FR');
-      TestBed.flushEffects();
       fixture.detectChanges();
 
       expect(spyRefreshCardData).toHaveBeenCalled();

@@ -6,6 +6,7 @@ npm-debug.log
 /dist
 /node_modules
 /src/environments/apisettings.ts
+/test-data/src-copy
 /tmp
 /out-tsc
 /cypress/screenshots/

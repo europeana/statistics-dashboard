@@ -6,8 +6,9 @@ import {
   tick
 } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { DimensionName } from '../_data';
 import { MockAPIService } from '../_mocked';
-import { DimensionName, PagerInfo, SortBy, TableRow } from '../_models';
+import { PagerInfo, SortBy, TableRow } from '../_models';
 import { APIService } from '../_services';
 import { GridPaginatorComponent } from '../grid-paginator';
 import { GridComponent } from '.';

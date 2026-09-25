@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  Output
+} from '@angular/core';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -41,7 +47,7 @@ type ColourSchemeMap = {
   styleUrls: ['./map.component.scss'],
   standalone: true
 })
-export class MapComponent extends SubscriptionManager {
+export class MapComponent extends SubscriptionManager implements AfterViewInit {
   @Output() mapCountrySet = new EventEmitter<boolean>();
 
   _mapData: Array<IdValue>;
@@ -148,38 +154,44 @@ export class MapComponent extends SubscriptionManager {
 
     const colourHighlightYellow = '#ffcb5c';
 
-    cst[TargetFieldName.THREE_D].push({
-      base: am4core.color(colourHeatmapBlue),
-      highlight: am4core.color(colourHeatmapBlue),
-      outline: am4core.color(colourHeatmapYellow)
-    });
-    cst[TargetFieldName.THREE_D].push({
-      base: am4core.color(colourHeatmapBlue),
-      highlight: am4core.color(colourHeatmapYellow),
-      outline: am4core.color(colourHeatmapYellow)
-    });
+    cst[TargetFieldName.THREE_D].push(
+      {
+        base: am4core.color(colourHeatmapBlue),
+        highlight: am4core.color(colourHeatmapBlue),
+        outline: am4core.color(colourHeatmapYellow)
+      },
+      {
+        base: am4core.color(colourHeatmapBlue),
+        highlight: am4core.color(colourHeatmapYellow),
+        outline: am4core.color(colourHeatmapYellow)
+      }
+    );
 
-    cst[TargetFieldName.HQ].push({
-      base: am4core.color(colourHeatmapRed),
-      highlight: am4core.color(colourHeatmapRed),
-      outline: am4core.color(colourHeatmapYellow)
-    });
-    cst[TargetFieldName.HQ].push({
-      base: am4core.color(colourHeatmapRed),
-      highlight: am4core.color(colourHeatmapYellow),
-      outline: am4core.color(colourHeatmapYellow)
-    });
+    cst[TargetFieldName.HQ].push(
+      {
+        base: am4core.color(colourHeatmapRed),
+        highlight: am4core.color(colourHeatmapRed),
+        outline: am4core.color(colourHeatmapYellow)
+      },
+      {
+        base: am4core.color(colourHeatmapRed),
+        highlight: am4core.color(colourHeatmapYellow),
+        outline: am4core.color(colourHeatmapYellow)
+      }
+    );
 
-    cst[TargetFieldName.TOTAL].push({
-      base: am4core.color(colourHeatmapYellow),
-      highlight: am4core.color(colourHeatmapYellow),
-      outline: am4core.color(colourHeatmapYellow)
-    });
-    cst[TargetFieldName.TOTAL].push({
-      base: am4core.color(colourHeatmapYellow),
-      highlight: am4core.color(colourHeatmapYellow),
-      outline: am4core.color(colourHeatmapYellow)
-    });
+    cst[TargetFieldName.TOTAL].push(
+      {
+        base: am4core.color(colourHeatmapYellow),
+        highlight: am4core.color(colourHeatmapYellow),
+        outline: am4core.color(colourHeatmapYellow)
+      },
+      {
+        base: am4core.color(colourHeatmapYellow),
+        highlight: am4core.color(colourHeatmapYellow),
+        outline: am4core.color(colourHeatmapYellow)
+      }
+    );
 
     this.colourSchemeTargets = cst;
     this.colourSchemeDefault = {
@@ -193,10 +205,7 @@ export class MapComponent extends SubscriptionManager {
         .pipe(debounceTime(250))
         .subscribe((clickedId: string) => {
           this.countryClick(clickedId);
-        })
-    );
-
-    this.subs.push(
+        }),
       this.dragEndSubject.pipe(debounceTime(350)).subscribe(() => {
         this.isDragging = false;
         this.isAnimating = false;
@@ -278,11 +287,11 @@ export class MapComponent extends SubscriptionManager {
   setCountryInclusion(countries: Array<string>): void {
     const singleCountry = countries.length === 1;
 
-    if (!singleCountry) {
+    if (singleCountry) {
+      this.chart.seriesContainer.draggable = false;
+    } else {
       this.selectedCountry = undefined;
       this.chart.seriesContainer.draggable = true;
-    } else {
-      this.chart.seriesContainer.draggable = false;
     }
 
     this.polygonSeries.include = countries;
@@ -419,13 +428,13 @@ export class MapComponent extends SubscriptionManager {
     const dataItem = mapData.find((item) => {
       return item['id'] === ctxtId;
     });
-    if (!dataItem) {
-      return '{name}';
-    } else {
+    if (dataItem) {
       const suffix = this.mapPercentMode ? '%' : '';
       return (
         '{name}: ' + Number(dataItem.value).toLocaleString('en-GB') + suffix
       );
+    } else {
+      return '{name}';
     }
   }
 
@@ -677,7 +686,7 @@ export class MapComponent extends SubscriptionManager {
     let [north, south, east, west] = [-90, 90, -180, 180];
     countryIds.forEach((countryId: string) => {
       const country = this.polygonSeries.getPolygonById(countryId);
-      if (country && !isNaN(country.north)) {
+      if (country && !Number.isNaN(country.north)) {
         north = Math.max(north, country.north);
         south = Math.min(south, country.south);
         west = Math.min(west, country.west);

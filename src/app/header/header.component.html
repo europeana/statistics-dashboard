@@ -9,13 +9,6 @@
       [queryParams]="includeCTZero ? { 'content-tier-zero': true } : {}"
       [attr.tabindex]="router.url === '/' ? -1 : 0"
     >
-      <span class="icon-wrapper">
-        <span class="icon"></span>
-      </span>
-      <span class="text">
-        metis statistics
-        <br />dashboard
-      </span>
     </a>
 
     <span
@@ -37,11 +30,11 @@
       >
       </span>
 
-      <span class="active-country" tabindex="0">
+      <a class="active-country" tabindex="0">
         @if(activeCountry) {
         {{ activeCountry | renameCountry }}
         } @else { Country Pages }
-      </span>
+      </a>
 
       <a
         class="country-closer x"

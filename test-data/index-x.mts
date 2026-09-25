@@ -1,22 +1,25 @@
 import * as url from 'url';
 import * as fileSystem from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
-import { TestDataServer } from '../tools/test-data-server/test-data-server';
+import { TestDataServer } from '../tools/test-data-server/test-data-server.mjs';
+
+import { IHashArray } from './src-copy/_models/ihash.js'
+
 import {
   BreakdownRequest,
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
-  DimensionName,
   FilterOption,
   GeneralResults,
-  IHashArray,
   RequestFilter
-} from '../src/app/_models';
-import { facetNames } from '../src/app/_data';
-import { CHO, IHashBoolean } from './_models/test-models';
-import { countryTargetData, targetData } from './static-country-data';
-import { DataGenerator } from './data-generator';
+} from './src-copy/_models/stats-server.js';
+import { DimensionName, facetNames } from './src-copy/_data/static-data.js';
+
+import { CHO, IHashBoolean } from './_models/test-models.mjs';
+
+import { countryTargetData, targetData } from './static-country-data.mjs';
+import { DataGenerator } from './data-generator.mjs';
 
 new (class extends TestDataServer {
   serverName = 'statistics-data-server';

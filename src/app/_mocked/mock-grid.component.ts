@@ -1,12 +1,6 @@
 import { Component, Input } from '@angular/core';
-import {
-  DimensionName,
-  FmtTableData,
-  SortBy,
-  SortInfo,
-  TableRow
-} from '../_models';
-
+import { DimensionName } from '../_data';
+import { FmtTableData, SortBy, SortInfo, TableRow } from '../_models';
 @Component({
   standalone: true,
   selector: 'app-grid',

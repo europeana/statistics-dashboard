@@ -6,7 +6,7 @@ import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 export class OpenerFocusDirective {
   @Input() fnHide: (event?: KeyboardEvent) => void;
 
-  constructor(private elRef: ElementRef) {}
+  constructor(private readonly elRef: ElementRef) {}
 
   hide(event: KeyboardEvent): void {
     if (this.fnHide) {

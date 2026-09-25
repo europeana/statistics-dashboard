@@ -1,16 +1,28 @@
 name: '- helper (lint)'
-on: workflow_call
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        description: 'Branch or tag to lint'
+        required: false
+        type: string
+        default: 'develop'
+
 jobs:
   run-lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name || github.event.pull_request.head.ref }}
-      - uses: actions/setup-node@v4
+          ref: ${{ inputs.tag_name || github.event.pull_request.head.ref }}
+
+      - uses: actions/setup-node@v5
         with:
-          node-version: '18.19.1'
-      - run: npm install
+          node-version: '22.12'
+          cache: 'npm' # Standard caching mechanism remains active
+
+      - run: npm install # Dynamically syncs package-lock with package.json dependencies
+
       - run: |
           npm run lint:ci

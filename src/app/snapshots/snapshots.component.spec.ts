@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CompareDataDescriptor, DimensionName, SortBy } from '../_models';
+import { DimensionName } from '../_data';
+import { CompareDataDescriptor, SortBy } from '../_models';
 import { SnapshotsComponent } from '.';
 
 describe('SnapshotsComponent', () => {

@@ -1,7 +1,7 @@
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
-  blockHosts: ['*fonts.googleapis.com', '*fonts.gstatic.com'],
+  blockHosts: ['*://googleapis.com', '*://gstatic.com'],
   screenshotsFolder: 'tmp/cypress-screenshots/',
   video: false,
   videosFolder: 'tmp/cypress-videos/',
@@ -12,7 +12,7 @@ export default defineConfig({
   },
   e2e: {
     setupNodeEvents(on, config) {
-      return require('./cypress/plugins/index.js')(on, config)
+      return config;
     },
     baseUrl: 'http://localhost:4280',
     excludeSpecPattern: ['tsconfig.json'],

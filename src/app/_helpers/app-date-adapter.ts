@@ -27,7 +27,7 @@ export class AppDateAdapter extends NativeDateAdapter {
   // Used when user types date into input
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parse(value: any): Date | null {
-    if (typeof value === 'string' && value.indexOf('/') > -1) {
+    if (typeof value === 'string' && value.includes('/')) {
       const str = value.split('/');
       const year = Number(str[2]);
       const month = Number(str[1]) - 1;

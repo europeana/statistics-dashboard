@@ -265,7 +265,7 @@ describe('LegendGridComponent', () => {
       .spyOn(component, 'addSeriesSetAndPin')
       .mockImplementation();
     const spyEmit = jest
-      .spyOn(component.onLoadHistory, 'emit')
+      .spyOn(component.historyLoadded, 'emit')
       .mockImplementation(
         (req: { fnCallback: (result: Array<TargetCountryData>) => void }) => {
           component.countryData = { DE: [] };
@@ -414,7 +414,7 @@ describe('LegendGridComponent', () => {
   });
 
   it('should load the country chart data', () => {
-    const spyEmit = jest.spyOn(component.onLoadHistory, 'emit');
+    const spyEmit = jest.spyOn(component.historyLoadded, 'emit');
     component.loadCountryChartData('DE');
     expect(spyEmit).toHaveBeenCalled();
   });

@@ -1,15 +1,26 @@
 name: '* CI'
 on:
-  push
+  push:
+    branches:
+      - '**' # Triggers on any git branch push tracking behavior
+
 jobs:
   run-ci:
     name: 'code-format-checks'
     uses: ./.github/workflows/run-lint.yaml
+    with:
+      tag_name: ${{ github.ref_name }}
+
   run-unit:
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
+    with:
+      tag_name: ${{ github.ref_name }}
     secrets: inherit
+
   run-sonar:
     needs: [run-unit]
     uses: ./.github/workflows/run-sonar.yaml
+    with:
+      tag_name: ${{ github.ref_name }}
     secrets: inherit

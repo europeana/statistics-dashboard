@@ -20,9 +20,13 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ClickAwareDirective, OpenerFocusDirective } from '../_directives';
-import { externalLinks, isoCountryCodes, targetDescriptions } from '../_data';
 import {
   DimensionName,
+  externalLinks,
+  isoCountryCodes,
+  targetDescriptions
+} from '../_data';
+import {
   GeneralResultsFormatted,
   IdValue,
   IHash,
@@ -225,7 +229,9 @@ export class LandingComponent extends SubscriptionManager {
           const target =
             this.targetMetaData[country][targetType][targetIndex].value;
           const progress = value
-            ? parseFloat(((parseInt(value) / target) * 100).toFixed(2))
+            ? Number.parseFloat(
+                ((Number.parseInt(value) / target) * 100).toFixed(2)
+              )
             : 0;
           this.allProgressSeries[targetType][targetIndex].push({
             id: country,

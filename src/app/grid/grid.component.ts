@@ -5,9 +5,8 @@ import {
   Output,
   ViewChild
 } from '@angular/core';
-import { colours } from '../_data';
+import { colours, DimensionName } from '../_data';
 import {
-  DimensionName,
   FmtTableData,
   HeaderNameType,
   PagerInfo,

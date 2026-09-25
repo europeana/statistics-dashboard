@@ -1,4 +1,4 @@
-import { DimensionName } from '../../src/app/_models';
+import { DimensionName } from '../../src/app/_data';
 
 context('Statistics Dashboard', () => {
   describe('filters', () => {

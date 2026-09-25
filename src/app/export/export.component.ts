@@ -25,8 +25,9 @@ export class ExportComponent {
 
   @Input() getGridData: () => FmtTableData;
   @Input() getChartData: () => Promise<string>;
+  @Input() getChartTitle: () => string;
 
-  @Output() onClose = new EventEmitter<boolean>();
+  @Output() closeExport = new EventEmitter<boolean>();
   @ViewChild('contentRef') contentRef: ElementRef;
   @ViewChild('downloadAnchor') downloadAnchor: ElementRef;
   @ViewChild('closer') closer: ElementRef;
@@ -35,6 +36,7 @@ export class ExportComponent {
 
   public ExportType = ExportType;
   active = false;
+  busy = false;
   copied = false;
   msMsgDisplay = 2000;
   _tabIndex = -1;
@@ -73,8 +75,10 @@ export class ExportComponent {
       );
       this.csv.download(data, this.downloadAnchor);
     } else if (type === ExportType.PDF) {
+      this.busy = true;
       this.getChartData().then((imgUrl: string) => {
-        this.pdf.download(gridData, imgUrl);
+        this.pdf.download(this.getChartTitle(), gridData, imgUrl);
+        this.busy = false;
       });
     } else if (type === ExportType.PNG) {
       this.getChartData().then((imgUrl: string) => {
@@ -104,7 +108,7 @@ export class ExportComponent {
    * @param { boolean } fromToolbar - flags if component was opened from the toolbar
    **/
   toggleActive(fromToolbar?: boolean): void {
-    if (typeof fromToolbar !== 'undefined') {
+    if (fromToolbar !== undefined) {
       this.openedFromToolbar = fromToolbar;
     }
 
@@ -112,7 +116,7 @@ export class ExportComponent {
     this.tabIndex = this.active ? 0 : -1;
 
     if (!this.active) {
-      this.onClose.emit(this.openedFromToolbar);
+      this.closeExport.emit(this.openedFromToolbar);
     }
   }
 }

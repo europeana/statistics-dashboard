@@ -19,10 +19,11 @@ import {
 import { MatDialogModule } from '@angular/material/dialog';
 import { environment } from '../../environments/environment';
 import { IsScrollableDirective } from '../_directives/is-scrollable';
-import { nonFacetFilters, portalNames } from '../_data';
+import { portalNames } from '../_data';
 import { today, yearZero } from '../_helpers';
 import { RenameApiFacetPipe } from '../_translate';
 
+import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
 import {
   createMockPipe,
   MockAPIService,
@@ -34,10 +35,8 @@ import {
 import {
   BreakdownResult,
   BreakdownResults,
-  DimensionName,
   FilterInfo,
   NameLabel,
-  NonFacetFilterNames,
   RequestFilter,
   RequestFilterRange
 } from '../_models';
@@ -127,7 +126,7 @@ describe('OverviewComponent', () => {
         add: { imports: [MockBarComponent, MockGridComponent] }
       })
       .compileComponents();
-    api = TestBed.get(APIService);
+    api = TestBed.inject(APIService);
   };
 
   const b4Each = (): void => {
@@ -207,7 +206,7 @@ describe('OverviewComponent', () => {
     it('should calculate the portal urls', () => {
       queryParams.next({});
 
-      const rootUrl = `${environment.serverPortal}?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)`;
+      const rootUrl = `${environment.serverPortal}/search?query=*&qf=contentTier:(1%20OR%202%20OR%203%20OR%204)`;
       const data = [{ name: 'name', value: 1, percent: 1 }];
 
       component.form.value.facetParameter = DimensionName.rightsCategory;
@@ -964,6 +963,9 @@ describe('OverviewComponent', () => {
 
     it('should get the total figure', () => {
       expect(component.getUrlRow(DimensionName.contentTier)).toBeTruthy();
+      expect(
+        component.getUrlRow(DimensionName.contentTier).indexOf('search')
+      ).toBeGreaterThan(-1);
     });
 
     it('should include the facet selection', () => {

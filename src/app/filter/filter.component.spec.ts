@@ -13,7 +13,7 @@ import {
   UntypedFormControl
 } from '@angular/forms';
 import { toInputSafeName } from '../_helpers';
-import { DimensionName } from '../_models';
+import { DimensionName } from '../_data';
 import { RenameApiFacetPipe } from '../_translate';
 import { CheckboxComponent } from '../checkbox';
 import { FilterComponent } from '.';

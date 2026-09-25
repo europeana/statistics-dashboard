@@ -1,7 +1,11 @@
 {
-  "extends": "./tsconfig.app.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "outDir": "./out-tsc/app",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "types": ["@angular/localize", "node", "jest"]
   },
-  "include": ["test-data"]
+  "include": ["test-data/**/*.ts", "test-data/**/*.mts"]
 }

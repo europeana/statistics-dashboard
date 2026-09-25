@@ -222,7 +222,7 @@ export class AppComponent extends SubscriptionManager implements OnInit {
    **/
   handleLocationPopState(state: PopStateEvent): void {
     this.setContentTierZeroValue(
-      `${state.url}`.indexOf('content-tier-zero=true') > -1
+      `${state.url}`.includes('content-tier-zero=true')
     );
   }
 

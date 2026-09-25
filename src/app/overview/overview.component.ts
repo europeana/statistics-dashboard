@@ -34,7 +34,6 @@ import {
   facetNames,
   isoCountryCodes,
   isoCountryCodesReversed,
-  nonFacetFilters,
   portalNames,
   portalNamesFriendly
 } from '../_data';
@@ -55,7 +54,6 @@ import {
   BreakdownResult,
   BreakdownResults,
   CountPercentageValue,
-  DimensionName,
   FilterInfo,
   FilterOptionSet,
   FilterState,
@@ -65,9 +63,9 @@ import {
   NameLabel,
   NameLabelValid,
   NamesValuePercent,
-  NonFacetFilterNames,
   RequestFilter
 } from '../_models';
+import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
 import { APIService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
@@ -309,9 +307,9 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
             this.countryPageShortcutsAvailable =
               !!queryParams[DimensionName.country] &&
               !!queryParams[DimensionName.metadataTier] &&
-              queryParams[DimensionName.metadataTier].indexOf('0') === -1 &&
+              !queryParams[DimensionName.metadataTier].includes('0') &&
               !!queryParams[DimensionName.contentTier] &&
-              queryParams[DimensionName.contentTier].indexOf('1') === -1;
+              !queryParams[DimensionName.contentTier].includes('1');
           }
 
           // checkbox representation of (split) datasetId
@@ -440,7 +438,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* returns the (portal) url for a specific item
   */
   getUrlRow(facet: string, qfVal?: string): string {
-    const rootUrl = `${environment.serverPortal}${this.getUrl(
+    const rootUrl = `${environment.serverPortal}/search${this.getUrl(
       facet === DimensionName.contentTier && !!qfVal
     )}`;
     if (!qfVal) {

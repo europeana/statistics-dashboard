@@ -1,5 +1,5 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { CHO } from '../../test-data/_models/test-models';
+import { CHO } from '../../test-data/_models/test-models.mjs';
 
 export abstract class TestDataServer {
   abstract serverName: string;

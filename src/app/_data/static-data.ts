@@ -1,4 +1,56 @@
-import { DimensionName, IHash, NonFacetFilterNames } from '../_models';
+export const memberStateCountryCodes = [
+  'AT',
+  'BE',
+  'BG',
+  'HR',
+  'CY',
+  'CZ',
+  'DK',
+  'EE',
+  'FI',
+  'FR',
+  'DE',
+  'GR',
+  'HU',
+  'IE',
+  'IT',
+  'LV',
+  'LT',
+  'LU',
+  'MT',
+  'NL',
+  'PL',
+  'PT',
+  'RO',
+  'SK',
+  'SI',
+  'ES',
+  'SE'
+];
+
+export enum DimensionName {
+  contentTier = 'contentTier',
+  country = 'country',
+  dataProvider = 'dataProvider',
+  metadataTier = 'metadataTier',
+  provider = 'provider',
+  rightsCategory = 'rightsCategory',
+  type = 'type'
+}
+
+export enum NonFacetFilterNames {
+  contentTierZero = 'contentTierZero',
+  dateFrom = 'dateFrom',
+  dateTo = 'dataTo',
+  datasetId = 'datasetId'
+}
+
+// TODO: remaining duplicate
+
+//export
+interface IHash<T> {
+  [details: string]: T;
+}
 
 export const facetNames: Array<DimensionName> = [
   DimensionName.contentTier,
@@ -90,6 +142,7 @@ export const externalLinks = {
   europeana: '//www.europeana.eu',
   pro: '//pro.europeana.eu',
   api: '//api.europeana.eu',
+  dataspace: '//www.dataspace-culturalheritage.eu',
   help: {
     contentTier: {
       href: 'https://europeana.atlassian.net/wiki/spaces/EF/pages/2060386340/Requirements+for+digital+objects+Tier+1',
@@ -119,36 +172,6 @@ export const targetDescriptions = {
   high_quality: $localize`:@@targetDescriptionsHQ:Digital objects found in ${tooltipLink} which conform to content tiers 2, 3 or 4 and metadata tiers A, B or C according to the Europeana Publishing Framework.`,
   total: $localize`:@@targetDescriptionsTOTAL:All digital objects found in ${tooltipLink} conforming to content tier 1 and higher.`
 };
-
-export const memberStateCountryCodes = [
-  'AT',
-  'BE',
-  'BG',
-  'HR',
-  'CY',
-  'CZ',
-  'DK',
-  'EE',
-  'FI',
-  'FR',
-  'DE',
-  'GR',
-  'HU',
-  'IE',
-  'IT',
-  'LV',
-  'LT',
-  'LU',
-  'MT',
-  'NL',
-  'PL',
-  'PT',
-  'RO',
-  'SK',
-  'SI',
-  'ES',
-  'SE'
-];
 
 export const eliData = {
   eliDocNum: '32021H1970',

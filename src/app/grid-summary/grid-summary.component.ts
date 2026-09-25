@@ -1,9 +1,7 @@
 import { Component, Input } from '@angular/core';
-import {
-  BreakdownResult,
-  CountPercentageValue,
-  DimensionName
-} from '../_models';
+import { BreakdownResult, CountPercentageValue } from '../_models';
+import { DimensionName } from '../_data';
+
 import { RenameApiFacetShortPipe, RenameCountryPipe } from '../_translate';
 import { DecimalPipe, NgIf } from '@angular/common';
 

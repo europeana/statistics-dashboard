@@ -30,9 +30,9 @@ import { RenameCountryPipe } from '../_translate';
 export class HeaderComponent {
   // class ref needed to access static variables in the template
   public classReference = HeaderComponent;
-  public static PAGE_TITLE_HIDDEN = 0;
-  public static PAGE_TITLE_MINIFIED = 1;
-  public static PAGE_TITLE_SHOWING = 2;
+  public static readonly PAGE_TITLE_HIDDEN = 0;
+  public static readonly PAGE_TITLE_MINIFIED = 1;
+  public static readonly PAGE_TITLE_SHOWING = 2;
 
   @Input() form?: FormGroup;
   @Input() includeCTZero: boolean;

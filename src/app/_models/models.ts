@@ -22,18 +22,6 @@ export interface FilterOptionSet {
 
 export type HeaderNameType = 'name' | 'count' | 'percent';
 
-export interface IHashString {
-  [details: string]: string;
-}
-
-export interface IHash<T> {
-  [details: string]: T;
-}
-
-export interface IHashArray<T> {
-  [details: string]: Array<T>;
-}
-
 interface PortalUrlInfo {
   href: string;
   hrefRewritten?: boolean;

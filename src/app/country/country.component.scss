@@ -330,24 +330,6 @@
   }
 }
 
-// show only the last restore link
-.entry-card:not(:last-child):not(.line-and-legend) .column-restore {
-  display: none;
-}
-
-// prevent user from deleting everything
-.entry-card:first-child:last-child .column-close {
-  cursor: default;
-  &:active {
-    // this prevents clicks from completing
-    // it's applied on the active state to preserve the tooltip
-    pointer-events: none;
-  }
-  &:hover .x {
-    opacity: 0;
-  }
-}
-
 .entry-card-content {
   .entry-card-totals {
     .totals {
@@ -359,11 +341,6 @@
   .totals {
     position: relative;
   }
-}
-
-.entry-card {
-  display: flex;
-  flex-direction: column;
 }
 
 .page-title {
@@ -502,10 +479,33 @@
   }
 }
 
-// maintain hover on the main when passing over a help
-.entry-card:has(.main-speech-bubble-wrapper:hover) {
-  .help-speech-bubble-wrapper {
-    z-index: 0;
+.entry-card {
+  display: flex;
+  flex-direction: column;
+
+  // show only the last restore link
+  &:not(:last-child):not(.line-and-legend) .column-restore {
+    display: none;
+  }
+
+  // prevent user from deleting everything
+  &:first-child:last-child .column-close {
+    cursor: default;
+    &:active {
+      // this prevents clicks from completing
+      // it's applied on the active state to preserve the tooltip
+      pointer-events: none;
+    }
+    &:hover .x {
+      opacity: 0;
+    }
+  }
+
+  // maintain hover on the main when passing over a help
+  &:has(.main-speech-bubble-wrapper:hover) {
+    .help-speech-bubble-wrapper {
+      z-index: 0;
+    }
   }
 }
 

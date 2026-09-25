@@ -1,5 +1,11 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, inject, Renderer2, RendererFactory2 } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  Renderer2,
+  RendererFactory2
+} from '@angular/core';
 
 export type ArrowType = 'top' | 'right' | 'bottom' | 'left';
 
@@ -9,7 +15,7 @@ export type ArrowType = 'top' | 'right' | 'bottom' | 'left';
   templateUrl: './doc-arrows.component.html',
   styleUrls: ['./doc-arrows.component.scss']
 })
-export class DocArrowsComponent {
+export class DocArrowsComponent implements OnInit {
   private readonly location = inject(Location);
   private readonly rendererFactory = inject(RendererFactory2);
   renderer: Renderer2;
@@ -121,18 +127,18 @@ export class DocArrowsComponent {
     if (['Backspace', 'Delete'].includes(event.key)) {
       if (this.documentationArrows.length > 1) {
         this.documentationArrows.pop();
-        arrow.parentNode.removeChild(arrow);
+        arrow.parentNode.removeChild(arrow); // NOSONAR
         return;
       }
     } // end removal
 
     // read arrow position
-    const arrowLeft = parseInt(arrow.style.left);
-    const arrowWidth = parseFloat(arrow.style.width);
-    const arrowHeight = parseFloat(arrow.style.height);
-    const arrowRight = parseInt(arrow.style.right);
-    const arrowTop = parseInt(arrow.style.top);
-    const arrowBottom = parseInt(arrow.style.bottom);
+    const arrowLeft = Number.parseInt(arrow.style.left);
+    const arrowWidth = Number.parseFloat(arrow.style.width);
+    const arrowHeight = Number.parseFloat(arrow.style.height);
+    const arrowRight = Number.parseInt(arrow.style.right);
+    const arrowTop = Number.parseInt(arrow.style.top);
+    const arrowBottom = Number.parseInt(arrow.style.bottom);
 
     let multiplier = 1;
 
@@ -148,7 +154,7 @@ export class DocArrowsComponent {
       if (shiftIndent) {
         if (!moveLeft) {
           // side margin
-          let indent = parseInt(this.sideIndent);
+          let indent = Number.parseInt(this.sideIndent);
           if (arrow.classList.contains('left')) {
             indent = indent - 50;
           } else {
@@ -189,7 +195,7 @@ export class DocArrowsComponent {
       if (shiftIndent) {
         if (!moveRight) {
           // side margin
-          let indent = parseInt(this.sideIndent);
+          let indent = Number.parseInt(this.sideIndent);
           if (arrow.classList.contains('left')) {
             indent = indent + 50;
           } else {
@@ -230,10 +236,10 @@ export class DocArrowsComponent {
       if (shiftIndent && !moveUp) {
         // top / bottom margins
         if (arrow.classList.contains('top')) {
-          this.topIndent = `${parseInt(this.topIndent) - 50}px`;
+          this.topIndent = `${Number.parseInt(this.topIndent) - 50}px`;
           this.arrowDefaults.top.top = this.topIndent;
         } else {
-          this.bottomIndent = `${parseInt(this.bottomIndent) + 50}px`;
+          this.bottomIndent = `${Number.parseInt(this.bottomIndent) + 50}px`;
           this.arrowDefaults.bottom.bottom = this.bottomIndent;
         }
 
@@ -266,10 +272,10 @@ export class DocArrowsComponent {
       if (shiftIndent && !moveDown) {
         // top / bottom margins
         if (arrow.classList.contains('top')) {
-          this.topIndent = `${parseInt(this.topIndent) + 50}px`;
+          this.topIndent = `${Number.parseInt(this.topIndent) + 50}px`;
           this.arrowDefaults.top.top = this.topIndent;
         } else {
-          this.bottomIndent = `${parseInt(this.bottomIndent) - 50}px`;
+          this.bottomIndent = `${Number.parseInt(this.bottomIndent) - 50}px`;
           this.arrowDefaults.bottom.bottom = this.bottomIndent;
         }
 

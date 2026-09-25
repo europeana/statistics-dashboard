@@ -114,7 +114,7 @@ export const isoCountryCodes = {
   Kazakhstan: 'KZ',
   Kenya: 'KE',
   Kiribati: 'KI',
-  Korea: 'KR',
+  'South Korea': 'KR',
   'North Korea': 'KP',
   Kuwait: 'KW',
   Kyrgyzstan: 'KG',
