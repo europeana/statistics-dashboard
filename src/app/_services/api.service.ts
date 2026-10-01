@@ -77,22 +77,25 @@ export class APIService {
    *
    * @return [TargetMetaDataRaw]
    **/
-  private loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
-    return this.http
-      .get<Array<TargetMetaDataRaw>>(
-        this.replaceDoubleSlashes(
-          `${environment.serverAPI}/${this.suffixTargetsUrl}`
-        )
-      )
-      .pipe(
-        map((targetData: Array<TargetMetaDataRaw>) => {
-          return targetData.map((tmd: TargetMetaDataRaw) => {
-            tmd.isInterim = tmd.targetYear !== 2030;
-            return tmd;
-          });
-        })
-      );
-  }
+   private loadTargetMetaData(): Observable<Array<TargetMetaDataRaw>> {
+     return this.http
+       .get<Array<TargetMetaDataRaw>>(
+         this.replaceDoubleSlashes(
+           `${environment.serverAPI}/${this.suffixTargetsUrl}`
+         )
+       )
+       .pipe(
+         map((targetData: Array<TargetMetaDataRaw>) => {
+           const sortedData = [...targetData].sort(
+             (a, b) => a.targetYear - b.targetYear
+           );
+           return sortedData.map((tmd: TargetMetaDataRaw) => {
+             tmd.isInterim = tmd.targetYear !== 2030;
+             return tmd;
+           });
+         })
+       );
+   }
 
   /**
    * reduceTargetMetaData
