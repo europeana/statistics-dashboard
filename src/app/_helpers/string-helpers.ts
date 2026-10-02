@@ -1,5 +1,5 @@
 import { UntypedFormGroup } from '@angular/forms';
-import { DiacriticsMap } from '../_data';
+import { DiacriticsMap, isoCountryCodesReversed } from '../_data';
 
 const sanitationRegex = /[.*+?^${}()|[\]\\]/g;
 const sanitationReplace = '\\$&';
@@ -176,3 +176,9 @@ export function getFormValueList(
         .map(fromInputSafeName)
     : [];
 }
+
+export const sortByDecodedCountryName = (a: string, b: string): number => {
+  const aDecoded = isoCountryCodesReversed[a] ?? a;
+  const bDecoded = isoCountryCodesReversed[b] ?? b;
+  return Intl.Collator('en').compare(aDecoded, bDecoded);
+};

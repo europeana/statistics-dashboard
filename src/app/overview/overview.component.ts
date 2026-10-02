@@ -1,19 +1,22 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
   ElementRef,
   inject,
   OnInit,
+  signal,
   TemplateRef,
-  ViewChild
+  viewChild,
+  WritableSignal
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   DatePipe,
   formatDate,
   NgClass,
-  NgFor,
-  NgIf,
   NgTemplateOutlet
 } from '@angular/common';
 import {
@@ -30,10 +33,13 @@ import { combineLatest, Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
+  DimensionName,
   externalLinks,
   facetNames,
   isoCountryCodes,
   isoCountryCodesReversed,
+  NonFacetFilterNames,
+  nonFacetFilters,
   portalNames,
   portalNamesFriendly
 } from '../_data';
@@ -48,7 +54,6 @@ import {
   yearZero
 } from '../_helpers';
 import { BarChartCool } from '../chart/chart-defaults';
-import { SubscriptionManager } from '../subscription-manager';
 import {
   BreakdownRequest,
   BreakdownResult,
@@ -65,8 +70,7 @@ import {
   NamesValuePercent,
   RequestFilter
 } from '../_models';
-import { DimensionName, NonFacetFilterNames, nonFacetFilters } from '../_data';
-import { APIService } from '../_services';
+import { APIService, FilterStateService } from '../_services';
 import { BarComponent } from '../chart';
 import { SnapshotsComponent } from '../snapshots';
 import { SpeechBubbleComponent } from '../speech-bubble';
@@ -85,6 +89,7 @@ import { ResizeComponent } from '../resize';
   templateUrl: './overview.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./overview.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -93,8 +98,6 @@ import { ResizeComponent } from '../resize';
     MatDialogModule,
     RouterLink,
     CTZeroControlComponent,
-    NgIf,
-    NgFor,
     NgTemplateOutlet,
     FilterComponent,
     IsScrollableDirective,
@@ -110,23 +113,25 @@ import { ResizeComponent } from '../resize';
     RenameCountryPipe
   ]
 })
-export class OverviewComponent extends SubscriptionManager implements OnInit {
-  @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridSummary') gridSummary: GridSummaryComponent;
-  @ViewChild('export') export: ExportComponent;
-  @ViewChild('barChart') barChart: BarComponent;
-  @ViewChild('snapshots') snapshots: SnapshotsComponent;
-  @ViewChild('dialogRef') dialogRef!: TemplateRef<HTMLElement>;
-  @ViewChild('exportOpenerToolbar') exportOpenerToolbar: ElementRef;
-  @ViewChild('exportOpener') exportOpener: ElementRef;
-  @ViewChild('dateFocusControl') dateFocusControl: ElementRef;
+export class OverviewComponent implements OnInit {
+  grid = viewChild(GridComponent);
+  cmpExport = viewChild(ExportComponent);
+  barChart = viewChild(BarComponent);
+  snapshots = viewChild(SnapshotsComponent);
+  gridSummary = viewChild(GridSummaryComponent);
+  dialogRef = viewChild.required<TemplateRef<HTMLElement>>('dialogRef');
+  exportOpenerToolbar = viewChild(ElementRef);
+  exportOpener = viewChild(ElementRef);
+  dateFocusControl = viewChild(ElementRef);
 
+  private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(APIService);
   private readonly fb = inject(UntypedFormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly filterStateService = inject(FilterStateService);
 
   // Make variables available to template
   public fromCSL = fromCSL;
@@ -151,8 +156,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
 
   readonly MAX_FILTER_OPTIONS = 50;
   readonly facetConf = facetNames;
+  readonly includeCTZero = this.filterStateService.includeCTZero;
 
-  filterStates: { [key: string]: FilterState } = {};
+  filterStates: { [key: string]: WritableSignal<FilterState> } = {};
+
   userFilterSearchTerms = facetNames.reduce((newMap, item: string) => {
     newMap[item] = {
       dimension: item,
@@ -200,7 +207,6 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
    * untyped formbuilder used so that unpredictable datasetId fields can be added
    **/
   constructor() {
-    super();
     this.facetConf.forEach((s: string) => {
       this.form.addControl(s, this.fb.group({}));
       this.form.addControl(`filter_list_${s}`, new FormControl(''));
@@ -258,117 +264,115 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* Event hook: subscribe to changes in the route / query params
   */
   ngOnInit(): void {
-    this.subs.push(
-      this.chartRefresher
-        .pipe(debounceTime(400))
-        .subscribe((redraw: boolean) => {
-          this.refreshChart(redraw, 0);
-        })
-    );
+    this.chartRefresher
+      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
+      .subscribe((redraw: boolean) => {
+        this.refreshChart(redraw, 0);
+        this.changeDetector.markForCheck();
+      });
 
-    this.subs.push(
-      combineLatest([this.route.params, this.route.queryParams])
-        .pipe(
-          map((results) => {
-            const qp = results[1];
-            const qpValArrays = {};
-            Object.keys(qp).forEach((paramName: string) => {
-              this.queryParamsRaw[paramName] = [];
-              qpValArrays[paramName] = (
-                Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
-              ).map((qpValue: string) => {
-                qpValue =
-                  paramName === DimensionName.country
-                    ? isoCountryCodes[qpValue]
-                    : qpValue;
-                this.queryParamsRaw[paramName].push(qpValue);
-                return toInputSafeName(qpValue);
-              });
+    combineLatest([this.route.params, this.route.queryParams])
+      .pipe(
+        map((results) => {
+          const qp = results[1];
+          const qpValArrays = {};
+          Object.keys(qp).forEach((paramName: string) => {
+            this.queryParamsRaw[paramName] = [];
+            qpValArrays[paramName] = (
+              Array.isArray(qp[paramName]) ? qp[paramName] : [qp[paramName]]
+            ).map((qpValue: string) => {
+              qpValue =
+                paramName === DimensionName.country
+                  ? isoCountryCodes[qpValue]
+                  : qpValue;
+              this.queryParamsRaw[paramName].push(qpValue);
+              return toInputSafeName(qpValue);
             });
-            return {
-              params: results[0],
-              queryParams: qpValArrays
-            };
-          })
-        )
-        .subscribe((combined) => {
-          this.disabledParams = {};
-
-          const params = combined.params;
-          const queryParams = combined.queryParams;
-
-          this.countryPageShortcutsAvailable =
-            Object.keys(queryParams).length === 2 &&
-            !!queryParams[DimensionName.country] &&
-            `${queryParams[DimensionName.type]}` === '3D' &&
-            queryParams[DimensionName.type].length === 1;
-
-          if (!this.countryPageShortcutsAvailable) {
-            this.countryPageShortcutsAvailable =
-              !!queryParams[DimensionName.country] &&
-              !!queryParams[DimensionName.metadataTier] &&
-              !queryParams[DimensionName.metadataTier].includes('0') &&
-              !!queryParams[DimensionName.contentTier] &&
-              !queryParams[DimensionName.contentTier].includes('1');
-          }
-
-          // checkbox representation of (split) datasetId
-          this.form.addControl('datasetIds', this.fb.group({}));
-
-          const datasetId =
-            queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
-          if (datasetId) {
-            const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
-            `${datasetId}`.split(',').forEach((part: string) => {
-              datasetIds.addControl(part.trim(), new FormControl(''));
-            });
-          }
-
-          if (queryParams[params.facet]) {
-            this.disabledParams[params.facet] = queryParams[params.facet];
-            delete queryParams[params.facet];
-          }
-
-          const facetChanged =
-            params.facet &&
-            params.facet !== this.form.controls.facetParameter.value;
-
-          if (facetChanged) {
-            this.form.controls.facetParameter.setValue(params.facet);
-            if (this.dataServerData) {
-              this.switchFacet();
-            }
-          }
-          this.queryParams = queryParams;
-          this.setCtZeroInputToQueryParam();
-          this.setDateInputsToQueryParams();
-          this.setDatasetIdInputToQueryParam();
-          this.loadData((): void => {
-            this.updateFilterAvailability();
           });
-        })
-    );
+          return {
+            params: results[0],
+            queryParams: qpValArrays
+          };
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((combined) => {
+        this.disabledParams = {};
+
+        const params = combined.params;
+        const queryParams = combined.queryParams;
+
+        this.countryPageShortcutsAvailable =
+          Object.keys(queryParams).length === 2 &&
+          !!queryParams[DimensionName.country] &&
+          `${queryParams[DimensionName.type]}` === '3D' &&
+          queryParams[DimensionName.type].length === 1;
+
+        if (!this.countryPageShortcutsAvailable) {
+          this.countryPageShortcutsAvailable =
+            !!queryParams[DimensionName.country] &&
+            !!queryParams[DimensionName.metadataTier] &&
+            !queryParams[DimensionName.metadataTier].includes('0') &&
+            !!queryParams[DimensionName.contentTier] &&
+            !queryParams[DimensionName.contentTier].includes('1');
+        }
+
+        // checkbox representation of (split) datasetId
+        this.form.addControl('datasetIds', this.fb.group({}));
+
+        const datasetId =
+          queryParams[nonFacetFilters[NonFacetFilterNames.datasetId]];
+        if (datasetId) {
+          const datasetIds = this.form.get('datasetIds') as UntypedFormGroup;
+          `${datasetId}`.split(',').forEach((part: string) => {
+            datasetIds.addControl(part.trim(), new FormControl(''));
+          });
+        }
+
+        if (queryParams[params.facet]) {
+          this.disabledParams[params.facet] = queryParams[params.facet];
+          delete queryParams[params.facet];
+        }
+
+        const facetChanged =
+          params.facet &&
+          params.facet !== this.form.controls.facetParameter.value;
+
+        if (facetChanged) {
+          this.form.controls.facetParameter.setValue(params.facet);
+          if (this.dataServerData) {
+            this.switchFacet();
+          }
+        }
+        this.queryParams = queryParams;
+        this.setCtZeroInputToQueryParam();
+        this.setDateInputsToQueryParams();
+        this.setDatasetIdInputToQueryParam();
+        this.loadData((): void => {
+          this.updateFilterAvailability();
+        });
+      });
   }
 
   getGridData(): FmtTableData {
-    return this.grid.getData();
+    return this.grid().getData();
   }
 
   getChartData(): Promise<string> {
-    return this.barChart.getSvgData();
+    return this.barChart().getSvgData();
   }
 
   /** chartPositionChanged
   /* @param {number} position - absolute position
   */
   chartPositionChanged(absPos: number): void {
-    const newPosition = Math.floor(absPos / this.barChart.maxNumberBars);
-    const scrollDiff = absPos % this.barChart.maxNumberBars;
+    const newPosition = Math.floor(absPos / this.barChart().maxNumberBars);
+    const scrollDiff = absPos % this.barChart().maxNumberBars;
     if (newPosition !== this.chartPosition) {
       this.chartPosition = newPosition;
       this.refreshChart(true, scrollDiff);
     } else {
-      this.barChart.zoomTop(scrollDiff);
+      this.barChart().zoomTop(scrollDiff);
     }
   }
 
@@ -582,32 +586,36 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* - loads the facet data
   */
   loadData(fnCallback?: (refresh?: boolean) => void): void {
-    this.subs.push(
-      this.api
-        .getBreakdowns(this.getDataServerDataRequest())
-        .subscribe((breakdownResults: BreakdownResults) => {
-          this.isLoading = false;
-          if (this.processServerResult(breakdownResults)) {
-            this.postProcessResult();
-          } else {
-            // build filter data using param data to allow removal of any blocking filters
-            this.buildFilters(this.queryParamsRaw);
-          }
-          if (fnCallback) {
-            fnCallback();
-          }
-        })
-    );
+    this.api
+      .getBreakdowns(this.getDataServerDataRequest())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((breakdownResults: BreakdownResults) => {
+        this.isLoading = false;
+        if (this.processServerResult(breakdownResults)) {
+          this.postProcessResult();
+        } else {
+          // build filter data using param data to allow removal of any blocking filters
+          this.buildFilters(this.queryParamsRaw);
+        }
+        if (fnCallback) {
+          fnCallback();
+        }
+        this.changeDetector.markForCheck();
+      });
   }
 
   initialiseFilterStates(): void {
     this.facetConf.forEach((name: string) => {
-      this.filterStates[name] = {
+      this.filterStates[name] = signal<FilterState>({
         visible: false,
         disabled: this.form.value.facetParameter === name
-      };
+      });
     });
-    this.filterStates.dates = { visible: false, disabled: false };
+
+    this.filterStates.dates = signal<FilterState>({
+      visible: false,
+      disabled: false
+    });
   }
 
   iHashNumberFromNVPs(
@@ -728,7 +736,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     const rightsFilters = Object.keys(rightsInfo).filter((key: string) => {
       return rightsInfo[key];
     });
-    this.snapshots.snap(this.form.value.facetParameter, name, {
+    this.snapshots().snap(this.form.value.facetParameter, name, {
       name: name,
       label: this.generateSeriesLabel(),
       data: this.iHashNumberFromNVPs(seriesValues),
@@ -752,21 +760,21 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { string : seriesKey } - the key of the series to remove
    */
   removeSeries(seriesKey: string): void {
-    this.snapshots.unapply(seriesKey);
+    this.snapshots().unapply(seriesKey);
     this.showAppliedSeriesInGridAndChart();
   }
 
   showAppliedSeriesInGridAndChart(): void {
-    const seriesKeys = this.snapshots.filteredCDKeys(
+    const seriesKeys = this.snapshots().filteredCDKeys(
       this.form.value.facetParameter,
       'applied'
     );
 
-    this.snapshots.preSortAndFilter(
+    this.snapshots().preSortAndFilter(
       this.form.value.facetParameter,
       seriesKeys,
-      this.grid.sortInfo,
-      this.grid.filterTerm
+      this.grid().sortInfo(),
+      this.grid().filterTerm()
     );
 
     this.showAppliedSeriesInGrid();
@@ -774,7 +782,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   }
 
   showDateDisclaimer(): void {
-    this.dialog.open(this.dialogRef);
+    this.dialog.open(this.dialogRef());
   }
 
   /** addSeries
@@ -783,7 +791,7 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { Array<string> : seriesKeys } - the keys of the series to add
    */
   addSeries(seriesKeys: Array<string>): void {
-    this.snapshots.apply(this.form.value.facetParameter, seriesKeys);
+    this.snapshots()?.apply(this.form.value.facetParameter, seriesKeys);
     this.showAppliedSeriesInGridAndChart();
   }
 
@@ -793,18 +801,20 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { Array<string> : seriesKeys } - the keys of the series to visualise
    */
   addSeriesToChart(seriesKeys: Array<string>): void {
-    const fn = (): void => {
-      const maxbars = this.barChart.maxNumberBars;
-      const seriesData = this.snapshots.getSeriesDataForChart(
+    queueMicrotask(() => {
+      const chart = this.barChart();
+      if (!chart) return;
+
+      const maxbars = chart.maxNumberBars;
+      const seriesData = this.snapshots().getSeriesDataForChart(
         this.form.value.facetParameter,
         seriesKeys,
         this.form.value['chartFormat']['percent'],
         this.chartPosition * maxbars,
         maxbars
       );
-      this.barChart.addSeries(seriesData);
-    };
-    setTimeout(fn, 0);
+      chart.addSeries(seriesData);
+    });
   }
 
   /** refreshChart
@@ -814,12 +824,12 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* @param { boolean : redrawChart } - flag redraw
    */
   refreshChart(redrawChart = false, scrollToTop = 0): void {
-    this.barChart.removeAllSeries();
+    this.barChart().removeAllSeries();
     this.addSeriesToChart(
-      this.snapshots.filteredCDKeys(this.form.value.facetParameter, 'applied')
+      this.snapshots().filteredCDKeys(this.form.value.facetParameter, 'applied')
     );
     if (redrawChart) {
-      this.barChart.drawChart(scrollToTop);
+      this.barChart().drawChart(scrollToTop);
     }
   }
 
@@ -1072,34 +1082,34 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
     this.updatePageUrl();
     this.datesOpen();
     this.changeDetector.detectChanges();
-    this.dateFocusControl.nativeElement.focus();
+    this.dateFocusControl()?.nativeElement.focus();
   }
 
   /** datesOpen
-  /* Opens the date fields after a millisecond pause
+  /* Opens the date fields after a microtask rendering frame pause
   */
   datesOpen(): void {
-    const filterStates = this.filterStates;
-    const fn = (): void => {
-      filterStates.dates = {
+    queueMicrotask(() => {
+      this.filterStates.dates.set({
         visible: true,
         disabled: false
-      };
-    };
-    setTimeout(fn, 1);
+      });
+      this.changeDetector.markForCheck();
+    });
   }
 
   /** focusExportOpener
-  /* Focuses the exportOpenerLastUsed after a millisecond pause
+  /* Focuses the exportOpenerLastUsed after a microtask rendering frame pause
   */
   focusExportOpener(fromToolbar: boolean): void {
-    setTimeout(() => {
-      if (fromToolbar) {
-        this.exportOpenerToolbar.nativeElement.focus();
-      } else {
-        this.exportOpener.nativeElement.focus();
-      }
-    }, 1);
+    const targetEl = fromToolbar
+      ? this.exportOpenerToolbar()?.nativeElement
+      : this.exportOpener()?.nativeElement;
+
+    queueMicrotask(() => {
+      targetEl?.focus();
+      this.changeDetector.markForCheck();
+    });
   }
 
   /** enableFilters
@@ -1109,7 +1119,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   enableFilters(): void {
     this.facetConf.forEach((name: string) => {
       this.form.controls[name].enable();
-      this.filterStates[name].disabled = false;
+      this.filterStates[name].update((current) => ({
+        ...current,
+        disabled: false
+      }));
     });
   }
 
@@ -1120,7 +1133,14 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   */
   updateFilterAvailability(): void {
     this.enableFilters();
-    this.filterStates[this.form.value['facetParameter']].disabled = true;
+
+    const activeFacet = this.form.value['facetParameter'];
+    if (activeFacet && this.filterStates[activeFacet]) {
+      this.filterStates[activeFacet].update((current) => ({
+        ...current,
+        disabled: true
+      }));
+    }
   }
 
   /** updatePageUrl
@@ -1228,11 +1248,16 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* clears the chart and grid data
   */
   clearData(): void {
-    this.barChart.removeAllSeries();
+    this.barChart().removeAllSeries();
     this.emptyDataset = true;
-    this.grid.setRows([]);
-    if (this.gridSummary) {
-      this.gridSummary.summaryData = { breakdownBy: '', results: [] };
+    this.grid().setRows([]);
+    if (this.gridSummary()) {
+      if (this.dataServerData?.results) {
+        this.dataServerData.results.breakdowns = {
+          breakdownBy: '',
+          results: []
+        };
+      }
     }
   }
 
@@ -1259,7 +1284,10 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
         return state !== exempt;
       })
       .forEach((state: string) => {
-        this.filterStates[state].visible = false;
+        this.filterStates[state].update((current) => ({
+          ...current,
+          visible: false
+        }));
       });
   }
 
@@ -1287,17 +1315,17 @@ export class OverviewComponent extends SubscriptionManager implements OnInit {
   /* sets table set table rows (combined series)
   */
   showAppliedSeriesInGrid(): void {
-    const seriesKeys = this.snapshots.filteredCDKeys(
+    const seriesKeys = this.snapshots().filteredCDKeys(
       this.form.value.facetParameter,
       'applied'
     );
 
-    const rows = this.snapshots.getSeriesDataForGrid(
+    const rows = this.snapshots().getSeriesDataForGrid(
       this.form.value.facetParameter,
       seriesKeys
     );
 
-    this.grid.isShowingSeriesInfo = seriesKeys.length > 1;
-    this.grid.setRows(rows);
+    this.grid().isShowingSeriesInfo.set(seriesKeys.length > 1);
+    this.grid().setRows(rows);
   }
 }

@@ -1,20 +1,26 @@
 import {
+  ChangeDetectorRef,
   Component,
+  effect,
   ElementRef,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild
+  inject,
+  input,
+  output,
+  viewChild
 } from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule,
   UntypedFormGroup
 } from '@angular/forms';
-import { getDateAsISOString, today, yearZero } from '../_helpers';
-import { NgIf } from '@angular/common';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { startWith, switchMap } from 'rxjs';
+import {
+  MatDatepickerModule,
+  MatDateRangePicker
+} from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { getDateAsISOString, today, yearZero } from '../_helpers';
 
 @Component({
   selector: 'app-dates',
@@ -24,60 +30,88 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatDatepickerModule,
-    NgIf
+    MatDatepickerModule
   ]
 })
 export class DatesComponent {
-  // Make imports available to template
+  private readonly cdr = inject(ChangeDetectorRef);
+
   public today = today;
   public yearZero = yearZero;
 
-  @Input() form: UntypedFormGroup;
-  @Output() valueChanged: EventEmitter<true> = new EventEmitter();
+  readonly form = input.required<UntypedFormGroup>();
+  readonly valueChanged = output<boolean>();
 
-  @ViewChild('dateFrom') dateFrom: ElementRef;
-  @ViewChild('dateTo') dateTo: ElementRef;
-  @ViewChild('rangePicker') rangePicker: ElementRef;
+  readonly dateFrom = viewChild<ElementRef<HTMLInputElement>>('dateFrom');
+  readonly dateTo = viewChild<ElementRef<HTMLInputElement>>('dateTo');
 
-  /** dateChange
-    /* Template utility:
-    /*   corrects @min / @max on the sibling element
-    /*   clears form errors / revalidates
-    /*   sets a default value of the sibling field if unset
-    /*   calls 'updatePageUrl' if valid
-    */
-  dateChange(): void {
-    const valFrom = this.form.value.dateFrom;
-    const valTo = this.form.value.dateTo;
+  readonly rangePicker = viewChild<MatDateRangePicker<unknown>>('rangePicker');
 
-    this.dateTo.nativeElement.setAttribute(
-      'min',
-      getDateAsISOString(new Date(valFrom || yearZero))
-    );
-    this.dateFrom.nativeElement.setAttribute(
-      'max',
-      getDateAsISOString(new Date(valTo || today))
-    );
+  private readonly formValues = toSignal(
+    toObservable(this.form).pipe(
+      switchMap((formInstance: UntypedFormGroup) =>
+        formInstance.valueChanges.pipe(
+          startWith(formInstance.value as { dateFrom: string; dateTo: string })
+        )
+      )
+    )
+  );
 
-    this.form.controls.dateTo.updateValueAndValidity();
-    this.form.controls.dateFrom.updateValueAndValidity();
+  constructor() {
+    effect(() => {
+      const values = this.formValues();
+      const currentForm = this.form();
+      const inputFrom = this.dateFrom();
+      const inputTo = this.dateTo();
+      const picker = this.rangePicker();
 
-    if (
-      !this.form.controls.dateFrom.errors &&
-      !this.form.controls.dateTo.errors &&
-      this.dateFrom.nativeElement.validity.valid &&
-      this.dateTo.nativeElement.validity.valid
-    ) {
-      if ((valFrom && valTo) || (!valFrom && !valTo)) {
-        this.changed();
+      if (!values || !currentForm || !inputFrom || !inputTo) {
+        return;
       }
-    }
 
-    (this.rangePicker as unknown as { open: () => void }).open();
-  }
+      const valFrom = values.dateFrom;
+      const valTo = values.dateTo;
 
-  changed(): void {
-    this.valueChanged.emit(true);
+      inputTo.nativeElement.setAttribute(
+        'min',
+        getDateAsISOString(new Date(valFrom || yearZero))
+      );
+      inputFrom.nativeElement.setAttribute(
+        'max',
+        getDateAsISOString(new Date(valTo || today))
+      );
+
+      currentForm.controls['dateTo'].updateValueAndValidity({
+        emitEvent: false
+      });
+      currentForm.controls['dateFrom'].updateValueAndValidity({
+        emitEvent: false
+      });
+
+      const controlsValid =
+        !currentForm.controls['dateFrom'].errors &&
+        !currentForm.controls['dateTo'].errors;
+      const domValid =
+        inputFrom.nativeElement.validity.valid &&
+        inputTo.nativeElement.validity.valid;
+
+      if (controlsValid && domValid) {
+        if ((valFrom && valTo) || (!valFrom && !valTo)) {
+          this.valueChanged.emit(true);
+        }
+      }
+
+      // Explicitly tell the zoneless framework that form validity controls updated layout states
+      this.cdr.markForCheck();
+
+      if (picker && typeof picker.open === 'function') {
+        const hasInput = !!picker.datepickerInput;
+        if (hasInput && !picker.opened) {
+          queueMicrotask(() => {
+            picker.open();
+          });
+        }
+      }
+    });
   }
 }

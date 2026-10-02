@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  output,
+  signal
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -6,27 +13,40 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { externalLinks } from '../_data';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-ct-zero-control',
   templateUrl: './ct-zero-control.component.html',
   styleUrls: ['./ct-zero-control.component.scss'],
-  imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf]
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, ReactiveFormsModule, NgClass]
 })
 export class CTZeroControlComponent {
-  @Input() form: FormGroup<{ contentTierZero: FormControl<boolean> }>;
+  form = input.required<FormGroup<{ contentTierZero: FormControl<boolean> }>>();
+  disabled = input<boolean>(false);
+  readonly changed = output<void>();
 
-  @Input() disabled = false;
-  @Output() onChange = new EventEmitter<void>();
+  public readonly externalLinks = externalLinks;
 
-  public externalLinks = externalLinks;
+  contentTierZeroChecked = signal<boolean>(false);
 
-  /**
-   * valueChanged
-   * emits event (invokes updatePageUrl())
-   **/
+  constructor() {
+    effect((onCleanup) => {
+      const activeForm = this.form();
+      const control = activeForm.controls.contentTierZero;
+
+      this.contentTierZeroChecked.set(!!control.value);
+
+      const subscription = control.valueChanges.subscribe((value) => {
+        this.contentTierZeroChecked.set(!!value);
+      });
+
+      onCleanup(() => subscription.unsubscribe());
+    });
+  }
+
   valueChanged(): void {
-    this.onChange.emit();
+    this.changed.emit();
   }
 }

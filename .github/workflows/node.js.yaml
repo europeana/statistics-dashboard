@@ -1,11 +1,11 @@
 name: '* Build & Deployment'
 run-name: |
-  ${{ github.event.inputs.delete == 'true'
-    && 'deleting' || github.event.inputs.run_build == 'true'
+  ${{ inputs.delete == true
+    && 'deleting' || inputs.run_build == true
     && 'building and deploying' || 'deploying' }}
-    ${{ github.event.inputs.tag_name }}
-    ${{ github.event.inputs.delete == 'true' && 'from' || 'to' }}
-    ${{ github.event.inputs.deploy_environment }}
+    ${{ inputs.tag_name }}
+    ${{ inputs.delete == true && 'from' || 'to' }}
+    ${{ inputs.deploy_environment }}
 on:
   workflow_dispatch:
     inputs:
@@ -33,40 +33,40 @@ jobs:
   make-env-file:
     uses: ./.github/workflows/env-file-generation.yaml
     with:
-      deploy_environment: ${{ github.event.inputs.deploy_environment }}
+      deploy_environment: ${{ inputs.deploy_environment }}
     secrets: inherit
 
   run-e2e:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build }}
     name: 'e2e'
     uses: ./.github/workflows/run-tests-e2e.yaml
     with:
-      tag_name: ${{ github.event.inputs.tag_name }}
+      tag_name: ${{ inputs.tag_name }}
 
   run-unit:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build }}
     name: 'tests'
     uses: ./.github/workflows/run-tests.yaml
     with:
-      tag_name: ${{ github.event.inputs.tag_name }}
+      tag_name: ${{ inputs.tag_name }}
     secrets: inherit
 
   run-sonar:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build }}
     needs: [run-unit]
     uses: ./.github/workflows/run-sonar.yaml
     with:
-      tag_name: ${{ github.event.inputs.tag_name }}
+      tag_name: ${{ inputs.tag_name }}
     secrets: inherit
 
   build-dist:
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name }}
+          ref: ${{ inputs.tag_name }}
       - name: Build Artifact
         uses: actions/setup-node@v5
         with:
@@ -82,13 +82,13 @@ jobs:
 
   push-docker-image:
     needs: [build-dist, run-unit, run-e2e]
-    if: ${{ github.event.inputs.run_build == 'true' }}
+    if: ${{ inputs.run_build }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.inputs.tag_name }}
+          ref: ${{ inputs.tag_name }}
       - name: Get Built Artifact
         uses: actions/download-artifact@v4
         with:
@@ -105,7 +105,7 @@ jobs:
         uses: docker/setup-buildx-action@v4.0.0
 
       - run: |
-          tag=${{ github.event.inputs.tag_name || 'develop' }}
+          tag=${{ inputs.tag_name || 'develop' }}
           TAG_ESCAPED=${tag//[\/]/_}
           echo TAG_ESCAPED=${TAG_ESCAPED} >> $GITHUB_ENV
 
@@ -126,7 +126,7 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
             ${{ env.PROJECT_VERSION }}
-            ${{ github.event.inputs.tag_name || 'develop' }}
+            ${{ inputs.tag_name || 'develop' }}
             ${{ env.TAG_ESCAPED }}
 
       - name: Build and push

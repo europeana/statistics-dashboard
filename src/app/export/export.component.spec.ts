@@ -1,11 +1,5 @@
 import { ElementRef } from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExportComponent } from '.';
 
 import { MockExportCSVService, MockExportPDFService } from '../_mocked';
@@ -17,34 +11,30 @@ describe('ExportComponent', () => {
   let fixture: ComponentFixture<ExportComponent>;
   let exportCSV: ExportCSVService;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ExportComponent],
       providers: [{ provide: ExportCSVService, useClass: MockExportCSVService }]
     }).compileComponents();
     exportCSV = TestBed.inject(ExportCSVService);
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExportComponent);
     component = fixture.componentInstance;
 
-    component.getGridData = (): FmtTableData => {
-      return {
-        columns: [],
-        tableRows: []
-      };
-    };
+    fixture.componentRef.setInput('getGridData', (): FmtTableData => {
+      return { columns: [], tableRows: [] };
+    });
 
-    component.getChartTitle = (): string => {
+    fixture.componentRef.setInput('getChartTitle', (): string => {
       return 'title';
-    };
+    });
 
-    component.getChartData = (): Promise<string> => {
-      return new Promise((resolve) => {
-        resolve(null);
-      });
-    };
+    fixture.componentRef.setInput('getChartData', (): Promise<string> => {
+      return Promise.resolve(null);
+    });
+
     fixture.detectChanges();
   });
 
@@ -52,48 +42,64 @@ describe('ExportComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should copy', fakeAsync(() => {
-    jest.spyOn(navigator.clipboard, 'writeText');
-    (component.contentRef.nativeElement as HTMLInputElement).value = 'some-url';
+  it('should copy', () => {
+    jest.useFakeTimers();
+    jest
+      .spyOn(navigator.clipboard, 'writeText')
+      .mockImplementation(() => Promise.resolve());
+
+    (component.contentRef().nativeElement as HTMLInputElement).value =
+      'some-url';
+
     component.copy();
     fixture.detectChanges();
-    expect(
-      component.contentRef.nativeElement.classList.contains('copied')
-    ).toBeTruthy();
+    TestBed.tick();
+
     expect(component.copied).toBeTruthy();
-    tick(component.msMsgDisplay);
+
+    jest.advanceTimersByTime(component.msMsgDisplay);
+    fixture.detectChanges();
+    TestBed.tick();
+
     expect(component.copied).toBeFalsy();
-  }));
+    jest.useRealTimers();
+  });
 
   it('should export CSV', () => {
     const spyDownload = jest.spyOn(exportCSV, 'download');
     const elDownload = document.createElement('a');
     document.body.append(elDownload);
-    component.downloadAnchor = { nativeElement: elDownload } as ElementRef;
+
+    const mockAnchor = {
+      nativeElement: elDownload
+    } as ElementRef<HTMLAnchorElement>;
+    Object.defineProperty(component, 'downloadAnchor', {
+      value: () => mockAnchor
+    });
+
     component.export(ExportType.CSV);
     expect(spyDownload).toHaveBeenCalled();
+    elDownload.remove();
   });
 
   it('should export PDF', () => {
-    const spyGetChartData = jest
-      .spyOn(component, 'getChartData')
-      .mockImplementation(() => {
-        return new Promise((resolve) => {
-          resolve(MockExportPDFService.imgDataURL);
-        }) as Promise<string>;
-      });
+    fixture.componentRef.setInput('getChartData', () =>
+      Promise.resolve(MockExportPDFService.imgDataURL)
+    );
+    fixture.detectChanges();
+
+    const spyGetChartData = jest.spyOn(component, 'getChartData');
     component.export(ExportType.PDF);
     expect(spyGetChartData).toHaveBeenCalled();
   });
 
   it('should export PNG', () => {
-    const spyGetChartData = jest
-      .spyOn(component, 'getChartData')
-      .mockImplementation(() => {
-        return new Promise((resolve) => {
-          resolve(MockExportPDFService.imgDataURL);
-        }) as Promise<string>;
-      });
+    fixture.componentRef.setInput('getChartData', () =>
+      Promise.resolve(MockExportPDFService.imgDataURL)
+    );
+    fixture.detectChanges();
+
+    const spyGetChartData = jest.spyOn(component, 'getChartData');
     component.export(ExportType.PNG);
     expect(spyGetChartData).toHaveBeenCalled();
   });

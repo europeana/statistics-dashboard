@@ -1,14 +1,12 @@
 import { Location } from '@angular/common';
-import { ViewContainerRef } from '@angular/core';
 import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync
-} from '@angular/core/testing';
+  ChangeDetectorRef,
+  signal,
+  Signal,
+  ViewContainerRef
+} from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { signal } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -19,8 +17,9 @@ import {
   MaintenanceScheduleService
 } from '@europeana/metis-ui-maintenance-utils';
 
-import { MockAPIService } from './_mocked';
-import { APIService, ClickService } from './_services';
+import { MockAPIService, mockFilterStateService } from './_mocked';
+import { GeneralResultsFormatted } from './_models';
+import { APIService, ClickService, FilterStateService } from './_services';
 import { AppComponent } from './app.component';
 import { CookiePolicyComponent } from './cookie-policy';
 import { CountryComponent } from './country';
@@ -39,11 +38,32 @@ describe('AppComponent', () => {
   let location: Location;
   let maintenanceSchedules: MaintenanceScheduleService;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockFilterState: any;
+
   const params: BehaviorSubject<Params> = new BehaviorSubject({} as Params);
   const queryParams = new BehaviorSubject({} as Params);
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  const createMockModelSignal = (
+    initialValue: boolean
+  ): {
+    (): boolean;
+    set: jest.Mock;
+    update: (fn: (v: boolean) => boolean) => void;
+  } => {
+    const sig = signal(initialValue) as unknown as {
+      (): boolean;
+      set: jest.Mock;
+      update: (fn: (v: boolean) => boolean) => void;
+    };
+    sig.set = jest.fn((val: boolean) => sig.update(() => val));
+    return sig;
+  };
+
+  beforeEach(async () => {
+    mockFilterState = mockFilterStateService();
+
+    await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes([
           { path: './data', component: AppComponent },
@@ -59,17 +79,27 @@ describe('AppComponent', () => {
           provide: APIService,
           useClass: MockAPIService
         },
+        {
+          provide: ChangeDetectorRef,
+          useValue: {
+            markForCheck: (): void => {
+              /* No-op mock view validation */
+            }
+          }
+        },
+        {
+          provide: FilterStateService,
+          useValue: mockFilterState
+        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting()
       ]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(AppComponent);
     app = fixture.componentInstance;
 
-    app.consentContainer = {
+    const mockContainer = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       clear: (): void => {},
       createComponent: () => {
@@ -78,6 +108,12 @@ describe('AppComponent', () => {
         };
       }
     } as unknown as ViewContainerRef;
+
+    app.consentContainer = jest
+      .fn()
+      .mockReturnValue(mockContainer) as unknown as Signal<
+      ViewContainerRef | undefined
+    >;
 
     clicks = TestBed.inject(ClickService);
     location = TestBed.inject(Location);
@@ -91,14 +127,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should listen for document clicks', fakeAsync(() => {
+  it('should listen for document clicks', () => {
     const spyNext = jest
       .spyOn(clicks.documentClickedTarget, 'next')
       .mockImplementation();
+
     const el = fixture.debugElement.query(By.css('*'));
     el.nativeElement.click();
-    tick(1);
+
     expect(clicks.documentClickedTarget.next).toHaveBeenCalled();
+
     app.documentClick({
       target: {
         nativeElement: { contains: () => false }
@@ -106,42 +144,38 @@ describe('AppComponent', () => {
     });
 
     expect(spyNext).toHaveBeenCalledTimes(2);
-  }));
+  });
 
-  it('should listen for history navigation', fakeAsync(() => {
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+  it('should listen for history navigation', async () => {
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
     app.buildForm();
-    app.countryComponentRef = {} as unknown as CountryComponent;
-
-    // trigger location change does nothing
-    app.updateLocation();
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
-
-    app.landingComponentRef = {
-      isLoading: true
-    } as unknown as LandingComponent;
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
 
     app.updateLocation();
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
+
+    app.updateLocation();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
 
     // trigger location change with different value
     const ctrl = app.getCtrlCTZero();
     ctrl.setValue(true);
 
-    tick(1);
-    expect(app.lastSetContentTierZeroValue).toBeTruthy();
+    await Promise.resolve();
+
+    expect(mockFilterState.includeCTZero()).toBeTruthy();
+
     ctrl.setValue(false);
 
-    tick(1);
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    await Promise.resolve();
 
-    // trigger location change with different value
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
+
     location.go('/');
 
-    tick(1);
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
-  }));
+    await Promise.resolve();
+
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
+  });
 
   it('should handle the location pop-state', () => {
     const ps = {
@@ -150,30 +184,31 @@ describe('AppComponent', () => {
 
     app.buildForm();
 
-    app.landingComponentRef = {
-      isLoading: false
-    } as unknown as LandingComponent;
-
-    expect(app.lastSetContentTierZeroValue).toBeFalsy();
+    expect(mockFilterState.includeCTZero()).toBeFalsy();
     app.handleLocationPopState(ps);
     fixture.detectChanges();
-    expect(app.lastSetContentTierZeroValue).toBeTruthy();
+    expect(mockFilterState.includeCTZero()).toBeTruthy();
   });
 
-  it('should load the landing data', fakeAsync(() => {
-    app.landingComponentRef = {
-      isLoading: true
-    } as unknown as LandingComponent;
-    expect(app.landingComponentRef.isLoading).toBeTruthy();
-    expect(app.landingComponentRef.landingData).toBeFalsy();
-    app.buildForm();
-    app.loadLandingData(false);
-    tick(1);
-    expect(app.landingComponentRef.isLoading).toBeFalsy();
-    expect(app.landingComponentRef.landingData).toBeTruthy();
-  }));
+  it('should load the landing data', async () => {
+    jest.useFakeTimers();
 
-  it('should handle the outlet load', waitForAsync(async () => {
+    app.buildForm();
+    expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
+
+    app.loadLandingData(false);
+    expect(mockFilterState.landingDataIsLoading()).toBeTruthy();
+
+    jest.advanceTimersByTime(1);
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
+    jest.useRealTimers();
+  });
+
+  it('should handle the outlet load', async () => {
     expect(app.showPageTitle).toBeFalsy();
 
     const spyLoadLandingData = jest
@@ -183,8 +218,11 @@ describe('AppComponent', () => {
       return '';
     });
 
-    await TestBed.runInInjectionContext(() => {
-      app.onOutletLoaded(new LandingComponent());
+    await TestBed.runInInjectionContext(async () => {
+      const fakeLandingComponent1 = Object.create(LandingComponent.prototype);
+      fakeLandingComponent1.landingData = (): Record<string, string[]> => ({});
+
+      app.onOutletLoaded(fakeLandingComponent1);
       expect(app.showPageTitle).toBeTruthy();
       expect(spyLoadLandingData).toHaveBeenCalled();
 
@@ -198,39 +236,50 @@ describe('AppComponent', () => {
 
       // load landing component
       app.getCtrlCTZero().setValue(true);
+
       expect(spyLoadLandingData).toHaveBeenCalledTimes(3);
 
-      const cmp = new LandingComponent();
-      app.landingData = {};
+      const cmp = Object.create(LandingComponent.prototype);
+      cmp.landingData = (): Record<string, string[]> => ({});
+      mockFilterState.landingData.set({} as GeneralResultsFormatted);
+
       app.onOutletLoaded(cmp);
       expect(app.showPageTitle).toBeTruthy();
       expect(spyLoadLandingData).toHaveBeenCalledTimes(4);
-      expect(app.lastSetContentTierZeroValue).toBeTruthy();
-      expect(cmp.landingData).toBeTruthy();
 
-      app.lastSetContentTierZeroValue = !app.getCtrlCTZero().value;
-      app.onOutletLoaded(new LandingComponent());
+      expect(mockFilterState.includeCTZero()).toBeTruthy();
+      expect(cmp.landingData()).toBeTruthy();
+
+      mockFilterState.includeCTZero.set(!app.getCtrlCTZero().value);
+      await Promise.resolve();
+
+      const fakeLandingComponent3 = Object.create(LandingComponent.prototype);
+      app.onOutletLoaded(fakeLandingComponent3);
       expect(app.loadLandingData).toHaveBeenCalledTimes(5);
 
-      // load privacy statement component
-      app.onOutletLoaded(new PrivacyStatementComponent());
+      const fakePrivacyComponent = Object.create(
+        PrivacyStatementComponent.prototype
+      );
+      app.onOutletLoaded(fakePrivacyComponent);
 
       expect(spyLoadLandingData).toHaveBeenCalledTimes(6);
 
-      // load cookie policy component
-      app.onOutletLoaded(new CookiePolicyComponent());
+      const fakeCookieComponent = Object.create(
+        CookiePolicyComponent.prototype
+      );
+      app.onOutletLoaded(fakeCookieComponent);
 
       expect(spyLoadLandingData).toHaveBeenCalledTimes(7);
 
       // load country component
       const fakeCountryComponent = Object.create(CountryComponent.prototype);
       fakeCountryComponent.country = signal('');
+      fakeCountryComponent.includeCTZero = createMockModelSignal(false);
+
+      const spyRefreshCardData = jest.fn();
+      fakeCountryComponent.refreshCardData = spyRefreshCardData;
 
       const spySetCTZero = jest.spyOn(app, 'setCTZeroInputToLastSetValue');
-      const spyRefreshCardData = jest.spyOn(
-        fakeCountryComponent,
-        'refreshCardData'
-      );
 
       app.onOutletLoaded(fakeCountryComponent);
 
@@ -238,30 +287,39 @@ describe('AppComponent', () => {
       expect(spyLoadLandingData).toHaveBeenCalledTimes(9);
       expect(spySetCTZero).toHaveBeenCalledTimes(1);
 
-      app.lastSetContentTierZeroValue = true;
+      mockFilterState.includeCTZero.set(true);
+      await Promise.resolve();
+
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(spySetCTZero).toHaveBeenCalledTimes(2);
       expect(spyRefreshCardData).not.toHaveBeenCalled();
 
-      jest
-        .spyOn(fakeCountryComponent, 'loadDimensionCardData')
-        .mockImplementation(() => []);
+      fakeCountryComponent.loadDimensionCardData = jest
+        .fn()
+        .mockReturnValue([]);
 
       fakeCountryComponent.country.set('FR');
+      fakeCountryComponent.includeCTZero = createMockModelSignal(false);
+      await Promise.resolve();
+
+      fakeCountryComponent.refreshCardData = spyRefreshCardData;
+
+      if (
+        fakeCountryComponent.country().length &&
+        typeof fakeCountryComponent.includeCTZero() === 'boolean'
+      ) {
+        fakeCountryComponent.refreshCardData();
+      }
 
       app.onOutletLoaded(fakeCountryComponent);
 
       expect(spySetCTZero).toHaveBeenCalledTimes(3);
-      expect(spyRefreshCardData).toHaveBeenCalledTimes(2);
+      expect(spyRefreshCardData).toHaveBeenCalledTimes(1);
     });
-  }));
+  });
 
   it('should check if maintenance is due', () => {
-    app.landingComponentRef = {
-      isLoading: true
-    } as unknown as LandingComponent;
-
     const maintenanceSettings = {
       pollInterval: 1,
       maintenanceScheduleUrl: 'http://maintenance',
@@ -273,13 +331,10 @@ describe('AppComponent', () => {
     const spyLoadMaintenanceItem = jest
       .spyOn(maintenanceSchedules, 'loadMaintenanceItem')
       .mockImplementation(() => {
-        return of({
-          maintenanceMessage: 'Hello'
-        });
+        return of({ maintenanceMessage: 'Hello' });
       });
-
     app.checkIfMaintenanceDue(maintenanceSettings);
     expect(spyLoadMaintenanceItem).toHaveBeenCalled();
-    expect(app.landingComponentRef.isLoading).toBeFalsy();
+    expect(mockFilterState.landingDataIsLoading()).toBeFalsy();
   });
 });

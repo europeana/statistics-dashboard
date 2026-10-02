@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { IsScrollableDirective } from '.';
 
@@ -29,14 +29,18 @@ describe('IsScrollableDirective', () => {
   let btnBack: DebugElement;
   let testComponent: TestIsScrollableDirectiveComponent;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [IsScrollableDirective, TestIsScrollableDirectiveComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
+
     fixture = TestBed.createComponent(TestIsScrollableDirectiveComponent);
     testComponent = fixture.componentInstance;
     fixture.detectChanges();
+
+    // Ensure all internal layout tasks and MutationObserver loops settle up front
+    await fixture.whenStable();
   });
 
   const initButtons = (): void => {
@@ -48,13 +52,22 @@ describe('IsScrollableDirective', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('it should have scrollInfo', fakeAsync(() => {
+  it('it should have scrollInfo', async () => {
     const cmp = fixture.debugElement.query(By.css('.cmp'));
+
+    // Stub out the parent node's scrollTo window controller function
     cmp.nativeElement.scrollTo = jest.fn();
+
     initButtons();
+
     btnFwd.nativeElement.click();
+    fixture.detectChanges();
+
     expect(cmp.nativeElement.scrollTo).toHaveBeenCalled();
+
     btnBack.nativeElement.click();
+    fixture.detectChanges();
+
     expect(cmp.nativeElement.scrollTo).toHaveBeenCalledTimes(2);
-  }));
+  });
 });

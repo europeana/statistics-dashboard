@@ -6,4 +6,6 @@ export * from './mock-line.component';
 export * from './mock-map.component';
 export * from './mock-export-csv.service';
 export * from './mock-export-pdf.service';
+export * from './mock-filter-state.service';
 export * from './mock-api.service';
+export * from './mock-snapshots.component';

@@ -10,5 +10,7 @@ export default {
     'node_modules/^(amcharts4)',
     'node_modules/^(am4map)'
   ],
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'html']
 } satisfies Config;

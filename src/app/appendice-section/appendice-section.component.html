@@ -1,37 +1,36 @@
 <div
   class="appendice-grid"
   [ngClass]="{
-    single: columnsEnabledCount === 1,
-    double: columnsEnabledCount === 2
+    single: columnsEnabledCount() === 1,
+    double: columnsEnabledCount() === 2
   }"
   tabindex="-1"
 >
   <span class="cell-header"><!-- Country--></span>
   <span class="cell-header cell-bold cell-left"><!--Date--></span>
 
-  <span *ngIf="columnEnabled3D" class="cell-header window">
+  @if(columnEnabled3D()){
+  <span class="cell-header window">
     <span class="window-frame"></span>
   </span>
-
-  <span *ngIf="columnEnabled3D" class="cell-header cell-bold">3D</span>
-  <span *ngIf="columnEnabled3D" class="cell-header diminished">(2025)</span>
-  <span *ngIf="columnEnabled3D" class="cell-header diminished">(2030)</span>
-
-  <span *ngIf="columnEnabledHQ" class="cell-header window">
+  <span class="cell-header cell-bold">3D</span>
+  <span class="cell-header diminished">(2025)</span>
+  <span class="cell-header diminished">(2030)</span>
+  } @if(columnEnabledHQ()){
+  <span class="cell-header window">
     <span class="window-frame"></span>
   </span>
-  <span *ngIf="columnEnabledHQ" class="cell-header cell-bold">HQ</span>
-  <span *ngIf="columnEnabledHQ" class="cell-header diminished">2025</span>
-  <span *ngIf="columnEnabledHQ" class="cell-header diminished">2030</span>
-
-  <span *ngIf="columnEnabledALL" class="cell-header window">
+  <span class="cell-header cell-bold">HQ</span>
+  <span class="cell-header diminished">2025</span>
+  <span class="cell-header diminished">2030</span>
+  } @if(columnEnabledALL()){
+  <span class="cell-header window">
     <span class="window-frame"></span>
   </span>
-  <span *ngIf="columnEnabledALL" class="cell-header cell-bold">All</span>
-  <span *ngIf="columnEnabledALL" class="cell-header diminished">2025</span>
-  <span *ngIf="columnEnabledALL" class="cell-header diminished cell-pad-right"
-    >2030</span
-  >
+  <span class="cell-header cell-bold">All</span>
+  <span class="cell-header diminished">2025</span>
+  <span class="cell-header diminished cell-pad-right">2030</span>
+  }
 
   <span class="appendice-grid-scrollable-section" tabindex="-1">
     <ng-template
@@ -83,9 +82,7 @@
       let-colourTOTAL="colourTOTAL"
     >
       @if(wrap){
-      <!-- wrap -->
       <span class="appendice-grid-sticky-row">
-        <!-- recurse -->
         <ng-content
           *ngTemplateOutlet="
             countryRow;
@@ -115,7 +112,8 @@
         {{ row["date"] | date : "dd/MM/yyyy" }}
       </span>
 
-      <ng-container *ngIf="columnEnabled3D">
+      @if(columnEnabled3D()){
+      <ng-container>
         <ng-content
           *ngTemplateOutlet="
             headerGroup;
@@ -129,8 +127,8 @@
           "
         ></ng-content>
       </ng-container>
-
-      <ng-container *ngIf="columnEnabledHQ">
+      } @if(columnEnabledHQ()){
+      <ng-container>
         <ng-content
           *ngTemplateOutlet="
             headerGroup;
@@ -144,8 +142,8 @@
           "
         ></ng-content>
       </ng-container>
-
-      <ng-container *ngIf="columnEnabledALL">
+      } @if(columnEnabledALL()){
+      <ng-container>
         <ng-content
           *ngTemplateOutlet="
             headerGroup;
@@ -159,55 +157,49 @@
           "
         ></ng-content>
       </ng-container>
-      }
+      } }
     </ng-template>
 
-    <ng-container *ngFor="let country of pinnedCountries | keyvalue">
-      <ng-container
-        *ngFor="
-          let row of countryData[country.key];
-          let countryRowIndex = index
+    @for (country of pinnedCountries() | keyvalue; track country.key) { @for
+    (row of countryData()[country.key]; track row.id || row.name || $index; let
+    countryRowIndex = $index) { @if(targetMetaData()[country.key]; as
+    countryTargetData){
+    <ng-container>
+      <ng-content
+        *ngTemplateOutlet="
+          countryRow;
+          context: {
+            colour3D:
+              colourMap()[country.key + TargetSeriesSuffixes[0]]?.fill ||
+              'transparent',
+            colourHQ:
+              colourMap()[country.key + TargetSeriesSuffixes[1]]?.fill ||
+              'transparent',
+            colourTOTAL:
+              colourMap()[country.key + TargetSeriesSuffixes[2]]?.fill ||
+              'transparent',
+            isHeader: countryRowIndex === 0,
+            country: country.key,
+            row: row,
+            targets: [
+              [
+                countryTargetData[TargetFieldName.THREE_D][0].value,
+                countryTargetData[TargetFieldName.THREE_D][1].value
+              ],
+              [
+                countryTargetData[TargetFieldName.HQ][0].value,
+                countryTargetData[TargetFieldName.HQ][1].value
+              ],
+              [
+                countryTargetData[TargetFieldName.TOTAL][0].value,
+                countryTargetData[TargetFieldName.TOTAL][1].value
+              ]
+            ],
+            wrap: countryRowIndex === 0
+          }
         "
-      >
-        <ng-container
-          *ngIf="targetMetaData[country.key]; let countryTargetData"
-        >
-          <ng-content
-            *ngTemplateOutlet="
-              countryRow;
-              context: {
-                colour3D:
-                  colourMap[country.key + TargetSeriesSuffixes[0]]?.fill ||
-                  'transparent',
-                colourHQ:
-                  colourMap[country.key + TargetSeriesSuffixes[1]]?.fill ||
-                  'transparent',
-                colourTOTAL:
-                  colourMap[country.key + TargetSeriesSuffixes[2]]?.fill ||
-                  'transparent',
-                isHeader: countryRowIndex === 0,
-                country: country.key,
-                row: row,
-                targets: [
-                  [
-                    countryTargetData[TargetFieldName.THREE_D][0].value,
-                    countryTargetData[TargetFieldName.THREE_D][1].value
-                  ],
-                  [
-                    countryTargetData[TargetFieldName.HQ][0].value,
-                    countryTargetData[TargetFieldName.HQ][1].value
-                  ],
-                  [
-                    countryTargetData[TargetFieldName.TOTAL][0].value,
-                    countryTargetData[TargetFieldName.TOTAL][1].value
-                  ]
-                ],
-                wrap: countryRowIndex === 0
-              }
-            "
-          ></ng-content>
-        </ng-container>
-      </ng-container>
+      ></ng-content>
     </ng-container>
+    } } }
   </span>
 </div>

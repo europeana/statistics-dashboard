@@ -1,24 +1,19 @@
 <main
   class="fit-to-page"
   [ngClass]="{
-    'loading-modal': !targetMetaData
+    'loading-modal': !targetMetaData()
   }"
 >
   <h1 class="page-title">
     <span class="flag-orb" [ngClass]="country()"></span>
-    <ng-container
-      *ngIf="
-        headerRef &&
-        headerRef['countryTotalMap'] &&
-        headerRef['countryTotalMap'][country()] !== undefined
-      "
-    >
-      <span *ngIf="country(); let country">{{ country | renameCountry }}</span>
-      <span *ngIf="country(); let country" i18n="@@countryPageTitle">Data</span>
-      <span *ngIf="country(); let country" class="page-subtitle">
-        {{ headerRef["countryTotalMap"][country] }}% of the Europeana dataset
-      </span>
-    </ng-container>
+    @if (countryTotalMap(); as activeMap) { @if (activeMap[country()] !==
+    undefined) {
+    <span>{{ country() | renameCountry }}</span>
+    <span i18n="@@countryPageTitle">Data</span>
+    <span class="page-subtitle">
+      {{ activeMap[country()] }}% of the Europeana dataset
+    </span>
+    } }
   </h1>
 
   <ng-template
@@ -85,14 +80,17 @@
             Top
             {{ dimension | renameApiFacetShort | lowercase }}
           </ng-template>
+          @if (isPowerLevel) {
           <span
-            *ngIf="isPowerLevel; else defaultCopy"
             e2e="power-bar-summary"
             i18n="landing chart summary percentage@@countryChartSummaryData"
             class="help-opener"
           >
             Target
           </span>
+          } @else {
+          <ng-container *ngTemplateOutlet="defaultCopy"></ng-container>
+          }
         </span>
         <span class="total bold">{{ valName | renameTargetType }}</span>
       </span>
@@ -114,36 +112,36 @@
           </ng-template>
 
           <!-- the "power-level" header -->
-          <ng-container *ngIf="isPowerLevel; else defaultCopy">
+          @if(isPowerLevel){
+          <span
+            class="hide-on-triple"
+            i18n="
+              landing chart summary percentage@@countryChartSummaryTotalLong"
+            >Current items</span
+          >
+          <span class="show-on-triple">
             <span
-              class="hide-on-triple"
-              i18n="
-                landing chart summary percentage@@countryChartSummaryTotalLong"
-              >Current items</span
+              class="xxl-only"
+              i18n="landing chart summary percentage@@countryChartSummaryTotal"
+              >Current Items</span
             >
-            <span class="show-on-triple">
-              <span
-                class="xxl-only"
-                i18n="
-                  landing chart summary percentage@@countryChartSummaryTotal"
-                >Current Items</span
-              >
-              <span
-                class="xxl-fallback"
-                i18n="
-                  landing chart summary
-                  percentage@@countryChartSummaryTotalShort"
-                >Items</span
-              >
-            </span>
-            <div class="help-speech-bubble-wrapper help-items">
-              <app-speech-bubble [arrowBottomRight]="true">
-                <span class="help-speech-bubble-content">
-                  {{ tooltipsAndTotals().tooltipsTotal[valName] }}
-                </span>
-              </app-speech-bubble>
-            </div>
-          </ng-container>
+            <span
+              class="xxl-fallback"
+              i18n="
+                landing chart summary percentage@@countryChartSummaryTotalShort"
+              >Items</span
+            >
+          </span>
+          <div class="help-speech-bubble-wrapper help-items">
+            <app-speech-bubble [arrowBottomRight]="true">
+              <span class="help-speech-bubble-content">
+                {{ tooltipsAndTotals().tooltipsTotal[valName] }}
+              </span>
+            </app-speech-bubble>
+          </div>
+          } @else {
+          <ng-container *ngTemplateOutlet="defaultCopy"></ng-container>
+          }
         </span>
         <span
           class="total"
@@ -160,7 +158,8 @@
           </span>
         </span>
       </span>
-      <span class="container-v" *ngIf="valName !== TargetFieldName.TOTAL">
+      @if(valName !== TargetFieldName.TOTAL){
+      <span class="container-v">
         <span
           class="total-title"
           [ngClass]="{
@@ -204,21 +203,21 @@
           >
         </span>
       </span>
+      }
     </span>
   </ng-template>
 
   <ng-template #powerLevelSummary let-name="name" let-valName="valName">
     <!-- include percent speech bubble if applicable -->
-    <div
-      class="help-speech-bubble-wrapper help-percent"
-      *ngIf="valName !== TargetFieldName.TOTAL"
-    >
+    @if(valName !== TargetFieldName.TOTAL){
+    <div class="help-speech-bubble-wrapper help-percent">
       <app-speech-bubble [arrowTopRight]="true">
         <span class="help-speech-bubble-content">
           {{ tooltipsAndTotals().tooltipsPercent[name] }}
         </span>
       </app-speech-bubble>
     </div>
+    }
 
     <!-- include cardSummary -->
     <ng-content
@@ -235,37 +234,40 @@
   </ng-template>
 
   <ng-template #dataRows let-dimension="dimension" let-data="data">
-    <div class="container-v data-rows" *ngIf="data">
+    @if(data){
+    <div class="container-v data-rows">
       <div class="container-h data-rows-title">
         <span>{{ dimension | renameApiFacet | uppercase }}</span>
         <span i18n="landing chart header@@countryLandingDataHeader"
           >ITEMS PROVIDED</span
         >
       </div>
-      <div *ngFor="let row of data.slice(0, 8)" class="container-h record-list">
+      @for (row of data.slice(0, 8); track row.id || row.name) {
+      <div class="container-h record-list">
         <app-truncate class="app-truncate" [text]="row.name"></app-truncate>
         <span class="numeric">{{ row.value | number }}</span>
         <span class="numeric">{{ row.percent }}%</span>
       </div>
+      }
     </div>
+    }
   </ng-template>
 
   <ng-template #tmpRestoreColumn>
+    @if(columnsEnabledCount < 3){
     <a
       class="column-restore"
       (click)="toggleColumn()"
       [attr.title]="'restore ' + (columnToEnable | renameTargetType)"
-      *ngIf="columnsEnabledCount < 3"
       >&gt;&gt;</a
     >
+    }
   </ng-template>
 
   <!-- End of templates, beginning of content -->
 
-  <span
-    *ngIf="showTargetsData && eliUrl; let eliUrl"
-    class="country-section-header"
-  >
+  @if(showTargetsData && eliUrl; as eliUrl){
+  <span class="country-section-header">
     <a
       target="_blank"
       class="info-icon"
@@ -292,14 +294,13 @@
       </app-speech-bubble>
     </span>
   </span>
+  }
 
   <div class="container-v">
     <div class="entry-card-multi">
       <!-- 3D -->
-      <div
-        class="entry-card"
-        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.THREE_D]"
-      >
+      @if(showTargetsData && columnsEnabled[TargetFieldName.THREE_D]){
+      <div class="entry-card">
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
           [attr.title]="
@@ -317,13 +318,9 @@
             ></span>
           </app-speech-bubble>
         </span>
-        <div
-          class="entry-card-content"
-          *ngIf="
-            targetMetaData[country()][TargetFieldName.THREE_D];
-            let targets3D
-          "
-        >
+
+        @if(targetMetaData()[country()][TargetFieldName.THREE_D]; as targets3D){
+        <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
               powerLevelSummary;
@@ -387,14 +384,14 @@
             >View (3D data) by content tier</a
           >
         </div>
+        }
       </div>
+      }
 
       <!-- HQ -->
 
-      <div
-        class="entry-card"
-        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.HQ]"
-      >
+      @if(showTargetsData && columnsEnabled[TargetFieldName.HQ]){
+      <div class="entry-card">
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
         <a
           class="entry-card-header column-close"
@@ -410,10 +407,8 @@
             ></span>
           </app-speech-bubble>
         </span>
-        <div
-          class="entry-card-content"
-          *ngIf="targetMetaData[country()][TargetFieldName.HQ]; let targetsHQ"
-        >
+        @if(targetMetaData()[country()][TargetFieldName.HQ]; as targetsHQ){
+        <div class="entry-card-content">
           <ng-content
             *ngTemplateOutlet="
               powerLevelSummary;
@@ -475,13 +470,13 @@
             >View (HQ data) by type</a
           >
         </div>
+        }
       </div>
+      }
 
       <!-- TOTAL -->
-      <div
-        class="entry-card entry-card-total"
-        *ngIf="showTargetsData && columnsEnabled[TargetFieldName.TOTAL]"
-      >
+      @if(showTargetsData && columnsEnabled[TargetFieldName.TOTAL]){
+      <div class="entry-card entry-card-total">
         <a
           class="entry-card-header column-close"
           (click)="toggleColumn(TargetFieldName.TOTAL)"
@@ -496,13 +491,9 @@
             ></span>
           </app-speech-bubble>
         </span>
-        <div
-          class="entry-card-content entry-card-totals"
-          *ngIf="
-            targetMetaData[country()][TargetFieldName.TOTAL];
-            let targetsTOTAL
-          "
-        >
+        @if(targetMetaData()[country()][TargetFieldName.TOTAL]; as
+        targetsTOTAL){
+        <div class="entry-card-content entry-card-totals">
           <ng-content
             *ngTemplateOutlet="
               powerLevelSummary;
@@ -561,14 +552,15 @@
             >&nbsp;{{ country() | renameCountry }}</a
           >
         </div>
-
+        }
         <ng-content *ngTemplateOutlet="tmpRestoreColumn"></ng-content>
       </div>
+      }
     </div>
 
     <!-- secondary content -->
-
-    <div *ngIf="showTargetsData" class="entry-card double-card line-and-legend">
+    @if(showTargetsData){
+    <div class="entry-card double-card line-and-legend">
       <span class="entry-card-header"
         ><span class="pad-word-right">{{ country() | renameCountry }}</span
         ><span i18n="@@countryTargetProgess">Data Progression</span></span
@@ -577,15 +569,19 @@
 
       <div class="entry-card-content">
         <div class="entry-card-multi">
-          <app-line-chart #lineChart [targetMetaData]="targetMetaData">
+          <app-line-chart
+            #lineChart
+            [targetMetaData]="targetMetaData()"
+            (chartReady)="onLineChartReady($event)"
+          >
           </app-line-chart>
 
+          @if(lineChartIsInitialised()){
           <app-legend-grid
-            *ngIf="lineChartIsInitialised"
             #legendGrid
             [countryData]="countryData()"
             [countryCode]="country()"
-            [targetMetaData]="targetMetaData"
+            [targetMetaData]="targetMetaData()"
             [lineChart]="lineChart"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
             [columnEnabledHQ]="columnsEnabled[TargetFieldName.HQ]"
@@ -593,6 +589,7 @@
             (unpinColumn)="toggleColumn($event)"
             (historyLoadded)="loadHistory($event)"
           ></app-legend-grid>
+          }
         </div>
 
         <a
@@ -601,17 +598,16 @@
           (keydown.enter)="toggleAppendice()"
           tabindex="0"
         >
-          <span *ngIf="appendiceExpanded" i18n="@@toggleTargetDataLabelHide"
-            >Hide data</span
-          >
-          <span *ngIf="!appendiceExpanded" i18n="@@toggleTargetDataLabelShow"
-            >Show data</span
-          >
+          @if(appendiceExpanded){
+          <span i18n="@@toggleTargetDataLabelHide">Hide data</span>
+          } @if(!appendiceExpanded){
+          <span i18n="@@toggleTargetDataLabelShow">Show data</span>
+          }
           <span class="save"></span>
         </a>
 
+        @if(legendGrid()){
         <div
-          *ngIf="legendGridIsInitialised"
           class="appendice-grid-wrapper"
           [ngClass]="{ 'is-open': appendiceExpanded }"
           tabindex="-1"
@@ -619,8 +615,8 @@
           <app-appendice-section
             #appendice
             tabindex="-1"
-            [pinnedCountries]="legendGrid.pinnedCountries"
-            [targetMetaData]="targetMetaData"
+            [pinnedCountries]="legendGrid().pinnedCountries"
+            [targetMetaData]="targetMetaData()"
             [countryData]="countryData()"
             [colourMap]="lineChart.allSeriesData"
             [columnEnabled3D]="columnsEnabled[TargetFieldName.THREE_D]"
@@ -628,18 +624,23 @@
             [columnEnabledALL]="columnsEnabled[TargetFieldName.TOTAL]"
           ></app-appendice-section>
         </div>
+        }
       </div>
     </div>
+    }
   </div>
 
   <!-- tertiary content -->
 
-  <div *ngIf="showTargetsData" class="header-text non-target-text">
+  @if(showTargetsData){
+  <div class="header-text non-target-text">
     Explore items for {{ country() | renameCountry }}
   </div>
+  }
 
   <div #scrollPoint>
-    <div class="container-v" *ngIf="cardData">
+    @if(cardData){
+    <div class="container-v">
       <div class="entry-card-pair">
         <div class="entry-card">
           <span class="entry-card-header">
@@ -647,10 +648,8 @@
             <span i18n="@@countryEntryType">data by content type</span>
           </span>
 
-          <div
-            class="entry-card-content"
-            *ngIf="cardData[DimensionName.type]?.length > 0"
-          >
+          @if(cardData[DimensionName.type]?.length > 0){
+          <div class="entry-card-content">
             <ng-content
               *ngTemplateOutlet="
                 cardSummary;
@@ -666,13 +665,13 @@
             <app-bar-chart
               #barChart
               chartId="typeChart"
-              [results]="cardData[DimensionName.type]"
+              [(results)]="cardData[DimensionName.type]"
             ></app-bar-chart>
             <a
               class="data-link"
               routerLink="/data/{{ DimensionName.type }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-type"
@@ -680,6 +679,7 @@
               >View by type</a
             >
           </div>
+          }
         </div>
         <div class="entry-card">
           <span class="entry-card-header">
@@ -708,7 +708,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.rightsCategory }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-rights"
@@ -741,7 +741,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.dataProvider }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-data-provider"
@@ -777,7 +777,7 @@
               class="data-link"
               routerLink="/data/{{ DimensionName.provider }}"
               [queryParams]="{
-                'content-tier-zero': includeCTZero ? true : undefined,
+                'content-tier-zero': includeCTZero() ? true : undefined,
                 country: country() | renameCountry
               }"
               data-e2e="link-entry-provider"
@@ -788,6 +788,7 @@
         </div>
       </div>
     </div>
+    }
   </div>
   <router-outlet></router-outlet>
 </main>

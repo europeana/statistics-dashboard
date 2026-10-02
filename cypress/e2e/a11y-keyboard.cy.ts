@@ -5,11 +5,13 @@ context('Keyboard Accessibility', () => {
 
   describe('Focusable Highlights', () => {
     const checkFocusHighlights = (filter = '*') => {
-      cy.get('button, input, :not(g)[tabindex="0"]')
+      cy.get(
+        'button, input:not([tabindex^="-"]), [tabindex="0"]:not(button):not(input):not(a):not(g)'
+      )
         .filter(':visible')
         .filter(filter)
         .each(($link) => {
-          cy.wrap($link[0])
+          cy.wrap($link)
             .focus()
             .should('have.css', 'outline-color', focusHighlightColour);
         });

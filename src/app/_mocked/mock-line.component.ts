@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 
@@ -24,6 +24,7 @@ const mockTargetMetaData = {
 
 class MockSeries {
   isHidden = false;
+  fill: am4core.Color;
 
   hide(): void {
     this.isHidden = true;
@@ -40,20 +41,19 @@ class MockSeries {
   template: ''
 })
 export class MockLineComponent {
-  @Input() targetMetaData: IHash<IHashArray<TargetMetaData>> =
-    mockTargetMetaData;
-
+  targetMetaData = input<IHash<IHashArray<TargetMetaData>>>(mockTargetMetaData);
   allSeriesData = ['FR', 'DE'].reduce((ob, code: string) => {
     [
       TargetFieldName.THREE_D,
       TargetFieldName.HQ,
       TargetFieldName.TOTAL
     ].forEach((fName: TargetFieldName) => {
-      ob[`${code}${fName}`] = new MockSeries();
-      ob[`${code}${fName}`].fill = am4core.color('#fff');
+      const series = new MockSeries();
+      series.fill = am4core.color('#fff');
+      ob[`${code}${fName}`] = series;
     });
     return ob;
-  }, {}) as unknown as IHash<am4charts.LineSeries>;
+  }, {} as Record<string, MockSeries>) as unknown as IHash<am4charts.LineSeries>;
 
   valueAxis: am4charts.ValueAxis<am4charts.AxisRenderer>;
 
@@ -87,11 +87,17 @@ export class MockLineComponent {
     console.log('MockLineComponent ngAfterViewInit');
   }
 
-  addSeries(_, __, ___, ____, _____): void {
+  addSeries(
+    _: unknown,
+    __: unknown,
+    ___: unknown,
+    ____: unknown,
+    _____: unknown
+  ): void {
     console.log('MockLineComponent addSeries');
   }
 
-  addSeriesData(_, __, ___): void {
+  addSeriesData(_: unknown, __: unknown, ___: unknown): void {
     console.log('MockLineComponent addSeriesData');
   }
 
@@ -100,12 +106,12 @@ export class MockLineComponent {
     specificValueName?: string,
     specificIndex?: number
   ): IHash<IHash<Array<number>>> {
-    const res = {};
+    const res: Record<string, unknown> = {};
     if (specificValueName) {
       res[specificValueName] = {};
       res[country] = [specificIndex];
     }
-    return res as IHash<IHash<Array<number>>>;
+    return res as unknown as IHash<IHash<Array<number>>>;
   }
 
   removeSeries(_: string): void {
@@ -129,7 +135,7 @@ export class MockLineComponent {
     console.log('MockLineComponent hideRange');
   }
 
-  sortSeriesData(_): void {
+  sortSeriesData(_: unknown): void {
     console.log('MockLineComponent sortSeriesData');
   }
 

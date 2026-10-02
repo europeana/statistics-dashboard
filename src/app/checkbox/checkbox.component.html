@@ -1,19 +1,19 @@
-<label *ngIf="form" [formGroup]="form" class="checkbox-labelled {{ group }}">
+@if (form()) {
+<label class="checkbox-labelled {{ group() }}">
   <span
     class="checkmarked-checkbox"
-    [ngClass]="{
-      checked: form.value[group][controlName]
-    }"
-    [formGroupName]="group"
+    [class.checked]="form()?.value?.[group()]?.[controlName()]"
   >
+    <!-- bind directly via the parent form group value mapper, bypassing group directives -->
     <input
       #baseInput
       class="checkbox"
       type="checkbox"
-      (change)="onChange()"
+      (change)="onInputChange($event)"
       (keyup.Space)="onSpaceKey()"
-      [formControlName]="controlName"
+      [formControl]="form()!.get([group(), controlName()])"
     />
   </span>
-  <span class="checkbox-label" [innerHTML]="labelText"> </span>
+  <span class="checkbox-label" [innerHTML]="labelText()"></span>
 </label>
+}

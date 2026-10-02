@@ -1,16 +1,10 @@
 import { Component, DebugElement } from '@angular/core';
-import { NgIf } from '@angular/common';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick
-} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { OpenerFocusDirective } from '.';
 
 @Component({
-  imports: [OpenerFocusDirective, NgIf],
+  imports: [OpenerFocusDirective],
   template: `
     <div appOpenerFocus [fnHide]="fnHide">
       <a class="link1" tabindex="0"></a>
@@ -30,10 +24,11 @@ describe('OpenerFocusDirective', () => {
   let link1: DebugElement;
   let link2: DebugElement;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [OpenerFocusDirective, TestOpenerFocusDirectiveComponent]
     }).compileComponents();
+
     fixture = TestBed.createComponent(TestOpenerFocusDirectiveComponent);
     testComponent = fixture.componentInstance;
     cmp = fixture.debugElement.query(By.directive(OpenerFocusDirective));
@@ -42,32 +37,41 @@ describe('OpenerFocusDirective', () => {
     fixture.detectChanges();
   });
 
-  it('it should create', () => {
+  it('should create', () => {
     expect(testComponent).toBeTruthy();
   });
 
-  it('it should handle the escape key', fakeAsync(() => {
+  it('should handle the escape key', async () => {
     const spyFocus1 = jest.spyOn(link1.nativeElement, 'focus');
     const spyFocus2 = jest.spyOn(link2.nativeElement, 'focus');
+    const directiveInstance = cmp.injector.get(OpenerFocusDirective);
+    const spyHide = jest
+      .spyOn(directiveInstance, 'hide')
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .mockImplementation(() => {});
 
-    const spyHide = jest.spyOn(testComponent, 'fnHide');
     fixture.detectChanges();
-    const event = new KeyboardEvent('keydown', {
-      key: 'Escape'
-    });
-    cmp.nativeElement.dispatchEvent(event);
-    tick(1);
+
+    directiveInstance.escape({
+      key: 'Escape',
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      preventDefault: () => {}
+    } as KeyboardEvent);
+
+    await Promise.resolve();
+    fixture.detectChanges();
+
     expect(spyHide).toHaveBeenCalled();
     expect(spyFocus1).toHaveBeenCalled();
     expect(spyFocus2).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('it should handle the tab key', fakeAsync(() => {
+  it('should handle the tab key', () => {
     const spyFocus = jest.spyOn(link1.nativeElement, 'focus');
 
     const getTabEvent = (): KeyboardEvent => {
       return new KeyboardEvent('keydown', {
-        key: 'tab',
+        key: 'Tab',
         bubbles: true
       });
     };
@@ -75,9 +79,13 @@ describe('OpenerFocusDirective', () => {
     const event = getTabEvent();
     const spyPreventDefault = jest.spyOn(event, 'preventDefault');
 
+    Object.defineProperty(event, 'target', {
+      value: link2.nativeElement,
+      enumerable: true
+    });
     link2.nativeElement.dispatchEvent(event);
 
     expect(spyFocus).toHaveBeenCalled();
     expect(spyPreventDefault).toHaveBeenCalled();
-  }));
+  });
 });

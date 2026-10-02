@@ -14,7 +14,7 @@ jobs:
     steps:
       - run: |
           touch env_file
-          case ${{ github.event.inputs.deploy_environment }} in
+          case ${{ inputs.deploy_environment }} in
             'production')
               echo APP_SERVER_PORTAL=${{ secrets.PRODUCTION_SERVER_PORTAL }} >> env_file
               echo APP_WS_KEY=${{ secrets.PRODUCTION_WS_KEY }} >> env_file
@@ -41,7 +41,7 @@ jobs:
           echo APP_MAINTENANCE_SCHEDULE_ENV_URL=${{ secrets.APP_MAINTENANCE_SCHEDULE_ENV_URL }} >> env_file
           echo APP_MATOMO_HOST=${{ secrets.APP_MATOMO_HOST }} >> env_file
           cat env_file
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
           name: envFile
           path: ./env_file

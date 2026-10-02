@@ -15,43 +15,30 @@ describe('AppendiceSectionComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should invoke the columns-enabled count calculation', () => {
-    const spyCalculateColumnsEnabledCount = jest.spyOn(
-      component,
-      'calculateColumnsEnabledCount'
-    );
-    component.columnEnabled3D = true;
-    component.columnEnabled3D = false;
+  it('should reactively calculate the columns-enabled count when inputs change', () => {
+    // Default initial value should be 3
+    expect(component.columnsEnabledCount()).toEqual(3);
 
-    expect(spyCalculateColumnsEnabledCount).toHaveBeenCalledTimes(2);
+    // Toggle HQ off -> count drops to 2
+    fixture.componentRef.setInput('columnEnabledHQ', false);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(2);
 
-    component.columnEnabledHQ = true;
-    component.columnEnabledHQ = false;
+    // Toggle 3D off -> count drops to 1
+    fixture.componentRef.setInput('columnEnabled3D', false);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(1);
 
-    expect(spyCalculateColumnsEnabledCount).toHaveBeenCalledTimes(4);
+    // Toggle ALL off -> count drops to 0
+    fixture.componentRef.setInput('columnEnabledALL', false);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(0);
 
-    component.columnEnabledALL = true;
-    component.columnEnabledALL = false;
-
-    expect(spyCalculateColumnsEnabledCount).toHaveBeenCalledTimes(6);
-  });
-
-  it('should calculate the columns-enabled count', () => {
-    expect(component.columnsEnabledCount).toEqual(3);
-
-    component.columnEnabledHQ = false;
-    component.calculateColumnsEnabledCount();
-
-    expect(component.columnsEnabledCount).toEqual(2);
-
-    component.columnEnabled3D = false;
-    component.calculateColumnsEnabledCount();
-
-    expect(component.columnsEnabledCount).toEqual(1);
-
-    component.columnEnabledHQ = true;
-    component.columnEnabled3D = true;
-
-    expect(component.columnsEnabledCount).toEqual(3);
+    // Toggle them back on
+    fixture.componentRef.setInput('columnEnabledHQ', true);
+    fixture.componentRef.setInput('columnEnabled3D', true);
+    fixture.componentRef.setInput('columnEnabledALL', true);
+    fixture.detectChanges();
+    expect(component.columnsEnabledCount()).toEqual(3);
   });
 });

@@ -1,4 +1,4 @@
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { MockExportPDFService } from '../_mocked';
 import { TableRow } from '../_models';
 import { ExportPDFService } from './';
@@ -6,12 +6,12 @@ import { ExportPDFService } from './';
 describe('ExportPDFService', () => {
   let service: ExportPDFService;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       providers: [ExportPDFService]
     }).compileComponents();
     service = TestBed.inject(ExportPDFService);
-  }));
+  });
 
   it('should download', () => {
     const model = {

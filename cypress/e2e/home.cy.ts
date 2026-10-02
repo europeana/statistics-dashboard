@@ -77,6 +77,14 @@ context('Statistics Dashboard', () => {
       cy.get(selMapLegend).should('have.length', 1);
     });
 
+    it('should show a usable map menu', () => {
+      const selMapMenu = '.derived-series-menu';
+      const selMapMenuOpener = '.derived-series-menu-opener';
+      cy.get(selMapMenu).should('not.be.visible');
+      cy.get(selMapMenuOpener).click();
+      cy.get(selMapMenu).should('be.visible');
+    });
+
     it('should show the data entry point links', () => {
       cy.get(selLinkDataContentTier).should('have.length', 1);
       cy.get(selLinkDataMetadata).should('have.length', 1);
