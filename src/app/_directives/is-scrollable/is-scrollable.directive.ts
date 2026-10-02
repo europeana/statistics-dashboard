@@ -55,6 +55,8 @@ export class IsScrollableDirective implements AfterViewInit {
   */
   nav(direction: number): void {
     const el = this.elementRef.nativeElement;
+    const diff = direction * Number.parseInt(el.getBoundingClientRect().width);
+    const newX = Number.parseInt(el.parentNode.scrollLeft) + diff;
     const parent = el.parentNode as HTMLElement;
     if (!parent) return;
 

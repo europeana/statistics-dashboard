@@ -86,7 +86,10 @@ export class APIService {
       )
       .pipe(
         map((targetData: Array<TargetMetaDataRaw>) => {
-          return targetData.map((tmd: TargetMetaDataRaw) => {
+          const sortedData = [...targetData].sort(
+            (a, b) => a.targetYear - b.targetYear
+          );
+          return sortedData.map((tmd: TargetMetaDataRaw) => {
             tmd.isInterim = tmd.targetYear !== 2030;
             return tmd;
           });
