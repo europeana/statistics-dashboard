@@ -58,11 +58,9 @@ export class IsScrollableDirective implements AfterViewInit {
     const diff = direction * Number.parseInt(el.getBoundingClientRect().width);
     const newX = Number.parseInt(el.parentNode.scrollLeft) + diff;
     const parent = el.parentNode as HTMLElement;
-    if (!parent) return;
-
-    const diff = direction * el.getBoundingClientRect().width;
-    const newX = parent.scrollLeft + diff;
-
+    if (!parent) {
+      return;
+    }
     parent.scrollTo({ left: newX, behavior: 'auto' });
     this.calc();
   }
