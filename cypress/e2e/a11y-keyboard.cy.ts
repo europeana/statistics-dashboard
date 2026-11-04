@@ -25,7 +25,7 @@ context('Keyboard Accessibility', () => {
       checkFocusHighlights(`:not(${selCountryLink})`);
 
       cy.get(selCountryLink).each(($link) => {
-        cy.wrap($link[0])
+        cy.wrap($link)
           .focus()
           .children('span')
           .should('have.css', 'border-color', focusHighlightColour);

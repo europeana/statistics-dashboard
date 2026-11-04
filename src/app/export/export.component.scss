@@ -150,6 +150,8 @@
 }
 
 .x {
-  align-self: baseline;
   background-color: transparent;
+  &::before {
+    margin-top: 2px;
+  }
 }

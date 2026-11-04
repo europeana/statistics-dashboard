@@ -5,9 +5,9 @@
     [attr.inert]="getAppliedDateRange() ? null : true"
   >
     <button
+      type="button"
       class="container-h when-set"
       (click)="datesClear()"
-      (keydown.enter)="datesClear()"
       tabindex="0"
     >
       <span>Custom</span>
@@ -15,9 +15,9 @@
     </button>
     <button
       #dateFocusControl
+      type="button"
       class="when-unset"
       (click)="datesOpen()"
-      (keydown.enter)="datesOpen()"
       tabindex="0"
       i18n="Period Summary|Summary for applied date filters@@periodSummary"
     >
@@ -61,7 +61,7 @@
             >The data is not live and may be a few days old</span
           >
         </div>
-        <button mat-button mat-dialog-close>Close</button>
+        <button type="button" mat-button mat-dialog-close>Close</button>
       </div>
     </ng-template>
 
@@ -134,7 +134,9 @@
             <span class="icon filter-icon-dataset"></span>
             <input
               formControlName="datasetId"
-              (keyup.enter)="updateDatasetIdFieldAndPageUrl()"
+              (keydown.enter)="
+                $event.preventDefault(); updateDatasetIdFieldAndPageUrl()
+              "
               i18n-placeholder="Dataset ID@@inputPlaceholderFilterDatasetId"
               placeholder="Dataset ID"
               class="dataset-name"
@@ -199,12 +201,11 @@
           <ng-content *ngTemplateOutlet="dateRemoval"></ng-content>
 
           <button
+            type="button"
             aria-label="toggle export section"
             #exportOpenerToolbar
             (click)="cmpExport.toggleActive(true)"
-            (keydown.enter)="cmpExport.toggleActive(true)"
             class="export-icon export-opener"
-            tabindex="0"
           ></button>
         </div>
 
@@ -416,10 +417,10 @@
           <div class="export-opener-link-wrapper">
             <button
               #exportOpener
+              type="button"
               class="export-opener-link"
               tabindex="0"
               (click)="cmpExport.toggleActive(false)"
-              (keydown.enter)="cmpExport.toggleActive(false)"
               i18n="Share Report Opener@@exportReportOpenerLink"
             >
               Export data
