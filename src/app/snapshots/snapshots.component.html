@@ -25,14 +25,14 @@
       </span>
     </a>
 
-    <a
+    <button
       class="save"
       [class.saved]="item.saved"
       aria-label="save (pin) item"
       [attr.tabindex]="0"
       (keydown.enter)="toggleSaved(key, item.current)"
       (click)="toggleSaved(key, item.current)"
-    ></a>
+    ></button>
   </li>
   } } }
 </ul>

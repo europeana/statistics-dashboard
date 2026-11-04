@@ -38,6 +38,10 @@ $width-left-col: 200px;
     }
   }
 
+  button {
+    color: variables.$gray-med;
+  }
+
   .date {
     font-size: 14px;
     white-space: nowrap;
@@ -225,6 +229,7 @@ input[type="checkbox"] {
 }
 
 .export-opener {
+  background-color: transparent;
   display: inline-block;
   height: 18px;
   width: 18px;
@@ -233,7 +238,9 @@ input[type="checkbox"] {
 .export-opener-link-wrapper {
   margin-top: 36px;
   text-align: right;
+
   .export-opener-link {
+    background: transparent;
     color: variables.$stats-blue;
     font-size: 14px;
     text-transform: uppercase;

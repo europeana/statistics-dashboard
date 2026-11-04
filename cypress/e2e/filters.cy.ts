@@ -232,10 +232,11 @@ context('Statistics Dashboard', () => {
 
       const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
 
-      cy.get(selDateFrom).type(today, force);
-      cy.get(selDateFrom).type('{enter}', force);
-      cy.get(selDateTo).type(today, force);
-      cy.get(selDateTo).type('{enter}', force);
+      cy.get(selDateFrom).invoke('val', today).trigger('input', force);
+      cy.get(selDateTo)
+        .invoke('val', today)
+        .trigger('input', force)
+        .trigger('change', force);
 
       cy.get(selCloseDateOverride).should('be.visible');
       cy.get(selDateFrom).clear(force);
