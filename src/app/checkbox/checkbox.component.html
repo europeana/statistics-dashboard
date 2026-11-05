@@ -11,9 +11,6 @@
       type="checkbox"
       (change)="onInputChange($event)"
       (keyup.Space)="onSpaceKey()"
-      (keydown.enter)="
-        $event.preventDefault(); $event.stopPropagation(); baseInput.click()
-      "
       [formControl]="form()!.get([group(), controlName()])"
     />
   </span>
