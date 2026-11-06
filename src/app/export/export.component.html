@@ -4,7 +4,6 @@
   [class.loading-modal]="busy"
   tabindex="-1"
   appOpenerFocus
-  [fnHide]="fnHide.bind(this)"
 >
   <li class="container-h">
     <span class="export-icon"
@@ -24,7 +23,8 @@
       #closer
       aria-label="toggle export"
       class="x"
-      (click)="toggleActive()"
+      (click)="fnHide()"
+      (keydown.esc)="fnHide()"
       [attr.tabindex]="tabIndex"
     ></button>
   </li>

@@ -120,8 +120,10 @@ export class OverviewComponent implements OnInit {
   snapshots = viewChild(SnapshotsComponent);
   gridSummary = viewChild(GridSummaryComponent);
   dialogRef = viewChild.required<TemplateRef<HTMLElement>>('dialogRef');
-  exportOpenerToolbar = viewChild(ElementRef);
-  exportOpener = viewChild(ElementRef);
+  exportOpenerToolbar = viewChild<ElementRef<HTMLButtonElement>>(
+    'exportOpenerToolbar'
+  );
+  exportOpener = viewChild<ElementRef<HTMLButtonElement>>('exportOpener');
   dateFocusControl = viewChild(ElementRef);
 
   private readonly destroyRef = inject(DestroyRef);
@@ -1105,11 +1107,8 @@ export class OverviewComponent implements OnInit {
     const targetEl = fromToolbar
       ? this.exportOpenerToolbar()?.nativeElement
       : this.exportOpener()?.nativeElement;
-
-    queueMicrotask(() => {
-      targetEl?.focus();
-      this.changeDetector.markForCheck();
-    });
+    targetEl?.focus();
+    this.changeDetector.markForCheck();
   }
 
   /** enableFilters
