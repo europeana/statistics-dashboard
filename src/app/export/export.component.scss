@@ -148,3 +148,11 @@
 .pad-top {
   margin-top: 12px;
 }
+
+.x {
+  background-color: transparent;
+  border-radius: 0;
+  &::before {
+    margin-top: 1px;
+  }
+}

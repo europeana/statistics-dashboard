@@ -4,7 +4,6 @@
   [class.loading-modal]="busy"
   tabindex="-1"
   appOpenerFocus
-  [fnHide]="fnHide.bind(this)"
 >
   <li class="container-h">
     <span class="export-icon"
@@ -19,14 +18,15 @@
     <span class="label-top" i18n="Share Report Header@@exportReportHeader"
       >Share Report</span
     ><!-- // NOSONAR
-    --><a
+    --><button
+      type="button"
       #closer
       aria-label="toggle export"
       class="x"
-      (click)="toggleActive()"
-      (keydown.enter)="toggleActive()"
+      (click)="fnHide()"
+      (keydown.esc)="fnHide()"
       [attr.tabindex]="tabIndex"
-    ></a>
+    ></button>
   </li>
   <li class="hr"></li>
   <li>

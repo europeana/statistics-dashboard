@@ -45,17 +45,17 @@ context('Statistics Dashboard', () => {
 
     it('should open and close the filters', () => {
       cy.visit(`/data/${DimensionName.country}`);
-      cy.get(selFilterOpener).first().click(force);
+      cy.get(selFilterOpener).first().click();
       cy.get(selFilterOpened).should('have.length', 1);
-      cy.get(selFilterOpener).last().click(force);
+      cy.get(selFilterOpener).last().click();
       cy.get(selFilterOpened).should('have.length', 0);
     });
 
     it('should apply the filters', () => {
       cy.visit(`/data/${DimensionName.country}`);
-      cy.get(selFilterOpener).first().click(force);
+      cy.get(selFilterOpener).first().click();
       cy.get(selFilterRemove).should('have.length', 0);
-      cy.get(selCheckbox).first().click(force);
+      cy.get(selCheckbox).first().click();
       cy.get(selFilterRemove).should('have.length', 1);
     });
 
@@ -63,13 +63,13 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
 
       // apply filter on country Belgium
-      cy.get(selFilterOpener).eq(1).click(force);
-      cy.get(selFilterValueLabel).contains('Belgium').click(force);
+      cy.get(selFilterOpener).eq(1).click();
+      cy.get(selFilterValueLabel).contains('Belgium').click();
       cy.get(selFilterRemove).should('have.length', 1);
 
-      cy.get(selFacetSelect).select('Country', force);
+      cy.get(selFacetSelect).select('Country');
       cy.get(selFilterRemove).should('have.length', 0);
-      cy.get(selFacetSelect).select('Provider', force);
+      cy.get(selFacetSelect).select('Provider');
       cy.get(selFilterRemove).should('have.length', 1);
     });
 
@@ -82,7 +82,7 @@ context('Statistics Dashboard', () => {
       // ...but nothing shows
       cy.get(selCheckbox).should('have.length', 0);
 
-      cy.get(selFilterRemove).click(force);
+      cy.get(selFilterRemove).click();
       cy.get(selFilterOpenerDisabled).should('have.length', 0);
 
       // Remove the blocking filter...
@@ -95,7 +95,7 @@ context('Statistics Dashboard', () => {
 
     it('should allow filters disabled by search terms to be reopened', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterOpener).eq(1).click();
 
       // search for inexistent country 'xxx'
       cy.get(selCheckbox).should('have.length.gt', 0);
@@ -118,16 +118,16 @@ context('Statistics Dashboard', () => {
     });
 
     it('should load more', () => {
-      const selLoadMore = '.load-more-item a';
+      const selLoadMore = '.load-more-item button';
 
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selLoadMore).should('have.length', 0);
-      cy.get(selFilterOpener).eq(2).click(force);
+      cy.get(selFilterOpener).eq(2).click();
 
       cy.get(selCheckbox).should('have.length', 50);
       cy.get(selLoadMore).filter(':visible').should('have.length', 1);
 
-      cy.get(selLoadMore).click(force);
+      cy.get(selLoadMore).click();
 
       cy.get(selCheckbox).should('have.length.gt', 50);
       cy.get(selLoadMore).filter(':visible').should('have.length', 0);
@@ -136,7 +136,7 @@ context('Statistics Dashboard', () => {
     it('should search the filters and remember the term when re-opened', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selFilterValueLabel).should('have.length', 0);
-      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterOpener).eq(1).click();
       cy.get(selFilterValueLabel).should('have.length.gt', 0);
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 1);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
@@ -146,14 +146,14 @@ context('Statistics Dashboard', () => {
       cy.get(selFilterValueLabel).contains('Belgium').should('have.length', 0);
       cy.get(selFilterValueLabel).contains('Germany').should('have.length', 1);
 
-      cy.get(selFiltersHeader).click(force);
-      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFiltersHeader).click();
+      cy.get(selFilterOpener).eq(1).click();
       cy.get(selSearch).should('have.value', 'Ge');
     });
 
     it('should search the filters (regex start)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterOpener).eq(1).click();
       cy.get(selCheckbox).should('have.length', 25);
       cy.get(selFilterValueLabel).contains('Cyprus').should('have.length', 1);
 
@@ -170,7 +170,7 @@ context('Statistics Dashboard', () => {
 
     it('should search the filters (regex end)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selFilterOpener).eq(1).click(force);
+      cy.get(selFilterOpener).eq(1).click();
       cy.get(selCheckbox).should('have.length', 25);
       cy.get(selFilterValueLabel).contains('Austria').should('have.length', 1);
 
@@ -187,7 +187,7 @@ context('Statistics Dashboard', () => {
 
     it('should search the filters (regex literals)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selFilterOpener).eq(3).click(force);
+      cy.get(selFilterOpener).eq(3).click();
       cy.get(selCheckbox).should('have.length', 38);
       cy.get(selSearch).type('^');
       cy.get(selCheckbox).should('have.length', 2);
@@ -198,7 +198,7 @@ context('Statistics Dashboard', () => {
 
     it('should search the filters (diacritics)', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
-      cy.get(selFilterOpener).eq(2).click(force);
+      cy.get(selFilterOpener).eq(2).click();
       cy.get(selFilterValueLabel)
         .contains(
           'Österreichische Nationalbibliothek - Austrian National Library'
@@ -232,10 +232,11 @@ context('Statistics Dashboard', () => {
 
       const today = new Date().toISOString().split('T')[0].replace(/-/g, '/');
 
-      cy.get(selDateFrom).type(today, force);
-      cy.get(selDateFrom).type('{enter}', force);
-      cy.get(selDateTo).type(today, force);
-      cy.get(selDateTo).type('{enter}', force);
+      cy.get(selDateFrom).invoke('val', today).trigger('input', force);
+      cy.get(selDateTo)
+        .invoke('val', today)
+        .trigger('input', force)
+        .trigger('change', force);
 
       cy.get(selCloseDateOverride).should('be.visible');
       cy.get(selDateFrom).clear(force);
@@ -260,7 +261,8 @@ context('Statistics Dashboard', () => {
       cy.visit(`/data/${DimensionName.contentTier}`);
       cy.get(selPercentFormat).should('be.visible');
       cy.get(selNoData).should('have.length', 0);
-      cy.get(selDatasetId).type('dataset_x{enter}', force);
+
+      cy.get(selDatasetId).focus().type('dataset_x{enter}');
       cy.get(selNoData).should('be.visible');
       cy.get(selPercentFormat).should('have.length', 0);
     });

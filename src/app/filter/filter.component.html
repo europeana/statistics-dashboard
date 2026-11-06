@@ -49,6 +49,7 @@
           #filterTerm
           class="checkbox-filter-input"
           (keyup)="filterOptions($event)"
+          (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
           formControlName="filter_list_{{ group() }}"
           i18n-placeholder="@@filterSearchItemsPlaceholder"
           placeholder="Search ({{ totalAvailable() }} entries)"
@@ -75,7 +76,7 @@
         class="load-more-item"
         [ngClass]="{ hidden: !currentOptionSet.hasMore }"
       >
-        <a (click)="loadMore()">view more...</a>
+        <button type="button" (click)="loadMore()">view more...</button>
       </li>
     </ul>
   </li>
