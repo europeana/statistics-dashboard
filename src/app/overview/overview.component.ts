@@ -124,7 +124,8 @@ export class OverviewComponent implements OnInit {
     'exportOpenerToolbar'
   );
   exportOpener = viewChild<ElementRef<HTMLButtonElement>>('exportOpener');
-  dateFocusControl = viewChild(ElementRef);
+  dateFocusControl =
+    viewChild<ElementRef<HTMLButtonElement>>('dateFocusControl');
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly api = inject(APIService);
@@ -161,6 +162,9 @@ export class OverviewComponent implements OnInit {
   readonly includeCTZero = this.filterStateService.includeCTZero;
 
   filterStates: { [key: string]: WritableSignal<FilterState> } = {};
+
+  hasCustomDates = signal<boolean>(false);
+  appliedDateRange = signal<[string, string] | null>(null);
 
   userFilterSearchTerms = facetNames.reduce((newMap, item: string) => {
     newMap[item] = {
@@ -993,8 +997,13 @@ export class OverviewComponent implements OnInit {
       this.queryParams[nonFacetFilters[NonFacetFilterNames.dateFrom]];
     const paramTo =
       this.queryParams[nonFacetFilters[NonFacetFilterNames.dateTo]];
-    this.form.controls.dateFrom.setValue(paramFrom ? paramFrom[0] : '');
-    this.form.controls.dateTo.setValue(paramTo ? paramTo[0] : '');
+
+    this.form.controls.dateFrom.setValue(
+      paramFrom?.[0] ? new Date(paramFrom[0]) : null
+    );
+    this.form.controls.dateTo.setValue(
+      paramTo?.[0] ? new Date(paramTo[0]) : null
+    );
   }
 
   /** setDatasetIdInputToQueryParam
@@ -1079,24 +1088,20 @@ export class OverviewComponent implements OnInit {
   /* Template utility: removes the date fields from the form and calls updatePageUrl
   */
   datesClear(): void {
-    this.form.controls.dateFrom.setValue('');
-    this.form.controls.dateTo.setValue('');
+    this.form.controls.dateFrom.setValue(null);
+    this.form.controls.dateTo.setValue(null);
     this.updatePageUrl();
-    this.datesOpen();
-    this.changeDetector.detectChanges();
     this.dateFocusControl()?.nativeElement.focus();
   }
 
   /** datesOpen
-  /* Opens the date fields after a microtask rendering frame pause
+  /* Opens the date fields deferring past the current click event
   */
   datesOpen(): void {
-    queueMicrotask(() => {
-      this.filterStates.dates.set({
-        visible: true,
-        disabled: false
-      });
-      this.changeDetector.markForCheck();
+    this.closeFilters('dates');
+    this.filterStates.dates.set({
+      visible: true,
+      disabled: false
     });
   }
 

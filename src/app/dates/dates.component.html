@@ -30,7 +30,10 @@
       </mat-date-range-input>
       <mat-datepicker-toggle matSuffix [for]="rangePicker">
       </mat-datepicker-toggle>
-      <mat-date-range-picker #rangePicker></mat-date-range-picker>
+      <mat-date-range-picker
+        #rangePicker
+        (closed)="onPickerClosed()"
+      ></mat-date-range-picker>
     </mat-form-field>
   </li>
 

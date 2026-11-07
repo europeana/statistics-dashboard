@@ -17,7 +17,7 @@
       #dateFocusControl
       type="button"
       class="when-unset"
-      (click)="datesOpen()"
+      (click)="$event.stopPropagation(); datesOpen()"
       tabindex="0"
       i18n="Period Summary|Summary for applied date filters@@periodSummary"
     >

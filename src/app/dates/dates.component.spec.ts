@@ -214,4 +214,37 @@ describe('DatesComponent', () => {
     expect(resFrom.isTooEarly).toBeFalsy();
     expect(resFrom.isTooLate).toBeTruthy();
   });
+
+  it('should emit valueChanged on picker close only when range is valid and complete or empty', () => {
+    const spyEmit = jest.spyOn(component.valueChanged, 'emit');
+
+    // half-selected range should NOT emit
+    mockForm.patchValue({ dateFrom: new Date(component.today), dateTo: null });
+    component.onPickerClosed();
+    expect(spyEmit).not.toHaveBeenCalled();
+
+    // both dates valid SHOULD emit
+    mockForm.patchValue({
+      dateFrom: new Date(component.today),
+      dateTo: new Date(component.today)
+    });
+    component.onPickerClosed();
+    expect(spyEmit).toHaveBeenCalledTimes(1);
+    expect(spyEmit).toHaveBeenCalledWith(true);
+
+    // invalid date (future date) should NOT emit
+    const tomorrow = new Date(component.today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    mockForm.patchValue({
+      dateFrom: new Date(component.today),
+      dateTo: tomorrow
+    });
+    component.onPickerClosed();
+    expect(spyEmit).toHaveBeenCalledTimes(1);
+
+    // both dates cleared SHOULD emit
+    mockForm.patchValue({ dateFrom: null, dateTo: null });
+    component.onPickerClosed();
+    expect(spyEmit).toHaveBeenCalledTimes(2);
+  });
 });

@@ -848,23 +848,20 @@ describe('OverviewComponent', () => {
       expect(mockToolbarFocus).toHaveBeenCalled();
     });
 
-    it('should clear the dates', async () => {
+    it('should clear the dates and open the date filter on demand', () => {
       expect(component.filterStates.dates().visible).toBeFalsy();
 
-      component.form.get('dateFrom').setValue(new Date().toISOString());
+      component.form.get('dateFrom').setValue(new Date());
+      component.form.get('dateTo').setValue(new Date());
       expect(component.form.value.dateFrom).toBeTruthy();
-      component.datesClear();
-      expect(component.form.value.dateFrom).toBeFalsy();
-
-      await Promise.resolve();
-      expect(component.filterStates.dates().visible).toBeTruthy();
-
-      component.form.get('dateTo').setValue(new Date().toISOString());
       expect(component.form.value.dateTo).toBeTruthy();
-      component.datesClear();
-      expect(component.form.value.dateTo).toBeFalsy();
 
-      await Promise.resolve();
+      component.datesClear();
+      expect(component.form.value.dateFrom).toBeNull();
+      expect(component.form.value.dateTo).toBeNull();
+      expect(component.filterStates.dates().visible).toBeFalsy();
+
+      component.datesOpen();
       expect(component.filterStates.dates().visible).toBeTruthy();
     });
 
