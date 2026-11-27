@@ -28,7 +28,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           start: npm run start:ci-data
-          wait-on: 'http-get://127.0.0.1:3001'
+          wait-on: 'npx wait-on tcp:127.0.0.1:3001'
           wait-on-timeout: 60
           command: npm run cypress:ci
 
