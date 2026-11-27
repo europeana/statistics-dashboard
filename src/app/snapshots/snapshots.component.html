@@ -25,14 +25,15 @@
       </span>
     </a>
 
-    <a
+    <button
+      type="button"
       class="save"
       [class.saved]="item.saved"
       aria-label="save (pin) item"
       [attr.tabindex]="0"
-      (keydown.enter)="toggleSaved(key, item.current)"
       (click)="toggleSaved(key, item.current)"
-    ></a>
+      (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
+    ></button>
   </li>
   } } }
 </ul>

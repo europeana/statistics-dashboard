@@ -104,19 +104,13 @@ export class ExportComponent {
 
   fnHide(): void {
     this.toggleActive(this.openedFromToolbar);
+    this.closeExport.emit(this.openedFromToolbar);
   }
 
-  toggleActive(fromToolbar?: boolean): void {
-    if (fromToolbar !== undefined) {
-      this.openedFromToolbar = fromToolbar;
-    }
-
+  toggleActive(fromToolbar = false): void {
+    this.openedFromToolbar = fromToolbar;
     this.active = !this.active;
     this.tabIndex = this.active ? 0 : -1;
-
-    if (!this.active) {
-      this.closeExport.emit(this.openedFromToolbar);
-    }
     this.cdr.markForCheck();
   }
 }

@@ -84,14 +84,16 @@ export function validateDateGeneric(
   }
 
   const otherField = fieldName === 'dateFrom' ? 'dateTo' : 'dateFrom';
-  const otherValue = control.parent.value[otherField];
+  const otherValue = control.parent?.value?.[otherField];
 
-  if (otherValue && otherValue.length > 0) {
+  if (otherValue) {
     const dateOtherVal = new Date(otherValue);
-    if (otherField === 'dateFrom') {
-      setErrorIfEarly(dateVal, dateOtherVal, res);
-    } else {
-      setErrorIfLate(dateVal, dateToUCT(dateOtherVal), res);
+    if (!Number.isNaN(dateOtherVal.getTime())) {
+      if (otherField === 'dateFrom') {
+        setErrorIfEarly(dateVal, dateToUCT(dateOtherVal), res);
+      } else {
+        setErrorIfLate(dateVal, dateToUCT(dateOtherVal), res);
+      }
     }
   }
   return Object.keys(res).length > 0 ? res : null;

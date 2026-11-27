@@ -75,6 +75,7 @@
         pattern="[0-9]+"
         class="go-to"
         (keyup)="goToPage($event)"
+        (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
         placeholder="{{ currentPager.currentPage + 1 }}"
       />
     </span>

@@ -14,7 +14,7 @@ import {
   viewChild,
   viewChildren
 } from '@angular/core';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DimensionName, isoCountryCodesReversed } from '../_data';
 import { OpenerFocusDirective } from '../_directives';
 import { getFormValueList } from '../_helpers';
@@ -37,7 +37,6 @@ import { ClickAwareDirective } from '../_directives/click-aware/click-aware.dire
   changeDetection: ChangeDetectionStrategy.OnPush, // Highly recommended for zoneless
   imports: [
     ClickAwareDirective,
-    FormsModule,
     ReactiveFormsModule,
     NgClass,
     DatesComponent,

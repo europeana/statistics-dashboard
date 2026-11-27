@@ -8,12 +8,14 @@ $total-width: 268px;
   &.hidden {
     display: none;
   }
-  a {
+  button {
+    background: transparent;
     color: #000;
     display: inline-block;
     font-size: 14px;
     font-style: italic;
     font-weight: bold;
+    line-height: 1;
     padding-left: variables.$spacing-xs;
     transform: translateY(8px);
 

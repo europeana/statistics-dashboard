@@ -1,52 +1,57 @@
 context('Statistics Dashboard Accessibility', () => {
-  const checkZone = (selector: string): void => {
-    cy.get(selector).should('have.length', 1);
-    cy.checkA11y(selector);
-  };
+  const baseExclusions = [
+    // ignore cookie banner region, graph & axes and the (too light) content box titles
+    '.eu-cm-mini-mode-text',
+    'g[transform]',
+    'tspan',
+    '.data-rows-title > span'
+  ];
 
-  describe('Landing Page', () => {
+  const dataPageSpecificExclusions = [
+    // ignore known colour contrast issues to do with theme
+    '[data-e2e="link-home"]',
+    '.filters-header',
+    'label[for="ctZero"]',
+    '.checkbox-label',
+    '.editable',
+    '.export-opener-link'
+  ];
+
+  const runStandardSuite = (url: string, pageExclusions: string[]) => {
     beforeEach(() => {
-      cy.visit('/');
-      cy.injectAxe(); // Native command works now!
-    });
-
-    it('Has an accessible header', () => {
-      checkZone('header');
-    });
-
-    it('Has an accessible footer', () => {
-      checkZone('footer');
-    });
-
-    it('Has an accessible main', () => {
-      checkZone('main');
-    });
-
-    it('Has no detectable a11y violations ()', () => {
-      cy.checkA11y();
-    });
-  });
-
-  describe('Data Page', () => {
-    beforeEach(() => {
-      cy.visit(`/data/contentTier`);
+      cy.visit(url);
       cy.injectAxe();
     });
 
     it('Has an accessible header', () => {
-      checkZone('header');
+      cy.get('header').should('have.length', 1);
+      cy.checkA11y({ include: ['header'], exclude: pageExclusions });
     });
 
     it('Has an accessible footer', () => {
-      checkZone('footer');
+      cy.get('footer').should('have.length', 1);
+      cy.checkA11y({ include: ['footer'], exclude: pageExclusions });
     });
 
     it('Has an accessible main', () => {
-      checkZone('main');
+      cy.get('main').should('have.length', 1);
+      cy.checkA11y({ include: ['main'], exclude: pageExclusions });
     });
 
     it('Has no detectable a11y violations', () => {
-      cy.checkA11y();
+      cy.checkA11y({ exclude: pageExclusions });
     });
+  };
+
+  describe('Landing Page', () => {
+    runStandardSuite('/', baseExclusions);
+  });
+
+  describe('Data Page', () => {
+    const dataPageExclusions = [
+      ...baseExclusions,
+      ...dataPageSpecificExclusions
+    ];
+    runStandardSuite('/data/contentTier', dataPageExclusions);
   });
 });

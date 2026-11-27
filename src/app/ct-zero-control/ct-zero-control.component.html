@@ -9,10 +9,14 @@
       }"
     >
       <input
+        #ctZeroInput
         id="ctZero"
         class="checkbox"
         type="checkbox"
         (change)="valueChanged()"
+        (keydown.enter)="
+          $event.preventDefault(); $event.stopPropagation(); ctZeroInput.click()
+        "
         formControlName="contentTierZero"
       />
     </span>
