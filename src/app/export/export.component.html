@@ -2,6 +2,7 @@
   class="export"
   [class.active]="active"
   [class.loading-modal]="busy"
+  (keydown.esc)="fnHide()"
   tabindex="-1"
   appOpenerFocus
 >
@@ -24,7 +25,6 @@
       aria-label="toggle export"
       class="x"
       (click)="fnHide()"
-      (keydown.esc)="fnHide()"
       [attr.tabindex]="tabIndex"
     ></button>
   </li>
