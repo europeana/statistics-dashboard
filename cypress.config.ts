@@ -1,7 +1,7 @@
 import { defineConfig } from 'cypress'
 
 export default defineConfig({
-  blockHosts: ['*://googleapis.com', '*://gstatic.com'],
+  blockHosts: ['*.googleapis.com', '*.gstatic.com'],
   screenshotsFolder: 'tmp/cypress-screenshots/',
   video: false,
   videosFolder: 'tmp/cypress-videos/',

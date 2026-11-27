@@ -50,8 +50,9 @@ jobs:
 
       - name: Run Cypress Accessibility Tests
         uses: cypress-io/github-action@v10
+
         with:
           start: npm run start:ci-data
-          wait-on: 'http://localhost:3001'
+          wait-on: 'npx wait-on tcp:127.0.0.1:3001'
           wait-on-timeout: 60
           command: npm run cypress:ci-accessibility
