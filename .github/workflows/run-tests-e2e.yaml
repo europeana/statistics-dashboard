@@ -28,10 +28,9 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           start: npm run start:ci-data
-          wait-on: 'http://localhost:3001'
+          wait-on: 'http-get://127.0.0.1:3001'
           wait-on-timeout: 60
           command: npm run cypress:ci
-
   a11y:
     runs-on: ubuntu-latest
     continue-on-error: true
