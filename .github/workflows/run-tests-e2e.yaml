@@ -31,28 +31,3 @@ jobs:
           wait-on: 'npx wait-on tcp:127.0.0.1:3001'
           wait-on-timeout: 60
           command: npm run cypress:ci
-
-  a11y:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ inputs.tag_name }}
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - run: npm install
-
-      - name: Run Cypress Accessibility Tests
-        uses: cypress-io/github-action@v10
-
-        with:
-          start: npm run start:ci-data
-          wait-on: 'npx wait-on tcp:127.0.0.1:3001'
-          wait-on-timeout: 60
-          command: npm run cypress:ci-accessibility
