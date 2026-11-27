@@ -20,7 +20,9 @@ context('Statistics Dashboard Accessibility', () => {
   const runStandardSuite = (url: string, pageExclusions: string[]) => {
     beforeEach(() => {
       cy.visit(url);
-      cy.injectAxe();
+      cy.injectAxe({
+        axeCorePath: 'node_modules/axe-core/axe.min.js',
+      });
     });
 
     it('Has an accessible header', () => {
