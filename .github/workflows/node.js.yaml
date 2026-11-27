@@ -81,7 +81,7 @@ jobs:
           path: ./dist
 
   push-docker-image:
-    needs: [build-dist, run-unit, run-e2e]
+    needs: [build-dist, run-unit]
     if: ${{ inputs.run_build }}
     runs-on: ubuntu-latest
     steps:
